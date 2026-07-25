@@ -81,6 +81,14 @@ button.big:active{transform:translateY(1px)}
 .avopts input{flex:0 0 auto;width:16px;height:16px;padding:0;margin:0;border:0;background:none;border-radius:0}
 #mv-tel{font-size:12.5px;padding:9px 10px}
 #mv-tel option,#mv-tel optgroup{font-size:12.5px}
+.fa{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.fa:last-child{border-bottom:none}
+.fa .fa-n{font-weight:600;font-size:14px}
+.fa .fa-d{font-size:12.5px;color:var(--muted);margin-top:2px}
+.fa .fa-a{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.fa .fa-a a,.fa .fa-a button{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:14px;padding:0}
+.fa .fa-a .call{color:var(--ok)}
+.fa .fa-a .no{color:var(--bad)}
 </style>
 
 <div class="top">
@@ -90,6 +98,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="prise">Prise de service</button>
     <button data-s="fin">Fin de service</button>
     <button data-s="suivi">Suivi demandes</button>
+    <button data-s="fiche">Fiche agent</button>
     <button data-s="thiam">Thiam</button>
   </div>
 </div>
@@ -253,6 +262,25 @@ button.big:active{transform:translateY(1px)}
     </div>
     <div class="suivilist" id="suiviList"></div>
   </section>
+  <section id="sec-fiche" class="hidden">
+    <div><h1>Fiche agent</h1><p class="sub">Répertoire des agents (nom · numéro · ville · fiabilité). Base du recoupement avec les demandes par rayon.</p></div>
+    <div class="card">
+      <div class="grid2">
+        <label class="f"><div class="lab">Nom de l'agent</div><input id="fa-nom" placeholder="Nom et prénom" autocomplete="off"></label>
+        <label class="f"><div class="lab">Numéro</div><input id="fa-tel" placeholder="Téléphone" inputmode="tel" autocomplete="off"></label>
+      </div>
+      <div class="grid2">
+        <label class="f"><div class="lab">Ville</div><div class="acwrap"><input type="text" id="fa-ville" placeholder="Ville de l'agent…" autocomplete="off"><div class="sugg hidden" id="sugg-fa-ville"></div></div></label>
+        <label class="f"><div class="lab">Fiabilité (à définir ensemble)</div><select id="fa-fiab"><option value="">— à définir —</option><option>✅ Fiable</option><option>🟡 Moyennement fiable</option><option>🔴 Non fiable</option><option>⚪ À évaluer</option></select></label>
+      </div>
+      <button class="big" id="fa-add">➕ Ajouter l'agent</button>
+    </div>
+    <div class="card">
+      <label class="f"><div class="lab">Rechercher</div><input id="fa-search" placeholder="Nom, ville, numéro…" autocomplete="off"></label>
+      <div class="lab" style="margin:0">Agents enregistrés (<span id="fa-count">0</span>)</div>
+      <div class="list" id="fa-list"></div>
+    </div>
+  </section>
   <section id="sec-thiam" class="hidden">
     <div><h1>Thiam</h1><p class="sub">Section à définir ensemble.</p></div>
     <div class="card"><p class="hint" style="margin:0">🚧 À concevoir — dis-moi ce que la section « Thiam » doit contenir.</p></div>
@@ -262,7 +290,7 @@ button.big:active{transform:translateY(1px)}
 <script>
 (function(){
   var byId=function(x){return document.getElementById(x)};
-  var secs=['demandes','prise','fin','suivi','thiam'];
+  var secs=['demandes','prise','fin','suivi','fiche','thiam'];
   document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
@@ -593,6 +621,37 @@ button.big:active{transform:translateY(1px)}
   }
   svcSection('ps','PRISE DE SERVICE','🟢','Heure de prise de service');
   svcSection('fs','FIN DE SERVICE','🔴','Heure de fin de service');
+
+  // ===== Fiche agent (répertoire) =====
+  var FA=load('fkh_fa'); var faEdit=null,faSel=null,faT;
+  function saveFA(){ save('fkh_fa',FA); }
+  byId('fa-ville').addEventListener('input',function(){var q=this.value.trim();faSel=null;clearTimeout(faT);if(q.length<2){byId('sugg-fa-ville').classList.add('hidden');return;}faT=setTimeout(function(){faSearch(q);},250);});
+  function faSearch(q){fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(q)+'&fields=nom,centre,codesPostaux,population&boost=population&limit=6').then(function(r){return r.json();}).then(function(list){if(!Array.isArray(list)||!list.length){byId('sugg-fa-ville').classList.add('hidden');return;}var box=byId('sugg-fa-ville');box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+c.nom+'</span> <span class="cp">'+cp+'</span>';d.onclick=function(){var co=c.centre&&c.centre.coordinates;faSel={nom:c.nom,cp:cp,la:co?co[1]:null,lo:co?co[0]:null};byId('fa-ville').value=c.nom;byId('sugg-fa-ville').classList.add('hidden');};box.appendChild(d);});box.classList.remove('hidden');}).catch(function(){byId('sugg-fa-ville').classList.add('hidden');});}
+  function resetFAform(){ ['fa-nom','fa-tel','fa-ville'].forEach(function(id){byId(id).value='';}); byId('fa-fiab').value=''; faSel=null; faEdit=null; byId('fa-add').textContent='➕ Ajouter l\'agent'; }
+  byId('fa-add').onclick=function(){
+    var nom=byId('fa-nom').value.trim(),tel=byId('fa-tel').value.trim(),ville=byId('fa-ville').value.trim(),fiab=byId('fa-fiab').value;
+    if(!(nom||tel||ville))return;
+    var g=(faSel&&faSel.nom===ville)?faSel:{nom:ville,cp:'',la:null,lo:null};
+    if(faEdit){ var a=null,i; for(i=0;i<FA.length;i++)if(FA[i].id===faEdit){a=FA[i];break;} if(a){a.nom=nom;a.tel=tel;a.ville=g.nom;a.cp=g.cp;a.la=g.la;a.lo=g.lo;a.fiab=fiab;} }
+    else { FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tel:tel,ville:g.nom,cp:g.cp,la:g.la,lo:g.lo,fiab:fiab}); }
+    saveFA(); resetFAform(); renderFA();
+  };
+  byId('fa-search').addEventListener('input',function(){renderFA();});
+  function renderFA(){
+    var q=(byId('fa-search').value||'').toLowerCase();
+    byId('fa-count').textContent=FA.length;
+    var arr=FA.filter(function(a){return !q||((a.nom||'')+' '+(a.tel||'')+' '+(a.ville||'')).toLowerCase().indexOf(q)>=0;});
+    arr.sort(function(a,b){return (a.nom||'').localeCompare(b.nom||'');});
+    if(!arr.length){ byId('fa-list').innerHTML='<div class="svempty">'+(FA.length?'Aucun agent ne correspond.':'Aucun agent enregistré.')+'</div>'; return; }
+    byId('fa-list').innerHTML=arr.map(function(a){
+      var d=[a.ville,a.cp,a.tel,a.fiab].filter(Boolean).map(esc).join(' · ');
+      var call=a.tel?'<a class="call" href="tel:'+esc(a.tel.replace(/\s/g,''))+'" title="Appeler">📞</a>':'';
+      return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+(d||'—')+'</div></div><div class="fa-a">'+call+'<button data-fae="'+a.id+'" title="Modifier">✏️</button><button class="no" data-fad="'+a.id+'" title="Supprimer">🗑️</button></div></div>';
+    }).join('');
+    byId('fa-list').querySelectorAll('[data-fad]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fad');FA=FA.filter(function(x){return x.id!==id;});saveFA();renderFA();};});
+    byId('fa-list').querySelectorAll('[data-fae]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fae'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id){a=FA[i];break;}if(a){byId('fa-nom').value=a.nom||'';byId('fa-tel').value=a.tel||'';byId('fa-ville').value=a.ville||'';byId('fa-fiab').value=a.fiab||'';faSel={nom:a.ville,cp:a.cp,la:a.la,lo:a.lo};faEdit=a.id;byId('fa-add').textContent='✔️ Enregistrer';window.scrollTo(0,0);}};});
+  }
+  renderFA();
 
   document.addEventListener('click',function(e){
     if(!e.target.closest('.acwrap'))document.querySelectorAll('.acwrap .sugg').forEach(function(s){s.classList.add('hidden');});
