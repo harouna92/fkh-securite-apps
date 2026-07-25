@@ -159,8 +159,8 @@ button.big:active{transform:translateY(1px)}
       </div>
       <button class="big" id="missionToggle" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">✅ Infos pour mission validée</button>
       <div id="missionBlock" class="hidden">
-        <label class="f hidden" id="mv-tel-choice-wrap"><div class="lab">Quel numéro ? (plusieurs pour ce client)</div><select id="mv-tel-choice"></select></label>
-        <label class="f"><div class="lab">📞 Numéro prise / fin de service</div><input id="mv-tel" placeholder="Rempli selon le client · modifiable" inputmode="tel" autocomplete="off"></label>
+        <label class="f"><div class="lab">📞 Numéro prise / fin de service</div><select id="mv-tel"></select></label>
+        <label class="f hidden" id="mv-tel-other-wrap"><div class="lab">Autre numéro (saisir)</div><input id="mv-tel-other" placeholder="Numéro à appeler" inputmode="tel" autocomplete="off"></label>
         <label class="f"><div class="lab">📍 Adresse du site</div><textarea id="adresse" placeholder="Adresse complète du site" style="min-height:44px"></textarea></label>
         <div class="lab" style="margin:8px 0 2px">Infos à inclure (mission validée)</div>
         <div class="avopts">
@@ -412,7 +412,7 @@ button.big:active{transform:translateY(1px)}
     if(on('meas'))meas.forEach(function(x){L.push('↳ '+x.n+(x.cp?' '+x.cp:'')+' à '+x.km+' km'+(x.dur?' · '+x.dur:''));});
     if(on('vac')){var vacs=readVacs();if(vacs.length){var off=(+byId(px+'-offh').value||0)*60+(+byId(px+'-offm').value||0);L=L.concat(vacLines(vacs,off));}}
     if(on('notes')&&byId('notes').value.trim())L.push('Consignes : '+byId('notes').value.trim());
-    if(on('num')&&byId(px+'-tel')&&byId(px+'-tel').value.trim())L.push('☎ Prise / fin de service : '+byId(px+'-tel').value.trim());
+    if(on('num')){var t=telNum();if(t)L.push('☎ Prise / fin de service : '+t);}
     return L.length?L.join('\n'):'';
   }
   var added=[];
@@ -465,14 +465,19 @@ button.big:active{transform:translateY(1px)}
   var TELDEF={SOTEL:[{l:'PC semaine',n:'05 61 14 87 21'},{l:'PC week-end',n:'05 57 19 17 40'},{l:'PC banque',n:'01 43 60 28 65'}],AQUILA:[{l:'',n:'04 90 84 24 24'}],SECURITAS:[{l:'Réponses Nantes',n:'02 28 09 25 39'},{l:'Réponse Lyon',n:'04 37 40 10 62'}],P2S:[{l:'',n:'01 81 91 41 59'}],FKH:[{l:'',n:'04 65 84 25 84'}],RANC:[{l:'',n:'04 42 05 45 88'}],COPS:[{l:'',n:'02 38 43 17 62'}],NEWANGELS:[{l:'',n:'01 30 54 99 12'}],ERYMA:[{l:'',n:'05 56 91 99 19'}]};
   function normCli(s){return (s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
   function telFor(c){var k=normCli(c);if(!k)return null;for(var key in TELDEF){if(k===key||k.indexOf(key)===0)return TELDEF[key];}return null;}
+  function telNum(){ var s=byId('mv-tel'); if(!s)return ''; if(s.value==='__other__')return (byId('mv-tel-other').value||'').trim(); return (s.value||'').trim(); }
   function fillTel(){
-    var c=byId('client').value.trim(),opts=telFor(c),wrap=byId('mv-tel-choice-wrap'),ch=byId('mv-tel-choice');
-    if(opts&&opts.length>1){ ch.innerHTML='<option value="">— choisir le numéro —</option>'+opts.map(function(o){return '<option value="'+o.n+'">'+(o.l?o.l+' : ':'')+o.n+'</option>';}).join(''); wrap.classList.remove('hidden'); byId('mv-tel').value=''; }
-    else { wrap.classList.add('hidden'); if(opts&&opts.length===1)byId('mv-tel').value=opts[0].n; else byId('mv-tel').value=(c&&TEL[c])?TEL[c]:''; }
+    var c=byId('client').value.trim(),opts=telFor(c),s=byId('mv-tel'),html='';
+    if(opts&&opts.length){ if(opts.length>1)html+='<option value="">— choisir le numéro —</option>'; opts.forEach(function(o){html+='<option value="'+o.n+'">'+(o.l?o.l+' : ':'')+o.n+'</option>';}); }
+    else if(c&&TEL[c]){ html+='<option value="'+TEL[c]+'">'+TEL[c]+'</option>'; }
+    else { html+='<option value="">— aucun —</option>'; }
+    html+='<option value="__other__">✏️ Autre / saisir…</option>';
+    s.innerHTML=html; byId('mv-tel-other-wrap').classList.add('hidden'); byId('mv-tel-other').value='';
   }
   byId('client').addEventListener('change',function(){ fillTel(); genText(); });
-  byId('mv-tel-choice').addEventListener('change',function(){ if(this.value){byId('mv-tel').value=this.value;genText();} });
-  byId('mv-tel').addEventListener('input',function(){ var c=byId('client').value.trim(); if(c&&!telFor(c)){ TEL[c]=this.value.trim(); try{localStorage.setItem('fkh_client_tel',JSON.stringify(TEL));}catch(e){} } genText(); });
+  byId('mv-tel').addEventListener('change',function(){ byId('mv-tel-other-wrap').classList.toggle('hidden',this.value!=='__other__'); genText(); });
+  byId('mv-tel-other').addEventListener('input',function(){ var c=byId('client').value.trim(); if(c&&!telFor(c)){ TEL[c]=this.value.trim(); try{localStorage.setItem('fkh_client_tel',JSON.stringify(TEL));}catch(e){} } genText(); });
+  fillTel();
   byId('copy-mission').onclick=function(){var x=byId('out-mission').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-mission'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
 
   // ===== Suivi demandes =====
