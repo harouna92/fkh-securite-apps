@@ -149,8 +149,8 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Heure de prise de service</div><div class="hm"><select id="ps-h" aria-label="Heure"></select><span>h</span><select id="ps-m" aria-label="Minutes"></select></div></label>
       </div>
       <label class="chk"><input type="checkbox" id="ps-retard"><span>⏰ En retard</span></label>
-      <label class="f hidden" id="ps-retard-wrap"><div class="lab">Précision du retard</div><input id="ps-retard-min" placeholder="ex. 15 min"></label>
-      <label class="chk"><input type="checkbox" id="ps-photo"><span>📷 Prise de service faite par photo</span></label>
+      <label class="f hidden" id="ps-retard-wrap"><div class="lab">Précision du retard</div><div class="hm"><select id="ps-retard-h" aria-label="Heures de retard"></select><span>h</span><select id="ps-retard-m" aria-label="Minutes de retard"></select></div></label>
+      <label class="f"><div class="lab">📷 Photo de prise de service</div><select id="ps-photo"><option value="">—</option><option>Photo horodatée</option><option>Photo non horodatée</option><option>Pas de photo</option></select></label>
       <label class="chk"><input type="checkbox" id="ps-avise"><span>📞 Client avisé</span></label>
     </div>
     <div class="card">
@@ -175,8 +175,8 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Heure de fin de service</div><div class="hm"><select id="fs-h" aria-label="Heure"></select><span>h</span><select id="fs-m" aria-label="Minutes"></select></div></label>
       </div>
       <label class="chk"><input type="checkbox" id="fs-retard"><span>⏰ En retard</span></label>
-      <label class="f hidden" id="fs-retard-wrap"><div class="lab">Précision du retard</div><input id="fs-retard-min" placeholder="ex. 15 min"></label>
-      <label class="chk"><input type="checkbox" id="fs-photo"><span>📷 Fin de service faite par photo</span></label>
+      <label class="f hidden" id="fs-retard-wrap"><div class="lab">Précision du retard</div><div class="hm"><select id="fs-retard-h" aria-label="Heures de retard"></select><span>h</span><select id="fs-retard-m" aria-label="Minutes de retard"></select></div></label>
+      <label class="f"><div class="lab">📷 Photo de fin de service</div><select id="fs-photo"><option value="">—</option><option>Photo horodatée</option><option>Photo non horodatée</option><option>Pas de photo</option></select></label>
       <label class="chk"><input type="checkbox" id="fs-avise"><span>📞 Client avisé</span></label>
     </div>
     <div class="card">
@@ -456,15 +456,16 @@ button.big:active{transform:translateY(1px)}
     function gen(){
       var cl=byId(pfx+'-client').value.trim(),si=byId(pfx+'-site').value.trim(),ag=byId(pfx+'-agent').value.trim(),vi=byId(pfx+'-ville').value.trim(),cp=byId(pfx+'-cp').value.trim();
       var h=byId(pfx+'-h').value,m=byId(pfx+'-m').value,heure=h?(h+':'+(m||'00')):'';
-      var retard=byId(pfx+'-retard').checked,rmin=byId(pfx+'-retard-min').value.trim(),photo=byId(pfx+'-photo').checked,avise=byId(pfx+'-avise').checked;
+      var retard=byId(pfx+'-retard').checked,photo=byId(pfx+'-photo').value,avise=byId(pfx+'-avise').checked;
+      var rtot=(+byId(pfx+'-retard-h').value||0)*60+(+byId(pfx+'-retard-m').value||0), rdur=rtot>=60?(Math.floor(rtot/60)+'h'+(rtot%60?pad2(rtot%60):'')):(rtot+' min');
       if(!(cl||si||ag||vi||cp||heure)){ byId(pfx+'-out').textContent='Remplis les infos…'; return; }
       var L=[emoji+' '+titre+' — FKH'];
       if(cl)L.push('Client : '+cl);
       if(si||vi||cp)L.push('Site : '+si+(vi?' — '+vi:'')+(cp?' ('+cp+')':''));
       if(ag)L.push('Agent : '+ag);
       if(heure)L.push(heureLabel+' : '+heure);
-      L.push('En retard : '+(retard?('OUI'+(rmin?' ('+rmin+')':'')):'non'));
-      L.push(titre.charAt(0)+titre.slice(1).toLowerCase()+' par photo : '+(photo?'OUI':'non'));
+      L.push('En retard : '+(retard?('OUI'+(rtot?' ('+rdur+')':'')):'non'));
+      L.push('Photo : '+(photo||'non précisé'));
       L.push('Client avisé : '+(avise?'OUI':'non'));
       byId(pfx+'-out').textContent=L.join('\n');
     }
@@ -472,9 +473,10 @@ button.big:active{transform:translateY(1px)}
     mkCombo(pfx+'-site',[],'fkh_site_noms',gen);
     mkCombo(pfx+'-agent',[],'fkh_agent_noms',gen);
     byId(pfx+'-h').innerHTML=HOPTS; byId(pfx+'-m').innerHTML=MOPTS;
+    var rh=''; for(var i=0;i<=12;i++)rh+='<option>'+i+'</option>'; byId(pfx+'-retard-h').innerHTML=rh; byId(pfx+'-retard-m').innerHTML=MOPTS;
     byId(pfx+'-retard').addEventListener('change',function(){ byId(pfx+'-retard-wrap').classList.toggle('hidden',!this.checked); gen(); });
-    [pfx+'-ville',pfx+'-cp',pfx+'-retard-min'].forEach(function(id){byId(id).addEventListener('input',gen);});
-    [pfx+'-h',pfx+'-m',pfx+'-photo',pfx+'-avise'].forEach(function(id){byId(id).addEventListener('change',gen);});
+    [pfx+'-ville',pfx+'-cp'].forEach(function(id){byId(id).addEventListener('input',gen);});
+    [pfx+'-h',pfx+'-m',pfx+'-retard-h',pfx+'-retard-m',pfx+'-photo',pfx+'-avise'].forEach(function(id){byId(id).addEventListener('change',gen);});
     byId(pfx+'-copy').onclick=function(){var x=byId(pfx+'-out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=this,o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   }
   svcSection('ps','PRISE DE SERVICE','🟢','Heure de prise de service');
