@@ -89,6 +89,24 @@ button.big:active{transform:translateY(1px)}
 .fa .fa-a a,.fa .fa-a button{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:14px;padding:0}
 .fa .fa-a .call{color:var(--ok)}
 .fa .fa-a .no{color:var(--bad)}
+.th-late-badge{background:var(--badbg);color:var(--bad);font-weight:700;font-size:13.5px;padding:9px 12px;border-radius:10px;text-align:center}
+.thboard{display:flex;flex-direction:column;gap:12px}
+.thsite{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.thsite.thsite-late{border-color:var(--bad)}
+.thsite-h{background:var(--panel2);padding:9px 12px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px}
+.thsite-del{margin-left:auto;border:none;background:none;color:var(--bad);cursor:pointer;font-size:16px;padding:0}
+.thc{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;border-top:1px solid var(--line)}
+.thc.thc-done{background:var(--okbg)}
+.thc.thc-late{background:var(--badbg)}
+.thc-chk{flex:0 0 auto;padding-top:1px;margin:0}
+.thc-chk input{width:24px;height:24px;margin:0}
+.thc-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.thc-h{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.thc-mali{color:var(--muted);font-weight:400;font-size:12.5px}
+.thc-at{color:var(--ok);font-weight:700;font-size:12.5px}
+.thc-todo{color:var(--muted);font-weight:400;font-size:12.5px}
+.thc-warn{color:var(--bad);font-weight:700;font-size:12.5px}
+.thc-com{font-size:13px;padding:8px 10px}
 </style>
 
 <div class="top">
@@ -329,11 +347,15 @@ button.big:active{transform:translateY(1px)}
         <div id="th-hours"></div>
         <button type="button" class="addvac" id="th-addHour">➕ Ajouter un appel</button>
       </div>
-      <button class="big" id="th-add" style="background:var(--panel);color:var(--ink);border:1px solid var(--line)">➕ Ajouter ce site, en saisir un autre</button>
-      <div class="hidden" id="th-addedCard"><div class="lab" style="margin:8px 0 5px">Sites ajoutés (<span id="th-addedN">0</span>)</div><div class="list" id="th-addedList"></div></div>
+      <button class="big" id="th-add" style="background:var(--brand);color:var(--brand-ink);border:1px solid transparent">➕ Ajouter ce site au suivi</button>
     </div>
     <div class="card">
-      <div class="lab" style="margin:0">Texte à copier</div>
+      <div class="lab" style="margin:0">🔔 Suivi des appels</div>
+      <div id="th-lateBadge" class="th-late-badge" style="display:none"></div>
+      <div class="thboard" id="th-board"></div>
+    </div>
+    <div class="card">
+      <div class="lab" style="margin:0">Texte à copier (pour partage / archive)</div>
       <div class="outbox" id="th-out">Remplis un site…</div>
       <button class="big" id="th-copy">Copier</button>
     </div>
@@ -344,7 +366,7 @@ button.big:active{transform:translateY(1px)}
 (function(){
   var byId=function(x){return document.getElementById(x)};
   var secs=['demandes','prise','fin','suivi','fiche','zone','thiam'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();window.scrollTo(0,0);};});
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='thiam'&&typeof thRenderBoard==='function')thRenderBoard();window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
   function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
@@ -822,7 +844,8 @@ button.big:active{transform:translateY(1px)}
     el.querySelector('.th-hdel').addEventListener('click',function(){if(document.querySelectorAll('#th-hours .th-hr').length>1){el.remove();thGen();}});
     return el;
   }
-  var thAdded=[];
+  var TH=load('fkh_thiam'); function thSave(){save('fkh_thiam',TH);}
+  function thSiteById(id){for(var i=0;i<TH.length;i++)if(TH[i].id===id)return TH[i];return null;}
   function thGetHM(px){var h=byId('th-'+px+'h').value,m=byId('th-'+px+'m').value;return h?(h+':'+(m||'00')):'';}
   function thStep(){var e=byId('th-stagger');return e?(parseInt(e.value,10)||30):30;}
   function thN(){var e=byId('th-ncalls');return e?(parseInt(e.value,10)||0):0;}
@@ -851,36 +874,70 @@ button.big:active{transform:translateY(1px)}
   function thRenderAuto(){
     var deb=thGetHM('deb'),fin=thGetHM('fin'),box=byId('th-auto');if(!box)return;
     if(!(deb&&fin)){box.style.display='none';box.innerHTML='';return;}
-    var stag=thAdded.length*thStep(),calls=thCalls(deb,fin,thN(),stag);
+    var stag=TH.length*thStep(),calls=thCalls(deb,fin,thN(),stag);
     box.style.display='';
-    box.innerHTML='<div class="lab" style="margin:0 0 3px">🔔 Appels — '+esc(deb)+' → '+esc(fin)+' · '+calls.length+' appel'+(calls.length>1?'s':'')+(stag?' · décalage +'+stag+' min (site n°'+(thAdded.length+1)+')':'')+'</div>'
+    box.innerHTML='<div class="lab" style="margin:0 0 3px">🔔 Appels — '+esc(deb)+' → '+esc(fin)+' · '+calls.length+' appel'+(calls.length>1?'s':'')+(stag?' · décalage +'+stag+' min (site n°'+(TH.length+1)+')':'')+'</div>'
       +'<div class="near">'+calls.map(function(fr){return '<div class="n"><span>'+esc(fr)+' <span style="color:var(--muted)">(France)</span></span><span class="d">'+esc(thToMali(fr))+' (Mali)</span></div>';}).join('')+'</div>';
   }
-  function thBuildCurrent(idx){
-    var stag=(idx==null?thAdded.length:idx)*thStep();
-    var site=byId('th-site').value.trim(),cli=byId('th-client').value.trim(),ag=byId('th-agent').value.trim(),tel=byId('th-tel').value.trim(),deb=thGetHM('deb'),fin=thGetHM('fin'),manual=thReadHours();
-    if(!(site||cli||ag||tel||deb||fin||manual.length))return '';
-    var auto=thCalls(deb,fin,thN(),stag),all=auto.slice();
-    manual.forEach(function(x){if(all.indexOf(x)<0)all.push(x);});
+  function thFormCalls(idx){
+    var stag=(idx==null?TH.length:idx)*thStep();
+    var frs=thCalls(thGetHM('deb'),thGetHM('fin'),thN(),stag);
+    thReadHours().forEach(function(x){if(frs.indexOf(x)<0)frs.push(x);});
+    return frs;
+  }
+  function thFormSite(){
+    var site=byId('th-site').value.trim(),cli=byId('th-client').value.trim(),ag=byId('th-agent').value.trim(),tel=byId('th-tel').value.trim(),deb=thGetHM('deb'),fin=thGetHM('fin'),frs=thFormCalls();
+    if(!(site||cli||ag||tel||deb||fin||frs.length))return null;
+    return {id:'t'+Date.now()+'_'+Math.round(Math.random()*1e5),site:site,client:cli,agent:ag,tel:tel,deb:deb,fin:fin,calls:frs.map(function(fr){return {fr:fr,done:false,at:null,com:''};})};
+  }
+  function thSiteText(s){
     var L=[];
-    if(site)L.push('Site : '+site);
-    if(cli)L.push('Client / donneur d\'ordre : '+cli);
-    if(ag)L.push('Agent : '+ag);
-    if(tel)L.push('N° agent : '+tel);
-    if(deb&&fin)L.push('Service : '+deb+' → '+fin);
-    if(all.length){L.push('Appel'+(all.length>1?'s':'')+' :');all.forEach(function(fr){L.push('  '+fr+' (France) → '+thToMali(fr)+' (Mali)');});}
+    if(s.site)L.push('Site : '+s.site);
+    if(s.client)L.push('Client / donneur d\'ordre : '+s.client);
+    if(s.agent)L.push('Agent : '+s.agent);
+    if(s.tel)L.push('N° agent : '+s.tel);
+    if(s.deb&&s.fin)L.push('Service : '+s.deb+' → '+s.fin);
+    if(s.calls&&s.calls.length){L.push('Appel'+(s.calls.length>1?'s':'')+' :');s.calls.forEach(function(c){L.push('  '+c.fr+' (France) → '+thToMali(c.fr)+' (Mali)'+(c.done?' ✅ '+c.at:'')+(c.com?' — '+c.com:''));});}
     return L.join('\n');
   }
   function thRenderOut(){
-    var blocks=thAdded.slice(),cur=thBuildCurrent();if(cur)blocks.push(cur);
+    var blocks=TH.map(thSiteText),cur=thFormSite();if(cur)blocks.push(thSiteText(cur));
     if(!blocks.length){byId('th-out').textContent='Remplis un site…';return;}
     if(blocks.length===1){byId('th-out').textContent='📞 THIAM — APPELS\n'+blocks[0];return;}
     byId('th-out').textContent='📞 THIAM — APPELS ('+blocks.length+')\n\n'+blocks.map(function(b,i){return '— Site '+(i+1)+' —\n'+b;}).join('\n\n');
   }
-  function thRenderAdded(){
-    byId('th-addedCard').classList.toggle('hidden',!thAdded.length);byId('th-addedN').textContent=thAdded.length;
-    byId('th-addedList').innerHTML=thAdded.map(function(b,i){var t=(b.split('\n')[0]||'Site').replace(/[<>]/g,'');return '<div class="it"><span class="pill" style="background:var(--panel2);color:var(--muted)">'+(i+1)+'</span><span style="flex:1">'+t+'</span><button data-thi="'+i+'" class="thrm" aria-label="Retirer" style="width:30px;height:30px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);cursor:pointer">✕</button></div>';}).join('');
-    byId('th-addedList').querySelectorAll('.thrm').forEach(function(bt){bt.onclick=function(){thAdded.splice(+bt.getAttribute('data-thi'),1);thRenderAdded();thRenderOut();};});
+  // ---- Suivi des appels (contrôleur de retard) ----
+  function thNowHM(){var d=new Date();return pad2(d.getHours())+':'+pad2(d.getMinutes());}
+  function thIsLate(fr,done){if(done)return false;var m=toMin(fr);if(m==null)return false;var d=new Date();var diff=((d.getHours()*60+d.getMinutes())-m+1440)%1440;return diff>=5&&diff<=720;}
+  function thRenderBoard(){
+    var wrap=byId('th-board');if(!wrap)return;
+    if(!TH.length){wrap.innerHTML='<div class="svempty">Aucun site au suivi. Remplis un site ci-dessus puis « Ajouter ce site au suivi ».</div>';byId('th-lateBadge').style.display='none';return;}
+    var lateTot=0;
+    wrap.innerHTML=TH.map(function(s){
+      var siteLate=false;
+      var rows=(s.calls||[]).map(function(c,ci){
+        var late=thIsLate(c.fr,c.done);if(late){lateTot++;siteLate=true;}
+        var st=c.done?('<span class="thc-at">✅ appelé à '+esc(c.at||'')+'</span>'):(late?'<span class="thc-warn">⚠️ EN RETARD — à faire</span>':'<span class="thc-todo">à faire</span>');
+        return '<div class="thc '+(c.done?'thc-done':(late?'thc-late':''))+'" data-sid="'+s.id+'" data-ci="'+ci+'">'
+          +'<label class="thc-chk"><input type="checkbox" class="thc-box"'+(c.done?' checked':'')+'></label>'
+          +'<div class="thc-main"><div class="thc-h">'+esc(c.fr)+' <span class="thc-mali">→ Mali '+esc(thToMali(c.fr))+'</span> '+st+'</div>'
+          +'<input class="thc-com" placeholder="Commentaire de l\'appel…" value="'+esc(c.com||'')+'"></div>'
+        +'</div>';
+      }).join('');
+      return '<div class="thsite'+(siteLate?' thsite-late':'')+'"><div class="thsite-h">'+esc(s.site||'Site')+(s.agent?' · '+esc(s.agent):'')+(s.deb&&s.fin?' · '+esc(s.deb)+'→'+esc(s.fin):'')+'<button class="thsite-del" data-thdel="'+s.id+'" title="Retirer ce site">🗑️</button></div>'+rows+'</div>';
+    }).join('');
+    var badge=byId('th-lateBadge');badge.textContent=lateTot?('⚠️ '+lateTot+' appel'+(lateTot>1?'s':'')+' en retard'):'';badge.style.display=lateTot?'':'none';
+  }
+  function thUpdateLate(){
+    var lateTot=0;
+    document.querySelectorAll('#th-board .thc').forEach(function(el){
+      var s=thSiteById(el.getAttribute('data-sid'));if(!s)return;var c=s.calls[+el.getAttribute('data-ci')];if(!c||c.done)return;
+      var late=thIsLate(c.fr,false);if(late)lateTot++;
+      el.classList.toggle('thc-late',late);
+      var st=el.querySelector('.thc-todo,.thc-warn');if(st){st.className=late?'thc-warn':'thc-todo';st.textContent=late?'⚠️ EN RETARD — à faire':'à faire';}
+    });
+    document.querySelectorAll('#th-board .thsite').forEach(function(sel){sel.classList.toggle('thsite-late',!!sel.querySelector('.thc-late'));});
+    var badge=byId('th-lateBadge');badge.textContent=lateTot?('⚠️ '+lateTot+' appel'+(lateTot>1?'s':'')+' en retard'):'';badge.style.display=lateTot?'':'none';
   }
   function thGen(){thRenderAuto();thRenderOut();}
   function thReset(){['th-site','th-client','th-agent','th-tel'].forEach(function(id){byId(id).value='';});['th-debh','th-debm','th-finh','th-finm'].forEach(function(id){byId(id).value='';});byId('th-ncalls').value='0';byId('th-hours').innerHTML='';byId('th-hours').appendChild(thMakeHour());thRenderAuto();}
@@ -891,9 +948,25 @@ button.big:active{transform:translateY(1px)}
   mkCombo('th-agent',[],'fkh_agent_noms',thGen);
   ['th-site','th-tel'].forEach(function(id){byId(id).addEventListener('input',thGen);});
   ['th-debh','th-debm','th-finh','th-finm','th-ncalls','th-stagger'].forEach(function(id){byId(id).addEventListener('change',thGen);});
-  byId('th-add').onclick=function(){var cur=thBuildCurrent();if(!cur)return;thAdded.push(cur);thReset();thRenderAdded();thRenderOut();window.scrollTo(0,0);};
+  byId('th-add').onclick=function(){var s=thFormSite();if(!s)return;TH.push(s);thSave();thReset();thRenderBoard();thRenderOut();window.scrollTo(0,0);};
+  byId('th-board').addEventListener('change',function(e){
+    var box=e.target.closest('.thc-box');if(!box)return;
+    var row=box.closest('.thc'),s=thSiteById(row.getAttribute('data-sid'));if(!s)return;var c=s.calls[+row.getAttribute('data-ci')];if(!c)return;
+    if(box.checked){c.done=true;c.at=thNowHM();}else{c.done=false;c.at=null;}
+    thSave();thRenderBoard();
+  });
+  byId('th-board').addEventListener('input',function(e){
+    var com=e.target.closest('.thc-com');if(!com)return;
+    var row=com.closest('.thc'),s=thSiteById(row.getAttribute('data-sid'));if(!s)return;var c=s.calls[+row.getAttribute('data-ci')];if(!c)return;
+    c.com=com.value;thSave();
+  });
+  byId('th-board').addEventListener('click',function(e){
+    var del=e.target.closest('[data-thdel]');if(!del)return;
+    var id=del.getAttribute('data-thdel');TH=TH.filter(function(x){return x.id!==id;});thSave();thRenderBoard();thRenderOut();thRenderAuto();
+  });
   byId('th-copy').onclick=function(){var x=byId('th-out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('th-copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
-  thRenderOut();
+  setInterval(function(){if(!byId('sec-thiam').classList.contains('hidden'))thUpdateLate();},30000);
+  thRenderBoard();thRenderOut();
 
   document.addEventListener('click',function(e){
     if(!e.target.closest('.acwrap'))document.querySelectorAll('.acwrap .sugg').forEach(function(s){s.classList.add('hidden');});
