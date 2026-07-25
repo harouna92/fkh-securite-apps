@@ -109,6 +109,8 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Ville</div><div class="acwrap"><input type="text" id="ville" placeholder="Tape ou choisis une ville…" autocomplete="off"><button type="button" class="cbtn" id="ville-btn" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg"></div></div></label>
       </div>
       <label class="f"><div class="lab">Code postal</div><div class="acwrap"><input id="cp" placeholder="Rempli par la ville · ou tape un code postal" autocomplete="off" inputmode="numeric"><div class="sugg hidden" id="sugg-cp"></div></div></label>
+      <label class="f"><div class="lab">Nom du site</div><input id="sitename" placeholder="Ex. GIFI, Carrefour…" autocomplete="off"></label>
+      <label class="f"><div class="lab">Adresse du site</div><textarea id="adresse" placeholder="Adresse complète du site" style="min-height:44px"></textarea></label>
 
       <div id="vacsWrap">
         <div class="lab" style="margin:0 0 5px">Vacations</div>
@@ -140,35 +142,43 @@ button.big:active{transform:translateY(1px)}
         <div class="lab" style="margin:8px 0 2px">Infos à inclure pour l'agent</div>
         <div class="avopts">
           <label><input type="checkbox" id="av-client">Client</label>
+          <label><input type="checkbox" id="av-sitename" checked>Nom du site</label>
           <label><input type="checkbox" id="av-presta">Prestation</label>
           <label><input type="checkbox" id="av-agenttype">Type d'agent</label>
           <label><input type="checkbox" id="av-sitetype" checked>Type de site</label>
           <label><input type="checkbox" id="av-surv" checked>Surveillance</label>
           <label><input type="checkbox" id="av-ville" checked>Lieu (ville + CP)</label>
+          <label><input type="checkbox" id="av-adresse" checked>Adresse</label>
           <label><input type="checkbox" id="av-near">Villes proches</label>
           <label><input type="checkbox" id="av-meas">Distances mesurées</label>
           <label><input type="checkbox" id="av-vac" checked>Vacations</label>
           <label><input type="checkbox" id="av-notes" checked>Consignes</label>
         </div>
+        <label class="f" style="margin-top:8px"><div class="lab">⏱ Marge avant début (déduite de l'heure de début)</div><div class="hm"><select id="av-offh"></select><span>h</span><select id="av-offm"></select></div></label>
         <div class="lab" style="margin:8px 0 0">Texte à envoyer à l'agent</div>
         <div class="outbox" id="out-agent">—</div>
         <button class="big" id="copy-agent">Copier pour l'agent</button>
       </div>
       <button class="big" id="missionToggle" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">✅ Infos pour mission validée</button>
       <div id="missionBlock" class="hidden">
+        <label class="f"><div class="lab">📞 Numéro prise / fin de service</div><input id="mv-tel" placeholder="Rempli selon le client · modifiable" inputmode="tel" autocomplete="off"></label>
         <div class="lab" style="margin:8px 0 2px">Infos à inclure (mission validée)</div>
         <div class="avopts">
           <label><input type="checkbox" id="mv-client" checked>Client</label>
+          <label><input type="checkbox" id="mv-sitename" checked>Nom du site</label>
           <label><input type="checkbox" id="mv-presta" checked>Prestation</label>
           <label><input type="checkbox" id="mv-agenttype">Type d'agent</label>
           <label><input type="checkbox" id="mv-sitetype" checked>Type de site</label>
           <label><input type="checkbox" id="mv-surv">Surveillance</label>
           <label><input type="checkbox" id="mv-ville" checked>Lieu (ville + CP)</label>
+          <label><input type="checkbox" id="mv-adresse" checked>Adresse</label>
           <label><input type="checkbox" id="mv-near">Villes proches</label>
           <label><input type="checkbox" id="mv-meas">Distances mesurées</label>
           <label><input type="checkbox" id="mv-vac" checked>Vacations</label>
           <label><input type="checkbox" id="mv-notes" checked>Consignes</label>
+          <label><input type="checkbox" id="mv-num" checked>Numéro prise/fin</label>
         </div>
+        <label class="f" style="margin-top:8px"><div class="lab">⏱ Marge avant début (déduite de l'heure de début)</div><div class="hm"><select id="mv-offh"></select><span>h</span><select id="mv-offm"></select></div></label>
         <div class="lab" style="margin:8px 0 0">Texte — mission validée</div>
         <div class="outbox" id="out-mission">—</div>
         <button class="big" id="copy-mission">Copier</button>
@@ -365,16 +375,19 @@ button.big:active{transform:translateY(1px)}
   addVac();
 
   function readVacs(){ var vacs=[]; document.querySelectorAll('#vacsList .vac').forEach(function(el){ var v=readVac(el); if(v.quand==='asap'||v.date||v.deb||v.fin||v.dateFin||v.arr||v.h24) vacs.push(v); }); return vacs; }
-  function vacLines(vacs){
+  function shiftTime(t,dmin){ var m=toMin(t); if(m==null)return t; m=((m+dmin)%1440+1440)%1440; return pad2(Math.floor(m/60))+':'+pad2(m%60); }
+  function vacLines(vacs,offMin){
+    offMin=offMin||0;
     var out=[];
     vacs.forEach(function(v,i){
+      var deb=(offMin>0&&v.deb)?shiftTime(v.deb,-offMin):v.deb;
       var p=[];
       if(v.quand==='asap')p.push('dès que possible'); else if(v.date)p.push('début '+fmtD(v.date));
       if(v.h24){ p.push('H24 (24h/24)'); p.push(v.dateFin?('fin le '+fmtD(v.dateFin)):'jusqu\'à nouvel ordre'); }
       else {
-        if(v.arr){ if(v.deb)p.push('début '+v.deb); p.push('fin à l\'arrivée du personnel'+(v.fin?' (vers '+v.fin+')':'')); }
-        else if(v.deb&&v.fin){ p.push('de '+v.deb+' à '+v.fin); var dd=duree(v.deb,v.fin); if(dd)p.push('plage '+dd); }
-        else { if(v.deb)p.push('début '+v.deb); if(v.fin)p.push('fin '+v.fin); }
+        if(v.arr){ if(deb)p.push('début '+deb); p.push('fin à l\'arrivée du personnel'+(v.fin?' (vers '+v.fin+')':'')); }
+        else if(deb&&v.fin){ p.push('de '+deb+' à '+v.fin); var dd=duree(deb,v.fin); if(dd)p.push('plage '+dd); }
+        else { if(deb)p.push('début '+deb); if(v.fin)p.push('fin '+v.fin); }
         if(v.dateFin)p.push('fin le '+fmtD(v.dateFin));
       }
       out.push(vacs.length>1?'Vacation '+(i+1)+' :':'Vacation :');
@@ -387,29 +400,34 @@ button.big:active{transform:translateY(1px)}
     var villeName=sel?sel.nom:byId('ville').value.trim(),cp=byId('cp').value.trim();
     var L=[];
     if(on('client')&&byId('client').value.trim())L.push('Client : '+byId('client').value.trim());
+    if(on('sitename')&&byId('sitename').value.trim())L.push('Site : '+byId('sitename').value.trim());
     if(on('presta')&&byId('type').value.trim())L.push('Prestation : '+byId('type').value.trim());
     if(on('agenttype')&&byId('agent').value.trim())L.push('Type d\'agent : '+byId('agent').value.trim());
     if(on('sitetype')&&byId('sitetype').value.trim())L.push('Type de site : '+byId('sitetype').value.trim());
     if(on('surv')&&byId('surv').value)L.push('Surveillance : '+byId('surv').value);
     if(on('ville')&&villeName)L.push('Lieu : '+villeName+(cp?' ('+cp+')':''));
+    if(on('adresse')&&byId('adresse').value.trim())L.push('Adresse : '+byId('adresse').value.trim());
     if(on('near')&&sel&&sel._near)sel._near.forEach(function(x){L.push(x.n+(x.cp?' '+x.cp:'')+' à '+x.d+' km'+(x.dur?' · '+x.dur:''));});
     if(on('meas'))meas.forEach(function(x){L.push('↳ '+x.n+(x.cp?' '+x.cp:'')+' à '+x.km+' km'+(x.dur?' · '+x.dur:''));});
-    if(on('vac')){var vacs=readVacs();if(vacs.length)L=L.concat(vacLines(vacs));}
+    if(on('vac')){var vacs=readVacs();if(vacs.length){var off=(+byId(px+'-offh').value||0)*60+(+byId(px+'-offm').value||0);L=L.concat(vacLines(vacs,off));}}
     if(on('notes')&&byId('notes').value.trim())L.push('Consignes : '+byId('notes').value.trim());
+    if(on('num')&&byId(px+'-tel')&&byId(px+'-tel').value.trim())L.push('☎ Prise / fin de service : '+byId(px+'-tel').value.trim());
     return L.length?L.join('\n'):'';
   }
   var added=[];
   function buildCurrent(){
-    var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
+    var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),sitename=byId('sitename').value.trim(),adresse=byId('adresse').value.trim(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
     var vacs=readVacs();
-    if(!(client||type||agent||siteT||sel||byId('ville').value.trim()||notes||vacs.length)) return '';
+    if(!(client||type||agent||siteT||sel||byId('ville').value.trim()||notes||vacs.length||sitename||adresse)) return '';
     var L=[];
     if(client)L.push('Client : '+client);
+    if(sitename)L.push('Site : '+sitename);
     if(type)L.push('Prestation : '+type);
     if(agent)L.push('Type d\'agent : '+agent);
     if(siteT)L.push('Type de site : '+siteT);
     if(surv)L.push('Surveillance : '+surv);
     if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':''));(sel._near||[]).forEach(function(x){L.push(x.n+(x.cp?' '+x.cp:'')+' à '+x.d+' km'+(x.dur?' · '+x.dur:''));});meas.forEach(function(x){L.push('↳ '+x.n+(x.cp?' '+x.cp:'')+' à '+x.km+' km'+(x.dur?' · '+x.dur:''));});}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':''));
+    if(adresse)L.push('Adresse : '+adresse);
     if(vacs.length)L=L.concat(vacLines(vacs));
     if(ag)L.push('Agents : '+ag);if(ref)L.push('Réf/contact : '+ref);if(notes)L.push('Notes : '+notes);
     return L.join('\n');
@@ -422,8 +440,8 @@ button.big:active{transform:translateY(1px)}
   }
   function genText(){ renderOut(); if(!byId('agentBlock').classList.contains('hidden')){ byId('out-agent').textContent=buildSel('av')||'Remplis la demande…'; } if(!byId('missionBlock').classList.contains('hidden')){ byId('out-mission').textContent=buildSel('mv')||'Remplis la demande…'; } }
   function resetForm(){
-    ['client','type','agent','sitetype','ville','cp','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
-    byId('surv').value='';
+    ['client','type','agent','sitetype','ville','cp','sitename','adresse','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
+    byId('surv').value='';var mt=byId('mv-tel');if(mt)mt.value='';
     byId('vacsList').innerHTML='';addVac();
     meas.length=0;byId('measList').innerHTML='';
     sel=null;byId('ctx').classList.add('hidden');
@@ -434,13 +452,19 @@ button.big:active{transform:translateY(1px)}
     byId('addedList').querySelectorAll('.rm').forEach(function(bt){bt.onclick=function(){added.splice(+bt.getAttribute('data-i'),1);renderAdded();renderOut();};});
   }
   byId('addBtn').onclick=function(){var cur=buildCurrent();if(!cur)return;added.push(cur);resetForm();renderAdded();renderOut();window.scrollTo(0,0);};
-  ['agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
+  ['sitename','adresse','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   byId('agentToggle').addEventListener('click',function(){ byId('agentBlock').classList.toggle('hidden'); genText(); });
-  ['av-client','av-presta','av-agenttype','av-sitetype','av-surv','av-ville','av-near','av-meas','av-vac','av-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
+  ['av-client','av-sitename','av-presta','av-agenttype','av-sitetype','av-surv','av-ville','av-adresse','av-near','av-meas','av-vac','av-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
   byId('copy-agent').onclick=function(){var x=byId('out-agent').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-agent'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   byId('missionToggle').addEventListener('click',function(){ byId('missionBlock').classList.toggle('hidden'); genText(); });
-  ['mv-client','mv-presta','mv-agenttype','mv-sitetype','mv-surv','mv-ville','mv-near','mv-meas','mv-vac','mv-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
+  ['mv-client','mv-sitename','mv-presta','mv-agenttype','mv-sitetype','mv-surv','mv-ville','mv-adresse','mv-near','mv-meas','mv-vac','mv-notes','mv-num'].forEach(function(id){byId(id).addEventListener('change',genText);});
+  ['av','mv'].forEach(function(px){ var oh=''; for(var i=0;i<=6;i++)oh+='<option>'+i+'</option>'; byId(px+'-offh').innerHTML=oh; byId(px+'-offm').innerHTML=MOPTS; byId(px+'-offh').addEventListener('change',genText); byId(px+'-offm').addEventListener('change',genText); });
+  // Numéro prise/fin par client (mémorisé, auto-rempli, modifiable)
+  var TEL={}; try{TEL=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(e){TEL={};}
+  function fillTel(){ var c=byId('client').value.trim(); byId('mv-tel').value=(c&&TEL[c])?TEL[c]:''; }
+  byId('client').addEventListener('change',function(){ fillTel(); genText(); });
+  byId('mv-tel').addEventListener('input',function(){ var c=byId('client').value.trim(); if(c){ TEL[c]=this.value.trim(); try{localStorage.setItem('fkh_client_tel',JSON.stringify(TEL));}catch(e){} } genText(); });
   byId('copy-mission').onclick=function(){var x=byId('out-mission').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-mission'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
 
   // ===== Suivi demandes =====
