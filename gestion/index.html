@@ -144,7 +144,10 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Nom de l'agent</div><div class="cbx"><input id="ps-agent" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="ps-agent" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-ps-agent"></div></div></label>
         <label class="f"><div class="lab">Ville du site</div><input id="ps-ville" placeholder="Ville" autocomplete="off"></label>
       </div>
-      <label class="f"><div class="lab">Heure de prise de service</div><div class="hm"><select id="ps-h" aria-label="Heure"></select><span>h</span><select id="ps-m" aria-label="Minutes"></select></div></label>
+      <div class="grid2">
+        <label class="f"><div class="lab">Code postal</div><input id="ps-cp" placeholder="Code postal" autocomplete="off" inputmode="numeric"></label>
+        <label class="f"><div class="lab">Heure de prise de service</div><div class="hm"><select id="ps-h" aria-label="Heure"></select><span>h</span><select id="ps-m" aria-label="Minutes"></select></div></label>
+      </div>
       <label class="chk"><input type="checkbox" id="ps-retard"><span>⏰ En retard</span></label>
       <label class="f hidden" id="ps-retard-wrap"><div class="lab">Précision du retard</div><input id="ps-retard-min" placeholder="ex. 15 min"></label>
       <label class="chk"><input type="checkbox" id="ps-photo"><span>📷 Prise de service faite par photo</span></label>
@@ -167,7 +170,10 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Nom de l'agent</div><div class="cbx"><input id="fs-agent" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="fs-agent" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-fs-agent"></div></div></label>
         <label class="f"><div class="lab">Ville du site</div><input id="fs-ville" placeholder="Ville" autocomplete="off"></label>
       </div>
-      <label class="f"><div class="lab">Heure de fin de service</div><div class="hm"><select id="fs-h" aria-label="Heure"></select><span>h</span><select id="fs-m" aria-label="Minutes"></select></div></label>
+      <div class="grid2">
+        <label class="f"><div class="lab">Code postal</div><input id="fs-cp" placeholder="Code postal" autocomplete="off" inputmode="numeric"></label>
+        <label class="f"><div class="lab">Heure de fin de service</div><div class="hm"><select id="fs-h" aria-label="Heure"></select><span>h</span><select id="fs-m" aria-label="Minutes"></select></div></label>
+      </div>
       <label class="chk"><input type="checkbox" id="fs-retard"><span>⏰ En retard</span></label>
       <label class="f hidden" id="fs-retard-wrap"><div class="lab">Précision du retard</div><input id="fs-retard-min" placeholder="ex. 15 min"></label>
       <label class="chk"><input type="checkbox" id="fs-photo"><span>📷 Fin de service faite par photo</span></label>
@@ -448,13 +454,13 @@ button.big:active{transform:translateY(1px)}
   // ===== Prise de service / Fin de service (même structure) =====
   function svcSection(pfx,titre,emoji,heureLabel){
     function gen(){
-      var cl=byId(pfx+'-client').value.trim(),si=byId(pfx+'-site').value.trim(),ag=byId(pfx+'-agent').value.trim(),vi=byId(pfx+'-ville').value.trim();
+      var cl=byId(pfx+'-client').value.trim(),si=byId(pfx+'-site').value.trim(),ag=byId(pfx+'-agent').value.trim(),vi=byId(pfx+'-ville').value.trim(),cp=byId(pfx+'-cp').value.trim();
       var h=byId(pfx+'-h').value,m=byId(pfx+'-m').value,heure=h?(h+':'+(m||'00')):'';
       var retard=byId(pfx+'-retard').checked,rmin=byId(pfx+'-retard-min').value.trim(),photo=byId(pfx+'-photo').checked,avise=byId(pfx+'-avise').checked;
-      if(!(cl||si||ag||vi||heure)){ byId(pfx+'-out').textContent='Remplis les infos…'; return; }
+      if(!(cl||si||ag||vi||cp||heure)){ byId(pfx+'-out').textContent='Remplis les infos…'; return; }
       var L=[emoji+' '+titre+' — FKH'];
       if(cl)L.push('Client : '+cl);
-      if(si||vi)L.push('Site : '+si+(vi?' — '+vi:''));
+      if(si||vi||cp)L.push('Site : '+si+(vi?' — '+vi:'')+(cp?' ('+cp+')':''));
       if(ag)L.push('Agent : '+ag);
       if(heure)L.push(heureLabel+' : '+heure);
       L.push('En retard : '+(retard?('OUI'+(rmin?' ('+rmin+')':'')):'non'));
@@ -467,7 +473,7 @@ button.big:active{transform:translateY(1px)}
     mkCombo(pfx+'-agent',[],'fkh_agent_noms',gen);
     byId(pfx+'-h').innerHTML=HOPTS; byId(pfx+'-m').innerHTML=MOPTS;
     byId(pfx+'-retard').addEventListener('change',function(){ byId(pfx+'-retard-wrap').classList.toggle('hidden',!this.checked); gen(); });
-    [pfx+'-ville',pfx+'-retard-min'].forEach(function(id){byId(id).addEventListener('input',gen);});
+    [pfx+'-ville',pfx+'-cp',pfx+'-retard-min'].forEach(function(id){byId(id).addEventListener('input',gen);});
     [pfx+'-h',pfx+'-m',pfx+'-photo',pfx+'-avise'].forEach(function(id){byId(id).addEventListener('change',gen);});
     byId(pfx+'-copy').onclick=function(){var x=byId(pfx+'-out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=this,o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   }
