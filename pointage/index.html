@@ -1,0 +1,173 @@
+<title>Pointage & photos de service — FKH Sécurité</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#eef1f5;--panel:#fff;--panel2:#f4f6fa;--line:#d3d9e3;--ink:#141922;--muted:#5c6473;--brand:#2456c7;--brand-ink:#fff;
+  --ok:#137a3b;--okbg:#e4f5ea;--okline:#7cc79a;--bad:#c02626;--badbg:#fbe7e7;--badline:#e79a9a;--warn:#9a6100;--warnbg:#fbf0dc;--warnline:#e6c483;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+@media (prefers-color-scheme:dark){:root{--bg:#0c1017;--panel:#151b26;--panel2:#1b2330;--line:#2a3444;--ink:#e8ecf3;--muted:#94a0b3;--brand:#5b8bff;--brand-ink:#0c1017;--ok:#43c777;--okbg:#12281b;--okline:#2b5c3c;--bad:#ff6b6b;--badbg:#2a1515;--badline:#5e2a2a;--warn:#f0b34a;--warnbg:#2a2010;--warnline:#5c4622;}}
+:root[data-theme="light"]{--bg:#eef1f5;--panel:#fff;--panel2:#f4f6fa;--line:#d3d9e3;--ink:#141922;--muted:#5c6473;--brand:#2456c7;--brand-ink:#fff;--ok:#137a3b;--okbg:#e4f5ea;--okline:#7cc79a;--bad:#c02626;--badbg:#fbe7e7;--badline:#e79a9a;--warn:#9a6100;--warnbg:#fbf0dc;--warnline:#e6c483;}
+:root[data-theme="dark"]{--bg:#0c1017;--panel:#151b26;--panel2:#1b2330;--line:#2a3444;--ink:#e8ecf3;--muted:#94a0b3;--brand:#5b8bff;--brand-ink:#0c1017;--ok:#43c777;--okbg:#12281b;--okline:#2b5c3c;--bad:#ff6b6b;--badbg:#2a1515;--badline:#5e2a2a;--warn:#f0b34a;--warnbg:#2a2010;--warnline:#5c4622;}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-text-size-adjust:100%;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.wrap{max-width:32rem;margin:0 auto;padding:18px 16px 40px;display:flex;flex-direction:column;gap:13px}
+.brandbar{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:12.5px;font-weight:700;letter-spacing:.02em}
+.brandbar .dot{width:9px;height:9px;border-radius:50%;background:var(--brand)}
+h1{font-size:1.28rem;font-weight:700;margin:2px 0 0;text-wrap:balance}
+.sub{font-size:12.5px;color:var(--muted);margin:0}
+.field{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:9px}
+.lab{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700}
+input[type=text]{font-family:inherit;font-size:1.05rem;width:100%;padding:12px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);color:var(--ink)}
+.status{border-radius:16px;padding:16px;border:1.5px solid var(--line);background:var(--panel);display:flex;gap:13px;align-items:flex-start;transition:background .2s,border-color .2s}
+.status .ic{font-size:1.6rem;flex-shrink:0;margin-top:1px}
+.status .t{font-size:1.06rem;font-weight:700}.status .s{font-size:13px;color:var(--muted);margin-top:3px}
+.status.ok{background:var(--okbg);border-color:var(--okline)}.status.ok .t{color:var(--ok)}
+.status.bad{background:var(--badbg);border-color:var(--badline)}.status.bad .t{color:var(--bad)}
+.status.warn{background:var(--warnbg);border-color:var(--warnline)}.status.warn .t{color:var(--warn)}
+.actions{display:flex;flex-direction:column;gap:9px}
+label.big{position:relative;font-family:inherit;font-size:1.06rem;font-weight:700;width:100%;min-height:60px;border-radius:14px;border:1px solid transparent;background:var(--brand);color:var(--brand-ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 16px;text-align:center}
+label.big:active{transform:translateY(1px)}
+.svc-start{background:#1a7f45;color:#fff}.svc-end{background:#b83535;color:#fff}
+.svc-photo{background:var(--panel);color:var(--ink);border:1px solid var(--line)}
+label.big input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+label.big.busy{opacity:.55;pointer-events:none}
+.hint{font-size:11px;color:var(--warn)}
+.thumb{width:100%;border-radius:12px;border:1px solid var(--line);display:block}
+.note{font-size:11.5px;color:var(--muted);line-height:1.6}.note b{color:var(--ink)}
+.foot{font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;line-height:1.6}
+#send.pinned{position:fixed;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:60;box-shadow:0 8px 26px rgba(0,0,0,.45)}
+body.pinbar .wrap{padding-bottom:104px}
+.hidden{display:none!important}
+button.link{background:none;border:none;color:var(--brand);font:inherit;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="brandbar"><span class="dot"></span>POINTAGE DE SERVICE · FKH SÉCURITÉ</div>
+  <h1>Pointage & photos de service</h1>
+  <p class="sub">Renseignez votre nom et le site, puis pointez. Chaque photo est tamponnée avec l'heure et votre position GPS, et vous l'envoyez au responsable.</p>
+
+  <div class="field">
+    <div><div class="lab" style="margin-bottom:6px">Votre nom</div><input type="text" id="f-nom" placeholder="Nom et prénom" autocomplete="name"></div>
+    <div><div class="lab" style="margin-bottom:6px">Site</div><input type="text" id="f-site" placeholder="Ex. GIFI"></div>
+    <div><div class="lab" style="margin-bottom:6px">Ville</div><input type="text" id="f-ville" placeholder="Ex. Bessoncourt"></div>
+    <div class="hint hidden" id="f-hint">Renseignez votre nom, le site et la ville avant de prendre une photo.</div>
+  </div>
+
+  <div class="status hidden" id="st">
+    <div class="ic">🕒</div>
+    <div><div class="t">Prêt à pointer</div><div class="s">Placez-vous sur le site, puis appuyez.</div></div>
+  </div>
+
+  <img class="thumb hidden" id="thumb" alt="Photo tamponnée" style="margin-bottom:4px">
+  <div class="actions">
+    <label class="big svc-start">🟢 Prise de service<input type="file" accept="image/*" capture="environment" data-t="PRISE DE SERVICE"></label>
+    <label class="big svc-photo">📷 Ronde<input type="file" accept="image/*" capture="environment" data-t="RONDE"></label>
+    <label class="big svc-end">🔴 Fin de service<input type="file" accept="image/*" capture="environment" data-t="FIN DE SERVICE"></label>
+  </div>
+
+  <a class="hidden" id="send" style="display:flex;align-items:center;justify-content:center;min-height:60px;border-radius:14px;background:#25D366;color:#fff;font-weight:700;font-size:1.08rem;text-decoration:none;gap:8px">📲 Envoyer</a>
+  <button class="link hidden" id="dl">Enregistrer la photo tamponnée</button>
+
+</div>
+
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s)};
+  // Numéro WhatsApp du responsable. Par défaut = 33756958069 (07 56 95 80 69) → le lien reste COURT et cliquable
+  // (pas de ?wa=). On peut malgré tout le surcharger via ...?wa=33XXXXXXXXX si besoin d'un autre numéro.
+  var num=(new URLSearchParams(location.search).get('wa')||'33756958069').replace(/[^0-9]/g,'');
+  function nom(){return ($('#f-nom').value||'').trim()}
+  function site(){return ($('#f-site').value||'').trim()}
+  function ville(){return ($('#f-ville').value||'').trim()}
+  function needFields(){var ok=nom()&&site()&&ville();$('#f-hint').classList.toggle('hidden',!!ok);return !ok;}
+  function stamp(d){function p(n){return(n<10?'0':'')+n}return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());}
+  function setStatus(cls,ic,t,s){var el=$('#st');el.className='status '+cls;el.querySelector('.ic').textContent=ic;el.querySelector('.t').textContent=t;el.querySelector('.s').textContent=s;}
+  $('#f-nom').oninput=$('#f-site').oninput=$('#f-ville').oninput=function(){ if(nom()&&site()&&ville())$('#f-hint').classList.add('hidden'); };
+
+  // Reverse-geocoding : convertit le GPS en ADRESSE (rendu type appli « Timestamp »). OpenStreetMap/Nominatim, sans clé.
+  function wrap(txt,n){var w=String(txt).split(' '),out=[],cur='';for(var i=0;i<w.length;i++){if((cur+' '+w[i]).trim().length>n){if(cur)out.push(cur);cur=w[i];}else cur=(cur?cur+' ':'')+w[i];}if(cur)out.push(cur);return out;}
+  function reverseGeocode(lat,lng,cb){
+    var done=false,to=setTimeout(function(){if(!done){done=true;cb('');}},6000);
+    try{
+      fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1&accept-language=fr')
+        .then(function(r){return r.json();})
+        .then(function(j){if(done)return;done=true;clearTimeout(to);cb((j&&j.display_name)?j.display_name:'');})
+        .catch(function(){if(done)return;done=true;clearTimeout(to);cb('');});
+    }catch(e){if(!done){done=true;clearTimeout(to);cb('');}}
+  }
+  function drawStamp(img,type,now,gps,addr){
+    var maxW=1600, scale=Math.min(1,maxW/(img.naturalWidth||maxW));
+    var w=Math.round((img.naturalWidth||maxW)*scale), h=Math.round((img.naturalHeight||maxW)*scale);
+    var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+    var ctx=cv.getContext('2d'); ctx.drawImage(img,0,0,w,h);
+    // 1ER JET : TOUT sur la photo — type + agent + site + ville + date/heure + GPS + adresse (on affinera après).
+    var lines=[type,
+      'Agent : '+nom(),
+      'Site : '+site()+(ville()?' — '+ville():''),
+      stamp(now),
+      'GPS '+gps.latitude.toFixed(5)+', '+gps.longitude.toFixed(5)+'  (± '+Math.round(gps.accuracy)+' m)'];
+    if(addr){ lines=lines.concat(wrap('📍 '+addr,44)); }
+    var fs=Math.max(15,Math.round(w*0.030)), pad=Math.round(fs*0.7), lh=Math.round(fs*1.4), barH=lh*lines.length+pad*2;
+    ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(0,h-barH,w,barH);
+    ctx.fillStyle='#fff'; ctx.textBaseline='top'; ctx.font='700 '+fs+'px '+'system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
+    lines.forEach(function(t,i){ ctx.fillText(t,pad,h-barH+pad+i*lh); });
+    cv.toBlob(function(blob){
+      if(!blob){ setStatus('bad','⚠️','Erreur image','Réessayez la photo.'); return; }
+      var url=URL.createObjectURL(blob); $('#thumb').src=url; $('#thumb').classList.remove('hidden');
+      var fname='FKH_'+type.replace(/[^A-Za-z]/g,'')+'_'+Date.now()+'.jpg';
+      var file=new File([blob],fname,{type:'image/jpeg'});
+      var msg='FKH SÉCURITÉ — POINTAGE'
+        +'\nType : '+type
+        +'\nAgent : '+nom()
+        +'\nSite : '+site()+(ville()?' — '+ville():'')
+        +'\nDate/heure : '+stamp(now)
+        +'\nGPS : '+gps.latitude.toFixed(5)+', '+gps.longitude.toFixed(5)+' (± '+Math.round(gps.accuracy)+' m)'
+        +(addr?'\nAdresse : '+addr:'')
+        +'\n📍 Carte : https://maps.google.com/?q='+gps.latitude+','+gps.longitude;
+      var send=$('#send'), dl=$('#dl');
+      dl.classList.remove('hidden'); dl.onclick=function(){var a=document.createElement('a');a.href=url;a.download=fname;a.click();};
+      // ENVOI au TAP (geste utilisateur, sinon blocage). Robuste navigateur WhatsApp : on tente le partage de la
+      // photo ; s'il est indisponible ou échoue, on enregistre la photo et on ouvre le chat WhatsApp du responsable.
+      send.removeAttribute('href'); send.textContent='📲 Envoyer';
+      send.onclick=function(e){
+        e.preventDefault();
+        // OPTION 1 (sans backend) : on envoie SEULEMENT la photo, AUCUNE légende → tu peux la transférer telle
+        // quelle, rien n'est collé. La photo porte date/heure + GPS + adresse. (Type/agent/site ne partent donc
+        // pas par WhatsApp — c'est le prix du « sans backend + transfert propre ».)
+        var okShare=false; try{ okShare=!!(navigator.canShare&&navigator.canShare({files:[file]})); }catch(_){}
+        function dl2(){ try{var a=document.createElement('a');a.href=url;a.download=fname;a.click();}catch(_){} }
+        if(okShare){ navigator.share({files:[file]}).catch(function(err){ if(err&&err.name==='AbortError')return; dl2(); }); }
+        else { dl2(); }
+      };
+      send.classList.remove('hidden'); send.classList.add('pinned'); document.body.classList.add('pinbar');
+      try{ $('#thumb').scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){}
+      setStatus('ok','✅',type+' — photo prête','Appuie sur le bouton vert « Envoyer » (fixé en bas).');
+    },'image/jpeg',0.9);
+  }
+
+  function handle(input){
+    var f=input.files&&input.files[0]; var type=input.getAttribute('data-t'); input.value='';
+    if(!f) return;
+    if(needFields()) return;
+    var lab=input.parentNode; lab.classList.add('busy');
+    setStatus('warn','⏳',type+' — traitement…','Localisation en cours, autorisez si demandé.');
+    var img=new Image(), imgOk=false, gpsOk=false, gps=null, drawn=false;
+    // Horodatage = heure d'ENVOI ; GPS OBLIGATOIRE : aucun envoi sans position.
+    function go(){ if(drawn||!(imgOk&&gpsOk)) return; drawn=true; lab.classList.remove('busy');
+      if(!gps){ drawn=false; setStatus('bad','📍','Position GPS obligatoire','Autorisez la localisation, puis réappuyez — chaque envoi doit être géolocalisé.'); return; }
+      setStatus('warn','⏳',type+' — adresse…','Conversion de la position en adresse…');
+      reverseGeocode(gps.latitude,gps.longitude,function(addr){ drawStamp(img,type,new Date(),gps,addr); }); }
+    img.onload=function(){imgOk=true;go();};
+    img.onerror=function(){imgOk=true;go();};
+    img.src=URL.createObjectURL(f);
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(function(p){gps=p.coords;gpsOk=true;go();},
+        function(){gps=null;gpsOk=true;go();},{enableHighAccuracy:true,timeout:12000,maximumAge:0});
+    } else { gpsOk=true; }
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('label.big input[type=file]'),function(inp){
+    inp.onchange=function(){ handle(inp); };
+  });
+})();
+</script>

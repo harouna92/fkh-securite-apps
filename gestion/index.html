@@ -1,0 +1,336 @@
+<title>FKH — Demandes & Suivi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#eef1f5;--panel:#fff;--panel2:#f4f6fa;--line:#d3d9e3;--ink:#141922;--muted:#5c6473;--brand:#2456c7;--brand-ink:#fff;--ok:#137a3b;--okbg:#e4f5ea;--bad:#c02626;--badbg:#fbe7e7;--warn:#9a6100;--warnbg:#fbf0dc;--mono:ui-monospace,Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;}
+@media (prefers-color-scheme:dark){:root{--bg:#0c1017;--panel:#151b26;--panel2:#1b2330;--line:#2a3444;--ink:#e8ecf3;--muted:#94a0b3;--brand:#5b8bff;--brand-ink:#0c1017;--ok:#43c777;--okbg:#12281b;--bad:#ff6b6b;--badbg:#2a1515;--warn:#f0b34a;--warnbg:#2a2010;}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.top{position:sticky;top:0;z-index:30;background:var(--panel);border-bottom:1px solid var(--line);padding:10px 12px}
+.brand{max-width:44rem;margin:0 auto 8px;font-weight:700;font-size:14px;display:flex;align-items:center;gap:7px}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--brand)}
+.tabs{max-width:44rem;margin:0 auto;display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{flex:1 1 auto;font-family:inherit;font-size:12px;font-weight:600;padding:8px 8px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.wrap{max-width:44rem;margin:0 auto;padding:16px 16px 48px;display:flex;flex-direction:column;gap:13px}
+h1{font-size:1.25rem;font-weight:700;margin:0}.sub{font-size:12.5px;color:var(--muted);margin:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.lab{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:5px}
+label.f{display:block}
+input,select,textarea{font-family:inherit;font-size:1rem;width:100%;padding:11px 12px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);color:var(--ink)}
+textarea{min-height:58px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:34rem){.grid2{grid-template-columns:1fr}}
+.acwrap{position:relative}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:20;background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.sugg div{padding:10px 12px;cursor:pointer;font-size:14px;border-bottom:1px solid var(--line)}.sugg div:last-child{border-bottom:none}.sugg div:hover{background:var(--panel2)}.sugg .cp{color:var(--muted);font-size:12px}
+.ctx{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:10px;align-items:baseline;font-size:13.5px}.row .k{color:var(--muted);min-width:7.5rem;flex-shrink:0}.row .v{font-weight:500}
+.near{display:flex;flex-direction:column;gap:5px}.near .n{display:flex;justify-content:space-between;gap:10px;font-size:13px}.near .n .d{color:var(--muted)}
+.plage{font-size:13.5px;color:var(--ok);font-weight:600;padding:2px 2px}
+.outbox{font-family:var(--mono);font-size:12.5px;white-space:pre-wrap;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+button.big{font-family:inherit;font-size:1.02rem;font-weight:700;width:100%;min-height:52px;border-radius:13px;border:1px solid transparent;background:var(--brand);color:var(--brand-ink);cursor:pointer}
+button.big:active{transform:translateY(1px)}
+.hint{font-size:12px;color:var(--muted)}
+.mck{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mck .m{background:var(--panel2);border-radius:12px;padding:12px}.mck .m .l{font-size:12px;color:var(--muted)}.mck .m .v{font-size:22px;font-weight:700;margin-top:2px}
+.list .it{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}.list .it:last-child{border-bottom:none}
+.pill{font-size:11px;padding:2px 8px;border-radius:8px;white-space:nowrap}
+.hidden{display:none!important}
+.cbx{position:relative}
+.cbx>input{padding-right:40px}
+.cbtn{position:absolute;right:1px;top:1px;bottom:1px;width:36px;border:none;background:transparent;color:var(--muted);font-size:13px;line-height:1;cursor:pointer;border-radius:0 11px 11px 0}
+.cbtn:active{color:var(--brand)}
+.cbx .sugg{max-height:230px;overflow-y:auto;overflow-x:hidden}
+.sugg .addnew{color:var(--brand);font-weight:600}
+.subtabs{display:flex;flex-wrap:wrap;gap:6px}
+.subtabs button{flex:1 1 auto;font-family:inherit;font-size:12px;font-weight:600;padding:8px 6px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
+.subtabs button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.subtabs .cnt{font-size:11px;background:rgba(128,128,128,.22);padding:0 6px;border-radius:7px;min-width:18px;text-align:center}
+.subtabs button.on .cnt{background:rgba(255,255,255,.28)}
+.suivilist{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+.sv{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:12px 14px;display:flex;flex-direction:column;gap:9px}
+.sv .svt{font-weight:700;font-size:14px}
+.sv .svm{font-size:12px;color:var(--muted);white-space:pre-wrap;background:var(--panel2);border-radius:9px;padding:8px 10px}
+.sv .meta{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:3px 14px}
+.sv .delai{color:var(--ok);font-weight:600}
+.sv .acts{display:flex;flex-wrap:wrap;gap:7px}
+.sv .acts button,.sv .acts select{font-family:inherit;font-size:12.5px;font-weight:600;padding:8px 11px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);cursor:pointer;width:auto}
+.sv .acts .ok{background:var(--okbg);color:var(--ok);border-color:transparent}
+.sv .acts .no{background:var(--badbg);color:var(--bad);border-color:transparent}
+.sv .acts .wn{background:var(--warnbg);color:var(--warn);border-color:transparent}
+.sv .badge{align-self:flex-start;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:8px}
+.svempty{color:var(--muted);font-size:13px;padding:18px;text-align:center;border:1px dashed var(--line);border-radius:12px}
+</style>
+
+<div class="top">
+  <div class="brand"><span class="dot"></span>FKH — DEMANDES &amp; SUIVI</div>
+  <div class="tabs" id="tabs">
+    <button data-s="demandes" class="on">Demandes</button>
+    <button data-s="prise">Prise de service</button>
+    <button data-s="fin">Fin de service</button>
+    <button data-s="suivi">Suivi demandes</button>
+    <button data-s="thiam">Thiam</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <section id="sec-demandes">
+    <div><h1>Demandes</h1><p class="sub">Choisis ou écris · la ville remplit le code postal · les heures donnent la plage.</p></div>
+    <div class="card">
+      <div class="grid2">
+        <label class="f"><div class="lab">Client / donneur d'ordre</div><div class="cbx"><input id="client" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="client" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-client"></div></div></label>
+        <label class="f"><div class="lab">Prestation</div><div class="cbx"><input id="type" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="type" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-type"></div></div></label>
+      </div>
+      <div class="grid2">
+        <label class="f"><div class="lab">Type d'agent</div><div class="cbx"><input id="agent" placeholder="ADS, SSIAP, maître-chien…" autocomplete="off"><button type="button" class="cbtn" data-for="agent" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-agent"></div></div></label>
+        <label class="f"><div class="lab">Type de site</div><div class="cbx"><input id="sitetype" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="sitetype" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-sitetype"></div></div></label>
+      </div>
+      <div class="grid2">
+        <label class="f"><div class="lab">Surveillance intérieur / extérieur</div><select id="surv"><option value="">—</option><option>Intérieur</option><option>Extérieur</option></select></label>
+        <label class="f"><div class="lab">Ville</div><div class="acwrap"><input type="text" id="ville" placeholder="Tape une ville…" autocomplete="off"><div class="sugg hidden" id="sugg"></div></div></label>
+      </div>
+      <label class="f"><div class="lab">Code postal</div><input id="cp" list="dl-cp" placeholder="Rempli avec la ville" autocomplete="off"><datalist id="dl-cp"></datalist></label>
+
+      <label class="f"><div class="lab">Quand ?</div><select id="quand"><option value="date">Date précise</option><option value="asap">Dès que possible</option></select></label>
+      <div class="grid2" id="dateBlock">
+        <label class="f"><div class="lab">Date</div><input type="date" id="date"></label>
+        <label class="f"><div class="lab">Heure de début</div><div class="cbx"><input id="debut" placeholder="20:00" autocomplete="off"><button type="button" class="cbtn" data-for="debut" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-debut"></div></div></label>
+      </div>
+      <div class="grid2">
+        <label class="f"><div class="lab">Fin de service</div><select id="finType"><option value="fixe">Heure fixe</option><option value="arrivee">À l'arrivée de la relève</option></select></label>
+        <label class="f" id="finHeureWrap"><div class="lab">Heure de fin</div><div class="cbx"><input id="finHeure" placeholder="06:00" autocomplete="off"><button type="button" class="cbtn" data-for="finHeure" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-finHeure"></div></div></label>
+      </div>
+      <div class="plage hidden" id="plage"></div>
+      <div class="grid2">
+        <label class="f"><div class="lab">Nb agents</div><input type="number" id="agents" min="1" placeholder="1"></label>
+        <label class="f"><div class="lab">Réf / contact</div><input type="text" id="ref" placeholder="Facultatif"></label>
+      </div>
+      <label class="f"><div class="lab">Notes</div><textarea id="notes" placeholder="Précisions, adresse exacte, consignes…"></textarea></label>
+    </div>
+    <div class="ctx hidden" id="ctx">
+      <div class="lab" style="margin:0">Contexte géographique</div>
+      <div class="row"><span class="k">Ville</span><span class="v" id="c-ville">—</span></div>
+      <div class="row"><span class="k">Département</span><span class="v" id="c-dep">—</span></div>
+      <div class="row"><span class="k">Région</span><span class="v" id="c-reg">—</span></div>
+      <div class="row"><span class="k">Grandes villes proches</span></div>
+      <div class="near" id="c-near"></div>
+    </div>
+    <button class="big" id="addBtn" style="background:var(--panel);color:var(--ink);border:1px solid var(--line)">➕ Ajouter cette demande, en saisir une autre</button>
+    <div class="card hidden" id="addedCard"><div class="lab" style="margin:0">Demandes ajoutées (<span id="addedN">0</span>)</div><div class="list" id="addedList"></div></div>
+    <div class="card">
+      <div class="lab" style="margin:0">Texte à copier dans le groupe</div>
+      <div class="outbox" id="out">Remplis la demande ci-dessus…</div>
+      <button class="big" id="copy">Copier pour le groupe</button>
+      <button class="big" id="toSuivi" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">📥 Envoyer vers « Suivi demandes »</button>
+    </div>
+  </section>
+
+  <section id="sec-prise" class="hidden">
+    <div><h1>Prise de service</h1><p class="sub">Section à définir ensemble.</p></div>
+    <div class="card"><p class="hint" style="margin:0">🚧 À concevoir — dis-moi ce que cette section doit contenir (ex. suivi des prises de service : qui a pointé, où, à quelle heure).</p></div>
+  </section>
+  <section id="sec-fin" class="hidden">
+    <div><h1>Fin de service</h1><p class="sub">Section à définir ensemble.</p></div>
+    <div class="card"><p class="hint" style="margin:0">🚧 À concevoir — dis-moi ce que cette section doit contenir.</p></div>
+  </section>
+  <section id="sec-suivi" class="hidden">
+    <div><h1>Suivi demandes</h1><p class="sub">Chaque demande envoyée ici est horodatée « prise en compte ». Fais-la avancer : agent trouvé, annulée client, ou non gérée (+ motif).</p></div>
+    <div class="subtabs" id="suiviTabs">
+      <button data-b="recherche" class="on">🔎 En recherche <span class="cnt" id="cnt-recherche">0</span></button>
+      <button data-b="validee">✅ Validées <span class="cnt" id="cnt-validee">0</span></button>
+      <button data-b="annulee">✖️ Annulées <span class="cnt" id="cnt-annulee">0</span></button>
+      <button data-b="nongeree">⚠️ Non gérées <span class="cnt" id="cnt-nongeree">0</span></button>
+    </div>
+    <div class="suivilist" id="suiviList"></div>
+  </section>
+  <section id="sec-thiam" class="hidden">
+    <div><h1>Thiam</h1><p class="sub">Section à définir ensemble.</p></div>
+    <div class="card"><p class="hint" style="margin:0">🚧 À concevoir — dis-moi ce que la section « Thiam » doit contenir.</p></div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var byId=function(x){return document.getElementById(x)};
+  var secs=['demandes','prise','fin','suivi','thiam'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});window.scrollTo(0,0);};});
+
+  function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
+  function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+  // Menu déroulant maison (fiable mobile) : flèche ▾ ouvre la liste, on tape pour filtrer,
+  // on tape un choix pour sélectionner, toute nouvelle valeur s'ajoute (mémorisée si key).
+  function esc(x){return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+  function mkCombo(id,base,key,cb){
+    var stored=key?load(key):[], list=base.slice();
+    stored.forEach(function(x){ if(list.indexOf(x)<0) list.push(x); });
+    var inp=byId(id), box=byId('sugg-'+id), btn=document.querySelector('.cbtn[data-for="'+id+'"]');
+    function commit(){ var v=inp.value.trim(); if(key && v && list.indexOf(v)<0){ list.push(v); stored.push(v); save(key,stored); } }
+    function open(){
+      var q=inp.value.trim().toLowerCase();
+      var items=list.filter(function(x){ return x.toLowerCase().indexOf(q)>=0; });
+      var html=items.map(function(x){ return '<div data-v="'+esc(x)+'">'+esc(x)+'</div>'; }).join('');
+      var typed=inp.value.trim();
+      if(typed && list.indexOf(typed)<0) html+='<div class="addnew" data-v="'+esc(typed)+'">➕ Ajouter « '+esc(typed)+' »</div>';
+      if(!html){ box.classList.add('hidden'); return; }
+      box.innerHTML=html; box.classList.remove('hidden');
+      box.querySelectorAll('div').forEach(function(d){ d.addEventListener('mousedown',function(e){ e.preventDefault(); inp.value=d.getAttribute('data-v'); commit(); box.classList.add('hidden'); if(cb)cb(); genText(); }); });
+    }
+    inp.addEventListener('focus',open);
+    inp.addEventListener('input',function(){ open(); if(cb)cb(); genText(); });
+    inp.addEventListener('change',function(){ commit(); if(cb)cb(); genText(); });
+    if(btn) btn.addEventListener('click',function(e){ e.preventDefault(); if(box.classList.contains('hidden')){ inp.focus(); open(); } else box.classList.add('hidden'); });
+  }
+  // Heures format 24h, par demi-heure
+  var TIMES=[]; for(var hh=0;hh<24;hh++){ ['00','30'].forEach(function(mm){ TIMES.push(('0'+hh).slice(-2)+':'+mm); }); }
+  mkCombo('client',["SECURITAS","AQUILA","RANC DEVELOPPEMENT","SOTEL","GAMBRINUS","SAS BULLION","P2S","NEW ANGEL'S"],'fkh_clients');
+  mkCombo('type',["Gardiennage","Ronde","Intervention sur alarme"],'fkh_presta');
+  mkCombo('agent',["ADS","SSIAP","Maître-chien"],'fkh_agents');
+  mkCombo('sitetype',["Magasin","Banque","Site professionnel"],'fkh_sites');
+  mkCombo('debut',TIMES,null,plage);
+  mkCombo('finHeure',TIMES,null,plage);
+
+  byId('surv').addEventListener('change',genText);
+  byId('quand').addEventListener('change',function(){ byId('dateBlock').classList.toggle('hidden',this.value==='asap'); plage(); genText(); });
+  byId('finType').addEventListener('change',function(){ byId('finHeureWrap').classList.toggle('hidden',this.value!=='fixe'); plage(); genText(); });
+
+  function toMin(t){ var m=/^(\d{1,2}):(\d{2})$/.exec(t.trim()); return m?(+m[1]*60+ +m[2]):null; }
+  function plageStr(){
+    var s=byId('debut').value, e=byId('finHeure').value, a=toMin(s), b=toMin(e);
+    if(a==null||b==null||byId('finType').value!=='fixe') return '';
+    var dur=b-a; if(dur<=0) dur+=1440; var h=Math.floor(dur/60), m=dur%60;
+    return s+' → '+e+'  ·  '+h+'h'+(m?('0'+m).slice(-2):'')+(b<=a?' (nuit)':'');
+  }
+  function plage(){ var p=byId('plage'); var s=plageStr(); if(s&&byId('quand').value!=='asap'){ p.textContent='🕐 '+s; p.classList.remove('hidden'); } else p.classList.add('hidden'); }
+
+  // ---- Ville (communes de France) + code postal auto ----
+  var BIG=[["Paris",48.8566,2.3522],["Marseille",43.2965,5.3698],["Lyon",45.764,4.8357],["Toulouse",43.6047,1.4442],["Nice",43.7102,7.262],["Nantes",47.2184,-1.5536],["Montpellier",43.6108,3.8767],["Strasbourg",48.5734,7.7521],["Bordeaux",44.8378,-0.5792],["Lille",50.6292,3.0573],["Rennes",48.1173,-1.6778],["Reims",49.2583,4.0317],["Saint-Étienne",45.4397,4.3872],["Le Havre",49.4944,0.1079],["Toulon",43.1242,5.928],["Grenoble",45.1885,5.7245],["Dijon",47.322,5.0415],["Angers",47.4784,-0.5632],["Nîmes",43.8367,4.3601],["Clermont-Ferrand",45.7772,3.087],["Le Mans",48.0061,0.1996],["Aix-en-Provence",43.5297,5.4474],["Brest",48.3904,-4.4861],["Tours",47.3941,0.6848],["Amiens",49.8941,2.2958],["Limoges",45.8336,1.2611],["Annecy",45.8992,6.1294],["Perpignan",42.6887,2.8948],["Besançon",47.2378,6.0241],["Metz",49.1193,6.1757],["Orléans",47.9029,1.9093],["Mulhouse",47.7508,7.3359],["Caen",49.1829,-0.3707],["Nancy",48.6921,6.1844],["Avignon",43.9493,4.8055],["Poitiers",46.5802,0.3404],["Bourges",47.081,2.3988],["Bayonne",43.4933,-1.4748],["Pau",43.2951,-0.3708],["La Rochelle",46.1603,-1.1511],["Chambéry",45.5646,5.9178],["Troyes",48.2973,4.0744],["Valence",44.9334,4.8924],["Belfort",47.6379,6.8628],["Lorient",47.7485,-3.37]];
+  function km(a,b,c,d){var R=6371,r=Math.PI/180,x=(c-a)*r,y=(d-b)*r;var s=Math.sin(x/2)*Math.sin(x/2)+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)*Math.sin(y/2);return Math.round(2*R*Math.asin(Math.min(1,Math.sqrt(s))));}
+  function dird(a,b,c,d){var r=Math.PI/180,dLo=(d-b)*r;var y=Math.sin(dLo)*Math.cos(c*r);var x=Math.cos(a*r)*Math.sin(c*r)-Math.sin(a*r)*Math.cos(c*r)*Math.cos(dLo);var bb=(Math.atan2(y,x)/r+360)%360;return ["N","N-E","E","S-E","S","S-O","O","N-O"][Math.round(bb/45)%8];}
+  var sel=null,t;
+  byId('ville').addEventListener('input',function(){var q=this.value.trim();sel=null;render();clearTimeout(t);if(q.length<2){byId('sugg').classList.add('hidden');return;}t=setTimeout(function(){search(q);},250);});
+  function search(q){fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(q)+'&fields=nom,code,departement,region,centre,codesPostaux,population&boost=population&limit=6').then(function(r){return r.json();}).then(function(list){if(!Array.isArray(list)||!list.length){byId('sugg').classList.add('hidden');return;}var box=byId('sugg');box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+c.nom+'</span> <span class="cp">'+cp+' · '+(c.departement?c.departement.nom:'')+'</span>';d.onclick=function(){pick(c);};box.appendChild(d);});box.classList.remove('hidden');}).catch(function(){byId('sugg').classList.add('hidden');});}
+  function pick(c){
+    sel=c;byId('ville').value=c.nom;byId('sugg').classList.add('hidden');
+    var co=c.centre&&c.centre.coordinates;sel._la=co?co[1]:null;sel._lo=co?co[0]:null;
+    var cps=c.codesPostaux||[];sel._cp=cps[0]||'';
+    byId('cp').value=cps[0]||''; byId('dl-cp').innerHTML=cps.map(function(x){return '<option value="'+x+'"></option>';}).join('');
+    sel._near=(sel._la!=null)?BIG.map(function(b){return{n:b[0],d:km(sel._la,sel._lo,b[1],b[2]),dir:dird(b[1],b[2],sel._la,sel._lo)};}).filter(function(x){return x.d>1;}).sort(function(a,b){return a.d-b.d;}).slice(0,3):[];
+    render();
+  }
+  function render(){var ctx=byId('ctx');if(sel){ctx.classList.remove('hidden');byId('c-ville').textContent=sel.nom;byId('c-dep').textContent=sel.departement?(sel.departement.nom+' ('+sel.departement.code+')'):'—';byId('c-reg').textContent=sel.region?sel.region.nom:'—';byId('c-near').innerHTML=(sel._near||[]).map(function(x){return '<div class="n"><span>'+x.n+' <span style="color:var(--muted)">('+x.dir+')</span></span><span class="d">'+x.d+' km</span></div>';}).join('')||'<div class="hint">—</div>';}else ctx.classList.add('hidden');genText();}
+
+  function fmtD(d){if(!d)return'';var x=new Date(d+'T00:00');return ('0'+x.getDate()).slice(-2)+'/'+('0'+(x.getMonth()+1)).slice(-2)+'/'+x.getFullYear();}
+  var added=[];
+  function buildCurrent(){
+    var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),quand=byId('quand').value,date=byId('date').value,debut=byId('debut').value.trim(),finType=byId('finType').value,finH=byId('finHeure').value.trim(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
+    if(!(client||type||agent||siteT||sel||byId('ville').value.trim()||date||finH||notes)) return '';
+    var L=[];
+    if(client)L.push('Client : '+client);
+    if(type)L.push('Prestation : '+type);
+    if(agent)L.push('Type d\'agent : '+agent);
+    if(siteT)L.push('Type de site : '+siteT);
+    if(surv)L.push('Surveillance : '+surv);
+    if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':'')+(sel.departement?' — '+sel.departement.nom+' ('+sel.departement.code+')':'')+(sel.region?', '+sel.region.nom:''));if(sel._near&&sel._near.length)L.push('Situation : à '+sel._near[0].d+' km au '+sel._near[0].dir+' de '+sel._near[0].n+(sel._near[1]?' · proche de '+sel._near[1].n+' ('+sel._near[1].d+' km)':'')+(sel._near[2]?', '+sel._near[2].n+' ('+sel._near[2].d+' km)':''));}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':''));
+    if(quand==='asap')L.push('Disponibilité : DÈS QUE POSSIBLE');else if(date)L.push('Date : '+fmtD(date));
+    var ps=plageStr();
+    if(quand!=='asap' && ps) L.push('Horaires : '+ps);
+    else { if(quand!=='asap' && debut)L.push('Début : '+debut); if(finType==='arrivee')L.push('Fin : à l\'arrivée de la relève');else if(finH)L.push('Fin : '+finH); }
+    if(ag)L.push('Agents : '+ag);if(ref)L.push('Réf/contact : '+ref);if(notes)L.push('Notes : '+notes);
+    return L.join('\n');
+  }
+  function renderOut(){
+    var blocks=added.slice(),cur=buildCurrent(); if(cur)blocks.push(cur);
+    if(!blocks.length){ byId('out').textContent='Remplis la demande ci-dessus…'; return; }
+    if(blocks.length===1){ byId('out').textContent='📋 NOUVELLE DEMANDE — FKH\n'+blocks[0]; return; }
+    byId('out').textContent='📋 DEMANDES FKH ('+blocks.length+')\n\n'+blocks.map(function(b,i){return '— Demande '+(i+1)+' —\n'+b;}).join('\n\n');
+  }
+  function genText(){ renderOut(); }
+  function resetForm(){
+    ['client','type','agent','sitetype','ville','cp','date','debut','finHeure','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
+    byId('surv').value='';byId('quand').value='date';byId('finType').value='fixe';
+    byId('dateBlock').classList.remove('hidden');byId('finHeureWrap').classList.remove('hidden');
+    sel=null;byId('ctx').classList.add('hidden');byId('plage').classList.add('hidden');
+  }
+  function renderAdded(){
+    byId('addedCard').classList.toggle('hidden',!added.length); byId('addedN').textContent=added.length;
+    byId('addedList').innerHTML=added.map(function(b,i){var t=(b.split('\n')[0]||'Demande').replace(/[<>]/g,'');return '<div class="it"><span class="pill" style="background:var(--panel2);color:var(--muted)">'+(i+1)+'</span><span style="flex:1">'+t+'</span><button data-i="'+i+'" class="rm" aria-label="Retirer" style="width:30px;height:30px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);cursor:pointer">✕</button></div>';}).join('');
+    byId('addedList').querySelectorAll('.rm').forEach(function(bt){bt.onclick=function(){added.splice(+bt.getAttribute('data-i'),1);renderAdded();renderOut();};});
+  }
+  byId('addBtn').onclick=function(){var cur=buildCurrent();if(!cur)return;added.push(cur);resetForm();renderAdded();renderOut();window.scrollTo(0,0);};
+  ['date','agents','ref','notes','cp'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
+  byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
+
+  // ===== Suivi demandes =====
+  var SUIVI=load('fkh_suivi'); SUIVI.forEach(function(x){delete x._pending;});
+  var MOTIFS_NG=["Pas d'agent disponible","Agent pas trouvé à temps","Délai trop court","Tarif non validé","Mission refusée","Autre"];
+  var MOTIFS_AN=["Annulée par le client","Reportée","Doublon","Plus besoin","Autre"];
+  var suiviBucket='recherche', idc=0;
+  function saveSuivi(){ save('fkh_suivi',SUIVI.map(function(x){var c={};for(var k in x)if(k!=='_pending')c[k]=x[k];return c;})); }
+  function titreFrom(txt){
+    function g(re){var m=re.exec(txt);return m?m[1].trim():'';}
+    var p=g(/Prestation : (.+)/), v=g(/Ville : ([^\n(—]+)/), d=g(/Date : (.+)/), asap=/DÈS QUE POSSIBLE/.test(txt);
+    return [p,v.replace(/\s+$/,''),asap?'dès que possible':d].filter(Boolean).join(' · ')||'Demande';
+  }
+  function fmtDT(ts){var x=new Date(ts);return ('0'+x.getDate()).slice(-2)+'/'+('0'+(x.getMonth()+1)).slice(-2)+' '+('0'+x.getHours()).slice(-2)+':'+('0'+x.getMinutes()).slice(-2);}
+  function fmtDelai(ms){ if(ms<0)ms=0; var min=Math.round(ms/60000); if(min<1)return '< 1 min'; if(min<60)return min+' min'; var h=Math.floor(min/60),m=min%60; if(h<24)return h+' h'+(m?(' '+('0'+m).slice(-2)):''); var j=Math.floor(h/24),hh=h%24; return j+' j'+(hh?(' '+hh+' h'):''); }
+  function pushToSuivi(){
+    var items=added.slice(), cur=buildCurrent(); if(cur&&items.indexOf(cur)<0)items.push(cur);
+    if(!items.length) return 0;
+    var now=Date.now();
+    items.forEach(function(txt){ SUIVI.unshift({id:'d'+now+'_'+(idc++),texte:txt,titre:titreFrom(txt),statut:'recherche',motif:'',pris:now,valide:null}); });
+    saveSuivi(); return items.length;
+  }
+  function badge(st,motif){
+    var map={validee:['okbg','ok','✅ Validée'],annulee:['badbg','bad','✖️ Annulée client'],nongeree:['warnbg','warn','⚠️ Non gérée']}, m=map[st];
+    return m?'<span class="badge" style="background:var(--'+m[0]+');color:var(--'+m[1]+')">'+m[2]+(motif?' — '+esc(motif):'')+'</span>':'';
+  }
+  function renderSuivi(){
+    ['recherche','validee','annulee','nongeree'].forEach(function(b){var el=byId('cnt-'+b);if(el)el.textContent=SUIVI.filter(function(x){return x.statut===b;}).length;});
+    document.querySelectorAll('#suiviTabs button').forEach(function(bt){bt.classList.toggle('on',bt.getAttribute('data-b')===suiviBucket);});
+    var arr=SUIVI.filter(function(x){return x.statut===suiviBucket;}), wrap=byId('suiviList');
+    if(!arr.length){ wrap.innerHTML='<div class="svempty">Aucune demande dans cette catégorie.</div>'; return; }
+    wrap.innerHTML=arr.map(function(x){
+      var meta='<span>📥 Prise en compte : '+fmtDT(x.pris)+'</span>';
+      if(x.valide)meta+='<span>🏁 Traitée : '+fmtDT(x.valide)+'</span><span class="delai">⏱ Délai : '+fmtDelai(x.valide-x.pris)+'</span>';
+      var body;
+      if(x._pending){
+        var motifs=x._pending==='nongeree'?MOTIFS_NG:MOTIFS_AN;
+        body='<div class="acts"><select data-sel="'+x.id+'">'+motifs.map(function(m){return '<option>'+esc(m)+'</option>';}).join('')+'</select><button class="ok" data-act="confirm" data-id="'+x.id+'">Confirmer</button><button data-act="cancel" data-id="'+x.id+'">Retour</button></div>';
+      } else if(x.statut==='recherche'){
+        body='<div class="acts"><button class="ok" data-act="trouve" data-id="'+x.id+'">✅ Agent trouvé</button><button class="no" data-act="annule" data-id="'+x.id+'">✖️ Annulée client</button><button class="wn" data-act="nongere" data-id="'+x.id+'">⚠️ Non gérée</button></div>';
+      } else {
+        body=badge(x.statut,x.motif)+'<div class="acts"><button data-act="reopen" data-id="'+x.id+'">↩︎ Remettre en recherche</button><button class="no" data-act="del" data-id="'+x.id+'">🗑️ Supprimer</button></div>';
+      }
+      return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div><div class="svm">'+esc(x.texte)+'</div>'+body+'</div>';
+    }).join('');
+  }
+  byId('suiviList').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b)return;
+    var id=b.getAttribute('data-id'), act=b.getAttribute('data-act'), it=null,i;
+    for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;}
+    if(!it)return;
+    if(act==='trouve'){it.statut='validee';it.valide=Date.now();it.motif='';delete it._pending;}
+    else if(act==='annule'){it._pending='annulee';}
+    else if(act==='nongere'){it._pending='nongeree';}
+    else if(act==='cancel'){delete it._pending;}
+    else if(act==='confirm'){var s=byId('suiviList').querySelector('select[data-sel="'+id+'"]');it.statut=it._pending;it.motif=s?s.value:'';it.valide=Date.now();delete it._pending;}
+    else if(act==='reopen'){it.statut='recherche';it.valide=null;it.motif='';delete it._pending;}
+    else if(act==='del'){SUIVI=SUIVI.filter(function(x){return x.id!==id;});}
+    saveSuivi(); renderSuivi();
+  });
+  document.querySelectorAll('#suiviTabs button').forEach(function(bt){bt.onclick=function(){suiviBucket=bt.getAttribute('data-b');renderSuivi();};});
+  function flash(btn,msg){var o=btn.getAttribute('data-o')||btn.textContent;btn.setAttribute('data-o',o);btn.textContent=msg;setTimeout(function(){btn.textContent=btn.getAttribute('data-o');},1500);}
+  byId('toSuivi').onclick=function(){
+    var n=pushToSuivi(); if(!n){flash(byId('toSuivi'),'Rien à envoyer');return;}
+    added=[];renderAdded();resetForm();renderOut();
+    flash(byId('toSuivi'),'✓ '+n+' demande'+(n>1?'s':'')+' → Suivi');
+    suiviBucket='recherche';renderSuivi();
+    document.querySelector('#tabs button[data-s="suivi"]').click();
+  };
+  renderSuivi();
+
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.acwrap'))byId('sugg').classList.add('hidden');
+    if(!e.target.closest('.cbx'))document.querySelectorAll('.cbx .sugg').forEach(function(s){s.classList.add('hidden');});
+  });
+})();
+</script>
