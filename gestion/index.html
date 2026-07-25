@@ -196,6 +196,7 @@ button.big:active{transform:translateY(1px)}
   (function(){ for(var h=0;h<24;h++)HOPTS+='<option>'+pad2(h)+'</option>'; for(var m=0;m<60;m+=5)MOPTS+='<option>'+pad2(m)+'</option>'; })();
   function hmv(deb,min){ return deb?(deb+':'+(min||'00')):''; }
   function ampl(s,e){ var a=toMin(s),b=toMin(e); if(a==null||b==null)return ''; var dur=b-a; if(dur<=0)dur+=1440; var h=Math.floor(dur/60),m=dur%60; return s+' → '+e+' · '+h+'h'+(m?pad2(m):'')+(b<=a?' (nuit)':''); }
+  function duree(s,e){ var a=toMin(s),b=toMin(e); if(a==null||b==null)return ''; var dur=b-a; if(dur<=0)dur+=1440; var h=Math.floor(dur/60),m=dur%60; return h+'h'+(m?pad2(m):'')+(b<=a?' (nuit)':''); }
 
   byId('surv').addEventListener('change',genText);
 
@@ -286,9 +287,10 @@ button.big:active{transform:translateY(1px)}
           p.push('H24 (24h/24)');
           if(v.dateFin)p.push('jusqu\'au '+fmtD(v.dateFin)); else p.push('jusqu\'à nouvel ordre');
         } else {
-          if(v.deb)p.push(v.deb);
+          if(v.deb)p.push('début '+v.deb);
           if(v.arr)p.push('fin à l\'arrivée du personnel'+(v.fin?' (vers '+v.fin+')':''));
           else if(v.fin)p.push('fin '+v.fin);
+          if(!v.arr){ var dd=duree(v.deb,v.fin); if(dd)p.push('plage '+dd); }
           if(v.dateFin)p.push('jusqu\'au '+fmtD(v.dateFin));
         }
         L.push((vacs.length>1?'Vacation '+(i+1)+' : ':'Vacation : ')+(p.join(' · ')||'(à définir)'));
