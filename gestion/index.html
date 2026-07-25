@@ -161,7 +161,11 @@ button.big:active{transform:translateY(1px)}
       <div id="missionBlock" class="hidden">
         <label class="f"><div class="lab">📞 Numéro prise / fin de service</div><select id="mv-tel"></select></label>
         <label class="f hidden" id="mv-tel-other-wrap"><div class="lab">Autre numéro (saisir)</div><input id="mv-tel-other" placeholder="Numéro à appeler" inputmode="tel" autocomplete="off"></label>
-        <label class="f"><div class="lab">📍 Adresse du site</div><textarea id="adresse" placeholder="Adresse complète du site" style="min-height:44px"></textarea></label>
+        <div class="grid2">
+          <label class="f"><div class="lab">📍 N° de voie</div><input id="adr-num" placeholder="Ex. 12" autocomplete="off"></label>
+          <label class="f"><div class="lab">Type de voie</div><input id="adr-type" placeholder="rue, avenue, bd…" autocomplete="off"></label>
+        </div>
+        <label class="f"><div class="lab">Nom de la voie</div><input id="adr-nom" placeholder="Ex. des Lilas" autocomplete="off"></label>
         <div class="lab" style="margin:8px 0 2px">Infos à inclure (mission validée)</div>
         <div class="avopts">
           <label><input type="checkbox" id="mv-client" checked>Client</label>
@@ -405,7 +409,7 @@ button.big:active{transform:translateY(1px)}
     if(on('sitetype')&&byId('sitetype').value.trim())L.push('Type de site : '+byId('sitetype').value.trim());
     if(on('surv')&&byId('surv').value)L.push('Surveillance : '+byId('surv').value);
     if(on('ville')&&villeName)L.push('Lieu : '+villeName+(cp?' ('+cp+')':''));
-    if(on('adresse')&&byId('adresse').value.trim())L.push('Adresse : '+byId('adresse').value.trim());
+    if(on('adresse')){ var adr=[byId('adr-num').value.trim(),byId('adr-type').value.trim(),byId('adr-nom').value.trim()].filter(Boolean).join(' '); if(adr)L.push('Adresse : '+adr); }
     if(on('near')&&sel&&sel._near)sel._near.forEach(function(x){L.push(x.n+(x.cp?' '+x.cp:'')+' à '+x.d+' km'+(x.dur?' · '+x.dur:''));});
     if(on('meas'))meas.forEach(function(x){L.push('↳ '+x.n+(x.cp?' '+x.cp:'')+' à '+x.km+' km'+(x.dur?' · '+x.dur:''));});
     if(on('vac')){var vacs=readVacs();if(vacs.length){var off=(+byId(px+'-offh').value||0)*60+(+byId(px+'-offm').value||0);L=L.concat(vacLines(vacs,off));}}
@@ -438,7 +442,7 @@ button.big:active{transform:translateY(1px)}
   }
   function genText(){ renderOut(); if(!byId('agentBlock').classList.contains('hidden')){ byId('out-agent').textContent=buildSel('av')||'Remplis la demande…'; } if(!byId('missionBlock').classList.contains('hidden')){ byId('out-mission').textContent=buildSel('mv')||'Remplis la demande…'; } }
   function resetForm(){
-    ['client','type','agent','sitetype','ville','cp','sitename','adresse','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
+    ['client','type','agent','sitetype','ville','cp','sitename','adr-num','adr-type','adr-nom','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
     byId('surv').value='';var mt=byId('mv-tel');if(mt)mt.value='';
     byId('vacsList').innerHTML='';addVac();
     meas.length=0;byId('measList').innerHTML='';
@@ -450,7 +454,7 @@ button.big:active{transform:translateY(1px)}
     byId('addedList').querySelectorAll('.rm').forEach(function(bt){bt.onclick=function(){added.splice(+bt.getAttribute('data-i'),1);renderAdded();renderOut();};});
   }
   byId('addBtn').onclick=function(){var cur=buildCurrent();if(!cur)return;added.push(cur);resetForm();renderAdded();renderOut();window.scrollTo(0,0);};
-  ['sitename','adresse','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
+  ['sitename','adr-num','adr-type','adr-nom','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   byId('agentToggle').addEventListener('click',function(){ byId('agentBlock').classList.toggle('hidden'); genText(); });
   ['av-client','av-sitename','av-presta','av-agenttype','av-sitetype','av-surv','av-ville','av-near','av-meas','av-vac','av-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
