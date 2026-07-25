@@ -111,6 +111,7 @@ button.big:active{transform:translateY(1px)}
 .thc-warn{color:var(--bad);font-weight:700;font-size:12.5px}
 .thc-lbl{font-size:11px;background:var(--brand);color:var(--brand-ink);border-radius:7px;padding:1px 7px;font-weight:700;white-space:nowrap}
 .thc-grp{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;padding:9px 12px 3px;border-top:1px solid var(--line)}
+.thc-sel{font-size:13px;padding:8px 10px}
 .thc-com{font-size:13px;padding:8px 10px}
 </style>
 
@@ -378,6 +379,10 @@ button.big:active{transform:translateY(1px)}
     <div class="card">
       <div id="th-lateBadge" class="th-late-badge" style="display:none"></div>
       <div class="thboard" id="th-board"></div>
+    </div>
+    <div class="card">
+      <div class="lab" style="margin:0">📵 Agents injoignables — statistiques</div>
+      <div id="th-injoign"></div>
     </div>
   </section>
 </div>
@@ -939,7 +944,7 @@ button.big:active{transform:translateY(1px)}
     if(s.deb&&s.fin)L.push('Service : '+s.deb+' → '+s.fin);else if(s.deb)L.push('Début : '+s.deb);
     var cs=s.calls||[];
     function kind(c){return c.kind||(c.lbl?'pre':'svc');}
-    function grp(title,arr){if(!arr.length)return;L.push(title+' :');arr.forEach(function(c){L.push('  '+(c.lbl?c.lbl+' ':'')+c.fr+' (France) → '+thToMali(c.fr)+' (Mali)'+(c.done?' ✅ '+c.at:'')+(c.com?' — '+c.com:''));});}
+    function grp(title,arr){if(!arr.length)return;L.push(title+' :');arr.forEach(function(c){var cm=thComShow(c);L.push('  '+(c.lbl?c.lbl+' ':'')+c.fr+' (France) → '+thToMali(c.fr)+' (Mali)'+(c.done?' ✅ '+c.at:'')+(cm?' — '+cm:''));});}
     grp('Avant la prise de service',cs.filter(function(c){return kind(c)==='pre';}));
     grp('Appels pendant le service',cs.filter(function(c){return kind(c)==='svc';}));
     return L.join('\n');
@@ -953,6 +958,9 @@ button.big:active{transform:translateY(1px)}
   // ---- Suivi des appels (contrôleur de retard) ----
   function thNowHM(){var d=new Date();return pad2(d.getHours())+':'+pad2(d.getMinutes());}
   function thIsLate(fr,done){if(done)return false;var m=toMin(fr);if(m==null)return false;var d=new Date();var diff=((d.getHours()*60+d.getMinutes())-m+1440)%1440;return diff>=5&&diff<=720;}
+  function thComSel(c){var v=c.com||'';if(v==='Injoignable'||v==='RAS'||v==='Autre')return v;return v?'Autre':'';}
+  function thComTxt(c){if(c.comtxt)return c.comtxt;var v=c.com||'';return (v&&v!=='Injoignable'&&v!=='RAS'&&v!=='Autre')?v:'';}
+  function thComShow(c){var v=c.com||'';if(v==='Autre')return c.comtxt||'Autre à préciser';return v;}
   function thRenderBoard(){
     var wrap=byId('th-board');if(!wrap)return;
     if(!TH.length){wrap.innerHTML='<div class="svempty">Aucun site au suivi. Remplis un site ci-dessus puis « Ajouter ce site au suivi ».</div>';byId('th-lateBadge').style.display='none';return;}
@@ -965,7 +973,8 @@ button.big:active{transform:translateY(1px)}
         return '<div class="thc '+(c.done?'thc-done':(late?'thc-late':''))+'" data-sid="'+s.id+'" data-ci="'+ci+'">'
           +'<label class="thc-chk"><input type="checkbox" class="thc-box"'+(c.done?' checked':'')+'></label>'
           +'<div class="thc-main"><div class="thc-h">'+(c.lbl?'<span class="thc-lbl">'+esc(c.lbl)+'</span> ':'')+esc(c.fr)+' <span class="thc-mali">→ Mali '+esc(thToMali(c.fr))+'</span> '+st+'</div>'
-          +'<input class="thc-com" placeholder="Commentaire de l\'appel…" value="'+esc(c.com||'')+'"></div>'
+          +'<select class="thc-sel"><option value=""'+(thComSel(c)===''?' selected':'')+'>— commentaire —</option><option value="Injoignable"'+(thComSel(c)==='Injoignable'?' selected':'')+'>Injoignable</option><option value="RAS"'+(thComSel(c)==='RAS'?' selected':'')+'>RAS</option><option value="Autre"'+(thComSel(c)==='Autre'?' selected':'')+'>Autre à préciser…</option></select>'
+          +'<input class="thc-com" placeholder="Préciser…" value="'+esc(thComTxt(c))+'"'+(thComSel(c)==='Autre'?'':' style="display:none"')+'></div>'
         +'</div>';
       }
       var cs=s.calls||[],pre='',svc='';
@@ -975,6 +984,16 @@ button.big:active{transform:translateY(1px)}
       return '<div class="thsite'+(siteLate?' thsite-late':'')+'"><div class="thsite-h">'+esc(s.site||'Site')+(s.agent?' · '+esc(s.agent):'')+(s.deb&&s.fin?' · '+esc(s.deb)+'→'+esc(s.fin):(s.deb?' · début '+esc(s.deb):''))+'<button class="thsite-del" data-thdel="'+s.id+'" title="Retirer ce site">🗑️</button></div>'+body+'</div>';
     }).join('');
     var badge=byId('th-lateBadge');badge.textContent=lateTot?('⚠️ '+lateTot+' appel'+(lateTot>1?'s':'')+' en retard'):'';badge.style.display=lateTot?'':'none';
+    thRenderInjoignable();
+  }
+  function thRenderInjoignable(){
+    var box=byId('th-injoign');if(!box)return;
+    var byAgent={};
+    TH.forEach(function(s){(s.calls||[]).forEach(function(c){if(c.com==='Injoignable'){var name=s.agent||s.site||'—';(byAgent[name]=byAgent[name]||[]).push({site:s.site||'',fr:c.fr,at:c.at});}});});
+    var names=Object.keys(byAgent);
+    if(!names.length){box.innerHTML='<div class="hint" style="padding:6px 2px">Aucun appel « injoignable » signalé pour le moment.</div>';return;}
+    names.sort(function(a,b){return byAgent[b].length-byAgent[a].length;});
+    box.innerHTML=names.map(function(nm){var ev=byAgent[nm];var det=ev.map(function(x){return '<div class="thc-mali" style="padding:2px 0">• '+(x.site?esc(x.site)+' — ':'')+'prévu '+esc(x.fr)+(x.at?' · appelé '+esc(x.at):'')+'</div>';}).join('');return '<div class="thsite" style="margin-bottom:8px"><div class="thsite-h"><span style="color:var(--bad)">📵 '+esc(nm)+'</span> · injoignable '+ev.length+' fois</div><div style="padding:8px 12px">'+det+'</div></div>';}).join('');
   }
   function thUpdateLate(){
     var lateTot=0;
@@ -1000,15 +1019,16 @@ button.big:active{transform:translateY(1px)}
   thApplyMode();
   byId('th-add').onclick=function(){var s=thFormSite();if(!s)return;TH.push(s);thSave();thReset();thRenderBoard();thRenderOut();window.scrollTo(0,0);};
   byId('th-board').addEventListener('change',function(e){
-    var box=e.target.closest('.thc-box');if(!box)return;
-    var row=box.closest('.thc'),s=thSiteById(row.getAttribute('data-sid'));if(!s)return;var c=s.calls[+row.getAttribute('data-ci')];if(!c)return;
-    if(box.checked){c.done=true;c.at=thNowHM();}else{c.done=false;c.at=null;}
-    thSave();thRenderBoard();
+    var box=e.target.closest('.thc-box'),sel=e.target.closest('.thc-sel');
+    var row=(box||sel)?(box||sel).closest('.thc'):null;if(!row)return;
+    var s=thSiteById(row.getAttribute('data-sid'));if(!s)return;var c=s.calls[+row.getAttribute('data-ci')];if(!c)return;
+    if(box){ if(box.checked){c.done=true;c.at=thNowHM();}else{c.done=false;c.at=null;} thSave();thRenderBoard(); return; }
+    if(sel){ c.com=sel.value; var t=row.querySelector('.thc-com'); if(t)t.style.display=(sel.value==='Autre')?'':'none'; thSave(); thRenderInjoignable(); thRenderOut(); return; }
   });
   byId('th-board').addEventListener('input',function(e){
     var com=e.target.closest('.thc-com');if(!com)return;
     var row=com.closest('.thc'),s=thSiteById(row.getAttribute('data-sid'));if(!s)return;var c=s.calls[+row.getAttribute('data-ci')];if(!c)return;
-    c.com=com.value;thSave();
+    c.comtxt=com.value;thSave();thRenderOut();
   });
   byId('th-board').addEventListener('click',function(e){
     var del=e.target.closest('[data-thdel]');if(!del)return;
