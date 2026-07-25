@@ -110,7 +110,6 @@ button.big:active{transform:translateY(1px)}
       </div>
       <label class="f"><div class="lab">Code postal</div><div class="acwrap"><input id="cp" placeholder="Rempli par la ville · ou tape un code postal" autocomplete="off" inputmode="numeric"><div class="sugg hidden" id="sugg-cp"></div></div></label>
       <label class="f"><div class="lab">Nom du site</div><input id="sitename" placeholder="Ex. GIFI, Carrefour…" autocomplete="off"></label>
-      <label class="f"><div class="lab">Adresse du site</div><textarea id="adresse" placeholder="Adresse complète du site" style="min-height:44px"></textarea></label>
 
       <div id="vacsWrap">
         <div class="lab" style="margin:0 0 5px">Vacations</div>
@@ -148,7 +147,6 @@ button.big:active{transform:translateY(1px)}
           <label><input type="checkbox" id="av-sitetype" checked>Type de site</label>
           <label><input type="checkbox" id="av-surv" checked>Surveillance</label>
           <label><input type="checkbox" id="av-ville" checked>Lieu (ville + CP)</label>
-          <label><input type="checkbox" id="av-adresse" checked>Adresse</label>
           <label><input type="checkbox" id="av-near">Villes proches</label>
           <label><input type="checkbox" id="av-meas">Distances mesurées</label>
           <label><input type="checkbox" id="av-vac" checked>Vacations</label>
@@ -162,6 +160,7 @@ button.big:active{transform:translateY(1px)}
       <button class="big" id="missionToggle" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">✅ Infos pour mission validée</button>
       <div id="missionBlock" class="hidden">
         <label class="f"><div class="lab">📞 Numéro prise / fin de service</div><input id="mv-tel" placeholder="Rempli selon le client · modifiable" inputmode="tel" autocomplete="off"></label>
+        <label class="f"><div class="lab">📍 Adresse du site</div><textarea id="adresse" placeholder="Adresse complète du site" style="min-height:44px"></textarea></label>
         <div class="lab" style="margin:8px 0 2px">Infos à inclure (mission validée)</div>
         <div class="avopts">
           <label><input type="checkbox" id="mv-client" checked>Client</label>
@@ -416,9 +415,9 @@ button.big:active{transform:translateY(1px)}
   }
   var added=[];
   function buildCurrent(){
-    var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),sitename=byId('sitename').value.trim(),adresse=byId('adresse').value.trim(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
+    var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),sitename=byId('sitename').value.trim(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
     var vacs=readVacs();
-    if(!(client||type||agent||siteT||sel||byId('ville').value.trim()||notes||vacs.length||sitename||adresse)) return '';
+    if(!(client||type||agent||siteT||sel||byId('ville').value.trim()||notes||vacs.length||sitename)) return '';
     var L=[];
     if(client)L.push('Client : '+client);
     if(sitename)L.push('Site : '+sitename);
@@ -427,7 +426,6 @@ button.big:active{transform:translateY(1px)}
     if(siteT)L.push('Type de site : '+siteT);
     if(surv)L.push('Surveillance : '+surv);
     if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':''));(sel._near||[]).forEach(function(x){L.push(x.n+(x.cp?' '+x.cp:'')+' à '+x.d+' km'+(x.dur?' · '+x.dur:''));});meas.forEach(function(x){L.push('↳ '+x.n+(x.cp?' '+x.cp:'')+' à '+x.km+' km'+(x.dur?' · '+x.dur:''));});}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':''));
-    if(adresse)L.push('Adresse : '+adresse);
     if(vacs.length)L=L.concat(vacLines(vacs));
     if(ag)L.push('Agents : '+ag);if(ref)L.push('Réf/contact : '+ref);if(notes)L.push('Notes : '+notes);
     return L.join('\n');
@@ -455,7 +453,7 @@ button.big:active{transform:translateY(1px)}
   ['sitename','adresse','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   byId('agentToggle').addEventListener('click',function(){ byId('agentBlock').classList.toggle('hidden'); genText(); });
-  ['av-client','av-sitename','av-presta','av-agenttype','av-sitetype','av-surv','av-ville','av-adresse','av-near','av-meas','av-vac','av-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
+  ['av-client','av-sitename','av-presta','av-agenttype','av-sitetype','av-surv','av-ville','av-near','av-meas','av-vac','av-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
   byId('copy-agent').onclick=function(){var x=byId('out-agent').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-agent'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   byId('missionToggle').addEventListener('click',function(){ byId('missionBlock').classList.toggle('hidden'); genText(); });
   ['mv-client','mv-sitename','mv-presta','mv-agenttype','mv-sitetype','mv-surv','mv-ville','mv-adresse','mv-near','mv-meas','mv-vac','mv-notes','mv-num'].forEach(function(id){byId(id).addEventListener('change',genText);});
