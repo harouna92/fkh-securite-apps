@@ -76,6 +76,9 @@ button.big:active{transform:translateY(1px)}
 .pickp{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px;display:flex;flex-direction:column;gap:2px}
 .plrow{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;padding:2px 0;cursor:pointer;white-space:pre-wrap}
 .plrow input{margin-top:2px;flex:0 0 auto}
+.avopts{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px}
+.avopts label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.avopts input{flex:0 0 auto}
 </style>
 
 <div class="top">
@@ -134,7 +137,18 @@ button.big:active{transform:translateY(1px)}
       <button class="big" id="copy">Copier pour le groupe</button>
       <label class="chk"><input type="checkbox" id="agentVer"><span>📱 Générer aussi la version à envoyer à l'agent</span></label>
       <div id="agentBlock" class="hidden">
-        <div class="lab" style="margin:2px 0 0">Texte à envoyer à l'agent</div>
+        <div class="lab" style="margin:8px 0 2px">Infos à inclure pour l'agent</div>
+        <div class="avopts">
+          <label><input type="checkbox" id="av-client">Client</label>
+          <label><input type="checkbox" id="av-presta">Prestation</label>
+          <label><input type="checkbox" id="av-agenttype">Type d'agent</label>
+          <label><input type="checkbox" id="av-sitetype" checked>Type de site</label>
+          <label><input type="checkbox" id="av-surv" checked>Surveillance</label>
+          <label><input type="checkbox" id="av-ville" checked>Lieu (ville + CP)</label>
+          <label><input type="checkbox" id="av-vac" checked>Vacations</label>
+          <label><input type="checkbox" id="av-notes" checked>Consignes</label>
+        </div>
+        <div class="lab" style="margin:8px 0 0">Texte à envoyer à l'agent</div>
         <div class="outbox" id="out-agent">—</div>
         <button class="big" id="copy-agent">Copier pour l'agent</button>
       </div>
@@ -348,17 +362,18 @@ button.big:active{transform:translateY(1px)}
     return out;
   }
   function buildAgent(){
-    var siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),notes=byId('notes').value.trim();
-    var villeName=sel?sel.nom:byId('ville').value.trim();
-    var vacs=readVacs();
-    if(!(villeName||siteT||surv||notes||vacs.length)) return '';
+    function on(id){var e=byId(id);return e&&e.checked;}
+    var villeName=sel?sel.nom:byId('ville').value.trim(),cp=byId('cp').value.trim();
     var L=['📱 MISSION — FKH'];
-    if(villeName)L.push('Lieu : '+villeName+(cp?' ('+cp+')':''));
-    if(siteT)L.push('Type de site : '+siteT);
-    if(surv)L.push('Surveillance : '+surv);
-    if(vacs.length)L=L.concat(vacLines(vacs));
-    if(notes)L.push('Consignes : '+notes);
-    return L.join('\n');
+    if(on('av-client')&&byId('client').value.trim())L.push('Client : '+byId('client').value.trim());
+    if(on('av-presta')&&byId('type').value.trim())L.push('Prestation : '+byId('type').value.trim());
+    if(on('av-agenttype')&&byId('agent').value.trim())L.push('Type d\'agent : '+byId('agent').value.trim());
+    if(on('av-sitetype')&&byId('sitetype').value.trim())L.push('Type de site : '+byId('sitetype').value.trim());
+    if(on('av-surv')&&byId('surv').value)L.push('Surveillance : '+byId('surv').value);
+    if(on('av-ville')&&villeName)L.push('Lieu : '+villeName+(cp?' ('+cp+')':''));
+    if(on('av-vac')){var vacs=readVacs();if(vacs.length)L=L.concat(vacLines(vacs));}
+    if(on('av-notes')&&byId('notes').value.trim())L.push('Consignes : '+byId('notes').value.trim());
+    return L.length<=1?'':L.join('\n');
   }
   var added=[];
   function buildCurrent(){
@@ -399,6 +414,7 @@ button.big:active{transform:translateY(1px)}
   ['agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   byId('agentVer').addEventListener('change',function(){ byId('agentBlock').classList.toggle('hidden',!this.checked); genText(); });
+  ['av-client','av-presta','av-agenttype','av-sitetype','av-surv','av-ville','av-vac','av-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
   byId('copy-agent').onclick=function(){var x=byId('out-agent').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-agent'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
 
   // ===== Suivi demandes =====
