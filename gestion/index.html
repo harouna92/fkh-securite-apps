@@ -864,11 +864,11 @@ button.big:active{transform:translateY(1px)}
     }
     return {dur:dur,d:d,offs:offs};
   }
-  // Applique le décalage anti-collision du site (borné à la fin de mission), dédoublonne, convertit en HH:MM.
+  // Applique le décalage anti-collision du site, MAIS borné à 30 min avant la fin (aucun appel ne dépasse fin-30), dédoublonne, convertit en HH:MM.
   function thCalls(deb,fin,n,stagger){
     var a=thOffsets(deb,fin,n);if(!a)return [];
-    var seen={},out=[];
-    a.offs.forEach(function(o){var s=Math.min(o+(stagger||0),a.dur);if(!seen[s]){seen[s]=1;var mm=(a.d+s)%1440;out.push(pad2(Math.floor(mm/60))+':'+pad2(mm%60));}});
+    var cap=Math.max(0,a.dur-30),seen={},out=[];
+    a.offs.forEach(function(o){var s=Math.min(o+(stagger||0),cap);if(!seen[s]){seen[s]=1;var mm=(a.d+s)%1440;out.push(pad2(Math.floor(mm/60))+':'+pad2(mm%60));}});
     return out;
   }
   function thRenderAuto(){
