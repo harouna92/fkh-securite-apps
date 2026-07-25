@@ -287,7 +287,7 @@ button.big:active{transform:translateY(1px)}
     if(btn) btn.addEventListener('click',function(e){ e.preventDefault(); if(box.classList.contains('hidden')){ inp.focus(); open(); } else box.classList.add('hidden'); });
   }
   var CLIENTS=["SECURITAS","AQUILA","RANC DEVELOPPEMENT","SOTEL","GAMBRINUS","SAS BULLION","P2S","NEW ANGEL'S","FKH","COPS","ERYMA"];
-  mkCombo('client',CLIENTS,'fkh_clients');
+  mkCombo('client',CLIENTS,'fkh_clients',function(){ if(typeof fillTel==='function') fillTel(); });
   mkCombo('type',["Gardiennage","Ronde","Intervention sur alarme"],'fkh_presta');
   mkCombo('agent',["ADS","SSIAP","Maître-chien"],'fkh_agents');
   mkCombo('sitetype',["Magasin","Banque","Site professionnel"],'fkh_sites');
@@ -457,7 +457,7 @@ button.big:active{transform:translateY(1px)}
   byId('agentToggle').addEventListener('click',function(){ byId('agentBlock').classList.toggle('hidden'); genText(); });
   ['av-client','av-sitename','av-presta','av-agenttype','av-sitetype','av-surv','av-ville','av-near','av-meas','av-vac','av-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
   byId('copy-agent').onclick=function(){var x=byId('out-agent').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-agent'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
-  byId('missionToggle').addEventListener('click',function(){ byId('missionBlock').classList.toggle('hidden'); genText(); });
+  byId('missionToggle').addEventListener('click',function(){ byId('missionBlock').classList.toggle('hidden'); if(!byId('missionBlock').classList.contains('hidden'))fillTel(); genText(); });
   ['mv-client','mv-sitename','mv-presta','mv-agenttype','mv-sitetype','mv-surv','mv-ville','mv-adresse','mv-near','mv-meas','mv-vac','mv-notes','mv-num'].forEach(function(id){byId(id).addEventListener('change',genText);});
   ['av','mv'].forEach(function(px){ var oh=''; for(var i=0;i<=6;i++)oh+='<option>'+i+'</option>'; byId(px+'-offh').innerHTML=oh; byId(px+'-offm').innerHTML=MOPTS; byId(px+'-offh').addEventListener('change',genText); byId(px+'-offm').addEventListener('change',genText); });
   // Numéro prise/fin par client (mémorisé, auto-rempli, modifiable)
