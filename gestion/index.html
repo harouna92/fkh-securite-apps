@@ -73,6 +73,9 @@ button.big:active{transform:translateY(1px)}
 .sv .acts .wn{background:var(--warnbg);color:var(--warn);border-color:transparent}
 .sv .badge{align-self:flex-start;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:8px}
 .svempty{color:var(--muted);font-size:13px;padding:18px;text-align:center;border:1px dashed var(--line);border-radius:12px}
+.pickp{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px;display:flex;flex-direction:column;gap:2px}
+.plrow{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;padding:2px 0;cursor:pointer;white-space:pre-wrap}
+.plrow input{margin-top:2px;flex:0 0 auto}
 </style>
 
 <div class="top">
@@ -399,11 +402,11 @@ button.big:active{transform:translateY(1px)}
   byId('copy-agent').onclick=function(){var x=byId('out-agent').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-agent'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
 
   // ===== Suivi demandes =====
-  var SUIVI=load('fkh_suivi'); SUIVI.forEach(function(x){delete x._pending;});
+  var SUIVI=load('fkh_suivi'); SUIVI.forEach(function(x){delete x._pending;delete x._pick;});
   var MOTIFS_NG=["Pas d'agent disponible","Agent pas trouvé à temps","Délai trop court","Tarif non validé","Mission refusée","Autre"];
   var MOTIFS_AN=["Annulée par le client","Reportée","Doublon","Plus besoin","Autre"];
   var suiviBucket='recherche', idc=0;
-  function saveSuivi(){ save('fkh_suivi',SUIVI.map(function(x){var c={};for(var k in x)if(k!=='_pending')c[k]=x[k];return c;})); }
+  function saveSuivi(){ save('fkh_suivi',SUIVI.map(function(x){var c={};for(var k in x)if(k!=='_pending'&&k!=='_pick')c[k]=x[k];return c;})); }
   function titreFrom(txt){
     function g(re){var m=re.exec(txt);return m?m[1].trim():'';}
     var p=g(/Prestation : (.+)/), v=g(/Ville : ([^\n(—]+)/), d=g(/Date : (.+)/), asap=/DÈS QUE POSSIBLE/.test(txt);
@@ -439,7 +442,13 @@ button.big:active{transform:translateY(1px)}
       } else {
         body=badge(x.statut,x.motif)+'<div class="acts"><button data-act="reopen" data-id="'+x.id+'">↩︎ Remettre en recherche</button><button class="no" data-act="del" data-id="'+x.id+'">🗑️ Supprimer</button></div>';
       }
-      return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div><div class="svm">'+esc(x.texte)+'</div>'+body+'</div>';
+      var pickBtn='<div class="acts" style="margin-top:2px"><button data-act="pick" data-id="'+x.id+'">📤 Infos pour l\'agent</button></div>';
+      var pickPanel='';
+      if(x._pick){
+        var lines=x.texte.split('\n');
+        pickPanel='<div class="pickp">'+lines.map(function(ln,li){return '<label class="plrow"><input type="checkbox" class="pl" data-li="'+li+'" checked><span>'+(esc(ln)||' ')+'</span></label>';}).join('')+'<div class="acts" style="margin-top:8px"><button class="ok" data-act="pickcopy" data-id="'+x.id+'">📋 Copier la sélection</button><button data-act="pickclose" data-id="'+x.id+'">Fermer</button></div></div>';
+      }
+      return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div><div class="svm">'+esc(x.texte)+'</div>'+body+pickBtn+pickPanel+'</div>';
     }).join('');
   }
   byId('suiviList').addEventListener('click',function(e){
@@ -454,6 +463,9 @@ button.big:active{transform:translateY(1px)}
     else if(act==='confirm'){var s=byId('suiviList').querySelector('select[data-sel="'+id+'"]');it.statut=it._pending;it.motif=s?s.value:'';it.valide=Date.now();delete it._pending;}
     else if(act==='reopen'){it.statut='recherche';it.valide=null;it.motif='';delete it._pending;}
     else if(act==='del'){SUIVI=SUIVI.filter(function(x){return x.id!==id;});}
+    else if(act==='pick'){it._pick=!it._pick;}
+    else if(act==='pickclose'){delete it._pick;}
+    else if(act==='pickcopy'){var card=b.closest('.sv'),lines=it.texte.split('\n'),outL=[];card.querySelectorAll('input.pl').forEach(function(c){if(c.checked)outL.push(lines[+c.getAttribute('data-li')]);});if(navigator.clipboard)navigator.clipboard.writeText(outL.join('\n'));flash(b,'Copié ✓');return;}
     saveSuivi(); renderSuivi();
   });
   document.querySelectorAll('#suiviTabs button').forEach(function(bt){bt.onclick=function(){suiviBucket=bt.getAttribute('data-b');renderSuivi();};});
