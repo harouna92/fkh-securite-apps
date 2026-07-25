@@ -339,17 +339,25 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Nom de l'agent</div><div class="cbx"><input id="th-agent" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="th-agent" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-th-agent"></div></div></label>
       </div>
       <label class="f"><div class="lab">Numéro de l'agent</div><input id="th-tel" placeholder="N° agent" inputmode="tel" autocomplete="off"></label>
-      <div class="grid2">
-        <label class="f"><div class="lab">Heure de début (mission)</div><div class="hm"><select id="th-debh" aria-label="Heure de début"></select><span>h</span><select id="th-debm" aria-label="Minutes début"></select></div></label>
-        <label class="f"><div class="lab">Heure de fin — facultative</div><div class="hm"><select id="th-finh" aria-label="Heure de fin"></select><span>h</span><select id="th-finm" aria-label="Minutes fin"></select></div></label>
+      <div class="lab" style="margin:2px 0 5px">Type d'appels pour ce site</div>
+      <div class="subtabs" id="th-mode">
+        <button type="button" data-m="pre">⏰ Avant la prise de service</button>
+        <button type="button" data-m="svc" class="on">🔁 Pendant le service</button>
+        <button type="button" data-m="both">Les deux</button>
       </div>
-      <div class="hint" style="margin:-4px 0 2px">Pour de simples appels avant la prise de service, l'heure de début suffit (laisse la fin vide).</div>
-      <div class="lab" style="margin:2px 0 5px">Contrôles avant la prise de service</div>
-      <label class="chk"><input type="checkbox" id="th-pre" checked><span>⏰ Appel <b>−15 min</b> avant le début — arrivée à l'heure ?</span></label>
-      <label class="f" style="margin-top:10px"><div class="lab">🚗 Appel « départ agent » avant le début — a-t-il pris la route ?</div><select id="th-depart"><option value="0">— aucun —</option><option value="30">30 min avant</option><option value="45">45 min avant</option><option value="60">1 h avant</option><option value="90">1 h 30 avant</option><option value="120">2 h avant</option></select></label>
-      <div class="grid2" style="margin-top:12px">
-        <label class="f"><div class="lab">Nombre d'appels (pendant le service)</div><select id="th-ncalls"><option value="0">Auto (≈ toutes les 2 h)</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
-        <label class="f"><div class="lab">Décalage entre sites</div><select id="th-stagger"><option value="30">30 min</option><option value="20">20 min</option><option value="15">15 min</option></select></label>
+      <label class="f" style="margin-top:12px"><div class="lab">Heure de début (prise de service)</div><div class="hm"><select id="th-debh" aria-label="Heure de début"></select><span>h</span><select id="th-debm" aria-label="Minutes début"></select></div></label>
+      <div id="th-blk-pre">
+        <div class="lab" style="margin:12px 0 5px">Appels avant la prise de service</div>
+        <label class="chk"><input type="checkbox" id="th-pre" checked><span>⏰ Appel <b>−15 min</b> avant le début — arrivée à l'heure ?</span></label>
+        <label class="f" style="margin-top:10px"><div class="lab">🚗 Appel « départ agent » avant le début — a-t-il pris la route ?</div><select id="th-depart"><option value="0">— aucun —</option><option value="30">30 min avant</option><option value="45">45 min avant</option><option value="60">1 h avant</option><option value="90">1 h 30 avant</option><option value="120">2 h avant</option></select></label>
+      </div>
+      <div id="th-blk-svc">
+        <div class="lab" style="margin:12px 0 5px">Appels pendant le service</div>
+        <label class="f"><div class="lab">Heure de fin — facultative</div><div class="hm"><select id="th-finh" aria-label="Heure de fin"></select><span>h</span><select id="th-finm" aria-label="Minutes fin"></select></div></label>
+        <div class="grid2" style="margin-top:12px">
+          <label class="f"><div class="lab">Nombre d'appels</div><select id="th-ncalls"><option value="0">Auto (≈ toutes les 2 h)</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
+          <label class="f"><div class="lab">Décalage entre sites</div><select id="th-stagger"><option value="30">30 min</option><option value="20">20 min</option><option value="15">15 min</option></select></label>
+        </div>
       </div>
       <div id="th-auto" class="ctx" style="display:none"></div>
       <div id="th-hoursWrap">
@@ -861,6 +869,8 @@ button.big:active{transform:translateY(1px)}
   function thGetHM(px){var h=byId('th-'+px+'h').value,m=byId('th-'+px+'m').value;return h?(h+':'+(m||'00')):'';}
   function thStep(){var e=byId('th-stagger');return e?(parseInt(e.value,10)||30):30;}
   function thN(){var e=byId('th-ncalls');return e?(parseInt(e.value,10)||0):0;}
+  function thMode(){var b=document.querySelector('#th-mode button.on');return b?b.getAttribute('data-m'):'svc';}
+  function thApplyMode(){var m=thMode();byId('th-blk-pre').style.display=(m==='svc')?'none':'';byId('th-blk-svc').style.display=(m==='pre')?'none':'';}
   // Répartition des appels sur la mission (début → fin). n=0 : auto (toutes les 2 h) ; n>0 : n appels équirépartis.
   // 1er appel au début, dernier 30 min avant la fin. Renvoie des minutes-offset depuis le début.
   function thOffsets(deb,fin,n){
@@ -888,8 +898,8 @@ button.big:active{transform:translateY(1px)}
   }
   function thCalls(deb,fin,n,stagger){return thMainCalls(deb,fin,n,stagger).map(function(c){return c.fr;});}
   // Liste complète = pré-appels (départ agent −X, pré-prise −15) + appels de service + appels manuels. -> [{off,fr,lbl}]
-  function thAllCalls(deb,fin,n,stagger,departMin,preOn){
-    var d=toMin(deb),list=thMainCalls(deb,fin,n,stagger).map(function(c){return {off:c.off,fr:c.fr,lbl:'',kind:'svc'};});
+  function thAllCalls(deb,fin,n,stagger,departMin,preOn,includeSvc){
+    var d=toMin(deb),list=(includeSvc===false?[]:thMainCalls(deb,fin,n,stagger).map(function(c){return {off:c.off,fr:c.fr,lbl:'',kind:'svc'};}));
     if(d!=null){
       if(departMin>0)list.push({off:-departMin,fr:hmFromMin(d-departMin),lbl:'🚗 Départ agent ?',kind:'pre'});
       if(preOn)list.push({off:-15,fr:hmFromMin(d-15),lbl:'⏰ Arrivée à l\'heure ?',kind:'pre'});
@@ -900,8 +910,8 @@ button.big:active{transform:translateY(1px)}
     return res;
   }
   function thFormCallObjs(idx){
-    var stag=(idx==null?TH.length:idx)*thStep();
-    return thAllCalls(thGetHM('deb'),thGetHM('fin'),thN(),stag,thDepart(),thPre());
+    var stag=(idx==null?TH.length:idx)*thStep(),m=thMode();
+    return thAllCalls(thGetHM('deb'),thGetHM('fin'),thN(),stag,(m==='svc'?0:thDepart()),(m==='svc'?false:thPre()),(m!=='pre'));
   }
   function thRenderAuto(){
     var deb=thGetHM('deb'),fin=thGetHM('fin'),box=byId('th-auto');if(!box)return;
@@ -978,7 +988,7 @@ button.big:active{transform:translateY(1px)}
     var badge=byId('th-lateBadge');badge.textContent=lateTot?('⚠️ '+lateTot+' appel'+(lateTot>1?'s':'')+' en retard'):'';badge.style.display=lateTot?'':'none';
   }
   function thGen(){thRenderAuto();thRenderOut();}
-  function thReset(){['th-site','th-client','th-agent','th-tel'].forEach(function(id){byId(id).value='';});['th-debh','th-debm','th-finh','th-finm'].forEach(function(id){byId(id).value='';});byId('th-ncalls').value='0';byId('th-pre').checked=true;byId('th-depart').value='0';byId('th-hours').innerHTML='';byId('th-hours').appendChild(thMakeHour());thRenderAuto();}
+  function thReset(){['th-site','th-client','th-agent','th-tel'].forEach(function(id){byId(id).value='';});['th-debh','th-debm','th-finh','th-finm'].forEach(function(id){byId(id).value='';});byId('th-ncalls').value='0';byId('th-pre').checked=true;byId('th-depart').value='0';document.querySelectorAll('#th-mode button').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-m')==='svc');});thApplyMode();byId('th-hours').innerHTML='';byId('th-hours').appendChild(thMakeHour());thRenderAuto();}
   byId('th-debh').innerHTML=HOPTS;byId('th-debm').innerHTML=MOPTS;byId('th-finh').innerHTML=HOPTS;byId('th-finm').innerHTML=MOPTS;
   byId('th-addHour').addEventListener('click',function(){byId('th-hours').appendChild(thMakeHour());thGen();});
   byId('th-hours').appendChild(thMakeHour());
@@ -986,6 +996,8 @@ button.big:active{transform:translateY(1px)}
   mkCombo('th-agent',[],'fkh_agent_noms',thGen);
   ['th-site','th-tel'].forEach(function(id){byId(id).addEventListener('input',thGen);});
   ['th-debh','th-debm','th-finh','th-finm','th-ncalls','th-stagger','th-pre','th-depart'].forEach(function(id){byId(id).addEventListener('change',thGen);});
+  document.querySelectorAll('#th-mode button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('#th-mode button').forEach(function(x){x.classList.toggle('on',x===b);});thApplyMode();thGen();});});
+  thApplyMode();
   byId('th-add').onclick=function(){var s=thFormSite();if(!s)return;TH.push(s);thSave();thReset();thRenderBoard();thRenderOut();window.scrollTo(0,0);};
   byId('th-board').addEventListener('change',function(e){
     var box=e.target.closest('.thc-box');if(!box)return;
