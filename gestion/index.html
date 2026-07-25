@@ -154,6 +154,25 @@ button.big:active{transform:translateY(1px)}
         <div class="outbox" id="out-agent">—</div>
         <button class="big" id="copy-agent">Copier pour l'agent</button>
       </div>
+      <button class="big" id="missionToggle" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">✅ Infos pour mission validée</button>
+      <div id="missionBlock" class="hidden">
+        <div class="lab" style="margin:8px 0 2px">Infos à inclure (mission validée)</div>
+        <div class="avopts">
+          <label><input type="checkbox" id="mv-client" checked>Client</label>
+          <label><input type="checkbox" id="mv-presta" checked>Prestation</label>
+          <label><input type="checkbox" id="mv-agenttype">Type d'agent</label>
+          <label><input type="checkbox" id="mv-sitetype" checked>Type de site</label>
+          <label><input type="checkbox" id="mv-surv">Surveillance</label>
+          <label><input type="checkbox" id="mv-ville" checked>Lieu (ville + CP)</label>
+          <label><input type="checkbox" id="mv-near">Villes proches</label>
+          <label><input type="checkbox" id="mv-meas">Distances mesurées</label>
+          <label><input type="checkbox" id="mv-vac" checked>Vacations</label>
+          <label><input type="checkbox" id="mv-notes" checked>Consignes</label>
+        </div>
+        <div class="lab" style="margin:8px 0 0">Texte — mission validée</div>
+        <div class="outbox" id="out-mission">—</div>
+        <button class="big" id="copy-mission">Copier</button>
+      </div>
       <button class="big" id="toSuivi" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">📥 Envoyer vers « Suivi demandes »</button>
     </div>
   </section>
@@ -363,20 +382,20 @@ button.big:active{transform:translateY(1px)}
     });
     return out;
   }
-  function buildAgent(){
-    function on(id){var e=byId(id);return e&&e.checked;}
+  function buildSel(px){
+    function on(s){var e=byId(px+'-'+s);return e&&e.checked;}
     var villeName=sel?sel.nom:byId('ville').value.trim(),cp=byId('cp').value.trim();
     var L=[];
-    if(on('av-client')&&byId('client').value.trim())L.push('Client : '+byId('client').value.trim());
-    if(on('av-presta')&&byId('type').value.trim())L.push('Prestation : '+byId('type').value.trim());
-    if(on('av-agenttype')&&byId('agent').value.trim())L.push('Type d\'agent : '+byId('agent').value.trim());
-    if(on('av-sitetype')&&byId('sitetype').value.trim())L.push('Type de site : '+byId('sitetype').value.trim());
-    if(on('av-surv')&&byId('surv').value)L.push('Surveillance : '+byId('surv').value);
-    if(on('av-ville')&&villeName)L.push('Lieu : '+villeName+(cp?' ('+cp+')':''));
-    if(on('av-near')&&sel&&sel._near)sel._near.forEach(function(x){L.push(x.n+(x.cp?' '+x.cp:'')+' à '+x.d+' km'+(x.dur?' · '+x.dur:''));});
-    if(on('av-meas'))meas.forEach(function(x){L.push('↳ '+x.n+(x.cp?' '+x.cp:'')+' à '+x.km+' km'+(x.dur?' · '+x.dur:''));});
-    if(on('av-vac')){var vacs=readVacs();if(vacs.length)L=L.concat(vacLines(vacs));}
-    if(on('av-notes')&&byId('notes').value.trim())L.push('Consignes : '+byId('notes').value.trim());
+    if(on('client')&&byId('client').value.trim())L.push('Client : '+byId('client').value.trim());
+    if(on('presta')&&byId('type').value.trim())L.push('Prestation : '+byId('type').value.trim());
+    if(on('agenttype')&&byId('agent').value.trim())L.push('Type d\'agent : '+byId('agent').value.trim());
+    if(on('sitetype')&&byId('sitetype').value.trim())L.push('Type de site : '+byId('sitetype').value.trim());
+    if(on('surv')&&byId('surv').value)L.push('Surveillance : '+byId('surv').value);
+    if(on('ville')&&villeName)L.push('Lieu : '+villeName+(cp?' ('+cp+')':''));
+    if(on('near')&&sel&&sel._near)sel._near.forEach(function(x){L.push(x.n+(x.cp?' '+x.cp:'')+' à '+x.d+' km'+(x.dur?' · '+x.dur:''));});
+    if(on('meas'))meas.forEach(function(x){L.push('↳ '+x.n+(x.cp?' '+x.cp:'')+' à '+x.km+' km'+(x.dur?' · '+x.dur:''));});
+    if(on('vac')){var vacs=readVacs();if(vacs.length)L=L.concat(vacLines(vacs));}
+    if(on('notes')&&byId('notes').value.trim())L.push('Consignes : '+byId('notes').value.trim());
     return L.length?L.join('\n'):'';
   }
   var added=[];
@@ -401,7 +420,7 @@ button.big:active{transform:translateY(1px)}
     if(blocks.length===1){ byId('out').textContent='📋 NOUVELLE DEMANDE — FKH\n'+blocks[0]; return; }
     byId('out').textContent='📋 DEMANDES FKH ('+blocks.length+')\n\n'+blocks.map(function(b,i){return '— Demande '+(i+1)+' —\n'+b;}).join('\n\n');
   }
-  function genText(){ renderOut(); if(!byId('agentBlock').classList.contains('hidden')){ byId('out-agent').textContent=buildAgent()||'Remplis la demande…'; } }
+  function genText(){ renderOut(); if(!byId('agentBlock').classList.contains('hidden')){ byId('out-agent').textContent=buildSel('av')||'Remplis la demande…'; } if(!byId('missionBlock').classList.contains('hidden')){ byId('out-mission').textContent=buildSel('mv')||'Remplis la demande…'; } }
   function resetForm(){
     ['client','type','agent','sitetype','ville','cp','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
     byId('surv').value='';
@@ -420,13 +439,16 @@ button.big:active{transform:translateY(1px)}
   byId('agentToggle').addEventListener('click',function(){ byId('agentBlock').classList.toggle('hidden'); genText(); });
   ['av-client','av-presta','av-agenttype','av-sitetype','av-surv','av-ville','av-near','av-meas','av-vac','av-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
   byId('copy-agent').onclick=function(){var x=byId('out-agent').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-agent'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
+  byId('missionToggle').addEventListener('click',function(){ byId('missionBlock').classList.toggle('hidden'); genText(); });
+  ['mv-client','mv-presta','mv-agenttype','mv-sitetype','mv-surv','mv-ville','mv-near','mv-meas','mv-vac','mv-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
+  byId('copy-mission').onclick=function(){var x=byId('out-mission').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-mission'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
 
   // ===== Suivi demandes =====
-  var SUIVI=load('fkh_suivi'); SUIVI.forEach(function(x){delete x._pending;delete x._pick;});
+  var SUIVI=load('fkh_suivi'); SUIVI.forEach(function(x){delete x._pending;delete x._pick;delete x._pick2;});
   var MOTIFS_NG=["Pas d'agent disponible","Agent pas trouvé à temps","Délai trop court","Tarif non validé","Mission refusée","Autre"];
   var MOTIFS_AN=["Annulée par le client","Reportée","Doublon","Plus besoin","Autre"];
   var suiviBucket='recherche', idc=0;
-  function saveSuivi(){ save('fkh_suivi',SUIVI.map(function(x){var c={};for(var k in x)if(k!=='_pending'&&k!=='_pick')c[k]=x[k];return c;})); }
+  function saveSuivi(){ save('fkh_suivi',SUIVI.map(function(x){var c={};for(var k in x)if(k!=='_pending'&&k!=='_pick'&&k!=='_pick2')c[k]=x[k];return c;})); }
   function titreFrom(txt){
     function g(re){var m=re.exec(txt);return m?m[1].trim():'';}
     var p=g(/Prestation : (.+)/), v=g(/Ville : ([^\n(—]+)/), d=g(/Date : (.+)/), asap=/DÈS QUE POSSIBLE/.test(txt);
@@ -462,11 +484,12 @@ button.big:active{transform:translateY(1px)}
       } else {
         body=badge(x.statut,x.motif)+'<div class="acts"><button data-act="reopen" data-id="'+x.id+'">↩︎ Remettre en recherche</button><button class="no" data-act="del" data-id="'+x.id+'">🗑️ Supprimer</button></div>';
       }
-      var pickBtn='<div class="acts" style="margin-top:2px"><button data-act="pick" data-id="'+x.id+'">📤 Infos pour l\'agent</button></div>';
+      var pickBtn='<div class="acts" style="margin-top:2px"><button data-act="pick" data-id="'+x.id+'">📤 Infos pour l\'agent</button><button data-act="pick2" data-id="'+x.id+'">✅ Mission validée</button></div>';
       var pickPanel='';
-      if(x._pick){
+      if(x._pick||x._pick2){
         var lines=x.texte.split('\n');
-        pickPanel='<div class="pickp">'+lines.map(function(ln,li){return '<label class="plrow"><input type="checkbox" class="pl" data-li="'+li+'" checked><span>'+(esc(ln)||' ')+'</span></label>';}).join('')+'<div class="acts" style="margin-top:8px"><button class="ok" data-act="pickcopy" data-id="'+x.id+'">📋 Copier la sélection</button><button data-act="pickclose" data-id="'+x.id+'">Fermer</button></div></div>';
+        var ptitre=x._pick2?'Mission validée — décoche ce que tu ne veux pas':'Infos pour l\'agent — décoche ce que tu ne veux pas';
+        pickPanel='<div class="pickp"><div class="lab" style="margin:0 0 2px">'+ptitre+'</div>'+lines.map(function(ln,li){return '<label class="plrow"><input type="checkbox" class="pl" data-li="'+li+'" checked><span>'+(esc(ln)||' ')+'</span></label>';}).join('')+'<div class="acts" style="margin-top:8px"><button class="ok" data-act="pickcopy" data-id="'+x.id+'">📋 Copier la sélection</button><button data-act="pickclose" data-id="'+x.id+'">Fermer</button></div></div>';
       }
       return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div><div class="svm">'+esc(x.texte)+'</div>'+body+pickBtn+pickPanel+'</div>';
     }).join('');
@@ -483,8 +506,9 @@ button.big:active{transform:translateY(1px)}
     else if(act==='confirm'){var s=byId('suiviList').querySelector('select[data-sel="'+id+'"]');it.statut=it._pending;it.motif=s?s.value:'';it.valide=Date.now();delete it._pending;}
     else if(act==='reopen'){it.statut='recherche';it.valide=null;it.motif='';delete it._pending;}
     else if(act==='del'){SUIVI=SUIVI.filter(function(x){return x.id!==id;});}
-    else if(act==='pick'){it._pick=!it._pick;}
-    else if(act==='pickclose'){delete it._pick;}
+    else if(act==='pick'){var o=it._pick;delete it._pick2;it._pick=!o;}
+    else if(act==='pick2'){var o2=it._pick2;delete it._pick;it._pick2=!o2;}
+    else if(act==='pickclose'){delete it._pick;delete it._pick2;}
     else if(act==='pickcopy'){var card=b.closest('.sv'),lines=it.texte.split('\n'),outL=[];card.querySelectorAll('input.pl').forEach(function(c){if(c.checked)outL.push(lines[+c.getAttribute('data-li')]);});if(navigator.clipboard)navigator.clipboard.writeText(outL.join('\n'));flash(b,'Copié ✓');return;}
     saveSuivi(); renderSuivi();
   });
