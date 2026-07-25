@@ -337,8 +337,9 @@ button.big:active{transform:translateY(1px)}
       <label class="f"><div class="lab">Numéro de l'agent</div><input id="th-tel" placeholder="N° agent" inputmode="tel" autocomplete="off"></label>
       <div class="grid2">
         <label class="f"><div class="lab">Heure de début (mission)</div><div class="hm"><select id="th-debh" aria-label="Heure de début"></select><span>h</span><select id="th-debm" aria-label="Minutes début"></select></div></label>
-        <label class="f"><div class="lab">Heure de fin (mission)</div><div class="hm"><select id="th-finh" aria-label="Heure de fin"></select><span>h</span><select id="th-finm" aria-label="Minutes fin"></select></div></label>
+        <label class="f"><div class="lab">Heure de fin — facultative</div><div class="hm"><select id="th-finh" aria-label="Heure de fin"></select><span>h</span><select id="th-finm" aria-label="Minutes fin"></select></div></label>
       </div>
+      <div class="hint" style="margin:-4px 0 2px">Pour de simples appels avant la prise de service, l'heure de début suffit (laisse la fin vide).</div>
       <div class="lab" style="margin:2px 0 5px">Contrôles avant la prise de service</div>
       <label class="chk"><input type="checkbox" id="th-pre" checked><span>⏰ Appel <b>−15 min</b> avant le début — arrivée à l'heure ?</span></label>
       <label class="f" style="margin-top:10px"><div class="lab">🚗 Appel « départ agent » avant le début — a-t-il pris la route ?</div><select id="th-depart"><option value="0">— aucun —</option><option value="30">30 min avant</option><option value="45">45 min avant</option><option value="60">1 h avant</option><option value="90">1 h 30 avant</option><option value="120">2 h avant</option></select></label>
