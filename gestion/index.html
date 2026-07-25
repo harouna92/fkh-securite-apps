@@ -47,6 +47,14 @@ button.big:active{transform:translateY(1px)}
 .chk{display:flex;align-items:center;gap:11px;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 13px;cursor:pointer;font-size:14px}
 .chk input{width:20px;height:20px;flex:0 0 auto;margin:0}
 .chk b{color:var(--brand)}
+.vac{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+.vac-h{display:flex;justify-content:space-between;align-items:center}
+.vac-n{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.v-del{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--bad);cursor:pointer;font-size:14px;line-height:1}
+.vac .chk{background:var(--panel)}
+.v-amp{color:var(--ok);font-weight:600}
+.addvac{font-family:inherit;font-size:14px;font-weight:600;width:100%;min-height:46px;border-radius:11px;border:1px dashed var(--line);background:var(--panel2);color:var(--brand);cursor:pointer}
+.addvac:active{transform:translateY(1px)}
 .subtabs{display:flex;flex-wrap:wrap;gap:6px}
 .subtabs button{flex:1 1 auto;font-family:inherit;font-size:12px;font-weight:600;padding:8px 6px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
 .subtabs button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
@@ -94,20 +102,18 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Surveillance intérieur / extérieur</div><select id="surv"><option value="">—</option><option>Intérieur</option><option>Extérieur</option></select></label>
         <label class="f"><div class="lab">Ville</div><div class="acwrap"><input type="text" id="ville" placeholder="Tape ou choisis une ville…" autocomplete="off"><button type="button" class="cbtn" id="ville-btn" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg"></div></div></label>
       </div>
-      <label class="f"><div class="lab">Code postal</div><input id="cp" list="dl-cp" placeholder="Rempli avec la ville" autocomplete="off"><datalist id="dl-cp"></datalist></label>
+      <label class="f"><div class="lab">Code postal</div><div class="acwrap"><input id="cp" placeholder="Rempli par la ville · ou tape un code postal" autocomplete="off" inputmode="numeric"><div class="sugg hidden" id="sugg-cp"></div></div></label>
 
-      <label class="f"><div class="lab">Quand ?</div><select id="quand"><option value="date">Date précise</option><option value="asap">Dès que possible</option></select></label>
       <label class="chk"><input type="checkbox" id="h24"><span>🕓 Service <b>H24</b> (24h/24, en continu)</span></label>
-      <div class="grid2">
-        <label class="f" id="dateDebWrap"><div class="lab">Date de début</div><input type="date" id="date"></label>
-        <label class="f"><div class="lab">Date de fin</div><input type="date" id="dateFin"><div class="hint" id="dateFinHint">Vide = même jour</div></label>
+      <div class="grid2 hidden" id="h24Block">
+        <label class="f"><div class="lab">Date de début</div><input type="date" id="h24date"></label>
+        <label class="f"><div class="lab">Date de fin</div><input type="date" id="h24fin"><div class="hint">Vide = jusqu'à nouvel ordre</div></label>
       </div>
-      <div class="grid2" id="hoursBlock">
-        <label class="f" id="debutWrap"><div class="lab">Heure de début</div><div class="hm"><select id="debut-h" aria-label="Heure de début"></select><span>h</span><select id="debut-m" aria-label="Minutes de début"></select></div></label>
-        <label class="f" id="finHeureWrap"><div class="lab" id="finHeureLab">Heure de fin</div><div class="hm"><select id="fin-h" aria-label="Heure de fin"></select><span>h</span><select id="fin-m" aria-label="Minutes de fin"></select></div></label>
+      <div id="vacsWrap">
+        <div class="lab" style="margin:0 0 5px">Vacations</div>
+        <div id="vacsList"></div>
+        <button type="button" class="addvac" id="addVac">➕ Ajouter une vacation</button>
       </div>
-      <label class="f" id="finTypeRow"><div class="lab">Fin de service</div><select id="finType"><option value="fixe">Heure fixe</option><option value="arrivee">À l'arrivée de la relève</option></select></label>
-      <div class="plage hidden" id="plage"></div>
       <div class="grid2">
         <label class="f"><div class="lab">Nb agents</div><input type="number" id="agents" min="1" placeholder="1"></label>
         <label class="f"><div class="lab">Réf / contact</div><input type="text" id="ref" placeholder="Facultatif"></label>
@@ -190,34 +196,19 @@ button.big:active{transform:translateY(1px)}
   mkCombo('type',["Gardiennage","Ronde","Intervention sur alarme"],'fkh_presta');
   mkCombo('agent',["ADS","SSIAP","Maître-chien"],'fkh_agents');
   mkCombo('sitetype',["Magasin","Banque","Site professionnel"],'fkh_sites');
-  // Heure = deux menus séparés : heures (00–23) et minutes (pas de 5)
+  // Heures (00–23) + minutes (pas de 5) — options réutilisées dans chaque vacation
   function pad2(n){return ('0'+n).slice(-2);}
-  (function initTimes(){
-    var hOpts='<option value="">--</option>', mOpts='';
-    for(var h=0;h<24;h++) hOpts+='<option>'+pad2(h)+'</option>';
-    for(var m=0;m<60;m+=5) mOpts+='<option>'+pad2(m)+'</option>';
-    byId('debut-h').innerHTML=hOpts; byId('fin-h').innerHTML=hOpts;
-    byId('debut-m').innerHTML=mOpts; byId('fin-m').innerHTML=mOpts;
-  })();
-  function debutVal(){ var h=byId('debut-h').value; return h?(h+':'+(byId('debut-m').value||'00')):''; }
-  function finVal(){ var h=byId('fin-h').value; return h?(h+':'+(byId('fin-m').value||'00')):''; }
-  ['debut-h','debut-m','fin-h','fin-m'].forEach(function(id){ byId(id).addEventListener('change',function(){ plage(); genText(); }); });
+  var HOPTS='<option value="">--</option>', MOPTS='';
+  (function(){ for(var h=0;h<24;h++)HOPTS+='<option>'+pad2(h)+'</option>'; for(var m=0;m<60;m+=5)MOPTS+='<option>'+pad2(m)+'</option>'; })();
+  function hmv(deb,min){ return deb?(deb+':'+(min||'00')):''; }
+  function ampl(s,e){ var a=toMin(s),b=toMin(e); if(a==null||b==null)return ''; var dur=b-a; if(dur<=0)dur+=1440; var h=Math.floor(dur/60),m=dur%60; return s+' → '+e+' · '+h+'h'+(m?pad2(m):'')+(b<=a?' (nuit)':''); }
 
   byId('surv').addEventListener('change',genText);
-  byId('quand').addEventListener('change',function(){ byId('dateDebWrap').classList.toggle('hidden',this.value==='asap'); plage(); genText(); });
-  byId('finType').addEventListener('change',function(){ byId('finHeureLab').textContent=this.value==='fixe'?'Heure de fin':'Heure de fin (indicative)'; plage(); genText(); });
-  function applyH24(){ var on=byId('h24').checked; byId('hoursBlock').classList.toggle('hidden',on); byId('finTypeRow').classList.toggle('hidden',on); byId('dateFinHint').textContent=on?'Vide = jusqu\'à nouvel ordre':'Vide = même jour'; if(on)byId('plage').classList.add('hidden'); else plage(); }
+  function applyH24(){ var on=byId('h24').checked; byId('h24Block').classList.toggle('hidden',!on); byId('vacsWrap').classList.toggle('hidden',on); }
   byId('h24').addEventListener('change',function(){ applyH24(); genText(); });
-  byId('dateFin').addEventListener('input',genText);
+  byId('h24date').addEventListener('input',genText); byId('h24fin').addEventListener('input',genText);
 
   function toMin(t){ var m=/^(\d{1,2}):(\d{2})$/.exec(t.trim()); return m?(+m[1]*60+ +m[2]):null; }
-  function plageStr(){
-    var s=debutVal(), e=finVal(), a=toMin(s), b=toMin(e);
-    if(a==null||b==null||byId('finType').value!=='fixe') return '';
-    var dur=b-a; if(dur<=0) dur+=1440; var h=Math.floor(dur/60), m=dur%60;
-    return s+' → '+e+'  ·  '+h+'h'+(m?('0'+m).slice(-2):'')+(b<=a?' (nuit)':'');
-  }
-  function plage(){ var p=byId('plage'); var s=plageStr(); if(s&&byId('quand').value!=='asap'&&!byId('h24').checked){ p.textContent='🕐 '+s; p.classList.remove('hidden'); } else p.classList.add('hidden'); }
 
   // ---- Ville (communes de France) + code postal auto ----
   var BIG=[["Paris",48.8566,2.3522],["Marseille",43.2965,5.3698],["Lyon",45.764,4.8357],["Toulouse",43.6047,1.4442],["Nice",43.7102,7.262],["Nantes",47.2184,-1.5536],["Montpellier",43.6108,3.8767],["Strasbourg",48.5734,7.7521],["Bordeaux",44.8378,-0.5792],["Lille",50.6292,3.0573],["Rennes",48.1173,-1.6778],["Reims",49.2583,4.0317],["Saint-Étienne",45.4397,4.3872],["Le Havre",49.4944,0.1079],["Toulon",43.1242,5.928],["Grenoble",45.1885,5.7245],["Dijon",47.322,5.0415],["Angers",47.4784,-0.5632],["Nîmes",43.8367,4.3601],["Clermont-Ferrand",45.7772,3.087],["Le Mans",48.0061,0.1996],["Aix-en-Provence",43.5297,5.4474],["Brest",48.3904,-4.4861],["Tours",47.3941,0.6848],["Amiens",49.8941,2.2958],["Limoges",45.8336,1.2611],["Annecy",45.8992,6.1294],["Perpignan",42.6887,2.8948],["Besançon",47.2378,6.0241],["Metz",49.1193,6.1757],["Orléans",47.9029,1.9093],["Mulhouse",47.7508,7.3359],["Caen",49.1829,-0.3707],["Nancy",48.6921,6.1844],["Avignon",43.9493,4.8055],["Poitiers",46.5802,0.3404],["Bourges",47.081,2.3988],["Bayonne",43.4933,-1.4748],["Pau",43.2951,-0.3708],["La Rochelle",46.1603,-1.1511],["Chambéry",45.5646,5.9178],["Troyes",48.2973,4.0744],["Valence",44.9334,4.8924],["Belfort",47.6379,6.8628],["Lorient",47.7485,-3.37]];
@@ -232,16 +223,20 @@ button.big:active{transform:translateY(1px)}
   function showBig(){var box=byId('sugg');box.innerHTML=BIG.map(function(b){return '<div data-city="'+b[0].replace(/"/g,'&quot;')+'"><span>'+b[0]+'</span> <span class="cp">grande ville</span></div>';}).join('');box.querySelectorAll('div').forEach(function(d){d.onclick=function(){quickPick(d.getAttribute('data-city'));};});box.classList.remove('hidden');}
   function quickPick(name){byId('ville').value=name;byId('sugg').classList.add('hidden');fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(name)+'&fields=nom,code,departement,region,centre,codesPostaux,population&boost=population&limit=1').then(function(r){return r.json();}).then(function(list){if(list&&list[0])pick(list[0]);}).catch(function(){});}
   function search(q){fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(q)+'&fields=nom,code,departement,region,centre,codesPostaux,population&boost=population&limit=6').then(function(r){return r.json();}).then(function(list){if(!Array.isArray(list)||!list.length){byId('sugg').classList.add('hidden');return;}var box=byId('sugg');box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+c.nom+'</span> <span class="cp">'+cp+'</span>';d.onclick=function(){pick(c);};box.appendChild(d);});box.classList.remove('hidden');}).catch(function(){byId('sugg').classList.add('hidden');});}
-  function pick(c){
-    sel=c;byId('ville').value=c.nom;byId('sugg').classList.add('hidden');
+  // Code postal → villes correspondantes
+  var tcp;
+  byId('cp').addEventListener('input',function(){var q=this.value.trim();clearTimeout(tcp);if(!/^\d{2,5}$/.test(q)){byId('sugg-cp').classList.add('hidden');genText();return;}tcp=setTimeout(function(){searchCP(q);},250);genText();});
+  function searchCP(cp){fetch('https://geo.api.gouv.fr/communes?codePostal='+encodeURIComponent(cp)+'&fields=nom,code,departement,region,centre,codesPostaux,population&format=json&limit=15').then(function(r){return r.json();}).then(function(list){if(!Array.isArray(list)||!list.length){byId('sugg-cp').classList.add('hidden');return;}list.sort(function(a,b){return (b.population||0)-(a.population||0);});var box=byId('sugg-cp');box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');d.innerHTML='<span>'+c.nom+'</span> <span class="cp">'+cp+'</span>';d.onclick=function(){pick(c,cp);};box.appendChild(d);});box.classList.remove('hidden');}).catch(function(){byId('sugg-cp').classList.add('hidden');});}
+  function pick(c,preferCP){
+    sel=c;byId('ville').value=c.nom;byId('sugg').classList.add('hidden');var scp=byId('sugg-cp');if(scp)scp.classList.add('hidden');
     var co=c.centre&&c.centre.coordinates;sel._la=co?co[1]:null;sel._lo=co?co[0]:null;
-    var cps=c.codesPostaux||[];sel._cp=cps[0]||'';
-    byId('cp').value=cps[0]||''; byId('dl-cp').innerHTML=cps.map(function(x){return '<option value="'+x+'"></option>';}).join('');
+    var cps=c.codesPostaux||[];sel._cp=preferCP||cps[0]||'';
+    byId('cp').value=preferCP||cps[0]||'';
     sel._near=(sel._la!=null)?BIG.map(function(b){return{n:b[0],cp:BIGCP[b[0]]||'',la:b[1],lo:b[2],d:km(sel._la,sel._lo,b[1],b[2]),dir:dird(b[1],b[2],sel._la,sel._lo)};}).filter(function(x){return x.d>1 && x.n!==sel.nom;}).sort(function(a,b){return a.d-b.d;}).slice(0,2):[];
     sel._drive=null; routeTo(sel._near&&sel._near[0]);
     render();
   }
-  function render(){var ctx=byId('ctx');if(sel){ctx.classList.remove('hidden');byId('c-ville').textContent=sel.nom;byId('c-near').innerHTML=(sel._near||[]).map(function(x){return '<div class="n"><span>'+x.n+(x.cp?' <span style="color:var(--muted)">'+x.cp+'</span>':'')+' <span style="color:var(--muted)">('+x.dir+')</span></span><span class="d">'+x.d+' km</span></div>';}).join('')||'<div class="hint">—</div>';}else ctx.classList.add('hidden');genText();}
+  function render(){var ctx=byId('ctx');if(sel){ctx.classList.remove('hidden');byId('c-ville').textContent=sel.nom;byId('c-near').innerHTML=(sel._near||[]).map(function(x){return '<div class="n"><span>'+x.n+(x.cp?' <span style="color:var(--muted)">'+x.cp+'</span>':'')+'</span><span class="d">'+x.d+' km</span></div>';}).join('')||'<div class="hint">—</div>';}else ctx.classList.add('hidden');genText();}
   function routeTo(near){
     var row=byId('c-route-row');
     if(!sel||sel._la==null||!near){ if(row)row.style.display='none'; return; }
@@ -260,24 +255,55 @@ button.big:active{transform:translateY(1px)}
   }
 
   function fmtD(d){if(!d)return'';var x=new Date(d+'T00:00');return ('0'+x.getDate()).slice(-2)+'/'+('0'+(x.getMonth()+1)).slice(-2)+'/'+x.getFullYear();}
+  // ---- Vacations (répéteur) ----
+  function makeVac(){
+    var el=document.createElement('div'); el.className='vac';
+    el.innerHTML='<div class="vac-h"><span class="vac-n"></span><button type="button" class="v-del" title="Retirer cette vacation">✕</button></div>'
+      +'<div class="grid2"><label class="f"><div class="lab">Date de début</div><input type="date" class="v-date"></label>'
+      +'<label class="f"><div class="lab">Date de fin</div><input type="date" class="v-datefin"><div class="hint">Vide = même jour</div></label></div>'
+      +'<div class="grid2"><label class="f"><div class="lab">Heure de début</div><div class="hm"><select class="v-dh">'+HOPTS+'</select><span>h</span><select class="v-dm">'+MOPTS+'</select></div></label>'
+      +'<label class="f"><div class="lab v-finlab">Heure de fin</div><div class="hm"><select class="v-fh">'+HOPTS+'</select><span>h</span><select class="v-fm">'+MOPTS+'</select></div></label></div>'
+      +'<label class="chk"><input type="checkbox" class="v-arr"><span>Fin à l\'arrivée de la relève (heure indicative)</span></label>'
+      +'<div class="hint v-amp" style="margin:0"></div>';
+    el.querySelectorAll('input,select').forEach(function(x){ var h=function(){vacRefresh(el);genText();}; x.addEventListener('input',h); x.addEventListener('change',h); });
+    el.querySelector('.v-arr').addEventListener('change',function(){ el.querySelector('.v-finlab').textContent=this.checked?'Heure de fin (indicative)':'Heure de fin'; });
+    el.querySelector('.v-del').addEventListener('click',function(){ if(document.querySelectorAll('#vacsList .vac').length>1){ el.remove(); renumVac(); genText(); } });
+    return el;
+  }
+  function renumVac(){ var els=document.querySelectorAll('#vacsList .vac'); els.forEach(function(el,i){ el.querySelector('.vac-n').textContent='Vacation '+(i+1); el.querySelector('.v-del').style.visibility=els.length>1?'visible':'hidden'; }); }
+  function readVac(el){ return {date:el.querySelector('.v-date').value,dateFin:el.querySelector('.v-datefin').value,deb:hmv(el.querySelector('.v-dh').value,el.querySelector('.v-dm').value),fin:hmv(el.querySelector('.v-fh').value,el.querySelector('.v-fm').value),arr:el.querySelector('.v-arr').checked}; }
+  function vacRefresh(el){ var v=readVac(el); el.querySelector('.v-amp').textContent=(v.deb&&v.fin&&!v.arr)?('🕐 '+ampl(v.deb,v.fin)):''; }
+  function addVac(){ var el=makeVac(); byId('vacsList').appendChild(el); renumVac(); return el; }
+  byId('addVac').addEventListener('click',function(){ addVac(); genText(); });
+  addVac();
+
   var added=[];
   function buildCurrent(){
-    var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),quand=byId('quand').value,date=byId('date').value,dateFin=byId('dateFin').value,h24=byId('h24').checked,debut=debutVal(),finType=byId('finType').value,finH=finVal(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
-    if(!(client||type||agent||siteT||sel||byId('ville').value.trim()||date||dateFin||finH||notes||h24)) return '';
+    var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),h24=byId('h24').checked,ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
+    var vacs=[]; document.querySelectorAll('#vacsList .vac').forEach(function(el){ var v=readVac(el); if(v.date||v.deb||v.fin||v.dateFin||v.arr) vacs.push(v); });
+    if(!(client||type||agent||siteT||sel||byId('ville').value.trim()||notes||h24||vacs.length)) return '';
     var L=[];
     if(client)L.push('Client : '+client);
     if(type)L.push('Prestation : '+type);
     if(agent)L.push('Type d\'agent : '+agent);
     if(siteT)L.push('Type de site : '+siteT);
     if(surv)L.push('Surveillance : '+surv);
-    if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':''));if(sel._near&&sel._near.length){var s0=sel._near[0],s1=sel._near[1];L.push('Grandes villes : '+s0.n+(s0.cp?' ('+s0.cp+')':'')+' à '+s0.d+' km ('+s0.dir+')'+(s1?' · '+s1.n+(s1.cp?' ('+s1.cp+')':'')+' à '+s1.d+' km ('+s1.dir+')':''));if(sel._drive)L.push('Trajet voiture : ~'+sel._drive.km+' km · ~'+sel._drive.dur+' → '+sel._drive.dest);}}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':''));
-    if(quand==='asap')L.push('Disponibilité : DÈS QUE POSSIBLE');else if(date)L.push('Date de début : '+fmtD(date));
-    if(h24){ L.push('Service : H24 (24h/24)'); if(dateFin)L.push('Date de fin : '+fmtD(dateFin)); else L.push('Fin : jusqu\'à nouvel ordre'); }
-    else {
-      if(debut)L.push('Heure de début : '+debut);
-      if(dateFin)L.push('Date de fin : '+fmtD(dateFin));
-      if(finType==='arrivee')L.push('Heure de fin : à l\'arrivée de la relève'+(finH?' (vers '+finH+', indicatif)':''));else if(finH)L.push('Heure de fin : '+finH);
-      var ps=plageStr(); if(ps)L.push('Amplitude : '+ps);
+    if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':''));if(sel._near&&sel._near.length){var s0=sel._near[0],s1=sel._near[1];L.push('Grandes villes : '+s0.n+(s0.cp?' ('+s0.cp+')':'')+' à '+s0.d+' km'+(s1?' · '+s1.n+(s1.cp?' ('+s1.cp+')':'')+' à '+s1.d+' km':''));if(sel._drive)L.push('Trajet voiture : ~'+sel._drive.km+' km · ~'+sel._drive.dur+' → '+sel._drive.dest);}}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':''));
+    if(h24){
+      L.push('Service : H24 (24h/24)');
+      var hd=byId('h24date').value,hf=byId('h24fin').value;
+      if(hd)L.push('Date de début : '+fmtD(hd));
+      if(hf)L.push('Date de fin : '+fmtD(hf)); else L.push('Fin : jusqu\'à nouvel ordre');
+    } else if(vacs.length){
+      vacs.forEach(function(v,i){
+        var p=[];
+        if(v.date)p.push('début '+fmtD(v.date));
+        if(v.deb)p.push(v.deb);
+        if(v.arr)p.push('fin à l\'arrivée de la relève'+(v.fin?' (vers '+v.fin+')':''));
+        else if(v.fin)p.push('fin '+v.fin);
+        if(v.dateFin)p.push('jusqu\'au '+fmtD(v.dateFin));
+        L.push((vacs.length>1?'Vacation '+(i+1)+' : ':'Vacation : ')+(p.join(' · ')||'(à définir)'));
+      });
     }
     if(ag)L.push('Agents : '+ag);if(ref)L.push('Réf/contact : '+ref);if(notes)L.push('Notes : '+notes);
     return L.join('\n');
@@ -290,12 +316,11 @@ button.big:active{transform:translateY(1px)}
   }
   function genText(){ renderOut(); }
   function resetForm(){
-    ['client','type','agent','sitetype','ville','cp','date','dateFin','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
-    ['debut-h','fin-h'].forEach(function(id){byId(id).value='';}); ['debut-m','fin-m'].forEach(function(id){byId(id).selectedIndex=0;});
-    byId('surv').value='';byId('quand').value='date';byId('finType').value='fixe';byId('finHeureLab').textContent='Heure de fin';
-    byId('h24').checked=false;byId('dateFinHint').textContent='Vide = même jour';
-    byId('dateDebWrap').classList.remove('hidden');byId('hoursBlock').classList.remove('hidden');byId('finTypeRow').classList.remove('hidden');byId('finHeureWrap').classList.remove('hidden');
-    sel=null;byId('ctx').classList.add('hidden');byId('plage').classList.add('hidden');
+    ['client','type','agent','sitetype','ville','cp','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
+    byId('surv').value='';
+    byId('h24').checked=false;byId('h24date').value='';byId('h24fin').value='';applyH24();
+    byId('vacsList').innerHTML='';addVac();
+    sel=null;byId('ctx').classList.add('hidden');
   }
   function renderAdded(){
     byId('addedCard').classList.toggle('hidden',!added.length); byId('addedN').textContent=added.length;
@@ -303,7 +328,7 @@ button.big:active{transform:translateY(1px)}
     byId('addedList').querySelectorAll('.rm').forEach(function(bt){bt.onclick=function(){added.splice(+bt.getAttribute('data-i'),1);renderAdded();renderOut();};});
   }
   byId('addBtn').onclick=function(){var cur=buildCurrent();if(!cur)return;added.push(cur);resetForm();renderAdded();renderOut();window.scrollTo(0,0);};
-  ['date','dateFin','agents','ref','notes','cp'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
+  ['agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
 
   // ===== Suivi demandes =====
@@ -376,7 +401,7 @@ button.big:active{transform:translateY(1px)}
   renderSuivi();
 
   document.addEventListener('click',function(e){
-    if(!e.target.closest('.acwrap'))byId('sugg').classList.add('hidden');
+    if(!e.target.closest('.acwrap'))document.querySelectorAll('.acwrap .sugg').forEach(function(s){s.classList.add('hidden');});
     if(!e.target.closest('.cbx'))document.querySelectorAll('.cbx .sugg').forEach(function(s){s.classList.add('hidden');});
   });
 })();
