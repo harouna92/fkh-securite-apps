@@ -106,6 +106,7 @@ button.big:active{transform:translateY(1px)}
 .thc-at{color:var(--ok);font-weight:700;font-size:12.5px}
 .thc-todo{color:var(--muted);font-weight:400;font-size:12.5px}
 .thc-warn{color:var(--bad);font-weight:700;font-size:12.5px}
+.thc-lbl{font-size:11px;background:var(--brand);color:var(--brand-ink);border-radius:7px;padding:1px 7px;font-weight:700;white-space:nowrap}
 .thc-com{font-size:13px;padding:8px 10px}
 </style>
 
@@ -338,8 +339,11 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Heure de début (mission)</div><div class="hm"><select id="th-debh" aria-label="Heure de début"></select><span>h</span><select id="th-debm" aria-label="Minutes début"></select></div></label>
         <label class="f"><div class="lab">Heure de fin (mission)</div><div class="hm"><select id="th-finh" aria-label="Heure de fin"></select><span>h</span><select id="th-finm" aria-label="Minutes fin"></select></div></label>
       </div>
-      <div class="grid2">
-        <label class="f"><div class="lab">Nombre d'appels</div><select id="th-ncalls"><option value="0">Auto (≈ toutes les 2 h)</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
+      <div class="lab" style="margin:2px 0 5px">Contrôles avant la prise de service</div>
+      <label class="chk"><input type="checkbox" id="th-pre" checked><span>⏰ Appel <b>−15 min</b> avant le début — arrivée à l'heure ?</span></label>
+      <label class="f" style="margin-top:10px"><div class="lab">🚗 Appel « départ agent » avant le début — a-t-il pris la route ?</div><select id="th-depart"><option value="0">— aucun —</option><option value="30">30 min avant</option><option value="45">45 min avant</option><option value="60">1 h avant</option><option value="90">1 h 30 avant</option><option value="120">2 h avant</option></select></label>
+      <div class="grid2" style="margin-top:12px">
+        <label class="f"><div class="lab">Nombre d'appels (pendant le service)</div><select id="th-ncalls"><option value="0">Auto (≈ toutes les 2 h)</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
         <label class="f"><div class="lab">Décalage entre sites</div><select id="th-stagger"><option value="30">30 min</option><option value="20">20 min</option><option value="15">15 min</option></select></label>
       </div>
       <div id="th-auto" class="ctx" style="display:none"></div>
@@ -867,31 +871,46 @@ button.big:active{transform:translateY(1px)}
     }
     return {dur:dur,d:d,offs:offs};
   }
-  // Applique le décalage anti-collision du site, MAIS borné à 30 min avant la fin (aucun appel ne dépasse fin-30), dédoublonne, convertit en HH:MM.
-  function thCalls(deb,fin,n,stagger){
+  function hmFromMin(x){var mm=((x%1440)+1440)%1440;return pad2(Math.floor(mm/60))+':'+pad2(mm%60);}
+  function thDepart(){var e=byId('th-depart');return e?(parseInt(e.value,10)||0):0;}
+  function thPre(){var e=byId('th-pre');return e?e.checked:false;}
+  // Appels de service (décalage anti-collision borné à fin-30, dédoublonnés) -> [{off,fr}]
+  function thMainCalls(deb,fin,n,stagger){
     var a=thOffsets(deb,fin,n);if(!a)return [];
     var cap=Math.max(0,a.dur-30),seen={},out=[];
-    a.offs.forEach(function(o){var s=Math.min(o+(stagger||0),cap);if(!seen[s]){seen[s]=1;var mm=(a.d+s)%1440;out.push(pad2(Math.floor(mm/60))+':'+pad2(mm%60));}});
+    a.offs.forEach(function(o){var s=Math.min(o+(stagger||0),cap);if(!seen[s]){seen[s]=1;out.push({off:s,fr:hmFromMin(a.d+s)});}});
     return out;
+  }
+  function thCalls(deb,fin,n,stagger){return thMainCalls(deb,fin,n,stagger).map(function(c){return c.fr;});}
+  // Liste complète = pré-appels (départ agent −X, pré-prise −15) + appels de service + appels manuels. -> [{off,fr,lbl}]
+  function thAllCalls(deb,fin,n,stagger,departMin,preOn){
+    var d=toMin(deb),list=thMainCalls(deb,fin,n,stagger).map(function(c){return {off:c.off,fr:c.fr,lbl:''};});
+    if(d!=null){
+      if(departMin>0)list.push({off:-departMin,fr:hmFromMin(d-departMin),lbl:'🚗 Départ agent ?'});
+      if(preOn)list.push({off:-15,fr:hmFromMin(d-15),lbl:'⏰ Arrivée à l\'heure ?'});
+    }
+    thReadHours().forEach(function(m){var off=(d!=null)?(((toMin(m)-d)%1440+1440)%1440):0;if(!list.some(function(c){return c.fr===m;}))list.push({off:off,fr:m,lbl:''});});
+    list.sort(function(a,b){return a.off-b.off;});
+    var seen={},res=[];list.forEach(function(c){if(!seen[c.off]){seen[c.off]=1;res.push(c);}});
+    return res;
+  }
+  function thFormCallObjs(idx){
+    var stag=(idx==null?TH.length:idx)*thStep();
+    return thAllCalls(thGetHM('deb'),thGetHM('fin'),thN(),stag,thDepart(),thPre());
   }
   function thRenderAuto(){
     var deb=thGetHM('deb'),fin=thGetHM('fin'),box=byId('th-auto');if(!box)return;
-    if(!(deb&&fin)){box.style.display='none';box.innerHTML='';return;}
-    var stag=TH.length*thStep(),calls=thCalls(deb,fin,thN(),stag);
+    var calls=thFormCallObjs();
+    if(!calls.length){box.style.display='none';box.innerHTML='';return;}
+    var stag=TH.length*thStep();
     box.style.display='';
-    box.innerHTML='<div class="lab" style="margin:0 0 3px">🔔 Appels — '+esc(deb)+' → '+esc(fin)+' · '+calls.length+' appel'+(calls.length>1?'s':'')+(stag?' · décalage +'+stag+' min (site n°'+(TH.length+1)+')':'')+'</div>'
-      +'<div class="near">'+calls.map(function(fr){return '<div class="n"><span>'+esc(fr)+' <span style="color:var(--muted)">(France)</span></span><span class="d">'+esc(thToMali(fr))+' (Mali)</span></div>';}).join('')+'</div>';
-  }
-  function thFormCalls(idx){
-    var stag=(idx==null?TH.length:idx)*thStep();
-    var frs=thCalls(thGetHM('deb'),thGetHM('fin'),thN(),stag);
-    thReadHours().forEach(function(x){if(frs.indexOf(x)<0)frs.push(x);});
-    return frs;
+    box.innerHTML='<div class="lab" style="margin:0 0 3px">🔔 Appels'+((deb&&fin)?' — '+esc(deb)+' → '+esc(fin):'')+' · '+calls.length+' appel'+(calls.length>1?'s':'')+(stag?' · décalage +'+stag+' min (site n°'+(TH.length+1)+')':'')+'</div>'
+      +'<div class="near">'+calls.map(function(c){return '<div class="n"><span>'+(c.lbl?esc(c.lbl)+' ':'')+esc(c.fr)+' <span style="color:var(--muted)">(France)</span></span><span class="d">'+esc(thToMali(c.fr))+' (Mali)</span></div>';}).join('')+'</div>';
   }
   function thFormSite(){
-    var site=byId('th-site').value.trim(),cli=byId('th-client').value.trim(),ag=byId('th-agent').value.trim(),tel=byId('th-tel').value.trim(),deb=thGetHM('deb'),fin=thGetHM('fin'),frs=thFormCalls();
-    if(!(site||cli||ag||tel||deb||fin||frs.length))return null;
-    return {id:'t'+Date.now()+'_'+Math.round(Math.random()*1e5),site:site,client:cli,agent:ag,tel:tel,deb:deb,fin:fin,calls:frs.map(function(fr){return {fr:fr,done:false,at:null,com:''};})};
+    var site=byId('th-site').value.trim(),cli=byId('th-client').value.trim(),ag=byId('th-agent').value.trim(),tel=byId('th-tel').value.trim(),deb=thGetHM('deb'),fin=thGetHM('fin'),calls=thFormCallObjs();
+    if(!(site||cli||ag||tel||deb||fin||calls.length))return null;
+    return {id:'t'+Date.now()+'_'+Math.round(Math.random()*1e5),site:site,client:cli,agent:ag,tel:tel,deb:deb,fin:fin,calls:calls.map(function(c){return {fr:c.fr,lbl:c.lbl,done:false,at:null,com:''};})};
   }
   function thSiteText(s){
     var L=[];
@@ -900,7 +919,7 @@ button.big:active{transform:translateY(1px)}
     if(s.agent)L.push('Agent : '+s.agent);
     if(s.tel)L.push('N° agent : '+s.tel);
     if(s.deb&&s.fin)L.push('Service : '+s.deb+' → '+s.fin);
-    if(s.calls&&s.calls.length){L.push('Appel'+(s.calls.length>1?'s':'')+' :');s.calls.forEach(function(c){L.push('  '+c.fr+' (France) → '+thToMali(c.fr)+' (Mali)'+(c.done?' ✅ '+c.at:'')+(c.com?' — '+c.com:''));});}
+    if(s.calls&&s.calls.length){L.push('Appel'+(s.calls.length>1?'s':'')+' :');s.calls.forEach(function(c){L.push('  '+(c.lbl?c.lbl+' ':'')+c.fr+' (France) → '+thToMali(c.fr)+' (Mali)'+(c.done?' ✅ '+c.at:'')+(c.com?' — '+c.com:''));});}
     return L.join('\n');
   }
   function thRenderOut(){
@@ -923,7 +942,7 @@ button.big:active{transform:translateY(1px)}
         var st=c.done?('<span class="thc-at">✅ appelé à '+esc(c.at||'')+'</span>'):(late?'<span class="thc-warn">⚠️ EN RETARD — à faire</span>':'<span class="thc-todo">à faire</span>');
         return '<div class="thc '+(c.done?'thc-done':(late?'thc-late':''))+'" data-sid="'+s.id+'" data-ci="'+ci+'">'
           +'<label class="thc-chk"><input type="checkbox" class="thc-box"'+(c.done?' checked':'')+'></label>'
-          +'<div class="thc-main"><div class="thc-h">'+esc(c.fr)+' <span class="thc-mali">→ Mali '+esc(thToMali(c.fr))+'</span> '+st+'</div>'
+          +'<div class="thc-main"><div class="thc-h">'+(c.lbl?'<span class="thc-lbl">'+esc(c.lbl)+'</span> ':'')+esc(c.fr)+' <span class="thc-mali">→ Mali '+esc(thToMali(c.fr))+'</span> '+st+'</div>'
           +'<input class="thc-com" placeholder="Commentaire de l\'appel…" value="'+esc(c.com||'')+'"></div>'
         +'</div>';
       }).join('');
@@ -943,14 +962,14 @@ button.big:active{transform:translateY(1px)}
     var badge=byId('th-lateBadge');badge.textContent=lateTot?('⚠️ '+lateTot+' appel'+(lateTot>1?'s':'')+' en retard'):'';badge.style.display=lateTot?'':'none';
   }
   function thGen(){thRenderAuto();thRenderOut();}
-  function thReset(){['th-site','th-client','th-agent','th-tel'].forEach(function(id){byId(id).value='';});['th-debh','th-debm','th-finh','th-finm'].forEach(function(id){byId(id).value='';});byId('th-ncalls').value='0';byId('th-hours').innerHTML='';byId('th-hours').appendChild(thMakeHour());thRenderAuto();}
+  function thReset(){['th-site','th-client','th-agent','th-tel'].forEach(function(id){byId(id).value='';});['th-debh','th-debm','th-finh','th-finm'].forEach(function(id){byId(id).value='';});byId('th-ncalls').value='0';byId('th-pre').checked=true;byId('th-depart').value='0';byId('th-hours').innerHTML='';byId('th-hours').appendChild(thMakeHour());thRenderAuto();}
   byId('th-debh').innerHTML=HOPTS;byId('th-debm').innerHTML=MOPTS;byId('th-finh').innerHTML=HOPTS;byId('th-finm').innerHTML=MOPTS;
   byId('th-addHour').addEventListener('click',function(){byId('th-hours').appendChild(thMakeHour());thGen();});
   byId('th-hours').appendChild(thMakeHour());
   mkCombo('th-client',CLIENTS,'fkh_clients',thGen);
   mkCombo('th-agent',[],'fkh_agent_noms',thGen);
   ['th-site','th-tel'].forEach(function(id){byId(id).addEventListener('input',thGen);});
-  ['th-debh','th-debm','th-finh','th-finm','th-ncalls','th-stagger'].forEach(function(id){byId(id).addEventListener('change',thGen);});
+  ['th-debh','th-debm','th-finh','th-finm','th-ncalls','th-stagger','th-pre','th-depart'].forEach(function(id){byId(id).addEventListener('change',thGen);});
   byId('th-add').onclick=function(){var s=thFormSite();if(!s)return;TH.push(s);thSave();thReset();thRenderBoard();thRenderOut();window.scrollTo(0,0);};
   byId('th-board').addEventListener('change',function(e){
     var box=e.target.closest('.thc-box');if(!box)return;
