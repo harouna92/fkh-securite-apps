@@ -295,8 +295,15 @@ button.big:active{transform:translateY(1px)}
     </div>
   </section>
   <section id="sec-zone" class="hidden">
-    <div><h1>Zone à couvrir</h1><p class="sub">Villes · départements · régions — à construire ensemble.</p></div>
-    <div class="card"><p class="hint" style="margin:0">🚧 À concevoir — dis-moi les informations à mettre (villes, départements, régions) et comment ça se recoupe avec <b>Suivi demandes</b> et <b>Fiche agent</b>.</p></div>
+    <div><h1>Zone à couvrir</h1><p class="sub">Carte de France — nombre d'agents par département (depuis la Fiche agent). 🟩 beaucoup · 🟥 peu.</p></div>
+    <div class="card">
+      <div id="zone-map" style="width:100%"></div>
+      <div id="zone-legend" class="hint" style="margin-top:8px;text-align:center"></div>
+    </div>
+    <div class="card">
+      <div class="lab" style="margin:0">Détail par département</div>
+      <div class="list" id="zone-list"></div>
+    </div>
   </section>
   <section id="sec-thiam" class="hidden">
     <div><h1>Thiam</h1><p class="sub">Section à définir ensemble.</p></div>
@@ -308,7 +315,7 @@ button.big:active{transform:translateY(1px)}
 (function(){
   var byId=function(x){return document.getElementById(x)};
   var secs=['demandes','prise','fin','suivi','fiche','zone','thiam'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});window.scrollTo(0,0);};});
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
   function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
@@ -642,8 +649,8 @@ button.big:active{transform:translateY(1px)}
   // ===== Fiche agent (répertoire) =====
   var FA=load('fkh_fa'); var faEdit=null,faSel=null,faT,faRef=null,faRT;
   function saveFA(){ save('fkh_fa',FA); }
-  function cityAuto(q,suggId,onPick){fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(q)+'&fields=nom,centre,codesPostaux,population&boost=population&limit=6').then(function(r){return r.json();}).then(function(list){var box=byId(suggId);if(!Array.isArray(list)||!list.length){box.classList.add('hidden');return;}box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+c.nom+'</span> <span class="cp">'+cp+'</span>';d.onclick=function(){onPick(c);};box.appendChild(d);});box.classList.remove('hidden');}).catch(function(){byId(suggId).classList.add('hidden');});}
-  byId('fa-ville').addEventListener('input',function(){var q=this.value.trim();faSel=null;clearTimeout(faT);if(q.length<2){byId('sugg-fa-ville').classList.add('hidden');return;}faT=setTimeout(function(){cityAuto(q,'sugg-fa-ville',function(c){var co=c.centre&&c.centre.coordinates;faSel={nom:c.nom,cp:(c.codesPostaux&&c.codesPostaux[0])||'',la:co?co[1]:null,lo:co?co[0]:null};byId('fa-ville').value=c.nom;byId('sugg-fa-ville').classList.add('hidden');});},250);});
+  function cityAuto(q,suggId,onPick){fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(q)+'&fields=nom,departement,centre,codesPostaux,population&boost=population&limit=6').then(function(r){return r.json();}).then(function(list){var box=byId(suggId);if(!Array.isArray(list)||!list.length){box.classList.add('hidden');return;}box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+c.nom+'</span> <span class="cp">'+cp+'</span>';d.onclick=function(){onPick(c);};box.appendChild(d);});box.classList.remove('hidden');}).catch(function(){byId(suggId).classList.add('hidden');});}
+  byId('fa-ville').addEventListener('input',function(){var q=this.value.trim();faSel=null;clearTimeout(faT);if(q.length<2){byId('sugg-fa-ville').classList.add('hidden');return;}faT=setTimeout(function(){cityAuto(q,'sugg-fa-ville',function(c){var co=c.centre&&c.centre.coordinates;faSel={nom:c.nom,cp:(c.codesPostaux&&c.codesPostaux[0])||'',la:co?co[1]:null,lo:co?co[0]:null,dep:(c.departement&&c.departement.code)||'',depnom:(c.departement&&c.departement.nom)||''};byId('fa-ville').value=c.nom;byId('sugg-fa-ville').classList.add('hidden');});},250);});
   byId('fa-refville').addEventListener('input',function(){var q=this.value.trim();faRef=null;clearTimeout(faRT);if(q.length<2){byId('sugg-fa-refville').classList.add('hidden');renderFA();return;}faRT=setTimeout(function(){cityAuto(q,'sugg-fa-refville',function(c){var co=c.centre&&c.centre.coordinates;faRef={nom:c.nom,la:co?co[1]:null,lo:co?co[0]:null};byId('fa-refville').value=c.nom;byId('sugg-fa-refville').classList.add('hidden');renderFA();});},250);});
   ['fa-radius','fa-f-ads','fa-f-voiture'].forEach(function(id){byId(id).addEventListener('change',renderFA);});
   byId('fa-search').addEventListener('input',renderFA);
@@ -651,9 +658,9 @@ button.big:active{transform:translateY(1px)}
   byId('fa-add').onclick=function(){
     var nom=byId('fa-nom').value.trim(),tel=byId('fa-tel').value.trim(),ville=byId('fa-ville').value.trim(),fiab=byId('fa-fiab').value,voiture=byId('fa-voiture').checked,ads=byId('fa-ads').checked;
     if(!(nom||tel||ville))return;
-    var g=(faSel&&faSel.nom===ville)?faSel:{nom:ville,cp:'',la:null,lo:null};
-    if(faEdit){ var a=null,i; for(i=0;i<FA.length;i++)if(FA[i].id===faEdit){a=FA[i];break;} if(a){a.nom=nom;a.tel=tel;a.ville=g.nom;a.cp=g.cp;a.la=g.la;a.lo=g.lo;a.fiab=fiab;a.voiture=voiture;a.ads=ads;} }
-    else { FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tel:tel,ville:g.nom,cp:g.cp,la:g.la,lo:g.lo,fiab:fiab,voiture:voiture,ads:ads}); }
+    var g=(faSel&&faSel.nom===ville)?faSel:{nom:ville,cp:'',la:null,lo:null,dep:'',depnom:''};
+    if(faEdit){ var a=null,i; for(i=0;i<FA.length;i++)if(FA[i].id===faEdit){a=FA[i];break;} if(a){a.nom=nom;a.tel=tel;a.ville=g.nom;a.cp=g.cp;a.la=g.la;a.lo=g.lo;a.dep=g.dep;a.depnom=g.depnom;a.fiab=fiab;a.voiture=voiture;a.ads=ads;} }
+    else { FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tel:tel,ville:g.nom,cp:g.cp,la:g.la,lo:g.lo,dep:g.dep,depnom:g.depnom,fiab:fiab,voiture:voiture,ads:ads}); }
     saveFA(); resetFAform(); renderFA();
   };
   function renderFA(){
@@ -677,9 +684,33 @@ button.big:active{transform:translateY(1px)}
       return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+(d||'—')+'</div></div><div class="fa-a">'+call+'<button data-fae="'+a.id+'" title="Modifier">✏️</button><button class="no" data-fad="'+a.id+'" title="Supprimer">🗑️</button></div></div>';
     }).join('');
     byId('fa-list').querySelectorAll('[data-fad]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fad');FA=FA.filter(function(x){return x.id!==id;});saveFA();renderFA();};});
-    byId('fa-list').querySelectorAll('[data-fae]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fae'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id){a=FA[i];break;}if(a){byId('fa-nom').value=a.nom||'';byId('fa-tel').value=a.tel||'';byId('fa-ville').value=a.ville||'';byId('fa-fiab').value=a.fiab||'';byId('fa-voiture').checked=!!a.voiture;byId('fa-ads').checked=!!a.ads;faSel={nom:a.ville,cp:a.cp,la:a.la,lo:a.lo};faEdit=a.id;byId('fa-add').textContent='✔️ Enregistrer';window.scrollTo(0,0);}};});
+    byId('fa-list').querySelectorAll('[data-fae]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fae'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id){a=FA[i];break;}if(a){byId('fa-nom').value=a.nom||'';byId('fa-tel').value=a.tel||'';byId('fa-ville').value=a.ville||'';byId('fa-fiab').value=a.fiab||'';byId('fa-voiture').checked=!!a.voiture;byId('fa-ads').checked=!!a.ads;faSel={nom:a.ville,cp:a.cp,la:a.la,lo:a.lo,dep:a.dep,depnom:a.depnom};faEdit=a.id;byId('fa-add').textContent='✔️ Enregistrer';window.scrollTo(0,0);}};});
   }
   renderFA();
+
+  // ===== Zone à couvrir : carte des départements =====
+  var GEO=null;
+  function deptCounts(){ var m={}; FA.forEach(function(a){ if(a.dep) m[a.dep]=(m[a.dep]||0)+1; }); return m; }
+  function lerp(a,b,t){return Math.round(a+(b-a)*t);}
+  function heatColor(n,max){ if(!n)return '#7a1f1f'; var t=Math.min(1,n/Math.max(1,max)),r,g,bl,u; if(t<0.5){u=t/0.5;r=lerp(192,235,u);g=lerp(57,178,u);bl=lerp(43,50,u);}else{u=(t-0.5)/0.5;r=lerp(235,39,u);g=lerp(178,174,u);bl=lerp(50,96,u);} return 'rgb('+r+','+g+','+bl+')'; }
+  function renderZone(){
+    var box=byId('zone-map'); if(!box)return;
+    if(!GEO){ box.innerHTML='<div class="hint" style="text-align:center;padding:24px">Chargement de la carte…</div>'; fetch('https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements-version-simplifiee.geojson').then(function(r){return r.json();}).then(function(j){GEO=j;renderZone();}).catch(function(){box.innerHTML='<div class="hint" style="text-align:center;padding:24px">Carte indisponible (connexion requise au 1er chargement).</div>';}); return; }
+    var feats=GEO.features.filter(function(f){var c=(f.properties.code||'')+'';return c.indexOf('97')!==0&&c.indexOf('98')!==0;});
+    var counts=deptCounts(),max=1; feats.forEach(function(f){var n=counts[f.properties.code]||0;if(n>max)max=n;});
+    var minx=1e9,maxx=-1e9,miny=1e9,maxy=-1e9,K=Math.cos(46.6*Math.PI/180);
+    function each(c){ if(typeof c[0]==='number'){var x=c[0]*K,y=-c[1];if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y;} else c.forEach(each); }
+    feats.forEach(function(f){each(f.geometry.coordinates);});
+    var W=560,pad=6,H=Math.round(W*(maxy-miny)/(maxx-minx));
+    function proj(lo,la){return [(pad+(lo*K-minx)/(maxx-minx)*(W-2*pad)).toFixed(1),(pad+(-la-miny)/(maxy-miny)*(H-2*pad)).toFixed(1)];}
+    function ring(r,arr){arr.push('M');r.forEach(function(pt,i){var p=proj(pt[0],pt[1]);arr.push((i?'L':'')+p[0]+' '+p[1]);});arr.push('Z');}
+    function pathFor(geom){var arr=[];if(geom.type==='Polygon')geom.coordinates.forEach(function(r){ring(r,arr);});else if(geom.type==='MultiPolygon')geom.coordinates.forEach(function(poly){poly.forEach(function(r){ring(r,arr);});});return arr.join(' ');}
+    var paths=feats.map(function(f){var c=f.properties.code,n=counts[c]||0;return '<path d="'+pathFor(f.geometry)+'" fill="'+heatColor(n,max)+'" stroke="rgba(0,0,0,.4)" stroke-width="0.4"><title>'+esc(f.properties.nom||'')+' ('+c+') : '+n+' agent'+(n>1?'s':'')+'</title></path>';}).join('');
+    box.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block">'+paths+'</svg>';
+    byId('zone-legend').innerHTML='🟥 0 agent · dégradé jusqu\'à 🟩 '+max+' agent'+(max>1?'s':'')+' (survole un département)';
+    var list=feats.map(function(f){return {code:f.properties.code,nom:f.properties.nom,n:counts[f.properties.code]||0};}).sort(function(a,b){return b.n-a.n||a.code.localeCompare(b.code);});
+    byId('zone-list').innerHTML=list.map(function(x){return '<div class="it"><span class="pill" style="background:'+heatColor(x.n,max)+';color:#fff;min-width:22px;text-align:center">'+x.n+'</span><span style="flex:1">'+esc(x.nom)+' ('+x.code+')</span></div>';}).join('');
+  }
 
   document.addEventListener('click',function(e){
     if(!e.target.closest('.acwrap'))document.querySelectorAll('.acwrap .sugg').forEach(function(s){s.classList.add('hidden');});
