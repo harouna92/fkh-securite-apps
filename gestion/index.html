@@ -542,7 +542,7 @@ button.big:active{transform:translateY(1px)}
   var MOTIFS_NG=["Pas d'agent disponible","Agent pas trouvé à temps","Délai trop court","Tarif non validé","Mission refusée","Autre"];
   var MOTIFS_AN=["Annulée par le client","Reportée","Doublon","Plus besoin","Autre"];
   var suiviBucket='recherche', idc=0;
-  function saveSuivi(){ save('fkh_suivi',SUIVI.map(function(x){var c={};for(var k in x)if(k!=='_pending'&&k!=='_pick'&&k!=='_pick2')c[k]=x[k];return c;})); }
+  function saveSuivi(){ save('fkh_suivi',SUIVI.map(function(x){var c={};for(var k in x)if(k.charAt(0)!=='_')c[k]=x[k];return c;})); }
   function titreFrom(txt){
     function g(re){var m=re.exec(txt);return m?m[1].trim():'';}
     var p=g(/Prestation : (.+)/), v=g(/Ville : ([^\n(—]+)/), d=g(/Date : (.+)/), asap=/DÈS QUE POSSIBLE/.test(txt);
@@ -550,12 +550,57 @@ button.big:active{transform:translateY(1px)}
   }
   function fmtDT(ts){var x=new Date(ts);return ('0'+x.getDate()).slice(-2)+'/'+('0'+(x.getMonth()+1)).slice(-2)+' '+('0'+x.getHours()).slice(-2)+':'+('0'+x.getMinutes()).slice(-2);}
   function fmtDelai(ms){ if(ms<0)ms=0; var min=Math.round(ms/60000); if(min<1)return '< 1 min'; if(min<60)return min+' min'; var h=Math.floor(min/60),m=min%60; if(h<24)return h+' h'+(m?(' '+('0'+m).slice(-2)):''); var j=Math.floor(h/24),hh=h%24; return j+' j'+(hh?(' '+hh+' h'):''); }
+  function extractVille(txt){ var m=/(?:Lieu|Ville) : ([^\n(—]+)/.exec(txt); return m?m[1].trim():''; }
   function pushToSuivi(){
-    var items=added.slice(), cur=buildCurrent(); if(cur&&items.indexOf(cur)<0)items.push(cur);
+    var items=added.slice(), cur=buildCurrent(), curIn=false; if(cur&&items.indexOf(cur)<0){items.push(cur);curIn=true;}
     if(!items.length) return 0;
     var now=Date.now();
-    items.forEach(function(txt){ SUIVI.unshift({id:'d'+now+'_'+(idc++),texte:txt,titre:titreFrom(txt),statut:'recherche',motif:'',pris:now,valide:null}); });
+    items.forEach(function(txt,idx){
+      var o={id:'d'+now+'_'+(idc++),texte:txt,titre:titreFrom(txt),statut:'recherche',motif:'',pris:now,valide:null,ville:extractVille(txt),la:null,lo:null,assoc:[]};
+      if(curIn&&idx===items.length-1&&sel&&sel._la!=null){ o.ville=sel.nom; o.la=sel._la; o.lo=sel._lo; }
+      SUIVI.unshift(o);
+    });
     saveSuivi(); return items.length;
+  }
+  // ---- Recoupement Suivi ↔ Fiche agent (agents dans un rayon de la demande) ----
+  function faById(id){ for(var i=0;i<FA.length;i++)if(FA[i].id===id)return FA[i]; return null; }
+  function ensureGeo(it,cb){
+    if(it.la!=null){cb&&cb();return;}
+    var v=it.ville||extractVille(it.texte);
+    if(!v){it._nogeo=true;cb&&cb();return;}
+    fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(v)+'&fields=nom,centre&boost=population&limit=1').then(function(r){return r.json();}).then(function(list){
+      if(list&&list[0]&&list[0].centre){var co=list[0].centre.coordinates;it.la=co[1];it.lo=co[0];if(!it.ville)it.ville=list[0].nom;} else it._nogeo=true;
+      cb&&cb();
+    }).catch(function(){it._nogeo=true;cb&&cb();});
+  }
+  function nearAgents(it){
+    var rad=it._rad||100,list=[];
+    FA.forEach(function(a){
+      if(a.la==null||a.lo==null)return;
+      if(it._nads&&!a.ads)return; if(it._nvoit&&!a.voiture)return;
+      var d=km(it.la,it.lo,a.la,a.lo); if(d<=rad)list.push({a:a,d:d});
+    });
+    list.sort(function(x,y){return x.d-y.d;}); return list;
+  }
+  function renderNear(it){
+    if(it.la==null){ return '<div class="pickp"><div class="hint">'+(it._nogeo?'📍 Ville non géolocalisée — distances indisponibles.':'⏳ Localisation de '+esc(it.ville||extractVille(it.texte)||'la ville')+'…')+'</div><div class="acts" style="margin-top:6px"><button data-act="nearclose" data-id="'+it.id+'">Fermer</button></div></div>'; }
+    var rad=it._rad||100, list=nearAgents(it);
+    var radOpts=[20,30,50,75,100,150].map(function(r){return '<option value="'+r+'"'+(r===rad?' selected':'')+'>'+r+' km</option>';}).join('');
+    var head='<div class="lab" style="margin:0 0 5px">🔍 Agents proches de '+esc(it.ville||'?')+'</div>'
+      +'<div class="hm" style="margin-bottom:7px;flex-wrap:wrap"><span style="color:var(--muted);font-weight:400;font-size:12.5px">Rayon</span><select data-nrad="'+it.id+'" style="flex:0 0 auto;width:auto;padding:6px 8px;font-size:13px">'+radOpts+'</select>'
+      +'<label style="display:flex;align-items:center;gap:4px;font-size:12.5px;margin-left:6px;cursor:pointer"><input type="checkbox" data-nads="'+it.id+'"'+(it._nads?' checked':'')+' style="width:16px;height:16px;padding:0;margin:0">🛡️ADS</label>'
+      +'<label style="display:flex;align-items:center;gap:4px;font-size:12.5px;cursor:pointer"><input type="checkbox" data-nvoit="'+it.id+'"'+(it._nvoit?' checked':'')+' style="width:16px;height:16px;padding:0;margin:0">🚗 Véhicule</label></div>';
+    var cnt='<div class="hint" style="margin:0 0 6px">'+list.length+' agent'+(list.length>1?'s':'')+' à ≤ '+rad+' km'+((it._nads||it._nvoit)?' (filtré)':'')+'</div>';
+    var body;
+    if(!list.length) body='<div class="svempty" style="padding:12px">Aucun agent dans ce rayon.'+(FA.length?'':' (Fiche agent vide.)')+'</div>';
+    else body='<div class="list">'+list.map(function(o){
+      var a=o.a, assoc=(it.assoc||[]).indexOf(a.id)>=0, tels=a.tels||(a.tel?[a.tel]:[]);
+      var tags=(a.voiture?'🚗 ':'')+(a.ads?'🛡️ADS ':'');
+      var d=(tags?tags+'· ':'')+[a.ville,o.d+' km',tels.join(' / '),a.fiab].filter(Boolean).map(esc).join(' · ');
+      var call=tels.map(function(t){return '<a class="call" href="tel:'+esc(t.replace(/\s/g,''))+'" title="Appeler '+esc(t)+'">📞</a>';}).join('');
+      return '<div class="fa"'+(assoc?' style="background:var(--okbg);border-radius:9px;padding:8px"':'')+'><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+(d||'—')+'</div></div><div class="fa-a">'+call+'<button data-act="nassoc" data-id="'+it.id+'" data-aid="'+a.id+'"'+(assoc?' style="color:var(--ok);border-color:var(--ok)"':'')+' title="'+(assoc?'Retirer de la demande':'Associer à la demande')+'">'+(assoc?'✓':'➕')+'</button></div></div>';
+    }).join('')+'</div>';
+    return '<div class="pickp">'+head+cnt+body+'<div class="acts" style="margin-top:8px"><button data-act="nearclose" data-id="'+it.id+'">Fermer</button></div></div>';
   }
   function badge(st,motif){
     var map={validee:['okbg','ok','✅ Validée'],annulee:['badbg','bad','✖️ Annulée client'],nongeree:['warnbg','warn','⚠️ Non gérée']}, m=map[st];
@@ -578,14 +623,17 @@ button.big:active{transform:translateY(1px)}
       } else {
         body=badge(x.statut,x.motif)+'<div class="acts"><button data-act="reopen" data-id="'+x.id+'">↩︎ Remettre en recherche</button><button class="no" data-act="del" data-id="'+x.id+'">🗑️ Supprimer</button></div>';
       }
-      var pickBtn='<div class="acts" style="margin-top:2px"><button data-act="pick" data-id="'+x.id+'">📤 Infos pour l\'agent</button><button data-act="pick2" data-id="'+x.id+'">✅ Mission validée</button></div>';
+      var pickBtn='<div class="acts" style="margin-top:2px"><button data-act="pick" data-id="'+x.id+'">📤 Infos agent</button><button data-act="pick2" data-id="'+x.id+'">✅ Mission validée</button><button data-act="near" data-id="'+x.id+'">🔍 Agents proches</button></div>';
       var pickPanel='';
       if(x._pick||x._pick2){
         var lines=x.texte.split('\n');
         var ptitre=x._pick2?'Mission validée — décoche ce que tu ne veux pas':'Infos pour l\'agent — décoche ce que tu ne veux pas';
         pickPanel='<div class="pickp"><div class="lab" style="margin:0 0 2px">'+ptitre+'</div>'+lines.map(function(ln,li){return '<label class="plrow"><input type="checkbox" class="pl" data-li="'+li+'" checked><span>'+(esc(ln)||' ')+'</span></label>';}).join('')+'<div class="acts" style="margin-top:8px"><button class="ok" data-act="pickcopy" data-id="'+x.id+'">📋 Copier la sélection</button><button data-act="pickclose" data-id="'+x.id+'">Fermer</button></div></div>';
       }
-      return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div><div class="svm">'+esc(x.texte)+'</div>'+body+pickBtn+pickPanel+'</div>';
+      var nearPanel=x._near?renderNear(x):'';
+      var assocLine='';
+      if(x.assoc&&x.assoc.length){ var nm=x.assoc.map(function(id){var a=faById(id);return a?(a.nom||'?'):null;}).filter(Boolean); if(nm.length)assocLine='<div class="meta" style="color:var(--ok);font-weight:600"><span>👥 Associé'+(nm.length>1?'s':'')+' : '+esc(nm.join(', '))+'</span></div>'; }
+      return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+assocLine+'<div class="svm">'+esc(x.texte)+'</div>'+body+pickBtn+pickPanel+nearPanel+'</div>';
     }).join('');
   }
   byId('suiviList').addEventListener('click',function(e){
@@ -602,9 +650,20 @@ button.big:active{transform:translateY(1px)}
     else if(act==='del'){SUIVI=SUIVI.filter(function(x){return x.id!==id;});}
     else if(act==='pick'){var o=it._pick;delete it._pick2;it._pick=!o;}
     else if(act==='pick2'){var o2=it._pick2;delete it._pick;it._pick2=!o2;}
+    else if(act==='near'){ if(it._near){delete it._near;} else { delete it._pick;delete it._pick2; it._near=true; if(it.la==null&&!it._nogeo){ ensureGeo(it,function(){ if(it._near){saveSuivi();renderSuivi();} }); } } saveSuivi(); renderSuivi(); return; }
+    else if(act==='nearclose'){ delete it._near; saveSuivi(); renderSuivi(); return; }
+    else if(act==='nassoc'){ var aid=b.getAttribute('data-aid'); it.assoc=it.assoc||[]; var ix=it.assoc.indexOf(aid); if(ix>=0)it.assoc.splice(ix,1); else it.assoc.push(aid); saveSuivi(); renderSuivi(); return; }
     else if(act==='pickclose'){delete it._pick;delete it._pick2;}
     else if(act==='pickcopy'){var card=b.closest('.sv'),lines=it.texte.split('\n'),outL=[];card.querySelectorAll('input.pl').forEach(function(c){if(c.checked)outL.push(lines[+c.getAttribute('data-li')]);});if(navigator.clipboard)navigator.clipboard.writeText(outL.join('\n'));flash(b,'Copié ✓');return;}
     saveSuivi(); renderSuivi();
+  });
+  byId('suiviList').addEventListener('change',function(e){
+    var t=e.target, id=t.getAttribute('data-nrad')||t.getAttribute('data-nads')||t.getAttribute('data-nvoit'); if(!id)return;
+    var it=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;} if(!it)return;
+    if(t.hasAttribute('data-nrad'))it._rad=parseInt(t.value,10)||100;
+    else if(t.hasAttribute('data-nads'))it._nads=t.checked;
+    else if(t.hasAttribute('data-nvoit'))it._nvoit=t.checked;
+    renderSuivi();
   });
   document.querySelectorAll('#suiviTabs button').forEach(function(bt){bt.onclick=function(){suiviBucket=bt.getAttribute('data-b');renderSuivi();};});
   function flash(btn,msg){var o=btn.getAttribute('data-o')||btn.textContent;btn.setAttribute('data-o',o);btn.textContent=msg;setTimeout(function(){btn.textContent=btn.getAttribute('data-o');},1500);}
