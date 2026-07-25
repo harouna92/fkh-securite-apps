@@ -126,9 +126,15 @@ button.big:active{transform:translateY(1px)}
     <button class="big" id="addBtn" style="background:var(--panel);color:var(--ink);border:1px solid var(--line)">➕ Ajouter cette demande, en saisir une autre</button>
     <div class="card hidden" id="addedCard"><div class="lab" style="margin:0">Demandes ajoutées (<span id="addedN">0</span>)</div><div class="list" id="addedList"></div></div>
     <div class="card">
-      <div class="lab" style="margin:0">Texte à copier dans le groupe</div>
+      <div class="lab" style="margin:0">Texte à copier — version groupe</div>
       <div class="outbox" id="out">Remplis la demande ci-dessus…</div>
       <button class="big" id="copy">Copier pour le groupe</button>
+      <label class="chk"><input type="checkbox" id="agentVer"><span>📱 Générer aussi la version à envoyer à l'agent</span></label>
+      <div id="agentBlock" class="hidden">
+        <div class="lab" style="margin:2px 0 0">Texte à envoyer à l'agent</div>
+        <div class="outbox" id="out-agent">—</div>
+        <button class="big" id="copy-agent">Copier pour l'agent</button>
+      </div>
       <button class="big" id="toSuivi" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">📥 Envoyer vers « Suivi demandes »</button>
     </div>
   </section>
@@ -320,10 +326,41 @@ button.big:active{transform:translateY(1px)}
   byId('addVac').addEventListener('click',function(){ addVac(); genText(); });
   addVac();
 
+  function readVacs(){ var vacs=[]; document.querySelectorAll('#vacsList .vac').forEach(function(el){ var v=readVac(el); if(v.quand==='asap'||v.date||v.deb||v.fin||v.dateFin||v.arr||v.h24) vacs.push(v); }); return vacs; }
+  function vacLines(vacs){
+    var out=[];
+    vacs.forEach(function(v,i){
+      var p=[];
+      if(v.quand==='asap')p.push('dès que possible'); else if(v.date)p.push('début '+fmtD(v.date));
+      if(v.h24){ p.push('H24 (24h/24)'); p.push(v.dateFin?('fin le '+fmtD(v.dateFin)):'jusqu\'à nouvel ordre'); }
+      else {
+        if(v.arr){ if(v.deb)p.push('début '+v.deb); p.push('fin à l\'arrivée du personnel'+(v.fin?' (vers '+v.fin+')':'')); }
+        else if(v.deb&&v.fin){ p.push('de '+v.deb+' à '+v.fin); var dd=duree(v.deb,v.fin); if(dd)p.push('plage '+dd); }
+        else { if(v.deb)p.push('début '+v.deb); if(v.fin)p.push('fin '+v.fin); }
+        if(v.dateFin)p.push('fin le '+fmtD(v.dateFin));
+      }
+      out.push(vacs.length>1?'Vacation '+(i+1)+' :':'Vacation :');
+      if(p.length)p.forEach(function(pl){out.push('  '+pl);}); else out.push('  (à définir)');
+    });
+    return out;
+  }
+  function buildAgent(){
+    var siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),notes=byId('notes').value.trim();
+    var villeName=sel?sel.nom:byId('ville').value.trim();
+    var vacs=readVacs();
+    if(!(villeName||siteT||surv||notes||vacs.length)) return '';
+    var L=['📱 MISSION — FKH'];
+    if(villeName)L.push('Lieu : '+villeName+(cp?' ('+cp+')':''));
+    if(siteT)L.push('Type de site : '+siteT);
+    if(surv)L.push('Surveillance : '+surv);
+    if(vacs.length)L=L.concat(vacLines(vacs));
+    if(notes)L.push('Consignes : '+notes);
+    return L.join('\n');
+  }
   var added=[];
   function buildCurrent(){
     var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
-    var vacs=[]; document.querySelectorAll('#vacsList .vac').forEach(function(el){ var v=readVac(el); if(v.quand==='asap'||v.date||v.deb||v.fin||v.dateFin||v.arr||v.h24) vacs.push(v); });
+    var vacs=readVacs();
     if(!(client||type||agent||siteT||sel||byId('ville').value.trim()||notes||vacs.length)) return '';
     var L=[];
     if(client)L.push('Client : '+client);
@@ -332,30 +369,7 @@ button.big:active{transform:translateY(1px)}
     if(siteT)L.push('Type de site : '+siteT);
     if(surv)L.push('Surveillance : '+surv);
     if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':''));(sel._near||[]).forEach(function(x){L.push(x.n+(x.cp?' '+x.cp:'')+' à '+x.d+' km'+(x.dur?' · '+x.dur:''));});meas.forEach(function(x){L.push('↳ '+x.n+(x.cp?' '+x.cp:'')+' à '+x.km+' km'+(x.dur?' · '+x.dur:''));});}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':''));
-    if(vacs.length){
-      vacs.forEach(function(v,i){
-        var p=[];
-        if(v.quand==='asap')p.push('dès que possible'); else if(v.date)p.push('début '+fmtD(v.date));
-        if(v.h24){
-          p.push('H24 (24h/24)');
-          p.push(v.dateFin?('fin le '+fmtD(v.dateFin)):'jusqu\'à nouvel ordre');
-        } else {
-          if(v.arr){
-            if(v.deb)p.push('début '+v.deb);
-            p.push('fin à l\'arrivée du personnel'+(v.fin?' (vers '+v.fin+')':''));
-          } else if(v.deb&&v.fin){
-            p.push('de '+v.deb+' à '+v.fin);
-            var dd=duree(v.deb,v.fin); if(dd)p.push('plage '+dd);
-          } else {
-            if(v.deb)p.push('début '+v.deb);
-            if(v.fin)p.push('fin '+v.fin);
-          }
-          if(v.dateFin)p.push('fin le '+fmtD(v.dateFin));
-        }
-        L.push(vacs.length>1?'Vacation '+(i+1)+' :':'Vacation :');
-        if(p.length)p.forEach(function(pl){L.push('  '+pl);}); else L.push('  (à définir)');
-      });
-    }
+    if(vacs.length)L=L.concat(vacLines(vacs));
     if(ag)L.push('Agents : '+ag);if(ref)L.push('Réf/contact : '+ref);if(notes)L.push('Notes : '+notes);
     return L.join('\n');
   }
@@ -365,7 +379,7 @@ button.big:active{transform:translateY(1px)}
     if(blocks.length===1){ byId('out').textContent='📋 NOUVELLE DEMANDE — FKH\n'+blocks[0]; return; }
     byId('out').textContent='📋 DEMANDES FKH ('+blocks.length+')\n\n'+blocks.map(function(b,i){return '— Demande '+(i+1)+' —\n'+b;}).join('\n\n');
   }
-  function genText(){ renderOut(); }
+  function genText(){ renderOut(); if(byId('agentVer').checked){ byId('out-agent').textContent=buildAgent()||'Remplis la demande…'; } }
   function resetForm(){
     ['client','type','agent','sitetype','ville','cp','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
     byId('surv').value='';
@@ -381,6 +395,8 @@ button.big:active{transform:translateY(1px)}
   byId('addBtn').onclick=function(){var cur=buildCurrent();if(!cur)return;added.push(cur);resetForm();renderAdded();renderOut();window.scrollTo(0,0);};
   ['agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
+  byId('agentVer').addEventListener('change',function(){ byId('agentBlock').classList.toggle('hidden',!this.checked); genText(); });
+  byId('copy-agent').onclick=function(){var x=byId('out-agent').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-agent'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
 
   // ===== Suivi demandes =====
   var SUIVI=load('fkh_suivi'); SUIVI.forEach(function(x){delete x._pending;});
