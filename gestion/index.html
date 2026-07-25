@@ -107,6 +107,7 @@ button.big:active{transform:translateY(1px)}
 .thc-todo{color:var(--muted);font-weight:400;font-size:12.5px}
 .thc-warn{color:var(--bad);font-weight:700;font-size:12.5px}
 .thc-lbl{font-size:11px;background:var(--brand);color:var(--brand-ink);border-radius:7px;padding:1px 7px;font-weight:700;white-space:nowrap}
+.thc-grp{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;padding:9px 12px 3px;border-top:1px solid var(--line)}
 .thc-com{font-size:13px;padding:8px 10px}
 </style>
 
@@ -885,12 +886,12 @@ button.big:active{transform:translateY(1px)}
   function thCalls(deb,fin,n,stagger){return thMainCalls(deb,fin,n,stagger).map(function(c){return c.fr;});}
   // Liste complète = pré-appels (départ agent −X, pré-prise −15) + appels de service + appels manuels. -> [{off,fr,lbl}]
   function thAllCalls(deb,fin,n,stagger,departMin,preOn){
-    var d=toMin(deb),list=thMainCalls(deb,fin,n,stagger).map(function(c){return {off:c.off,fr:c.fr,lbl:''};});
+    var d=toMin(deb),list=thMainCalls(deb,fin,n,stagger).map(function(c){return {off:c.off,fr:c.fr,lbl:'',kind:'svc'};});
     if(d!=null){
-      if(departMin>0)list.push({off:-departMin,fr:hmFromMin(d-departMin),lbl:'🚗 Départ agent ?'});
-      if(preOn)list.push({off:-15,fr:hmFromMin(d-15),lbl:'⏰ Arrivée à l\'heure ?'});
+      if(departMin>0)list.push({off:-departMin,fr:hmFromMin(d-departMin),lbl:'🚗 Départ agent ?',kind:'pre'});
+      if(preOn)list.push({off:-15,fr:hmFromMin(d-15),lbl:'⏰ Arrivée à l\'heure ?',kind:'pre'});
     }
-    thReadHours().forEach(function(m){var off=(d!=null)?(((toMin(m)-d)%1440+1440)%1440):0;if(!list.some(function(c){return c.fr===m;}))list.push({off:off,fr:m,lbl:''});});
+    thReadHours().forEach(function(m){var off=(d!=null)?(((toMin(m)-d)%1440+1440)%1440):0;if(!list.some(function(c){return c.fr===m;}))list.push({off:off,fr:m,lbl:'',kind:'svc'});});
     list.sort(function(a,b){return a.off-b.off;});
     var seen={},res=[];list.forEach(function(c){if(!seen[c.off]){seen[c.off]=1;res.push(c);}});
     return res;
@@ -904,14 +905,17 @@ button.big:active{transform:translateY(1px)}
     var calls=thFormCallObjs();
     if(!calls.length){box.style.display='none';box.innerHTML='';return;}
     var stag=TH.length*thStep();
+    function kind(c){return c.kind||(c.lbl?'pre':'svc');}
+    function grp(title,arr){if(!arr.length)return '';return '<div class="thc-grp" style="border:none;padding:8px 0 2px">'+title+'</div><div class="near">'+arr.map(function(c){return '<div class="n"><span>'+(c.lbl?esc(c.lbl)+' ':'')+esc(c.fr)+' <span style="color:var(--muted)">(France)</span></span><span class="d">'+esc(thToMali(c.fr))+' (Mali)</span></div>';}).join('')+'</div>';}
     box.style.display='';
     box.innerHTML='<div class="lab" style="margin:0 0 3px">🔔 Appels'+((deb&&fin)?' — '+esc(deb)+' → '+esc(fin):'')+' · '+calls.length+' appel'+(calls.length>1?'s':'')+(stag?' · décalage +'+stag+' min (site n°'+(TH.length+1)+')':'')+'</div>'
-      +'<div class="near">'+calls.map(function(c){return '<div class="n"><span>'+(c.lbl?esc(c.lbl)+' ':'')+esc(c.fr)+' <span style="color:var(--muted)">(France)</span></span><span class="d">'+esc(thToMali(c.fr))+' (Mali)</span></div>';}).join('')+'</div>';
+      +grp('Avant la prise de service',calls.filter(function(c){return kind(c)==='pre';}))
+      +grp('Pendant le service',calls.filter(function(c){return kind(c)==='svc';}));
   }
   function thFormSite(){
     var site=byId('th-site').value.trim(),cli=byId('th-client').value.trim(),ag=byId('th-agent').value.trim(),tel=byId('th-tel').value.trim(),deb=thGetHM('deb'),fin=thGetHM('fin'),calls=thFormCallObjs();
     if(!(site||cli||ag||tel||deb||fin||calls.length))return null;
-    return {id:'t'+Date.now()+'_'+Math.round(Math.random()*1e5),site:site,client:cli,agent:ag,tel:tel,deb:deb,fin:fin,calls:calls.map(function(c){return {fr:c.fr,lbl:c.lbl,done:false,at:null,com:''};})};
+    return {id:'t'+Date.now()+'_'+Math.round(Math.random()*1e5),site:site,client:cli,agent:ag,tel:tel,deb:deb,fin:fin,calls:calls.map(function(c){return {fr:c.fr,lbl:c.lbl,kind:c.kind,done:false,at:null,com:''};})};
   }
   function thSiteText(s){
     var L=[];
@@ -919,8 +923,12 @@ button.big:active{transform:translateY(1px)}
     if(s.client)L.push('Client / donneur d\'ordre : '+s.client);
     if(s.agent)L.push('Agent : '+s.agent);
     if(s.tel)L.push('N° agent : '+s.tel);
-    if(s.deb&&s.fin)L.push('Service : '+s.deb+' → '+s.fin);
-    if(s.calls&&s.calls.length){L.push('Appel'+(s.calls.length>1?'s':'')+' :');s.calls.forEach(function(c){L.push('  '+(c.lbl?c.lbl+' ':'')+c.fr+' (France) → '+thToMali(c.fr)+' (Mali)'+(c.done?' ✅ '+c.at:'')+(c.com?' — '+c.com:''));});}
+    if(s.deb&&s.fin)L.push('Service : '+s.deb+' → '+s.fin);else if(s.deb)L.push('Début : '+s.deb);
+    var cs=s.calls||[];
+    function kind(c){return c.kind||(c.lbl?'pre':'svc');}
+    function grp(title,arr){if(!arr.length)return;L.push(title+' :');arr.forEach(function(c){L.push('  '+(c.lbl?c.lbl+' ':'')+c.fr+' (France) → '+thToMali(c.fr)+' (Mali)'+(c.done?' ✅ '+c.at:'')+(c.com?' — '+c.com:''));});}
+    grp('Avant la prise de service',cs.filter(function(c){return kind(c)==='pre';}));
+    grp('Appels pendant le service',cs.filter(function(c){return kind(c)==='svc';}));
     return L.join('\n');
   }
   function thRenderOut(){
@@ -938,7 +946,7 @@ button.big:active{transform:translateY(1px)}
     var lateTot=0;
     wrap.innerHTML=TH.map(function(s){
       var siteLate=false;
-      var rows=(s.calls||[]).map(function(c,ci){
+      function rowHtml(c,ci){
         var late=thIsLate(c.fr,c.done);if(late){lateTot++;siteLate=true;}
         var st=c.done?('<span class="thc-at">✅ appelé à '+esc(c.at||'')+'</span>'):(late?'<span class="thc-warn">⚠️ EN RETARD — à faire</span>':'<span class="thc-todo">à faire</span>');
         return '<div class="thc '+(c.done?'thc-done':(late?'thc-late':''))+'" data-sid="'+s.id+'" data-ci="'+ci+'">'
@@ -946,8 +954,12 @@ button.big:active{transform:translateY(1px)}
           +'<div class="thc-main"><div class="thc-h">'+(c.lbl?'<span class="thc-lbl">'+esc(c.lbl)+'</span> ':'')+esc(c.fr)+' <span class="thc-mali">→ Mali '+esc(thToMali(c.fr))+'</span> '+st+'</div>'
           +'<input class="thc-com" placeholder="Commentaire de l\'appel…" value="'+esc(c.com||'')+'"></div>'
         +'</div>';
-      }).join('');
-      return '<div class="thsite'+(siteLate?' thsite-late':'')+'"><div class="thsite-h">'+esc(s.site||'Site')+(s.agent?' · '+esc(s.agent):'')+(s.deb&&s.fin?' · '+esc(s.deb)+'→'+esc(s.fin):'')+'<button class="thsite-del" data-thdel="'+s.id+'" title="Retirer ce site">🗑️</button></div>'+rows+'</div>';
+      }
+      var cs=s.calls||[],pre='',svc='';
+      cs.forEach(function(c,ci){var k=c.kind||(c.lbl?'pre':'svc');if(k==='pre')pre+=rowHtml(c,ci);else svc+=rowHtml(c,ci);});
+      var body=(pre?'<div class="thc-grp">Avant la prise de service</div>'+pre:'')+(svc?'<div class="thc-grp">Appels pendant le service</div>'+svc:'');
+      if(!body)body='<div class="hint" style="padding:10px 12px">Aucun appel.</div>';
+      return '<div class="thsite'+(siteLate?' thsite-late':'')+'"><div class="thsite-h">'+esc(s.site||'Site')+(s.agent?' · '+esc(s.agent):'')+(s.deb&&s.fin?' · '+esc(s.deb)+'→'+esc(s.fin):(s.deb?' · début '+esc(s.deb):''))+'<button class="thsite-del" data-thdel="'+s.id+'" title="Retirer ce site">🗑️</button></div>'+body+'</div>';
     }).join('');
     var badge=byId('th-lateBadge');badge.textContent=lateTot?('⚠️ '+lateTot+' appel'+(lateTot>1?'s':'')+' en retard'):'';badge.style.display=lateTot?'':'none';
   }
