@@ -79,6 +79,8 @@ button.big:active{transform:translateY(1px)}
 .avopts{display:flex;flex-wrap:wrap;gap:7px 16px;font-size:12.5px}
 .avopts label{display:flex;align-items:center;gap:5px;cursor:pointer}
 .avopts input{flex:0 0 auto;width:16px;height:16px;padding:0;margin:0;border:0;background:none;border-radius:0}
+#mv-tel{font-size:12.5px;padding:9px 10px}
+#mv-tel option,#mv-tel optgroup{font-size:12.5px}
 </style>
 
 <div class="top">
@@ -163,7 +165,7 @@ button.big:active{transform:translateY(1px)}
         <label class="f hidden" id="mv-tel-other-wrap"><div class="lab">Autre numéro (saisir)</div><input id="mv-tel-other" placeholder="Numéro à appeler" inputmode="tel" autocomplete="off"></label>
         <div class="grid2">
           <label class="f"><div class="lab">📍 N° de voie</div><input id="adr-num" placeholder="Ex. 12" autocomplete="off"></label>
-          <label class="f"><div class="lab">Type de voie</div><input id="adr-type" placeholder="rue, avenue, bd…" autocomplete="off"></label>
+          <label class="f"><div class="lab">Type de voie</div><select id="adr-type"><option value="">—</option><option>Rue</option><option>Avenue</option><option>Boulevard</option><option>Impasse</option><option>Chemin</option><option>Place</option><option>Allée</option><option>Route</option><option>Quai</option><option>Cours</option><option>Passage</option><option>Square</option><option>Rond-point</option><option>Voie</option><option>Lotissement</option><option>Résidence</option><option>Zone (ZA/ZI)</option></select></label>
         </div>
         <label class="f"><div class="lab">Nom de la voie</div><input id="adr-nom" placeholder="Ex. des Lilas" autocomplete="off"></label>
         <div class="lab" style="margin:8px 0 2px">Infos à inclure (mission validée)</div>
@@ -455,6 +457,7 @@ button.big:active{transform:translateY(1px)}
   }
   byId('addBtn').onclick=function(){var cur=buildCurrent();if(!cur)return;added.push(cur);resetForm();renderAdded();renderOut();window.scrollTo(0,0);};
   ['sitename','adr-num','adr-type','adr-nom','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
+  byId('adr-type').addEventListener('change',genText);
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   byId('agentToggle').addEventListener('click',function(){ byId('agentBlock').classList.toggle('hidden'); genText(); });
   ['av-client','av-sitename','av-presta','av-agenttype','av-sitetype','av-surv','av-ville','av-near','av-meas','av-vac','av-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
