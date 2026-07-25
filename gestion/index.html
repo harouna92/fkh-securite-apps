@@ -344,6 +344,14 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Nom de l'agent</div><div class="cbx"><input id="th-agent" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="th-agent" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-th-agent"></div></div></label>
       </div>
       <label class="f"><div class="lab">Numéro de l'agent</div><input id="th-tel" placeholder="N° agent" inputmode="tel" autocomplete="off"></label>
+      <div id="th-newagent" class="ctx" style="display:none">
+        <div class="lab" style="margin:0 0 4px">🆕 Numéro inconnu — l'ajouter à la Fiche agent ?</div>
+        <div class="grid2">
+          <label class="f"><div class="lab">Ville de l'agent</div><div class="acwrap"><input type="text" id="th-na-ville" placeholder="Ville de l'agent…" autocomplete="off"><div class="sugg hidden" id="sugg-th-na-ville"></div></div></label>
+          <label class="f"><div class="lab">Code postal</div><input id="th-na-cp" placeholder="CP" inputmode="numeric" autocomplete="off"></label>
+        </div>
+        <div class="hint" style="margin:2px 0 0">Renseigne la ville : l'agent sera créé dans la Fiche agent à l'ajout du site.</div>
+      </div>
       <div class="lab" style="margin:2px 0 5px">Type d'appels pour ce site</div>
       <div class="subtabs" id="th-mode">
         <button type="button" data-m="pre">⏰ Avant la prise de service</button>
@@ -888,6 +896,8 @@ button.big:active{transform:translateY(1px)}
   function thN(){var e=byId('th-ncalls');return e?(parseInt(e.value,10)||0):0;}
   function thMode(){var b=document.querySelector('#th-mode button.on');return b?b.getAttribute('data-m'):'svc';}
   function thApplyMode(){var m=thMode();byId('th-blk-pre').style.display=(m==='svc')?'none':'';byId('th-blk-svc').style.display=(m==='pre')?'none':'';}
+  function thTelExists(tel){var k=telKey(tel);if(!k)return false;var f=false;FA.forEach(function(a){(a.tels||[]).forEach(function(t){if(telKey(t)===k)f=true;});});return f;}
+  function thCheckAgent(){var tel=byId('th-tel').value.trim(),k=telKey(tel);byId('th-newagent').style.display=(k.length>=6&&!thTelExists(tel))?'':'none';}
   // Répartition des appels sur la mission (début → fin). n=0 : auto (toutes les 2 h) ; n>0 : n appels équirépartis.
   // 1er appel au début, dernier 30 min avant la fin. Renvoie des minutes-offset depuis le début.
   function thOffsets(deb,fin,n){
@@ -1019,17 +1029,29 @@ button.big:active{transform:translateY(1px)}
     var badge=byId('th-lateBadge');badge.textContent=lateTot?('⚠️ '+lateTot+' appel'+(lateTot>1?'s':'')+' en retard'):'';badge.style.display=lateTot?'':'none';
   }
   function thGen(){thRenderAuto();thRenderOut();}
-  function thReset(){['th-site','th-client','th-agent','th-tel'].forEach(function(id){byId(id).value='';});['th-debh','th-debm','th-finh','th-finm'].forEach(function(id){byId(id).value='';});byId('th-ncalls').value='0';byId('th-pre').checked=true;byId('th-depart').value='0';document.querySelectorAll('#th-mode button').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-m')==='svc');});thApplyMode();byId('th-hours').innerHTML='';byId('th-hours').appendChild(thMakeHour());thRenderAuto();}
+  function thReset(){['th-site','th-client','th-agent','th-tel'].forEach(function(id){byId(id).value='';});['th-debh','th-debm','th-finh','th-finm'].forEach(function(id){byId(id).value='';});byId('th-ncalls').value='0';byId('th-pre').checked=true;byId('th-depart').value='0';byId('th-na-ville').value='';byId('th-na-cp').value='';byId('th-newagent').style.display='none';thNaSel=null;document.querySelectorAll('#th-mode button').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-m')==='svc');});thApplyMode();byId('th-hours').innerHTML='';byId('th-hours').appendChild(thMakeHour());thRenderAuto();}
   byId('th-debh').innerHTML=HOPTS;byId('th-debm').innerHTML=MOPTS;byId('th-finh').innerHTML=HOPTS;byId('th-finm').innerHTML=MOPTS;
   byId('th-addHour').addEventListener('click',function(){byId('th-hours').appendChild(thMakeHour());thGen();});
   byId('th-hours').appendChild(thMakeHour());
   mkCombo('th-client',CLIENTS,'fkh_clients',thGen);
   mkCombo('th-agent',[],'fkh_agent_noms',thGen);
   ['th-site','th-tel'].forEach(function(id){byId(id).addEventListener('input',thGen);});
+  var thNaSel=null,thNaT;
+  byId('th-tel').addEventListener('input',thCheckAgent);
+  byId('th-na-ville').addEventListener('input',function(){var q=this.value.trim();thNaSel=null;clearTimeout(thNaT);if(q.length<2){byId('sugg-th-na-ville').classList.add('hidden');return;}thNaT=setTimeout(function(){cityAuto(q,'sugg-th-na-ville',function(c){var co=c.centre&&c.centre.coordinates;thNaSel={nom:c.nom,cp:(c.codesPostaux&&c.codesPostaux[0])||'',la:co?co[1]:null,lo:co?co[0]:null,dep:(c.departement&&c.departement.code)||'',depnom:(c.departement&&c.departement.nom)||''};byId('th-na-ville').value=c.nom;byId('th-na-cp').value=thNaSel.cp;byId('sugg-th-na-ville').classList.add('hidden');});},250);});
   ['th-debh','th-debm','th-finh','th-finm','th-ncalls','th-stagger','th-pre','th-depart'].forEach(function(id){byId(id).addEventListener('change',thGen);});
   document.querySelectorAll('#th-mode button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('#th-mode button').forEach(function(x){x.classList.toggle('on',x===b);});thApplyMode();thGen();});});
   thApplyMode();
-  byId('th-add').onclick=function(){var s=thFormSite();if(!s)return;TH.push(s);thSave();thReset();thRenderBoard();thRenderOut();window.scrollTo(0,0);};
+  byId('th-add').onclick=function(){
+    var s=thFormSite();if(!s)return;
+    var tel=byId('th-tel').value.trim(),nom=byId('th-agent').value.trim(),villeIn=byId('th-na-ville').value.trim();
+    if(tel&&!thTelExists(tel)&&villeIn){
+      var g=(thNaSel&&thNaSel.nom===villeIn)?thNaSel:{nom:villeIn,cp:byId('th-na-cp').value.trim(),la:null,lo:null,dep:'',depnom:''};
+      FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom||villeIn,tels:[tel],ville:g.nom,cp:g.cp||byId('th-na-cp').value.trim(),la:g.la,lo:g.lo,dep:g.dep,depnom:g.depnom,fiab:'',voiture:false,ads:false});
+      saveFA(); if(typeof renderFA==='function')renderFA();
+    }
+    TH.push(s);thSave();thReset();thRenderBoard();thRenderOut();window.scrollTo(0,0);
+  };
   byId('th-board').addEventListener('change',function(e){
     var box=e.target.closest('.thc-box'),sel=e.target.closest('.thc-sel');
     var row=(box||sel)?(box||sel).closest('.thc'):null;if(!row)return;
