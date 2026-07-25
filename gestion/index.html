@@ -159,6 +159,7 @@ button.big:active{transform:translateY(1px)}
       </div>
       <button class="big" id="missionToggle" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">✅ Infos pour mission validée</button>
       <div id="missionBlock" class="hidden">
+        <label class="f hidden" id="mv-tel-choice-wrap"><div class="lab">Quel numéro ? (plusieurs pour ce client)</div><select id="mv-tel-choice"></select></label>
         <label class="f"><div class="lab">📞 Numéro prise / fin de service</div><input id="mv-tel" placeholder="Rempli selon le client · modifiable" inputmode="tel" autocomplete="off"></label>
         <label class="f"><div class="lab">📍 Adresse du site</div><textarea id="adresse" placeholder="Adresse complète du site" style="min-height:44px"></textarea></label>
         <div class="lab" style="margin:8px 0 2px">Infos à inclure (mission validée)</div>
@@ -285,7 +286,8 @@ button.big:active{transform:translateY(1px)}
     inp.addEventListener('change',function(){ commit(); if(cb)cb(); genText(); });
     if(btn) btn.addEventListener('click',function(e){ e.preventDefault(); if(box.classList.contains('hidden')){ inp.focus(); open(); } else box.classList.add('hidden'); });
   }
-  mkCombo('client',["SECURITAS","AQUILA","RANC DEVELOPPEMENT","SOTEL","GAMBRINUS","SAS BULLION","P2S","NEW ANGEL'S"],'fkh_clients');
+  var CLIENTS=["SECURITAS","AQUILA","RANC DEVELOPPEMENT","SOTEL","GAMBRINUS","SAS BULLION","P2S","NEW ANGEL'S","FKH","COPS","ERYMA"];
+  mkCombo('client',CLIENTS,'fkh_clients');
   mkCombo('type',["Gardiennage","Ronde","Intervention sur alarme"],'fkh_presta');
   mkCombo('agent',["ADS","SSIAP","Maître-chien"],'fkh_agents');
   mkCombo('sitetype',["Magasin","Banque","Site professionnel"],'fkh_sites');
@@ -460,9 +462,17 @@ button.big:active{transform:translateY(1px)}
   ['av','mv'].forEach(function(px){ var oh=''; for(var i=0;i<=6;i++)oh+='<option>'+i+'</option>'; byId(px+'-offh').innerHTML=oh; byId(px+'-offm').innerHTML=MOPTS; byId(px+'-offh').addEventListener('change',genText); byId(px+'-offm').addEventListener('change',genText); });
   // Numéro prise/fin par client (mémorisé, auto-rempli, modifiable)
   var TEL={}; try{TEL=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(e){TEL={};}
-  function fillTel(){ var c=byId('client').value.trim(); byId('mv-tel').value=(c&&TEL[c])?TEL[c]:''; }
+  var TELDEF={SOTEL:[{l:'PC semaine',n:'05 61 14 87 21'},{l:'PC week-end',n:'05 57 19 17 40'},{l:'PC banque',n:'01 43 60 28 65'}],AQUILA:[{l:'',n:'04 90 84 24 24'}],SECURITAS:[{l:'Réponses Nantes',n:'02 28 09 25 39'},{l:'Réponse Lyon',n:'04 37 40 10 62'}],P2S:[{l:'',n:'01 81 91 41 59'}],FKH:[{l:'',n:'04 65 84 25 84'}],RANC:[{l:'',n:'04 42 05 45 88'}],COPS:[{l:'',n:'02 38 43 17 62'}],NEWANGELS:[{l:'',n:'01 30 54 99 12'}],ERYMA:[{l:'',n:'05 56 91 99 19'}]};
+  function normCli(s){return (s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
+  function telFor(c){var k=normCli(c);if(!k)return null;for(var key in TELDEF){if(k===key||k.indexOf(key)===0)return TELDEF[key];}return null;}
+  function fillTel(){
+    var c=byId('client').value.trim(),opts=telFor(c),wrap=byId('mv-tel-choice-wrap'),ch=byId('mv-tel-choice');
+    if(opts&&opts.length>1){ ch.innerHTML='<option value="">— choisir le numéro —</option>'+opts.map(function(o){return '<option value="'+o.n+'">'+(o.l?o.l+' : ':'')+o.n+'</option>';}).join(''); wrap.classList.remove('hidden'); byId('mv-tel').value=''; }
+    else { wrap.classList.add('hidden'); if(opts&&opts.length===1)byId('mv-tel').value=opts[0].n; else byId('mv-tel').value=(c&&TEL[c])?TEL[c]:''; }
+  }
   byId('client').addEventListener('change',function(){ fillTel(); genText(); });
-  byId('mv-tel').addEventListener('input',function(){ var c=byId('client').value.trim(); if(c){ TEL[c]=this.value.trim(); try{localStorage.setItem('fkh_client_tel',JSON.stringify(TEL));}catch(e){} } genText(); });
+  byId('mv-tel-choice').addEventListener('change',function(){ if(this.value){byId('mv-tel').value=this.value;genText();} });
+  byId('mv-tel').addEventListener('input',function(){ var c=byId('client').value.trim(); if(c&&!telFor(c)){ TEL[c]=this.value.trim(); try{localStorage.setItem('fkh_client_tel',JSON.stringify(TEL));}catch(e){} } genText(); });
   byId('copy-mission').onclick=function(){var x=byId('out-mission').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-mission'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
 
   // ===== Suivi demandes =====
@@ -563,7 +573,7 @@ button.big:active{transform:translateY(1px)}
       L.push('Client avisé : '+(avise?'OUI':'non'));
       byId(pfx+'-out').textContent=L.join('\n');
     }
-    mkCombo(pfx+'-client',["SECURITAS","AQUILA","RANC DEVELOPPEMENT","SOTEL","GAMBRINUS","SAS BULLION","P2S","NEW ANGEL'S"],'fkh_clients',gen);
+    mkCombo(pfx+'-client',CLIENTS,'fkh_clients',gen);
     mkCombo(pfx+'-site',[],'fkh_site_noms',gen);
     mkCombo(pfx+'-agent',[],'fkh_agent_noms',gen);
     byId(pfx+'-h').innerHTML=HOPTS; byId(pfx+'-m').innerHTML=MOPTS;
