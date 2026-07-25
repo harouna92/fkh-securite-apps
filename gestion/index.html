@@ -135,7 +135,7 @@ button.big:active{transform:translateY(1px)}
       <div class="lab" style="margin:0">Texte à copier — version groupe</div>
       <div class="outbox" id="out">Remplis la demande ci-dessus…</div>
       <button class="big" id="copy">Copier pour le groupe</button>
-      <label class="chk"><input type="checkbox" id="agentVer"><span>📱 Générer aussi la version à envoyer à l'agent</span></label>
+      <button class="big" id="agentToggle" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">📱 Infos pour l'agent</button>
       <div id="agentBlock" class="hidden">
         <div class="lab" style="margin:8px 0 2px">Infos à inclure pour l'agent</div>
         <div class="avopts">
@@ -397,7 +397,7 @@ button.big:active{transform:translateY(1px)}
     if(blocks.length===1){ byId('out').textContent='📋 NOUVELLE DEMANDE — FKH\n'+blocks[0]; return; }
     byId('out').textContent='📋 DEMANDES FKH ('+blocks.length+')\n\n'+blocks.map(function(b,i){return '— Demande '+(i+1)+' —\n'+b;}).join('\n\n');
   }
-  function genText(){ renderOut(); if(byId('agentVer').checked){ byId('out-agent').textContent=buildAgent()||'Remplis la demande…'; } }
+  function genText(){ renderOut(); if(!byId('agentBlock').classList.contains('hidden')){ byId('out-agent').textContent=buildAgent()||'Remplis la demande…'; } }
   function resetForm(){
     ['client','type','agent','sitetype','ville','cp','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
     byId('surv').value='';
@@ -413,7 +413,7 @@ button.big:active{transform:translateY(1px)}
   byId('addBtn').onclick=function(){var cur=buildCurrent();if(!cur)return;added.push(cur);resetForm();renderAdded();renderOut();window.scrollTo(0,0);};
   ['agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
-  byId('agentVer').addEventListener('change',function(){ byId('agentBlock').classList.toggle('hidden',!this.checked); genText(); });
+  byId('agentToggle').addEventListener('click',function(){ byId('agentBlock').classList.toggle('hidden'); genText(); });
   ['av-client','av-presta','av-agenttype','av-sitetype','av-surv','av-ville','av-vac','av-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
   byId('copy-agent').onclick=function(){var x=byId('out-agent').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-agent'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
 
