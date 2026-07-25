@@ -99,6 +99,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="fin">Fin de service</button>
     <button data-s="suivi">Suivi demandes</button>
     <button data-s="fiche">Fiche agent</button>
+    <button data-s="zone">Zone à couvrir</button>
     <button data-s="thiam">Thiam</button>
   </div>
 </div>
@@ -293,6 +294,10 @@ button.big:active{transform:translateY(1px)}
       <div class="list" id="fa-list"></div>
     </div>
   </section>
+  <section id="sec-zone" class="hidden">
+    <div><h1>Zone à couvrir</h1><p class="sub">Villes · départements · régions — à construire ensemble.</p></div>
+    <div class="card"><p class="hint" style="margin:0">🚧 À concevoir — dis-moi les informations à mettre (villes, départements, régions) et comment ça se recoupe avec <b>Suivi demandes</b> et <b>Fiche agent</b>.</p></div>
+  </section>
   <section id="sec-thiam" class="hidden">
     <div><h1>Thiam</h1><p class="sub">Section à définir ensemble.</p></div>
     <div class="card"><p class="hint" style="margin:0">🚧 À concevoir — dis-moi ce que la section « Thiam » doit contenir.</p></div>
@@ -302,7 +307,7 @@ button.big:active{transform:translateY(1px)}
 <script>
 (function(){
   var byId=function(x){return document.getElementById(x)};
-  var secs=['demandes','prise','fin','suivi','fiche','thiam'];
+  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam'];
   document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
