@@ -291,18 +291,25 @@ button.big:active{transform:translateY(1px)}
     if(vacs.length){
       vacs.forEach(function(v,i){
         var p=[];
-        if(v.quand==='asap')p.push('dès que possible'); else if(v.date)p.push(fmtD(v.date));
+        if(v.quand==='asap')p.push('dès que possible'); else if(v.date)p.push('début '+fmtD(v.date));
         if(v.h24){
           p.push('H24 (24h/24)');
-          if(v.dateFin)p.push('jusqu\'au '+fmtD(v.dateFin)); else p.push('jusqu\'à nouvel ordre');
+          p.push(v.dateFin?('fin le '+fmtD(v.dateFin)):'jusqu\'à nouvel ordre');
         } else {
-          if(v.deb)p.push('début '+v.deb);
-          if(v.arr)p.push('fin à l\'arrivée du personnel'+(v.fin?' (vers '+v.fin+')':''));
-          else if(v.fin)p.push('fin '+v.fin);
-          if(!v.arr){ var dd=duree(v.deb,v.fin); if(dd)p.push('plage '+dd); }
-          if(v.dateFin)p.push('jusqu\'au '+fmtD(v.dateFin));
+          if(v.arr){
+            if(v.deb)p.push('début '+v.deb);
+            p.push('fin à l\'arrivée du personnel'+(v.fin?' (vers '+v.fin+')':''));
+          } else if(v.deb&&v.fin){
+            p.push('de '+v.deb+' à '+v.fin);
+            var dd=duree(v.deb,v.fin); if(dd)p.push('plage '+dd);
+          } else {
+            if(v.deb)p.push('début '+v.deb);
+            if(v.fin)p.push('fin '+v.fin);
+          }
+          if(v.dateFin)p.push('fin le '+fmtD(v.dateFin));
         }
-        L.push((vacs.length>1?'Vacation '+(i+1)+' : ':'Vacation : ')+(p.join(' · ')||'(à définir)'));
+        L.push(vacs.length>1?'Vacation '+(i+1)+' :':'Vacation :');
+        if(p.length)p.forEach(function(pl){L.push('  '+pl);}); else L.push('  (à définir)');
       });
     }
     if(ag)L.push('Agents : '+ag);if(ref)L.push('Réf/contact : '+ref);if(notes)L.push('Notes : '+notes);
