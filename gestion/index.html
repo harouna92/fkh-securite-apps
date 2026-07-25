@@ -282,7 +282,7 @@ button.big:active{transform:translateY(1px)}
     if(vacs.length){
       vacs.forEach(function(v,i){
         var p=[];
-        if(v.quand==='asap')p.push('dès que possible'); else if(v.date)p.push('début '+fmtD(v.date));
+        if(v.quand==='asap')p.push('dès que possible'); else if(v.date)p.push(fmtD(v.date));
         if(v.h24){
           p.push('H24 (24h/24)');
           if(v.dateFin)p.push('jusqu\'au '+fmtD(v.dateFin)); else p.push('jusqu\'à nouvel ordre');
