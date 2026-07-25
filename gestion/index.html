@@ -314,10 +314,7 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Client / donneur d'ordre</div><div class="cbx"><input id="th-client" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="th-client" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-th-client"></div></div></label>
         <label class="f"><div class="lab">Nom de l'agent</div><div class="cbx"><input id="th-agent" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="th-agent" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-th-agent"></div></div></label>
       </div>
-      <div class="grid2">
-        <label class="f"><div class="lab">Numéro de l'agence</div><input id="th-agence" placeholder="N° agence" inputmode="tel" autocomplete="off"></label>
-        <label class="f"><div class="lab">Numéro de l'agent</div><input id="th-tel" placeholder="N° agent" inputmode="tel" autocomplete="off"></label>
-      </div>
+      <label class="f"><div class="lab">Numéro de l'agent</div><input id="th-tel" placeholder="N° agent" inputmode="tel" autocomplete="off"></label>
       <div id="th-hoursWrap">
         <div class="lab" style="margin:0 0 5px">Heures d'appel (France → Mali)</div>
         <div id="th-hours"></div>
@@ -818,13 +815,12 @@ button.big:active{transform:translateY(1px)}
   }
   var thAdded=[];
   function thBuildCurrent(){
-    var site=byId('th-site').value.trim(),cli=byId('th-client').value.trim(),ag=byId('th-agent').value.trim(),agence=byId('th-agence').value.trim(),tel=byId('th-tel').value.trim(),hours=thReadHours();
-    if(!(site||cli||ag||agence||tel||hours.length))return '';
+    var site=byId('th-site').value.trim(),cli=byId('th-client').value.trim(),ag=byId('th-agent').value.trim(),tel=byId('th-tel').value.trim(),hours=thReadHours();
+    if(!(site||cli||ag||tel||hours.length))return '';
     var L=[];
     if(site)L.push('Site : '+site);
     if(cli)L.push('Client / donneur d\'ordre : '+cli);
     if(ag)L.push('Agent : '+ag);
-    if(agence)L.push('N° agence : '+agence);
     if(tel)L.push('N° agent : '+tel);
     if(hours.length){L.push('Appel'+(hours.length>1?'s':'')+' :');hours.forEach(function(fr){L.push('  '+fr+' (France) → '+thToMali(fr)+' (Mali)');});}
     return L.join('\n');
@@ -841,12 +837,12 @@ button.big:active{transform:translateY(1px)}
     byId('th-addedList').querySelectorAll('.thrm').forEach(function(bt){bt.onclick=function(){thAdded.splice(+bt.getAttribute('data-thi'),1);thRenderAdded();thRenderOut();};});
   }
   function thGen(){thRenderOut();}
-  function thReset(){['th-site','th-client','th-agent','th-agence','th-tel'].forEach(function(id){byId(id).value='';});byId('th-hours').innerHTML='';byId('th-hours').appendChild(thMakeHour());}
+  function thReset(){['th-site','th-client','th-agent','th-tel'].forEach(function(id){byId(id).value='';});byId('th-hours').innerHTML='';byId('th-hours').appendChild(thMakeHour());}
   byId('th-addHour').addEventListener('click',function(){byId('th-hours').appendChild(thMakeHour());thGen();});
   byId('th-hours').appendChild(thMakeHour());
   mkCombo('th-client',CLIENTS,'fkh_clients',thGen);
   mkCombo('th-agent',[],'fkh_agent_noms',thGen);
-  ['th-site','th-agence','th-tel'].forEach(function(id){byId(id).addEventListener('input',thGen);});
+  ['th-site','th-tel'].forEach(function(id){byId(id).addEventListener('input',thGen);});
   byId('th-add').onclick=function(){var cur=thBuildCurrent();if(!cur)return;thAdded.push(cur);thReset();thRenderAdded();thRenderOut();window.scrollTo(0,0);};
   byId('th-copy').onclick=function(){var x=byId('th-out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('th-copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   thRenderOut();
