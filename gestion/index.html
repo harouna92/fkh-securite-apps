@@ -307,8 +307,30 @@ button.big:active{transform:translateY(1px)}
     </div>
   </section>
   <section id="sec-thiam" class="hidden">
-    <div><h1>Thiam</h1><p class="sub">Section à définir ensemble.</p></div>
-    <div class="card"><p class="hint" style="margin:0">🚧 À concevoir — dis-moi ce que la section « Thiam » doit contenir.</p></div>
+    <div><h1>Thiam</h1><p class="sub">Appels par site. Chaque heure d'appel (France) est convertie automatiquement en heure du Mali.</p></div>
+    <div class="card">
+      <label class="f"><div class="lab">Nom du site</div><input id="th-site" placeholder="Nom du site" autocomplete="off"></label>
+      <div class="grid2">
+        <label class="f"><div class="lab">Client / donneur d'ordre</div><div class="cbx"><input id="th-client" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="th-client" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-th-client"></div></div></label>
+        <label class="f"><div class="lab">Nom de l'agent</div><div class="cbx"><input id="th-agent" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="th-agent" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-th-agent"></div></div></label>
+      </div>
+      <div class="grid2">
+        <label class="f"><div class="lab">Numéro de l'agence</div><input id="th-agence" placeholder="N° agence" inputmode="tel" autocomplete="off"></label>
+        <label class="f"><div class="lab">Numéro de l'agent</div><input id="th-tel" placeholder="N° agent" inputmode="tel" autocomplete="off"></label>
+      </div>
+      <div id="th-hoursWrap">
+        <div class="lab" style="margin:0 0 5px">Heures d'appel (France → Mali)</div>
+        <div id="th-hours"></div>
+        <button type="button" class="addvac" id="th-addHour">➕ Ajouter une heure d'appel</button>
+      </div>
+      <button class="big" id="th-add" style="background:var(--panel);color:var(--ink);border:1px solid var(--line)">➕ Ajouter ce site, en saisir un autre</button>
+      <div class="hidden" id="th-addedCard"><div class="lab" style="margin:8px 0 5px">Sites ajoutés (<span id="th-addedN">0</span>)</div><div class="list" id="th-addedList"></div></div>
+    </div>
+    <div class="card">
+      <div class="lab" style="margin:0">Texte à copier</div>
+      <div class="outbox" id="th-out">Remplis un site…</div>
+      <button class="big" id="th-copy">Copier</button>
+    </div>
   </section>
 </div>
 
@@ -778,6 +800,56 @@ button.big:active{transform:translateY(1px)}
     var list=feats.map(function(f){return {code:f.properties.code,nom:f.properties.nom,n:counts[f.properties.code]||0};}).sort(function(a,b){return b.n-a.n||a.code.localeCompare(b.code);});
     byId('zone-list').innerHTML=list.map(function(x){return '<div class="it"><span class="pill" style="background:'+heatColor(x.n,max)+';color:#fff;min-width:22px;text-align:center">'+x.n+'</span><span style="flex:1">'+esc(x.nom)+' ('+x.code+')</span></div>';}).join('');
   }
+
+  // ===== Thiam : appels par site (heure France → heure Mali) =====
+  // Mali = UTC+0 toute l'année ; France = UTC+2 (été/CEST) ou UTC+1 (hiver/CET). Décalage calculé automatiquement.
+  function thLastSunUTC(y,mo){var d=new Date(Date.UTC(y,mo+1,0));d.setUTCDate(d.getUTCDate()-d.getUTCDay());return d;}
+  function thFrSummer(dt){var y=dt.getFullYear();var s=thLastSunUTC(y,2);s.setUTCHours(1);var e=thLastSunUTC(y,9);e.setUTCHours(1);var t=dt.getTime();return t>=s.getTime()&&t<e.getTime();}
+  function thMaliOff(){return thFrSummer(new Date())?2:1;}
+  function thToMali(hhmm){var m=toMin(hhmm);if(m==null)return '';var raw=m-thMaliOff()*60;var mm=((raw%1440)+1440)%1440;return pad2(Math.floor(mm/60))+':'+pad2(mm%60)+(raw<0?' (veille)':'');}
+  function thReadHours(){var out=[];document.querySelectorAll('#th-hours .th-hr').forEach(function(el){var h=el.querySelector('.th-hh').value,m=el.querySelector('.th-hm').value;if(h)out.push(h+':'+(m||'00'));});return out;}
+  function thHourMali(el){var h=el.querySelector('.th-hh').value,m=el.querySelector('.th-hm').value,fr=h?(h+':'+(m||'00')):'';el.querySelector('.th-hmali').textContent=fr?('→ Mali : '+thToMali(fr)):'';}
+  function thMakeHour(){
+    var el=document.createElement('div');el.className='th-hr';el.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap';
+    el.innerHTML='<div class="hm" style="flex:0 0 auto"><select class="th-hh">'+HOPTS+'</select><span>h</span><select class="th-hm">'+MOPTS+'</select></div><span class="th-hmali v-amp" style="font-size:13px"></span><button type="button" class="v-del th-hdel" title="Retirer">✕</button>';
+    el.querySelectorAll('select').forEach(function(s){s.addEventListener('change',function(){thHourMali(el);thGen();});});
+    el.querySelector('.th-hdel').addEventListener('click',function(){if(document.querySelectorAll('#th-hours .th-hr').length>1){el.remove();thGen();}});
+    return el;
+  }
+  var thAdded=[];
+  function thBuildCurrent(){
+    var site=byId('th-site').value.trim(),cli=byId('th-client').value.trim(),ag=byId('th-agent').value.trim(),agence=byId('th-agence').value.trim(),tel=byId('th-tel').value.trim(),hours=thReadHours();
+    if(!(site||cli||ag||agence||tel||hours.length))return '';
+    var L=[];
+    if(site)L.push('Site : '+site);
+    if(cli)L.push('Client / donneur d\'ordre : '+cli);
+    if(ag)L.push('Agent : '+ag);
+    if(agence)L.push('N° agence : '+agence);
+    if(tel)L.push('N° agent : '+tel);
+    if(hours.length){L.push('Appel'+(hours.length>1?'s':'')+' :');hours.forEach(function(fr){L.push('  '+fr+' (France) → '+thToMali(fr)+' (Mali)');});}
+    return L.join('\n');
+  }
+  function thRenderOut(){
+    var blocks=thAdded.slice(),cur=thBuildCurrent();if(cur)blocks.push(cur);
+    if(!blocks.length){byId('th-out').textContent='Remplis un site…';return;}
+    if(blocks.length===1){byId('th-out').textContent='📞 THIAM — APPELS\n'+blocks[0];return;}
+    byId('th-out').textContent='📞 THIAM — APPELS ('+blocks.length+')\n\n'+blocks.map(function(b,i){return '— Site '+(i+1)+' —\n'+b;}).join('\n\n');
+  }
+  function thRenderAdded(){
+    byId('th-addedCard').classList.toggle('hidden',!thAdded.length);byId('th-addedN').textContent=thAdded.length;
+    byId('th-addedList').innerHTML=thAdded.map(function(b,i){var t=(b.split('\n')[0]||'Site').replace(/[<>]/g,'');return '<div class="it"><span class="pill" style="background:var(--panel2);color:var(--muted)">'+(i+1)+'</span><span style="flex:1">'+t+'</span><button data-thi="'+i+'" class="thrm" aria-label="Retirer" style="width:30px;height:30px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);cursor:pointer">✕</button></div>';}).join('');
+    byId('th-addedList').querySelectorAll('.thrm').forEach(function(bt){bt.onclick=function(){thAdded.splice(+bt.getAttribute('data-thi'),1);thRenderAdded();thRenderOut();};});
+  }
+  function thGen(){thRenderOut();}
+  function thReset(){['th-site','th-client','th-agent','th-agence','th-tel'].forEach(function(id){byId(id).value='';});byId('th-hours').innerHTML='';byId('th-hours').appendChild(thMakeHour());}
+  byId('th-addHour').addEventListener('click',function(){byId('th-hours').appendChild(thMakeHour());thGen();});
+  byId('th-hours').appendChild(thMakeHour());
+  mkCombo('th-client',CLIENTS,'fkh_clients',thGen);
+  mkCombo('th-agent',[],'fkh_agent_noms',thGen);
+  ['th-site','th-agence','th-tel'].forEach(function(id){byId(id).addEventListener('input',thGen);});
+  byId('th-add').onclick=function(){var cur=thBuildCurrent();if(!cur)return;thAdded.push(cur);thReset();thRenderAdded();thRenderOut();window.scrollTo(0,0);};
+  byId('th-copy').onclick=function(){var x=byId('th-out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('th-copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
+  thRenderOut();
 
   document.addEventListener('click',function(e){
     if(!e.target.closest('.acwrap'))document.querySelectorAll('.acwrap .sugg').forEach(function(s){s.classList.add('hidden');});
