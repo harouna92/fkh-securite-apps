@@ -364,7 +364,7 @@ button.big:active{transform:translateY(1px)}
   function buildAgent(){
     function on(id){var e=byId(id);return e&&e.checked;}
     var villeName=sel?sel.nom:byId('ville').value.trim(),cp=byId('cp').value.trim();
-    var L=['📱 MISSION — FKH'];
+    var L=[];
     if(on('av-client')&&byId('client').value.trim())L.push('Client : '+byId('client').value.trim());
     if(on('av-presta')&&byId('type').value.trim())L.push('Prestation : '+byId('type').value.trim());
     if(on('av-agenttype')&&byId('agent').value.trim())L.push('Type d\'agent : '+byId('agent').value.trim());
@@ -373,7 +373,7 @@ button.big:active{transform:translateY(1px)}
     if(on('av-ville')&&villeName)L.push('Lieu : '+villeName+(cp?' ('+cp+')':''));
     if(on('av-vac')){var vacs=readVacs();if(vacs.length)L=L.concat(vacLines(vacs));}
     if(on('av-notes')&&byId('notes').value.trim())L.push('Consignes : '+byId('notes').value.trim());
-    return L.length<=1?'':L.join('\n');
+    return L.length?L.join('\n'):'';
   }
   var added=[];
   function buildCurrent(){
