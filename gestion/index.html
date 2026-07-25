@@ -120,6 +120,8 @@ button.big:active{transform:translateY(1px)}
       <div class="row"><span class="k">Ville</span><span class="v" id="c-ville">—</span></div>
       <div class="row" style="align-items:center"><span class="k">Villes proches</span><select id="nbNear" style="width:auto;padding:5px 8px;font-size:13px"><option value="1">1 ville</option><option value="2" selected>2 villes</option><option value="3">3 villes</option><option value="4">4 villes</option><option value="5">5 villes</option></select></div>
       <div class="near" id="c-near"></div>
+      <div class="row" style="align-items:center;margin-top:6px"><span class="k">📏 Mesurer vers</span><div class="acwrap" style="flex:1;min-width:0"><input type="text" id="meas" placeholder="Tape une autre ville…" autocomplete="off"><div class="sugg hidden" id="sugg-meas"></div></div></div>
+      <div class="near" id="measList"></div>
     </div>
     <button class="big" id="addBtn" style="background:var(--panel);color:var(--ink);border:1px solid var(--line)">➕ Ajouter cette demande, en saisir une autre</button>
     <div class="card hidden" id="addedCard"><div class="lab" style="margin:0">Demandes ajoutées (<span id="addedN">0</span>)</div><div class="list" id="addedList"></div></div>
@@ -225,10 +227,17 @@ button.big:active{transform:translateY(1px)}
     var cps=c.codesPostaux||[];sel._cp=preferCP||cps[0]||'';
     byId('cp').value=preferCP||cps[0]||'';
     sel._allNear=(sel._la!=null)?BIG.map(function(b){return{n:b[0],cp:BIGCP[b[0]]||'',la:b[1],lo:b[2],d:km(sel._la,sel._lo,b[1],b[2])};}).filter(function(x){return x.d>1 && x.n!==sel.nom;}).sort(function(a,b){return a.d-b.d;}):[];
+    meas.length=0; byId('measList').innerHTML='';
     setNear();
   }
   function setNear(){ if(!sel){render();return;} var n=parseInt(byId('nbNear').value,10)||2; sel._near=(sel._allNear||[]).slice(0,n); routeAll(); render(); }
   byId('nbNear').addEventListener('change',setNear);
+  // ---- Mesurer la distance vers d'autres villes ----
+  var meas=[], tmeas;
+  byId('meas').addEventListener('input',function(){var q=this.value.trim();clearTimeout(tmeas);if(q.length<2){byId('sugg-meas').classList.add('hidden');return;}tmeas=setTimeout(function(){searchMeas(q);},250);});
+  function searchMeas(q){fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(q)+'&fields=nom,centre,codesPostaux,population&boost=population&limit=6').then(function(r){return r.json();}).then(function(list){if(!Array.isArray(list)||!list.length){byId('sugg-meas').classList.add('hidden');return;}var box=byId('sugg-meas');box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+c.nom+'</span> <span class="cp">'+cp+'</span>';d.onclick=function(){addMeas(c);};box.appendChild(d);});box.classList.remove('hidden');}).catch(function(){byId('sugg-meas').classList.add('hidden');});}
+  function addMeas(c){byId('meas').value='';byId('sugg-meas').classList.add('hidden');if(!sel||sel._la==null)return;var co=c.centre&&c.centre.coordinates;if(!co)return;var la=co[1],lo=co[0],cp=(c.codesPostaux&&c.codesPostaux[0])||'';var item={n:c.nom,cp:cp,km:km(sel._la,sel._lo,la,lo),dur:null};meas.push(item);renderMeas();var cur=sel;fetch('https://router.project-osrm.org/route/v1/driving/'+sel._lo+','+sel._la+';'+lo+','+la+'?overview=false').then(function(r){return r.json();}).then(function(j){if(sel!==cur)return;if(j&&j.routes&&j.routes[0]){var min=Math.round(j.routes[0].duration/60),hh=Math.floor(min/60),mm=min%60;item.dur=hh?(hh+'h'+(mm?pad2(mm):'')):(min+' min');renderMeas();}}).catch(function(){});}
+  function renderMeas(){var box=byId('measList');box.innerHTML=meas.map(function(x,i){return '<div class="n"><span>'+x.n+(x.cp?' <span style="color:var(--muted)">'+x.cp+'</span>':'')+'</span><span class="d">'+x.km+' km'+(x.dur?' · '+x.dur:'')+' <button type="button" data-mi="'+i+'" class="rmm" style="border:none;background:none;color:var(--bad);cursor:pointer;padding:0 0 0 5px">✕</button></span></div>';}).join('');box.querySelectorAll('.rmm').forEach(function(b){b.onclick=function(){meas.splice(+b.getAttribute('data-mi'),1);renderMeas();};});genText();}
   function render(){var ctx=byId('ctx');if(sel){ctx.classList.remove('hidden');byId('c-ville').textContent=sel.nom;byId('c-near').innerHTML=(sel._near||[]).map(function(x){return '<div class="n"><span>'+x.n+(x.cp?' <span style="color:var(--muted)">'+x.cp+'</span>':'')+'</span><span class="d">'+x.d+' km'+(x.dur?' · '+x.dur:'')+'</span></div>';}).join('')||'<div class="hint">—</div>';}else ctx.classList.add('hidden');genText();}
   function routeAll(){
     if(!sel||sel._la==null||!sel._near) return;
@@ -278,7 +287,7 @@ button.big:active{transform:translateY(1px)}
     if(agent)L.push('Type d\'agent : '+agent);
     if(siteT)L.push('Type de site : '+siteT);
     if(surv)L.push('Surveillance : '+surv);
-    if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':''));(sel._near||[]).forEach(function(x){L.push(x.n+(x.cp?' '+x.cp:'')+' à '+x.d+' km'+(x.dur?' · '+x.dur:''));});}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':''));
+    if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':''));(sel._near||[]).forEach(function(x){L.push(x.n+(x.cp?' '+x.cp:'')+' à '+x.d+' km'+(x.dur?' · '+x.dur:''));});meas.forEach(function(x){L.push('↳ '+x.n+(x.cp?' '+x.cp:'')+' à '+x.km+' km'+(x.dur?' · '+x.dur:''));});}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':''));
     if(vacs.length){
       vacs.forEach(function(v,i){
         var p=[];
@@ -310,6 +319,7 @@ button.big:active{transform:translateY(1px)}
     ['client','type','agent','sitetype','ville','cp','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
     byId('surv').value='';
     byId('vacsList').innerHTML='';addVac();
+    meas.length=0;byId('measList').innerHTML='';
     sel=null;byId('ctx').classList.add('hidden');
   }
   function renderAdded(){
