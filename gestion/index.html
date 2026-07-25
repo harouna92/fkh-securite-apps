@@ -145,6 +145,7 @@ button.big:active{transform:translateY(1px)}
           <label><input type="checkbox" id="av-sitetype" checked>Type de site</label>
           <label><input type="checkbox" id="av-surv" checked>Surveillance</label>
           <label><input type="checkbox" id="av-ville" checked>Lieu (ville + CP)</label>
+          <label><input type="checkbox" id="av-meas">Distances mesurées</label>
           <label><input type="checkbox" id="av-vac" checked>Vacations</label>
           <label><input type="checkbox" id="av-notes" checked>Consignes</label>
         </div>
@@ -371,6 +372,7 @@ button.big:active{transform:translateY(1px)}
     if(on('av-sitetype')&&byId('sitetype').value.trim())L.push('Type de site : '+byId('sitetype').value.trim());
     if(on('av-surv')&&byId('surv').value)L.push('Surveillance : '+byId('surv').value);
     if(on('av-ville')&&villeName)L.push('Lieu : '+villeName+(cp?' ('+cp+')':''));
+    if(on('av-meas'))meas.forEach(function(x){L.push('↳ '+x.n+(x.cp?' '+x.cp:'')+' à '+x.km+' km'+(x.dur?' · '+x.dur:''));});
     if(on('av-vac')){var vacs=readVacs();if(vacs.length)L=L.concat(vacLines(vacs));}
     if(on('av-notes')&&byId('notes').value.trim())L.push('Consignes : '+byId('notes').value.trim());
     return L.length?L.join('\n'):'';
@@ -414,7 +416,7 @@ button.big:active{transform:translateY(1px)}
   ['agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   byId('agentToggle').addEventListener('click',function(){ byId('agentBlock').classList.toggle('hidden'); genText(); });
-  ['av-client','av-presta','av-agenttype','av-sitetype','av-surv','av-ville','av-vac','av-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
+  ['av-client','av-presta','av-agenttype','av-sitetype','av-surv','av-ville','av-meas','av-vac','av-notes'].forEach(function(id){byId(id).addEventListener('change',genText);});
   byId('copy-agent').onclick=function(){var x=byId('out-agent').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy-agent'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
 
   // ===== Suivi demandes =====
