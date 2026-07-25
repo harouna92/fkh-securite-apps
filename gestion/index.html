@@ -250,7 +250,7 @@ button.big:active{transform:translateY(1px)}
       +'<label class="chk"><input type="checkbox" class="v-h24"><span>🕓 <b>H24</b> (24h/24, en continu)</span></label>'
       +'<div class="grid2 v-hours"><label class="f"><div class="lab">Heure de début</div><div class="hm"><select class="v-dh">'+HOPTS+'</select><span>h</span><select class="v-dm">'+MOPTS+'</select></div></label>'
       +'<label class="f"><div class="lab v-finlab">Heure de fin</div><div class="hm"><select class="v-fh">'+HOPTS+'</select><span>h</span><select class="v-fm">'+MOPTS+'</select></div></label></div>'
-      +'<label class="chk v-arrwrap"><input type="checkbox" class="v-arr"><span>Fin à l\'arrivée de la relève (heure indicative)</span></label>'
+      +'<label class="chk v-arrwrap"><input type="checkbox" class="v-arr"><span>Fin à l\'arrivée du personnel (heure indicative)</span></label>'
       +'<label class="f"><div class="lab">Date de fin</div><input type="date" class="v-datefin"><div class="hint v-dfhint">Vide = même jour</div></label>'
       +'<div class="hint v-amp" style="margin:0"></div>';
     el.querySelectorAll('input,select').forEach(function(x){ var h=function(){vacRefresh(el);genText();}; x.addEventListener('input',h); x.addEventListener('change',h); });
@@ -286,7 +286,7 @@ button.big:active{transform:translateY(1px)}
           if(v.dateFin)p.push('jusqu\'au '+fmtD(v.dateFin)); else p.push('jusqu\'à nouvel ordre');
         } else {
           if(v.deb)p.push(v.deb);
-          if(v.arr)p.push('fin à l\'arrivée de la relève'+(v.fin?' (vers '+v.fin+')':''));
+          if(v.arr)p.push('fin à l\'arrivée du personnel'+(v.fin?' (vers '+v.fin+')':''));
           else if(v.fin)p.push('fin '+v.fin);
           if(v.dateFin)p.push('jusqu\'au '+fmtD(v.dateFin));
         }
