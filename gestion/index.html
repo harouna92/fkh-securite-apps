@@ -1,4 +1,4 @@
-<title>FKH — Demandes & Suivi</title>
+<title>GESTION</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
 :root{--bg:#eef1f5;--panel:#fff;--panel2:#f4f6fa;--line:#d3d9e3;--ink:#141922;--muted:#5c6473;--brand:#2456c7;--brand-ink:#fff;--ok:#137a3b;--okbg:#e4f5ea;--bad:#c02626;--badbg:#fbe7e7;--warn:#9a6100;--warnbg:#fbf0dc;--mono:ui-monospace,Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;}
@@ -36,11 +36,14 @@ button.big:active{transform:translateY(1px)}
 .pill{font-size:11px;padding:2px 8px;border-radius:8px;white-space:nowrap}
 .hidden{display:none!important}
 .cbx{position:relative}
-.cbx>input{padding-right:40px}
+.cbx>input,.acwrap>input{padding-right:40px}
 .cbtn{position:absolute;right:1px;top:1px;bottom:1px;width:36px;border:none;background:transparent;color:var(--muted);font-size:13px;line-height:1;cursor:pointer;border-radius:0 11px 11px 0}
 .cbtn:active{color:var(--brand)}
 .cbx .sugg{max-height:230px;overflow-y:auto;overflow-x:hidden}
 .sugg .addnew{color:var(--brand);font-weight:600}
+.hm{display:flex;align-items:center;gap:7px}
+.hm select{flex:1 1 auto;min-width:0}
+.hm span{color:var(--muted);font-weight:700;font-size:13px}
 .subtabs{display:flex;flex-wrap:wrap;gap:6px}
 .subtabs button{flex:1 1 auto;font-family:inherit;font-size:12px;font-weight:600;padding:8px 6px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
 .subtabs button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
@@ -62,7 +65,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>FKH — DEMANDES &amp; SUIVI</div>
+  <div class="brand"><span class="dot"></span>GESTION</div>
   <div class="tabs" id="tabs">
     <button data-s="demandes" class="on">Demandes</button>
     <button data-s="prise">Prise de service</button>
@@ -86,18 +89,21 @@ button.big:active{transform:translateY(1px)}
       </div>
       <div class="grid2">
         <label class="f"><div class="lab">Surveillance intérieur / extérieur</div><select id="surv"><option value="">—</option><option>Intérieur</option><option>Extérieur</option></select></label>
-        <label class="f"><div class="lab">Ville</div><div class="acwrap"><input type="text" id="ville" placeholder="Tape une ville…" autocomplete="off"><div class="sugg hidden" id="sugg"></div></div></label>
+        <label class="f"><div class="lab">Ville</div><div class="acwrap"><input type="text" id="ville" placeholder="Tape ou choisis une ville…" autocomplete="off"><button type="button" class="cbtn" id="ville-btn" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg"></div></div></label>
       </div>
-      <label class="f"><div class="lab">Code postal</div><input id="cp" list="dl-cp" placeholder="Rempli avec la ville" autocomplete="off"><datalist id="dl-cp"></datalist></label>
+      <div class="grid2">
+        <label class="f"><div class="lab">Code postal</div><input id="cp" list="dl-cp" placeholder="Rempli avec la ville" autocomplete="off"><datalist id="dl-cp"></datalist></label>
+        <label class="f"><div class="lab">Département</div><input id="dep" placeholder="Rempli avec la ville" autocomplete="off"></label>
+      </div>
 
       <label class="f"><div class="lab">Quand ?</div><select id="quand"><option value="date">Date précise</option><option value="asap">Dès que possible</option></select></label>
       <div class="grid2" id="dateBlock">
         <label class="f"><div class="lab">Date</div><input type="date" id="date"></label>
-        <label class="f"><div class="lab">Heure de début</div><div class="cbx"><input id="debut" placeholder="20:00" autocomplete="off"><button type="button" class="cbtn" data-for="debut" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-debut"></div></div></label>
+        <label class="f"><div class="lab">Heure de début</div><div class="hm"><select id="debut-h" aria-label="Heure de début"></select><span>h</span><select id="debut-m" aria-label="Minutes de début"></select></div></label>
       </div>
       <div class="grid2">
         <label class="f"><div class="lab">Fin de service</div><select id="finType"><option value="fixe">Heure fixe</option><option value="arrivee">À l'arrivée de la relève</option></select></label>
-        <label class="f" id="finHeureWrap"><div class="lab">Heure de fin</div><div class="cbx"><input id="finHeure" placeholder="06:00" autocomplete="off"><button type="button" class="cbtn" data-for="finHeure" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-finHeure"></div></div></label>
+        <label class="f" id="finHeureWrap"><div class="lab" id="finHeureLab">Heure de fin</div><div class="hm"><select id="fin-h" aria-label="Heure de fin"></select><span>h</span><select id="fin-m" aria-label="Minutes de fin"></select></div></label>
       </div>
       <div class="plage hidden" id="plage"></div>
       <div class="grid2">
@@ -179,22 +185,30 @@ button.big:active{transform:translateY(1px)}
     inp.addEventListener('change',function(){ commit(); if(cb)cb(); genText(); });
     if(btn) btn.addEventListener('click',function(e){ e.preventDefault(); if(box.classList.contains('hidden')){ inp.focus(); open(); } else box.classList.add('hidden'); });
   }
-  // Heures format 24h, par demi-heure
-  var TIMES=[]; for(var hh=0;hh<24;hh++){ ['00','30'].forEach(function(mm){ TIMES.push(('0'+hh).slice(-2)+':'+mm); }); }
   mkCombo('client',["SECURITAS","AQUILA","RANC DEVELOPPEMENT","SOTEL","GAMBRINUS","SAS BULLION","P2S","NEW ANGEL'S"],'fkh_clients');
   mkCombo('type',["Gardiennage","Ronde","Intervention sur alarme"],'fkh_presta');
   mkCombo('agent',["ADS","SSIAP","Maître-chien"],'fkh_agents');
   mkCombo('sitetype',["Magasin","Banque","Site professionnel"],'fkh_sites');
-  mkCombo('debut',TIMES,null,plage);
-  mkCombo('finHeure',TIMES,null,plage);
+  // Heure = deux menus séparés : heures (00–23) et minutes (pas de 5)
+  function pad2(n){return ('0'+n).slice(-2);}
+  (function initTimes(){
+    var hOpts='<option value="">--</option>', mOpts='';
+    for(var h=0;h<24;h++) hOpts+='<option>'+pad2(h)+'</option>';
+    for(var m=0;m<60;m+=5) mOpts+='<option>'+pad2(m)+'</option>';
+    byId('debut-h').innerHTML=hOpts; byId('fin-h').innerHTML=hOpts;
+    byId('debut-m').innerHTML=mOpts; byId('fin-m').innerHTML=mOpts;
+  })();
+  function debutVal(){ var h=byId('debut-h').value; return h?(h+':'+(byId('debut-m').value||'00')):''; }
+  function finVal(){ var h=byId('fin-h').value; return h?(h+':'+(byId('fin-m').value||'00')):''; }
+  ['debut-h','debut-m','fin-h','fin-m'].forEach(function(id){ byId(id).addEventListener('change',function(){ plage(); genText(); }); });
 
   byId('surv').addEventListener('change',genText);
   byId('quand').addEventListener('change',function(){ byId('dateBlock').classList.toggle('hidden',this.value==='asap'); plage(); genText(); });
-  byId('finType').addEventListener('change',function(){ byId('finHeureWrap').classList.toggle('hidden',this.value!=='fixe'); plage(); genText(); });
+  byId('finType').addEventListener('change',function(){ byId('finHeureLab').textContent=this.value==='fixe'?'Heure de fin':'Heure de fin (indicative)'; plage(); genText(); });
 
   function toMin(t){ var m=/^(\d{1,2}):(\d{2})$/.exec(t.trim()); return m?(+m[1]*60+ +m[2]):null; }
   function plageStr(){
-    var s=byId('debut').value, e=byId('finHeure').value, a=toMin(s), b=toMin(e);
+    var s=debutVal(), e=finVal(), a=toMin(s), b=toMin(e);
     if(a==null||b==null||byId('finType').value!=='fixe') return '';
     var dur=b-a; if(dur<=0) dur+=1440; var h=Math.floor(dur/60), m=dur%60;
     return s+' → '+e+'  ·  '+h+'h'+(m?('0'+m).slice(-2):'')+(b<=a?' (nuit)':'');
@@ -206,13 +220,19 @@ button.big:active{transform:translateY(1px)}
   function km(a,b,c,d){var R=6371,r=Math.PI/180,x=(c-a)*r,y=(d-b)*r;var s=Math.sin(x/2)*Math.sin(x/2)+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)*Math.sin(y/2);return Math.round(2*R*Math.asin(Math.min(1,Math.sqrt(s))));}
   function dird(a,b,c,d){var r=Math.PI/180,dLo=(d-b)*r;var y=Math.sin(dLo)*Math.cos(c*r);var x=Math.cos(a*r)*Math.sin(c*r)-Math.sin(a*r)*Math.cos(c*r)*Math.cos(dLo);var bb=(Math.atan2(y,x)/r+360)%360;return ["N","N-E","E","S-E","S","S-O","O","N-O"][Math.round(bb/45)%8];}
   var sel=null,t;
-  byId('ville').addEventListener('input',function(){var q=this.value.trim();sel=null;render();clearTimeout(t);if(q.length<2){byId('sugg').classList.add('hidden');return;}t=setTimeout(function(){search(q);},250);});
+  byId('ville').addEventListener('input',function(){var q=this.value.trim();sel=null;render();clearTimeout(t);if(q.length<2){ if(q.length===0)showBig(); else byId('sugg').classList.add('hidden'); return;}t=setTimeout(function(){search(q);},250);});
+  byId('ville').addEventListener('focus',openVille);
+  byId('ville-btn').addEventListener('click',function(e){e.preventDefault();if(byId('sugg').classList.contains('hidden')){byId('ville').focus();openVille();}else byId('sugg').classList.add('hidden');});
+  function openVille(){var q=byId('ville').value.trim();if(q.length>=2)search(q);else showBig();}
+  function showBig(){var box=byId('sugg');box.innerHTML=BIG.map(function(b){return '<div data-city="'+b[0].replace(/"/g,'&quot;')+'"><span>'+b[0]+'</span> <span class="cp">grande ville</span></div>';}).join('');box.querySelectorAll('div').forEach(function(d){d.onclick=function(){quickPick(d.getAttribute('data-city'));};});box.classList.remove('hidden');}
+  function quickPick(name){byId('ville').value=name;byId('sugg').classList.add('hidden');fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(name)+'&fields=nom,code,departement,region,centre,codesPostaux,population&boost=population&limit=1').then(function(r){return r.json();}).then(function(list){if(list&&list[0])pick(list[0]);}).catch(function(){});}
   function search(q){fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(q)+'&fields=nom,code,departement,region,centre,codesPostaux,population&boost=population&limit=6').then(function(r){return r.json();}).then(function(list){if(!Array.isArray(list)||!list.length){byId('sugg').classList.add('hidden');return;}var box=byId('sugg');box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+c.nom+'</span> <span class="cp">'+cp+' · '+(c.departement?c.departement.nom:'')+'</span>';d.onclick=function(){pick(c);};box.appendChild(d);});box.classList.remove('hidden');}).catch(function(){byId('sugg').classList.add('hidden');});}
   function pick(c){
     sel=c;byId('ville').value=c.nom;byId('sugg').classList.add('hidden');
     var co=c.centre&&c.centre.coordinates;sel._la=co?co[1]:null;sel._lo=co?co[0]:null;
     var cps=c.codesPostaux||[];sel._cp=cps[0]||'';
     byId('cp').value=cps[0]||''; byId('dl-cp').innerHTML=cps.map(function(x){return '<option value="'+x+'"></option>';}).join('');
+    byId('dep').value=c.departement?(c.departement.nom+' ('+c.departement.code+')'):'';
     sel._near=(sel._la!=null)?BIG.map(function(b){return{n:b[0],d:km(sel._la,sel._lo,b[1],b[2]),dir:dird(b[1],b[2],sel._la,sel._lo)};}).filter(function(x){return x.d>1;}).sort(function(a,b){return a.d-b.d;}).slice(0,3):[];
     render();
   }
@@ -221,7 +241,7 @@ button.big:active{transform:translateY(1px)}
   function fmtD(d){if(!d)return'';var x=new Date(d+'T00:00');return ('0'+x.getDate()).slice(-2)+'/'+('0'+(x.getMonth()+1)).slice(-2)+'/'+x.getFullYear();}
   var added=[];
   function buildCurrent(){
-    var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),quand=byId('quand').value,date=byId('date').value,debut=byId('debut').value.trim(),finType=byId('finType').value,finH=byId('finHeure').value.trim(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
+    var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),dep=byId('dep').value.trim(),quand=byId('quand').value,date=byId('date').value,debut=debutVal(),finType=byId('finType').value,finH=finVal(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
     if(!(client||type||agent||siteT||sel||byId('ville').value.trim()||date||finH||notes)) return '';
     var L=[];
     if(client)L.push('Client : '+client);
@@ -229,11 +249,11 @@ button.big:active{transform:translateY(1px)}
     if(agent)L.push('Type d\'agent : '+agent);
     if(siteT)L.push('Type de site : '+siteT);
     if(surv)L.push('Surveillance : '+surv);
-    if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':'')+(sel.departement?' — '+sel.departement.nom+' ('+sel.departement.code+')':'')+(sel.region?', '+sel.region.nom:''));if(sel._near&&sel._near.length)L.push('Situation : à '+sel._near[0].d+' km au '+sel._near[0].dir+' de '+sel._near[0].n+(sel._near[1]?' · proche de '+sel._near[1].n+' ('+sel._near[1].d+' km)':'')+(sel._near[2]?', '+sel._near[2].n+' ('+sel._near[2].d+' km)':''));}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':''));
+    if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':'')+(dep?' — '+dep:'')+(sel.region?', '+sel.region.nom:''));if(sel._near&&sel._near.length)L.push('Situation : à '+sel._near[0].d+' km au '+sel._near[0].dir+' de '+sel._near[0].n+(sel._near[1]?' · proche de '+sel._near[1].n+' ('+sel._near[1].d+' km)':'')+(sel._near[2]?', '+sel._near[2].n+' ('+sel._near[2].d+' km)':''));}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':'')+(dep?' — '+dep:''));
     if(quand==='asap')L.push('Disponibilité : DÈS QUE POSSIBLE');else if(date)L.push('Date : '+fmtD(date));
     var ps=plageStr();
     if(quand!=='asap' && ps) L.push('Horaires : '+ps);
-    else { if(quand!=='asap' && debut)L.push('Début : '+debut); if(finType==='arrivee')L.push('Fin : à l\'arrivée de la relève');else if(finH)L.push('Fin : '+finH); }
+    else { if(quand!=='asap' && debut)L.push('Début : '+debut); if(finType==='arrivee')L.push('Fin : à l\'arrivée de la relève'+(finH?' (vers '+finH+', indicatif)':''));else if(finH)L.push('Fin : '+finH); }
     if(ag)L.push('Agents : '+ag);if(ref)L.push('Réf/contact : '+ref);if(notes)L.push('Notes : '+notes);
     return L.join('\n');
   }
@@ -245,8 +265,9 @@ button.big:active{transform:translateY(1px)}
   }
   function genText(){ renderOut(); }
   function resetForm(){
-    ['client','type','agent','sitetype','ville','cp','date','debut','finHeure','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
-    byId('surv').value='';byId('quand').value='date';byId('finType').value='fixe';
+    ['client','type','agent','sitetype','ville','cp','dep','date','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
+    ['debut-h','fin-h'].forEach(function(id){byId(id).value='';}); ['debut-m','fin-m'].forEach(function(id){byId(id).selectedIndex=0;});
+    byId('surv').value='';byId('quand').value='date';byId('finType').value='fixe';byId('finHeureLab').textContent='Heure de fin';
     byId('dateBlock').classList.remove('hidden');byId('finHeureWrap').classList.remove('hidden');
     sel=null;byId('ctx').classList.add('hidden');byId('plage').classList.add('hidden');
   }
@@ -256,7 +277,7 @@ button.big:active{transform:translateY(1px)}
     byId('addedList').querySelectorAll('.rm').forEach(function(bt){bt.onclick=function(){added.splice(+bt.getAttribute('data-i'),1);renderAdded();renderOut();};});
   }
   byId('addBtn').onclick=function(){var cur=buildCurrent();if(!cur)return;added.push(cur);resetForm();renderAdded();renderOut();window.scrollTo(0,0);};
-  ['date','agents','ref','notes','cp'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
+  ['date','agents','ref','notes','cp','dep'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
 
   // ===== Suivi demandes =====
