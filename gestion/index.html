@@ -119,6 +119,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="fiche">Fiche agent</button>
     <button data-s="zone">Zone à couvrir</button>
     <button data-s="thiam">Thiam</button>
+    <button data-s="suiviappels">Suivi des appels</button>
   </div>
 </div>
 
@@ -350,14 +351,16 @@ button.big:active{transform:translateY(1px)}
       <button class="big" id="th-add" style="background:var(--brand);color:var(--brand-ink);border:1px solid transparent">➕ Ajouter ce site au suivi</button>
     </div>
     <div class="card">
-      <div class="lab" style="margin:0">🔔 Suivi des appels</div>
-      <div id="th-lateBadge" class="th-late-badge" style="display:none"></div>
-      <div class="thboard" id="th-board"></div>
-    </div>
-    <div class="card">
       <div class="lab" style="margin:0">Texte à copier (pour partage / archive)</div>
       <div class="outbox" id="th-out">Remplis un site…</div>
       <button class="big" id="th-copy">Copier</button>
+    </div>
+  </section>
+  <section id="sec-suiviappels" class="hidden">
+    <div><h1>Suivi des appels</h1><p class="sub">Pointe chaque appel (⏱ heure réelle enregistrée au clic), ajoute un commentaire, repère les retards. Les sites proviennent de l'onglet Thiam.</p></div>
+    <div class="card">
+      <div id="th-lateBadge" class="th-late-badge" style="display:none"></div>
+      <div class="thboard" id="th-board"></div>
     </div>
   </section>
 </div>
@@ -365,8 +368,8 @@ button.big:active{transform:translateY(1px)}
 <script>
 (function(){
   var byId=function(x){return document.getElementById(x)};
-  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='thiam'&&typeof thRenderBoard==='function')thRenderBoard();window.scrollTo(0,0);};});
+  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
   function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
@@ -965,7 +968,7 @@ button.big:active{transform:translateY(1px)}
     var id=del.getAttribute('data-thdel');TH=TH.filter(function(x){return x.id!==id;});thSave();thRenderBoard();thRenderOut();thRenderAuto();
   });
   byId('th-copy').onclick=function(){var x=byId('th-out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('th-copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
-  setInterval(function(){if(!byId('sec-thiam').classList.contains('hidden'))thUpdateLate();},30000);
+  setInterval(function(){if(!byId('sec-suiviappels').classList.contains('hidden'))thUpdateLate();},30000);
   thRenderBoard();thRenderOut();
 
   document.addEventListener('click',function(e){
