@@ -268,7 +268,7 @@ button.big:active{transform:translateY(1px)}
     <div class="card">
       <div class="grid2">
         <label class="f"><div class="lab">Nom de l'agent</div><input id="fa-nom" placeholder="Nom et prénom" autocomplete="off"></label>
-        <label class="f"><div class="lab">Numéro</div><input id="fa-tel" placeholder="Téléphone" inputmode="tel" autocomplete="off"></label>
+        <label class="f"><div class="lab">Numéro(s) — un par ligne</div><textarea id="fa-tel" placeholder="Un ou plusieurs numéros (un par ligne)" inputmode="tel" style="min-height:44px"></textarea></label>
       </div>
       <div class="grid2">
         <label class="f"><div class="lab">Ville</div><div class="acwrap"><input type="text" id="fa-ville" placeholder="Ville de l'agent…" autocomplete="off"><div class="sugg hidden" id="sugg-fa-ville"></div></div></label>
@@ -278,6 +278,7 @@ button.big:active{transform:translateY(1px)}
         <label class="chk"><input type="checkbox" id="fa-voiture"><span>🚗 Véhicule</span></label>
         <label class="chk"><input type="checkbox" id="fa-ads"><span>🛡️ ADS</span></label>
       </div>
+      <div class="hint" id="fa-err" style="color:var(--bad)"></div>
       <button class="big" id="fa-add">➕ Ajouter l'agent</button>
     </div>
     <div class="card">
@@ -647,20 +648,26 @@ button.big:active{transform:translateY(1px)}
   svcSection('fs','FIN DE SERVICE','🔴','Heure de fin de service');
 
   // ===== Fiche agent (répertoire) =====
-  var FA=load('fkh_fa'); var faEdit=null,faSel=null,faT,faRef=null,faRT;
+  var FA=load('fkh_fa'); FA.forEach(function(a){if(a.tel&&!a.tels){a.tels=[a.tel];delete a.tel;}}); var faEdit=null,faSel=null,faT,faRef=null,faRT;
+  function parseTels(raw){return (raw||'').split(/[\n,;]+/).map(function(t){return t.trim();}).filter(Boolean);}
+  function telKey(t){return (t||'').replace(/\D/g,'');}
   function saveFA(){ save('fkh_fa',FA); }
   function cityAuto(q,suggId,onPick){fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(q)+'&fields=nom,departement,centre,codesPostaux,population&boost=population&limit=6').then(function(r){return r.json();}).then(function(list){var box=byId(suggId);if(!Array.isArray(list)||!list.length){box.classList.add('hidden');return;}box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+c.nom+'</span> <span class="cp">'+cp+'</span>';d.onclick=function(){onPick(c);};box.appendChild(d);});box.classList.remove('hidden');}).catch(function(){byId(suggId).classList.add('hidden');});}
   byId('fa-ville').addEventListener('input',function(){var q=this.value.trim();faSel=null;clearTimeout(faT);if(q.length<2){byId('sugg-fa-ville').classList.add('hidden');return;}faT=setTimeout(function(){cityAuto(q,'sugg-fa-ville',function(c){var co=c.centre&&c.centre.coordinates;faSel={nom:c.nom,cp:(c.codesPostaux&&c.codesPostaux[0])||'',la:co?co[1]:null,lo:co?co[0]:null,dep:(c.departement&&c.departement.code)||'',depnom:(c.departement&&c.departement.nom)||''};byId('fa-ville').value=c.nom;byId('sugg-fa-ville').classList.add('hidden');});},250);});
   byId('fa-refville').addEventListener('input',function(){var q=this.value.trim();faRef=null;clearTimeout(faRT);if(q.length<2){byId('sugg-fa-refville').classList.add('hidden');renderFA();return;}faRT=setTimeout(function(){cityAuto(q,'sugg-fa-refville',function(c){var co=c.centre&&c.centre.coordinates;faRef={nom:c.nom,la:co?co[1]:null,lo:co?co[0]:null};byId('fa-refville').value=c.nom;byId('sugg-fa-refville').classList.add('hidden');renderFA();});},250);});
   ['fa-radius','fa-f-ads','fa-f-voiture'].forEach(function(id){byId(id).addEventListener('change',renderFA);});
   byId('fa-search').addEventListener('input',renderFA);
-  function resetFAform(){ ['fa-nom','fa-tel','fa-ville'].forEach(function(id){byId(id).value='';}); byId('fa-fiab').value=''; byId('fa-voiture').checked=false; byId('fa-ads').checked=false; faSel=null; faEdit=null; byId('fa-add').textContent='➕ Ajouter l\'agent'; }
+  function resetFAform(){ ['fa-nom','fa-tel','fa-ville'].forEach(function(id){byId(id).value='';}); byId('fa-fiab').value=''; byId('fa-voiture').checked=false; byId('fa-ads').checked=false; byId('fa-err').textContent=''; faSel=null; faEdit=null; byId('fa-add').textContent='➕ Ajouter l\'agent'; }
   byId('fa-add').onclick=function(){
-    var nom=byId('fa-nom').value.trim(),tel=byId('fa-tel').value.trim(),ville=byId('fa-ville').value.trim(),fiab=byId('fa-fiab').value,voiture=byId('fa-voiture').checked,ads=byId('fa-ads').checked;
-    if(!(nom||tel||ville))return;
+    var nom=byId('fa-nom').value.trim(),tels=parseTels(byId('fa-tel').value),ville=byId('fa-ville').value.trim(),fiab=byId('fa-fiab').value,voiture=byId('fa-voiture').checked,ads=byId('fa-ads').checked;
+    if(!(nom||tels.length||ville))return;
+    var used={}; FA.forEach(function(a){ if(a.id!==faEdit&&a.tels) a.tels.forEach(function(t){var k=telKey(t);if(k)used[k]=a.nom||'un autre agent';}); });
+    var conflict=null; tels.forEach(function(t){var k=telKey(t);if(k&&used[k])conflict=t+' → déjà attribué à '+used[k];});
+    if(conflict){ byId('fa-err').textContent='⚠️ '+conflict; return; }
+    byId('fa-err').textContent='';
     var g=(faSel&&faSel.nom===ville)?faSel:{nom:ville,cp:'',la:null,lo:null,dep:'',depnom:''};
-    if(faEdit){ var a=null,i; for(i=0;i<FA.length;i++)if(FA[i].id===faEdit){a=FA[i];break;} if(a){a.nom=nom;a.tel=tel;a.ville=g.nom;a.cp=g.cp;a.la=g.la;a.lo=g.lo;a.dep=g.dep;a.depnom=g.depnom;a.fiab=fiab;a.voiture=voiture;a.ads=ads;} }
-    else { FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tel:tel,ville:g.nom,cp:g.cp,la:g.la,lo:g.lo,dep:g.dep,depnom:g.depnom,fiab:fiab,voiture:voiture,ads:ads}); }
+    if(faEdit){ var a=null,i; for(i=0;i<FA.length;i++)if(FA[i].id===faEdit){a=FA[i];break;} if(a){a.nom=nom;a.tels=tels;a.ville=g.nom;a.cp=g.cp;a.la=g.la;a.lo=g.lo;a.dep=g.dep;a.depnom=g.depnom;a.fiab=fiab;a.voiture=voiture;a.ads=ads;} }
+    else { FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tels:tels,ville:g.nom,cp:g.cp,la:g.la,lo:g.lo,dep:g.dep,depnom:g.depnom,fiab:fiab,voiture:voiture,ads:ads}); }
     saveFA(); resetFAform(); renderFA();
   };
   function renderFA(){
@@ -668,7 +675,7 @@ button.big:active{transform:translateY(1px)}
     var rad=parseInt(byId('fa-radius').value,10)||0, byRadius=rad&&faRef&&faRef.la!=null;
     var fAds=byId('fa-f-ads').checked, fVoit=byId('fa-f-voiture').checked;
     var arr=FA.filter(function(a){
-      if(q&&((a.nom||'')+' '+(a.tel||'')+' '+(a.ville||'')).toLowerCase().indexOf(q)<0)return false;
+      if(q&&((a.nom||'')+' '+((a.tels||[]).join(' '))+' '+(a.ville||'')).toLowerCase().indexOf(q)<0)return false;
       if(fAds&&!a.ads)return false; if(fVoit&&!a.voiture)return false;
       if(byRadius){ if(a.la==null||a.lo==null){a._d=null;return false;} a._d=km(faRef.la,faRef.lo,a.la,a.lo); if(a._d>rad)return false; } else { a._d=null; }
       return true;
@@ -678,13 +685,14 @@ button.big:active{transform:translateY(1px)}
     if(!arr.length){ byId('fa-list').innerHTML='<div class="svempty">'+(byRadius?'Aucun agent dans ce rayon (ou ville non géolocalisée).':(FA.length?'Aucun agent ne correspond.':'Aucun agent enregistré.'))+'</div>'; return; }
     byId('fa-list').innerHTML=arr.map(function(a){
       var tags=(a.voiture?'🚗 ':'')+(a.ads?'🛡️ADS ':'');
-      var parts=[a.ville]; if(a._d!=null)parts.push(a._d+' km'); parts.push(a.cp); parts.push(a.tel); if(a.fiab)parts.push(a.fiab);
+      var tels=a.tels||(a.tel?[a.tel]:[]);
+      var parts=[a.ville]; if(a._d!=null)parts.push(a._d+' km'); parts.push(a.cp); if(tels.length)parts.push(tels.join(' / ')); if(a.fiab)parts.push(a.fiab);
       var d=(tags?tags+'· ':'')+parts.filter(Boolean).map(esc).join(' · ');
-      var call=a.tel?'<a class="call" href="tel:'+esc(a.tel.replace(/\s/g,''))+'" title="Appeler">📞</a>':'';
+      var call=tels.map(function(t){return '<a class="call" href="tel:'+esc(t.replace(/\s/g,''))+'" title="Appeler '+esc(t)+'">📞</a>';}).join('');
       return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+(d||'—')+'</div></div><div class="fa-a">'+call+'<button data-fae="'+a.id+'" title="Modifier">✏️</button><button class="no" data-fad="'+a.id+'" title="Supprimer">🗑️</button></div></div>';
     }).join('');
     byId('fa-list').querySelectorAll('[data-fad]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fad');FA=FA.filter(function(x){return x.id!==id;});saveFA();renderFA();};});
-    byId('fa-list').querySelectorAll('[data-fae]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fae'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id){a=FA[i];break;}if(a){byId('fa-nom').value=a.nom||'';byId('fa-tel').value=a.tel||'';byId('fa-ville').value=a.ville||'';byId('fa-fiab').value=a.fiab||'';byId('fa-voiture').checked=!!a.voiture;byId('fa-ads').checked=!!a.ads;faSel={nom:a.ville,cp:a.cp,la:a.la,lo:a.lo,dep:a.dep,depnom:a.depnom};faEdit=a.id;byId('fa-add').textContent='✔️ Enregistrer';window.scrollTo(0,0);}};});
+    byId('fa-list').querySelectorAll('[data-fae]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fae'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id){a=FA[i];break;}if(a){byId('fa-nom').value=a.nom||'';byId('fa-tel').value=(a.tels||(a.tel?[a.tel]:[])).join('\n');byId('fa-ville').value=a.ville||'';byId('fa-fiab').value=a.fiab||'';byId('fa-voiture').checked=!!a.voiture;byId('fa-ads').checked=!!a.ads;faSel={nom:a.ville,cp:a.cp,la:a.la,lo:a.lo,dep:a.dep,depnom:a.depnom};faEdit=a.id;byId('fa-add').textContent='✔️ Enregistrer';window.scrollTo(0,0);}};});
   }
   renderFA();
 
