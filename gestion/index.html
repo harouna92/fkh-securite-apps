@@ -118,7 +118,7 @@ button.big:active{transform:translateY(1px)}
     <div class="ctx hidden" id="ctx">
       <div class="lab" style="margin:0">Contexte géographique</div>
       <div class="row"><span class="k">Ville</span><span class="v" id="c-ville">—</span></div>
-      <div class="row"><span class="k">2 grandes villes proches</span></div>
+      <div class="row" style="align-items:center"><span class="k">Villes proches</span><select id="nbNear" style="width:auto;padding:5px 8px;font-size:13px"><option value="1">1 ville</option><option value="2" selected>2 villes</option><option value="3">3 villes</option><option value="4">4 villes</option><option value="5">5 villes</option></select></div>
       <div class="near" id="c-near"></div>
     </div>
     <button class="big" id="addBtn" style="background:var(--panel);color:var(--ink);border:1px solid var(--line)">➕ Ajouter cette demande, en saisir une autre</button>
@@ -223,16 +223,17 @@ button.big:active{transform:translateY(1px)}
     var co=c.centre&&c.centre.coordinates;sel._la=co?co[1]:null;sel._lo=co?co[0]:null;
     var cps=c.codesPostaux||[];sel._cp=preferCP||cps[0]||'';
     byId('cp').value=preferCP||cps[0]||'';
-    sel._near=(sel._la!=null)?BIG.map(function(b){return{n:b[0],cp:BIGCP[b[0]]||'',la:b[1],lo:b[2],d:km(sel._la,sel._lo,b[1],b[2]),dir:dird(b[1],b[2],sel._la,sel._lo)};}).filter(function(x){return x.d>1 && x.n!==sel.nom;}).sort(function(a,b){return a.d-b.d;}).slice(0,2):[];
-    routeAll();
-    render();
+    sel._allNear=(sel._la!=null)?BIG.map(function(b){return{n:b[0],cp:BIGCP[b[0]]||'',la:b[1],lo:b[2],d:km(sel._la,sel._lo,b[1],b[2])};}).filter(function(x){return x.d>1 && x.n!==sel.nom;}).sort(function(a,b){return a.d-b.d;}):[];
+    setNear();
   }
+  function setNear(){ if(!sel){render();return;} var n=parseInt(byId('nbNear').value,10)||2; sel._near=(sel._allNear||[]).slice(0,n); routeAll(); render(); }
+  byId('nbNear').addEventListener('change',setNear);
   function render(){var ctx=byId('ctx');if(sel){ctx.classList.remove('hidden');byId('c-ville').textContent=sel.nom;byId('c-near').innerHTML=(sel._near||[]).map(function(x){return '<div class="n"><span>'+x.n+(x.cp?' <span style="color:var(--muted)">'+x.cp+'</span>':'')+'</span><span class="d">'+x.d+' km'+(x.dur?' · '+x.dur:'')+'</span></div>';}).join('')||'<div class="hint">—</div>';}else ctx.classList.add('hidden');genText();}
   function routeAll(){
     if(!sel||sel._la==null||!sel._near) return;
     var la=sel._la,lo=sel._lo,cur=sel;
     sel._near.forEach(function(x){
-      x.dur=null;
+      if(x.dur)return;
       fetch('https://router.project-osrm.org/route/v1/driving/'+lo+','+la+';'+x.lo+','+x.la+'?overview=false').then(function(r){return r.json();}).then(function(j){
         if(sel!==cur)return;
         if(j&&j.routes&&j.routes[0]){ var min=Math.round(j.routes[0].duration/60),hh=Math.floor(min/60),mm=min%60; x.dur=hh?(hh+'h'+(mm?pad2(mm):'')):(min+' min'); render(); }
