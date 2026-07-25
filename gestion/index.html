@@ -104,11 +104,6 @@ button.big:active{transform:translateY(1px)}
       </div>
       <label class="f"><div class="lab">Code postal</div><div class="acwrap"><input id="cp" placeholder="Rempli par la ville · ou tape un code postal" autocomplete="off" inputmode="numeric"><div class="sugg hidden" id="sugg-cp"></div></div></label>
 
-      <label class="chk"><input type="checkbox" id="h24"><span>🕓 Service <b>H24</b> (24h/24, en continu)</span></label>
-      <div class="grid2 hidden" id="h24Block">
-        <label class="f"><div class="lab">Date de début</div><input type="date" id="h24date"></label>
-        <label class="f"><div class="lab">Date de fin</div><input type="date" id="h24fin"><div class="hint">Vide = jusqu'à nouvel ordre</div></label>
-      </div>
       <div id="vacsWrap">
         <div class="lab" style="margin:0 0 5px">Vacations</div>
         <div id="vacsList"></div>
@@ -203,9 +198,6 @@ button.big:active{transform:translateY(1px)}
   function ampl(s,e){ var a=toMin(s),b=toMin(e); if(a==null||b==null)return ''; var dur=b-a; if(dur<=0)dur+=1440; var h=Math.floor(dur/60),m=dur%60; return s+' → '+e+' · '+h+'h'+(m?pad2(m):'')+(b<=a?' (nuit)':''); }
 
   byId('surv').addEventListener('change',genText);
-  function applyH24(){ var on=byId('h24').checked; byId('h24Block').classList.toggle('hidden',!on); byId('vacsWrap').classList.toggle('hidden',on); }
-  byId('h24').addEventListener('change',function(){ applyH24(); genText(); });
-  byId('h24date').addEventListener('input',genText); byId('h24fin').addEventListener('input',genText);
 
   function toMin(t){ var m=/^(\d{1,2}):(\d{2})$/.exec(t.trim()); return m?(+m[1]*60+ +m[2]):null; }
 
@@ -253,11 +245,13 @@ button.big:active{transform:translateY(1px)}
   function makeVac(){
     var el=document.createElement('div'); el.className='vac';
     el.innerHTML='<div class="vac-h"><span class="vac-n"></span><button type="button" class="v-del" title="Retirer cette vacation">✕</button></div>'
-      +'<div class="grid2"><label class="f"><div class="lab">Date de début</div><input type="date" class="v-date"></label>'
-      +'<label class="f"><div class="lab">Date de fin</div><input type="date" class="v-datefin"><div class="hint">Vide = même jour</div></label></div>'
-      +'<div class="grid2"><label class="f"><div class="lab">Heure de début</div><div class="hm"><select class="v-dh">'+HOPTS+'</select><span>h</span><select class="v-dm">'+MOPTS+'</select></div></label>'
+      +'<div class="grid2"><label class="f"><div class="lab">Quand ?</div><select class="v-quand"><option value="date">Date précise</option><option value="asap">Dès que possible</option></select></label>'
+      +'<label class="f v-datewrap"><div class="lab">Date de début</div><input type="date" class="v-date"></label></div>'
+      +'<label class="chk"><input type="checkbox" class="v-h24"><span>🕓 <b>H24</b> (24h/24, en continu)</span></label>'
+      +'<div class="grid2 v-hours"><label class="f"><div class="lab">Heure de début</div><div class="hm"><select class="v-dh">'+HOPTS+'</select><span>h</span><select class="v-dm">'+MOPTS+'</select></div></label>'
       +'<label class="f"><div class="lab v-finlab">Heure de fin</div><div class="hm"><select class="v-fh">'+HOPTS+'</select><span>h</span><select class="v-fm">'+MOPTS+'</select></div></label></div>'
-      +'<label class="chk"><input type="checkbox" class="v-arr"><span>Fin à l\'arrivée de la relève (heure indicative)</span></label>'
+      +'<label class="chk v-arrwrap"><input type="checkbox" class="v-arr"><span>Fin à l\'arrivée de la relève (heure indicative)</span></label>'
+      +'<label class="f"><div class="lab">Date de fin</div><input type="date" class="v-datefin"><div class="hint v-dfhint">Vide = même jour</div></label>'
       +'<div class="hint v-amp" style="margin:0"></div>';
     el.querySelectorAll('input,select').forEach(function(x){ var h=function(){vacRefresh(el);genText();}; x.addEventListener('input',h); x.addEventListener('change',h); });
     el.querySelector('.v-arr').addEventListener('change',function(){ el.querySelector('.v-finlab').textContent=this.checked?'Heure de fin (indicative)':'Heure de fin'; });
@@ -265,17 +259,17 @@ button.big:active{transform:translateY(1px)}
     return el;
   }
   function renumVac(){ var els=document.querySelectorAll('#vacsList .vac'); els.forEach(function(el,i){ el.querySelector('.vac-n').textContent='Vacation '+(i+1); el.querySelector('.v-del').style.visibility=els.length>1?'visible':'hidden'; }); }
-  function readVac(el){ return {date:el.querySelector('.v-date').value,dateFin:el.querySelector('.v-datefin').value,deb:hmv(el.querySelector('.v-dh').value,el.querySelector('.v-dm').value),fin:hmv(el.querySelector('.v-fh').value,el.querySelector('.v-fm').value),arr:el.querySelector('.v-arr').checked}; }
-  function vacRefresh(el){ var v=readVac(el); el.querySelector('.v-amp').textContent=(v.deb&&v.fin&&!v.arr)?('🕐 '+ampl(v.deb,v.fin)):''; }
+  function readVac(el){ return {quand:el.querySelector('.v-quand').value,h24:el.querySelector('.v-h24').checked,date:el.querySelector('.v-date').value,dateFin:el.querySelector('.v-datefin').value,deb:hmv(el.querySelector('.v-dh').value,el.querySelector('.v-dm').value),fin:hmv(el.querySelector('.v-fh').value,el.querySelector('.v-fm').value),arr:el.querySelector('.v-arr').checked}; }
+  function vacRefresh(el){ var v=readVac(el); el.querySelector('.v-datewrap').classList.toggle('hidden',v.quand==='asap'); el.querySelector('.v-hours').classList.toggle('hidden',v.h24); el.querySelector('.v-arrwrap').classList.toggle('hidden',v.h24); el.querySelector('.v-dfhint').textContent=v.h24?'Vide = jusqu\'à nouvel ordre':'Vide = même jour'; el.querySelector('.v-amp').textContent=(!v.h24&&v.deb&&v.fin&&!v.arr)?('🕐 '+ampl(v.deb,v.fin)):''; }
   function addVac(){ var el=makeVac(); byId('vacsList').appendChild(el); renumVac(); return el; }
   byId('addVac').addEventListener('click',function(){ addVac(); genText(); });
   addVac();
 
   var added=[];
   function buildCurrent(){
-    var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),h24=byId('h24').checked,ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
-    var vacs=[]; document.querySelectorAll('#vacsList .vac').forEach(function(el){ var v=readVac(el); if(v.date||v.deb||v.fin||v.dateFin||v.arr) vacs.push(v); });
-    if(!(client||type||agent||siteT||sel||byId('ville').value.trim()||notes||h24||vacs.length)) return '';
+    var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
+    var vacs=[]; document.querySelectorAll('#vacsList .vac').forEach(function(el){ var v=readVac(el); if(v.quand==='asap'||v.date||v.deb||v.fin||v.dateFin||v.arr||v.h24) vacs.push(v); });
+    if(!(client||type||agent||siteT||sel||byId('ville').value.trim()||notes||vacs.length)) return '';
     var L=[];
     if(client)L.push('Client : '+client);
     if(type)L.push('Prestation : '+type);
@@ -283,19 +277,19 @@ button.big:active{transform:translateY(1px)}
     if(siteT)L.push('Type de site : '+siteT);
     if(surv)L.push('Surveillance : '+surv);
     if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':''));(sel._near||[]).forEach(function(x){L.push(x.n+(x.cp?' '+x.cp:'')+' à '+x.d+' km'+(x.dur?' · '+x.dur:''));});}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':''));
-    if(h24){
-      L.push('Service : H24 (24h/24)');
-      var hd=byId('h24date').value,hf=byId('h24fin').value;
-      if(hd)L.push('Date de début : '+fmtD(hd));
-      if(hf)L.push('Date de fin : '+fmtD(hf)); else L.push('Fin : jusqu\'à nouvel ordre');
-    } else if(vacs.length){
+    if(vacs.length){
       vacs.forEach(function(v,i){
         var p=[];
-        if(v.date)p.push('début '+fmtD(v.date));
-        if(v.deb)p.push(v.deb);
-        if(v.arr)p.push('fin à l\'arrivée de la relève'+(v.fin?' (vers '+v.fin+')':''));
-        else if(v.fin)p.push('fin '+v.fin);
-        if(v.dateFin)p.push('jusqu\'au '+fmtD(v.dateFin));
+        if(v.quand==='asap')p.push('dès que possible'); else if(v.date)p.push('début '+fmtD(v.date));
+        if(v.h24){
+          p.push('H24 (24h/24)');
+          if(v.dateFin)p.push('jusqu\'au '+fmtD(v.dateFin)); else p.push('jusqu\'à nouvel ordre');
+        } else {
+          if(v.deb)p.push(v.deb);
+          if(v.arr)p.push('fin à l\'arrivée de la relève'+(v.fin?' (vers '+v.fin+')':''));
+          else if(v.fin)p.push('fin '+v.fin);
+          if(v.dateFin)p.push('jusqu\'au '+fmtD(v.dateFin));
+        }
         L.push((vacs.length>1?'Vacation '+(i+1)+' : ':'Vacation : ')+(p.join(' · ')||'(à définir)'));
       });
     }
@@ -312,7 +306,6 @@ button.big:active{transform:translateY(1px)}
   function resetForm(){
     ['client','type','agent','sitetype','ville','cp','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.value='';});
     byId('surv').value='';
-    byId('h24').checked=false;byId('h24date').value='';byId('h24fin').value='';applyH24();
     byId('vacsList').innerHTML='';addVac();
     sel=null;byId('ctx').classList.add('hidden');
   }
