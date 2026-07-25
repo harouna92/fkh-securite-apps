@@ -117,8 +117,9 @@ button.big:active{transform:translateY(1px)}
       <div class="row"><span class="k">Ville</span><span class="v" id="c-ville">—</span></div>
       <div class="row"><span class="k">Département</span><span class="v" id="c-dep">—</span></div>
       <div class="row"><span class="k">Région</span><span class="v" id="c-reg">—</span></div>
-      <div class="row"><span class="k">Grandes villes proches</span></div>
+      <div class="row"><span class="k">2 grandes villes proches</span></div>
       <div class="near" id="c-near"></div>
+      <div class="row" id="c-route-row" style="display:none"><span class="k">Trajet voiture</span><span class="v" id="c-route">—</span></div>
     </div>
     <button class="big" id="addBtn" style="background:var(--panel);color:var(--ink);border:1px solid var(--line)">➕ Ajouter cette demande, en saisir une autre</button>
     <div class="card hidden" id="addedCard"><div class="lab" style="margin:0">Demandes ajoutées (<span id="addedN">0</span>)</div><div class="list" id="addedList"></div></div>
@@ -217,6 +218,7 @@ button.big:active{transform:translateY(1px)}
 
   // ---- Ville (communes de France) + code postal auto ----
   var BIG=[["Paris",48.8566,2.3522],["Marseille",43.2965,5.3698],["Lyon",45.764,4.8357],["Toulouse",43.6047,1.4442],["Nice",43.7102,7.262],["Nantes",47.2184,-1.5536],["Montpellier",43.6108,3.8767],["Strasbourg",48.5734,7.7521],["Bordeaux",44.8378,-0.5792],["Lille",50.6292,3.0573],["Rennes",48.1173,-1.6778],["Reims",49.2583,4.0317],["Saint-Étienne",45.4397,4.3872],["Le Havre",49.4944,0.1079],["Toulon",43.1242,5.928],["Grenoble",45.1885,5.7245],["Dijon",47.322,5.0415],["Angers",47.4784,-0.5632],["Nîmes",43.8367,4.3601],["Clermont-Ferrand",45.7772,3.087],["Le Mans",48.0061,0.1996],["Aix-en-Provence",43.5297,5.4474],["Brest",48.3904,-4.4861],["Tours",47.3941,0.6848],["Amiens",49.8941,2.2958],["Limoges",45.8336,1.2611],["Annecy",45.8992,6.1294],["Perpignan",42.6887,2.8948],["Besançon",47.2378,6.0241],["Metz",49.1193,6.1757],["Orléans",47.9029,1.9093],["Mulhouse",47.7508,7.3359],["Caen",49.1829,-0.3707],["Nancy",48.6921,6.1844],["Avignon",43.9493,4.8055],["Poitiers",46.5802,0.3404],["Bourges",47.081,2.3988],["Bayonne",43.4933,-1.4748],["Pau",43.2951,-0.3708],["La Rochelle",46.1603,-1.1511],["Chambéry",45.5646,5.9178],["Troyes",48.2973,4.0744],["Valence",44.9334,4.8924],["Belfort",47.6379,6.8628],["Lorient",47.7485,-3.37]];
+  var BIGCP={"Paris":"75001","Marseille":"13001","Lyon":"69001","Toulouse":"31000","Nice":"06000","Nantes":"44000","Montpellier":"34000","Strasbourg":"67000","Bordeaux":"33000","Lille":"59000","Rennes":"35000","Reims":"51100","Saint-Étienne":"42000","Le Havre":"76600","Toulon":"83000","Grenoble":"38000","Dijon":"21000","Angers":"49000","Nîmes":"30000","Clermont-Ferrand":"63000","Le Mans":"72000","Aix-en-Provence":"13100","Brest":"29200","Tours":"37000","Amiens":"80000","Limoges":"87000","Annecy":"74000","Perpignan":"66000","Besançon":"25000","Metz":"57000","Orléans":"45000","Mulhouse":"68100","Caen":"14000","Nancy":"54000","Avignon":"84000","Poitiers":"86000","Bourges":"18000","Bayonne":"64100","Pau":"64000","La Rochelle":"17000","Chambéry":"73000","Troyes":"10000","Valence":"26000","Belfort":"90000","Lorient":"56100"};
   function km(a,b,c,d){var R=6371,r=Math.PI/180,x=(c-a)*r,y=(d-b)*r;var s=Math.sin(x/2)*Math.sin(x/2)+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)*Math.sin(y/2);return Math.round(2*R*Math.asin(Math.min(1,Math.sqrt(s))));}
   function dird(a,b,c,d){var r=Math.PI/180,dLo=(d-b)*r;var y=Math.sin(dLo)*Math.cos(c*r);var x=Math.cos(a*r)*Math.sin(c*r)-Math.sin(a*r)*Math.cos(c*r)*Math.cos(dLo);var bb=(Math.atan2(y,x)/r+360)%360;return ["N","N-E","E","S-E","S","S-O","O","N-O"][Math.round(bb/45)%8];}
   var sel=null,t;
@@ -233,10 +235,27 @@ button.big:active{transform:translateY(1px)}
     var cps=c.codesPostaux||[];sel._cp=cps[0]||'';
     byId('cp').value=cps[0]||''; byId('dl-cp').innerHTML=cps.map(function(x){return '<option value="'+x+'"></option>';}).join('');
     byId('dep').value=c.departement?(c.departement.nom+' ('+c.departement.code+')'):'';
-    sel._near=(sel._la!=null)?BIG.map(function(b){return{n:b[0],d:km(sel._la,sel._lo,b[1],b[2]),dir:dird(b[1],b[2],sel._la,sel._lo)};}).filter(function(x){return x.d>1;}).sort(function(a,b){return a.d-b.d;}).slice(0,3):[];
+    sel._near=(sel._la!=null)?BIG.map(function(b){return{n:b[0],cp:BIGCP[b[0]]||'',la:b[1],lo:b[2],d:km(sel._la,sel._lo,b[1],b[2]),dir:dird(b[1],b[2],sel._la,sel._lo)};}).filter(function(x){return x.d>1;}).sort(function(a,b){return a.d-b.d;}).slice(0,2):[];
+    sel._drive=null; routeTo(sel._near&&sel._near[0]);
     render();
   }
-  function render(){var ctx=byId('ctx');if(sel){ctx.classList.remove('hidden');byId('c-ville').textContent=sel.nom;byId('c-dep').textContent=sel.departement?(sel.departement.nom+' ('+sel.departement.code+')'):'—';byId('c-reg').textContent=sel.region?sel.region.nom:'—';byId('c-near').innerHTML=(sel._near||[]).map(function(x){return '<div class="n"><span>'+x.n+' <span style="color:var(--muted)">('+x.dir+')</span></span><span class="d">'+x.d+' km</span></div>';}).join('')||'<div class="hint">—</div>';}else ctx.classList.add('hidden');genText();}
+  function render(){var ctx=byId('ctx');if(sel){ctx.classList.remove('hidden');byId('c-ville').textContent=sel.nom;byId('c-dep').textContent=sel.departement?(sel.departement.nom+' ('+sel.departement.code+')'):'—';byId('c-reg').textContent=sel.region?sel.region.nom:'—';byId('c-near').innerHTML=(sel._near||[]).map(function(x){return '<div class="n"><span>'+x.n+(x.cp?' <span style="color:var(--muted)">'+x.cp+'</span>':'')+' <span style="color:var(--muted)">('+x.dir+')</span></span><span class="d">'+x.d+' km</span></div>';}).join('')||'<div class="hint">—</div>';}else ctx.classList.add('hidden');genText();}
+  function routeTo(near){
+    var row=byId('c-route-row');
+    if(!sel||sel._la==null||!near){ if(row)row.style.display='none'; return; }
+    row.style.display=''; byId('c-route').textContent='calcul du trajet…';
+    var url='https://router.project-osrm.org/route/v1/driving/'+sel._lo+','+sel._la+';'+near.lo+','+near.la+'?overview=false';
+    fetch(url).then(function(r){return r.json();}).then(function(j){
+      if(j&&j.routes&&j.routes[0]){
+        var dkm=Math.round(j.routes[0].distance/1000), min=Math.round(j.routes[0].duration/60);
+        var hh=Math.floor(min/60), mm=min%60, dur=hh?(hh+'h'+(mm?('0'+mm).slice(-2):'')):(min+' min');
+        var maps='https://www.google.com/maps/dir/?api=1&origin='+sel._la+','+sel._lo+'&destination='+near.la+','+near.lo;
+        sel._drive={km:dkm,dur:dur,dest:near.n};
+        byId('c-route').innerHTML='~'+dkm+' km · ~'+dur+' → '+near.n+' &nbsp;<a href="'+maps+'" target="_blank" rel="noopener" style="color:var(--brand);font-weight:600">itinéraire ↗</a>';
+        genText();
+      } else { byId('c-route').textContent='indisponible'; }
+    }).catch(function(){ byId('c-route').textContent='trajet indisponible'; });
+  }
 
   function fmtD(d){if(!d)return'';var x=new Date(d+'T00:00');return ('0'+x.getDate()).slice(-2)+'/'+('0'+(x.getMonth()+1)).slice(-2)+'/'+x.getFullYear();}
   var added=[];
@@ -249,7 +268,7 @@ button.big:active{transform:translateY(1px)}
     if(agent)L.push('Type d\'agent : '+agent);
     if(siteT)L.push('Type de site : '+siteT);
     if(surv)L.push('Surveillance : '+surv);
-    if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':'')+(dep?' — '+dep:'')+(sel.region?', '+sel.region.nom:''));if(sel._near&&sel._near.length)L.push('Situation : à '+sel._near[0].d+' km au '+sel._near[0].dir+' de '+sel._near[0].n+(sel._near[1]?' · proche de '+sel._near[1].n+' ('+sel._near[1].d+' km)':'')+(sel._near[2]?', '+sel._near[2].n+' ('+sel._near[2].d+' km)':''));}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':'')+(dep?' — '+dep:''));
+    if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':'')+(dep?' — '+dep:'')+(sel.region?', '+sel.region.nom:''));if(sel._near&&sel._near.length){var s0=sel._near[0],s1=sel._near[1];L.push('Grandes villes : '+s0.n+(s0.cp?' ('+s0.cp+')':'')+' à '+s0.d+' km ('+s0.dir+')'+(s1?' · '+s1.n+(s1.cp?' ('+s1.cp+')':'')+' à '+s1.d+' km ('+s1.dir+')':''));if(sel._drive)L.push('Trajet voiture : ~'+sel._drive.km+' km · ~'+sel._drive.dur+' → '+sel._drive.dest);}}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':'')+(dep?' — '+dep:''));
     if(quand==='asap')L.push('Disponibilité : DÈS QUE POSSIBLE');else if(date)L.push('Date : '+fmtD(date));
     var ps=plageStr();
     if(quand!=='asap' && ps) L.push('Horaires : '+ps);
