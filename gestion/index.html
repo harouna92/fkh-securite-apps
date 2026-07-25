@@ -228,8 +228,6 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Code postal</div><input id="fs-cp" placeholder="Code postal" autocomplete="off" inputmode="numeric"></label>
         <label class="f"><div class="lab">Heure de fin de service</div><div class="hm"><select id="fs-h" aria-label="Heure"></select><span>h</span><select id="fs-m" aria-label="Minutes"></select></div></label>
       </div>
-      <label class="chk"><input type="checkbox" id="fs-retard"><span>⏰ En retard</span></label>
-      <label class="f hidden" id="fs-retard-wrap"><div class="lab">Précision du retard</div><div class="hm"><select id="fs-retard-h" aria-label="Heures de retard"></select><span>h</span><select id="fs-retard-m" aria-label="Minutes de retard"></select></div></label>
       <label class="f"><div class="lab">📷 Photo de fin de service</div><select id="fs-photo"><option value="">—</option><option>Photo horodatée</option><option>Photo non horodatée</option><option>Pas de photo</option></select></label>
       <label class="chk"><input type="checkbox" id="fs-avise"><span>📞 Client avisé</span></label>
     </div>
@@ -465,14 +463,18 @@ button.big:active{transform:translateY(1px)}
   var TELDEF={SOTEL:[{l:'PC semaine',n:'05 61 14 87 21'},{l:'PC week-end',n:'05 57 19 17 40'},{l:'PC banque',n:'01 43 60 28 65'}],AQUILA:[{l:'',n:'04 90 84 24 24'}],SECURITAS:[{l:'Réponses Nantes',n:'02 28 09 25 39'},{l:'Réponse Lyon',n:'04 37 40 10 62'}],P2S:[{l:'',n:'01 81 91 41 59'}],FKH:[{l:'',n:'04 65 84 25 84'}],RANC:[{l:'',n:'04 42 05 45 88'}],COPS:[{l:'',n:'02 38 43 17 62'}],NEWANGELS:[{l:'',n:'01 30 54 99 12'}],ERYMA:[{l:'',n:'05 56 91 99 19'}]};
   function normCli(s){return (s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
   function telFor(c){var k=normCli(c);if(!k)return null;for(var key in TELDEF){if(k===key||k.indexOf(key)===0)return TELDEF[key];}return null;}
+  var DISPNAME={SOTEL:'SOTEL',AQUILA:'AQUILA',SECURITAS:'SECURITAS',P2S:'P2S',FKH:'FKH',RANC:'RANC',COPS:'COPS',NEWANGELS:"NEW ANGEL'S",ERYMA:'ERYMA'};
   function telNum(){ var s=byId('mv-tel'); if(!s)return ''; if(s.value==='__other__')return (byId('mv-tel-other').value||'').trim(); return (s.value||'').trim(); }
   function fillTel(){
-    var c=byId('client').value.trim(),opts=telFor(c),s=byId('mv-tel'),html='';
-    if(opts&&opts.length){ if(opts.length>1)html+='<option value="">— choisir le numéro —</option>'; opts.forEach(function(o){html+='<option value="'+o.n+'">'+(o.l?o.l+' : ':'')+o.n+'</option>';}); }
-    else if(c&&TEL[c]){ html+='<option value="'+TEL[c]+'">'+TEL[c]+'</option>'; }
-    else { html+='<option value="">— aucun —</option>'; }
+    var c=byId('client').value.trim(),cur=telFor(c),s=byId('mv-tel');
+    var html='<option value="">— choisir un numéro —</option>';
+    for(var key in TELDEF){ html+='<optgroup label="'+(DISPNAME[key]||key)+'">'; TELDEF[key].forEach(function(o){ html+='<option value="'+o.n+'">'+(o.l?o.l+' : ':'')+o.n+'</option>'; }); html+='</optgroup>'; }
+    var extra=''; for(var k in TEL){ if(!telFor(k)&&TEL[k]) extra+='<option value="'+TEL[k]+'">'+k+' : '+TEL[k]+'</option>'; }
+    if(extra) html+='<optgroup label="Autres (mémorisés)">'+extra+'</optgroup>';
     html+='<option value="__other__">✏️ Autre / saisir…</option>';
-    s.innerHTML=html; byId('mv-tel-other-wrap').classList.add('hidden'); byId('mv-tel-other').value='';
+    s.innerHTML=html;
+    if(cur&&cur.length===1) s.value=cur[0].n;
+    byId('mv-tel-other-wrap').classList.add('hidden'); byId('mv-tel-other').value='';
   }
   byId('client').addEventListener('change',function(){ fillTel(); genText(); });
   byId('mv-tel').addEventListener('change',function(){ byId('mv-tel-other-wrap').classList.toggle('hidden',this.value!=='__other__'); genText(); });
@@ -565,15 +567,15 @@ button.big:active{transform:translateY(1px)}
     function gen(){
       var cl=byId(pfx+'-client').value.trim(),si=byId(pfx+'-site').value.trim(),ag=byId(pfx+'-agent').value.trim(),vi=byId(pfx+'-ville').value.trim(),cp=byId(pfx+'-cp').value.trim();
       var h=byId(pfx+'-h').value,m=byId(pfx+'-m').value,heure=h?(h+':'+(m||'00')):'';
-      var retard=byId(pfx+'-retard').checked,photo=byId(pfx+'-photo').value,avise=byId(pfx+'-avise').checked;
-      var rtot=(+byId(pfx+'-retard-h').value||0)*60+(+byId(pfx+'-retard-m').value||0), rdur=rtot>=60?(Math.floor(rtot/60)+'h'+(rtot%60?pad2(rtot%60):'')):(rtot+' min');
+      var retardEl=byId(pfx+'-retard'),retard=retardEl&&retardEl.checked,photo=byId(pfx+'-photo').value,avise=byId(pfx+'-avise').checked;
+      var rtot=retardEl?((+byId(pfx+'-retard-h').value||0)*60+(+byId(pfx+'-retard-m').value||0)):0, rdur=rtot>=60?(Math.floor(rtot/60)+'h'+(rtot%60?pad2(rtot%60):'')):(rtot+' min');
       if(!(cl||si||ag||vi||cp||heure)){ byId(pfx+'-out').textContent='Remplis les infos…'; return; }
       var L=[emoji+' '+titre+' — FKH'];
       if(cl)L.push('Client : '+cl);
       if(si||vi||cp)L.push('Site : '+si+(vi?' — '+vi:'')+(cp?' ('+cp+')':''));
       if(ag)L.push('Agent : '+ag);
       if(heure)L.push(heureLabel+' : '+heure);
-      L.push('En retard : '+(retard?('OUI'+(rtot?' ('+rdur+')':'')):'non'));
+      if(retardEl)L.push('En retard : '+(retard?('OUI'+(rtot?' ('+rdur+')':'')):'non'));
       L.push('Photo : '+(photo||'non précisé'));
       L.push('Client avisé : '+(avise?'OUI':'non'));
       byId(pfx+'-out').textContent=L.join('\n');
@@ -582,10 +584,9 @@ button.big:active{transform:translateY(1px)}
     mkCombo(pfx+'-site',[],'fkh_site_noms',gen);
     mkCombo(pfx+'-agent',[],'fkh_agent_noms',gen);
     byId(pfx+'-h').innerHTML=HOPTS; byId(pfx+'-m').innerHTML=MOPTS;
-    var rh=''; for(var i=0;i<=12;i++)rh+='<option>'+i+'</option>'; byId(pfx+'-retard-h').innerHTML=rh; byId(pfx+'-retard-m').innerHTML=MOPTS;
-    byId(pfx+'-retard').addEventListener('change',function(){ byId(pfx+'-retard-wrap').classList.toggle('hidden',!this.checked); gen(); });
+    if(byId(pfx+'-retard')){ var rh=''; for(var i=0;i<=12;i++)rh+='<option>'+i+'</option>'; byId(pfx+'-retard-h').innerHTML=rh; byId(pfx+'-retard-m').innerHTML=MOPTS; byId(pfx+'-retard').addEventListener('change',function(){ byId(pfx+'-retard-wrap').classList.toggle('hidden',!this.checked); gen(); }); byId(pfx+'-retard-h').addEventListener('change',gen); byId(pfx+'-retard-m').addEventListener('change',gen); }
     [pfx+'-ville',pfx+'-cp'].forEach(function(id){byId(id).addEventListener('input',gen);});
-    [pfx+'-h',pfx+'-m',pfx+'-retard-h',pfx+'-retard-m',pfx+'-photo',pfx+'-avise'].forEach(function(id){byId(id).addEventListener('change',gen);});
+    [pfx+'-h',pfx+'-m',pfx+'-photo',pfx+'-avise'].forEach(function(id){byId(id).addEventListener('change',gen);});
     byId(pfx+'-copy').onclick=function(){var x=byId(pfx+'-out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=this,o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   }
   svcSection('ps','PRISE DE SERVICE','🟢','Heure de prise de service');
