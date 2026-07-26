@@ -419,13 +419,34 @@ button.big:active{transform:translateY(1px)}
       <div id="th-injoign"></div>
     </div>
   </section>
+
+  <section id="sec-assistant" class="hidden">
+    <div><h1>💬 Assistant</h1><p class="sub">Pose une question ou demande une analyse, ou signale un besoin / une observation sur l'appli. Claude répond ici (la page se rafraîchit toute seule).</p></div>
+    <div id="asg-offline" class="card" style="display:none"><p class="sub" style="margin:0">Connecte-toi avec le mot de passe commun pour utiliser l'assistant.</p></div>
+    <div id="asg-wrap">
+      <div class="subtabs" id="asg-tabs" style="margin-bottom:10px">
+        <button type="button" data-c="analyse" class="on">🔎 Analyse / question</button>
+        <button type="button" data-c="retour">🗣️ Observation / besoin</button>
+      </div>
+      <div class="card">
+        <label class="f"><div class="lab">Ton nom</div><input id="asg-auteur" placeholder="Qui écrit ?" autocomplete="off"></label>
+        <label class="f" style="margin-top:8px"><div class="lab" id="asg-lab">Ta question ou ce que tu veux faire analyser</div><textarea id="asg-texte" placeholder="Écris ici…"></textarea></label>
+        <button class="big" id="asg-send">Envoyer à Claude</button>
+        <div class="sub" id="asg-status" style="margin-top:6px"></div>
+      </div>
+      <div class="card">
+        <div class="lab" style="margin:0">Historique</div>
+        <div class="list" id="asg-thread"></div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <script>
 (function(){
   var byId=function(x){return document.getElementById(x)};
-  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();window.scrollTo(0,0);};});
+  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
   function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} if(typeof cloudPush==='function')cloudPush(k); }
@@ -1139,7 +1160,7 @@ button.big:active{transform:translateY(1px)}
   function cloudPoll(){ clearTimeout(CLOUD.pollT); CLOUD.pollT=setTimeout(function(){ cloudPull().then(cloudPoll); },4000); }
   function cloudBar(txt,online){ var b=byId('cloudbar'); if(!b)return; b.style.display='flex'; b.querySelector('.cb-txt').textContent=txt; b.className='cloudbar '+(online?'cb-on':'cb-off'); }
   function cloudLogout(msg){ CLOUD.on=false; CLOUD.pass=''; try{sessionStorage.removeItem('fkh_pass');}catch(e){} clearTimeout(CLOUD.pollT); var lo=byId('loginOverlay'); if(lo)lo.style.display='flex'; if(msg)byId('login-err').textContent=msg; }
-  function cloudStart(){ CLOUD.on=true; try{sessionStorage.setItem('fkh_pass',CLOUD.pass);}catch(e){} var lo=byId('loginOverlay'); if(lo)lo.style.display='none'; cloudBar('☁︎ Connecté — données partagées',true); cloudToggleImport(); cloudPull().then(function(){ cloudPoll(); }); }
+  function cloudStart(){ CLOUD.on=true; try{sessionStorage.setItem('fkh_pass',CLOUD.pass);}catch(e){} var lo=byId('loginOverlay'); if(lo)lo.style.display='none'; cloudBar('☁︎ Connecté — données partagées',true); cloudToggleImport(); cloudPull().then(function(){ cloudPoll(); }); if(typeof asgOnConnect==='function')asgOnConnect(); }
   // Y a-t-il des données locales pas encore dans le classeur commun ? (sert à n'afficher le bouton que quand c'est utile)
   function cloudHasLocalData(){ for(var i=0;i<SYNC_KEYS.length;i++){ var v=localStorage.getItem(SYNC_KEYS[i]); if(v&&v.length>2&&v!=='[]'&&v!=='{}')return true; } return false; }
   function cloudToggleImport(){ var ib=byId('cloud-import'); if(ib)ib.style.display=(CLOUD.on&&cloudHasLocalData())?'':'none'; }
@@ -1158,6 +1179,51 @@ button.big:active{transform:translateY(1px)}
       .then(function(r){return r.json();}).then(function(j){ btn.disabled=false; btn.textContent='Se connecter'; if(j&&j.ok){ CLOUD.pass=pass; cloudStart(); } else { err.textContent='Mot de passe incorrect.'; } })
       .catch(function(){ btn.disabled=false; btn.textContent='Se connecter'; err.textContent='Serveur injoignable. Vérifie ta connexion.'; });
   }
+  /* ===== Assistant — porte Claude (routes /msg du Worker) ===== */
+  var ASG={ canal:'analyse', last:0, pollT:null, msgs:{} };
+  function asgHdr(){ return {'Content-Type':'application/json','X-App-Password':CLOUD.pass}; }
+  function asgVisible(){ var s=byId('sec-assistant'); return s && !s.classList.contains('hidden'); }
+  function asgAvail(){ var on=CLOUD.on; var off=byId('asg-offline'),wr=byId('asg-wrap'); if(off)off.style.display=on?'none':''; if(wr)wr.style.display=on?'':'none'; }
+  function asgOnOpen(){ asgAvail(); if(CLOUD.on){ asgPull(); } asgRender(); }
+  function asgOnConnect(){ asgAvail(); asgPull().then(asgPoll); }
+  function asgSetCanal(c){ ASG.canal=(c==='retour')?'retour':'analyse'; document.querySelectorAll('#asg-tabs button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-c')===ASG.canal);}); byId('asg-lab').textContent=ASG.canal==='retour'?'Ton observation ou ton besoin sur l\'appli':'Ta question ou ce que tu veux faire analyser'; byId('asg-texte').placeholder=ASG.canal==='retour'?'Ex. il faudrait pouvoir exporter le suivi des appels en PDF…':'Écris ta question ici…'; }
+  function asgSend(){
+    if(!CLOUD.on)return;
+    var t=(byId('asg-texte').value||'').trim(); if(!t){byId('asg-status').textContent='Écris un message d\'abord.';return;}
+    var a=(byId('asg-auteur').value||'').trim(); try{localStorage.setItem('fkh_asg_nom',a);}catch(e){}
+    var btn=byId('asg-send'); btn.disabled=true; btn.textContent='Envoi…'; byId('asg-status').textContent='';
+    fetch(CLOUD.base+'/msg',{method:'POST',headers:asgHdr(),body:JSON.stringify({canal:ASG.canal,auteur:a,texte:t})})
+      .then(function(r){return r.json();}).then(function(j){ btn.disabled=false; btn.textContent='Envoyer à Claude';
+        if(j&&j.ok){ byId('asg-texte').value=''; byId('asg-status').textContent='✅ Envoyé — Claude répondra ici.'; asgPull(); }
+        else { byId('asg-status').textContent='Échec de l\'envoi.'; } })
+      .catch(function(){ btn.disabled=false; btn.textContent='Envoyer à Claude'; byId('asg-status').textContent='Serveur injoignable.'; });
+  }
+  function asgPull(){
+    if(!CLOUD.on)return Promise.resolve();
+    return fetch(CLOUD.base+'/msg?since='+ASG.last,{headers:asgHdr()})
+      .then(function(r){ if(r.status===401)throw new Error('401'); return r.json(); })
+      .then(function(j){ if(!j)return; (j.messages||[]).forEach(function(m){ASG.msgs[m.id]=m;}); if(j.now)ASG.last=j.now; if(asgVisible())asgRender(); })
+      .catch(function(){});
+  }
+  function asgPoll(){ clearTimeout(ASG.pollT); ASG.pollT=setTimeout(function(){ asgPull().then(asgPoll); },5000); }
+  function asgRender(){
+    var box=byId('asg-thread'); if(!box)return;
+    var arr=Object.keys(ASG.msgs).map(function(k){return ASG.msgs[k];}).sort(function(a,b){return b.id-a.id;});
+    if(!arr.length){ box.innerHTML='<div class="sub">Aucun message pour l\'instant.</div>'; return; }
+    box.innerHTML=arr.map(function(m){
+      var d=new Date(m.created_at), when=(''+d.getDate()).padStart(2,'0')+'/'+(''+(d.getMonth()+1)).padStart(2,'0')+' '+(''+d.getHours()).padStart(2,'0')+':'+(''+d.getMinutes()).padStart(2,'0');
+      var badge=m.canal==='retour'?'🗣️ Observation':'🔎 Analyse';
+      var rep=m.reponse?('<div style="margin-top:6px;padding:8px;border-radius:8px;background:var(--panel);border-left:3px solid var(--brand)"><b>Claude :</b> '+esc(m.reponse)+'</div>'):('<div style="margin-top:6px;font-size:12px;color:var(--muted)">⏳ En attente de réponse…</div>');
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--panel2)"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">'+badge+' · '+esc(m.auteur||'—')+' · '+when+'</div><div>'+esc(m.texte)+'</div>'+rep+'</div>';
+    }).join('');
+  }
+  (function initAsg(){
+    var sv=null; try{sv=localStorage.getItem('fkh_asg_nom');}catch(e){} if(sv&&byId('asg-auteur'))byId('asg-auteur').value=sv;
+    var sb=byId('asg-send'); if(sb)sb.addEventListener('click',asgSend);
+    document.querySelectorAll('#asg-tabs button').forEach(function(b){ b.addEventListener('click',function(){ asgSetCanal(b.getAttribute('data-c')); }); });
+    asgAvail();
+  })();
+
   (function initCloud(){
     var lo=byId('loginOverlay');
     if(!CLOUD.base){ if(lo)lo.style.display='none'; return; } // pas de backend => 100% local, rien ne change
