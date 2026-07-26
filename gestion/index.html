@@ -460,6 +460,7 @@ button.big:active{transform:translateY(1px)}
       <div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="sa-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="sa-to"></label></div>
       <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><button type="button" class="sa-preset" data-d="1">Aujourd'hui</button><button type="button" class="sa-preset" data-d="3">3 j</button><button type="button" class="sa-preset" data-d="7">7 j</button><button type="button" class="sa-preset" data-d="30">30 j</button><button type="button" class="sa-preset" data-d="all">Tout</button></div>
       <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><span class="sub" style="margin:0;align-self:center">Type :</span><button type="button" class="sa-type on" data-ty="all">Tous</button><button type="button" class="sa-type" data-ty="avant">☎ Avant</button><button type="button" class="sa-type" data-ty="prise">🟢 Prise</button><button type="button" class="sa-type" data-ty="pendant">🌙 Pendant</button><button type="button" class="sa-type" data-ty="fin">🔚 Fin</button></div>
+      <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><span class="sub" style="margin:0;align-self:center">Tranche :</span><button type="button" class="sa-slice on" data-sl="all">Toutes</button><button type="button" class="sa-slice" data-sl="jour">☀️ Jour 8h→20h</button><button type="button" class="sa-slice" data-sl="nuit">🌙 Nuit 20h→8h</button></div>
       <button type="button" class="big" id="sa-reset" style="margin-top:8px;background:var(--panel2);color:var(--ink);border:1px solid var(--line)">↺ Revenir au défaut (aujourd'hui · tous · chronologique)</button>
     </div>
     <div id="sa-alert" style="position:fixed;right:12px;bottom:14px;z-index:59;max-width:340px;max-height:62vh;overflow:auto;background:var(--panel);border:2px solid var(--bad);border-radius:12px;padding:10px 12px;box-shadow:0 6px 24px rgba(0,0,0,.45);display:none"></div>
@@ -2056,8 +2057,9 @@ button.big:active{transform:translateY(1px)}
 
   // ===== Suivi des appels : agenda chronologique des appels à faire (issus des missions) =====
   function saSet(mid,key,patch){ var S=ssLoad(); if(!S[mid])S[mid]={}; var r=S[mid][key]||{}; for(var k in patch)r[k]=patch[k]; S[mid][key]=r; ssSave(S); }
-  var saType='all';
+  var saType='all', saSlice='all';
   function saTypeMatch(key){ if(saType==='all')return true; if(saType==='avant')return key==='j15'||key==='route'; if(saType==='prise')return key==='prise'; if(saType==='pendant')return key.indexOf('ctrl')===0; if(saType==='fin')return key==='fin'; return true; }
+  function saSliceMatch(e){ if(saSlice==='all')return true; var m=toMin(e.mheure); if(m==null)return true; var h=Math.floor(m/60), day=(h>=8&&h<20); return saSlice==='jour'?day:!day; }
   function saEntries(from,to){
     var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; });
     if(typeof apDeconflict==='function')apDeconflict(missions,10);
@@ -2070,12 +2072,16 @@ button.big:active{transform:translateY(1px)}
     var wrap=byId('sa-body'); if(!wrap)return;
     var from=byId('sa-from')?byId('sa-from').value:'', to=byId('sa-to')?byId('sa-to').value:'';
     var lbl=(from||to)?('du '+(from?from.split('-').reverse().join('/'):'…')+' au '+(to?to.split('-').reverse().join('/'):'…')):'toute la période';
-    var entries=saEntries(from,to).filter(function(e){return saTypeMatch(e.key);});
+    var entries=saEntries(from,to).filter(function(e){return saTypeMatch(e.key)&&saSliceMatch(e);});
     document.querySelectorAll('.sa-type').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-ty')===saType);});
-    if(!entries.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucun appel '+esc(lbl)+(saType!=='all'?' (type filtré)':'')+'. (Il faut des missions validées avec une heure sur cette période.)</div></div>'; return; }
-    var S=ssLoad(), doneN=0; entries.forEach(function(e){ if(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done)doneN++; });
+    document.querySelectorAll('.sa-slice').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-sl')===saSlice);});
+    var slLbl=saSlice==='jour'?' · ☀️ tranche jour (8h→20h)':saSlice==='nuit'?' · 🌙 tranche nuit (20h→8h)':'';
+    if(!entries.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucun appel '+esc(lbl)+slLbl+(saType!=='all'?' (type filtré)':'')+'. (Il faut des missions validées avec une heure sur cette période.)</div></div>'; return; }
+    var S=ssLoad(), doneN=0, cnt={prise:0,fin:0,route:0,j15:0,ctrl:0,tenue:0}; entries.forEach(function(e){ if(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done)doneN++; var k=e.key; if(cnt[k]!=null)cnt[k]++; else if(k.indexOf('ctrl')===0)cnt.ctrl++; });
     var STATUTS=['','✅ RAS','⚠️ Injoignable','🔄 Autre'];
-    wrap.innerHTML='<div class="card"><div class="lab" style="margin:0">'+entries.length+' appel'+(entries.length>1?'s':'')+' — '+esc(lbl)+' · '+doneN+' fait'+(doneN>1?'s':'')+'</div></div>'+entries.map(function(e){
+    function saCnt(ic,lb,n){ return n?'<span style="display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:1px 8px;margin:2px 4px 0 0;font-size:12px;font-weight:700">'+ic+' '+lb+' : '+n+'</span>':''; }
+    var breakdown=saCnt('🚗','Route',cnt.route)+saCnt('☎','Pré-prise',cnt.j15)+saCnt('🟢','Prise',cnt.prise)+saCnt('🎛️','Contrôle',cnt.ctrl)+saCnt('🦺','Tenue',cnt.tenue)+saCnt('🔚','Fin',cnt.fin);
+    wrap.innerHTML='<div class="card"><div class="lab" style="margin:0 0 4px">'+entries.length+' appel'+(entries.length>1?'s':'')+' — '+esc(lbl)+slLbl+'</div><div class="fa-d" style="margin:0 0 4px">✅ '+doneN+' fait'+(doneN>1?'s':'')+' · <span style="color:var(--warn);font-weight:700">'+(entries.length-doneN)+' à faire</span></div><div>'+breakdown+'</div></div>'+entries.map(function(e){
       var r=(S[e.mid]&&S[e.mid][e.key])||{}, done=!!r.done, d0='data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'"';
       var extra=done?(' <span style="color:var(--ok)">✓ '+esc(r.hm||'')+'</span>'+(r.retard>0?' <span style="color:var(--bad)">saisie +'+r.retard+' min</span>':'')):'';
       if(done&&(e.key==='prise'||e.key==='fin')&&!r.avise)extra+=' <span style="color:var(--bad);font-weight:700">⚠ CLIENT NON AVISÉ</span>';
@@ -2126,7 +2132,8 @@ button.big:active{transform:translateY(1px)}
   if(byId('sa-from'))byId('sa-from').addEventListener('change',renderSuiviAppels);
   if(byId('sa-to'))byId('sa-to').addEventListener('change',renderSuiviAppels);
   document.querySelectorAll('.sa-type').forEach(function(b){ b.addEventListener('click',function(){ saType=b.getAttribute('data-ty'); renderSuiviAppels(); }); });
-  if(byId('sa-reset'))byId('sa-reset').onclick=function(){ saType='all'; var t=impTodayISO(); if(byId('sa-from'))byId('sa-from').value=t; if(byId('sa-to'))byId('sa-to').value=t; renderSuiviAppels(); };
+  document.querySelectorAll('.sa-slice').forEach(function(b){ b.addEventListener('click',function(){ saSlice=b.getAttribute('data-sl'); renderSuiviAppels(); }); });
+  if(byId('sa-reset'))byId('sa-reset').onclick=function(){ saType='all'; saSlice='all'; var t=impTodayISO(); if(byId('sa-from'))byId('sa-from').value=t; if(byId('sa-to'))byId('sa-to').value=t; renderSuiviAppels(); };
   (function(){ var t=impTodayISO(); if(byId('sa-from')&&!byId('sa-from').value)byId('sa-from').value=t; if(byId('sa-to')&&!byId('sa-to').value)byId('sa-to').value=t; })();
   (function(){ function tick(){ var el=byId('sa-clock'); if(!el)return; var d=new Date(); el.textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2); } tick(); setInterval(tick,1000); })();
 
