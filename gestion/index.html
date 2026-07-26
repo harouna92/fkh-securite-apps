@@ -454,7 +454,7 @@ button.big:active{transform:translateY(1px)}
     </div>
   </section>
   <section id="sec-suiviappels" class="hidden">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><h1 style="margin:0">📞 Suivi des appels</h1><div id="sa-clock" style="font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;padding:4px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">--:--:--</div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><h1 style="margin:0">📞 Suivi des appels</h1><div id="sa-clock" style="position:fixed;right:14px;bottom:14px;z-index:60;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;padding:6px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);box-shadow:0 4px 16px rgba(0,0,0,.35)">--:--:--</div></div>
     <p class="sub">Agenda chronologique des appels à faire (issus des missions validées). Pour chaque ligne : coche « Fait » (heure réelle enregistrée), choisis le statut, ajoute un commentaire. Heures 🇫🇷 + 🇲🇱.</p>
     <div class="card">
       <div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="sa-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="sa-to"></label></div>
@@ -2018,14 +2018,19 @@ button.big:active{transform:translateY(1px)}
     var S=ssLoad(), doneN=0; entries.forEach(function(e){ if(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done)doneN++; });
     var STATUTS=['','✅ RAS','⚠️ Injoignable','🔄 Autre'];
     wrap.innerHTML='<div class="card"><div class="lab" style="margin:0">'+entries.length+' appel'+(entries.length>1?'s':'')+' — '+esc(lbl)+' · '+doneN+' fait'+(doneN>1?'s':'')+'</div></div>'+entries.map(function(e){
-      var r=(S[e.mid]&&S[e.mid][e.key])||{}, done=!!r.done;
-      var opts=STATUTS.map(function(s){return '<option value="'+esc(s)+'"'+(r.statut===s?' selected':'')+'>'+(s||'— statut —')+'</option>';}).join('');
-      var extra=done?(' <span style="color:var(--ok)">✓ '+esc(r.hm||'')+'</span>'+(r.retard>0?' <span style="color:var(--bad)">retard '+r.retard+' min</span>':'')):'';
+      var r=(S[e.mid]&&S[e.mid][e.key])||{}, done=!!r.done, d0='data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'"';
+      var extra=done?(' <span style="color:var(--ok)">✓ '+esc(r.hm||'')+'</span>'+(r.retard>0?' <span style="color:var(--bad)">saisie +'+r.retard+' min</span>':'')):'';
+      if(done&&(e.key==='prise'||e.key==='fin')&&!r.avise)extra+=' <span style="color:var(--bad);font-weight:700">⚠ CLIENT NON AVISÉ</span>';
       var ct=e.mdate?(new Date(e.mdate+'T00:00:00').getTime()+e.abs*60000):'';
+      var fait='<label class="chk" style="margin:0"><input type="checkbox" class="sa-done" '+d0+' data-h="'+esc(e.heure)+'"'+(done?' checked':'')+'><span>Fait</span></label>';
+      var note='<input class="sa-f" data-f="note" '+d0+' placeholder="commentaire…" value="'+esc(r.note||'')+'" style="flex:1;min-width:120px">';
+      var statut='<select class="sa-f" data-f="statut" '+d0+'>'+STATUTS.map(function(s){return '<option value="'+esc(s)+'"'+(r.statut===s?' selected':'')+'>'+(s||'— statut —')+'</option>';}).join('')+'</select>';
+      var photoSel='<select class="sa-f" data-f="photo" '+d0+'>'+['','Photo horodatée','Photo non horodatée','Pas de photo'].map(function(p){return '<option value="'+esc(p)+'"'+(r.photo===p?' selected':'')+'>'+(p||'📷 photo ?')+'</option>';}).join('')+'</select>';
+      var avise='<label class="chk" style="margin:0;'+(done&&!r.avise?'color:var(--bad)':'')+'"><input type="checkbox" class="sa-f" data-f="avise" '+d0+(r.avise?' checked':'')+'><span>📞 Client avisé</span></label>';
+      var agret='<label class="chk" style="margin:0"><input type="checkbox" class="sa-f" data-f="agRetard" '+d0+(r.agRetard?' checked':'')+'><span>⏰ Agent en retard</span></label><input class="sa-f" data-f="agRetardMin" '+d0+' type="number" min="0" placeholder="min" value="'+esc(r.agRetardMin!=null?r.agRetardMin:'')+'" style="width:62px">';
+      var fields=(e.key==='prise')?(fait+agret+photoSel+avise+note):(e.key==='fin')?(fait+photoSel+avise+note):(fait+statut+note);
       return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" style="padding:8px'+(done?';opacity:.6':'')+'"><div class="fa-n"><span class="sa-tag"></span><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+e.label+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'
-        +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center"><label class="chk" style="margin:0"><input type="checkbox" class="sa-done" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'" data-h="'+esc(e.heure)+'"'+(done?' checked':'')+'><span>Fait</span></label>'
-        +'<select class="sa-st" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'">'+opts+'</select>'
-        +'<input class="sa-note" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'" placeholder="commentaire…" value="'+esc(r.note||'')+'" style="flex:1;min-width:130px"></div></div>';
+        +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">'+fields+'</div></div>';
     }).join('');
     saColorize();
   }
@@ -2036,9 +2041,9 @@ button.big:active{transform:translateY(1px)}
     byId('sa-body').addEventListener('change',function(e){
       var t=e.target, mid=t.getAttribute('data-mid'), key=t.getAttribute('data-key'); if(!mid)return;
       if(t.classList.contains('sa-done')){ if(t.checked){ var now=ssNowHM(),rt=toMin(now)-toMin(t.getAttribute('data-h')); saSet(mid,key,{done:true,hm:now,at:Date.now(),retard:(rt==null?null:rt)}); } else { saSet(mid,key,{done:false}); } renderSuiviAppels(); }
-      else if(t.classList.contains('sa-st')){ saSet(mid,key,{statut:t.value}); }
+      else if(t.classList.contains('sa-f')){ var f=t.getAttribute('data-f'),v=(t.type==='checkbox')?t.checked:t.value,p={}; p[f]=v; saSet(mid,key,p); if(f==='avise'||f==='agRetard')renderSuiviAppels(); }
     });
-    byId('sa-body').addEventListener('input',function(e){ var t=e.target; if(t.classList.contains('sa-note'))saSet(t.getAttribute('data-mid'),t.getAttribute('data-key'),{note:t.value}); });
+    byId('sa-body').addEventListener('input',function(e){ var t=e.target; if(t.classList.contains('sa-f')&&(t.type==='text'||t.type==='number')){ var f=t.getAttribute('data-f'),p={}; p[f]=t.value; saSet(t.getAttribute('data-mid'),t.getAttribute('data-key'),p); } });
   }
   document.querySelectorAll('.sa-preset').forEach(function(b){ b.addEventListener('click',function(){ var d=b.getAttribute('data-d'),t=impTodayISO(); if(d==='all'){ byId('sa-from').value=''; byId('sa-to').value=''; } else { var n=parseInt(d,10)||1; byId('sa-from').value=t; byId('sa-to').value=svcAddDays(t,n-1); } renderSuiviAppels(); }); });
   if(byId('sa-from'))byId('sa-from').addEventListener('change',renderSuiviAppels);
@@ -2066,6 +2071,7 @@ button.big:active{transform:translateY(1px)}
         if(r.statut==='⚠️ Injoignable')anom.push({sev:2,ic:'🔴',type:'Agent injoignable',agent:e.agent,when:e.mdate+' '+e.heure,detail:[e.site,r.note].filter(Boolean).join(' · ')});
         if(r.done&&r.retard>5)anom.push({sev:1,ic:'⏱️',type:'Appel pointé en retard',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · +'+r.retard+' min'});
         if(!r.done&&d.lateMin!=null&&d.lateMin>=10&&(typeof saGolive!=='function'||d.ct>=saGolive()))anom.push({sev:3,ic:'⛔',type:'Appel non fait',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · pas coché ('+Math.round(d.lateMin)+' min)'});
+        if((e.key==='prise'||e.key==='fin')&&r.done&&!r.avise)anom.push({sev:2,ic:'📞',type:'Client NON avisé',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · '+(e.key==='prise'?'prise':'fin')+' de service'});
       });
       Object.keys(affAg).forEach(function(id){ var a=affAg[id],t=tenueOf(a); if(t.none)anom.push({sev:1,ic:'🦺',type:'Tenue jamais contrôlée',agent:a.nom,when:'',detail:''}); else if(t.days!=null&&t.days>14)anom.push({sev:1,ic:'🦺',type:'Tenue à recontrôler',agent:a.nom,when:'',detail:t.days+' j'}); });
       anom.sort(function(a,b){return b.sev-a.sev;});
@@ -2079,6 +2085,8 @@ button.big:active{transform:translateY(1px)}
     var lheure=doneRet.filter(function(d){return d.r.retard<=1;}).length, r5=doneRet.filter(function(d){return d.r.retard>1&&d.r.retard<=5;}).length, rp5=doneRet.filter(function(d){return d.r.retard>5;}).length;
     var injo=data.filter(function(d){return d.r.statut==='⚠️ Injoignable';}).length;
     var nonfait=data.filter(function(d){return !d.r.done&&d.lateMin!=null&&d.lateMin>=10&&(typeof saGolive!=='function'||d.ct>=saGolive());}).length;
+    var pfDone=data.filter(function(d){return (d.e.key==='prise'||d.e.key==='fin')&&d.r.done;});
+    var clientNA=pfDone.filter(function(d){return !d.r.avise;}).length, clientOK=pfDone.length-clientNA;
     var aff=miss.filter(function(m){return m.agentId;}).length, toaff=miss.length-aff;
     var jamctrl=0,arectrl=0; Object.keys(affAg).forEach(function(id){var t=tenueOf(affAg[id]);if(t.none)jamctrl++;else if(t.days!=null&&t.days>14)arectrl++;});
     function kpi(t,v,col){ return '<div style="flex:1;min-width:120px;border:1px solid var(--line);border-radius:10px;padding:10px"><div style="font-size:22px;font-weight:800'+(col?';color:'+col:'')+'">'+v+'</div><div class="sub" style="margin:2px 0 0">'+t+'</div></div>'; }
@@ -2087,7 +2095,8 @@ button.big:active{transform:translateY(1px)}
       +kpi('Retard moyen de coche',(avgRet==null?'—':(avgRet<=0?'à l\'heure':'+'+avgRet+' min')))
       +kpi('Injoignables',injo,injo?'var(--bad)':'')
       +kpi('Non faits (>10 min)',nonfait,nonfait?'var(--bad)':'')
-      +'</div><div class="sub" style="margin:8px 0 0">Ponctualité : '+lheure+' à l\'heure · '+r5+' (+≤5 min) · '+rp5+' (+>5 min)</div></div>';
+      +kpi('Clients NON avisés',clientNA,clientNA?'var(--bad)':'')
+      +'</div><div class="sub" style="margin:8px 0 0">Ponctualité : '+lheure+' à l\'heure · '+r5+' (+≤5 min) · '+rp5+' (+>5 min) · Clients avisés : '+clientOK+'/'+pfDone.length+'</div></div>';
     h+='<div class="card"><div class="lab" style="margin:0 0 8px">📋 Missions</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+kpi('Validées',miss.length)+kpi('Affectées',aff)+kpi('À affecter',toaff,toaff?'var(--warn)':'')+'</div></div>';
     h+='<div class="card"><div class="lab" style="margin:0 0 8px">🦺 Tenues (agents affectés)</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+kpi('Jamais contrôlées',jamctrl,jamctrl?'var(--bad)':'')+kpi('À recontrôler (>2 sem)',arectrl,arectrl?'var(--warn)':'')+'</div><div class="sub" style="margin:8px 0 0">📷 Photos manquantes : suivi à venir (avec la capture photo).</div></div>';
     wrap.innerHTML=h;
