@@ -366,6 +366,7 @@ button.big:active{transform:translateY(1px)}
         <label class="chk"><input type="checkbox" id="fa-voiture"><span>🚗 Véhicule</span></label>
         <label class="chk"><input type="checkbox" id="fa-ads"><span>🛡️ ADS</span></label>
       </div>
+      <label class="chk"><input type="checkbox" id="fa-verif"><span>🟢 Fiche vérifiée (infos validées)</span></label>
       <label class="f"><div class="lab">🚨 Villes d'intervention (une par ligne) — pour retrouver l'agent quand une intervention tombe dans cette ville</div><textarea id="fa-interv" placeholder="Ex.&#10;Toulon&#10;La Seyne-sur-Mer" style="min-height:44px"></textarea></label>
       <div class="hint" id="fa-err" style="color:var(--bad)"></div>
       <button class="big" id="fa-add">➕ Ajouter l'agent</button>
@@ -452,13 +453,15 @@ button.big:active{transform:translateY(1px)}
     </div>
   </section>
   <section id="sec-suiviappels" class="hidden">
-    <div><h1>Suivi des appels</h1><p class="sub">Pointe chaque appel (⏱ heure réelle enregistrée au clic), ajoute un commentaire, repère les retards. Les sites proviennent de l'onglet Thiam.</p></div>
+    <div><h1>📞 Suivi des appels</h1><p class="sub">Agenda chronologique des appels à faire (issus des missions validées). Pour chaque ligne : coche « Fait » (heure réelle enregistrée), choisis le statut, ajoute un commentaire. Heures 🇫🇷 + 🇲🇱.</p></div>
     <div class="card">
+      <div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="sa-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="sa-to"></label></div>
+      <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><button type="button" class="sa-preset" data-d="1">Aujourd'hui</button><button type="button" class="sa-preset" data-d="3">3 j</button><button type="button" class="sa-preset" data-d="7">7 j</button><button type="button" class="sa-preset" data-d="30">30 j</button><button type="button" class="sa-preset" data-d="all">Tout</button></div>
+    </div>
+    <div id="sa-body"></div>
+    <div style="display:none">
       <div id="th-lateBadge" class="th-late-badge" style="display:none"></div>
       <div class="thboard" id="th-board"></div>
-    </div>
-    <div class="card">
-      <div class="lab" style="margin:0">📵 Agents injoignables — statistiques</div>
       <div id="th-injoign"></div>
     </div>
   </section>
@@ -529,8 +532,7 @@ button.big:active{transform:translateY(1px)}
     <div><h1>🏢 Suivi site</h1><p class="sub">Aperçu de la future section unifiée (Prise/Fin de service + appels + Thiam). Une fiche par mission : début du service (J‑15 → 🟢 prise → +30 min), contrôles, fin. Heures 🇫🇷 France + 🇲🇱 Mali. <b>Version aperçu — les anciens onglets restent en place.</b></p></div>
     <div id="ss-filter" style="margin:8px 0"><div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="ss-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="ss-to"></label></div><div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:6px"><button type="button" class="ss-preset" data-d="1">Aujourd'hui</button><button type="button" class="ss-preset" data-d="3">3 j</button><button type="button" class="ss-preset" data-d="7">7 j</button><button type="button" class="ss-preset" data-d="20">20 j</button><button type="button" class="ss-preset" data-d="40">40 j</button></div></div>
     <div class="subtabs" id="ssTabs">
-      <button data-t="suivi" class="on">▶️ Suivi</button>
-      <button data-t="regl">⚙️ Réglages</button>
+      <button data-t="regl" class="on">⚙️ Réglages</button>
       <button data-t="hist">🗂️ Historique</button>
     </div>
     <div id="ss-body"></div>
@@ -541,7 +543,7 @@ button.big:active{transform:translateY(1px)}
 (function(){
   var byId=function(x){return document.getElementById(x)};
   var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','appels','suivisite'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
   function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} if(typeof cloudPush==='function')cloudPush(k); }
@@ -1045,17 +1047,17 @@ button.big:active{transform:translateY(1px)}
   byId('fa-refville').addEventListener('input',function(){var q=this.value.trim();faRef=null;clearTimeout(faRT);if(q.length<2){byId('sugg-fa-refville').classList.add('hidden');renderFA();return;}faRT=setTimeout(function(){cityAuto(q,'sugg-fa-refville',function(c){var co=c.centre&&c.centre.coordinates;faRef={nom:c.nom,la:co?co[1]:null,lo:co?co[0]:null};byId('fa-refville').value=c.nom;byId('sugg-fa-refville').classList.add('hidden');renderFA();});},250);});
   ['fa-radius','fa-f-ads','fa-f-voiture','fa-f-verif'].forEach(function(id){byId(id).addEventListener('change',renderFA);});
   byId('fa-search').addEventListener('input',renderFA);
-  function resetFAform(){ ['fa-nom','fa-tel','fa-ville','fa-interv'].forEach(function(id){byId(id).value='';}); byId('fa-fiab').value=''; byId('fa-voiture').checked=false; byId('fa-ads').checked=false; byId('fa-err').textContent=''; faSel=null; faEdit=null; byId('fa-add').textContent='➕ Ajouter l\'agent'; }
+  function resetFAform(){ ['fa-nom','fa-tel','fa-ville','fa-interv'].forEach(function(id){byId(id).value='';}); byId('fa-fiab').value=''; byId('fa-voiture').checked=false; byId('fa-ads').checked=false; byId('fa-verif').checked=true; byId('fa-err').textContent=''; faSel=null; faEdit=null; byId('fa-add').textContent='➕ Ajouter l\'agent'; }
   byId('fa-add').onclick=function(){
-    var nom=byId('fa-nom').value.trim(),tels=parseTels(byId('fa-tel').value),ville=byId('fa-ville').value.trim(),fiab=byId('fa-fiab').value,voiture=byId('fa-voiture').checked,ads=byId('fa-ads').checked,interv=parseTels(byId('fa-interv').value);
+    var nom=byId('fa-nom').value.trim(),tels=parseTels(byId('fa-tel').value),ville=byId('fa-ville').value.trim(),fiab=byId('fa-fiab').value,voiture=byId('fa-voiture').checked,ads=byId('fa-ads').checked,interv=parseTels(byId('fa-interv').value),verif=byId('fa-verif').checked;
     if(!(nom||tels.length||ville))return;
     var used={}; FA.forEach(function(a){ if(a.id!==faEdit&&a.tels) a.tels.forEach(function(t){var k=telKey(t);if(k)used[k]=a.nom||'un autre agent';}); });
     var conflict=null; tels.forEach(function(t){var k=telKey(t);if(k&&used[k])conflict=t+' → déjà attribué à '+used[k];});
     if(conflict){ byId('fa-err').textContent='⚠️ '+conflict; return; }
     byId('fa-err').textContent='';
     var g=(faSel&&faSel.nom===ville)?faSel:{nom:ville,cp:'',la:null,lo:null,dep:'',depnom:''};
-    if(faEdit){ var a=null,i; for(i=0;i<FA.length;i++)if(FA[i].id===faEdit){a=FA[i];break;} if(a){a.nom=nom;a.tels=tels;a.ville=g.nom;a.cp=g.cp;a.la=g.la;a.lo=g.lo;a.dep=g.dep;a.depnom=g.depnom;a.fiab=fiab;a.voiture=voiture;a.ads=ads;a.interv=interv;a.verifie=true;} }
-    else { FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tels:tels,ville:g.nom,cp:g.cp,la:g.la,lo:g.lo,dep:g.dep,depnom:g.depnom,fiab:fiab,voiture:voiture,ads:ads,interv:interv,verifie:true}); }
+    if(faEdit){ var a=null,i; for(i=0;i<FA.length;i++)if(FA[i].id===faEdit){a=FA[i];break;} if(a){a.nom=nom;a.tels=tels;a.ville=g.nom;a.cp=g.cp;a.la=g.la;a.lo=g.lo;a.dep=g.dep;a.depnom=g.depnom;a.fiab=fiab;a.voiture=voiture;a.ads=ads;a.interv=interv;a.verifie=verif;} }
+    else { FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tels:tels,ville:g.nom,cp:g.cp,la:g.la,lo:g.lo,dep:g.dep,depnom:g.depnom,fiab:fiab,voiture:voiture,ads:ads,interv:interv,verifie:verif}); }
     saveFA(); resetFAform(); renderFA();
   };
   function renderFA(){
@@ -1083,7 +1085,7 @@ button.big:active{transform:translateY(1px)}
     }).join('');
     byId('fa-list').querySelectorAll('[data-fav]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fav'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id)a=FA[i];if(a){a.verifie=!a.verifie;saveFA();renderFA();}};});
     byId('fa-list').querySelectorAll('[data-fad]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fad');FA=FA.filter(function(x){return x.id!==id;});saveFA();renderFA();};});
-    byId('fa-list').querySelectorAll('[data-fae]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fae'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id){a=FA[i];break;}if(a){byId('fa-nom').value=a.nom||'';byId('fa-tel').value=(a.tels||(a.tel?[a.tel]:[])).join('\n');byId('fa-ville').value=a.ville||'';byId('fa-fiab').value=a.fiab||'';byId('fa-voiture').checked=!!a.voiture;byId('fa-ads').checked=!!a.ads;byId('fa-interv').value=(a.interv||[]).join('\n');faSel={nom:a.ville,cp:a.cp,la:a.la,lo:a.lo,dep:a.dep,depnom:a.depnom};faEdit=a.id;byId('fa-add').textContent='✔️ Enregistrer';window.scrollTo(0,0);}};});
+    byId('fa-list').querySelectorAll('[data-fae]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fae'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id){a=FA[i];break;}if(a){byId('fa-nom').value=a.nom||'';byId('fa-tel').value=(a.tels||(a.tel?[a.tel]:[])).join('\n');byId('fa-ville').value=a.ville||'';byId('fa-fiab').value=a.fiab||'';byId('fa-voiture').checked=!!a.voiture;byId('fa-ads').checked=!!a.ads;byId('fa-verif').checked=!!a.verifie;byId('fa-interv').value=(a.interv||[]).join('\n');faSel={nom:a.ville,cp:a.cp,la:a.la,lo:a.lo,dep:a.dep,depnom:a.depnom};faEdit=a.id;byId('fa-add').textContent='✔️ Enregistrer';window.scrollTo(0,0);}};});
   }
   renderFA();
 
@@ -1907,7 +1909,7 @@ button.big:active{transform:translateY(1px)}
   (function(){ var t=impTodayISO(); if(byId('ap-from')&&!byId('ap-from').value)byId('ap-from').value=t; if(byId('ap-to')&&!byId('ap-to').value)byId('ap-to').value=t; var p1=document.querySelector('.ap-preset[data-d="1"]'); if(p1)p1.classList.add('on'); })();
 
   // ===== Suivi site (aperçu unifié : début service / contrôles / fin, une fiche par mission) =====
-  var ssTab='suivi';
+  var ssTab='regl';
   function ssLoad(){ var s=load('fkh_suivisite'); return (s&&typeof s==='object'&&!Array.isArray(s))?s:{}; }
   function ssSave(s){ save('fkh_suivisite',s); }
   function ssParams(){ var p=load('fkh_ss_params'); if(!p||typeof p!=='object'||Array.isArray(p))p={}; return {before:(p.before!=null?p.before:15), after:(p.after!=null?p.after:30)}; }
@@ -1983,6 +1985,47 @@ button.big:active{transform:translateY(1px)}
   if(byId('ss-from'))byId('ss-from').addEventListener('change',renderSuiviSite);
   if(byId('ss-to'))byId('ss-to').addEventListener('change',renderSuiviSite);
   (function(){ var t=impTodayISO(); if(byId('ss-from')&&!byId('ss-from').value)byId('ss-from').value=t; if(byId('ss-to')&&!byId('ss-to').value)byId('ss-to').value=t; })();
+
+  // ===== Suivi des appels : agenda chronologique des appels à faire (issus des missions) =====
+  function saSet(mid,key,patch){ var S=ssLoad(); if(!S[mid])S[mid]={}; var r=S[mid][key]||{}; for(var k in patch)r[k]=patch[k]; S[mid][key]=r; ssSave(S); }
+  function saEntries(from,to){
+    var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; });
+    if(typeof apDeconflict==='function')apDeconflict(missions,10);
+    var out=[];
+    missions.forEach(function(m){ var start=toMin(m.mheure); ssSteps(m).forEach(function(s){ if(!s.heure)return; var mn=toMin(s.heure),abs=(mn==null?0:mn); if(s.key!=='j15'&&start!=null&&mn!=null&&mn<start)abs=mn+1440; out.push({mid:m.id,mdate:m.mdate||'',site:m.siteAgent||m.titre||'—',agent:(m.agentId&&faById(m.agentId))?faById(m.agentId).nom:'',key:s.key,label:s.label,heure:s.heure,abs:abs,type:s.type}); }); });
+    out.sort(function(a,b){ if(a.mdate!==b.mdate)return a.mdate<b.mdate?-1:1; return a.abs-b.abs; });
+    return out;
+  }
+  function renderSuiviAppels(){
+    var wrap=byId('sa-body'); if(!wrap)return;
+    var from=byId('sa-from')?byId('sa-from').value:'', to=byId('sa-to')?byId('sa-to').value:'';
+    var lbl=(from||to)?('du '+(from?from.split('-').reverse().join('/'):'…')+' au '+(to?to.split('-').reverse().join('/'):'…')):'toute la période';
+    var entries=saEntries(from,to);
+    if(!entries.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucun appel à faire '+esc(lbl)+'. (Il faut des missions validées avec une heure sur cette période.)</div></div>'; return; }
+    var S=ssLoad(), doneN=0; entries.forEach(function(e){ if(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done)doneN++; });
+    var STATUTS=['','✅ RAS','⚠️ Injoignable','🔄 Autre'];
+    wrap.innerHTML='<div class="card"><div class="lab" style="margin:0">'+entries.length+' appel'+(entries.length>1?'s':'')+' — '+esc(lbl)+' · '+doneN+' fait'+(doneN>1?'s':'')+'</div></div>'+entries.map(function(e){
+      var r=(S[e.mid]&&S[e.mid][e.key])||{}, done=!!r.done;
+      var opts=STATUTS.map(function(s){return '<option value="'+esc(s)+'"'+(r.statut===s?' selected':'')+'>'+(s||'— statut —')+'</option>';}).join('');
+      var extra=done?(' <span style="color:var(--ok)">✓ '+esc(r.hm||'')+'</span>'+(r.retard>0?' <span style="color:var(--bad)">retard '+r.retard+' min</span>':'')):'';
+      return '<div class="card" style="padding:8px'+(done?';opacity:.7':'')+'"><div class="fa-n"><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+e.label+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'
+        +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center"><label class="chk" style="margin:0"><input type="checkbox" class="sa-done" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'" data-h="'+esc(e.heure)+'"'+(done?' checked':'')+'><span>Fait</span></label>'
+        +'<select class="sa-st" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'">'+opts+'</select>'
+        +'<input class="sa-note" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'" placeholder="commentaire…" value="'+esc(r.note||'')+'" style="flex:1;min-width:130px"></div></div>';
+    }).join('');
+  }
+  if(byId('sa-body')){
+    byId('sa-body').addEventListener('change',function(e){
+      var t=e.target, mid=t.getAttribute('data-mid'), key=t.getAttribute('data-key'); if(!mid)return;
+      if(t.classList.contains('sa-done')){ if(t.checked){ var now=ssNowHM(),rt=toMin(now)-toMin(t.getAttribute('data-h')); saSet(mid,key,{done:true,hm:now,at:Date.now(),retard:(rt==null?null:rt)}); } else { saSet(mid,key,{done:false}); } renderSuiviAppels(); }
+      else if(t.classList.contains('sa-st')){ saSet(mid,key,{statut:t.value}); }
+    });
+    byId('sa-body').addEventListener('input',function(e){ var t=e.target; if(t.classList.contains('sa-note'))saSet(t.getAttribute('data-mid'),t.getAttribute('data-key'),{note:t.value}); });
+  }
+  document.querySelectorAll('.sa-preset').forEach(function(b){ b.addEventListener('click',function(){ var d=b.getAttribute('data-d'),t=impTodayISO(); if(d==='all'){ byId('sa-from').value=''; byId('sa-to').value=''; } else { var n=parseInt(d,10)||1; byId('sa-from').value=t; byId('sa-to').value=svcAddDays(t,n-1); } renderSuiviAppels(); }); });
+  if(byId('sa-from'))byId('sa-from').addEventListener('change',renderSuiviAppels);
+  if(byId('sa-to'))byId('sa-to').addEventListener('change',renderSuiviAppels);
+  (function(){ var t=impTodayISO(); if(byId('sa-from')&&!byId('sa-from').value)byId('sa-from').value=t; if(byId('sa-to')&&!byId('sa-to').value)byId('sa-to').value=t; })();
 
   (function initCloud(){
     var lo=byId('loginOverlay');
