@@ -344,6 +344,7 @@ button.big:active{transform:translateY(1px)}
         <div class="grid2"><label class="f"><div class="lab">Fichier CSV</div><input type="file" id="ct-file" accept=".csv,text/csv,text/plain"></label><label class="chk" style="align-self:end"><input type="checkbox" id="ct-onlyphone" checked><span>Seulement les contacts avec un numéro</span></label></div>
         <div class="acts" style="margin-top:6px"><button class="ok" id="ct-analyse">📂 Charger</button><button id="ct-cancel">Fermer</button><button id="ct-later" type="button">⏳ À décider (0)</button></div>
         <div id="ct-err" class="hint" style="color:var(--bad)"></div>
+        <div id="ct-filter" class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px;display:none"><button type="button" class="ct-fil on" data-f="personne">👤 Personnes (<span data-c="personne">0</span>)</button><button type="button" class="ct-fil" data-f="societe">🏢 Sociétés (<span data-c="societe">0</span>)</button><button type="button" class="ct-fil" data-f="dup">♻️ Doublons (<span data-c="dup">0</span>)</button><button type="button" class="ct-fil" data-f="all">Tous (<span data-c="all">0</span>)</button><button type="button" class="no" id="ct-ignore-soc">❌ Ignorer toutes les sociétés</button></div>
         <input id="ct-search" placeholder="🔎 Aller à un contact (nom, numéro…)" autocomplete="off" style="width:100%;margin-top:8px;display:none">
         <div id="ct-body"></div>
       </div>
@@ -1717,6 +1718,17 @@ button.big:active{transform:translateY(1px)}
   function ctDone(){ var d=load('fkh_contacts_done'); return (d&&typeof d==='object'&&!Array.isArray(d))?d:{}; }
   function ctLater(){ var l=load('fkh_contacts_later'); return Array.isArray(l)?l:[]; }
   function ctKey(c){ return c.tels.length?('t'+impPhoneKey(c.tels[0])):('n'+(c.nom||'').toLowerCase()+'|'+(c.email||'').toLowerCase()); }
+  var ctFilter='personne';
+  function ctType(nom,org,person){ var s=((nom||'')+' '+(org||'')).toLowerCase(); if(/soci[eé]t|s[eé]curit|securit|sarl|\bsas\b|sasu|eurl|agence|groupe|entreprise|protection|gardiennage|holding|scop|\bste\b|\bsté\b|surveillance/.test(s))return 'societe'; if(!person&&org)return 'societe'; return 'personne'; }
+  function ctApplyFilter(){
+    CT.list=(CT.all||[]).filter(function(c){ if(ctFilter==='all')return true; if(ctFilter==='dup')return !!c.dup; return c.type===ctFilter; });
+    CT.idx=0;
+    var cnt={personne:0,societe:0,dup:0,all:(CT.all||[]).length};
+    (CT.all||[]).forEach(function(c){ if(c.type==='societe')cnt.societe++; else cnt.personne++; if(c.dup)cnt.dup++; });
+    document.querySelectorAll('#ct-filter [data-c]').forEach(function(s){ s.textContent=cnt[s.getAttribute('data-c')]||0; });
+    document.querySelectorAll('.ct-fil').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-f')===ctFilter); });
+    ctRenderOne();
+  }
   function ctParse(t){ t=String(t||'').replace(/^﻿/,''); var rows=[],f=[],cur='',q=false;
     for(var i=0;i<t.length;i++){ var c=t[i];
       if(q){ if(c==='"'){ if(t[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
@@ -1733,14 +1745,20 @@ button.big:active{transform:translateY(1px)}
       rows.slice(1).forEach(function(r){
         function tel(ix){ if(ix<0)return []; return String(r[ix]||'').split(/\s*:::\s*/).map(function(s){return s.trim();}).filter(Boolean); }
         var tels=tel(C.p1).concat(tel(C.p2)).concat(tel(C.p3));
-        var nom=[C.fn>=0?r[C.fn]:'',C.ln>=0?r[C.ln]:''].filter(Boolean).join(' ').trim() || (C.nick>=0?String(r[C.nick]||'').trim():'') || (C.org>=0?String(r[C.org]||'').trim():'');
+        var person=[C.fn>=0?r[C.fn]:'',C.ln>=0?r[C.ln]:''].filter(Boolean).join(' ').trim();
+        var org=C.org>=0?String(r[C.org]||'').trim():'';
+        var nom=person||(C.nick>=0?String(r[C.nick]||'').trim():'')||org;
         var email=C.email>=0?String(r[C.email]||'').trim():'';
         if(onlyPhone&&!tels.length)return; if(!nom&&!tels.length)return;
-        var c={nom:nom,tels:tels,email:email}; c.key=ctKey(c);
+        var c={nom:nom,tels:tels,email:email,org:org,type:ctType(nom,org,person)}; c.key=ctKey(c);
         if(done[c.key])return;
         list.push(c);
       });
-      CT={list:list,idx:0}; byId('ct-search').style.display=list.length?'block':'none'; ctRenderOne();
+      var pc={}; list.forEach(function(c){ if(c.tels.length){var k=impPhoneKey(c.tels[0]); pc[k]=(pc[k]||0)+1;} });
+      list.forEach(function(c){ c.dup=!!(c.tels.length&&pc[impPhoneKey(c.tels[0])]>1); });
+      CT={all:list,list:[],idx:0}; ctFilter='personne';
+      byId('ct-search').style.display=list.length?'block':'none'; byId('ct-filter').style.display=list.length?'flex':'none';
+      ctApplyFilter();
     }
     var f=byId('ct-file').files[0]; if(!f){ err.textContent='Choisis le fichier CSV.'; return; }
     var rd=new FileReader(); rd.onload=function(){run(String(rd.result||''));}; rd.onerror=function(){err.textContent='Lecture impossible.';}; rd.readAsText(f,'utf-8');
@@ -1754,6 +1772,7 @@ button.big:active{transform:translateY(1px)}
     var h='<div class="card" style="background:var(--panel2)"><div class="sub" style="margin:0 0 6px">Contact '+(CT.idx+1)+' / '+CT.list.length+'</div>';
     h+='<div class="fa-n" style="font-size:17px">'+esc(c.nom||'(sans nom)')+'</div>';
     h+='<div class="fa-d">'+esc(c.tels.join(' / ')||'(pas de numéro)')+(c.email?' · '+esc(c.email):'')+'</div>';
+    h+='<div class="fa-d">'+(c.type==='societe'?'🏢 société':'👤 personne')+(c.dup?' · <span style="color:var(--warn)">♻️ doublon (numéro déjà présent dans le fichier)</span>':'')+(c.org&&c.type==='personne'?' · '+esc(c.org):'')+'</div>';
     if(exist)h+='<div class="meta" style="color:var(--warn)"><span>⚠ Déjà un agent : '+esc(exist.nom||'—')+'</span></div>';
     h+='<div id="ct-ville-wrap"></div>';
     h+='<div class="acts" style="margin-top:8px"><button class="ok" id="ct-add">✅ Ajouter</button><button class="no" id="ct-ignore">❌ Ignorer</button><button id="ct-postpone">⏳ Plus tard</button><button id="ct-skip">⏭️ Passer</button></div></div>';
@@ -1776,16 +1795,20 @@ button.big:active{transform:translateY(1px)}
       saveFA(); if(typeof renderFA==='function')renderFA(); ctDecide('added');
     };
   }
+  function ctCounts(){ var cnt={personne:0,societe:0,dup:0,all:(CT.all||[]).length}; (CT.all||[]).forEach(function(c){ if(c.type==='societe')cnt.societe++; else cnt.personne++; if(c.dup)cnt.dup++; }); document.querySelectorAll('#ct-filter [data-c]').forEach(function(s){ s.textContent=cnt[s.getAttribute('data-c')]||0; }); }
   function ctDecide(status){
     var c=CT.list[CT.idx]; if(!c)return; var done=ctDone();
     if(status==='later'){ var L=ctLater(); if(!L.some(function(x){return x.key===c.key;}))L.push({key:c.key,nom:c.nom,tels:c.tels,email:c.email}); save('fkh_contacts_later',L); }
     else { done[c.key]=status; save('fkh_contacts_done',done); save('fkh_contacts_later',ctLater().filter(function(x){return x.key!==c.key;})); }
-    CT.idx++; ctRenderOne();
+    CT.list.splice(CT.idx,1); if(CT.all)CT.all=CT.all.filter(function(x){return x.key!==c.key;});
+    ctUpdLaterBtn(); ctCounts(); ctRenderOne();
   }
   function ctUpdLaterBtn(){ var b=byId('ct-later'); if(b)b.textContent='⏳ À décider ('+ctLater().length+')'; }
   if(byId('ct-open'))byId('ct-open').onclick=function(){ byId('ct-panel').classList.toggle('hidden'); ctUpdLaterBtn(); };
   if(byId('ct-cancel'))byId('ct-cancel').onclick=function(){ byId('ct-panel').classList.add('hidden'); };
   if(byId('ct-analyse'))byId('ct-analyse').onclick=ctAnalyse;
+  document.querySelectorAll('.ct-fil').forEach(function(b){ b.onclick=function(){ ctFilter=b.getAttribute('data-f'); ctApplyFilter(); }; });
+  if(byId('ct-ignore-soc'))byId('ct-ignore-soc').onclick=function(){ if(!CT.all||!CT.all.length)return; if(!confirm('Marquer toutes les sociétés du fichier comme ignorées ?'))return; var done=ctDone(); CT.all.forEach(function(c){ if(c.type==='societe')done[c.key]='ignored'; }); save('fkh_contacts_done',done); CT.all=CT.all.filter(function(c){return c.type!=='societe';}); ctApplyFilter(); };
   if(byId('ct-later'))byId('ct-later').onclick=function(){ var L=ctLater(); if(!L.length){ byId('ct-body').innerHTML='<div class="card" style="background:var(--panel2)"><div class="sub" style="margin:0">Aucun contact « à décider plus tard ».</div></div>'; return; } CT={list:L.map(function(x){return {nom:x.nom,tels:x.tels||[],email:x.email||'',key:x.key};}),idx:0}; byId('ct-search').style.display='block'; ctRenderOne(); };
   if(byId('ct-search'))byId('ct-search').addEventListener('input',function(){ var q=this.value.toLowerCase().trim(); if(!q)return; for(var i=0;i<CT.list.length;i++){ var c=CT.list[i]; if(((c.nom||'')+' '+(c.tels||[]).join(' ')).toLowerCase().indexOf(q)>=0){ CT.idx=i; ctRenderOne(); return; } } });
 
