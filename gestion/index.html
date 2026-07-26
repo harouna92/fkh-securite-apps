@@ -344,7 +344,7 @@ button.big:active{transform:translateY(1px)}
         <div class="grid2"><label class="f"><div class="lab">Fichier CSV</div><input type="file" id="ct-file" accept=".csv,text/csv,text/plain"></label><label class="chk" style="align-self:end"><input type="checkbox" id="ct-onlyphone" checked><span>Seulement les contacts avec un numéro</span></label></div>
         <div class="acts" style="margin-top:6px"><button class="ok" id="ct-analyse">📂 Charger</button><button id="ct-cancel">Fermer</button><button id="ct-later" type="button">⏳ À décider (0)</button></div>
         <div id="ct-err" class="hint" style="color:var(--bad)"></div>
-        <div id="ct-filter" class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px;display:none"><button type="button" class="ct-fil on" data-f="personne">👤 Personnes (<span data-c="personne">0</span>)</button><button type="button" class="ct-fil" data-f="societe">🏢 Sociétés (<span data-c="societe">0</span>)</button><button type="button" class="ct-fil" data-f="dup">♻️ Doublons (<span data-c="dup">0</span>)</button><button type="button" class="ct-fil" data-f="all">Tous (<span data-c="all">0</span>)</button><button type="button" class="no" id="ct-ignore-soc">❌ Ignorer toutes les sociétés</button></div>
+        <div id="ct-filter" class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px;display:none"><button type="button" class="ct-fil on" data-f="personne">👤 Personnes (<span data-c="personne">0</span>)</button><button type="button" class="ct-fil" data-f="societe">🏢 Sociétés (<span data-c="societe">0</span>)</button><button type="button" class="ct-fil" data-f="parasite">🚫 Parasites (<span data-c="parasite">0</span>)</button><button type="button" class="ct-fil" data-f="dup">♻️ Doublons (<span data-c="dup">0</span>)</button><button type="button" class="ct-fil" data-f="all">Tous (<span data-c="all">0</span>)</button><button type="button" class="no" id="ct-ignore-soc">❌ Ignorer sociétés</button><button type="button" class="no" id="ct-ignore-par">🚫 Ignorer parasites</button></div>
         <input id="ct-search" placeholder="🔎 Aller à un contact (nom, numéro…)" autocomplete="off" style="width:100%;margin-top:8px;display:none">
         <div id="ct-body"></div>
       </div>
@@ -1729,13 +1729,12 @@ button.big:active{transform:translateY(1px)}
   function ctLater(){ var l=load('fkh_contacts_later'); return Array.isArray(l)?l:[]; }
   function ctKey(c){ return c.tels.length?('t'+impPhoneKey(c.tels[0])):('n'+(c.nom||'').toLowerCase()+'|'+(c.email||'').toLowerCase()); }
   var ctFilter='personne';
-  function ctType(nom,org,person){ var s=((nom||'')+' '+(org||'')).toLowerCase(); if(/soci[eé]t|s[eé]curit|securit|sarl|\bsas\b|sasu|eurl|agence|groupe|entreprise|protection|gardiennage|holding|scop|\bste\b|\bsté\b|surveillance/.test(s))return 'societe'; if(!person&&org)return 'societe'; return 'personne'; }
+  function ctJunk(nom){ var n=(nom||'').trim().toLowerCase(); if(!n)return true; if(n.charAt(0)==='.')return true; var letters=(n.replace(/[^a-zà-ÿ]/gi,'').length), digits=(n.replace(/\D/g,'').length); if(letters<2)return true; if(digits>letters)return true; if(/r[ée]pondeur|annuaire|voyance|tonalit|renvoi|rechargement|\bconso\b|\bsav\b|\bspam\b|arnaque|ne pas r[ée]pond|injoignable|\bfaux\b|\btest\b|messagerie|hotline|assistance|service client|standard|accueil/.test(n))return true; return false; }
+  function ctType(nom,org,person){ if(ctJunk(nom))return 'parasite'; var s=((nom||'')+' '+(org||'')).toLowerCase(); if(/soci[eé]t|s[eé]curit|securit|sarl|\bsas\b|sasu|eurl|agence|groupe|entreprise|protection|gardiennage|holding|scop|\bste\b|\bsté\b|surveillance/.test(s))return 'societe'; if(!person&&org)return 'societe'; return 'personne'; }
   function ctApplyFilter(){
     CT.list=(CT.all||[]).filter(function(c){ if(ctFilter==='all')return true; if(ctFilter==='dup')return !!c.dup; return c.type===ctFilter; });
     CT.idx=0;
-    var cnt={personne:0,societe:0,dup:0,all:(CT.all||[]).length};
-    (CT.all||[]).forEach(function(c){ if(c.type==='societe')cnt.societe++; else cnt.personne++; if(c.dup)cnt.dup++; });
-    document.querySelectorAll('#ct-filter [data-c]').forEach(function(s){ s.textContent=cnt[s.getAttribute('data-c')]||0; });
+    ctCounts();
     document.querySelectorAll('.ct-fil').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-f')===ctFilter); });
     ctRenderOne();
   }
@@ -1782,7 +1781,7 @@ button.big:active{transform:translateY(1px)}
     var h='<div class="card" style="background:var(--panel2)"><div class="sub" style="margin:0 0 6px">Contact '+(CT.idx+1)+' / '+CT.list.length+'</div>';
     h+='<div class="fa-n" style="font-size:17px">'+esc(c.nom||'(sans nom)')+'</div>';
     h+='<div class="fa-d">'+esc(c.tels.join(' / ')||'(pas de numéro)')+(c.email?' · '+esc(c.email):'')+'</div>';
-    h+='<div class="fa-d">'+(c.type==='societe'?'🏢 société':'👤 personne')+(c.dup?' · <span style="color:var(--warn)">♻️ doublon (numéro déjà présent dans le fichier)</span>':'')+(c.org&&c.type==='personne'?' · '+esc(c.org):'')+'</div>';
+    h+='<div class="fa-d">'+(c.type==='societe'?'🏢 société':c.type==='parasite'?'<span style="color:var(--muted)">🚫 parasite (à ignorer probablement)</span>':'👤 personne')+(c.dup?' · <span style="color:var(--warn)">♻️ doublon (numéro déjà présent dans le fichier)</span>':'')+(c.org&&c.type==='personne'?' · '+esc(c.org):'')+'</div>';
     if(exist)h+='<div class="meta" style="color:var(--warn)"><span>⚠ Déjà un agent : '+esc(exist.nom||'—')+'</span></div>';
     h+='<div id="ct-ville-wrap"></div>';
     h+='<div class="acts" style="margin-top:8px"><button class="ok" id="ct-add">✅ Ajouter</button><button class="no" id="ct-ignore">❌ Ignorer</button><button id="ct-postpone">⏳ Plus tard</button><button id="ct-skip">⏭️ Passer</button></div></div>';
@@ -1805,7 +1804,7 @@ button.big:active{transform:translateY(1px)}
       saveFA(); if(typeof renderFA==='function')renderFA(); ctDecide('added');
     };
   }
-  function ctCounts(){ var cnt={personne:0,societe:0,dup:0,all:(CT.all||[]).length}; (CT.all||[]).forEach(function(c){ if(c.type==='societe')cnt.societe++; else cnt.personne++; if(c.dup)cnt.dup++; }); document.querySelectorAll('#ct-filter [data-c]').forEach(function(s){ s.textContent=cnt[s.getAttribute('data-c')]||0; }); }
+  function ctCounts(){ var cnt={personne:0,societe:0,parasite:0,dup:0,all:(CT.all||[]).length}; (CT.all||[]).forEach(function(c){ if(c.type==='societe')cnt.societe++; else if(c.type==='parasite')cnt.parasite++; else cnt.personne++; if(c.dup)cnt.dup++; }); document.querySelectorAll('#ct-filter [data-c]').forEach(function(s){ s.textContent=cnt[s.getAttribute('data-c')]||0; }); }
   function ctDecide(status){
     var c=CT.list[CT.idx]; if(!c)return; var done=ctDone();
     if(status==='later'){ var L=ctLater(); if(!L.some(function(x){return x.key===c.key;}))L.push({key:c.key,nom:c.nom,tels:c.tels,email:c.email}); save('fkh_contacts_later',L); }
@@ -1819,6 +1818,7 @@ button.big:active{transform:translateY(1px)}
   if(byId('ct-analyse'))byId('ct-analyse').onclick=ctAnalyse;
   document.querySelectorAll('.ct-fil').forEach(function(b){ b.onclick=function(){ ctFilter=b.getAttribute('data-f'); ctApplyFilter(); }; });
   if(byId('ct-ignore-soc'))byId('ct-ignore-soc').onclick=function(){ if(!CT.all||!CT.all.length)return; if(!confirm('Marquer toutes les sociétés du fichier comme ignorées ?'))return; var done=ctDone(); CT.all.forEach(function(c){ if(c.type==='societe')done[c.key]='ignored'; }); save('fkh_contacts_done',done); CT.all=CT.all.filter(function(c){return c.type!=='societe';}); ctApplyFilter(); };
+  if(byId('ct-ignore-par'))byId('ct-ignore-par').onclick=function(){ if(!CT.all||!CT.all.length)return; if(!confirm('Marquer tous les parasites (répondeurs, numéros de service…) comme ignorés ?'))return; var done=ctDone(); CT.all.forEach(function(c){ if(c.type==='parasite')done[c.key]='ignored'; }); save('fkh_contacts_done',done); CT.all=CT.all.filter(function(c){return c.type!=='parasite';}); ctApplyFilter(); };
   if(byId('ct-later'))byId('ct-later').onclick=function(){ var L=ctLater(); if(!L.length){ byId('ct-body').innerHTML='<div class="card" style="background:var(--panel2)"><div class="sub" style="margin:0">Aucun contact « à décider plus tard ».</div></div>'; return; } CT={list:L.map(function(x){return {nom:x.nom,tels:x.tels||[],email:x.email||'',key:x.key};}),idx:0}; byId('ct-search').style.display='block'; ctRenderOne(); };
   if(byId('ct-search'))byId('ct-search').addEventListener('input',function(){ var q=this.value.toLowerCase().trim(); if(!q)return; for(var i=0;i<CT.list.length;i++){ var c=CT.list[i]; if(((c.nom||'')+' '+(c.tels||[]).join(' ')).toLowerCase().indexOf(q)>=0){ CT.idx=i; ctRenderOne(); return; } } });
 
