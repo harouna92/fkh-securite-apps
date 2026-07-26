@@ -139,6 +139,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="tenues">🦺 Tenues</button>
     <button data-s="services">📁 Services</button>
     <button data-s="dispatch">🧭 Dispatch</button>
+    <button data-s="interv">🚨 Interventions</button>
   </div>
 </div>
 <div class="cloudbar" id="cloudbar"><span class="cb-txt"></span><button type="button" id="cloud-import">Importer mes données locales</button></div>
@@ -486,13 +487,22 @@ button.big:active{transform:translateY(1px)}
     </div>
     <div id="dsp-result"></div>
   </section>
+  <section id="sec-interv" class="hidden">
+    <div><h1>🚨 Zones d'intervention</h1><p class="sub">Crée une zone (ville + rayon), puis classe tes agents par ordre de priorité d'appel. Quand une demande tombe dans une zone, l'appli te ressort direct la liste priorisée des agents à appeler.</p></div>
+    <div class="card">
+      <div class="lab" style="margin:0 0 6px">Nouvelle zone</div>
+      <div class="grid2"><label class="f"><div class="lab">Ville pivot</div><div class="acwrap"><input type="text" id="iz-ville" placeholder="Ex. Chalon-sur-Saône…" autocomplete="off"><div class="sugg hidden" id="sugg-iz-ville"></div></div></label><label class="f"><div class="lab">Rayon (km)</div><input type="number" id="iz-radius" value="30" min="1" max="300"></label></div>
+      <button class="big ok" id="iz-add" style="margin-top:6px">➕ Créer la zone</button>
+    </div>
+    <div id="iz-list"></div>
+  </section>
 </div>
 
 <script>
 (function(){
   var byId=function(x){return document.getElementById(x)};
-  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
+  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof renderInterv==='function')renderInterv();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
   function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} if(typeof cloudPush==='function')cloudPush(k); }
@@ -815,6 +825,7 @@ button.big:active{transform:translateY(1px)}
   function renderAffect(x){
     if(x.statut!=='validee')return '';
     var out='';
+    if(typeof izPriorityLine==='function')out+=izPriorityLine(x);
     if(x.agentId&&FA){ var a=faById(x.agentId),miss=a?agentMissing(a):[],bd=miss.length?' <span style="color:var(--warn)">⚠ '+miss.map(esc).join(' · ')+'</span>':''; out+='<div class="meta" style="color:var(--ok);font-weight:600"><span>👤 Agent : '+esc(a?(a.nom||'—'):'(agent supprimé)')+bd+tenueBadge(a)+'</span></div>'; var cd=missCountdown(x); if(cd)out+='<div class="meta"><span>'+cd+'</span></div>'; }
     else if(x.agentId){ out+='<div class="meta" style="color:var(--ok);font-weight:600"><span>👤 Agent affecté</span></div>'; }
     out+='<div class="acts" style="margin-top:2px"><button data-act="affect" data-id="'+x.id+'">👤 '+(x.agentId?'Changer / voir l\'agent':'Affecter un agent')+'</button></div>';
@@ -1252,7 +1263,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null };
   function cloudHdr(){ return {'Content-Type':'application/json','X-App-Password':CLOUD.pass}; }
   function cloudPush(k){
@@ -1595,6 +1606,73 @@ button.big:active{transform:translateY(1px)}
   if(byId('dsp-day'))byId('dsp-day').addEventListener('change',function(){renderDispatch();});
   if(byId('dsp-all'))byId('dsp-all').onclick=function(){ dspMissions().forEach(function(m){DSP.sel[m.id]=true;}); renderDispatch(); };
   if(byId('dsp-none'))byId('dsp-none').onclick=function(){ DSP.sel={}; renderDispatch(); };
+
+  // ===== Zones d'intervention : listes d'agents priorisées par zone (ville + rayon) =====
+  function izLoad(){ var z=load('fkh_zones_interv'); return Array.isArray(z)?z:[]; }
+  function izSave(z){ save('fkh_zones_interv',z); }
+  var izSel=null, izT;
+  if(byId('iz-ville'))byId('iz-ville').addEventListener('input',function(){ var q=this.value.trim(); izSel=null; clearTimeout(izT); if(q.length<2){byId('sugg-iz-ville').classList.add('hidden');return;} izT=setTimeout(function(){ cityAuto(q,'sugg-iz-ville',function(c){ var co=c.centre&&c.centre.coordinates; izSel={nom:c.nom,la:co?co[1]:null,lo:co?co[0]:null}; byId('iz-ville').value=c.nom; byId('sugg-iz-ville').classList.add('hidden'); }); },250); });
+  if(byId('iz-add'))byId('iz-add').onclick=function(){
+    var v=byId('iz-ville').value.trim(); if(!v)return;
+    var rad=parseInt(byId('iz-radius').value,10)||30;
+    var g=(izSel&&izSel.nom===v)?izSel:{nom:v,la:null,lo:null};
+    var z=izLoad(); z.push({id:'z'+Date.now(),nom:g.nom,la:g.la,lo:g.lo,rayon:rad,agents:[]}); izSave(z);
+    byId('iz-ville').value=''; byId('iz-radius').value='30'; izSel=null; renderInterv();
+  };
+  function renderInterv(){
+    var wrap=byId('iz-list'); if(!wrap)return;
+    var z=izLoad();
+    if(!z.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune zone. Crée-en une ci-dessus (ex. Chalon-sur-Saône, 30 km).</div></div>'; return; }
+    wrap.innerHTML=z.map(function(zone){
+      var agentsHtml=zone.agents.length?zone.agents.map(function(aid,ix){
+        var a=faById(aid), nom=a?(a.nom||'—'):'(agent supprimé)', tels=a?(a.tels||[]):[];
+        var dist=(a&&a.la!=null&&zone.la!=null)?(' · '+km(zone.la,zone.lo,a.la,a.lo)+' km'):'';
+        var call=tels.length?'<a class="call" href="tel:'+esc(tels[0].replace(/\s/g,''))+'">📞</a>':'';
+        return '<div class="it"><div style="flex:1"><div class="fa-n">'+(ix+1)+'. '+esc(nom)+' <span style="color:var(--muted);font-weight:400">'+esc(tels.join(' / ')||'')+dist+'</span></div></div><div class="fa-a"><button data-izup="'+zone.id+'" data-ix="'+ix+'" title="Monter">▲</button><button data-izdn="'+zone.id+'" data-ix="'+ix+'" title="Descendre">▼</button>'+call+'<button class="no" data-izrm="'+zone.id+'" data-aid="'+esc(aid)+'" title="Retirer">✖</button></div></div>';
+      }).join(''):'<div class="sub" style="margin:2px 0">Aucun agent classé. Ajoute-les ci-dessous (proposés du plus proche au plus loin).</div>';
+      return '<div class="card"><div class="fa-n" style="font-size:16px">🚨 '+esc(zone.nom)+' <span style="color:var(--muted);font-weight:400">· rayon '+zone.rayon+' km · '+zone.agents.length+' agent'+(zone.agents.length>1?'s':'')+'</span></div>'
+        +'<div class="list" style="margin:6px 0">'+agentsHtml+'</div>'
+        +'<div class="acwrap"><input type="text" class="iz-addq" data-z="'+zone.id+'" placeholder="Ajouter un agent (nom, ville…)" autocomplete="off"><div class="sugg hidden" id="sugg-izadd-'+zone.id+'"></div></div>'
+        +'<div class="acts" style="margin-top:6px"><button class="no" data-izdel="'+zone.id+'">🗑️ Supprimer la zone</button></div></div>';
+    }).join('');
+    wrap.querySelectorAll('[data-izup]').forEach(function(b){b.onclick=function(){izMove(b.getAttribute('data-izup'),+b.getAttribute('data-ix'),-1);};});
+    wrap.querySelectorAll('[data-izdn]').forEach(function(b){b.onclick=function(){izMove(b.getAttribute('data-izdn'),+b.getAttribute('data-ix'),1);};});
+    wrap.querySelectorAll('[data-izrm]').forEach(function(b){b.onclick=function(){izRemove(b.getAttribute('data-izrm'),b.getAttribute('data-aid'));};});
+    wrap.querySelectorAll('[data-izdel]').forEach(function(b){b.onclick=function(){ if(!confirm('Supprimer cette zone ?'))return; var id=b.getAttribute('data-izdel'); izSave(izLoad().filter(function(x){return x.id!==id;})); renderInterv(); };});
+    wrap.querySelectorAll('.iz-addq').forEach(function(inp){ inp.addEventListener('input',function(){ izAddSuggest(inp); }); });
+  }
+  function izMove(zid,ix,dir){ var z=izLoad(),zone=null,i; for(i=0;i<z.length;i++)if(z[i].id===zid)zone=z[i]; if(!zone)return; var j=ix+dir; if(j<0||j>=zone.agents.length)return; var t=zone.agents[ix]; zone.agents[ix]=zone.agents[j]; zone.agents[j]=t; izSave(z); renderInterv(); }
+  function izRemove(zid,aid){ var z=izLoad(),zone=null,i; for(i=0;i<z.length;i++)if(z[i].id===zid)zone=z[i]; if(!zone)return; zone.agents=zone.agents.filter(function(x){return x!==aid;}); izSave(z); renderInterv(); }
+  function izAddSuggest(inp){
+    var zid=inp.getAttribute('data-z'), box=byId('sugg-izadd-'+zid), q=inp.value.trim().toLowerCase();
+    var z=izLoad(),zone=null,i; for(i=0;i<z.length;i++)if(z[i].id===zid)zone=z[i]; if(!zone){box.classList.add('hidden');return;}
+    if(q.length<1){box.classList.add('hidden');return;}
+    var cand=FA.filter(function(a){ if(zone.agents.indexOf(a.id)>=0)return false; return ((a.nom||'')+' '+(a.ville||'')+' '+((a.tels||[]).join(' '))).toLowerCase().indexOf(q)>=0; });
+    if(zone.la!=null)cand.forEach(function(a){a._izd=(a.la!=null)?km(zone.la,zone.lo,a.la,a.lo):99999;});
+    cand.sort(function(a,b){return (a._izd||0)-(b._izd||0)||(a.nom||'').localeCompare(b.nom||'');});
+    cand=cand.slice(0,8);
+    if(!cand.length){box.classList.add('hidden');return;}
+    box.innerHTML=cand.map(function(a){ var d=(zone.la!=null&&a.la!=null)?(' <span class="cp">'+km(zone.la,zone.lo,a.la,a.lo)+' km</span>'):''; return '<div data-aid="'+esc(a.id)+'"><span>'+esc(a.nom||'—')+'</span>'+d+'</div>'; }).join('');
+    box.classList.remove('hidden');
+    box.querySelectorAll('div[data-aid]').forEach(function(d){ d.onclick=function(){ var aid=d.getAttribute('data-aid'); var zz=izLoad(),zo=null,k; for(k=0;k<zz.length;k++)if(zz[k].id===zid)zo=zz[k]; if(zo&&zo.agents.indexOf(aid)<0){zo.agents.push(aid); izSave(zz);} renderInterv(); }; });
+  }
+  function izZonesForItem(it){
+    var z=izLoad(); if(!z.length)return [];
+    var v=(it.ville||'').toLowerCase().trim();
+    return z.filter(function(zone){
+      if(it.la!=null&&zone.la!=null){ return km(zone.la,zone.lo,it.la,it.lo)<=zone.rayon; }
+      return v&&zone.nom&&v===zone.nom.toLowerCase().trim();
+    });
+  }
+  function izPriorityLine(it){
+    var zs=(typeof izZonesForItem==='function')?izZonesForItem(it):[]; if(!zs.length)return '';
+    return zs.map(function(zone){
+      if(!zone.agents.length)return '';
+      var ags=zone.agents.map(function(aid,ix){ var a=faById(aid); if(!a)return ''; var tel=(a.tels&&a.tels[0])?a.tels[0]:''; var call=tel?' <a class="call" href="tel:'+esc(tel.replace(/\s/g,''))+'">📞</a>':''; return '<span style="white-space:nowrap">'+(ix+1)+'. '+esc(a.nom||'—')+call+'</span>'; }).filter(Boolean).join(' &nbsp; ');
+      if(!ags)return '';
+      return '<div class="meta" style="color:#e0784b;font-weight:600"><span>🚨 Zone '+esc(zone.nom)+' — agents prioritaires : '+ags+'</span></div>';
+    }).join('');
+  }
 
   (function initCloud(){
     var lo=byId('loginOverlay');
