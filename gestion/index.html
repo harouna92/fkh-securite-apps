@@ -1831,6 +1831,21 @@ button.big:active{transform:translateY(1px)}
   }
   function apSetOn(mid,on){ var A=apLoad(); if(!A[mid])A[mid]={}; A[mid].on=on; apSave(A); }
   function apSetNb(mid,nb){ var A=apLoad(); if(!A[mid])A[mid]={}; A[mid].nb=Math.max(0,nb); A[mid].on=true; apSave(A); }
+  // Dé-confliction : décale les appels de contrôle des missions du même jour pour laisser >= gap min entre 2 sites
+  var AP_DC={};
+  function apDeconflict(arr,gap){
+    gap=gap||10; AP_DC={};
+    var groups={};
+    (arr||[]).forEach(function(m){ var p=apPlan(m); if(!p||!p.on||!p.controls.length)return; (groups[m.mdate||'']=groups[m.mdate||'']||[]).push({m:m,p:p}); });
+    Object.keys(groups).forEach(function(d){
+      var items=[];
+      groups[d].forEach(function(g){ var sm=toMin(g.m.mheure); g.p.controls.forEach(function(c,idx){ var mn=toMin(c),abs=mn; if(sm!=null&&mn!=null&&mn<sm)abs=mn+1440; items.push({mid:g.m.id,idx:idx,abs:abs}); }); });
+      items.sort(function(a,b){return a.abs-b.abs;});
+      var last=-1e9;
+      items.forEach(function(it){ if(it.abs-last<gap)it.abs=last+gap; last=it.abs; var hm=pad2(Math.floor((it.abs%1440)/60))+':'+pad2(it.abs%60); (AP_DC[it.mid]=AP_DC[it.mid]||[])[it.idx]=hm; });
+    });
+  }
+  function apControls(m){ return (AP_DC[m.id]&&AP_DC[m.id].length)?AP_DC[m.id]:(((typeof apPlan==='function'?apPlan(m):null)||{}).controls||[]); }
   function renderAppels(){
     var wrap=byId('ap-body'); if(!wrap)return;
     var from=byId('ap-from')?byId('ap-from').value:'', to=byId('ap-to')?byId('ap-to').value:'';
@@ -1838,12 +1853,13 @@ button.big:active{transform:translateY(1px)}
     arr.sort(function(a,b){var da=(a.mdate||'')+' '+(a.mheure||''),db=(b.mdate||'')+' '+(b.mheure||'');return da<db?-1:da>db?1:0;});
     var periode=(from||to)?('du '+(from?from.split('-').reverse().join('/'):'…')+' au '+(to?to.split('-').reverse().join('/'):'…')):'toute la période';
     if(!arr.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune mission validée '+esc(periode)+'.</div></div>'; return; }
+    apDeconflict(arr,10);
     function line(lbl,hh){ if(!hh)return ''; return '<div class="it"><div style="flex:1"><span class="fa-n">'+lbl+'</span> <b>'+esc(hh)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(hh))+'</span></div></div>'; }
     wrap.innerHTML='<div class="card"><div class="lab" style="margin:0">'+arr.length+' mission'+(arr.length>1?'s':'')+' — '+esc(periode)+'</div></div>'+arr.map(function(m){
       var p=apPlan(m), site=m.siteAgent||m.titre||'—', ag=(m.agentId&&faById(m.agentId))?faById(m.agentId).nom:'';
       var h='<div class="card"><div class="fa-n" style="font-size:16px">'+esc(site)+(m.ville?' · '+esc(m.ville):'')+' <span style="color:var(--muted);font-weight:400">'+esc(m.mdate||'')+(ag?' · '+esc(ag):'')+'</span>'+(p&&p.night?' <span style="color:#e0784b">🌙 nuit</span>':'')+'</div>';
       if(!p){ h+='<div class="sub" style="margin:4px 0">Heure de début manquante — plan impossible.</div></div>'; return h; }
-      h+='<div class="list" style="margin:6px 0">'+line('📞 Avant (prise)',p.start)+p.controls.map(function(c,i){return line('🌙 Contrôle '+(i+1),c);}).join('')+line('🔚 Fin de service',p.fin)+'</div>';
+      h+='<div class="list" style="margin:6px 0">'+line('📞 Avant (prise)',p.start)+apControls(m).map(function(c,i){return line('🌙 Contrôle '+(i+1),c);}).join('')+line('🔚 Fin de service',p.fin)+'</div>';
       h+='<div class="acts" style="gap:6px;align-items:center"><span class="sub" style="margin:0">Appels de contrôle : <b>'+p.nb+'</b></span><button data-apm="'+esc(m.id)+'" data-d="-1" title="Moins">−</button><button data-apm="'+esc(m.id)+'" data-d="1" title="Plus">+</button>'+((apLoad()[m.id])?'<button data-apr="'+esc(m.id)+'" title="Revenir au défaut">↺ défaut</button>':'')+'</div></div>';
       return h;
     }).join('');
@@ -1872,8 +1888,7 @@ button.big:active{transform:translateY(1px)}
     if(prise)steps.push({key:'j15',label:'☎ J‑'+P.before+' min',heure:shiftTime(prise,-P.before),type:'call'});
     steps.push({key:'prise',label:'🟢 Prise de service',heure:prise,type:'prise'});
     if(prise)steps.push({key:'after',label:'☎ Prise +'+P.after+' min',heure:shiftTime(prise,P.after),type:'call'});
-    var pl=(typeof apPlan==='function')?apPlan(m):null;
-    if(pl&&pl.controls)pl.controls.forEach(function(c,i){ steps.push({key:'ctrl'+i,label:'🌙 Contrôle '+(i+1),heure:c,type:'call'}); });
+    apControls(m).forEach(function(c,i){ steps.push({key:'ctrl'+i,label:'🌙 Contrôle '+(i+1),heure:c,type:'call'}); });
     steps.push({key:'fin',label:'🔚 Fin de service',heure:(typeof apFinHeure==='function')?apFinHeure(m):'',type:'fin'});
     return steps;
   }
@@ -1900,7 +1915,7 @@ button.big:active{transform:translateY(1px)}
     var h='<div class="card"><div class="fa-n" style="font-size:16px">'+esc(site)+(m.ville?' · '+esc(m.ville):'')+' <span style="color:var(--muted);font-weight:400">'+esc(m.mdate||'')+(m.mheure?' '+esc(m.mheure):'')+'</span>'+(p&&p.night?' <span style="color:#e0784b">🌙 nuit</span>':'')+'</div>';
     if(!p){ h+='<div class="sub" style="margin:4px 0">Heure de début manquante.</div></div>'; return h; }
     h+='<label class="chk" style="margin-top:6px"><input type="checkbox" data-ason="'+esc(m.id)+'"'+(p.on?' checked':'')+'><span>📞 Appels de contrôle pendant le service</span></label>';
-    if(p.on){ h+='<div class="acts" style="gap:6px;align-items:center;margin-top:4px"><span class="sub" style="margin:0">Nombre de contrôles : <b>'+p.nb+'</b></span><button data-asnb="'+esc(m.id)+'" data-d="-1">−</button><button data-asnb="'+esc(m.id)+'" data-d="1">+</button></div><div class="sub" style="margin:4px 0 0">'+(p.controls.length?('Contrôles : '+p.controls.map(function(c){return esc(c)+' (🇲🇱 '+esc(thToMali(c))+')';}).join(' · ')):'—')+'</div>'; }
+    if(p.on){ var cc=apControls(m); h+='<div class="acts" style="gap:6px;align-items:center;margin-top:4px"><span class="sub" style="margin:0">Nombre de contrôles : <b>'+p.nb+'</b></span><button data-asnb="'+esc(m.id)+'" data-d="-1">−</button><button data-asnb="'+esc(m.id)+'" data-d="1">+</button></div><div class="sub" style="margin:4px 0 0">'+(cc.length?('Contrôles : '+cc.map(function(c){return esc(c)+' (🇲🇱 '+esc(thToMali(c))+')';}).join(' · ')):'—')+'</div>'; }
     h+='</div>';
     return h;
   }
@@ -1918,6 +1933,7 @@ button.big:active{transform:translateY(1px)}
       wrap.innerHTML='<div class="card"><div class="lab" style="margin:0 0 6px">'+ev.length+' pointage'+(ev.length>1?'s':'')+' — '+esc(lbl)+'</div><div class="list">'+ev.map(function(e){ return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(e.site||'—')+' <span style="color:var(--muted);font-weight:400">· '+esc(lblK(e.k))+'</span></div><div class="fa-d">'+esc(e.mdate||'')+' · pointé '+esc(e.hm||'')+(e.retard!=null&&e.retard>0?' <span style="color:var(--bad)">retard '+e.retard+' min</span>':'')+'</div></div></div>'; }).join('')+'</div></div>';
       return; }
     var arr=ssMissions(from,to), naff=arr.filter(function(x){return !x.agentId;}).length;
+    apDeconflict(arr,10);
     if(!arr.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune mission validée '+esc(lbl)+'.</div></div>'; return; }
     var head='<div class="card"><div class="lab" style="margin:0">'+arr.length+' mission'+(arr.length>1?'s':'')+' — '+esc(lbl)+(naff?(' · <span style="color:var(--warn)">'+naff+' à affecter</span>'):'')+'</div></div>';
     if(ssTab==='regl'){
