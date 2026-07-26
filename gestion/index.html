@@ -253,6 +253,7 @@ button.big:active{transform:translateY(1px)}
 
   <section id="sec-prise" class="hidden">
     <div><h1>Prise de service</h1><p class="sub">Renseigne la prise de service de l'agent, puis copie le compte-rendu.</p></div>
+    <div class="card" id="ps-mcard"><div class="lab" style="margin:0 0 6px">📋 Missions affectées — clique « Prendre » pour pré-remplir</div><label class="f" style="max-width:220px"><div class="lab">Jour</div><input type="date" id="ps-mday"></label><div id="ps-missions" style="margin-top:8px"></div></div>
     <div class="card">
       <div class="grid2">
         <label class="f"><div class="lab">Client</div><div class="cbx"><input id="ps-client" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="ps-client" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-ps-client"></div></div></label>
@@ -275,10 +276,12 @@ button.big:active{transform:translateY(1px)}
       <div class="lab" style="margin:0">Compte-rendu à copier</div>
       <div class="outbox" id="ps-out">Remplis la prise de service…</div>
       <button class="big" id="ps-copy">Copier le compte-rendu</button>
+      <button class="big" id="ps-save" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line);margin-top:8px">💾 Enregistrer dans le suivi des services</button>
     </div>
   </section>
   <section id="sec-fin" class="hidden">
     <div><h1>Fin de service</h1><p class="sub">Renseigne la fin de service de l'agent, puis copie le compte-rendu.</p></div>
+    <div class="card" id="fs-mcard"><div class="lab" style="margin:0 0 6px">📋 Missions affectées — clique « Terminer » pour pré-remplir</div><label class="f" style="max-width:220px"><div class="lab">Jour</div><input type="date" id="fs-mday"></label><div id="fs-missions" style="margin-top:8px"></div></div>
     <div class="card">
       <div class="grid2">
         <label class="f"><div class="lab">Client</div><div class="cbx"><input id="fs-client" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="fs-client" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-fs-client"></div></div></label>
@@ -299,6 +302,7 @@ button.big:active{transform:translateY(1px)}
       <div class="lab" style="margin:0">Compte-rendu à copier</div>
       <div class="outbox" id="fs-out">Remplis la fin de service…</div>
       <button class="big" id="fs-copy">Copier le compte-rendu</button>
+      <button class="big" id="fs-save" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line);margin-top:8px">💾 Enregistrer dans le suivi des services</button>
     </div>
   </section>
   <section id="sec-suivi" class="hidden">
@@ -451,7 +455,7 @@ button.big:active{transform:translateY(1px)}
 (function(){
   var byId=function(x){return document.getElementById(x)};
   var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();window.scrollTo(0,0);};});
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
   function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} if(typeof cloudPush==='function')cloudPush(k); }
@@ -705,7 +709,7 @@ button.big:active{transform:translateY(1px)}
     saveSuivi(); return items.length;
   }
   // ---- Recoupement Suivi ↔ Fiche agent (agents dans un rayon de la demande) ----
-  function faById(id){ for(var i=0;i<FA.length;i++)if(FA[i].id===id)return FA[i]; return null; }
+  function faById(id){ if(typeof FA==='undefined'||!FA)return null; for(var i=0;i<FA.length;i++)if(FA[i].id===id)return FA[i]; return null; }
   function ensureGeo(it,cb){
     if(it.la!=null){cb&&cb();return;}
     var v=it.ville||extractVille(it.texte);
@@ -881,7 +885,10 @@ button.big:active{transform:translateY(1px)}
   renderSuivi();
 
   // ===== Prise de service / Fin de service (même structure) =====
+  var SVCREFRESH=[];
   function svcSection(pfx,titre,emoji,heureLabel){
+    var isPrise=(pfx==='ps'), _linked=null, _planned='';
+    function svcNowHM(){var d=new Date();return pad2(d.getHours())+':'+pad2(d.getMinutes());}
     function gen(){
       var cl=byId(pfx+'-client').value.trim(),si=byId(pfx+'-site').value.trim(),ag=byId(pfx+'-agent').value.trim(),vi=byId(pfx+'-ville').value.trim(),cp=byId(pfx+'-cp').value.trim();
       var h=byId(pfx+'-h').value,m=byId(pfx+'-m').value,heure=h?(h+':'+(m||'00')):'';
@@ -896,6 +903,7 @@ button.big:active{transform:translateY(1px)}
       if(retardEl)L.push('En retard : '+(retard?('OUI'+(rtot?' ('+rdur+')':'')):'non'));
       L.push('Photo : '+(photo||'non précisé'));
       L.push('Client avisé : '+(avise?'OUI':'non'));
+      if(_planned){ var _nh=svcNowHM(),_x=toMin(_nh),_y=toMin(_planned); if(_x!=null&&_y!=null){ var _dd=_x-_y,_a=Math.abs(_dd),_lb=(_a>=60?(Math.floor(_a/60)+'h'+(_a%60?pad2(_a%60):'')):(_a+' min')); L.push('⏱ Saisie : '+_nh+' (prévu '+_planned+' → '+(_dd===0?'à l\'heure':(_dd>0?'+':'−')+_lb+' de décalage')+')'); } }
       byId(pfx+'-out').textContent=L.join('\n');
     }
     mkCombo(pfx+'-client',CLIENTS,'fkh_clients',gen);
@@ -906,6 +914,12 @@ button.big:active{transform:translateY(1px)}
     [pfx+'-ville',pfx+'-cp'].forEach(function(id){byId(id).addEventListener('input',gen);});
     [pfx+'-h',pfx+'-m',pfx+'-photo',pfx+'-avise'].forEach(function(id){byId(id).addEventListener('change',gen);});
     byId(pfx+'-copy').onclick=function(){var x=byId(pfx+'-out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=this,o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
+    function svcCS(txt){txt=String(txt||'');var c='',s='';var mc=txt.match(/Client[^\n:]*:\s*([^\n]+)/i);if(mc)c=mc[1].trim();var ms=txt.match(/[Ss]ite[^\n:]*:\s*([^\n]+)/);if(ms)s=ms[1].trim();return {client:c,site:s};}
+    function svcPick(id){var it=null,i;for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;}if(!it)return;var a=faById(it.agentId);byId(pfx+'-agent').value=a?(a.nom||''):'';byId(pfx+'-ville').value=it.ville||'';var cs=svcCS(it.texte);if(cs.client)byId(pfx+'-client').value=cs.client;if(cs.site)byId(pfx+'-site').value=cs.site;if(it.mheure){var p=String(it.mheure).split(':');byId(pfx+'-h').value=p[0]||'';byId(pfx+'-m').value=p[1]||'';}_linked=it;_planned=it.mheure||'';gen();window.scrollTo(0,0);}
+    function svcMissions(){var box=byId(pfx+'-missions');if(!box)return;var mdEl=byId(pfx+'-mday'),day=mdEl?mdEl.value:'';var arr=(SUIVI||[]).filter(function(x){return x.statut==='validee'&&x.agentId&&(!day||x.mdate===day);});if(!arr.length){box.innerHTML='<div class="hint" style="margin:0">Aucune mission affectée'+(day?' ce jour-là':'')+'. Affecte un agent dans « Suivi demandes ».</div>';return;}box.innerHTML='<div class="list">'+arr.map(function(x){var a=faById(x.agentId),nm=a?(a.nom||'?'):'(agent)';return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(nm)+(x.mheure?' <span style="color:var(--muted);font-weight:400">· prévu '+esc(x.mheure)+'</span>':'')+'</div><div class="fa-d">'+esc(x.titre||'')+(x.mdate?' · '+esc(x.mdate):'')+'</div></div><button class="ok" data-svcpick="'+x.id+'">'+(isPrise?'Prendre':'Terminer')+'</button></div>';}).join('')+'</div>';box.querySelectorAll('[data-svcpick]').forEach(function(b){b.onclick=function(){svcPick(b.getAttribute('data-svcpick'));};});}
+    var _md=byId(pfx+'-mday'); if(_md){var _t=new Date();_md.value=_t.getFullYear()+'-'+pad2(_t.getMonth()+1)+'-'+pad2(_t.getDate());_md.addEventListener('change',svcMissions);}
+    svcMissions(); SVCREFRESH.push(svcMissions);
+    var _sv=byId(pfx+'-save'); if(_sv)_sv.onclick=function(){var cl=byId(pfx+'-client').value.trim(),si=byId(pfx+'-site').value.trim(),ag=byId(pfx+'-agent').value.trim(),vi=byId(pfx+'-ville').value.trim();var hh=byId(pfx+'-h').value,mm=byId(pfx+'-m').value,heure=hh?(hh+':'+(mm||'00')):'';if(!(ag||cl||si||heure)){flash(this,'Rien à enregistrer');return;}var rEl=byId(pfx+'-retard'),rtot=rEl?((+byId(pfx+'-retard-h').value||0)*60+(+byId(pfx+'-retard-m').value||0)):0;var nh=svcNowHM(),dm=null;if(_planned){var px=toMin(nh),py=toMin(_planned);if(px!=null&&py!=null)dm=px-py;}var SV=load('fkh_services');SV.unshift({id:'sv'+Date.now()+'_'+Math.round(Math.random()*1e5),type:isPrise?'prise':'fin',missionId:_linked?_linked.id:null,agent:ag,client:cl,site:si,ville:vi,heure:heure,retard:rEl?(rEl.checked?(rtot||1):0):null,photo:byId(pfx+'-photo').value,avise:byId(pfx+'-avise').checked,mdate:_linked?_linked.mdate:(_md?_md.value:''),planned:_planned,saisiHM:nh,decMin:dm,at:Date.now()});save('fkh_services',SV);flash(this,'✅ Enregistré');if(typeof renderServices==='function')renderServices();};
   }
   svcSection('ps','PRISE DE SERVICE','🟢','Heure de prise de service');
   svcSection('fs','FIN DE SERVICE','🔴','Heure de fin de service');
@@ -1191,7 +1205,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null };
   function cloudHdr(){ return {'Content-Type':'application/json','X-App-Password':CLOUD.pass}; }
   function cloudPush(k){
