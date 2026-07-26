@@ -492,7 +492,29 @@ button.big:active{transform:translateY(1px)}
     </div>
   </section>
   <section id="sec-tenues" class="hidden">
-    <div><h1>🦺 Tenues</h1><p class="sub">État des tenues par agent (contrôle photo ≥ toutes les 2 semaines) + stock. Données synchronisées depuis l'inventaire partagé.</p></div>
+    <div><h1>🦺 Tenues</h1><p class="sub">État des tenues par agent (contrôle ≥ toutes les 2 semaines) + stock. Tu peux maintenant saisir/modifier un contrôle directement ici.</p></div>
+    <div class="card" id="tc-card">
+      <button type="button" class="big" id="tc-open" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">➕ Saisir / modifier un contrôle de tenue</button>
+      <div id="tc-panel" class="hidden" style="margin-top:10px">
+        <div class="grid2"><label class="f"><div class="lab">Agent</div><div class="acwrap"><input id="tc-agent" placeholder="Nom de l'agent" autocomplete="off"><div class="sugg hidden" id="sugg-tc-agent"></div></div></label><label class="f"><div class="lab">Date du contrôle</div><input type="date" id="tc-date"></label></div>
+        <div class="grid2"><label class="f"><div class="lab">Site</div><input id="tc-site" placeholder="Site du contrôle" autocomplete="off"></label><label class="f"><div class="lab">Société</div><input id="tc-societe" placeholder="FKH, DAHLIA…" autocomplete="off"></label></div>
+        <div class="lab" style="margin:8px 0 4px">📏 Mensurations</div>
+        <div class="grid2"><label class="f"><div class="lab">Pointure</div><input id="tc-pointure" placeholder="43" autocomplete="off"></label><label class="f"><div class="lab">Taille pantalon</div><input id="tc-pantalon" placeholder="M, 44…" autocomplete="off"></label></div>
+        <label class="f"><div class="lab">Taille haut</div><input id="tc-haut" placeholder="L, XL…" autocomplete="off"></label>
+        <div class="lab" style="margin:8px 0 4px">🧩 Pièces — coche = présente / OK, décoche = manquante</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <label class="chk"><input type="checkbox" class="tc-piece" data-p="Chaussures" checked><span>Chaussures</span></label>
+          <label class="chk"><input type="checkbox" class="tc-piece" data-p="Pantalon" checked><span>Pantalon</span></label>
+          <label class="chk"><input type="checkbox" class="tc-piece" data-p="Tshirt" checked><span>T-shirt</span></label>
+          <label class="chk"><input type="checkbox" class="tc-piece" data-p="Polo" checked><span>Polo</span></label>
+          <label class="chk"><input type="checkbox" class="tc-piece" data-p="Parka" checked><span>Parka</span></label>
+          <label class="chk"><input type="checkbox" class="tc-piece" data-p="Gilet" checked><span>Gilet</span></label>
+          <label class="chk"><input type="checkbox" class="tc-piece" data-p="Ceinturon" checked><span>Ceinturon</span></label>
+        </div>
+        <div class="hint" id="tc-err" style="color:var(--bad)"></div>
+        <div class="acts" style="margin-top:8px"><button class="ok" id="tc-save">💾 Enregistrer le contrôle</button><button id="tc-cancel">Annuler</button></div>
+      </div>
+    </div>
     <div id="ten-body"></div>
   </section>
   <section id="sec-services" class="hidden">
@@ -1450,13 +1472,14 @@ button.big:active{transform:translateY(1px)}
       var inc=String(c['Statut tenue']||'').toLowerCase().indexOf('incomplet')>=0, d=ctrlDays(c['Date contrôle']);
       var mens=[c.Pointure&&('👟 '+c.Pointure),c['T. pantalon']&&('👖 '+c['T. pantalon']),c['T. haut']&&('👕 '+c['T. haut'])].filter(Boolean).join(' · ');
       var manq=c.Manquants?('<div class="fa-d" style="color:var(--bad)">Manque : '+esc(String(c.Manquants))+'</div>'):'';
-      return '<div class="it"><div style="flex:1"><div class="fa-n">'+(inc?'🟠':'🟢')+' '+esc(c.Agent||'—')+(c.Site?' <span style="color:var(--muted);font-weight:400">· '+esc(String(c.Site))+'</span>':'')+'</div><div class="fa-d">'+esc(String(c['Date contrôle']||'').slice(0,10))+(d!=null?' · il y a '+d+' j':'')+(d!=null&&d>14?' <span style="color:var(--bad)">⚠ à recontrôler</span>':'')+(mens?' · '+esc(mens):'')+'</div>'+manq+'</div></div>';
+      return '<div class="it"><div style="flex:1"><div class="fa-n">'+(inc?'🟠':'🟢')+' '+esc(c.Agent||'—')+(c.Site?' <span style="color:var(--muted);font-weight:400">· '+esc(String(c.Site))+'</span>':'')+'</div><div class="fa-d">'+esc(String(c['Date contrôle']||'').slice(0,10))+(d!=null?' · il y a '+d+' j':'')+(d!=null&&d>14?' <span style="color:var(--bad)">⚠ à recontrôler</span>':'')+(mens?' · '+esc(mens):'')+'</div>'+manq+'</div><div class="fa-a"><button class="tc-edit" data-i="'+TCTRL.indexOf(c)+'" title="Éditer ce contrôle">✏️</button></div></div>';
     }).join('')+'</div></div>';
     var st=(TSTOCK||[]); function low(s){var x=String(s['Statut stock']||'').toLowerCase();return x.indexOf('proche')>=0||x.indexOf('rupture')>=0||x.indexOf('manqu')>=0;}
     var nlow=st.filter(low).length;
     H+='<div class="card"><div class="lab" style="margin:0 0 6px">📦 Stock ('+st.length+' réf.'+(nlow?' · '+nlow+' à surveiller':'')+')</div><div class="list">';
     H+= st.map(function(s){var w=low(s);return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(String(s['Pièce']||'—'))+' <span style="color:var(--muted);font-weight:400">'+esc([s.Couleur,s.Taille].filter(function(x){return x!=null&&x!=='';}).join(' '))+'</span></div><div class="fa-d">Qté : '+esc(String(s['Qté en stock']!=null?s['Qté en stock']:'?'))+(s['Statut stock']?' · <span style="color:'+(w?'var(--bad)':'var(--muted)')+'">'+esc(String(s['Statut stock']))+'</span>':'')+'</div></div></div>';}).join('')+'</div></div>';
     wrap.innerHTML=H;
+    wrap.querySelectorAll('.tc-edit').forEach(function(b){b.onclick=function(){var i=+b.getAttribute('data-i'); if(TCTRL[i]&&typeof tcFill==='function')tcFill(TCTRL[i],i);};});
   }
   // ===== Import de services (CSV) → missions validées + fiches agents (aperçu avant validation) =====
   var IMP={};
@@ -2142,6 +2165,24 @@ button.big:active{transform:translateY(1px)}
   if(byId('sup-from'))byId('sup-from').addEventListener('change',renderSupervision);
   if(byId('sup-to'))byId('sup-to').addEventListener('change',renderSupervision);
   (function(){ var t=impTodayISO(); if(byId('sup-from')&&!byId('sup-from').value)byId('sup-from').value=t; if(byId('sup-to')&&!byId('sup-to').value)byId('sup-to').value=t; })();
+
+  // ===== Saisie / édition d'un contrôle de tenue =====
+  var tcEdit=null;
+  function tcReset(){ ['tc-agent','tc-site','tc-societe','tc-pointure','tc-pantalon','tc-haut'].forEach(function(id){if(byId(id))byId(id).value='';}); if(byId('tc-date'))byId('tc-date').value=impTodayISO(); document.querySelectorAll('.tc-piece').forEach(function(c){c.checked=true;}); if(byId('tc-err'))byId('tc-err').textContent=''; tcEdit=null; if(byId('tc-save'))byId('tc-save').textContent='💾 Enregistrer le contrôle'; }
+  function tcFill(rec,idx){ tcEdit=idx; byId('tc-panel').classList.remove('hidden'); byId('tc-agent').value=rec.Agent||''; byId('tc-date').value=String(rec['Date contrôle']||'').slice(0,10); byId('tc-site').value=rec.Site||''; byId('tc-societe').value=rec['Société']||''; byId('tc-pointure').value=rec.Pointure||''; byId('tc-pantalon').value=rec['T. pantalon']||''; byId('tc-haut').value=rec['T. haut']||''; document.querySelectorAll('.tc-piece').forEach(function(c){var p=c.getAttribute('data-p'),v=String(rec[p]||'').toLowerCase(); c.checked=!(v.indexOf('manqu')>=0);}); byId('tc-save').textContent='✔️ Mettre à jour'; byId('tc-err').textContent=''; window.scrollTo(0,0); }
+  function tcSave(){
+    var agent=byId('tc-agent').value.trim(); if(!agent){byId('tc-err').textContent='Le nom de l\'agent est requis.';return;}
+    var manq=[], rec={'Date contrôle':byId('tc-date').value||impTodayISO(),'Agent':agent,'Site':byId('tc-site').value.trim(),'Société':byId('tc-societe').value.trim(),'Pointure':byId('tc-pointure').value.trim(),'T. pantalon':byId('tc-pantalon').value.trim(),'T. haut':byId('tc-haut').value.trim()};
+    document.querySelectorAll('.tc-piece').forEach(function(c){var p=c.getAttribute('data-p'); rec[p]=c.checked?'OK':'Manquant'; if(!c.checked)manq.push(p);});
+    rec['Statut tenue']=manq.length?'Incomplet':'Complet'; rec['Manquants']=manq.join(' '); rec['Urgence']=''; rec['Besoin pour le']='';
+    var T=load('fkh_tenues_ctrl'); if(!Array.isArray(T))T=[];
+    if(tcEdit!=null&&T[tcEdit])T[tcEdit]=rec; else T.push(rec);
+    save('fkh_tenues_ctrl',T); TCTRL=T; tcReset(); if(typeof renderTenues==='function')renderTenues(); if(typeof renderFA==='function')renderFA(); if(typeof renderSuivi==='function')renderSuivi();
+  }
+  if(byId('tc-open'))byId('tc-open').onclick=function(){ byId('tc-panel').classList.toggle('hidden'); if(byId('tc-date')&&!byId('tc-date').value)byId('tc-date').value=impTodayISO(); };
+  if(byId('tc-cancel'))byId('tc-cancel').onclick=function(){ tcReset(); byId('tc-panel').classList.add('hidden'); };
+  if(byId('tc-save'))byId('tc-save').onclick=tcSave;
+  if(byId('tc-agent'))byId('tc-agent').addEventListener('input',function(){ var q=this.value.toLowerCase().trim(),box=byId('sugg-tc-agent'); if(q.length<1||typeof FA==='undefined'||!FA){box.classList.add('hidden');return;} var m=FA.filter(function(a){return (a.nom||'').toLowerCase().indexOf(q)>=0;}).slice(0,6); if(!m.length){box.classList.add('hidden');return;} box.innerHTML=m.map(function(a){return '<div data-v="'+esc(a.nom||'')+'">'+esc(a.nom||'')+'</div>';}).join(''); box.classList.remove('hidden'); box.querySelectorAll('div').forEach(function(d){d.onmousedown=function(e){e.preventDefault();byId('tc-agent').value=d.getAttribute('data-v');box.classList.add('hidden');};}); });
 
   (function initCloud(){
     var lo=byId('loginOverlay');
