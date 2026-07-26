@@ -878,7 +878,7 @@ button.big:active{transform:translateY(1px)}
     if(x.statut!=='validee')return '';
     var out='';
     if(typeof izPriorityLine==='function')out+=izPriorityLine(x);
-    if(x.agentId&&FA){ var a=faById(x.agentId),miss=a?agentMissing(a):[],bd=miss.length?' <span style="color:var(--warn)">⚠ '+miss.map(esc).join(' · ')+'</span>':''; out+='<div class="meta" style="color:var(--ok);font-weight:600"><span>👤 Agent : '+esc(a?(a.nom||'—'):'(agent supprimé)')+bd+tenueBadge(a)+'</span></div>'; var cd=missCountdown(x); if(cd)out+='<div class="meta"><span>'+cd+'</span></div>'; }
+    if(x.agentId&&FA){ var a=faById(x.agentId),miss=a?agentMissing(a):[],bd=miss.length?' <span style="color:var(--warn)">⚠ '+miss.map(esc).join(' · ')+'</span>':''; out+='<div class="meta" style="color:var(--ok);font-weight:600"><span>👤 Agent : '+esc(a?(a.nom||'—'):'(agent supprimé)')+bd+tenueBadge(a)+'</span></div>'; }
     else if(x.agentId){ out+='<div class="meta" style="color:var(--ok);font-weight:600"><span>👤 Agent affecté</span></div>'; }
     out+='<div class="acts" style="margin-top:2px"><button data-act="affect" data-id="'+x.id+'">👤 '+(x.agentId?'Changer / voir l\'agent':'Affecter un agent')+'</button></div>';
     if(typeof apPlan==='function'){ var apP=apPlan(x); if(apP){ out+='<div class="meta" style="margin-top:2px"><span>📞 Appels pendant le service : <button data-act="apon" data-id="'+x.id+'"'+(apP.on?' class="ok"':'')+'>'+(apP.on?'activés':'désactivés')+'</button>'+(apP.on?(' &nbsp;<b>'+apP.nb+'</b> contrôle'+(apP.nb>1?'s':'')+' <button data-act="apnb" data-id="'+x.id+'" data-d="-1">−</button><button data-act="apnb" data-id="'+x.id+'" data-d="1">+</button>'+(apP.night?' <span style="color:#e0784b">🌙 nuit</span>':'')):'')+'</span></div>'; } }
@@ -926,7 +926,8 @@ button.big:active{transform:translateY(1px)}
       var assocLine='';
       if(x.assoc&&x.assoc.length){ var nm=x.assoc.map(function(id){var a=faById(id);return a?(a.nom||'?'):null;}).filter(Boolean); if(nm.length)assocLine='<div class="meta" style="color:var(--ok);font-weight:600"><span>👥 Associé'+(nm.length>1?'s':'')+' : '+esc(nm.join(', '))+'</span></div>'; }
       var zdLine=(x.depCode&&ZDIFF[x.depCode])?'<div class="meta" style="color:var(--bad);font-weight:600"><span>🔺 Zone difficile'+(x.depNom?' : '+esc(x.depNom)+' ('+esc(x.depCode)+')':'')+'</span></div>':'';
-      return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+assocLine+zdLine+'<div class="svm">'+esc(x.texte)+'</div>'+body+pickBtn+pickPanel+nearPanel+renderAffect(x)+'</div>';
+      var cdLine=(x.statut==='validee'&&x.mdate&&typeof missCountdown==='function')?(function(){var cd=missCountdown(x);return cd?'<div class="meta" style="font-weight:700;color:var(--accent,#6ea8fe)"><span>'+cd+(x.mdate?' <span style="color:var(--muted);font-weight:400">('+esc(x.mdate)+(x.mheure?' '+esc(x.mheure):'')+')</span>':'')+'</span></div>':'';})():'';
+      return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+cdLine+assocLine+zdLine+'<div class="svm">'+esc(x.texte)+'</div>'+body+pickBtn+pickPanel+nearPanel+renderAffect(x)+'</div>';
     }
     if(suiviBucket==='validee'){
       var byD=function(a,b){var da=a.mdate||'9999-99-99',db=b.mdate||'9999-99-99';return da>db?1:(da<db?-1:0);};
