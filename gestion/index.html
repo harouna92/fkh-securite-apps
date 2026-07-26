@@ -462,6 +462,7 @@ button.big:active{transform:translateY(1px)}
       <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><span class="sub" style="margin:0;align-self:center">Type :</span><button type="button" class="sa-type on" data-ty="all">Tous</button><button type="button" class="sa-type" data-ty="avant">☎ Avant</button><button type="button" class="sa-type" data-ty="prise">🟢 Prise</button><button type="button" class="sa-type" data-ty="pendant">🌙 Pendant</button><button type="button" class="sa-type" data-ty="fin">🔚 Fin</button></div>
       <button type="button" class="big" id="sa-reset" style="margin-top:8px;background:var(--panel2);color:var(--ink);border:1px solid var(--line)">↺ Revenir au défaut (aujourd'hui · tous · chronologique)</button>
     </div>
+    <div id="sa-alert" style="position:fixed;right:12px;bottom:14px;z-index:59;max-width:340px;max-height:62vh;overflow:auto;background:var(--panel);border:2px solid var(--bad);border-radius:12px;padding:10px 12px;box-shadow:0 6px 24px rgba(0,0,0,.45);display:none"></div>
     <div id="sa-body"></div>
     <div style="display:none">
       <div id="th-lateBadge" class="th-late-badge" style="display:none"></div>
@@ -2036,11 +2037,25 @@ button.big:active{transform:translateY(1px)}
       return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" style="padding:8px'+(done?';opacity:.6':'')+'"><div class="fa-n"><span class="sa-tag"></span><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+e.label+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'+ctx
         +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">'+fields+'</div></div>';
     }).join('');
-    saColorize();
+    saColorize(); if(typeof saAlert==='function')saAlert();
   }
   function saGolive(){ var g=load('fkh_sa_golive'); if(typeof g==='string'&&g){ var t=new Date(g).getTime(); if(!isNaN(t))return t; } return new Date('2026-07-26T18:40:00').getTime(); }
   function saColorize(){ var now=Date.now(), gl=saGolive(), els=document.querySelectorAll('#sa-body .sacard'); for(var i=0;i<els.length;i++){ var c=els[i],done=c.getAttribute('data-done')==='1',ct=+c.getAttribute('data-ct'),tag=c.querySelector('.sa-tag'); if(done||!ct||ct<gl){c.style.borderLeft='';c.style.background='';if(tag)tag.innerHTML='';continue;} var dmin=(now-ct)/60000; if(dmin>=10){c.style.borderLeft='6px solid var(--bad)';c.style.background='rgba(200,0,0,.14)';if(tag)tag.innerHTML='<span style="color:var(--bad);font-weight:800">⛔ DANGER — appel non fait </span>';} else if(dmin>=4.5){c.style.borderLeft='4px solid var(--bad)';c.style.background='';if(tag)tag.innerHTML='<span style="color:var(--bad);font-weight:700">🔴 EN RETARD </span>';} else if(dmin>=-2){c.style.borderLeft='4px solid #e0a13b';c.style.background='';if(tag)tag.innerHTML='<span style="color:#e0a13b;font-weight:700">🟡 À FAIRE MAINTENANT </span>';} else {c.style.borderLeft='';c.style.background='';if(tag)tag.innerHTML='';} } }
-  setInterval(function(){ if(byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')&&typeof saColorize==='function')saColorize(); },20000);
+  function saAlert(){
+    var box=byId('sa-alert'); if(!box)return; var now=Date.now(), gl=(typeof saGolive==='function')?saGolive():0, due=[];
+    document.querySelectorAll('#sa-body .sacard').forEach(function(c){ if(c.getAttribute('data-done')==='1')return; var ct=+c.getAttribute('data-ct'); if(!ct||ct<gl)return; var dmin=(now-ct)/60000; if(dmin<-2)return; due.push({c:c,dmin:dmin}); });
+    if(!due.length){ box.style.display='none'; box.innerHTML=''; return; }
+    due.sort(function(a,b){return b.dmin-a.dmin;});
+    box.style.display='block';
+    box.innerHTML='<div style="font-weight:800;margin-bottom:4px">🔔 '+due.length+' appel'+(due.length>1?'s':'')+' à faire maintenant</div>'+due.slice(0,5).map(function(o,i){
+      var c=o.c, tit=c.querySelector('.fa-n')?c.querySelector('.fa-n').cloneNode(true):null; if(tit){var tg=tit.querySelector('.sa-tag'); if(tg)tg.remove();}
+      var lvl=o.dmin>=10?'⛔':(o.dmin>=4.5?'🔴':'🟡');
+      var ctx=c.querySelector('.fa-d')?c.querySelector('.fa-d').innerHTML:'';
+      return '<div style="border-top:1px solid var(--line);padding-top:6px;margin-top:6px"><div style="font-weight:600">'+lvl+' '+(tit?tit.innerHTML:'')+'</div><div class="fa-d" style="font-size:12px;line-height:1.6">'+ctx+'</div><button class="ok sa-alertdone" data-idx="'+i+'" style="margin-top:5px">✅ Fait</button></div>';
+    }).join('');
+    box.querySelectorAll('.sa-alertdone').forEach(function(b){ b.onclick=function(){ var cb=due[+b.getAttribute('data-idx')].c.querySelector('.sa-done'); if(cb){cb.checked=true; cb.dispatchEvent(new Event('change',{bubbles:true}));} }; });
+  }
+  setInterval(function(){ if(byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')){ if(typeof saColorize==='function')saColorize(); if(typeof saAlert==='function')saAlert(); } },10000);
   if(byId('sa-body')){
     byId('sa-body').addEventListener('change',function(e){
       var t=e.target, mid=t.getAttribute('data-mid'), key=t.getAttribute('data-key'); if(!mid)return;
