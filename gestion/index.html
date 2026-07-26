@@ -521,13 +521,12 @@ button.big:active{transform:translateY(1px)}
   </section>
   <section id="sec-suivisite" class="hidden">
     <div><h1>🏢 Suivi site</h1><p class="sub">Aperçu de la future section unifiée (Prise/Fin de service + appels + Thiam). Une fiche par mission : début du service (J‑15 → 🟢 prise → +30 min), contrôles, fin. Heures 🇫🇷 France + 🇲🇱 Mali. <b>Version aperçu — les anciens onglets restent en place.</b></p></div>
+    <div id="ss-filter" style="margin:8px 0"><div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="ss-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="ss-to"></label></div><div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:6px"><button type="button" class="ss-preset" data-d="1">Aujourd'hui</button><button type="button" class="ss-preset" data-d="3">3 j</button><button type="button" class="ss-preset" data-d="7">7 j</button><button type="button" class="ss-preset" data-d="20">20 j</button><button type="button" class="ss-preset" data-d="40">40 j</button></div></div>
     <div class="subtabs" id="ssTabs">
-      <button data-t="today" class="on">📆 Aujourd'hui</button>
-      <button data-t="soon">⏭️ À venir</button>
+      <button data-t="suivi" class="on">▶️ Suivi</button>
+      <button data-t="regl">⚙️ Réglages</button>
       <button data-t="hist">🗂️ Historique</button>
-      <button data-t="params">⚙️ Paramètres</button>
     </div>
-    <div id="ss-filter" class="hidden" style="margin:8px 0"><div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="ss-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="ss-to"></label></div><div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:6px"><button type="button" class="ss-preset" data-d="3">3 j</button><button type="button" class="ss-preset" data-d="7">7 j</button><button type="button" class="ss-preset" data-d="20">20 j</button><button type="button" class="ss-preset" data-d="40">40 j</button></div></div>
     <div id="ss-body"></div>
   </section>
 </div>
@@ -1822,13 +1821,16 @@ button.big:active{transform:translateY(1px)}
     var fin=apFinHeure(m), end=toMin(fin);
     var endAbs=(end!=null)?((end<=start)?end+1440:end):null;
     var dur=(endAbs!=null)?(endAbs-start):null;
-    var over=apLoad()[m.id];
+    var over=apLoad()[m.id], night=apIsNight(start,end);
+    var on=(over&&over.on!=null)?over.on:night;
     var defNb=(dur!=null)?Math.max(0,Math.round(dur/120)-1):0;
     var nb=(over&&over.nb!=null)?over.nb:defNb;
     var controls=[];
-    if(dur!=null&&nb>0){ var step=dur/(nb+1); for(var i=1;i<=nb;i++){ var mn=Math.round((start+i*step)/5)*5; controls.push(pad2(Math.floor((mn%1440)/60))+':'+pad2(mn%60)); } }
-    return { start:m.mheure, fin:fin, controls:controls, nb:nb, night:apIsNight(start,end), dur:dur };
+    if(on&&dur!=null&&nb>0){ var step=dur/(nb+1); for(var i=1;i<=nb;i++){ var mn=Math.round((start+i*step)/5)*5; controls.push(pad2(Math.floor((mn%1440)/60))+':'+pad2(mn%60)); } }
+    return { start:m.mheure, fin:fin, controls:controls, nb:nb, night:night, on:on, dur:dur };
   }
+  function apSetOn(mid,on){ var A=apLoad(); if(!A[mid])A[mid]={}; A[mid].on=on; apSave(A); }
+  function apSetNb(mid,nb){ var A=apLoad(); if(!A[mid])A[mid]={}; A[mid].nb=Math.max(0,nb); A[mid].on=true; apSave(A); }
   function renderAppels(){
     var wrap=byId('ap-body'); if(!wrap)return;
     var from=byId('ap-from')?byId('ap-from').value:'', to=byId('ap-to')?byId('ap-to').value:'';
@@ -1859,7 +1861,7 @@ button.big:active{transform:translateY(1px)}
   (function(){ var t=impTodayISO(); if(byId('ap-from')&&!byId('ap-from').value)byId('ap-from').value=t; if(byId('ap-to')&&!byId('ap-to').value)byId('ap-to').value=t; var p1=document.querySelector('.ap-preset[data-d="1"]'); if(p1)p1.classList.add('on'); })();
 
   // ===== Suivi site (aperçu unifié : début service / contrôles / fin, une fiche par mission) =====
-  var ssTab='today';
+  var ssTab='suivi';
   function ssLoad(){ var s=load('fkh_suivisite'); return (s&&typeof s==='object'&&!Array.isArray(s))?s:{}; }
   function ssSave(s){ save('fkh_suivisite',s); }
   function ssParams(){ var p=load('fkh_ss_params'); if(!p||typeof p!=='object'||Array.isArray(p))p={}; return {before:(p.before!=null?p.before:15), after:(p.after!=null?p.after:30)}; }
@@ -1893,35 +1895,48 @@ button.big:active{transform:translateY(1px)}
     }).join('');
     return '<div class="card">'+head+'<div class="list" style="margin-top:6px">'+rows+'</div></div>';
   }
+  function ssReglCard(m){
+    var p=(typeof apPlan==='function')?apPlan(m):null, site=m.siteAgent||m.titre||'—';
+    var h='<div class="card"><div class="fa-n" style="font-size:16px">'+esc(site)+(m.ville?' · '+esc(m.ville):'')+' <span style="color:var(--muted);font-weight:400">'+esc(m.mdate||'')+(m.mheure?' '+esc(m.mheure):'')+'</span>'+(p&&p.night?' <span style="color:#e0784b">🌙 nuit</span>':'')+'</div>';
+    if(!p){ h+='<div class="sub" style="margin:4px 0">Heure de début manquante.</div></div>'; return h; }
+    h+='<label class="chk" style="margin-top:6px"><input type="checkbox" data-ason="'+esc(m.id)+'"'+(p.on?' checked':'')+'><span>📞 Appels de contrôle pendant le service</span></label>';
+    if(p.on){ h+='<div class="acts" style="gap:6px;align-items:center;margin-top:4px"><span class="sub" style="margin:0">Nombre de contrôles : <b>'+p.nb+'</b></span><button data-asnb="'+esc(m.id)+'" data-d="-1">−</button><button data-asnb="'+esc(m.id)+'" data-d="1">+</button></div><div class="sub" style="margin:4px 0 0">'+(p.controls.length?('Contrôles : '+p.controls.map(function(c){return esc(c)+' (🇲🇱 '+esc(thToMali(c))+')';}).join(' · ')):'—')+'</div>'; }
+    h+='</div>';
+    return h;
+  }
   function renderSuiviSite(){
     var wrap=byId('ss-body'); if(!wrap)return;
     document.querySelectorAll('#ssTabs button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===ssTab);});
-    var flt=byId('ss-filter'); if(flt)flt.classList.toggle('hidden',ssTab!=='soon');
-    if(ssTab==='params'){ var P=ssParams(); wrap.innerHTML='<div class="card"><div class="lab" style="margin:0 0 6px">Paramètres pré-remplis (ajustables)</div><div class="grid2"><label class="f"><div class="lab">Appel avant la prise (min)</div><input type="number" id="ss-before" value="'+P.before+'" min="0" max="120"></label><label class="f"><div class="lab">Appel après la prise (min)</div><input type="number" id="ss-after" value="'+P.after+'" min="0" max="180"></label></div><p class="sub" style="margin:8px 0 0">Le nombre d\'appels de contrôle (nuit) s\'ajuste par mission dans 📞 Appels. La conversion Mali est automatique.</p></div>';
-      byId('ss-before').addEventListener('change',function(){ var p=ssParams(); p.before=parseInt(this.value,10)||0; save('fkh_ss_params',p); });
-      byId('ss-after').addEventListener('change',function(){ var p=ssParams(); p.after=parseInt(this.value,10)||0; save('fkh_ss_params',p); });
-      return; }
+    var from=byId('ss-from')?byId('ss-from').value:'', to=byId('ss-to')?byId('ss-to').value:'';
+    var lbl=(from||to)?('du '+(from?from.split('-').reverse().join('/'):'…')+' au '+(to?to.split('-').reverse().join('/'):'…')):'toute la période';
     if(ssTab==='hist'){
       var S=ssLoad(), ev=[];
-      Object.keys(S).forEach(function(mid){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===mid)m=SUIVI[i]; Object.keys(S[mid]).forEach(function(k){ var r=S[mid][k]; if(r&&r.done)ev.push({k:k,at:r.at,hm:r.hm,retard:r.retard,site:m?(m.siteAgent||m.titre):mid,mdate:m?m.mdate:''}); }); });
+      Object.keys(S).forEach(function(mid){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===mid)m=SUIVI[i]; var md=m?m.mdate:''; if(from&&(!md||md<from))return; if(to&&(!md||md>to))return; Object.keys(S[mid]).forEach(function(k){ var r=S[mid][k]; if(r&&r.done)ev.push({k:k,at:r.at,hm:r.hm,retard:r.retard,site:m?(m.siteAgent||m.titre):mid,mdate:md}); }); });
       ev.sort(function(a,b){return (b.at||0)-(a.at||0);});
-      if(!ev.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucun pointage encore. Pointe des étapes dans « Aujourd\'hui ».</div></div>'; return; }
-      function lblK(k){ if(k.indexOf('ctrl')===0)return 'Contrôle '+((+k.slice(4))+1); return {j15:'J‑15',prise:'Prise',after:'Après prise',fin:'Fin'}[k]||k; }
-      wrap.innerHTML='<div class="card"><div class="lab" style="margin:0 0 6px">'+ev.length+' pointage'+(ev.length>1?'s':'')+'</div><div class="list">'+ev.map(function(e){ return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(e.site||'—')+' <span style="color:var(--muted);font-weight:400">· '+esc(lblK(e.k))+'</span></div><div class="fa-d">'+esc(e.mdate||'')+' · pointé '+esc(e.hm||'')+(e.retard!=null&&e.retard>0?' <span style="color:var(--bad)">retard '+e.retard+' min</span>':'')+'</div></div></div>'; }).join('')+'</div></div>';
+      if(!ev.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucun pointage '+esc(lbl)+'.</div></div>'; return; }
+      var lblK=function(k){ if(k.indexOf('ctrl')===0)return 'Contrôle '+((+k.slice(4))+1); return {j15:'J‑15',prise:'Prise',after:'Après prise',fin:'Fin'}[k]||k; };
+      wrap.innerHTML='<div class="card"><div class="lab" style="margin:0 0 6px">'+ev.length+' pointage'+(ev.length>1?'s':'')+' — '+esc(lbl)+'</div><div class="list">'+ev.map(function(e){ return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(e.site||'—')+' <span style="color:var(--muted);font-weight:400">· '+esc(lblK(e.k))+'</span></div><div class="fa-d">'+esc(e.mdate||'')+' · pointé '+esc(e.hm||'')+(e.retard!=null&&e.retard>0?' <span style="color:var(--bad)">retard '+e.retard+' min</span>':'')+'</div></div></div>'; }).join('')+'</div></div>';
       return; }
-    var from,to;
-    if(ssTab==='today'){ from=impTodayISO(); to=impTodayISO(); }
-    else { from=byId('ss-from')?byId('ss-from').value:''; to=byId('ss-to')?byId('ss-to').value:''; }
-    var arr=ssMissions(from,to);
-    if(!arr.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune mission validée '+(ssTab==='today'?'aujourd\'hui':'sur cette période')+'.</div></div>'; return; }
-    var naff=arr.filter(function(x){return !x.agentId;}).length;
-    wrap.innerHTML='<div class="card"><div class="lab" style="margin:0">'+arr.length+' mission'+(arr.length>1?'s':'')+(naff?(' · <span style="color:var(--warn)">'+naff+' à affecter</span>'):'')+'</div></div>'+arr.map(ssCard).join('');
+    var arr=ssMissions(from,to), naff=arr.filter(function(x){return !x.agentId;}).length;
+    if(!arr.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune mission validée '+esc(lbl)+'.</div></div>'; return; }
+    var head='<div class="card"><div class="lab" style="margin:0">'+arr.length+' mission'+(arr.length>1?'s':'')+' — '+esc(lbl)+(naff?(' · <span style="color:var(--warn)">'+naff+' à affecter</span>'):'')+'</div></div>';
+    if(ssTab==='regl'){
+      var P=ssParams();
+      var gl='<div class="card"><div class="lab" style="margin:0 0 6px">Paramètres généraux (pré-remplis)</div><div class="grid2"><label class="f"><div class="lab">Appel avant la prise (min)</div><input type="number" id="ss-before" value="'+P.before+'" min="0" max="120"></label><label class="f"><div class="lab">Appel après la prise (min)</div><input type="number" id="ss-after" value="'+P.after+'" min="0" max="180"></label></div><p class="sub" style="margin:6px 0 0">🌙 Les nuits (20 h→8 h) ont les appels de contrôle activés d\'office. Coche/décoche par mission ci-dessous.</p></div>';
+      wrap.innerHTML=head+gl+arr.map(ssReglCard).join('');
+      byId('ss-before').addEventListener('change',function(){ var p=ssParams(); p.before=parseInt(this.value,10)||0; save('fkh_ss_params',p); renderSuiviSite(); });
+      byId('ss-after').addEventListener('change',function(){ var p=ssParams(); p.after=parseInt(this.value,10)||0; save('fkh_ss_params',p); renderSuiviSite(); });
+      wrap.querySelectorAll('[data-ason]').forEach(function(b){ b.onclick=function(){ apSetOn(b.getAttribute('data-ason'), b.checked); renderSuiviSite(); }; });
+      wrap.querySelectorAll('[data-asnb]').forEach(function(b){ b.onclick=function(){ var id=b.getAttribute('data-asnb'),dd=+b.getAttribute('data-d'),m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id)m=SUIVI[i]; if(!m)return; apSetNb(id,apPlan(m).nb+dd); renderSuiviSite(); }; });
+      return; }
+    wrap.innerHTML=head+arr.map(ssCard).join('');
     wrap.querySelectorAll('[data-ssp]').forEach(function(b){ b.onclick=function(){ ssPoint(b.getAttribute('data-ssp'),b.getAttribute('data-k'),b.getAttribute('data-h'),b.getAttribute('data-ty')); }; });
   }
   document.querySelectorAll('#ssTabs button').forEach(function(b){ b.onclick=function(){ ssTab=b.getAttribute('data-t'); renderSuiviSite(); }; });
-  document.querySelectorAll('.ss-preset').forEach(function(b){ b.addEventListener('click',function(){ var n=parseInt(b.getAttribute('data-d'),10)||3,t=impTodayISO(); if(byId('ss-from'))byId('ss-from').value=t; if(byId('ss-to'))byId('ss-to').value=svcAddDays(t,n-1); renderSuiviSite(); }); });
+  document.querySelectorAll('.ss-preset').forEach(function(b){ b.addEventListener('click',function(){ var n=parseInt(b.getAttribute('data-d'),10)||1,t=impTodayISO(); if(byId('ss-from'))byId('ss-from').value=t; if(byId('ss-to'))byId('ss-to').value=svcAddDays(t,n-1); renderSuiviSite(); }); });
   if(byId('ss-from'))byId('ss-from').addEventListener('change',renderSuiviSite);
   if(byId('ss-to'))byId('ss-to').addEventListener('change',renderSuiviSite);
+  (function(){ var t=impTodayISO(); if(byId('ss-from')&&!byId('ss-from').value)byId('ss-from').value=t; if(byId('ss-to')&&!byId('ss-to').value)byId('ss-to').value=t; })();
 
   (function initCloud(){
     var lo=byId('loginOverlay');
