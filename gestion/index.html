@@ -887,7 +887,8 @@ button.big:active{transform:translateY(1px)}
     if(a.tenue==='incomplet')return ' <span style="color:var(--warn)">🟠 tenue incomplète</span>';
     var c=agentCtrl(a.nom||''); if(!c)return ' <span style="color:var(--bad)">🔴 tenue jamais contrôlée</span>';
     var inc=String(c['Statut tenue']||'').toLowerCase().indexOf('incomplet')>=0, days=ctrlDays(c['Date contrôle']), stale=days!=null&&days>14;
-    return ' <span style="color:'+(inc?'var(--warn)':'var(--ok)')+'">'+(inc?'🟠 tenue incomplète':'🟢 tenue complète')+'</span>'+(stale?' <span style="color:var(--bad)">⚠ à recontrôler ('+days+'j)</span>':''); }
+    var noMens=!(c.Pointure||c['T. pantalon']||c['T. haut']);
+    return ' <span style="color:'+(inc?'var(--warn)':'var(--ok)')+'">'+(inc?'🟠 tenue incomplète':'🟢 tenue complète')+(inc&&c.Manquants?' — manque : '+esc(String(c.Manquants)):'')+'</span>'+(noMens?' <span style="color:var(--bad)">📏 mensurations manquantes</span>':'')+(stale?' <span style="color:var(--bad)">⚠ à recontrôler ('+days+'j)</span>':''); }
   function missCountdown(x){ if(!x.mdate)return ''; var t=new Date(x.mdate+'T'+((x.mheure||'00:00'))+':00'); if(isNaN(t.getTime()))return ''; var diff=t.getTime()-Date.now(); if(diff<=0)return '🟢 mission commencée / passée'; var mins=Math.floor(diff/60000),d=Math.floor(mins/1440),h=Math.floor((mins%1440)/60),mm=mins%60,p=[]; if(d)p.push(d+' j'); if(h||d)p.push(h+' h'); if(!d)p.push(mm+' min'); return '⏳ commence dans '+p.join(' '); }
   function nearBig(la,lo,n){ if(la==null||lo==null||typeof BIG==='undefined'||!BIG)return []; return BIG.map(function(b){return {n:b[0],d:km(la,lo,b[1],b[2])};}).filter(function(x){return x.d>1;}).sort(function(a,b){return a.d-b.d;}).slice(0,n||2); }
   var _geoDeb; function geoScheduleSave(){ clearTimeout(_geoDeb); _geoDeb=setTimeout(function(){ if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); },900); }
@@ -2110,7 +2111,7 @@ button.big:active{transform:translateY(1px)}
     var data=entries.map(function(e){ var r=(S[e.mid]&&S[e.mid][e.key])||{}; var ct=e.mdate?(new Date(e.mdate+'T00:00:00').getTime()+e.abs*60000):null; var lateMin=(ct!=null&&!r.done)?((now-ct)/60000):null; return {e:e,r:r,ct:ct,lateMin:lateMin}; });
     var miss=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; });
     var affAg={}; miss.forEach(function(m){ if(m.agentId){var a=faById(m.agentId); if(a)affAg[a.id]=a;} });
-    function tenueOf(a){ var c=(typeof agentCtrl==='function')?agentCtrl(a.nom):null; if(!c)return {none:true}; var dd=(typeof ctrlDays==='function')?ctrlDays(c['Date contrôle']):null; return {none:false,days:dd,statut:c['Statut tenue']||''}; }
+    function tenueOf(a){ var c=(typeof agentCtrl==='function')?agentCtrl(a.nom):null; if(!c)return {none:true}; var dd=(typeof ctrlDays==='function')?ctrlDays(c['Date contrôle']):null; return {none:false,days:dd,statut:c['Statut tenue']||'',noMens:!(c.Pointure||c['T. pantalon']||c['T. haut'])}; }
     if(supTab==='oper'){
       var glv=(typeof saGolive==='function')?saGolive():0, opr=[];
       function opCtx(e){ return [(e.client?'🏢 '+esc(e.client):''),(e.site?'📍 '+esc(e.site):''),(e.ville?esc(e.ville):''),(e.agent?'👤 '+esc(e.agent):''),(e.agentTel?'📞 <a class="call" href="tel:'+esc(String(e.agentTel).replace(/\s/g,''))+'">'+esc(e.agentTel)+'</a>':'')].filter(Boolean).join(' · '); }
@@ -2133,7 +2134,7 @@ button.big:active{transform:translateY(1px)}
         if(e.key==='prise'&&r.done&&r.agRetard)anom.push({sev:3,ic:'🔴',type:'Agent EN RETARD à la prise',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+(r.agRetardMin?' · '+r.agRetardMin+' min':'')});
         if((e.key==='prise'||e.key==='fin')&&r.done){ if(r.photo==='Photo non horodatée')anom.push({sev:2,ic:'📷',type:'Photo NON horodatée',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · '+(e.key==='prise'?'prise':'fin')}); else if(!r.photo||r.photo==='Pas de photo')anom.push({sev:2,ic:'📷',type:'Photo MANQUANTE',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · '+(e.key==='prise'?'prise':'fin')}); }
       });
-      Object.keys(affAg).forEach(function(id){ var a=affAg[id],t=tenueOf(a); if(t.none)anom.push({sev:2,ic:'🦺',type:'Tenue jamais contrôlée',agent:a.nom,when:'',detail:'agent planifié'}); else { if((t.statut||'').toLowerCase().indexOf('incomplet')>=0)anom.push({sev:2,ic:'🦺',type:'Tenue INCOMPLÈTE',agent:a.nom,when:'',detail:'agent planifié'}); if(t.days!=null&&t.days>14)anom.push({sev:1,ic:'🦺',type:'Tenue à recontrôler',agent:a.nom,when:'',detail:t.days+' j'}); } });
+      Object.keys(affAg).forEach(function(id){ var a=affAg[id],t=tenueOf(a); if(t.none)anom.push({sev:2,ic:'🦺',type:'Tenue jamais contrôlée',agent:a.nom,when:'',detail:'agent planifié'}); else { if((t.statut||'').toLowerCase().indexOf('incomplet')>=0)anom.push({sev:2,ic:'🦺',type:'Tenue INCOMPLÈTE',agent:a.nom,when:'',detail:'agent planifié'}); if(t.noMens)anom.push({sev:2,ic:'📏',type:'Mensurations manquantes',agent:a.nom,when:'',detail:'agent planifié'}); if(t.days!=null&&t.days>14)anom.push({sev:1,ic:'🦺',type:'Tenue à recontrôler',agent:a.nom,when:'',detail:t.days+' j'}); } });
       anom.sort(function(a,b){return b.sev-a.sev;});
       if(!anom.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">✅ Aucune anomalie sur la période.</div></div>'; return; }
       wrap.innerHTML='<div class="card"><div class="lab" style="margin:0 0 6px">'+anom.length+' anomalie'+(anom.length>1?'s':'')+'</div><div class="list">'+anom.map(function(a){ return '<div class="it"><div style="flex:1"><div class="fa-n">'+a.ic+' '+esc(a.type)+(a.agent?' — '+esc(a.agent):'')+'</div><div class="fa-d">'+[esc(a.when),esc(a.detail)].filter(Boolean).join(' · ')+'</div></div></div>'; }).join('')+'</div></div>';
@@ -2148,7 +2149,7 @@ button.big:active{transform:translateY(1px)}
     var pfDone=data.filter(function(d){return (d.e.key==='prise'||d.e.key==='fin')&&d.r.done;});
     var clientNA=pfDone.filter(function(d){return !d.r.avise;}).length, clientOK=pfDone.length-clientNA;
     var aff=miss.filter(function(m){return m.agentId;}).length, toaff=miss.length-aff;
-    var jamctrl=0,arectrl=0,tenIncomp=0; Object.keys(affAg).forEach(function(id){var t=tenueOf(affAg[id]);if(t.none)jamctrl++;else{if((t.statut||'').toLowerCase().indexOf('incomplet')>=0)tenIncomp++;if(t.days!=null&&t.days>14)arectrl++;}});
+    var jamctrl=0,arectrl=0,tenIncomp=0,mensN=0; Object.keys(affAg).forEach(function(id){var t=tenueOf(affAg[id]);if(t.none)jamctrl++;else{if((t.statut||'').toLowerCase().indexOf('incomplet')>=0)tenIncomp++;if(t.noMens)mensN++;if(t.days!=null&&t.days>14)arectrl++;}});
     var agRetN=data.filter(function(d){return d.e.key==='prise'&&d.r.done&&d.r.agRetard;}).length;
     var photoBad=data.filter(function(d){return (d.e.key==='prise'||d.e.key==='fin')&&d.r.done&&(!d.r.photo||d.r.photo==='Pas de photo'||d.r.photo==='Photo non horodatée');}).length;
     function kpi(t,v,col){ return '<div style="flex:1;min-width:120px;border:1px solid var(--line);border-radius:10px;padding:10px"><div style="font-size:22px;font-weight:800'+(col?';color:'+col:'')+'">'+v+'</div><div class="sub" style="margin:2px 0 0">'+t+'</div></div>'; }
@@ -2162,7 +2163,7 @@ button.big:active{transform:translateY(1px)}
       +kpi('Photos KO (manq./non horod.)',photoBad,photoBad?'var(--bad)':'')
       +'</div><div class="sub" style="margin:8px 0 0">Ponctualité : '+lheure+' à l\'heure · '+r5+' (+≤5 min) · '+rp5+' (+>5 min) · Clients avisés : '+clientOK+'/'+pfDone.length+'</div></div>';
     h+='<div class="card"><div class="lab" style="margin:0 0 8px">📋 Missions</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+kpi('Validées',miss.length)+kpi('Affectées',aff)+kpi('À affecter',toaff,toaff?'var(--warn)':'')+'</div></div>';
-    h+='<div class="card"><div class="lab" style="margin:0 0 8px">🦺 Tenues (agents affectés)</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+kpi('Incomplètes',tenIncomp,tenIncomp?'var(--bad)':'')+kpi('Jamais contrôlées',jamctrl,jamctrl?'var(--bad)':'')+kpi('À recontrôler (>2 sem)',arectrl,arectrl?'var(--warn)':'')+'</div></div>';
+    h+='<div class="card"><div class="lab" style="margin:0 0 8px">🦺 Tenues (agents affectés)</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+kpi('Incomplètes',tenIncomp,tenIncomp?'var(--bad)':'')+kpi('Mensurations manquantes',mensN,mensN?'var(--bad)':'')+kpi('Jamais contrôlées',jamctrl,jamctrl?'var(--bad)':'')+kpi('À recontrôler (>2 sem)',arectrl,arectrl?'var(--warn)':'')+'</div></div>';
     wrap.innerHTML=h;
   }
   document.querySelectorAll('#supTabs button').forEach(function(b){ b.onclick=function(){ supTab=b.getAttribute('data-t'); renderSupervision(); }; });
