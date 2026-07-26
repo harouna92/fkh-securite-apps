@@ -890,6 +890,27 @@ button.big:active{transform:translateY(1px)}
     var inc=String(c['Statut tenue']||'').toLowerCase().indexOf('incomplet')>=0, days=ctrlDays(c['Date contrôle']), stale=days!=null&&days>14;
     var noMens=!(c.Pointure||c['T. pantalon']||c['T. haut']);
     return ' <span style="color:'+(inc?'var(--warn)':'var(--ok)')+'">'+(inc?'🟠 tenue incomplète':'🟢 tenue complète')+(inc&&c.Manquants?' — manque : '+esc(String(c.Manquants)):'')+'</span>'+(noMens?' <span style="color:var(--bad)">📏 mensurations manquantes</span>':'')+(stale?' <span style="color:var(--bad)">⚠ à recontrôler ('+days+'j)</span>':''); }
+  function agentStats(nom){ if(!nom||typeof ssLoad!=='function'||typeof SUIVI==='undefined')return null; var n=tnorm(nom); if(!n)return null; var S=ssLoad(); var st={missions:0,priseDone:0,priseNoPhoto:0,finDone:0,finNoPhoto:0,retardPrise:0,injo:0,nePeutRoute:0,retardAnnonce:0};
+    function noPhoto(r){ return !r.photo||r.photo==='Pas de photo'||r.photo==='Photo non horodatée'; }
+    SUIVI.forEach(function(m){ if(m.statut!=='validee'||!m.agentId)return; var a=faById(m.agentId); if(!a||tnorm(a.nom)!==n)return; var resp=S[m.id]; if(!resp)return; st.missions++;
+      Object.keys(resp).forEach(function(k){ var r=resp[k]||{};
+        if(k==='prise'&&r.done){ st.priseDone++; if(noPhoto(r))st.priseNoPhoto++; if(r.agRetard)st.retardPrise++; }
+        if(k==='fin'&&r.done){ st.finDone++; if(noPhoto(r))st.finNoPhoto++; }
+        if(r.statut==='⚠️ Injoignable'||(r.route&&r.route.indexOf('Injoignable')>=0)||(r.ponctuel&&r.ponctuel.indexOf('Injoignable')>=0))st.injo++;
+        if(r.route&&r.route.indexOf('Ne peut pas')>=0)st.nePeutRoute++;
+        if(r.ponctuel&&r.ponctuel.indexOf('Retard annoncé')>=0)st.retardAnnonce++;
+      });
+    });
+    return st; }
+  function agentStatLine(nom){ var s=agentStats(nom); if(!s||!s.missions)return ''; var b=[];
+    if(s.priseNoPhoto)b.push('📷 '+s.priseNoPhoto+' prise'+(s.priseNoPhoto>1?'s':'')+' sans photo'+(s.priseDone?' /'+s.priseDone:''));
+    if(s.finNoPhoto)b.push('📷 '+s.finNoPhoto+' fin'+(s.finNoPhoto>1?'s':'')+' sans photo'+(s.finDone?' /'+s.finDone:''));
+    if(s.retardPrise)b.push('⏰ '+s.retardPrise+' retard'+(s.retardPrise>1?'s':'')+' à la prise');
+    if(s.injo)b.push('📵 '+s.injo+'× injoignable');
+    if(s.nePeutRoute)b.push('🚗 '+s.nePeutRoute+' refus de route');
+    if(s.retardAnnonce)b.push('⏰ '+s.retardAnnonce+' retard'+(s.retardAnnonce>1?'s':'')+' annoncé'+(s.retardAnnonce>1?'s':''));
+    if(!b.length)return '';
+    return '<div class="fa-d" style="color:var(--bad);margin-top:2px;font-weight:600">📊 Anomalies agent ('+s.missions+' mission'+(s.missions>1?'s':'')+' suivie'+(s.missions>1?'s':'')+') : '+b.join(' · ')+'</div>'; }
   function missCountdown(x){ if(!x.mdate)return ''; var t=new Date(x.mdate+'T'+((x.mheure||'00:00'))+':00'); if(isNaN(t.getTime()))return ''; var diff=t.getTime()-Date.now(); if(diff<=0)return '🟢 mission commencée / passée'; var mins=Math.floor(diff/60000),d=Math.floor(mins/1440),h=Math.floor((mins%1440)/60),mm=mins%60,p=[]; if(d)p.push(d+' j'); if(h||d)p.push(h+' h'); if(!d)p.push(mm+' min'); return '⏳ commence dans '+p.join(' '); }
   function nearBig(la,lo,n){ if(la==null||lo==null||typeof BIG==='undefined'||!BIG)return []; return BIG.map(function(b){return {n:b[0],d:km(la,lo,b[1],b[2])};}).filter(function(x){return x.d>1;}).sort(function(a,b){return a.d-b.d;}).slice(0,n||2); }
   var _geoDeb; function geoScheduleSave(){ clearTimeout(_geoDeb); _geoDeb=setTimeout(function(){ if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); },900); }
@@ -1123,7 +1144,7 @@ button.big:active{transform:translateY(1px)}
       var d=(tags?tags+'· ':'')+parts.filter(Boolean).map(esc).join(' · ')+(agentMissing(a).length?' <span style="color:var(--warn)">⚠ '+agentMissing(a).map(esc).join(' · ')+'</span>':'')+tenueBadge(a)+((a.interv&&a.interv.length)?'<br><span style="color:#e0784b">🚨 Intervention : '+a.interv.map(esc).join(', ')+'</span>':'')+anBlock;
       var call=tels.map(function(t){return '<a class="call" href="tel:'+esc(t.replace(/\s/g,''))+'" title="Appeler '+esc(t)+'">📞</a>';}).join('');
       var vbadge=a.verifie?'<span style="color:var(--ok);font-size:12px;font-weight:600"> 🟢 vérifiée</span>':'<span style="color:var(--warn);font-size:12px;font-weight:600"> 🟠 à vérifier</span>';
-      return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+vbadge+'</div><div class="fa-d">'+(d||'—')+'</div></div><div class="fa-a">'+call+'<button data-fav="'+a.id+'" title="'+(a.verifie?'Repasser à « à vérifier »':'Marquer vérifiée')+'">'+(a.verifie?'↩':'✅')+'</button><button data-fae="'+a.id+'" title="Modifier">✏️</button><button class="no" data-fad="'+a.id+'" title="Supprimer">🗑️</button></div></div>';
+      return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+vbadge+'</div><div class="fa-d">'+(d||'—')+'</div>'+agentStatLine(a.nom)+'</div><div class="fa-a">'+call+'<button data-fav="'+a.id+'" title="'+(a.verifie?'Repasser à « à vérifier »':'Marquer vérifiée')+'">'+(a.verifie?'↩':'✅')+'</button><button data-fae="'+a.id+'" title="Modifier">✏️</button><button class="no" data-fad="'+a.id+'" title="Supprimer">🗑️</button></div></div>';
     }).join('');
     byId('fa-list').querySelectorAll('[data-fav]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fav'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id)a=FA[i];if(a){a.verifie=!a.verifie;saveFA();renderFA();}};});
     byId('fa-list').querySelectorAll('[data-fad]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fad');FA=FA.filter(function(x){return x.id!==id;});saveFA();renderFA();};});
@@ -2203,7 +2224,7 @@ button.big:active{transform:translateY(1px)}
       var shown=supShowDone?active.concat(doneL):active; SUP_ANOM=shown;
       var byAg={}; active.forEach(function(a){ if(!a.agent)return; (byAg[a.agent]=byAg[a.agent]||[]).push(a); });
       var agNames=Object.keys(byAg).sort(function(x,y){return byAg[y].length-byAg[x].length;});
-      var agHtml=agNames.map(function(nm){ var list=byAg[nm],tel=anomTel(list[0]); return '<div class="it"><div style="flex:1"><div class="fa-n">👤 '+esc(nm)+' <span style="color:var(--bad);font-weight:700">'+list.length+' anomalie'+(list.length>1?'s':'')+'</span></div><div class="fa-d">'+list.map(function(a){return a.ic+' '+esc(a.type)+(a.step?' <span style="color:var(--muted)">('+esc(a.step)+')</span>':'');}).join(' · ')+'</div></div>'+(tel?'<a class="btn call" href="tel:'+esc(String(tel).replace(/\s/g,''))+'" style="align-self:center">📞 Appeler</a>':'<span class="sub" style="align-self:center">n° inconnu</span>')+'</div>'; }).join('');
+      var agHtml=agNames.map(function(nm){ var list=byAg[nm],tel=anomTel(list[0]); return '<div class="it"><div style="flex:1"><div class="fa-n">👤 '+esc(nm)+' <span style="color:var(--bad);font-weight:700">'+list.length+' anomalie'+(list.length>1?'s':'')+'</span></div><div class="fa-d">'+list.map(function(a){return a.ic+' '+esc(a.type)+(a.step?' <span style="color:var(--muted)">('+esc(a.step)+')</span>':'');}).join(' · ')+'</div>'+((typeof agentStatLine==='function')?agentStatLine(nm):'')+'</div>'+(tel?'<a class="btn call" href="tel:'+esc(String(tel).replace(/\s/g,''))+'" style="align-self:center">📞 Appeler</a>':'<span class="sub" style="align-self:center">n° inconnu</span>')+'</div>'; }).join('');
       var perAgent=agNames.length?'<div class="card" style="border:2px solid var(--warn)"><div class="lab" style="margin:0 0 6px">👤 '+agNames.length+' agent'+(agNames.length>1?'s':'')+' à rappeler pour échanger sur leurs anomalies</div><div class="list">'+agHtml+'</div></div>':'';
       var doneBar=doneL.length?'<div class="card" style="background:var(--panel2);padding:8px"><label class="chk" style="margin:0"><input type="checkbox" id="anom-showdone"'+(supShowDone?' checked':'')+'><span>✓ '+doneL.length+' anomalie'+(doneL.length>1?'s':'')+' traitée'+(doneL.length>1?'s':'')+' — '+(supShowDone?'masquer':'afficher pour décocher')+'</span></label></div>':'';
       var listHtml=shown.map(function(a,i){ var isDone=!!ADONE[anomDoneKey(a)]; var sb=a.step?'<span style="display:inline-block;font-size:11px;font-weight:700;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 7px;margin-right:6px">'+esc(a.step)+'</span>':''; return '<div class="it anom-it" data-anom="'+i+'" style="cursor:pointer;flex-direction:column;align-items:stretch'+(isDone?';opacity:.5':'')+'"><div style="display:flex;align-items:center;width:100%"><label class="chk" style="margin:0 8px 0 0" title="Marquer traité"><input type="checkbox" class="anom-done-cb" data-akey="'+esc(anomDoneKey(a))+'"'+(isDone?' checked':'')+'></label><div style="flex:1"><div class="fa-n">'+sb+a.ic+' '+esc(a.type)+(a.agent?' — '+esc(a.agent):'')+(isDone?' <span style="color:var(--ok);font-weight:400">✓ traité</span>':'')+'</div><div class="fa-d">'+[esc(a.when),esc(a.detail)].filter(Boolean).join(' · ')+'</div></div><div style="color:var(--muted);font-size:16px;margin-left:6px">▾</div></div><div class="anom-panel hidden" data-ap="'+i+'" style="margin-top:8px"></div></div>'; }).join('');
