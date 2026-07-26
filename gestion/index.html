@@ -2091,7 +2091,8 @@ button.big:active{transform:translateY(1px)}
         if(e.key==='route'&&r.route&&r.route.indexOf('Ne peut pas')>=0)opr.push({sev:3,ic:'🚗',type:'NE PEUT PAS prendre la route',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+(r.note?' · '+r.note:'')});
         if(e.key==='j15'&&r.ponctuel&&r.ponctuel.indexOf('Retard annoncé')>=0)opr.push({sev:3,ic:'⏰',type:'NE SERA PAS à l\'heure (retard annoncé)',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+(r.note?' · '+r.note:'')});
         if(r.statut==='⚠️ Injoignable'||(r.route&&r.route.indexOf('Injoignable')>=0)||(r.ponctuel&&r.ponctuel.indexOf('Injoignable')>=0))opr.push({sev:2,ic:'📵',type:'Agent injoignable',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · '+e.label});
-        if(!r.done&&d.ct!=null&&d.ct>=glv&&d.lateMin!=null&&d.lateMin>=5)opr.push({sev:(d.lateMin>=10?3:2),ic:(d.lateMin>=10?'⛔':'🔴'),type:(d.lateMin>=10?'Appel NON FAIT':'Appel en retard'),agent:e.agent,when:e.mdate+' '+e.heure,detail:e.label+' — '+e.site+' · '+Math.round(d.lateMin)+' min'});
+        if(!r.done&&d.ct!=null&&d.ct>=glv&&d.lateMin!=null&&d.lateMin>=5)opr.push({sev:(d.lateMin>=10?3:2),ic:(d.lateMin>=10?'⛔':'🔴'),type:(d.lateMin>=10?'Appel NON FAIT':'Appel en retard'),agent:e.agent,when:e.mdate+' '+e.heure,detail:e.label+' — '+e.site+' · depuis '+Math.round(d.lateMin)+' min'});
+        if((e.key==='prise'||e.key==='fin')&&r.done&&!r.avise){ var avMin=r.at?Math.round((now-r.at)/60000):null; opr.push({sev:2,ic:'📞',type:'Client NON avisé ('+(e.key==='prise'?'prise':'fin')+' de service)',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+(avMin!=null?' · depuis '+avMin+' min':'')}); }
       });
       opr.sort(function(a,b){return b.sev-a.sev;});
       if(!opr.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">✅ Rien à traiter dans l\'immédiat. Tout est sous contrôle.</div></div>'; return; }
@@ -2103,7 +2104,6 @@ button.big:active{transform:translateY(1px)}
       data.forEach(function(d){ var e=d.e,r=d.r;
         if(e.key==='prise'&&r.done&&r.agRetard)anom.push({sev:3,ic:'🔴',type:'Agent EN RETARD à la prise',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+(r.agRetardMin?' · '+r.agRetardMin+' min':'')});
         if((e.key==='prise'||e.key==='fin')&&r.done){ if(r.photo==='Photo non horodatée')anom.push({sev:2,ic:'📷',type:'Photo NON horodatée',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · '+(e.key==='prise'?'prise':'fin')}); else if(!r.photo||r.photo==='Pas de photo')anom.push({sev:2,ic:'📷',type:'Photo MANQUANTE',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · '+(e.key==='prise'?'prise':'fin')}); }
-        if((e.key==='prise'||e.key==='fin')&&r.done&&!r.avise)anom.push({sev:2,ic:'📞',type:'Client NON avisé',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · '+(e.key==='prise'?'prise':'fin')+' de service'});
       });
       Object.keys(affAg).forEach(function(id){ var a=affAg[id],t=tenueOf(a); if(t.none)anom.push({sev:2,ic:'🦺',type:'Tenue jamais contrôlée',agent:a.nom,when:'',detail:'agent planifié'}); else { if((t.statut||'').toLowerCase().indexOf('incomplet')>=0)anom.push({sev:2,ic:'🦺',type:'Tenue INCOMPLÈTE',agent:a.nom,when:'',detail:'agent planifié'}); if(t.days!=null&&t.days>14)anom.push({sev:1,ic:'🦺',type:'Tenue à recontrôler',agent:a.nom,when:'',detail:t.days+' j'}); } });
       anom.sort(function(a,b){return b.sev-a.sev;});
