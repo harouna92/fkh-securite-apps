@@ -2101,7 +2101,7 @@ button.big:active{transform:translateY(1px)}
   (function(){ function tick(){ var el=byId('sa-clock'); if(!el)return; var d=new Date(); el.textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2); } tick(); setInterval(tick,1000); })();
 
   // ===== Supervision : tableau de bord + anomalies (à partir des appels pointés / missions / tenues) =====
-  var supTab='oper';
+  var supTab='oper', SUP_DRILL={};
   function renderSupervision(){
     var wrap=byId('sup-body'); if(!wrap)return;
     document.querySelectorAll('#supTabs button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===supTab);});
@@ -2147,26 +2147,34 @@ button.big:active{transform:translateY(1px)}
     var injo=data.filter(function(d){return d.r.statut==='⚠️ Injoignable';}).length;
     var nonfait=data.filter(function(d){return !d.r.done&&d.lateMin!=null&&d.lateMin>=10&&(typeof saGolive!=='function'||d.ct>=saGolive());}).length;
     var pfDone=data.filter(function(d){return (d.e.key==='prise'||d.e.key==='fin')&&d.r.done;});
-    var clientNA=pfDone.filter(function(d){return !d.r.avise;}).length, clientOK=pfDone.length-clientNA;
-    var aff=miss.filter(function(m){return m.agentId;}).length, toaff=miss.length-aff;
-    var jamctrl=0,arectrl=0,tenIncomp=0,mensN=0; Object.keys(affAg).forEach(function(id){var t=tenueOf(affAg[id]);if(t.none)jamctrl++;else{if((t.statut||'').toLowerCase().indexOf('incomplet')>=0)tenIncomp++;if(t.noMens)mensN++;if(t.days!=null&&t.days>14)arectrl++;}});
-    var agRetN=data.filter(function(d){return d.e.key==='prise'&&d.r.done&&d.r.agRetard;}).length;
-    var photoBad=data.filter(function(d){return (d.e.key==='prise'||d.e.key==='fin')&&d.r.done&&(!d.r.photo||d.r.photo==='Pas de photo'||d.r.photo==='Photo non horodatée');}).length;
-    function kpi(t,v,col){ return '<div style="flex:1;min-width:120px;border:1px solid var(--line);border-radius:10px;padding:10px"><div style="font-size:22px;font-weight:800'+(col?';color:'+col:'')+'">'+v+'</div><div class="sub" style="margin:2px 0 0">'+t+'</div></div>'; }
+    var clientNAitems=pfDone.filter(function(d){return !d.r.avise;}); var clientNA=clientNAitems.length, clientOK=pfDone.length-clientNA;
+    var affItems=miss.filter(function(m){return m.agentId;}), toaffItems=miss.filter(function(m){return !m.agentId;}); var aff=affItems.length, toaff=toaffItems.length;
+    var jamL=[],arecL=[],incL=[],mensL=[]; Object.keys(affAg).forEach(function(id){var a=affAg[id],t=tenueOf(a); if(t.none){jamL.push({who:a.nom,sub:'jamais contrôlée'});return;} if((t.statut||'').toLowerCase().indexOf('incomplet')>=0)incL.push({who:a.nom,sub:'incomplète'}); if(t.noMens)mensL.push({who:a.nom,sub:'mensurations manquantes'}); if(t.days!=null&&t.days>14)arecL.push({who:a.nom,sub:t.days+' j sans contrôle'});});
+    var injoItems=data.filter(function(d){return d.r.statut==='⚠️ Injoignable';}); var injo=injoItems.length;
+    var nonfaitItems=data.filter(function(d){return !d.r.done&&d.lateMin!=null&&d.lateMin>=10&&(typeof saGolive!=='function'||d.ct>=saGolive());}); var nonfait=nonfaitItems.length;
+    var agRetItems=data.filter(function(d){return d.e.key==='prise'&&d.r.done&&d.r.agRetard;}); var agRetN=agRetItems.length;
+    var photoBadItems=data.filter(function(d){return (d.e.key==='prise'||d.e.key==='fin')&&d.r.done&&(!d.r.photo||d.r.photo==='Pas de photo'||d.r.photo==='Photo non horodatée');}); var photoBad=photoBadItems.length;
+    var jamctrl=jamL.length,arectrl=arecL.length,tenIncomp=incL.length,mensN=mensL.length;
+    function diCall(d,extra){ var e=d.e; return {who:(e.agent||'—'),sub:[(e.site||''),(e.mdate||'')+' '+(e.heure||''),extra].filter(Boolean).join(' · ')}; }
+    function diMiss(m){ return {who:(m.siteAgent||m.titre||'—'),sub:[(m.mdate||'')+' '+(m.mheure||''),(m.agentId&&faById(m.agentId))?('👤 '+faById(m.agentId).nom):'⚠ à affecter',(m.ville||'')].filter(Boolean).join(' · ')}; }
+    SUP_DRILL={ injo:injoItems.map(function(d){return diCall(d);}), nonfait:nonfaitItems.map(function(d){return diCall(d,'depuis '+Math.round(d.lateMin)+' min');}), clientNA:clientNAitems.map(function(d){return diCall(d,'client non avisé');}), agRet:agRetItems.map(function(d){return diCall(d,(d.r.agRetardMin?d.r.agRetardMin+' min':'en retard'));}), photoBad:photoBadItems.map(function(d){return diCall(d,d.r.photo||'pas de photo');}), missAll:miss.map(diMiss), aff:affItems.map(diMiss), toaff:toaffItems.map(diMiss), incomp:incL, mens:mensL, jam:jamL, arec:arecL };
+    function kpi(t,v,col,key){ return '<div'+(key?' class="sup-kpi" data-drill="'+key+'"':'')+' style="'+(key?'cursor:pointer;':'')+'flex:1;min-width:120px;border:1px solid var(--line);border-radius:10px;padding:10px"><div style="font-size:22px;font-weight:800'+(col?';color:'+col:'')+'">'+v+'</div><div class="sub" style="margin:2px 0 0">'+t+(key&&v?' 🔎':'')+'</div></div>'; }
     var h='<div class="card"><div class="lab" style="margin:0 0 8px">📞 Appels</div><div style="display:flex;gap:8px;flex-wrap:wrap">'
       +kpi('Réalisés / prévus',faits+' / '+prevu+(prevu?' ('+Math.round(faits/prevu*100)+'%)':''))
       +kpi('Retard moyen de coche',(avgRet==null?'—':(avgRet<=0?'à l\'heure':'+'+avgRet+' min')))
-      +kpi('Injoignables',injo,injo?'var(--bad)':'')
-      +kpi('Non faits (>10 min)',nonfait,nonfait?'var(--bad)':'')
-      +kpi('Clients NON avisés',clientNA,clientNA?'var(--bad)':'')
-      +kpi('Agents en retard (prise)',agRetN,agRetN?'var(--bad)':'')
-      +kpi('Photos KO (manq./non horod.)',photoBad,photoBad?'var(--bad)':'')
+      +kpi('Injoignables',injo,injo?'var(--bad)':'','injo')
+      +kpi('Non faits (>10 min)',nonfait,nonfait?'var(--bad)':'','nonfait')
+      +kpi('Clients NON avisés',clientNA,clientNA?'var(--bad)':'','clientNA')
+      +kpi('Agents en retard (prise)',agRetN,agRetN?'var(--bad)':'','agRet')
+      +kpi('Photos KO (manq./non horod.)',photoBad,photoBad?'var(--bad)':'','photoBad')
       +'</div><div class="sub" style="margin:8px 0 0">Ponctualité : '+lheure+' à l\'heure · '+r5+' (+≤5 min) · '+rp5+' (+>5 min) · Clients avisés : '+clientOK+'/'+pfDone.length+'</div></div>';
-    h+='<div class="card"><div class="lab" style="margin:0 0 8px">📋 Missions</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+kpi('Validées',miss.length)+kpi('Affectées',aff)+kpi('À affecter',toaff,toaff?'var(--warn)':'')+'</div></div>';
-    h+='<div class="card"><div class="lab" style="margin:0 0 8px">🦺 Tenues (agents affectés)</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+kpi('Incomplètes',tenIncomp,tenIncomp?'var(--bad)':'')+kpi('Mensurations manquantes',mensN,mensN?'var(--bad)':'')+kpi('Jamais contrôlées',jamctrl,jamctrl?'var(--bad)':'')+kpi('À recontrôler (>2 sem)',arectrl,arectrl?'var(--warn)':'')+'</div></div>';
+    h+='<div class="card"><div class="lab" style="margin:0 0 8px">📋 Missions</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+kpi('Validées',miss.length,'','missAll')+kpi('Affectées',aff,'','aff')+kpi('À affecter',toaff,toaff?'var(--warn)':'','toaff')+'</div></div>';
+    h+='<div class="card"><div class="lab" style="margin:0 0 8px">🦺 Tenues (agents affectés)</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+kpi('Incomplètes',tenIncomp,tenIncomp?'var(--bad)':'','incomp')+kpi('Mensurations manquantes',mensN,mensN?'var(--bad)':'','mens')+kpi('Jamais contrôlées',jamctrl,jamctrl?'var(--bad)':'','jam')+kpi('À recontrôler (>2 sem)',arectrl,arectrl?'var(--warn)':'','arec')+'</div></div>';
+    h+='<div id="sup-drill" style="margin-top:2px"></div><div class="sub" style="margin:4px 0 0">💡 Clique un chiffre 🔎 pour voir le détail (qui / quel site).</div>';
     wrap.innerHTML=h;
   }
   document.querySelectorAll('#supTabs button').forEach(function(b){ b.onclick=function(){ supTab=b.getAttribute('data-t'); renderSupervision(); }; });
+  if(byId('sup-body'))byId('sup-body').addEventListener('click',function(e){ var k=e.target.closest('[data-drill]'); if(!k)return; var key=k.getAttribute('data-drill'), box=byId('sup-drill'); if(!box)return; if(box.getAttribute('data-cur')===key){box.innerHTML='';box.removeAttribute('data-cur');return;} var list=(SUP_DRILL&&SUP_DRILL[key])||[]; box.setAttribute('data-cur',key); box.innerHTML='<div class="card" style="border:2px solid #6ea8fe"><div class="lab" style="margin:0 0 6px">🔎 '+list.length+' élément'+(list.length>1?'s':'')+'</div>'+(list.length?'<div class="list">'+list.map(function(it){return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(it.who||'—')+'</div><div class="fa-d">'+esc(it.sub||'')+'</div></div></div>';}).join('')+'</div>':'<div class="sub" style="margin:0">Aucun élément.</div>')+'</div>'; if(box.scrollIntoView)box.scrollIntoView({behavior:'smooth',block:'nearest'}); });
   document.querySelectorAll('.sup-preset').forEach(function(b){ b.addEventListener('click',function(){ var d=b.getAttribute('data-d'),t=impTodayISO(); if(d==='all'){byId('sup-from').value='';byId('sup-to').value='';}else{var n=parseInt(d,10)||1;byId('sup-from').value=t;byId('sup-to').value=svcAddDays(t,n-1);} renderSupervision(); }); });
   if(byId('sup-from'))byId('sup-from').addEventListener('change',renderSupervision);
   if(byId('sup-to'))byId('sup-to').addEventListener('change',renderSupervision);
