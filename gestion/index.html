@@ -1520,10 +1520,12 @@ button.big:active{transform:translateY(1px)}
       var data=rows.slice(1), today=impTodayISO();
       var siteMap=impMap();
       var existPhones={}; FA.forEach(function(a){(a.tels||[]).forEach(function(t){var k=impPhoneKey(t);if(k)existPhones[k]=a;});});
-      var existRefs={}; SUIVI.forEach(function(x){ if(x.ref)existRefs[String(x.ref).trim()]=true; });
+      function siteNorm(b){return String(b||'').trim().toLowerCase().replace(/\s+/g,' ');}
+      function endHM(txt){ var m=/(\d{1,2}):(\d{2})\s*$/.exec(String(txt||'')); return m?(('0'+m[1]).slice(-2)+':'+m[2]):''; }
+      // Unité de comparaison mission = site + date + horaire début + horaire fin (pas la Référence)
+      var existMiss={}; SUIVI.forEach(function(x){ if(x.mdate){ existMiss[siteNorm(x.siteBDC||x.siteAgent||x.titre||'')+'|'+x.mdate+'|'+(x.mheure||'')+'|'+endHM(x.mfin)]=true; } });
       var includeEmpty=byId('imp-empty').checked;
       var agentsByPhone={}, missions=[], sites={}, past=0, dupRef=0, emptySkipped=0;
-      function siteNorm(b){return String(b||'').trim().toLowerCase().replace(/\s+/g,' ');}
       data.forEach(function(r,idx){
         var dt=impDMY(r[C.deb]); if(!dt)return;
         var isFuture=dt.date>=today;
@@ -1537,13 +1539,15 @@ button.big:active{transform:translateY(1px)}
         }
         if(isFuture){
           var ref=C.ref>=0?String(r[C.ref]||'').trim():'';
-          if(ref&&existRefs[ref]){ dupRef++; return; }
+          var bdc=C.site>=0?String(r[C.site]||'').trim():''; var sn=siteNorm(bdc);
+          var endh=(C.fin>=0)?((impDMY(r[C.fin])||{}).heure||''):'';
+          var mk=sn+'|'+dt.date+'|'+(dt.heure||'')+'|'+endh;
+          if(existMiss[mk]){ dupRef++; return; }   // même site + date + horaires déjà en base -> ignoré
           var hasAgent=(pk&&pk.length>=9)||!!nom;
           if(!hasAgent&&!includeEmpty){ emptySkipped++; return; }
-          var bdc=C.site>=0?String(r[C.site]||'').trim():''; var sn=siteNorm(bdc);
           if(bdc&&!sites[sn])sites[sn]={bdc:bdc,agent:siteMap[sn]||impSiteAgent(bdc)};
           missions.push({mdate:dt.date,mheure:dt.heure,finRaw:C.fin>=0?r[C.fin]:'',client:C.client>=0?String(r[C.client]||'').trim():'',bdc:bdc,sn:sn,rue:C.rue>=0?String(r[C.rue]||'').trim():'',cp:C.cp>=0?String(r[C.cp]||'').trim():'',ville:ville,poste:C.spec>=0?String(r[C.spec]||'').trim():'',agentNom:nom,agentTel:(pk&&pk.length>=9)?impNormPhone(rawTel):'',agentRef:agentRef,ref:ref});
-          if(ref)existRefs[ref]=true;
+          existMiss[mk]=true;
         } else past++;
       });
       IMP={agentsByPhone:agentsByPhone,missions:missions,sites:sites,past:past,dupRef:dupRef,emptySkipped:emptySkipped};
@@ -1562,7 +1566,7 @@ button.big:active{transform:translateY(1px)}
     var h='<div class="card" style="margin-top:10px;background:var(--panel2)"><div class="lab" style="margin:0 0 6px">Aperçu — rien n\'est encore enregistré</div><ul style="margin:0 0 8px 18px;padding:0;line-height:1.7">';
     h+='<li><b>'+miss.length+'</b> mission'+(miss.length>1?'s':'')+' (aujourd\'hui + à venir) — <b>'+aff+'</b> avec agent · <b>'+toaff+'</b> à affecter</li>';
     h+='<li><b>'+newAg+'</b> nouvelle'+(newAg>1?'s':'')+' fiche'+(newAg>1?'s':'')+' agent (n° pas déjà en base)</li>';
-    if(IMP.dupRef)h+='<li>'+IMP.dupRef+' mission(s) déjà importée(s) — ignorées</li>';
+    if(IMP.dupRef)h+='<li>'+IMP.dupRef+' mission(s) déjà en base (même site + date + horaires) — ignorées</li>';
     if(IMP.emptySkipped)h+='<li>'+IMP.emptySkipped+' créneau(x) sans agent ignoré(s)</li>';
     if(IMP.past)h+='<li>'+IMP.past+' ligne(s) passée(s) — agents récupérés, pas de mission</li>';
     h+='</ul>';
