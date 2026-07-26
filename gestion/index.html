@@ -113,6 +113,15 @@ button.big:active{transform:translateY(1px)}
 .thc-grp{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;padding:9px 12px 3px;border-top:1px solid var(--line)}
 .thc-sel{font-size:13px;padding:8px 10px}
 .thc-com{font-size:13px;padding:8px 10px}
+.login-ov{display:none;position:fixed;inset:0;z-index:100;background:var(--bg);align-items:center;justify-content:center;padding:20px}
+.login-box{width:100%;max-width:22rem;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.login-box h2{margin:0;font-size:1.15rem}.login-box p{margin:0;font-size:12.5px;color:var(--muted)}
+.login-err{color:var(--bad);font-size:12.5px;font-weight:600;min-height:16px}
+.login-alt{background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;padding:4px}
+.cloudbar{display:none;max-width:44rem;margin:0 auto;font-size:12px;font-weight:600;padding:6px 16px;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.cloudbar.cb-on{background:var(--okbg);color:var(--ok)}.cloudbar.cb-off{background:var(--warnbg);color:var(--warn)}
+.cloudbar .cb-txt{flex:1}
+.cloudbar button{font-family:inherit;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
 </style>
 
 <div class="top">
@@ -126,6 +135,18 @@ button.big:active{transform:translateY(1px)}
     <button data-s="zone">Zone à couvrir</button>
     <button data-s="thiam">Thiam</button>
     <button data-s="suiviappels">Suivi des appels</button>
+  </div>
+</div>
+<div class="cloudbar" id="cloudbar"><span class="cb-txt"></span><button type="button" id="cloud-import">Importer mes données locales</button></div>
+
+<div class="login-ov" id="loginOverlay">
+  <div class="login-box">
+    <h2>🔒 GESTION — connexion</h2>
+    <p>Entre le mot de passe commun pour accéder aux données partagées.</p>
+    <input type="password" id="login-pass" placeholder="Mot de passe" autocomplete="current-password">
+    <div class="login-err" id="login-err"></div>
+    <button class="big" id="login-btn">Se connecter</button>
+    <button type="button" class="login-alt" id="login-local">Continuer hors-ligne (données de cet appareil)</button>
   </div>
 </div>
 
@@ -406,7 +427,7 @@ button.big:active{transform:translateY(1px)}
   document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
-  function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+  function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} if(typeof cloudPush==='function')cloudPush(k); }
   // Menu déroulant maison (fiable mobile) : flèche ▾ ouvre la liste, on tape pour filtrer,
   // on tape un choix pour sélectionner, toute nouvelle valeur s'ajoute (mémorisée si key).
   function esc(x){return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
@@ -1076,5 +1097,72 @@ button.big:active{transform:translateY(1px)}
     if(!e.target.closest('.acwrap'))document.querySelectorAll('.acwrap .sugg').forEach(function(s){s.classList.add('hidden');});
     if(!e.target.closest('.cbx'))document.querySelectorAll('.cbx .sugg').forEach(function(s){s.classList.add('hidden');});
   });
+
+  /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
+  // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
+  var BACKEND_URL = '';
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff'];
+  var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null };
+  function cloudHdr(){ return {'Content-Type':'application/json','X-App-Password':CLOUD.pass}; }
+  function cloudPush(k){
+    if(!CLOUD.on || SYNC_KEYS.indexOf(k)<0) return;
+    clearTimeout(CLOUD.pushT[k]);
+    CLOUD.pushT[k]=setTimeout(function(){
+      var v=localStorage.getItem(k); if(v==null) return;
+      fetch(CLOUD.base+'/state',{method:'PUT',headers:cloudHdr(),body:JSON.stringify({k:k,v:v})})
+        .then(function(r){return r.json();}).then(function(j){ if(j&&j.now&&j.now>CLOUD.last)CLOUD.last=j.now; }).catch(function(){});
+    },500);
+  }
+  function cloudApply(k,v){
+    if(v==null || localStorage.getItem(k)===v) return; // identique / notre propre écho
+    try{ localStorage.setItem(k,v); }catch(e){}
+    try{
+      if(k==='fkh_suivi'){ SUIVI=load('fkh_suivi'); SUIVI.forEach(function(x){delete x._pending;delete x._pick;delete x._pick2;}); if(typeof renderSuivi==='function')renderSuivi(); }
+      else if(k==='fkh_fa'){ FA=load('fkh_fa'); FA.forEach(function(a){if(a.tel&&!a.tels){a.tels=[a.tel];delete a.tel;}}); if(typeof renderFA==='function')renderFA(); }
+      else if(k==='fkh_thiam'){ TH=load('fkh_thiam'); if(typeof thRenderBoard==='function')thRenderBoard(); if(typeof thRenderOut==='function')thRenderOut(); if(typeof thRenderAuto==='function')thRenderAuto(); }
+      else if(k==='fkh_zones_diff'){ try{ZDIFF=JSON.parse(localStorage.getItem('fkh_zones_diff')||'{}')||{};}catch(e){ZDIFF={};} if(typeof renderZone==='function' && byId('sec-zone') && !byId('sec-zone').classList.contains('hidden'))renderZone(); }
+      // clés « combos » (clients, agents, prestations…) : localStorage à jour, listes visibles au prochain chargement
+    }catch(e){}
+  }
+  function cloudPull(){
+    if(!CLOUD.on) return Promise.resolve();
+    return fetch(CLOUD.base+'/state?since='+CLOUD.last,{headers:cloudHdr()})
+      .then(function(r){ if(r.status===401){cloudLogout('Mot de passe refusé.');throw new Error('401');} return r.json(); })
+      .then(function(j){ if(!j)return; if(j.changed)Object.keys(j.changed).forEach(function(k){cloudApply(k,j.changed[k].v);}); if(j.now)CLOUD.last=j.now; })
+      .catch(function(){});
+  }
+  function cloudPoll(){ clearTimeout(CLOUD.pollT); CLOUD.pollT=setTimeout(function(){ cloudPull().then(cloudPoll); },4000); }
+  function cloudBar(txt,online){ var b=byId('cloudbar'); if(!b)return; b.style.display='flex'; b.querySelector('.cb-txt').textContent=txt; b.className='cloudbar '+(online?'cb-on':'cb-off'); }
+  function cloudLogout(msg){ CLOUD.on=false; CLOUD.pass=''; try{sessionStorage.removeItem('fkh_pass');}catch(e){} clearTimeout(CLOUD.pollT); var lo=byId('loginOverlay'); if(lo)lo.style.display='flex'; if(msg)byId('login-err').textContent=msg; }
+  function cloudStart(){ CLOUD.on=true; try{sessionStorage.setItem('fkh_pass',CLOUD.pass);}catch(e){} var lo=byId('loginOverlay'); if(lo)lo.style.display='none'; cloudBar('☁︎ Connecté — données partagées',true); cloudPull().then(function(){ cloudPoll(); }); }
+  function cloudImportLocal(btn){
+    if(!CLOUD.on) return;
+    var items=[]; SYNC_KEYS.forEach(function(k){var v=localStorage.getItem(k);if(v!=null)items.push({k:k,v:v});});
+    if(!items.length){ if(btn)btn.textContent='Rien à importer'; return; }
+    if(btn){btn.disabled=true;btn.textContent='Import…';}
+    fetch(CLOUD.base+'/state',{method:'PUT',headers:cloudHdr(),body:JSON.stringify({items:items})})
+      .then(function(r){return r.json();}).then(function(j){ if(j&&j.now)CLOUD.last=j.now; if(btn){btn.disabled=false;btn.textContent='✅ Importé';setTimeout(function(){btn.textContent='Importer mes données locales';},1800);} })
+      .catch(function(){ if(btn){btn.disabled=false;btn.textContent='Échec, réessayer';} });
+  }
+  function cloudLogin(pass){
+    var err=byId('login-err'); err.textContent=''; var btn=byId('login-btn'); btn.disabled=true; btn.textContent='Connexion…';
+    fetch(CLOUD.base+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pass})})
+      .then(function(r){return r.json();}).then(function(j){ btn.disabled=false; btn.textContent='Se connecter'; if(j&&j.ok){ CLOUD.pass=pass; cloudStart(); } else { err.textContent='Mot de passe incorrect.'; } })
+      .catch(function(){ btn.disabled=false; btn.textContent='Se connecter'; err.textContent='Serveur injoignable. Vérifie ta connexion.'; });
+  }
+  (function initCloud(){
+    var lo=byId('loginOverlay');
+    if(!CLOUD.base){ if(lo)lo.style.display='none'; return; } // pas de backend => 100% local, rien ne change
+    byId('login-btn').addEventListener('click',function(){ cloudLogin(byId('login-pass').value); });
+    byId('login-pass').addEventListener('keydown',function(e){ if(e.key==='Enter')cloudLogin(this.value); });
+    byId('login-local').addEventListener('click',function(){ if(lo)lo.style.display='none'; cloudBar('⚠︎ Hors-ligne — données de cet appareil seulement',false); });
+    var ib=byId('cloud-import'); if(ib)ib.addEventListener('click',function(){cloudImportLocal(ib);});
+    var saved=null; try{saved=sessionStorage.getItem('fkh_pass');}catch(e){}
+    if(saved){ CLOUD.pass=saved;
+      fetch(CLOUD.base+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:saved})})
+        .then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){cloudStart();} else {if(lo)lo.style.display='flex';} })
+        .catch(function(){ if(lo)lo.style.display='flex'; });
+    } else { if(lo)lo.style.display='flex'; }
+  })();
 })();
 </script>

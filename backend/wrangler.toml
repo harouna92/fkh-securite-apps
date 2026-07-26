@@ -1,0 +1,9 @@
+name = "fkh-gestion-api"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+# La base D1 partagée. `database_id` est rempli après `wrangler d1 create` (voir DEPLOY.md).
+[[d1_databases]]
+binding = "DB"
+database_name = "fkh-gestion"
+database_id = "A_REMPLIR_APRES_CREATE"
