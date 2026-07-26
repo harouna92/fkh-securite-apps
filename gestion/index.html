@@ -467,8 +467,12 @@ button.big:active{transform:translateY(1px)}
     <div id="ten-body"></div>
   </section>
   <section id="sec-services" class="hidden">
-    <div><h1>📁 Suivi des services</h1><p class="sub">Historique de toutes les prises et fins de service enregistrées. Filtre par jour ou par agent.</p></div>
-    <div class="card"><div class="grid2"><label class="f"><div class="lab">Jour</div><input type="date" id="svc-day"></label><label class="f"><div class="lab">Agent</div><input id="svc-q" placeholder="Filtrer par agent…" autocomplete="off"></label></div><button type="button" class="cbtn" id="svc-clear" style="position:static;width:auto;padding:4px 10px;border:1px solid var(--line);border-radius:8px;margin-top:6px">Tout afficher</button></div>
+    <div><h1>📁 Suivi des services</h1><p class="sub">Historique de toutes les prises et fins de service enregistrées. Choisis une période (défaut : aujourd'hui) ou filtre par agent.</p></div>
+    <div class="card">
+      <div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="svc-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="svc-to"></label></div>
+      <div class="acts" style="flex-wrap:wrap;gap:6px;margin:8px 0 2px"><button type="button" class="svc-preset" data-d="1">Aujourd'hui</button><button type="button" class="svc-preset" data-d="3">3 j</button><button type="button" class="svc-preset" data-d="7">7 j</button><button type="button" class="svc-preset" data-d="20">20 j</button><button type="button" class="svc-preset" data-d="40">40 j</button><button type="button" class="svc-preset" data-d="all">Tout</button></div>
+      <label class="f" style="margin-top:6px"><div class="lab">Agent</div><input id="svc-q" placeholder="Filtrer par agent…" autocomplete="off"></label>
+    </div>
     <div id="svc-body"></div>
   </section>
 </div>
@@ -1485,16 +1489,21 @@ button.big:active{transform:translateY(1px)}
   function renderServices(){
     var wrap=byId('svc-body'); if(!wrap)return;
     var SV=load('fkh_services');
-    var day=byId('svc-day')?byId('svc-day').value:'', q=(byId('svc-q')?byId('svc-q').value:'').toLowerCase().trim();
+    var from=byId('svc-from')?byId('svc-from').value:'', to=byId('svc-to')?byId('svc-to').value:'', q=(byId('svc-q')?byId('svc-q').value:'').toLowerCase().trim();
+    function svcDate(x){ return x.mdate||(x.at?new Date(x.at).toISOString().slice(0,10):''); }
     var arr=(SV||[]).filter(function(x){
-      if(day){ var xd=x.mdate||(x.at?new Date(x.at).toISOString().slice(0,10):''); if(xd!==day)return false; }
+      var xd=svcDate(x);
+      if(from){ if(!xd||xd<from)return false; }
+      if(to){ if(!xd||xd>to)return false; }
       if(q && (String(x.agent||'')+' '+String(x.client||'')+' '+String(x.site||'')).toLowerCase().indexOf(q)<0)return false;
       return true;
     });
-    if(!arr.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucun service enregistré'+(day||q?' pour ce filtre':'')+'. Va dans Prise / Fin de service, remplis, puis clique « 💾 Enregistrer ».</div></div>'; return; }
+    arr.sort(function(a,b){var da=svcDate(a),db=svcDate(b); if(da!==db)return da>db?-1:1; return (b.at||0)-(a.at||0);});
+    var periode=(from||to)?('du '+(from?from.split('-').reverse().join('/'):'…')+' au '+(to?to.split('-').reverse().join('/'):'…')):'toute la période';
+    if(!arr.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucun service '+esc(periode)+(q?' pour cet agent':'')+'. Va dans Prise / Fin de service, remplis, puis clique « 💾 Enregistrer ».</div></div>'; return; }
     function dec(x){ if(x.decMin==null)return ''; var d=x.decMin,a=Math.abs(d),l=(a>=60?(Math.floor(a/60)+'h'+(a%60?pad2(a%60):'')):(a+' min')); return d===0?'à l\'heure':(d>0?'+':'−')+l; }
     function fdt(t){ if(!t)return ''; try{var x=new Date(t);return pad2(x.getDate())+'/'+pad2(x.getMonth()+1)+' '+pad2(x.getHours())+':'+pad2(x.getMinutes());}catch(e){return '';} }
-    wrap.innerHTML='<div class="card"><div class="lab" style="margin:0 0 6px">'+arr.length+' service'+(arr.length>1?'s':'')+' enregistré'+(arr.length>1?'s':'')+'</div><div class="list">'+arr.map(function(x){
+    wrap.innerHTML='<div class="card"><div class="lab" style="margin:0 0 6px">'+arr.length+' service'+(arr.length>1?'s':'')+' — '+esc(periode)+'</div><div class="list">'+arr.map(function(x){
       var isP=x.type==='prise', ic=isP?'🟢':'🔴', lbl=isP?'Prise':'Fin';
       var meta=[x.client,x.site,x.ville].filter(Boolean).map(esc).join(' · ');
       var lines=[];
@@ -1506,9 +1515,18 @@ button.big:active{transform:translateY(1px)}
     }).join('')+'</div></div>';
     wrap.querySelectorAll('[data-svcdel]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-svcdel');var L=load('fkh_services').filter(function(y){return String(y.id)!==id;});save('fkh_services',L);renderServices();};});
   }
-  if(byId('svc-day'))byId('svc-day').addEventListener('change',renderServices);
+  function svcAddDays(iso,n){ var p=iso.split('-'); var d=new Date(+p[0],+p[1]-1,+p[2]); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+  if(byId('svc-from'))byId('svc-from').addEventListener('change',renderServices);
+  if(byId('svc-to'))byId('svc-to').addEventListener('change',renderServices);
   if(byId('svc-q'))byId('svc-q').addEventListener('input',renderServices);
-  if(byId('svc-clear'))byId('svc-clear').addEventListener('click',function(){if(byId('svc-day'))byId('svc-day').value='';if(byId('svc-q'))byId('svc-q').value='';renderServices();});
+  document.querySelectorAll('.svc-preset').forEach(function(b){ b.addEventListener('click',function(){
+    var d=b.getAttribute('data-d'); var t=impTodayISO();
+    if(d==='all'){ byId('svc-from').value=''; byId('svc-to').value=''; }
+    else { var n=parseInt(d,10)||1; byId('svc-from').value=t; byId('svc-to').value=svcAddDays(t,n-1); }
+    document.querySelectorAll('.svc-preset').forEach(function(x){x.classList.toggle('on',x===b);});
+    renderServices();
+  }); });
+  (function(){ var t=impTodayISO(); if(byId('svc-from')&&!byId('svc-from').value)byId('svc-from').value=t; if(byId('svc-to')&&!byId('svc-to').value)byId('svc-to').value=t; var p1=document.querySelector('.svc-preset[data-d="1"]'); if(p1)p1.classList.add('on'); })();
   (function initCloud(){
     var lo=byId('loginOverlay');
     if(!CLOUD.base){ if(lo)lo.style.display='none'; return; } // pas de backend => 100% local, rien ne change
