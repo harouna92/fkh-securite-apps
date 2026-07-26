@@ -830,7 +830,7 @@ button.big:active{transform:translateY(1px)}
   function renderNear(it){
     if(it.la==null){ return '<div class="pickp"><div class="hint">'+(it._nogeo?'📍 Ville non géolocalisée — distances indisponibles.':'⏳ Localisation de '+esc(it.ville||extractVille(it.texte)||'la ville')+'…')+'</div><div class="acts" style="margin-top:6px"><button data-act="nearclose" data-id="'+it.id+'">Fermer</button></div></div>'; }
     var rad=it._rad||100, list=nearAgents(it);
-    var radOpts=[20,30,50,75,100,150].map(function(r){return '<option value="'+r+'"'+(r===rad?' selected':'')+'>'+r+' km</option>';}).join('');
+    var radOpts=[20,30,50,75,100,150,200,300].map(function(r){return '<option value="'+r+'"'+(r===rad?' selected':'')+'>'+r+' km</option>';}).join('');
     var head='<div class="lab" style="margin:0 0 5px">🔍 Agents proches de '+esc(it.ville||'?')+'</div>'
       +'<div class="hm" style="margin-bottom:7px;flex-wrap:wrap"><span style="color:var(--muted);font-weight:400;font-size:12.5px">Rayon</span><select data-nrad="'+it.id+'" style="flex:0 0 auto;width:auto;padding:6px 8px;font-size:13px">'+radOpts+'</select>'
       +'<label style="display:flex;align-items:center;gap:4px;font-size:12.5px;margin-left:6px;cursor:pointer"><input type="checkbox" data-nads="'+it.id+'"'+(it._nads?' checked':'')+' style="width:16px;height:16px;padding:0;margin:0">🛡️ADS</label>'
