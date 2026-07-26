@@ -142,6 +142,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="interv">🚨 Interventions</button>
     <button data-s="appels">📞 Appels</button>
     <button data-s="suivisite">🏢 Suivi site</button>
+    <button data-s="supervision">📊 Supervision</button>
   </div>
 </div>
 <div class="cloudbar" id="cloudbar"><span class="cb-txt"></span><button type="button" id="cloud-import">Importer mes données locales</button></div>
@@ -537,13 +538,19 @@ button.big:active{transform:translateY(1px)}
     </div>
     <div id="ss-body"></div>
   </section>
+  <section id="sec-supervision" class="hidden">
+    <div><h1>📊 Supervision</h1><p class="sub">Les chiffres du suivi (appels, retards, injoignables, tenues) + le fil des anomalies. Choisis la période.</p></div>
+    <div class="card"><div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="sup-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="sup-to"></label></div><div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><button type="button" class="sup-preset" data-d="1">Aujourd'hui</button><button type="button" class="sup-preset" data-d="7">7 j</button><button type="button" class="sup-preset" data-d="30">30 j</button><button type="button" class="sup-preset" data-d="all">Tout</button></div></div>
+    <div class="subtabs" id="supTabs"><button type="button" data-t="board" class="on">📈 Tableau de bord</button><button type="button" data-t="anom">🚨 Anomalies</button></div>
+    <div id="sup-body"></div>
+  </section>
 </div>
 
 <script>
 (function(){
   var byId=function(x){return document.getElementById(x)};
-  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','appels','suivisite'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
+  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','appels','suivisite','supervision'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
   function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} if(typeof cloudPush==='function')cloudPush(k); }
@@ -2008,12 +2015,16 @@ button.big:active{transform:translateY(1px)}
       var r=(S[e.mid]&&S[e.mid][e.key])||{}, done=!!r.done;
       var opts=STATUTS.map(function(s){return '<option value="'+esc(s)+'"'+(r.statut===s?' selected':'')+'>'+(s||'— statut —')+'</option>';}).join('');
       var extra=done?(' <span style="color:var(--ok)">✓ '+esc(r.hm||'')+'</span>'+(r.retard>0?' <span style="color:var(--bad)">retard '+r.retard+' min</span>':'')):'';
-      return '<div class="card" style="padding:8px'+(done?';opacity:.7':'')+'"><div class="fa-n"><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+e.label+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'
+      var ct=e.mdate?(new Date(e.mdate+'T00:00:00').getTime()+e.abs*60000):'';
+      return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" style="padding:8px'+(done?';opacity:.6':'')+'"><div class="fa-n"><span class="sa-tag"></span><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+e.label+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'
         +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center"><label class="chk" style="margin:0"><input type="checkbox" class="sa-done" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'" data-h="'+esc(e.heure)+'"'+(done?' checked':'')+'><span>Fait</span></label>'
         +'<select class="sa-st" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'">'+opts+'</select>'
         +'<input class="sa-note" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'" placeholder="commentaire…" value="'+esc(r.note||'')+'" style="flex:1;min-width:130px"></div></div>';
     }).join('');
+    saColorize();
   }
+  function saColorize(){ var now=Date.now(), els=document.querySelectorAll('#sa-body .sacard'); for(var i=0;i<els.length;i++){ var c=els[i],done=c.getAttribute('data-done')==='1',ct=+c.getAttribute('data-ct'),tag=c.querySelector('.sa-tag'); if(done||!ct){c.style.borderLeft='';c.style.background='';if(tag)tag.innerHTML='';continue;} var dmin=(now-ct)/60000; if(dmin>=10){c.style.borderLeft='6px solid var(--bad)';c.style.background='rgba(200,0,0,.14)';if(tag)tag.innerHTML='<span style="color:var(--bad);font-weight:800">⛔ DANGER — appel non fait </span>';} else if(dmin>=4.5){c.style.borderLeft='4px solid var(--bad)';c.style.background='';if(tag)tag.innerHTML='<span style="color:var(--bad);font-weight:700">🔴 EN RETARD </span>';} else if(dmin>=-2){c.style.borderLeft='4px solid #e0a13b';c.style.background='';if(tag)tag.innerHTML='<span style="color:#e0a13b;font-weight:700">🟡 À FAIRE MAINTENANT </span>';} else {c.style.borderLeft='';c.style.background='';if(tag)tag.innerHTML='';} } }
+  setInterval(function(){ if(byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')&&typeof saColorize==='function')saColorize(); },20000);
   if(byId('sa-body')){
     byId('sa-body').addEventListener('change',function(e){
       var t=e.target, mid=t.getAttribute('data-mid'), key=t.getAttribute('data-key'); if(!mid)return;
@@ -2026,6 +2037,56 @@ button.big:active{transform:translateY(1px)}
   if(byId('sa-from'))byId('sa-from').addEventListener('change',renderSuiviAppels);
   if(byId('sa-to'))byId('sa-to').addEventListener('change',renderSuiviAppels);
   (function(){ var t=impTodayISO(); if(byId('sa-from')&&!byId('sa-from').value)byId('sa-from').value=t; if(byId('sa-to')&&!byId('sa-to').value)byId('sa-to').value=t; })();
+
+  // ===== Supervision : tableau de bord + anomalies (à partir des appels pointés / missions / tenues) =====
+  var supTab='board';
+  function renderSupervision(){
+    var wrap=byId('sup-body'); if(!wrap)return;
+    document.querySelectorAll('#supTabs button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===supTab);});
+    var from=byId('sup-from')?byId('sup-from').value:'', to=byId('sup-to')?byId('sup-to').value:'';
+    var entries=(typeof saEntries==='function')?saEntries(from,to):[];
+    var S=ssLoad(), now=Date.now();
+    var data=entries.map(function(e){ var r=(S[e.mid]&&S[e.mid][e.key])||{}; var ct=e.mdate?(new Date(e.mdate+'T00:00:00').getTime()+e.abs*60000):null; var lateMin=(ct!=null&&!r.done)?((now-ct)/60000):null; return {e:e,r:r,ct:ct,lateMin:lateMin}; });
+    var miss=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; });
+    var affAg={}; miss.forEach(function(m){ if(m.agentId){var a=faById(m.agentId); if(a)affAg[a.id]=a;} });
+    function tenueOf(a){ var c=(typeof agentCtrl==='function')?agentCtrl(a.nom):null; if(!c)return {none:true}; var dd=(typeof ctrlDays==='function')?ctrlDays(c['Date contrôle']):null; return {none:false,days:dd}; }
+    if(supTab==='anom'){
+      var anom=[];
+      data.forEach(function(d){ var e=d.e,r=d.r;
+        if(r.statut==='⚠️ Injoignable')anom.push({sev:2,ic:'🔴',type:'Agent injoignable',agent:e.agent,when:e.mdate+' '+e.heure,detail:[e.site,r.note].filter(Boolean).join(' · ')});
+        if(r.done&&r.retard>5)anom.push({sev:1,ic:'⏱️',type:'Appel pointé en retard',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · +'+r.retard+' min'});
+        if(!r.done&&d.lateMin!=null&&d.lateMin>=10)anom.push({sev:3,ic:'⛔',type:'Appel non fait',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · pas coché ('+Math.round(d.lateMin)+' min)'});
+      });
+      Object.keys(affAg).forEach(function(id){ var a=affAg[id],t=tenueOf(a); if(t.none)anom.push({sev:1,ic:'🦺',type:'Tenue jamais contrôlée',agent:a.nom,when:'',detail:''}); else if(t.days!=null&&t.days>14)anom.push({sev:1,ic:'🦺',type:'Tenue à recontrôler',agent:a.nom,when:'',detail:t.days+' j'}); });
+      anom.sort(function(a,b){return b.sev-a.sev;});
+      if(!anom.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">✅ Aucune anomalie sur la période.</div></div>'; return; }
+      wrap.innerHTML='<div class="card"><div class="lab" style="margin:0 0 6px">'+anom.length+' anomalie'+(anom.length>1?'s':'')+'</div><div class="list">'+anom.map(function(a){ return '<div class="it"><div style="flex:1"><div class="fa-n">'+a.ic+' '+esc(a.type)+(a.agent?' — '+esc(a.agent):'')+'</div><div class="fa-d">'+[esc(a.when),esc(a.detail)].filter(Boolean).join(' · ')+'</div></div></div>'; }).join('')+'</div></div>';
+      return;
+    }
+    var prevu=data.length, faits=data.filter(function(d){return d.r.done;}).length;
+    var doneRet=data.filter(function(d){return d.r.done&&d.r.retard!=null;});
+    var avgRet=doneRet.length?Math.round(doneRet.reduce(function(s,d){return s+d.r.retard;},0)/doneRet.length):null;
+    var lheure=doneRet.filter(function(d){return d.r.retard<=1;}).length, r5=doneRet.filter(function(d){return d.r.retard>1&&d.r.retard<=5;}).length, rp5=doneRet.filter(function(d){return d.r.retard>5;}).length;
+    var injo=data.filter(function(d){return d.r.statut==='⚠️ Injoignable';}).length;
+    var nonfait=data.filter(function(d){return !d.r.done&&d.lateMin!=null&&d.lateMin>=10;}).length;
+    var aff=miss.filter(function(m){return m.agentId;}).length, toaff=miss.length-aff;
+    var jamctrl=0,arectrl=0; Object.keys(affAg).forEach(function(id){var t=tenueOf(affAg[id]);if(t.none)jamctrl++;else if(t.days!=null&&t.days>14)arectrl++;});
+    function kpi(t,v,col){ return '<div style="flex:1;min-width:120px;border:1px solid var(--line);border-radius:10px;padding:10px"><div style="font-size:22px;font-weight:800'+(col?';color:'+col:'')+'">'+v+'</div><div class="sub" style="margin:2px 0 0">'+t+'</div></div>'; }
+    var h='<div class="card"><div class="lab" style="margin:0 0 8px">📞 Appels</div><div style="display:flex;gap:8px;flex-wrap:wrap">'
+      +kpi('Réalisés / prévus',faits+' / '+prevu+(prevu?' ('+Math.round(faits/prevu*100)+'%)':''))
+      +kpi('Retard moyen de coche',(avgRet==null?'—':(avgRet<=0?'à l\'heure':'+'+avgRet+' min')))
+      +kpi('Injoignables',injo,injo?'var(--bad)':'')
+      +kpi('Non faits (>10 min)',nonfait,nonfait?'var(--bad)':'')
+      +'</div><div class="sub" style="margin:8px 0 0">Ponctualité : '+lheure+' à l\'heure · '+r5+' (+≤5 min) · '+rp5+' (+>5 min)</div></div>';
+    h+='<div class="card"><div class="lab" style="margin:0 0 8px">📋 Missions</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+kpi('Validées',miss.length)+kpi('Affectées',aff)+kpi('À affecter',toaff,toaff?'var(--warn)':'')+'</div></div>';
+    h+='<div class="card"><div class="lab" style="margin:0 0 8px">🦺 Tenues (agents affectés)</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+kpi('Jamais contrôlées',jamctrl,jamctrl?'var(--bad)':'')+kpi('À recontrôler (>2 sem)',arectrl,arectrl?'var(--warn)':'')+'</div><div class="sub" style="margin:8px 0 0">📷 Photos manquantes : suivi à venir (avec la capture photo).</div></div>';
+    wrap.innerHTML=h;
+  }
+  document.querySelectorAll('#supTabs button').forEach(function(b){ b.onclick=function(){ supTab=b.getAttribute('data-t'); renderSupervision(); }; });
+  document.querySelectorAll('.sup-preset').forEach(function(b){ b.addEventListener('click',function(){ var d=b.getAttribute('data-d'),t=impTodayISO(); if(d==='all'){byId('sup-from').value='';byId('sup-to').value='';}else{var n=parseInt(d,10)||1;byId('sup-from').value=t;byId('sup-to').value=svcAddDays(t,n-1);} renderSupervision(); }); });
+  if(byId('sup-from'))byId('sup-from').addEventListener('change',renderSupervision);
+  if(byId('sup-to'))byId('sup-to').addEventListener('change',renderSupervision);
+  (function(){ var t=impTodayISO(); if(byId('sup-from')&&!byId('sup-from').value)byId('sup-from').value=t; if(byId('sup-to')&&!byId('sup-to').value)byId('sup-to').value=t; })();
 
   (function initCloud(){
     var lo=byId('loginOverlay');
