@@ -379,6 +379,7 @@ button.big:active{transform:translateY(1px)}
         <label class="chk"><input type="checkbox" id="fa-f-ads"><span>🛡️ ADS uniquement</span></label>
         <label class="chk"><input type="checkbox" id="fa-f-voiture"><span>🚗 Avec véhicule</span></label>
       </div>
+      <label class="chk"><input type="checkbox" id="fa-f-verif"><span>🟠 Fiches à vérifier uniquement</span></label>
       <label class="f"><div class="lab">Rechercher (texte)</div><input id="fa-search" placeholder="Nom, ville, numéro…" autocomplete="off"></label>
       <div class="lab" style="margin:0" id="fa-listlab">Agents enregistrés (<span id="fa-count">0</span>)</div>
       <div class="list" id="fa-list"></div>
@@ -1042,7 +1043,7 @@ button.big:active{transform:translateY(1px)}
   function cityAuto(q,suggId,onPick){fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(q)+'&fields=nom,departement,centre,codesPostaux,population&boost=population&limit=6').then(function(r){return r.json();}).then(function(list){var box=byId(suggId);if(!Array.isArray(list)||!list.length){box.classList.add('hidden');return;}box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+c.nom+'</span> <span class="cp">'+cp+'</span>';d.onclick=function(){onPick(c);};box.appendChild(d);});box.classList.remove('hidden');}).catch(function(){byId(suggId).classList.add('hidden');});}
   byId('fa-ville').addEventListener('input',function(){var q=this.value.trim();faSel=null;clearTimeout(faT);if(q.length<2){byId('sugg-fa-ville').classList.add('hidden');return;}faT=setTimeout(function(){cityAuto(q,'sugg-fa-ville',function(c){var co=c.centre&&c.centre.coordinates;faSel={nom:c.nom,cp:(c.codesPostaux&&c.codesPostaux[0])||'',la:co?co[1]:null,lo:co?co[0]:null,dep:(c.departement&&c.departement.code)||'',depnom:(c.departement&&c.departement.nom)||''};byId('fa-ville').value=c.nom;byId('sugg-fa-ville').classList.add('hidden');});},250);});
   byId('fa-refville').addEventListener('input',function(){var q=this.value.trim();faRef=null;clearTimeout(faRT);if(q.length<2){byId('sugg-fa-refville').classList.add('hidden');renderFA();return;}faRT=setTimeout(function(){cityAuto(q,'sugg-fa-refville',function(c){var co=c.centre&&c.centre.coordinates;faRef={nom:c.nom,la:co?co[1]:null,lo:co?co[0]:null};byId('fa-refville').value=c.nom;byId('sugg-fa-refville').classList.add('hidden');renderFA();});},250);});
-  ['fa-radius','fa-f-ads','fa-f-voiture'].forEach(function(id){byId(id).addEventListener('change',renderFA);});
+  ['fa-radius','fa-f-ads','fa-f-voiture','fa-f-verif'].forEach(function(id){byId(id).addEventListener('change',renderFA);});
   byId('fa-search').addEventListener('input',renderFA);
   function resetFAform(){ ['fa-nom','fa-tel','fa-ville','fa-interv'].forEach(function(id){byId(id).value='';}); byId('fa-fiab').value=''; byId('fa-voiture').checked=false; byId('fa-ads').checked=false; byId('fa-err').textContent=''; faSel=null; faEdit=null; byId('fa-add').textContent='➕ Ajouter l\'agent'; }
   byId('fa-add').onclick=function(){
@@ -1053,22 +1054,23 @@ button.big:active{transform:translateY(1px)}
     if(conflict){ byId('fa-err').textContent='⚠️ '+conflict; return; }
     byId('fa-err').textContent='';
     var g=(faSel&&faSel.nom===ville)?faSel:{nom:ville,cp:'',la:null,lo:null,dep:'',depnom:''};
-    if(faEdit){ var a=null,i; for(i=0;i<FA.length;i++)if(FA[i].id===faEdit){a=FA[i];break;} if(a){a.nom=nom;a.tels=tels;a.ville=g.nom;a.cp=g.cp;a.la=g.la;a.lo=g.lo;a.dep=g.dep;a.depnom=g.depnom;a.fiab=fiab;a.voiture=voiture;a.ads=ads;a.interv=interv;} }
-    else { FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tels:tels,ville:g.nom,cp:g.cp,la:g.la,lo:g.lo,dep:g.dep,depnom:g.depnom,fiab:fiab,voiture:voiture,ads:ads,interv:interv}); }
+    if(faEdit){ var a=null,i; for(i=0;i<FA.length;i++)if(FA[i].id===faEdit){a=FA[i];break;} if(a){a.nom=nom;a.tels=tels;a.ville=g.nom;a.cp=g.cp;a.la=g.la;a.lo=g.lo;a.dep=g.dep;a.depnom=g.depnom;a.fiab=fiab;a.voiture=voiture;a.ads=ads;a.interv=interv;a.verifie=true;} }
+    else { FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tels:tels,ville:g.nom,cp:g.cp,la:g.la,lo:g.lo,dep:g.dep,depnom:g.depnom,fiab:fiab,voiture:voiture,ads:ads,interv:interv,verifie:true}); }
     saveFA(); resetFAform(); renderFA();
   };
   function renderFA(){
     var q=(byId('fa-search').value||'').toLowerCase();
     var rad=parseInt(byId('fa-radius').value,10)||0, byRadius=rad&&faRef&&faRef.la!=null;
-    var fAds=byId('fa-f-ads').checked, fVoit=byId('fa-f-voiture').checked;
+    var fAds=byId('fa-f-ads').checked, fVoit=byId('fa-f-voiture').checked, fVerif=byId('fa-f-verif')&&byId('fa-f-verif').checked;
     var arr=FA.filter(function(a){
       if(q&&((a.nom||'')+' '+((a.tels||[]).join(' '))+' '+(a.ville||'')+' '+((a.interv||[]).join(' '))).toLowerCase().indexOf(q)<0)return false;
-      if(fAds&&!a.ads)return false; if(fVoit&&!a.voiture)return false;
+      if(fAds&&!a.ads)return false; if(fVoit&&!a.voiture)return false; if(fVerif&&a.verifie)return false;
       if(byRadius){ if(a.la==null||a.lo==null){a._d=null;return false;} a._d=km(faRef.la,faRef.lo,a.la,a.lo); if(a._d>rad)return false; } else { a._d=null; }
       return true;
     });
     if(byRadius) arr.sort(function(a,b){return (a._d||0)-(b._d||0);}); else arr.sort(function(a,b){return (a.nom||'').localeCompare(b.nom||'');});
-    byId('fa-listlab').innerHTML=byRadius?('Agents à ≤ '+rad+' km de '+esc(faRef.nom)+' ('+arr.length+')'):('Agents enregistrés ('+FA.length+')');
+    var nAV=FA.filter(function(a){return !a.verifie;}).length;
+    byId('fa-listlab').innerHTML=(byRadius?('Agents à ≤ '+rad+' km de '+esc(faRef.nom)+' ('+arr.length+')'):('Agents enregistrés ('+FA.length+')'))+(nAV?' <span style="color:var(--warn)">· 🟠 '+nAV+' à vérifier</span>':'');
     if(!arr.length){ byId('fa-list').innerHTML='<div class="svempty">'+(byRadius?'Aucun agent dans ce rayon (ou ville non géolocalisée).':(FA.length?'Aucun agent ne correspond.':'Aucun agent enregistré.'))+'</div>'; return; }
     byId('fa-list').innerHTML=arr.map(function(a){
       var tags=(a.voiture?'🚗 ':'')+(a.ads?'🛡️ADS ':'');
@@ -1076,8 +1078,10 @@ button.big:active{transform:translateY(1px)}
       var parts=[a.ville]; if(a._d!=null)parts.push(a._d+' km'); parts.push(a.cp); if(tels.length)parts.push(tels.join(' / ')); if(a.fiab)parts.push(a.fiab);
       var d=(tags?tags+'· ':'')+parts.filter(Boolean).map(esc).join(' · ')+(agentMissing(a).length?' <span style="color:var(--warn)">⚠ '+agentMissing(a).map(esc).join(' · ')+'</span>':'')+tenueBadge(a)+((a.interv&&a.interv.length)?'<br><span style="color:#e0784b">🚨 Intervention : '+a.interv.map(esc).join(', ')+'</span>':'');
       var call=tels.map(function(t){return '<a class="call" href="tel:'+esc(t.replace(/\s/g,''))+'" title="Appeler '+esc(t)+'">📞</a>';}).join('');
-      return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+(d||'—')+'</div></div><div class="fa-a">'+call+'<button data-fae="'+a.id+'" title="Modifier">✏️</button><button class="no" data-fad="'+a.id+'" title="Supprimer">🗑️</button></div></div>';
+      var vbadge=a.verifie?'<span style="color:var(--ok);font-size:12px;font-weight:600"> 🟢 vérifiée</span>':'<span style="color:var(--warn);font-size:12px;font-weight:600"> 🟠 à vérifier</span>';
+      return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+vbadge+'</div><div class="fa-d">'+(d||'—')+'</div></div><div class="fa-a">'+call+'<button data-fav="'+a.id+'" title="'+(a.verifie?'Repasser à « à vérifier »':'Marquer vérifiée')+'">'+(a.verifie?'↩':'✅')+'</button><button data-fae="'+a.id+'" title="Modifier">✏️</button><button class="no" data-fad="'+a.id+'" title="Supprimer">🗑️</button></div></div>';
     }).join('');
+    byId('fa-list').querySelectorAll('[data-fav]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fav'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id)a=FA[i];if(a){a.verifie=!a.verifie;saveFA();renderFA();}};});
     byId('fa-list').querySelectorAll('[data-fad]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fad');FA=FA.filter(function(x){return x.id!==id;});saveFA();renderFA();};});
     byId('fa-list').querySelectorAll('[data-fae]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fae'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id){a=FA[i];break;}if(a){byId('fa-nom').value=a.nom||'';byId('fa-tel').value=(a.tels||(a.tel?[a.tel]:[])).join('\n');byId('fa-ville').value=a.ville||'';byId('fa-fiab').value=a.fiab||'';byId('fa-voiture').checked=!!a.voiture;byId('fa-ads').checked=!!a.ads;byId('fa-interv').value=(a.interv||[]).join('\n');faSel={nom:a.ville,cp:a.cp,la:a.la,lo:a.lo,dep:a.dep,depnom:a.depnom};faEdit=a.id;byId('fa-add').textContent='✔️ Enregistrer';window.scrollTo(0,0);}};});
   }
