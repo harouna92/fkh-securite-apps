@@ -950,7 +950,6 @@ button.big:active{transform:translateY(1px)}
   function renderAffect(x){
     if(x.statut!=='validee')return '';
     var out='';
-    if(typeof izPriorityLine==='function')out+=izPriorityLine(x);
     if(x.agentId&&FA){ var a=faById(x.agentId),miss=a?agentMissing(a):[],bd=miss.length?' <span style="color:var(--warn)">⚠ '+miss.map(esc).join(' · ')+'</span>':''; out+='<div class="meta" style="color:var(--ok);font-weight:600"><span>👤 Agent : '+esc(a?(a.nom||'—'):'(agent supprimé)')+bd+tenueBadge(a)+'</span></div>'; }
     else if(x.agentId){ out+='<div class="meta" style="color:var(--ok);font-weight:600"><span>👤 Agent affecté</span></div>'; }
     out+='<div class="acts" style="margin-top:2px"><button data-act="affect" data-id="'+x.id+'">👤 '+(x.agentId?'Changer / voir l\'agent':'Affecter un agent')+'</button>'+(x.agentId?'<button class="no" data-act="affremove" data-id="'+x.id+'" title="Retirer cet agent — la mission repasse « à affecter »">❌ Retirer l\'agent</button>':'')+'</div>';
@@ -1000,7 +999,8 @@ button.big:active{transform:translateY(1px)}
       if(x.assoc&&x.assoc.length){ var nm=x.assoc.map(function(id){var a=faById(id);return a?(a.nom||'?'):null;}).filter(Boolean); if(nm.length)assocLine='<div class="meta" style="color:var(--ok);font-weight:600"><span>👥 Associé'+(nm.length>1?'s':'')+' : '+esc(nm.join(', '))+'</span></div>'; }
       var zdLine=(x.depCode&&ZDIFF[x.depCode])?'<div class="meta" style="color:var(--bad);font-weight:600"><span>🔺 Zone difficile'+(x.depNom?' : '+esc(x.depNom)+' ('+esc(x.depCode)+')':'')+'</span></div>':'';
       var cdLine=(x.statut==='validee'&&x.mdate&&typeof missCountdown==='function')?(function(){var cd=missCountdown(x);return cd?'<div class="meta" style="font-weight:700;color:var(--accent,#6ea8fe)"><span>'+cd+(x.mdate?' <span style="color:var(--muted);font-weight:400">('+esc(x.mdate)+(x.mheure?' '+esc(x.mheure):'')+')</span>':'')+'</span></div>':'';})():'';
-      return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+cdLine+bigCitiesLine(x)+assocLine+zdLine+'<div class="svm">'+esc(x.texte)+'</div>'+body+pickBtn+pickPanel+nearPanel+renderAffect(x)+'</div>';
+      var izLine=(typeof izPriorityLine==='function')?izPriorityLine(x):'';
+      return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+cdLine+bigCitiesLine(x)+assocLine+zdLine+izLine+'<div class="svm">'+esc(x.texte)+'</div>'+body+pickBtn+pickPanel+nearPanel+renderAffect(x)+'</div>';
     }
     if(suiviBucket==='validee'){
       var byD=function(a,b){var da=a.mdate||'9999-99-99',db=b.mdate||'9999-99-99';return da>db?1:(da<db?-1:0);};
@@ -1870,7 +1870,12 @@ button.big:active{transform:translateY(1px)}
     });
   }
   function izPriorityLine(it){
-    var zs=(typeof izZonesForItem==='function')?izZonesForItem(it):[]; if(!zs.length)return '';
+    var zs=(typeof izZonesForItem==='function')?izZonesForItem(it):[];
+    if(!zs.length){
+      // Pas de zone trouvée : la demande n'a peut-être pas de département. On le déduit de sa ville (1 fois).
+      if(!it.depCode&&!it._depTried){ var vv=it.ville||(typeof extractVille==='function'?extractVille(it.texte):''); if(vv&&typeof depFromVille==='function'){ it._depTried=true; depFromVille(vv,function(d){ if(d&&d.code){ it.depCode=d.code; if(d.nom)it.depNom=d.nom; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderSuivi==='function')renderSuivi(); } }); } }
+      return '';
+    }
     return zs.map(function(zone){
       if(!zone.agents.length)return '';
       var ags=zone.agents.map(function(aid,ix){ var a=faById(aid); if(!a)return ''; var tel=(a.tels&&a.tels[0])?a.tels[0]:''; var call=tel?' <a class="call" href="tel:'+esc(tel.replace(/\s/g,''))+'">📞</a>':''; return '<span style="white-space:nowrap">'+(ix+1)+'. '+esc(a.nom||'—')+call+'</span>'; }).filter(Boolean).join(' &nbsp; ');
