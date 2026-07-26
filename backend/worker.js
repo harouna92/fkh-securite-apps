@@ -88,6 +88,38 @@ export default {
       return json({ ok: true, now });
     }
 
+    // --- Porte Claude : depot d'une demande/observation par un collaborateur ---
+    if (path === "/msg" && request.method === "POST") {
+      let body = {};
+      try { body = await request.json(); } catch (_) {}
+      const canal = (body.canal === "retour") ? "retour" : "analyse";
+      const texte = typeof body.texte === "string" ? body.texte.trim() : "";
+      const auteur = typeof body.auteur === "string" ? body.auteur.slice(0, 120) : "";
+      const fichier = typeof body.fichier === "string" ? body.fichier.slice(0, 2000) : null;
+      if (!texte) return json({ error: "texte vide" }, 400);
+      const now = Date.now();
+      const rs = await env.DB
+        .prepare("INSERT INTO messages (canal, auteur, texte, fichier, statut, created_at) VALUES (?, ?, ?, ?, 'nouveau', ?)")
+        .bind(canal, auteur, texte, fichier, now)
+        .run();
+      const id = rs.meta && rs.meta.last_row_id;
+      return json({ ok: true, id, now });
+    }
+
+    // --- Porte Claude : le site recupere les messages (et les reponses) depuis un horodatage ---
+    if (path === "/msg" && request.method === "GET") {
+      const since = parseInt(url.searchParams.get("since") || "0", 10) || 0;
+      const rs = await env.DB
+        .prepare(
+          "SELECT id, canal, auteur, texte, fichier, statut, reponse, created_at, replied_at " +
+          "FROM messages WHERE created_at > ? OR (replied_at IS NOT NULL AND replied_at > ?) " +
+          "ORDER BY id ASC LIMIT 200"
+        )
+        .bind(since, since)
+        .all();
+      return json({ now: Date.now(), messages: rs.results || [] });
+    }
+
     return json({ error: "not found" }, 404);
   },
 };
