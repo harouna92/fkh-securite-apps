@@ -18,7 +18,7 @@
 function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": origin || "*",
-    "Access-Control-Allow-Methods": "GET,PUT,POST,OPTIONS",
+    "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, X-App-Password",
     "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
@@ -86,6 +86,46 @@ export default {
       );
       await env.DB.batch(batch);
       return json({ ok: true, now });
+    }
+
+    // --- Upload d'une photo vers R2 (corps = octets de l'image, ?key=chemin/dans/le/bucket) ---
+    if (path === "/photo" && request.method === "POST") {
+      if (!env.PHOTOS) return json({ error: "no bucket" }, 500);
+      const key = url.searchParams.get("key");
+      if (!key) return json({ error: "key manquante" }, 400);
+      const ct = request.headers.get("Content-Type") || "application/octet-stream";
+      await env.PHOTOS.put(key, request.body, { httpMetadata: { contentType: ct } });
+      return json({ ok: true, key, now: Date.now() });
+    }
+
+    // --- Liste des photos (repertoire), ?prefix=tenue/ ---
+    if (path === "/photos" && request.method === "GET") {
+      if (!env.PHOTOS) return json({ error: "no bucket" }, 500);
+      const prefix = url.searchParams.get("prefix") || "";
+      const listed = await env.PHOTOS.list({ prefix, limit: 500 });
+      const keys = (listed.objects || []).map((o) => ({ key: o.key, size: o.size, uploaded: o.uploaded }));
+      return json({ keys });
+    }
+
+    // --- Affichage d'une photo depuis R2 (l'appli fetch avec le mot de passe -> blob) ---
+    if (path.startsWith("/photo/") && request.method === "GET") {
+      if (!env.PHOTOS) return json({ error: "no bucket" }, 500);
+      const key = decodeURIComponent(path.slice("/photo/".length));
+      const obj = await env.PHOTOS.get(key);
+      if (!obj) return json({ error: "not found" }, 404);
+      const h = new Headers(cors);
+      h.set("Content-Type", (obj.httpMetadata && obj.httpMetadata.contentType) || "application/octet-stream");
+      h.set("Cache-Control", "private, max-age=3600");
+      return new Response(obj.body, { headers: h });
+    }
+
+    // --- Suppression d'une photo (?key=...) ---
+    if (path === "/photo" && request.method === "DELETE") {
+      if (!env.PHOTOS) return json({ error: "no bucket" }, 500);
+      const key = url.searchParams.get("key");
+      if (!key) return json({ error: "key manquante" }, 400);
+      await env.PHOTOS.delete(key);
+      return json({ ok: true });
     }
 
     // --- Porte Claude : depot d'une demande/observation par un collaborateur ---
