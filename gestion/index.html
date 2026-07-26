@@ -454,10 +454,13 @@ button.big:active{transform:translateY(1px)}
     </div>
   </section>
   <section id="sec-suiviappels" class="hidden">
-    <div><h1>📞 Suivi des appels</h1><p class="sub">Agenda chronologique des appels à faire (issus des missions validées). Pour chaque ligne : coche « Fait » (heure réelle enregistrée), choisis le statut, ajoute un commentaire. Heures 🇫🇷 + 🇲🇱.</p></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><h1 style="margin:0">📞 Suivi des appels</h1><div id="sa-clock" style="font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;padding:4px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">--:--:--</div></div>
+    <p class="sub">Agenda chronologique des appels à faire (issus des missions validées). Pour chaque ligne : coche « Fait » (heure réelle enregistrée), choisis le statut, ajoute un commentaire. Heures 🇫🇷 + 🇲🇱.</p>
     <div class="card">
       <div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="sa-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="sa-to"></label></div>
       <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><button type="button" class="sa-preset" data-d="1">Aujourd'hui</button><button type="button" class="sa-preset" data-d="3">3 j</button><button type="button" class="sa-preset" data-d="7">7 j</button><button type="button" class="sa-preset" data-d="30">30 j</button><button type="button" class="sa-preset" data-d="all">Tout</button></div>
+      <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><span class="sub" style="margin:0;align-self:center">Type :</span><button type="button" class="sa-type on" data-ty="all">Tous</button><button type="button" class="sa-type" data-ty="avant">☎ Avant</button><button type="button" class="sa-type" data-ty="prise">🟢 Prise</button><button type="button" class="sa-type" data-ty="pendant">🌙 Pendant</button><button type="button" class="sa-type" data-ty="fin">🔚 Fin</button></div>
+      <button type="button" class="big" id="sa-reset" style="margin-top:8px;background:var(--panel2);color:var(--ink);border:1px solid var(--line)">↺ Revenir au défaut (aujourd'hui · tous · chronologique)</button>
     </div>
     <div id="sa-body"></div>
     <div style="display:none">
@@ -1995,6 +1998,8 @@ button.big:active{transform:translateY(1px)}
 
   // ===== Suivi des appels : agenda chronologique des appels à faire (issus des missions) =====
   function saSet(mid,key,patch){ var S=ssLoad(); if(!S[mid])S[mid]={}; var r=S[mid][key]||{}; for(var k in patch)r[k]=patch[k]; S[mid][key]=r; ssSave(S); }
+  var saType='all';
+  function saTypeMatch(key){ if(saType==='all')return true; if(saType==='avant')return key==='j15'; if(saType==='prise')return key==='prise'||key==='after'; if(saType==='pendant')return key.indexOf('ctrl')===0; if(saType==='fin')return key==='fin'; return true; }
   function saEntries(from,to){
     var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; });
     if(typeof apDeconflict==='function')apDeconflict(missions,10);
@@ -2007,8 +2012,9 @@ button.big:active{transform:translateY(1px)}
     var wrap=byId('sa-body'); if(!wrap)return;
     var from=byId('sa-from')?byId('sa-from').value:'', to=byId('sa-to')?byId('sa-to').value:'';
     var lbl=(from||to)?('du '+(from?from.split('-').reverse().join('/'):'…')+' au '+(to?to.split('-').reverse().join('/'):'…')):'toute la période';
-    var entries=saEntries(from,to);
-    if(!entries.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucun appel à faire '+esc(lbl)+'. (Il faut des missions validées avec une heure sur cette période.)</div></div>'; return; }
+    var entries=saEntries(from,to).filter(function(e){return saTypeMatch(e.key);});
+    document.querySelectorAll('.sa-type').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-ty')===saType);});
+    if(!entries.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucun appel '+esc(lbl)+(saType!=='all'?' (type filtré)':'')+'. (Il faut des missions validées avec une heure sur cette période.)</div></div>'; return; }
     var S=ssLoad(), doneN=0; entries.forEach(function(e){ if(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done)doneN++; });
     var STATUTS=['','✅ RAS','⚠️ Injoignable','🔄 Autre'];
     wrap.innerHTML='<div class="card"><div class="lab" style="margin:0">'+entries.length+' appel'+(entries.length>1?'s':'')+' — '+esc(lbl)+' · '+doneN+' fait'+(doneN>1?'s':'')+'</div></div>'+entries.map(function(e){
@@ -2023,7 +2029,8 @@ button.big:active{transform:translateY(1px)}
     }).join('');
     saColorize();
   }
-  function saColorize(){ var now=Date.now(), els=document.querySelectorAll('#sa-body .sacard'); for(var i=0;i<els.length;i++){ var c=els[i],done=c.getAttribute('data-done')==='1',ct=+c.getAttribute('data-ct'),tag=c.querySelector('.sa-tag'); if(done||!ct){c.style.borderLeft='';c.style.background='';if(tag)tag.innerHTML='';continue;} var dmin=(now-ct)/60000; if(dmin>=10){c.style.borderLeft='6px solid var(--bad)';c.style.background='rgba(200,0,0,.14)';if(tag)tag.innerHTML='<span style="color:var(--bad);font-weight:800">⛔ DANGER — appel non fait </span>';} else if(dmin>=4.5){c.style.borderLeft='4px solid var(--bad)';c.style.background='';if(tag)tag.innerHTML='<span style="color:var(--bad);font-weight:700">🔴 EN RETARD </span>';} else if(dmin>=-2){c.style.borderLeft='4px solid #e0a13b';c.style.background='';if(tag)tag.innerHTML='<span style="color:#e0a13b;font-weight:700">🟡 À FAIRE MAINTENANT </span>';} else {c.style.borderLeft='';c.style.background='';if(tag)tag.innerHTML='';} } }
+  function saGolive(){ var g=load('fkh_sa_golive'); if(typeof g==='string'&&g){ var t=new Date(g).getTime(); if(!isNaN(t))return t; } return new Date('2026-07-26T18:40:00').getTime(); }
+  function saColorize(){ var now=Date.now(), gl=saGolive(), els=document.querySelectorAll('#sa-body .sacard'); for(var i=0;i<els.length;i++){ var c=els[i],done=c.getAttribute('data-done')==='1',ct=+c.getAttribute('data-ct'),tag=c.querySelector('.sa-tag'); if(done||!ct||ct<gl){c.style.borderLeft='';c.style.background='';if(tag)tag.innerHTML='';continue;} var dmin=(now-ct)/60000; if(dmin>=10){c.style.borderLeft='6px solid var(--bad)';c.style.background='rgba(200,0,0,.14)';if(tag)tag.innerHTML='<span style="color:var(--bad);font-weight:800">⛔ DANGER — appel non fait </span>';} else if(dmin>=4.5){c.style.borderLeft='4px solid var(--bad)';c.style.background='';if(tag)tag.innerHTML='<span style="color:var(--bad);font-weight:700">🔴 EN RETARD </span>';} else if(dmin>=-2){c.style.borderLeft='4px solid #e0a13b';c.style.background='';if(tag)tag.innerHTML='<span style="color:#e0a13b;font-weight:700">🟡 À FAIRE MAINTENANT </span>';} else {c.style.borderLeft='';c.style.background='';if(tag)tag.innerHTML='';} } }
   setInterval(function(){ if(byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')&&typeof saColorize==='function')saColorize(); },20000);
   if(byId('sa-body')){
     byId('sa-body').addEventListener('change',function(e){
@@ -2036,7 +2043,10 @@ button.big:active{transform:translateY(1px)}
   document.querySelectorAll('.sa-preset').forEach(function(b){ b.addEventListener('click',function(){ var d=b.getAttribute('data-d'),t=impTodayISO(); if(d==='all'){ byId('sa-from').value=''; byId('sa-to').value=''; } else { var n=parseInt(d,10)||1; byId('sa-from').value=t; byId('sa-to').value=svcAddDays(t,n-1); } renderSuiviAppels(); }); });
   if(byId('sa-from'))byId('sa-from').addEventListener('change',renderSuiviAppels);
   if(byId('sa-to'))byId('sa-to').addEventListener('change',renderSuiviAppels);
+  document.querySelectorAll('.sa-type').forEach(function(b){ b.addEventListener('click',function(){ saType=b.getAttribute('data-ty'); renderSuiviAppels(); }); });
+  if(byId('sa-reset'))byId('sa-reset').onclick=function(){ saType='all'; var t=impTodayISO(); if(byId('sa-from'))byId('sa-from').value=t; if(byId('sa-to'))byId('sa-to').value=t; renderSuiviAppels(); };
   (function(){ var t=impTodayISO(); if(byId('sa-from')&&!byId('sa-from').value)byId('sa-from').value=t; if(byId('sa-to')&&!byId('sa-to').value)byId('sa-to').value=t; })();
+  (function(){ function tick(){ var el=byId('sa-clock'); if(!el)return; var d=new Date(); el.textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2); } tick(); setInterval(tick,1000); })();
 
   // ===== Supervision : tableau de bord + anomalies (à partir des appels pointés / missions / tenues) =====
   var supTab='board';
@@ -2055,7 +2065,7 @@ button.big:active{transform:translateY(1px)}
       data.forEach(function(d){ var e=d.e,r=d.r;
         if(r.statut==='⚠️ Injoignable')anom.push({sev:2,ic:'🔴',type:'Agent injoignable',agent:e.agent,when:e.mdate+' '+e.heure,detail:[e.site,r.note].filter(Boolean).join(' · ')});
         if(r.done&&r.retard>5)anom.push({sev:1,ic:'⏱️',type:'Appel pointé en retard',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · +'+r.retard+' min'});
-        if(!r.done&&d.lateMin!=null&&d.lateMin>=10)anom.push({sev:3,ic:'⛔',type:'Appel non fait',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · pas coché ('+Math.round(d.lateMin)+' min)'});
+        if(!r.done&&d.lateMin!=null&&d.lateMin>=10&&(typeof saGolive!=='function'||d.ct>=saGolive()))anom.push({sev:3,ic:'⛔',type:'Appel non fait',agent:e.agent,when:e.mdate+' '+e.heure,detail:e.site+' · pas coché ('+Math.round(d.lateMin)+' min)'});
       });
       Object.keys(affAg).forEach(function(id){ var a=affAg[id],t=tenueOf(a); if(t.none)anom.push({sev:1,ic:'🦺',type:'Tenue jamais contrôlée',agent:a.nom,when:'',detail:''}); else if(t.days!=null&&t.days>14)anom.push({sev:1,ic:'🦺',type:'Tenue à recontrôler',agent:a.nom,when:'',detail:t.days+' j'}); });
       anom.sort(function(a,b){return b.sev-a.sev;});
@@ -2068,7 +2078,7 @@ button.big:active{transform:translateY(1px)}
     var avgRet=doneRet.length?Math.round(doneRet.reduce(function(s,d){return s+d.r.retard;},0)/doneRet.length):null;
     var lheure=doneRet.filter(function(d){return d.r.retard<=1;}).length, r5=doneRet.filter(function(d){return d.r.retard>1&&d.r.retard<=5;}).length, rp5=doneRet.filter(function(d){return d.r.retard>5;}).length;
     var injo=data.filter(function(d){return d.r.statut==='⚠️ Injoignable';}).length;
-    var nonfait=data.filter(function(d){return !d.r.done&&d.lateMin!=null&&d.lateMin>=10;}).length;
+    var nonfait=data.filter(function(d){return !d.r.done&&d.lateMin!=null&&d.lateMin>=10&&(typeof saGolive!=='function'||d.ct>=saGolive());}).length;
     var aff=miss.filter(function(m){return m.agentId;}).length, toaff=miss.length-aff;
     var jamctrl=0,arectrl=0; Object.keys(affAg).forEach(function(id){var t=tenueOf(affAg[id]);if(t.none)jamctrl++;else if(t.days!=null&&t.days>14)arectrl++;});
     function kpi(t,v,col){ return '<div style="flex:1;min-width:120px;border:1px solid var(--line);border-radius:10px;padding:10px"><div style="font-size:22px;font-weight:800'+(col?';color:'+col:'')+'">'+v+'</div><div class="sub" style="margin:2px 0 0">'+t+'</div></div>'; }
