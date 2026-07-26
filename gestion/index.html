@@ -743,6 +743,30 @@ button.big:active{transform:translateY(1px)}
     var map={validee:['okbg','ok','✅ Validée'],annulee:['badbg','bad','✖️ Annulée client'],nongeree:['warnbg','warn','⚠️ Non gérée']}, m=map[st];
     return m?'<span class="badge" style="background:var(--'+m[0]+');color:var(--'+m[1]+')">'+m[2]+(motif?' — '+esc(motif):'')+'</span>':'';
   }
+  // ===== Étape 1 — Affectation d'agent à une mission validée =====
+  function afHopts(sel){var s='<option value="">--</option>';for(var h=0;h<24;h++){var v=pad2(h);s+='<option'+(v===sel?' selected':'')+'>'+v+'</option>';}return s;}
+  function afMopts(sel){var s='';for(var m=0;m<60;m+=5){var v=pad2(m);s+='<option'+(v===sel?' selected':'')+'>'+v+'</option>';}return s;}
+  function agentMissing(a){var m=[];if(!(a.tels&&a.tels.length))m.push('n°');if(!a.ville)m.push('ville');if(a.voiture==null)m.push('véhicule ?');if(a.ads==null)m.push('ADS ?');if(!a.fiab)m.push('fiabilité ?');return m;}
+  function missCountdown(x){ if(!x.mdate)return ''; var t=new Date(x.mdate+'T'+((x.mheure||'00:00'))+':00'); if(isNaN(t.getTime()))return ''; var diff=t.getTime()-Date.now(); if(diff<=0)return '🟢 mission commencée / passée'; var mins=Math.floor(diff/60000),d=Math.floor(mins/1440),h=Math.floor((mins%1440)/60),mm=mins%60,p=[]; if(d)p.push(d+' j'); if(h||d)p.push(h+' h'); if(!d)p.push(mm+' min'); return '⏳ commence dans '+p.join(' '); }
+  function afResults(x){ var q=(x._afq||'').toLowerCase().trim(); if(!q)return '<div class="hint" style="padding:4px 2px">Tape un nom, un numéro ou une ville.</div>'; if(!FA)return ''; var arr=FA.filter(function(a){return (((a.nom||'')+' '+((a.tels||[]).join(' '))+' '+(a.ville||'')).toLowerCase().indexOf(q)>=0);}).slice(0,8); if(!arr.length)return '<div class="hint" style="padding:4px 2px">Aucun agent trouvé — crée-le ci-dessous.</div>'; return arr.map(function(a){var miss=agentMissing(a),bd=miss.length?' <span style="color:var(--warn)">⚠ '+miss.map(esc).join(' · ')+'</span>':'';return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+esc((a.tels||[]).join(' / ')||'—')+(a.ville?' · '+esc(a.ville):'')+bd+'</div></div><div class="fa-a"><button class="ok" data-act="affpick" data-id="'+x.id+'" data-aid="'+a.id+'">Choisir</button></div></div>';}).join(''); }
+  function renderAffect(x){
+    if(x.statut!=='validee')return '';
+    var out='';
+    if(x.agentId&&FA){ var a=faById(x.agentId),miss=a?agentMissing(a):[],bd=miss.length?' <span style="color:var(--warn)">⚠ '+miss.map(esc).join(' · ')+'</span>':''; out+='<div class="meta" style="color:var(--ok);font-weight:600"><span>👤 Agent : '+esc(a?(a.nom||'—'):'(agent supprimé)')+bd+'</span></div>'; var cd=missCountdown(x); if(cd)out+='<div class="meta"><span>'+cd+'</span></div>'; }
+    else if(x.agentId){ out+='<div class="meta" style="color:var(--ok);font-weight:600"><span>👤 Agent affecté</span></div>'; }
+    out+='<div class="acts" style="margin-top:2px"><button data-act="affect" data-id="'+x.id+'">👤 '+(x.agentId?'Changer / voir l\'agent':'Affecter un agent')+'</button></div>';
+    if(x._affect){
+      var mh=(x.mheure||'').split(':');
+      out+='<div class="pickp"><div class="grid2"><label class="f"><div class="lab" style="margin:0 0 3px">Date de la mission</div><input type="date" class="af-date" data-id="'+x.id+'" value="'+esc(x.mdate||'')+'"></label><label class="f"><div class="lab" style="margin:0 0 3px">Heure de début</div><div class="hm"><select class="af-h" data-id="'+x.id+'">'+afHopts(mh[0]||'')+'</select><span>h</span><select class="af-m" data-id="'+x.id+'">'+afMopts(mh[1]||'')+'</select></div></label></div>'
+        +'<div class="lab" style="margin:8px 0 3px">Rechercher un agent (nom · n° · ville)</div><input class="af-search" data-id="'+x.id+'" placeholder="Tape un nom, un numéro ou une ville…" autocomplete="off" value="'+esc(x._afq||'')+'"><div class="af-res" data-id="'+x.id+'">'+afResults(x)+'</div>'
+        +'<div class="acts" style="margin-top:8px"><button data-act="affnew" data-id="'+x.id+'">➕ Introuvable — créer l\'agent</button><button data-act="affclose" data-id="'+x.id+'">Fermer</button></div>';
+      if(x._affnew){
+        out+='<div class="ctx" style="margin-top:8px"><div class="lab" style="margin:0 0 3px">Nouvel agent (enregistrable même incomplet)</div><input class="afn-nom" data-id="'+x.id+'" placeholder="Nom" autocomplete="off" value="'+esc(x._afnom||'')+'"><input class="afn-tel" data-id="'+x.id+'" placeholder="Numéro(s)" inputmode="tel" autocomplete="off" style="margin-top:6px" value="'+esc(x._aftel||'')+'"><div class="acwrap" style="margin-top:6px"><input class="afn-ville" data-id="'+x.id+'" placeholder="Ville (optionnel)" autocomplete="off" value="'+esc(x._afville||'')+'"><div class="sugg hidden" id="sugg-afn-'+x.id+'"></div></div><div class="acts" style="margin-top:8px"><button class="ok" data-act="affcreate" data-id="'+x.id+'">Enregistrer + affecter</button></div></div>';
+      }
+      out+='</div>';
+    }
+    return out;
+  }
   function renderSuivi(){
     ['recherche','validee','annulee','nongeree'].forEach(function(b){var el=byId('cnt-'+b);if(el)el.textContent=SUIVI.filter(function(x){return x.statut===b;}).length;});
     document.querySelectorAll('#suiviTabs button').forEach(function(bt){bt.classList.toggle('on',bt.getAttribute('data-b')===suiviBucket);});
@@ -772,7 +796,7 @@ button.big:active{transform:translateY(1px)}
       var assocLine='';
       if(x.assoc&&x.assoc.length){ var nm=x.assoc.map(function(id){var a=faById(id);return a?(a.nom||'?'):null;}).filter(Boolean); if(nm.length)assocLine='<div class="meta" style="color:var(--ok);font-weight:600"><span>👥 Associé'+(nm.length>1?'s':'')+' : '+esc(nm.join(', '))+'</span></div>'; }
       var zdLine=(x.depCode&&ZDIFF[x.depCode])?'<div class="meta" style="color:var(--bad);font-weight:600"><span>🔺 Zone difficile'+(x.depNom?' : '+esc(x.depNom)+' ('+esc(x.depCode)+')':'')+'</span></div>':'';
-      return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+assocLine+zdLine+'<div class="svm">'+esc(x.texte)+'</div>'+body+pickBtn+pickPanel+nearPanel+'</div>';
+      return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+assocLine+zdLine+'<div class="svm">'+esc(x.texte)+'</div>'+body+pickBtn+pickPanel+nearPanel+renderAffect(x)+'</div>';
     }).join('');
   }
   // Aperçu live du texte à copier (Infos agent / Mission validée) : recalculé à chaque case cochée/décochée
@@ -795,12 +819,18 @@ button.big:active{transform:translateY(1px)}
     else if(act==='nearclose'){ delete it._near; saveSuivi(); renderSuivi(); return; }
     else if(act==='nassoc'){ var aid=b.getAttribute('data-aid'); it.assoc=it.assoc||[]; var ix=it.assoc.indexOf(aid); if(ix>=0)it.assoc.splice(ix,1); else it.assoc.push(aid); saveSuivi(); renderSuivi(); return; }
     else if(act==='zonediff'){ var tog=function(dep){ if(!dep||!dep.code){flash(b,'Ville ?');return;} it.depCode=dep.code; if(dep.nom)it.depNom=dep.nom; if(ZDIFF[dep.code])delete ZDIFF[dep.code]; else ZDIFF[dep.code]={nom:dep.nom||it.depNom||''}; saveZDIFF(); saveSuivi(); renderSuivi(); }; if(it.depCode){tog({code:it.depCode,nom:it.depNom});} else {flash(b,'…');depFromVille(it.ville||extractVille(it.texte),tog);} return; }
+    else if(act==='affect'){ if(it._affect){delete it._affect;delete it._affnew;}else{it._affect=true;} }
+    else if(act==='affclose'){ delete it._affect;delete it._affnew; }
+    else if(act==='affnew'){ it._affnew=!it._affnew; }
+    else if(act==='affpick'){ it.agentId=b.getAttribute('data-aid'); delete it._affect;delete it._affnew;delete it._afq; saveSuivi(); renderSuivi(); return; }
+    else if(act==='affcreate'){ var nom=(it._afnom||'').trim(),tels=parseTels(it._aftel||''),ville=(it._afville||'').trim(),existing=null; tels.forEach(function(t){var k=telKey(t);if(k)FA.forEach(function(a){(a.tels||[]).forEach(function(tt){if(telKey(tt)===k)existing=a;});});}); if(existing){it.agentId=existing.id;} else { var g=it._afgeo||{},sameV=(g.nom===ville); FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tels:tels,ville:ville,cp:sameV?(g.cp||''):'',la:sameV?g.la:null,lo:sameV?g.lo:null,dep:sameV?(g.dep||''):'',depnom:sameV?(g.depnom||''):'',fiab:'',voiture:null,ads:null}); it.agentId=FA[FA.length-1].id; saveFA(); if(typeof renderFA==='function')renderFA(); } delete it._affect;delete it._affnew;delete it._afnom;delete it._aftel;delete it._afville;delete it._afgeo;delete it._afq; saveSuivi(); renderSuivi(); return; }
     else if(act==='pickclose'){delete it._pick;delete it._pick2;}
     else if(act==='pickcopy'){var card=b.closest('.sv'),lines=it.texte.split('\n'),outL=[];card.querySelectorAll('input.pl').forEach(function(c){if(c.checked)outL.push(lines[+c.getAttribute('data-li')]);});if(navigator.clipboard)navigator.clipboard.writeText(outL.join('\n'));flash(b,'Copié ✓');return;}
     saveSuivi(); renderSuivi();
   });
   byId('suiviList').addEventListener('change',function(e){
     if(e.target.classList&&e.target.classList.contains('pl')){ plPreview(e.target.closest('.sv')); return; }
+    if(e.target.classList&&(e.target.classList.contains('af-date')||e.target.classList.contains('af-h')||e.target.classList.contains('af-m'))){ var aid=e.target.getAttribute('data-id'),ai=null,k; for(k=0;k<SUIVI.length;k++)if(SUIVI[k].id===aid){ai=SUIVI[k];break;} if(ai){ var acard=e.target.closest('.sv'),dt=acard.querySelector('.af-date'),hh=acard.querySelector('.af-h'),mm=acard.querySelector('.af-m'); ai.mdate=dt?dt.value:ai.mdate; var H=hh?hh.value:'',M=mm?mm.value:''; ai.mheure=H?(H+':'+(M||'00')):''; saveSuivi(); renderSuivi(); } return; }
     var t=e.target, id=t.getAttribute('data-nrad')||t.getAttribute('data-nads')||t.getAttribute('data-nvoit'); if(!id)return;
     var it=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;} if(!it)return;
     if(t.hasAttribute('data-nrad'))it._rad=parseInt(t.value,10)||100;
@@ -808,6 +838,15 @@ button.big:active{transform:translateY(1px)}
     else if(t.hasAttribute('data-nvoit'))it._nvoit=t.checked;
     renderSuivi();
   });
+  byId('suiviList').addEventListener('input',function(e){
+    var t=e.target; if(!t.classList)return; var id=t.getAttribute('data-id'); if(!id)return;
+    var it=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;} if(!it)return;
+    if(t.classList.contains('af-search')){ it._afq=t.value; var res=t.closest('.pickp').querySelector('.af-res'); if(res)res.innerHTML=afResults(it); return; }
+    if(t.classList.contains('afn-nom')){ it._afnom=t.value; return; }
+    if(t.classList.contains('afn-tel')){ it._aftel=t.value; return; }
+    if(t.classList.contains('afn-ville')){ it._afville=t.value; it._afgeo=null; var sg='sugg-afn-'+id,val=t.value.trim(); clearTimeout(it._afvt); if(val.length<2){var bx=byId(sg);if(bx)bx.classList.add('hidden');return;} it._afvt=setTimeout(function(){ cityAuto(val,sg,function(c){var co=c.centre&&c.centre.coordinates;it._afgeo={nom:c.nom,cp:(c.codesPostaux&&c.codesPostaux[0])||'',la:co?co[1]:null,lo:co?co[0]:null,dep:(c.departement&&c.departement.code)||'',depnom:(c.departement&&c.departement.nom)||''};it._afville=c.nom;var inp=document.querySelector('.afn-ville[data-id="'+id+'"]');if(inp)inp.value=c.nom;var bx2=byId(sg);if(bx2)bx2.classList.add('hidden');}); },250); return; }
+  });
+  setInterval(function(){ if(byId('sec-suivi').classList.contains('hidden'))return; if(SUIVI.some(function(x){return x._affect||x._pick||x._pick2||x._near||x._pending;}))return; renderSuivi(); },60000);
   document.querySelectorAll('#suiviTabs button').forEach(function(bt){bt.onclick=function(){suiviBucket=bt.getAttribute('data-b');renderSuivi();};});
   function flash(btn,msg){var o=btn.getAttribute('data-o')||btn.textContent;btn.setAttribute('data-o',o);btn.textContent=msg;setTimeout(function(){btn.textContent=btn.getAttribute('data-o');},1500);}
   byId('toSuivi').onclick=function(){
