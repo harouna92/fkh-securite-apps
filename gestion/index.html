@@ -766,7 +766,7 @@ button.big:active{transform:translateY(1px)}
       if(x._pick||x._pick2){
         var lines=x.texte.split('\n');
         var ptitre=x._pick2?'Mission validée — décoche ce que tu ne veux pas':'Infos pour l\'agent — décoche ce que tu ne veux pas';
-        pickPanel='<div class="pickp"><div class="lab" style="margin:0 0 2px">'+ptitre+'</div>'+lines.map(function(ln,li){return '<label class="plrow"><input type="checkbox" class="pl" data-li="'+li+'" checked><span>'+(esc(ln)||' ')+'</span></label>';}).join('')+'<div class="acts" style="margin-top:8px"><button class="ok" data-act="pickcopy" data-id="'+x.id+'">📋 Copier la sélection</button><button data-act="pickclose" data-id="'+x.id+'">Fermer</button></div></div>';
+        pickPanel='<div class="pickp"><div class="lab" style="margin:0 0 2px">'+ptitre+'</div>'+lines.map(function(ln,li){return '<label class="plrow"><input type="checkbox" class="pl" data-li="'+li+'" checked><span>'+(esc(ln)||' ')+'</span></label>';}).join('')+'<div class="lab" style="margin:9px 0 3px">📋 Aperçu — texte à copier</div><div class="outbox pl-out" data-id="'+x.id+'">'+esc(lines.join('\n'))+'</div><div class="acts" style="margin-top:8px"><button class="ok" data-act="pickcopy" data-id="'+x.id+'">📋 Copier la sélection</button><button data-act="pickclose" data-id="'+x.id+'">Fermer</button></div></div>';
       }
       var nearPanel=x._near?renderNear(x):'';
       var assocLine='';
@@ -775,6 +775,8 @@ button.big:active{transform:translateY(1px)}
       return '<div class="sv"><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+assocLine+zdLine+'<div class="svm">'+esc(x.texte)+'</div>'+body+pickBtn+pickPanel+nearPanel+'</div>';
     }).join('');
   }
+  // Aperçu live du texte à copier (Infos agent / Mission validée) : recalculé à chaque case cochée/décochée
+  function plPreview(card){ if(!card)return; var out=card.querySelector('.pl-out'); if(!out)return; var id=out.getAttribute('data-id'),it=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;} if(!it)return; var lines=it.texte.split('\n'),arr=[]; card.querySelectorAll('input.pl').forEach(function(c){if(c.checked)arr.push(lines[+c.getAttribute('data-li')]);}); out.textContent=arr.join('\n')||'(rien de sélectionné)'; }
   byId('suiviList').addEventListener('click',function(e){
     var b=e.target.closest('button'); if(!b)return;
     var id=b.getAttribute('data-id'), act=b.getAttribute('data-act'), it=null,i;
@@ -798,6 +800,7 @@ button.big:active{transform:translateY(1px)}
     saveSuivi(); renderSuivi();
   });
   byId('suiviList').addEventListener('change',function(e){
+    if(e.target.classList&&e.target.classList.contains('pl')){ plPreview(e.target.closest('.sv')); return; }
     var t=e.target, id=t.getAttribute('data-nrad')||t.getAttribute('data-nads')||t.getAttribute('data-nvoit'); if(!id)return;
     var it=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;} if(!it)return;
     if(t.hasAttribute('data-nrad'))it._rad=parseInt(t.value,10)||100;
