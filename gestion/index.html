@@ -454,7 +454,7 @@ button.big:active{transform:translateY(1px)}
     </div>
   </section>
   <section id="sec-suiviappels" class="hidden">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><h1 style="margin:0">📞 Suivi des appels</h1><div id="sa-clock" style="position:fixed;right:14px;bottom:14px;z-index:60;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;padding:6px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);box-shadow:0 4px 16px rgba(0,0,0,.35)">--:--:--</div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><h1 style="margin:0">📞 Suivi des appels</h1><div id="sa-clock" style="position:fixed;right:12px;top:10px;z-index:60;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;padding:6px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);box-shadow:0 4px 16px rgba(0,0,0,.35)">--:--:--</div></div>
     <p class="sub">Agenda chronologique des appels à faire (issus des missions validées). Pour chaque ligne : coche « Fait » (heure réelle enregistrée), choisis le statut, ajoute un commentaire. Heures 🇫🇷 + 🇲🇱.</p>
     <div class="card">
       <div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="sa-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="sa-to"></label></div>
@@ -1922,14 +1922,14 @@ button.big:active{transform:translateY(1px)}
   var ssTab='regl';
   function ssLoad(){ var s=load('fkh_suivisite'); return (s&&typeof s==='object'&&!Array.isArray(s))?s:{}; }
   function ssSave(s){ save('fkh_suivisite',s); }
-  function ssParams(){ var p=load('fkh_ss_params'); if(!p||typeof p!=='object'||Array.isArray(p))p={}; return {before:(p.before!=null?p.before:15), after:(p.after!=null?p.after:30)}; }
+  function ssParams(){ var p=load('fkh_ss_params'); if(!p||typeof p!=='object'||Array.isArray(p))p={}; return {before:(p.before!=null?p.before:15), route:(p.route!=null?p.route:30)}; }
   function ssNowHM(){ var d=new Date(); return pad2(d.getHours())+':'+pad2(d.getMinutes()); }
   function ssMissions(from,to){ return SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; }).sort(function(a,b){var da=(a.mdate||'')+' '+(a.mheure||''),db=(b.mdate||'')+' '+(b.mheure||'');return da<db?-1:da>db?1:0;}); }
   function ssSteps(m){
     var P=ssParams(), steps=[], prise=m.mheure||'';
-    if(prise)steps.push({key:'j15',label:'☎ J‑'+P.before+' min',heure:shiftTime(prise,-P.before),type:'call'});
+    if(prise)steps.push({key:'route',label:'☎ Route (renseignements)',heure:shiftTime(prise,-P.route),type:'route'});
+    if(prise)steps.push({key:'j15',label:'☎ Pré-prise (J‑'+P.before+')',heure:shiftTime(prise,-P.before),type:'j15'});
     steps.push({key:'prise',label:'🟢 Prise de service',heure:prise,type:'prise'});
-    if(prise)steps.push({key:'after',label:'☎ Prise +'+P.after+' min',heure:shiftTime(prise,P.after),type:'call'});
     apControls(m).forEach(function(c,i){ steps.push({key:'ctrl'+i,label:'🌙 Contrôle '+(i+1),heure:c,type:'call'}); });
     steps.push({key:'fin',label:'🔚 Fin de service',heure:(typeof apFinHeure==='function')?apFinHeure(m):'',type:'fin'});
     return steps;
@@ -1980,10 +1980,10 @@ button.big:active{transform:translateY(1px)}
     var head='<div class="card"><div class="lab" style="margin:0">'+arr.length+' mission'+(arr.length>1?'s':'')+' — '+esc(lbl)+(naff?(' · <span style="color:var(--warn)">'+naff+' à affecter</span>'):'')+'</div></div>';
     if(ssTab==='regl'){
       var P=ssParams();
-      var gl='<div class="card"><div class="lab" style="margin:0 0 6px">Paramètres généraux (pré-remplis)</div><div class="grid2"><label class="f"><div class="lab">Appel avant la prise (min)</div><input type="number" id="ss-before" value="'+P.before+'" min="0" max="120"></label><label class="f"><div class="lab">Appel après la prise (min)</div><input type="number" id="ss-after" value="'+P.after+'" min="0" max="180"></label></div><p class="sub" style="margin:6px 0 0">🌙 Les nuits (20 h→8 h) ont les appels de contrôle activés d\'office. Coche/décoche par mission ci-dessous.</p></div>';
+      var gl='<div class="card"><div class="lab" style="margin:0 0 6px">Paramètres généraux (pré-remplis)</div><div class="grid2"><label class="f"><div class="lab">☎ Appel « route » — min AVANT la prise</div><input type="number" id="ss-route" value="'+P.route+'" min="0" max="180"></label><label class="f"><div class="lab">☎ Pré-prise (J‑15) — min avant la prise</div><input type="number" id="ss-before" value="'+P.before+'" min="0" max="120"></label></div><p class="sub" style="margin:6px 0 0">🌙 Les nuits (20 h→8 h) ont les appels de contrôle activés d\'office. Coche/décoche par mission ci-dessous.</p></div>';
       wrap.innerHTML=head+gl+arr.map(ssReglCard).join('');
+      byId('ss-route').addEventListener('change',function(){ var p=ssParams(); p.route=parseInt(this.value,10)||0; save('fkh_ss_params',p); renderSuiviSite(); });
       byId('ss-before').addEventListener('change',function(){ var p=ssParams(); p.before=parseInt(this.value,10)||0; save('fkh_ss_params',p); renderSuiviSite(); });
-      byId('ss-after').addEventListener('change',function(){ var p=ssParams(); p.after=parseInt(this.value,10)||0; save('fkh_ss_params',p); renderSuiviSite(); });
       wrap.querySelectorAll('[data-ason]').forEach(function(b){ b.onclick=function(){ apSetOn(b.getAttribute('data-ason'), b.checked); renderSuiviSite(); }; });
       wrap.querySelectorAll('[data-asnb]').forEach(function(b){ b.onclick=function(){ var id=b.getAttribute('data-asnb'),dd=+b.getAttribute('data-d'),m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id)m=SUIVI[i]; if(!m)return; apSetNb(id,apPlan(m).nb+dd); renderSuiviSite(); }; });
       return; }
@@ -1999,7 +1999,7 @@ button.big:active{transform:translateY(1px)}
   // ===== Suivi des appels : agenda chronologique des appels à faire (issus des missions) =====
   function saSet(mid,key,patch){ var S=ssLoad(); if(!S[mid])S[mid]={}; var r=S[mid][key]||{}; for(var k in patch)r[k]=patch[k]; S[mid][key]=r; ssSave(S); }
   var saType='all';
-  function saTypeMatch(key){ if(saType==='all')return true; if(saType==='avant')return key==='j15'; if(saType==='prise')return key==='prise'||key==='after'; if(saType==='pendant')return key.indexOf('ctrl')===0; if(saType==='fin')return key==='fin'; return true; }
+  function saTypeMatch(key){ if(saType==='all')return true; if(saType==='avant')return key==='j15'||key==='route'; if(saType==='prise')return key==='prise'; if(saType==='pendant')return key.indexOf('ctrl')===0; if(saType==='fin')return key==='fin'; return true; }
   function saEntries(from,to){
     var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; });
     if(typeof apDeconflict==='function')apDeconflict(missions,10);
@@ -2028,7 +2028,9 @@ button.big:active{transform:translateY(1px)}
       var photoSel='<select class="sa-f" data-f="photo" '+d0+'>'+['','Photo horodatée','Photo non horodatée','Pas de photo'].map(function(p){return '<option value="'+esc(p)+'"'+(r.photo===p?' selected':'')+'>'+(p||'📷 photo ?')+'</option>';}).join('')+'</select>';
       var avise='<label class="chk" style="margin:0;'+(done&&!r.avise?'color:var(--bad)':'')+'"><input type="checkbox" class="sa-f" data-f="avise" '+d0+(r.avise?' checked':'')+'><span>📞 Client avisé</span></label>';
       var agret='<label class="chk" style="margin:0"><input type="checkbox" class="sa-f" data-f="agRetard" '+d0+(r.agRetard?' checked':'')+'><span>⏰ Agent en retard</span></label><input class="sa-f" data-f="agRetardMin" '+d0+' type="number" min="0" placeholder="min" value="'+esc(r.agRetardMin!=null?r.agRetardMin:'')+'" style="width:62px">';
-      var fields=(e.key==='prise')?(fait+agret+photoSel+avise+note):(e.key==='fin')?(fait+photoSel+avise+note):(fait+statut+note);
+      var prisRoute='<label class="chk" style="margin:0"><input type="checkbox" class="sa-f" data-f="route" '+d0+(r.route?' checked':'')+'><span>🚗 A pris la route</span></label>';
+      var ponctuel='<select class="sa-f" data-f="ponctuel" '+d0+'>'+['','✅ Sera à l\'heure','⚠️ Retard annoncé','🔴 Injoignable'].map(function(s){return '<option value="'+esc(s)+'"'+(r.ponctuel===s?' selected':'')+'>'+(s||'— sera à l\'heure ? —')+'</option>';}).join('')+'</select>';
+      var fields=(e.key==='prise')?(fait+agret+photoSel+avise+note):(e.key==='fin')?(fait+photoSel+avise+note):(e.key==='route')?(fait+prisRoute+note):(e.key==='j15')?(fait+ponctuel+note):(fait+statut+note);
       var cl=[]; if(e.client)cl.push('🏢 Client : '+esc(e.client)); cl.push('📍 Site : '+esc(e.site)+(e.siteBDC&&e.siteBDC!==e.site?' <span style="color:var(--muted)">(BDC : '+esc(e.siteBDC)+')</span>':'')); if(e.ville||e.cp)cl.push('Ville : '+[esc(e.ville),esc(e.cp)].filter(Boolean).join(' ')); if(e.mheure)cl.push('🕐 Heure prévue : '+esc(e.mheure)); cl.push('👤 Agent : '+(e.agent?esc(e.agent):'<span style="color:var(--warn)">⚠ à affecter</span>')); if(e.agentTel)cl.push('📞 Numéro : <a class="call" href="tel:'+esc(String(e.agentTel).replace(/\s/g,''))+'">'+esc(e.agentTel)+'</a>');
       var ctx='<div class="fa-d" style="margin:4px 0 2px;line-height:1.7">'+cl.join('<br>')+'</div>';
       return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" style="padding:8px'+(done?';opacity:.6':'')+'"><div class="fa-n"><span class="sa-tag"></span><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+e.label+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'+ctx
