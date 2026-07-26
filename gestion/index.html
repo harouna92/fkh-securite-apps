@@ -333,6 +333,10 @@ button.big:active{transform:translateY(1px)}
       <button data-b="nongeree">⚠️ Non gérées <span class="cnt" id="cnt-nongeree">0</span></button>
     </div>
     <input id="suivi-q" placeholder="🔎 Filtrer (site, ville, client, agent…)" autocomplete="off" style="width:100%;margin:8px 0 4px">
+    <div id="val-controls" class="hidden">
+      <div class="subtabs" style="margin:6px 0"><button type="button" class="valsub on" data-v="toaff">✅ À affecter <span class="cnt" id="val-cnt-toaff">0</span></button><button type="button" class="valsub" data-v="aff">👤 Affectées <span class="cnt" id="val-cnt-aff">0</span></button></div>
+      <div class="card" style="padding:8px"><div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="val-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="val-to"></label></div><div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:6px"><button type="button" class="val-preset" data-d="all">Tout</button><button type="button" class="val-preset" data-d="1">Aujourd'hui</button><button type="button" class="val-preset" data-d="7">7 j</button><button type="button" class="val-preset" data-d="30">30 j</button></div></div>
+    </div>
     <div class="suivilist" id="suiviList"></div>
   </section>
   <section id="sec-fiche" class="hidden">
@@ -768,7 +772,7 @@ button.big:active{transform:translateY(1px)}
   function depFromVille(v,cb){ if(!v){cb(null);return;} fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(v)+'&fields=departement&boost=population&limit=1').then(function(r){return r.json();}).then(function(list){ if(list&&list[0]&&list[0].departement)cb({code:list[0].departement.code,nom:list[0].departement.nom}); else cb(null); }).catch(function(){cb(null);}); }
   var MOTIFS_NG=["Pas d'agent disponible","Agent pas trouvé à temps","Délai trop court","Tarif non validé","Mission refusée","Autre"];
   var MOTIFS_AN=["Annulée par le client","Reportée","Doublon","Plus besoin","Autre"];
-  var suiviBucket='recherche', idc=0;
+  var suiviBucket='recherche', idc=0, valSub='toaff';
   function saveSuivi(){ save('fkh_suivi',SUIVI.map(function(x){var c={};for(var k in x)if(k.charAt(0)!=='_')c[k]=x[k];return c;})); }
   function titreFrom(txt){
     function g(re){var m=re.exec(txt);return m?m[1].trim():'';}
@@ -879,6 +883,7 @@ button.big:active{transform:translateY(1px)}
   function renderSuivi(){
     ['recherche','validee','annulee','nongeree'].forEach(function(b){var el=byId('cnt-'+b);if(el)el.textContent=SUIVI.filter(function(x){return x.statut===b;}).length;});
     document.querySelectorAll('#suiviTabs button').forEach(function(bt){bt.classList.toggle('on',bt.getAttribute('data-b')===suiviBucket);});
+    if(byId('val-controls'))byId('val-controls').classList.toggle('hidden',suiviBucket!=='validee');
     var q=((byId('suivi-q')&&byId('suivi-q').value)||'').toLowerCase().trim(), wrap=byId('suiviList');
     function matchQ(x){ if(!q)return true; var an=(x.agentId&&faById(x.agentId))?faById(x.agentId).nom:''; return (((x.titre||'')+' '+(x.texte||'')+' '+(x.ville||'')+' '+(x.client||'')+' '+(x.siteBDC||'')+' '+(an||'')).toLowerCase().indexOf(q)>=0); }
     var arr=SUIVI.filter(function(x){return x.statut===suiviBucket&&matchQ(x);});
@@ -911,8 +916,14 @@ button.big:active{transform:translateY(1px)}
     }
     if(suiviBucket==='validee'){
       var byD=function(a,b){var da=a.mdate||'9999-99-99',db=b.mdate||'9999-99-99';return da>db?1:(da<db?-1:0);};
-      var toaff=arr.filter(function(x){return !x.agentId;}).sort(byD), aff=arr.filter(function(x){return x.agentId;}).sort(byD);
-      wrap.innerHTML='<div class="svgrouphd" style="font-weight:700;margin:6px 0 4px;font-size:15px">✅ Validée · à affecter <span class="cnt">'+toaff.length+'</span></div>'+(toaff.length?toaff.map(svItem).join(''):'<div class="svempty">Aucune mission à affecter.</div>')+'<div class="svgrouphd" style="font-weight:700;margin:16px 0 4px;font-size:15px">👤 Validée · affectée <span class="cnt">'+aff.length+'</span></div>'+(aff.length?aff.map(svItem).join(''):'<div class="svempty">Aucune mission affectée.</div>');
+      var vf=(byId('val-from')&&byId('val-from').value)||'', vt=(byId('val-to')&&byId('val-to').value)||'';
+      function inPer(x){ var d=x.mdate||''; if(vf&&(!d||d<vf))return false; if(vt&&(!d||d>vt))return false; return true; }
+      var toaff=arr.filter(function(x){return !x.agentId&&inPer(x);}).sort(byD), aff=arr.filter(function(x){return x.agentId&&inPer(x);}).sort(byD);
+      if(byId('val-cnt-toaff'))byId('val-cnt-toaff').textContent=toaff.length;
+      if(byId('val-cnt-aff'))byId('val-cnt-aff').textContent=aff.length;
+      document.querySelectorAll('.valsub').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-v')===valSub);});
+      var show=(valSub==='aff')?aff:toaff;
+      wrap.innerHTML=show.length?show.map(svItem).join(''):'<div class="svempty">Aucune mission '+(valSub==='aff'?'affectée':'à affecter')+(vf||vt?' sur cette période':'')+'.</div>';
     } else {
       wrap.innerHTML=arr.map(svItem).join('');
     }
@@ -969,6 +980,10 @@ button.big:active{transform:translateY(1px)}
   setInterval(function(){ if(byId('sec-suivi').classList.contains('hidden'))return; if(SUIVI.some(function(x){return x._affect||x._pick||x._pick2||x._near||x._pending;}))return; renderSuivi(); },60000);
   document.querySelectorAll('#suiviTabs button').forEach(function(bt){bt.onclick=function(){suiviBucket=bt.getAttribute('data-b');renderSuivi();};});
   if(byId('suivi-q'))byId('suivi-q').addEventListener('input',function(){renderSuivi();});
+  document.querySelectorAll('.valsub').forEach(function(b){ b.onclick=function(){ valSub=b.getAttribute('data-v'); renderSuivi(); }; });
+  document.querySelectorAll('.val-preset').forEach(function(b){ b.addEventListener('click',function(){ var d=b.getAttribute('data-d'); if(d==='all'){ byId('val-from').value=''; byId('val-to').value=''; } else { var n=parseInt(d,10)||1,t=impTodayISO(); byId('val-from').value=t; byId('val-to').value=svcAddDays(t,n-1); } renderSuivi(); }); });
+  if(byId('val-from'))byId('val-from').addEventListener('change',function(){renderSuivi();});
+  if(byId('val-to'))byId('val-to').addEventListener('change',function(){renderSuivi();});
   function flash(btn,msg){var o=btn.getAttribute('data-o')||btn.textContent;btn.setAttribute('data-o',o);btn.textContent=msg;setTimeout(function(){btn.textContent=btn.getAttribute('data-o');},1500);}
   byId('toSuivi').onclick=function(){
     var n=pushToSuivi(); if(!n){flash(byId('toSuivi'),'Rien à envoyer');return;}
