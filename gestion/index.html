@@ -765,6 +765,12 @@ button.big:active{transform:translateY(1px)}
     return ' <span style="color:'+(inc?'var(--warn)':'var(--ok)')+'">'+(inc?'🟠 tenue incomplète':'🟢 tenue complète')+'</span>'+(stale?' <span style="color:var(--bad)">⚠ à recontrôler ('+days+'j)</span>':''); }
   function missCountdown(x){ if(!x.mdate)return ''; var t=new Date(x.mdate+'T'+((x.mheure||'00:00'))+':00'); if(isNaN(t.getTime()))return ''; var diff=t.getTime()-Date.now(); if(diff<=0)return '🟢 mission commencée / passée'; var mins=Math.floor(diff/60000),d=Math.floor(mins/1440),h=Math.floor((mins%1440)/60),mm=mins%60,p=[]; if(d)p.push(d+' j'); if(h||d)p.push(h+' h'); if(!d)p.push(mm+' min'); return '⏳ commence dans '+p.join(' '); }
   function afResults(x){ var q=(x._afq||'').toLowerCase().trim(); if(!q)return '<div class="hint" style="padding:4px 2px">Tape un nom, un numéro ou une ville.</div>'; if(!FA)return ''; var arr=FA.filter(function(a){return (((a.nom||'')+' '+((a.tels||[]).join(' '))+' '+(a.ville||'')).toLowerCase().indexOf(q)>=0);}).slice(0,8); if(!arr.length)return '<div class="hint" style="padding:4px 2px">Aucun agent trouvé — crée-le ci-dessous.</div>'; return arr.map(function(a){var miss=agentMissing(a),bd=miss.length?' <span style="color:var(--warn)">⚠ '+miss.map(esc).join(' · ')+'</span>':'';return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+esc((a.tels||[]).join(' / ')||'—')+(a.ville?' · '+esc(a.ville):'')+bd+tenueBadge(a)+'</div></div><div class="fa-a"><button class="ok" data-act="affpick" data-id="'+x.id+'" data-aid="'+a.id+'">Choisir</button></div></div>';}).join(''); }
+  // Extrait date + heure de début depuis le texte de la mission (pré-remplissage de l'affectation)
+  function deriveMissionDT(txt){ txt=String(txt||''); var d='',h='',m;
+    m=txt.match(/(\d{4})-(\d{2})-(\d{2})/); if(m){d=m[1]+'-'+m[2]+'-'+m[3];}
+    else{ m=txt.match(/(\d{2})\/(\d{2})\/(\d{4})/); if(m){d=m[3]+'-'+m[2]+'-'+m[1];} }
+    m=txt.match(/(\d{1,2})\s*[:hH]\s*(\d{2})/); if(m){h=('0'+m[1]).slice(-2)+':'+m[2];}
+    return {date:d,heure:h}; }
   function renderAffect(x){
     if(x.statut!=='validee')return '';
     var out='';
@@ -835,7 +841,7 @@ button.big:active{transform:translateY(1px)}
     else if(act==='nearclose'){ delete it._near; saveSuivi(); renderSuivi(); return; }
     else if(act==='nassoc'){ var aid=b.getAttribute('data-aid'); it.assoc=it.assoc||[]; var ix=it.assoc.indexOf(aid); if(ix>=0)it.assoc.splice(ix,1); else it.assoc.push(aid); saveSuivi(); renderSuivi(); return; }
     else if(act==='zonediff'){ var tog=function(dep){ if(!dep||!dep.code){flash(b,'Ville ?');return;} it.depCode=dep.code; if(dep.nom)it.depNom=dep.nom; if(ZDIFF[dep.code])delete ZDIFF[dep.code]; else ZDIFF[dep.code]={nom:dep.nom||it.depNom||''}; saveZDIFF(); saveSuivi(); renderSuivi(); }; if(it.depCode){tog({code:it.depCode,nom:it.depNom});} else {flash(b,'…');depFromVille(it.ville||extractVille(it.texte),tog);} return; }
-    else if(act==='affect'){ if(it._affect){delete it._affect;delete it._affnew;}else{it._affect=true;} }
+    else if(act==='affect'){ if(it._affect){delete it._affect;delete it._affnew;}else{ if(!it.mdate&&!it.mheure){var _dt=deriveMissionDT(it.texte); it.mdate=_dt.date; it.mheure=_dt.heure;} it._affect=true;} }
     else if(act==='affclose'){ delete it._affect;delete it._affnew; }
     else if(act==='affnew'){ it._affnew=!it._affnew; }
     else if(act==='affpick'){ it.agentId=b.getAttribute('data-aid'); delete it._affect;delete it._affnew;delete it._afq; saveSuivi(); renderSuivi(); return; }
