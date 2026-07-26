@@ -136,6 +136,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="thiam">Thiam</button>
     <button data-s="suiviappels">Suivi des appels</button>
     <button data-s="assistant">💬 Assistant</button>
+    <button data-s="tenues">🦺 Tenues</button>
   </div>
 </div>
 <div class="cloudbar" id="cloudbar"><span class="cb-txt"></span><button type="button" id="cloud-import">Importer mes données locales</button></div>
@@ -440,13 +441,17 @@ button.big:active{transform:translateY(1px)}
       </div>
     </div>
   </section>
+  <section id="sec-tenues" class="hidden">
+    <div><h1>🦺 Tenues</h1><p class="sub">État des tenues par agent (contrôle photo ≥ toutes les 2 semaines) + stock. Données synchronisées depuis l'inventaire partagé.</p></div>
+    <div id="ten-body"></div>
+  </section>
 </div>
 
 <script>
 (function(){
   var byId=function(x){return document.getElementById(x)};
-  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();window.scrollTo(0,0);};});
+  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
   function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} if(typeof cloudPush==='function')cloudPush(k); }
@@ -748,7 +753,16 @@ button.big:active{transform:translateY(1px)}
   function afMopts(sel){var s='';for(var m=0;m<60;m+=5){var v=pad2(m);s+='<option'+(v===sel?' selected':'')+'>'+v+'</option>';}return s;}
   function agentMissing(a){var m=[];if(!(a.tels&&a.tels.length))m.push('n°');if(!a.ville)m.push('ville');if(a.voiture==null)m.push('véhicule ?');if(a.ads==null)m.push('ADS ?');if(!a.fiab)m.push('fiabilité ?');return m;}
   // État de la tenue (alimenté par le chantier B / import Excel ; défaut = jamais contrôlée)
-  function tenueBadge(a){ if(!a)return ''; var e=a.tenue; if(e==='complet')return ' <span style="color:var(--ok)">🟢 tenue complète</span>'; if(e==='incomplet')return ' <span style="color:var(--warn)">🟠 tenue incomplète</span>'; return ' <span style="color:var(--bad)">🔴 tenue jamais contrôlée</span>'; }
+  function tnorm(s){return (s==null?'':String(s)).toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ').trim();}
+  var TCTRL=load('fkh_tenues_ctrl'), TSTOCK=load('fkh_tenues_stock');
+  function ctrlDays(dstr){ if(!dstr)return null; var t=new Date(String(dstr).slice(0,10)+'T00:00'); if(isNaN(t.getTime()))return null; return Math.floor((Date.now()-t.getTime())/86400000); }
+  function agentCtrl(nom){ if(!nom||!TCTRL||!TCTRL.length)return null; var n=tnorm(nom); if(!n)return null; var best=null,bd=''; TCTRL.forEach(function(c){var cn=tnorm(c.Agent);if(!cn)return; if(cn===n||cn.indexOf(n)>=0||n.indexOf(cn)>=0){var d=String(c['Date contrôle']||''); if(!best||d>bd){best=c;bd=d;}}}); return best; }
+  function tenueBadge(a){ if(!a)return '';
+    if(a.tenue==='complet')return ' <span style="color:var(--ok)">🟢 tenue complète</span>';
+    if(a.tenue==='incomplet')return ' <span style="color:var(--warn)">🟠 tenue incomplète</span>';
+    var c=agentCtrl(a.nom||''); if(!c)return ' <span style="color:var(--bad)">🔴 tenue jamais contrôlée</span>';
+    var inc=String(c['Statut tenue']||'').toLowerCase().indexOf('incomplet')>=0, days=ctrlDays(c['Date contrôle']), stale=days!=null&&days>14;
+    return ' <span style="color:'+(inc?'var(--warn)':'var(--ok)')+'">'+(inc?'🟠 tenue incomplète':'🟢 tenue complète')+'</span>'+(stale?' <span style="color:var(--bad)">⚠ à recontrôler ('+days+'j)</span>':''); }
   function missCountdown(x){ if(!x.mdate)return ''; var t=new Date(x.mdate+'T'+((x.mheure||'00:00'))+':00'); if(isNaN(t.getTime()))return ''; var diff=t.getTime()-Date.now(); if(diff<=0)return '🟢 mission commencée / passée'; var mins=Math.floor(diff/60000),d=Math.floor(mins/1440),h=Math.floor((mins%1440)/60),mm=mins%60,p=[]; if(d)p.push(d+' j'); if(h||d)p.push(h+' h'); if(!d)p.push(mm+' min'); return '⏳ commence dans '+p.join(' '); }
   function afResults(x){ var q=(x._afq||'').toLowerCase().trim(); if(!q)return '<div class="hint" style="padding:4px 2px">Tape un nom, un numéro ou une ville.</div>'; if(!FA)return ''; var arr=FA.filter(function(a){return (((a.nom||'')+' '+((a.tels||[]).join(' '))+' '+(a.ville||'')).toLowerCase().indexOf(q)>=0);}).slice(0,8); if(!arr.length)return '<div class="hint" style="padding:4px 2px">Aucun agent trouvé — crée-le ci-dessous.</div>'; return arr.map(function(a){var miss=agentMissing(a),bd=miss.length?' <span style="color:var(--warn)">⚠ '+miss.map(esc).join(' · ')+'</span>':'';return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+esc((a.tels||[]).join(' / ')||'—')+(a.ville?' · '+esc(a.ville):'')+bd+tenueBadge(a)+'</div></div><div class="fa-a"><button class="ok" data-act="affpick" data-id="'+x.id+'" data-aid="'+a.id+'">Choisir</button></div></div>';}).join(''); }
   function renderAffect(x){
@@ -782,7 +796,7 @@ button.big:active{transform:translateY(1px)}
         var motifs=x._pending==='nongeree'?MOTIFS_NG:MOTIFS_AN;
         body='<div class="acts"><select data-sel="'+x.id+'">'+motifs.map(function(m){return '<option>'+esc(m)+'</option>';}).join('')+'</select><button class="ok" data-act="confirm" data-id="'+x.id+'">Confirmer</button><button data-act="cancel" data-id="'+x.id+'">Retour</button></div>';
       } else if(x.statut==='recherche'){
-        body='<div class="acts"><button class="ok" data-act="trouve" data-id="'+x.id+'">✅ Agent trouvé</button><button class="no" data-act="annule" data-id="'+x.id+'">✖️ Annulée client</button><button class="wn" data-act="nongere" data-id="'+x.id+'">⚠️ Non gérée</button></div>';
+        body='<div class="acts"><button class="ok" data-act="trouve" data-id="'+x.id+'">✅ À valider</button><button class="no" data-act="annule" data-id="'+x.id+'">✖️ Annulée client</button><button class="wn" data-act="nongere" data-id="'+x.id+'">⚠️ Non gérée</button></div>';
       } else {
         body=badge(x.statut,x.motif)+'<div class="acts"><button data-act="reopen" data-id="'+x.id+'">↩︎ Remettre en recherche</button><button class="no" data-act="del" data-id="'+x.id+'">🗑️ Supprimer</button></div>';
       }
@@ -1171,7 +1185,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null };
   function cloudHdr(){ return {'Content-Type':'application/json','X-App-Password':CLOUD.pass}; }
   function cloudPush(k){
@@ -1191,6 +1205,8 @@ button.big:active{transform:translateY(1px)}
       else if(k==='fkh_fa'){ FA=load('fkh_fa'); FA.forEach(function(a){if(a.tel&&!a.tels){a.tels=[a.tel];delete a.tel;}}); if(typeof renderFA==='function')renderFA(); }
       else if(k==='fkh_thiam'){ TH=load('fkh_thiam'); if(typeof thRenderBoard==='function')thRenderBoard(); if(typeof thRenderOut==='function')thRenderOut(); if(typeof thRenderAuto==='function')thRenderAuto(); }
       else if(k==='fkh_zones_diff'){ try{ZDIFF=JSON.parse(localStorage.getItem('fkh_zones_diff')||'{}')||{};}catch(e){ZDIFF={};} if(typeof renderZone==='function' && byId('sec-zone') && !byId('sec-zone').classList.contains('hidden'))renderZone(); }
+      else if(k==='fkh_tenues_ctrl'){ TCTRL=load('fkh_tenues_ctrl'); if(typeof renderTenues==='function')renderTenues(); if(typeof renderFA==='function')renderFA(); if(typeof renderSuivi==='function')renderSuivi(); }
+      else if(k==='fkh_tenues_stock'){ TSTOCK=load('fkh_tenues_stock'); if(typeof renderTenues==='function')renderTenues(); }
       else { var fns=COMBO_REFRESH[k]; if(fns)fns.forEach(function(f){try{f();}catch(e){}}); } // clés « combos » (clients, agents…) : listes rafraîchies en direct
     }catch(e){}
   }
@@ -1268,6 +1284,31 @@ button.big:active{transform:translateY(1px)}
     asgAvail();
   })();
 
+  function renderTenues(){
+    var wrap=byId('ten-body'); if(!wrap)return;
+    if(!TCTRL)TCTRL=load('fkh_tenues_ctrl'); if(!TSTOCK)TSTOCK=load('fkh_tenues_stock');
+    if(!(TCTRL&&TCTRL.length)){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune donnée tenue chargée. Connecte-toi avec le mot de passe commun pour les recevoir depuis le classeur partagé.</div></div>'; return; }
+    var byA={}; TCTRL.forEach(function(c){var n=tnorm(c.Agent);if(!n)return;var d=String(c['Date contrôle']||'');if(!byA[n]||d>byA[n]._d)byA[n]={rec:c,_d:d};});
+    var agents=Object.keys(byA).map(function(k){return byA[k].rec;}).sort(function(a,b){return String(b['Date contrôle']).localeCompare(String(a['Date contrôle']));});
+    var stale=agents.filter(function(c){var d=ctrlDays(c['Date contrôle']);return d!=null&&d>14;});
+    var never=[]; (FA||[]).forEach(function(a){if(a.nom&&!agentCtrl(a.nom))never.push(a.nom);});
+    var H='<div class="card"><div class="lab" style="margin:0 0 6px">⚠️ À recontrôler (plus de 2 semaines)</div>';
+    H+= stale.length? '<div class="near">'+stale.map(function(c){var d=ctrlDays(c['Date contrôle']);return '<div class="n"><span>'+esc(c.Agent||'—')+'</span><span class="d" style="color:var(--bad)">contrôlé il y a '+d+' j</span></div>';}).join('')+'</div>' : '<div class="hint" style="margin:0">Aucun — tous contrôlés il y a moins de 2 semaines. 👍</div>';
+    if(never.length)H+='<div class="hint" style="margin-top:8px;color:var(--bad)">🔴 Jamais contrôlés (en fiche agent) : '+esc(never.join(', '))+'</div>';
+    H+='</div>';
+    H+='<div class="card"><div class="lab" style="margin:0 0 6px">👕 État tenue par agent ('+agents.length+')</div><div class="list">';
+    H+= agents.map(function(c){
+      var inc=String(c['Statut tenue']||'').toLowerCase().indexOf('incomplet')>=0, d=ctrlDays(c['Date contrôle']);
+      var mens=[c.Pointure&&('👟 '+c.Pointure),c['T. pantalon']&&('👖 '+c['T. pantalon']),c['T. haut']&&('👕 '+c['T. haut'])].filter(Boolean).join(' · ');
+      var manq=c.Manquants?('<div class="fa-d" style="color:var(--bad)">Manque : '+esc(String(c.Manquants))+'</div>'):'';
+      return '<div class="it"><div style="flex:1"><div class="fa-n">'+(inc?'🟠':'🟢')+' '+esc(c.Agent||'—')+(c.Site?' <span style="color:var(--muted);font-weight:400">· '+esc(String(c.Site))+'</span>':'')+'</div><div class="fa-d">'+esc(String(c['Date contrôle']||'').slice(0,10))+(d!=null?' · il y a '+d+' j':'')+(d!=null&&d>14?' <span style="color:var(--bad)">⚠ à recontrôler</span>':'')+(mens?' · '+esc(mens):'')+'</div>'+manq+'</div></div>';
+    }).join('')+'</div></div>';
+    var st=(TSTOCK||[]); function low(s){var x=String(s['Statut stock']||'').toLowerCase();return x.indexOf('proche')>=0||x.indexOf('rupture')>=0||x.indexOf('manqu')>=0;}
+    var nlow=st.filter(low).length;
+    H+='<div class="card"><div class="lab" style="margin:0 0 6px">📦 Stock ('+st.length+' réf.'+(nlow?' · '+nlow+' à surveiller':'')+')</div><div class="list">';
+    H+= st.map(function(s){var w=low(s);return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(String(s['Pièce']||'—'))+' <span style="color:var(--muted);font-weight:400">'+esc([s.Couleur,s.Taille].filter(function(x){return x!=null&&x!=='';}).join(' '))+'</span></div><div class="fa-d">Qté : '+esc(String(s['Qté en stock']!=null?s['Qté en stock']:'?'))+(s['Statut stock']?' · <span style="color:'+(w?'var(--bad)':'var(--muted)')+'">'+esc(String(s['Statut stock']))+'</span>':'')+'</div></div></div>';}).join('')+'</div></div>';
+    wrap.innerHTML=H;
+  }
   (function initCloud(){
     var lo=byId('loginOverlay');
     if(!CLOUD.base){ if(lo)lo.style.display='none'; return; } // pas de backend => 100% local, rien ne change
