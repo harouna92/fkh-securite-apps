@@ -890,7 +890,7 @@ button.big:active{transform:translateY(1px)}
     var inc=String(c['Statut tenue']||'').toLowerCase().indexOf('incomplet')>=0, days=ctrlDays(c['Date contrôle']), stale=days!=null&&days>14;
     var noMens=!(c.Pointure||c['T. pantalon']||c['T. haut']);
     return ' <span style="color:'+(inc?'var(--warn)':'var(--ok)')+'">'+(inc?'🟠 tenue incomplète':'🟢 tenue complète')+(inc&&c.Manquants?' — manque : '+esc(String(c.Manquants)):'')+'</span>'+(noMens?' <span style="color:var(--bad)">📏 mensurations manquantes</span>':'')+(stale?' <span style="color:var(--bad)">⚠ à recontrôler ('+days+'j)</span>':''); }
-  function agentStats(nom){ if(!nom||typeof ssLoad!=='function'||typeof SUIVI==='undefined')return null; var n=tnorm(nom); if(!n)return null; var S=ssLoad(); var st={missions:0,priseDone:0,priseNoPhoto:0,finDone:0,finNoPhoto:0,retardPrise:0,injo:0,nePeutRoute:0,retardAnnonce:0};
+  function agentStats(nom){ if(!nom||typeof ssLoad!=='function'||typeof SUIVI==='undefined')return null; var n=tnorm(nom); if(!n)return null; var S=ssLoad(); var st={missions:0,priseDone:0,priseNoPhoto:0,finDone:0,finNoPhoto:0,retardPrise:0,injo:0,nePeutRoute:0,retardAnnonce:0,refusTenue:0};
     function noPhoto(r){ return !r.photo||r.photo==='Pas de photo'||r.photo==='Photo non horodatée'; }
     SUIVI.forEach(function(m){ if(m.statut!=='validee'||!m.agentId)return; var a=faById(m.agentId); if(!a||tnorm(a.nom)!==n)return; var resp=S[m.id]; if(!resp)return; st.missions++;
       Object.keys(resp).forEach(function(k){ var r=resp[k]||{};
@@ -899,6 +899,7 @@ button.big:active{transform:translateY(1px)}
         if(r.statut==='⚠️ Injoignable'||(r.route&&r.route.indexOf('Injoignable')>=0)||(r.ponctuel&&r.ponctuel.indexOf('Injoignable')>=0))st.injo++;
         if(r.route&&r.route.indexOf('Ne peut pas')>=0)st.nePeutRoute++;
         if(r.ponctuel&&r.ponctuel.indexOf('Retard annoncé')>=0)st.retardAnnonce++;
+        if(k==='tenue'&&r.tenueCtrl&&r.tenueCtrl.indexOf('REFUS')>=0)st.refusTenue++;
       });
     });
     return st; }
@@ -909,6 +910,7 @@ button.big:active{transform:translateY(1px)}
     if(s.injo)b.push('📵 '+s.injo+'× injoignable');
     if(s.nePeutRoute)b.push('🚗 '+s.nePeutRoute+' refus de route');
     if(s.retardAnnonce)b.push('⏰ '+s.retardAnnonce+' retard'+(s.retardAnnonce>1?'s':'')+' annoncé'+(s.retardAnnonce>1?'s':''));
+    if(s.refusTenue)b.push('🚫 '+s.refusTenue+' refus contrôle tenue');
     if(!b.length)return '';
     return '<div class="fa-d" style="color:var(--bad);margin-top:2px;font-weight:600">📊 Anomalies agent ('+s.missions+' mission'+(s.missions>1?'s':'')+' suivie'+(s.missions>1?'s':'')+') : '+b.join(' · ')+'</div>'; }
   function missCountdown(x){ if(!x.mdate)return ''; var t=new Date(x.mdate+'T'+((x.mheure||'00:00'))+':00'); if(isNaN(t.getTime()))return ''; var diff=t.getTime()-Date.now(); if(diff<=0)return '🟢 mission commencée / passée'; var mins=Math.floor(diff/60000),d=Math.floor(mins/1440),h=Math.floor((mins%1440)/60),mm=mins%60,p=[]; if(d)p.push(d+' j'); if(h||d)p.push(h+' h'); if(!d)p.push(mm+' min'); return '⏳ commence dans '+p.join(' '); }
@@ -2116,7 +2118,8 @@ button.big:active{transform:translateY(1px)}
       var prisRoute='<select class="sa-f" data-f="route" '+d0+'>'+['','✅ A pris la route','🔴 Ne peut pas prendre la route','📵 Injoignable'].map(function(s){return '<option value="'+esc(s)+'"'+(r.route===s?' selected':'')+'>'+(s||'— a pris la route ? —')+'</option>';}).join('')+'</select>';
       var ponctuel='<select class="sa-f" data-f="ponctuel" '+d0+'>'+['','✅ Sera à l\'heure','⚠️ Retard annoncé','🔴 Injoignable'].map(function(s){return '<option value="'+esc(s)+'"'+(r.ponctuel===s?' selected':'')+'>'+(s||'— sera à l\'heure ? —')+'</option>';}).join('')+'</select>';
       var tenuePh='<label class="chk" style="margin:0"><input type="checkbox" class="sa-f" data-f="tenuePhoto" '+d0+(r.tenuePhoto?' checked':'')+'><span>📷 Photo tenue prise</span></label>';
-      var fields=(e.key==='prise')?(fait+agret+photoSel+avise+note):(e.key==='fin')?(fait+photoSel+avise+note):(e.key==='route')?(fait+prisRoute+note):(e.key==='j15')?(fait+ponctuel+note):(e.key==='tenue')?(fait+tenuePh+note):(fait+statut+note);
+      var tenueSel='<select class="sa-f" data-f="tenueCtrl" '+d0+'>'+['','✅ Fait — photo prise','📩 Demandé — en attente','🚫 Agent a REFUSÉ'].map(function(s){return '<option value="'+esc(s)+'"'+(r.tenueCtrl===s?' selected':'')+'>'+(s||'— contrôle tenue demandé ? —')+'</option>';}).join('')+'</select>';
+      var fields=(e.key==='prise')?(fait+agret+photoSel+avise+note):(e.key==='fin')?(fait+photoSel+avise+note):(e.key==='route')?(fait+prisRoute+note):(e.key==='j15')?(fait+ponctuel+note):(e.key==='tenue')?(fait+tenueSel+tenuePh+note):(fait+statut+note);
       var cl=[]; if(e.client)cl.push('🏢 Client : '+esc(e.client)); cl.push('📍 Site : '+esc(e.site)+(e.siteBDC&&e.siteBDC!==e.site?' <span style="color:var(--muted)">(BDC : '+esc(e.siteBDC)+')</span>':'')); if(e.ville||e.cp)cl.push('Ville : '+[esc(e.ville),esc(e.cp)].filter(Boolean).join(' ')); if(e.mheure)cl.push('🕐 Heure prévue : '+esc(e.mheure)); cl.push('👤 Agent : '+(e.agent?esc(e.agent):'<span style="color:var(--warn)">⚠ à affecter</span>')); if(e.agentTel)cl.push('📞 Numéro : <a class="call" href="tel:'+esc(String(e.agentTel).replace(/\s/g,''))+'">'+esc(e.agentTel)+'</a>');
       var ctx='<div class="fa-d" style="margin:4px 0 2px;line-height:1.7">'+cl.join('<br>')+'</div>';
       return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" style="padding:8px'+(done?';opacity:.6':'')+'"><div class="fa-n"><span class="sa-tag"></span><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+(e.key==='tenue'?'<span style="color:#e0784b;font-weight:800">'+e.label+'</span>':e.label)+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'+ctx
@@ -2175,6 +2178,7 @@ button.big:active{transform:translateY(1px)}
       if(e.key==='prise'&&r.done&&r.agRetard)anom.push({sev:3,ic:'🔴',type:'Agent EN RETARD à la prise',agent:e.agent,step:sl(e.key),when:e.mdate+' '+e.heure,detail:e.site+(r.agRetardMin?' · '+r.agRetardMin+' min':''),act:'call',agentTel:e.agentTel});
       if((e.key==='prise'||e.key==='fin')&&r.done){ if(r.photo==='Photo non horodatée')anom.push({sev:2,ic:'📷',type:'Photo NON horodatée',agent:e.agent,step:sl(e.key),when:e.mdate+' '+e.heure,detail:e.site,act:'call',agentTel:e.agentTel}); else if(!r.photo||r.photo==='Pas de photo')anom.push({sev:2,ic:'📷',type:'Photo MANQUANTE',agent:e.agent,step:sl(e.key),when:e.mdate+' '+e.heure,detail:e.site,act:'call',agentTel:e.agentTel}); }
       if(r.statut==='⚠️ Injoignable')anom.push({sev:2,ic:'📵',type:'Agent injoignable',agent:e.agent,step:sl(e.key),when:e.mdate+' '+e.heure,detail:e.site,act:'call',agentTel:e.agentTel});
+      if(e.key==='tenue'&&r.tenueCtrl&&r.tenueCtrl.indexOf('REFUS')>=0)anom.push({sev:3,ic:'🚫',type:'Agent a REFUSÉ le contrôle tenue',agent:e.agent,step:'Contrôle tenue',when:e.mdate+' '+e.heure,detail:e.site,act:'call',agentTel:e.agentTel});
     });
     Object.keys(affAg).forEach(function(id){ var a=affAg[id],t=tOf(a),tel=(a.tels&&a.tels[0])||''; if(t.none)anom.push({sev:2,ic:'🦺',type:'Tenue jamais contrôlée',agent:a.nom,step:'Contrôle tenue',when:'',detail:'agent planifié — à contrôler',act:'ctrl',agentTel:tel}); else { if((t.statut||'').toLowerCase().indexOf('incomplet')>=0)anom.push({sev:2,ic:'🦺',type:'Tenue INCOMPLÈTE',agent:a.nom,step:'Contrôle tenue',when:'',detail:(t.manq?'manque : '+t.manq:'pièces manquantes (voir contrôle)'),act:'ctrl',agentTel:tel,manq:t.manq}); if(t.noMens)anom.push({sev:2,ic:'📏',type:'Mensurations manquantes (agent contrôlé)',agent:a.nom,step:'Contrôle tenue',when:'',detail:'pointure / pantalon / haut à renseigner',act:'mens',agentTel:tel}); if(t.days!=null&&t.days>14)anom.push({sev:1,ic:'🦺',type:'Tenue à recontrôler',agent:a.nom,step:'Contrôle tenue',when:'',detail:t.days+' j sans contrôle',act:'ctrl',agentTel:tel}); } });
     anom.sort(function(a,b){return b.sev-a.sev;});
