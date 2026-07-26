@@ -138,6 +138,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="assistant">💬 Assistant</button>
     <button data-s="tenues">🦺 Tenues</button>
     <button data-s="services">📁 Services</button>
+    <button data-s="dispatch">🧭 Dispatch</button>
   </div>
 </div>
 <div class="cloudbar" id="cloudbar"><span class="cb-txt"></span><button type="button" id="cloud-import">Importer mes données locales</button></div>
@@ -475,13 +476,23 @@ button.big:active{transform:translateY(1px)}
     </div>
     <div id="svc-body"></div>
   </section>
+  <section id="sec-dispatch" class="hidden">
+    <div><h1>🧭 Dispatch multi-sites</h1><p class="sub">Coche des missions, choisis un rayon → l'appli sort, pour chaque site, les agents dans le rayon (du plus proche au plus loin). Les agents proches de plusieurs sites cochés sont mis en avant : ce sont ceux avec qui tu peux jongler.</p></div>
+    <div class="card">
+      <div class="grid2"><label class="f"><div class="lab">Rayon (km)</div><input type="number" id="dsp-radius" value="30" min="1" max="300"></label><label class="f"><div class="lab">Jour (filtre les missions)</div><input type="date" id="dsp-day"></label></div>
+      <div class="acts" style="flex-wrap:wrap;gap:6px;margin:6px 0"><button type="button" id="dsp-all">Tout cocher</button><button type="button" id="dsp-none">Tout décocher</button><span id="dsp-sel" class="sub" style="margin:0;align-self:center"></span></div>
+      <div id="dsp-missions" style="max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:6px"></div>
+      <button class="big ok" id="dsp-go" style="margin-top:8px">🧭 Calculer la couverture</button>
+    </div>
+    <div id="dsp-result"></div>
+  </section>
 </div>
 
 <script>
 (function(){
   var byId=function(x){return document.getElementById(x)};
-  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
+  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof thRenderBoard==='function')thRenderBoard();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
   function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} if(typeof cloudPush==='function')cloudPush(k); }
@@ -1527,6 +1538,64 @@ button.big:active{transform:translateY(1px)}
     renderServices();
   }); });
   (function(){ var t=impTodayISO(); if(byId('svc-from')&&!byId('svc-from').value)byId('svc-from').value=t; if(byId('svc-to')&&!byId('svc-to').value)byId('svc-to').value=t; var p1=document.querySelector('.svc-preset[data-d="1"]'); if(p1)p1.classList.add('on'); })();
+  // ===== Dispatch multi-sites : agents dans un rayon autour de plusieurs sites cochés =====
+  var DSP={sel:{}};
+  function dspGeoVille(v){ return new Promise(function(res){ if(!v){res(null);return;} fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(v)+'&fields=nom,centre&boost=population&limit=1').then(function(r){return r.json();}).then(function(list){ if(list&&list[0]&&list[0].centre){var co=list[0].centre.coordinates;res({la:co[1],lo:co[0]});} else res(null); }).catch(function(){res(null);}); }); }
+  function dspMissions(){ var day=byId('dsp-day')?byId('dsp-day').value:''; return SUIVI.filter(function(x){ return x.statut==='validee' && (!day || x.mdate===day); }); }
+  function dspUpdSel(){ var n=Object.keys(DSP.sel).length; if(byId('dsp-sel'))byId('dsp-sel').textContent=n?(n+' mission'+(n>1?'s':'')+' cochée'+(n>1?'s':'')):''; }
+  function renderDispatch(){
+    var box=byId('dsp-missions'); if(!box)return;
+    var arr=dspMissions();
+    if(!arr.length){ box.innerHTML='<div class="sub" style="margin:0">Aucune mission validée'+((byId('dsp-day')&&byId('dsp-day').value)?' ce jour':'')+'. Valide/importe des missions d\'abord.</div>'; dspUpdSel(); return; }
+    box.innerHTML=arr.map(function(x){
+      var site=x.siteAgent||x.titre||'—', lieu=x.ville||'';
+      return '<label class="plrow" style="display:flex;gap:8px;align-items:flex-start;padding:4px 2px"><input type="checkbox" class="dsp-cb" data-id="'+esc(x.id)+'"'+(DSP.sel[x.id]?' checked':'')+'><span><b>'+esc(site)+'</b>'+(lieu?' · '+esc(lieu):'')+(x.mdate?' <span style="color:var(--muted)">('+esc(x.mdate)+(x.mheure?' '+esc(x.mheure):'')+')</span>':'')+'</span></label>';
+    }).join('');
+    box.querySelectorAll('.dsp-cb').forEach(function(cb){ cb.onclick=function(){ var id=cb.getAttribute('data-id'); if(cb.checked)DSP.sel[id]=true; else delete DSP.sel[id]; dspUpdSel(); }; });
+    dspUpdSel();
+  }
+  function dspGo(){
+    var ids=Object.keys(DSP.sel), res=byId('dsp-result');
+    if(!ids.length){ res.innerHTML='<div class="card"><div class="sub" style="margin:0">Coche au moins une mission.</div></div>'; return; }
+    var rad=parseInt(byId('dsp-radius').value,10)||30;
+    var miss=ids.map(function(id){ for(var i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id)return SUIVI[i]; return null; }).filter(Boolean);
+    res.innerHTML='<div class="card"><div class="sub" style="margin:0">⏳ Localisation des sites et des agents…</div></div>';
+    var geoSites=miss.map(function(m){ if(m.la!=null)return Promise.resolve(m); return dspGeoVille(m.ville||'').then(function(g){ if(g){m.la=g.la;m.lo=g.lo;} return m; }); });
+    var agentsNeed=FA.filter(function(a){ return a.la==null && (a.ville||''); }).slice(0,80);
+    var geoAgents=agentsNeed.map(function(a){ return dspGeoVille(a.ville).then(function(g){ if(g){a.la=g.la;a.lo=g.lo;} return a; }); });
+    Promise.all(geoSites.concat(geoAgents)).then(function(){ if(geoAgents.length&&typeof saveFA==='function')saveFA(); dspRender(miss,rad); });
+  }
+  function dspRender(miss,rad){
+    var res=byId('dsp-result');
+    var placed=FA.filter(function(a){return a.la!=null&&a.lo!=null;});
+    var hits={};
+    var perSite=miss.map(function(m){
+      if(m.la==null)return {m:m,nogeo:true,list:[]};
+      var list=placed.map(function(a){return {a:a,d:km(m.la,m.lo,a.la,a.lo)};}).filter(function(o){return o.d<=rad;}).sort(function(a,b){return a.d-b.d;});
+      list.forEach(function(o){ hits[o.a.id]=(hits[o.a.id]||0)+1; });
+      return {m:m,list:list};
+    });
+    var multi=Object.keys(hits).filter(function(id){return hits[id]>=2;}).length;
+    var h='<div class="card"><div class="lab" style="margin:0 0 4px">Couverture — rayon '+rad+' km · '+miss.length+' site'+(miss.length>1?'s':'')+'</div>';
+    h+='<div class="sub" style="margin:0 0 8px">'+(multi?('⭐ '+multi+' agent'+(multi>1?'s':'')+' proche'+(multi>1?'s':'')+' de plusieurs sites (marqués ⭐) — ceux avec qui jongler.'):'Aucun agent commun à 2 sites dans ce rayon.')+'</div>';
+    perSite.forEach(function(s){
+      var site=s.m.siteAgent||s.m.titre||'—';
+      h+='<div style="border-top:1px solid var(--line);padding-top:8px;margin-top:8px"><div class="fa-n">📍 '+esc(site)+(s.m.ville?' · '+esc(s.m.ville):'')+(s.m.mdate?' <span style="color:var(--muted);font-weight:400">('+esc(s.m.mdate)+(s.m.mheure?' '+esc(s.m.mheure):'')+')</span>':'')+'</div>';
+      if(s.nogeo){ h+='<div class="sub" style="margin:2px 0">⚠ Site non localisé (ville manquante/inconnue).</div></div>'; return; }
+      if(!s.list.length){ h+='<div class="sub" style="margin:2px 0">Aucun agent dans '+rad+' km.</div></div>'; return; }
+      h+='<div class="list" style="margin-top:4px">'+s.list.map(function(o){
+        var star=hits[o.a.id]>=2?' ⭐':'', tels=o.a.tels||(o.a.tel?[o.a.tel]:[]);
+        var call=tels.map(function(t){return '<a class="call" href="tel:'+esc(t.replace(/\s/g,''))+'">📞</a>';}).join('');
+        return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(o.a.nom||'—')+star+' <span style="color:var(--muted);font-weight:400">· '+o.d+' km</span></div><div class="fa-d">'+esc(tels.join(' / ')||'')+(o.a.ville?' · '+esc(o.a.ville):'')+'</div></div><div class="fa-a">'+call+'</div></div>';
+      }).join('')+'</div></div>';
+    });
+    h+='</div>'; res.innerHTML=h;
+  }
+  if(byId('dsp-go'))byId('dsp-go').onclick=dspGo;
+  if(byId('dsp-day'))byId('dsp-day').addEventListener('change',function(){renderDispatch();});
+  if(byId('dsp-all'))byId('dsp-all').onclick=function(){ dspMissions().forEach(function(m){DSP.sel[m.id]=true;}); renderDispatch(); };
+  if(byId('dsp-none'))byId('dsp-none').onclick=function(){ DSP.sel={}; renderDispatch(); };
+
   (function initCloud(){
     var lo=byId('loginOverlay');
     if(!CLOUD.base){ if(lo)lo.style.display='none'; return; } // pas de backend => 100% local, rien ne change
