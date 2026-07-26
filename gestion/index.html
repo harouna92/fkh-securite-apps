@@ -930,7 +930,7 @@ button.big:active{transform:translateY(1px)}
       var tags=(a.voiture?'🚗 ':'')+(a.ads?'🛡️ADS ':'');
       var tels=a.tels||(a.tel?[a.tel]:[]);
       var parts=[a.ville]; if(a._d!=null)parts.push(a._d+' km'); parts.push(a.cp); if(tels.length)parts.push(tels.join(' / ')); if(a.fiab)parts.push(a.fiab);
-      var d=(tags?tags+'· ':'')+parts.filter(Boolean).map(esc).join(' · ');
+      var d=(tags?tags+'· ':'')+parts.filter(Boolean).map(esc).join(' · ')+(agentMissing(a).length?' <span style="color:var(--warn)">⚠ '+agentMissing(a).map(esc).join(' · ')+'</span>':'')+tenueBadge(a);
       var call=tels.map(function(t){return '<a class="call" href="tel:'+esc(t.replace(/\s/g,''))+'" title="Appeler '+esc(t)+'">📞</a>';}).join('');
       return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+(d||'—')+'</div></div><div class="fa-a">'+call+'<button data-fae="'+a.id+'" title="Modifier">✏️</button><button class="no" data-fad="'+a.id+'" title="Supprimer">🗑️</button></div></div>';
     }).join('');
