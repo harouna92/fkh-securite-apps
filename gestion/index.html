@@ -335,6 +335,17 @@ button.big:active{transform:translateY(1px)}
   </section>
   <section id="sec-fiche" class="hidden">
     <div><h1>Fiche agent</h1><p class="sub">Répertoire des agents (nom · numéro · ville · fiabilité). Base du recoupement avec les demandes par rayon.</p></div>
+    <div class="card" id="ct-card">
+      <button type="button" class="big" id="ct-open" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">📇 Importer des contacts (Google CSV)</button>
+      <div id="ct-panel" class="hidden" style="margin-top:10px">
+        <p class="sub" style="margin:0 0 8px">Dépose l'export <b>Google Contacts (CSV)</b>. Tu passes les contacts un par un : <b>✅ Ajouter</b> (l'appli te demande la ville) · <b>❌ Ignorer</b> · <b>⏳ Décider plus tard</b>. Tes décisions sont mémorisées ; les contacts déjà agents (même n°) sont signalés.</p>
+        <div class="grid2"><label class="f"><div class="lab">Fichier CSV</div><input type="file" id="ct-file" accept=".csv,text/csv,text/plain"></label><label class="chk" style="align-self:end"><input type="checkbox" id="ct-onlyphone" checked><span>Seulement les contacts avec un numéro</span></label></div>
+        <div class="acts" style="margin-top:6px"><button class="ok" id="ct-analyse">📂 Charger</button><button id="ct-cancel">Fermer</button><button id="ct-later" type="button">⏳ À décider (0)</button></div>
+        <div id="ct-err" class="hint" style="color:var(--bad)"></div>
+        <input id="ct-search" placeholder="🔎 Aller à un contact (nom, numéro…)" autocomplete="off" style="width:100%;margin-top:8px;display:none">
+        <div id="ct-body"></div>
+      </div>
+    </div>
     <div class="card">
       <div class="grid2">
         <label class="f"><div class="lab">Nom de l'agent</div><input id="fa-nom" placeholder="Nom et prénom" autocomplete="off"></label>
@@ -1673,6 +1684,83 @@ button.big:active{transform:translateY(1px)}
       return '<div class="meta" style="color:#e0784b;font-weight:600"><span>🚨 Zone '+esc(zone.nom)+' — agents prioritaires : '+ags+'</span></div>';
     }).join('');
   }
+
+  // ===== Import de contacts (Google CSV) → fiches agents, file d'attente 1 par 1 =====
+  var CT={ list:[], idx:0 };
+  function ctDone(){ var d=load('fkh_contacts_done'); return (d&&typeof d==='object'&&!Array.isArray(d))?d:{}; }
+  function ctLater(){ var l=load('fkh_contacts_later'); return Array.isArray(l)?l:[]; }
+  function ctKey(c){ return c.tels.length?('t'+impPhoneKey(c.tels[0])):('n'+(c.nom||'').toLowerCase()+'|'+(c.email||'').toLowerCase()); }
+  function ctParse(t){ t=String(t||'').replace(/^﻿/,''); var rows=[],f=[],cur='',q=false;
+    for(var i=0;i<t.length;i++){ var c=t[i];
+      if(q){ if(c==='"'){ if(t[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+      else { if(c==='"')q=true; else if(c===','){f.push(cur);cur='';} else if(c==='\n'){f.push(cur);rows.push(f);f=[];cur='';} else if(c==='\r'){} else cur+=c; } }
+    if(cur.length||f.length){f.push(cur);rows.push(f);} return rows; }
+  function ctCol(hdr){ var m={}; hdr.forEach(function(h,i){m[String(h).trim().toLowerCase()]=i;}); function g(n){for(var j=0;j<n.length;j++)if(m[n[j]]!=null)return m[n[j]];return -1;}
+    return { fn:g(['first name']), ln:g(['last name']), nick:g(['nickname']), org:g(['organization name']), email:g(['e-mail 1 - value']), p1:g(['phone 1 - value']), p2:g(['phone 2 - value']), p3:g(['phone 3 - value']) }; }
+  function ctAnalyse(){
+    var err=byId('ct-err'); err.textContent='';
+    function run(txt){
+      var rows=ctParse(txt); if(rows.length<2){err.textContent='Fichier vide ou illisible.';return;}
+      var C=ctCol(rows[0]); if(C.p1<0&&C.fn<0){err.textContent='Ce ne semble pas être un export Google Contacts.';return;}
+      var onlyPhone=byId('ct-onlyphone').checked, done=ctDone(), list=[];
+      rows.slice(1).forEach(function(r){
+        function tel(ix){ if(ix<0)return []; return String(r[ix]||'').split(/\s*:::\s*/).map(function(s){return s.trim();}).filter(Boolean); }
+        var tels=tel(C.p1).concat(tel(C.p2)).concat(tel(C.p3));
+        var nom=[C.fn>=0?r[C.fn]:'',C.ln>=0?r[C.ln]:''].filter(Boolean).join(' ').trim() || (C.nick>=0?String(r[C.nick]||'').trim():'') || (C.org>=0?String(r[C.org]||'').trim():'');
+        var email=C.email>=0?String(r[C.email]||'').trim():'';
+        if(onlyPhone&&!tels.length)return; if(!nom&&!tels.length)return;
+        var c={nom:nom,tels:tels,email:email}; c.key=ctKey(c);
+        if(done[c.key])return;
+        list.push(c);
+      });
+      CT={list:list,idx:0}; byId('ct-search').style.display=list.length?'block':'none'; ctRenderOne();
+    }
+    var f=byId('ct-file').files[0]; if(!f){ err.textContent='Choisis le fichier CSV.'; return; }
+    var rd=new FileReader(); rd.onload=function(){run(String(rd.result||''));}; rd.onerror=function(){err.textContent='Lecture impossible.';}; rd.readAsText(f,'utf-8');
+  }
+  function ctExistingAgent(c){ if(!c.tels.length)return null; var pk=impPhoneKey(c.tels[0]); for(var i=0;i<FA.length;i++){ var tl=FA[i].tels||[]; for(var j=0;j<tl.length;j++)if(impPhoneKey(tl[j])===pk)return FA[i]; } return null; }
+  function ctRenderOne(){
+    var body=byId('ct-body'); if(!body)return; ctUpdLaterBtn();
+    if(!CT.list.length){ body.innerHTML='<div class="card" style="background:var(--panel2)"><div class="sub" style="margin:0">Aucun contact à traiter. Charge un fichier ci-dessus.</div></div>'; return; }
+    if(CT.idx>=CT.list.length){ body.innerHTML='<div class="card" style="background:var(--panel2)"><b>✅ Terminé</b> — tous les contacts chargés ont été traités.</div>'; return; }
+    var c=CT.list[CT.idx], exist=ctExistingAgent(c);
+    var h='<div class="card" style="background:var(--panel2)"><div class="sub" style="margin:0 0 6px">Contact '+(CT.idx+1)+' / '+CT.list.length+'</div>';
+    h+='<div class="fa-n" style="font-size:17px">'+esc(c.nom||'(sans nom)')+'</div>';
+    h+='<div class="fa-d">'+esc(c.tels.join(' / ')||'(pas de numéro)')+(c.email?' · '+esc(c.email):'')+'</div>';
+    if(exist)h+='<div class="meta" style="color:var(--warn)"><span>⚠ Déjà un agent : '+esc(exist.nom||'—')+'</span></div>';
+    h+='<div id="ct-ville-wrap"></div>';
+    h+='<div class="acts" style="margin-top:8px"><button class="ok" id="ct-add">✅ Ajouter</button><button class="no" id="ct-ignore">❌ Ignorer</button><button id="ct-postpone">⏳ Plus tard</button><button id="ct-skip">⏭️ Passer</button></div></div>';
+    body.innerHTML=h;
+    byId('ct-add').onclick=ctAskVille;
+    byId('ct-ignore').onclick=function(){ ctDecide('ignored'); };
+    byId('ct-postpone').onclick=function(){ ctDecide('later'); };
+    byId('ct-skip').onclick=function(){ CT.idx++; ctRenderOne(); };
+  }
+  function ctAskVille(){
+    var w=byId('ct-ville-wrap');
+    w.innerHTML='<div class="acwrap" style="margin-top:8px"><input type="text" id="ct-ville" placeholder="Ville de l\'agent…" autocomplete="off"><div class="sugg hidden" id="sugg-ct-ville"></div></div><div class="acts" style="margin-top:6px"><button class="ok" id="ct-save">💾 Créer l\'agent</button></div>';
+    var sel=null,t;
+    byId('ct-ville').addEventListener('input',function(){ var q=this.value.trim(); sel=null; clearTimeout(t); if(q.length<2){byId('sugg-ct-ville').classList.add('hidden');return;} t=setTimeout(function(){ cityAuto(q,'sugg-ct-ville',function(cc){ var co=cc.centre&&cc.centre.coordinates; sel={nom:cc.nom,cp:(cc.codesPostaux&&cc.codesPostaux[0])||'',la:co?co[1]:null,lo:co?co[0]:null,dep:(cc.departement&&cc.departement.code)||'',depnom:(cc.departement&&cc.departement.nom)||''}; byId('ct-ville').value=cc.nom; byId('sugg-ct-ville').classList.add('hidden'); }); },250); });
+    byId('ct-ville').focus();
+    byId('ct-save').onclick=function(){
+      var c=CT.list[CT.idx]; var ville=byId('ct-ville').value.trim();
+      var g=(sel&&sel.nom===ville)?sel:{nom:ville,cp:'',la:null,lo:null,dep:'',depnom:''};
+      FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:c.nom||ville||'',tels:c.tels,ville:g.nom,cp:g.cp,la:g.la,lo:g.lo,dep:g.dep,depnom:g.depnom,fiab:'',voiture:null,ads:null,intervention:false,interv:[],src:'contacts'});
+      saveFA(); if(typeof renderFA==='function')renderFA(); ctDecide('added');
+    };
+  }
+  function ctDecide(status){
+    var c=CT.list[CT.idx]; if(!c)return; var done=ctDone();
+    if(status==='later'){ var L=ctLater(); if(!L.some(function(x){return x.key===c.key;}))L.push({key:c.key,nom:c.nom,tels:c.tels,email:c.email}); save('fkh_contacts_later',L); }
+    else { done[c.key]=status; save('fkh_contacts_done',done); save('fkh_contacts_later',ctLater().filter(function(x){return x.key!==c.key;})); }
+    CT.idx++; ctRenderOne();
+  }
+  function ctUpdLaterBtn(){ var b=byId('ct-later'); if(b)b.textContent='⏳ À décider ('+ctLater().length+')'; }
+  if(byId('ct-open'))byId('ct-open').onclick=function(){ byId('ct-panel').classList.toggle('hidden'); ctUpdLaterBtn(); };
+  if(byId('ct-cancel'))byId('ct-cancel').onclick=function(){ byId('ct-panel').classList.add('hidden'); };
+  if(byId('ct-analyse'))byId('ct-analyse').onclick=ctAnalyse;
+  if(byId('ct-later'))byId('ct-later').onclick=function(){ var L=ctLater(); if(!L.length){ byId('ct-body').innerHTML='<div class="card" style="background:var(--panel2)"><div class="sub" style="margin:0">Aucun contact « à décider plus tard ».</div></div>'; return; } CT={list:L.map(function(x){return {nom:x.nom,tels:x.tels||[],email:x.email||'',key:x.key};}),idx:0}; byId('ct-search').style.display='block'; ctRenderOne(); };
+  if(byId('ct-search'))byId('ct-search').addEventListener('input',function(){ var q=this.value.toLowerCase().trim(); if(!q)return; for(var i=0;i<CT.list.length;i++){ var c=CT.list[i]; if(((c.nom||'')+' '+(c.tels||[]).join(' ')).toLowerCase().indexOf(q)>=0){ CT.idx=i; ctRenderOne(); return; } } });
 
   (function initCloud(){
     var lo=byId('loginOverlay');
