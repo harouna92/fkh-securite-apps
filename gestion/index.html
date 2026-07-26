@@ -541,7 +541,7 @@ button.big:active{transform:translateY(1px)}
     <div class="card">
       <div class="lab" style="margin:0 0 6px">Nouvelle zone</div>
       <div class="grid2"><label class="f"><div class="lab">Ville pivot</div><div class="acwrap"><input type="text" id="iz-ville" placeholder="Ex. Chalon-sur-Saône…" autocomplete="off"><div class="sugg hidden" id="sugg-iz-ville"></div></div></label><label class="f"><div class="lab">Rayon (km)</div><input type="number" id="iz-radius" value="30" min="1" max="300"></label></div>
-      <label class="f" style="margin-top:6px"><div class="lab">Départements couverts (codes séparés par virgule, ex. 01, 71)</div><input type="text" id="iz-deps" placeholder="Ex. 01, 71, 69" autocomplete="off"></label>
+      <label class="f" style="margin-top:6px"><div class="lab">Départements couverts — tape un numéro ou un nom et choisis dans la liste (ex. 01 Ain, 71 Saône-et-Loire)</div><div class="acwrap"><input type="text" id="iz-deps" placeholder="Ex. 01, 71, 69 — ou « saône »…" autocomplete="off"><div class="sugg hidden" id="sugg-iz-deps"></div></div></label>
       <div class="grid2" style="margin-top:6px"><label class="chk"><input type="checkbox" id="iz-byville" checked><span>🏙️ Rattacher par ville (rayon)</span></label><label class="chk"><input type="checkbox" id="iz-bydep" checked><span>🗺️ Rattacher par département</span></label></div>
       <button class="big ok" id="iz-add" style="margin-top:6px">➕ Créer la zone</button>
     </div>
@@ -1718,6 +1718,26 @@ button.big:active{transform:translateY(1px)}
   var izSel=null, izT;
   if(byId('iz-ville'))byId('iz-ville').addEventListener('input',function(){ var q=this.value.trim(); izSel=null; clearTimeout(izT); if(q.length<2){byId('sugg-iz-ville').classList.add('hidden');return;} izT=setTimeout(function(){ cityAuto(q,'sugg-iz-ville',function(c){ var co=c.centre&&c.centre.coordinates; izSel={nom:c.nom,la:co?co[1]:null,lo:co?co[0]:null}; byId('iz-ville').value=c.nom; byId('sugg-iz-ville').classList.add('hidden'); }); },250); });
   function izParseDeps(s){ return String(s||'').split(/[,;\s]+/).map(function(d){ d=d.trim().toUpperCase(); if(/^\d$/.test(d))d='0'+d; return d; }).filter(function(d){return /^(\d{2,3}|2A|2B)$/.test(d);}); }
+  var DEPT_RAW="01:Ain|02:Aisne|03:Allier|04:Alpes-de-Haute-Provence|05:Hautes-Alpes|06:Alpes-Maritimes|07:Ardèche|08:Ardennes|09:Ariège|10:Aube|11:Aude|12:Aveyron|13:Bouches-du-Rhône|14:Calvados|15:Cantal|16:Charente|17:Charente-Maritime|18:Cher|19:Corrèze|2A:Corse-du-Sud|2B:Haute-Corse|21:Côte-d'Or|22:Côtes-d'Armor|23:Creuse|24:Dordogne|25:Doubs|26:Drôme|27:Eure|28:Eure-et-Loir|29:Finistère|30:Gard|31:Haute-Garonne|32:Gers|33:Gironde|34:Hérault|35:Ille-et-Vilaine|36:Indre|37:Indre-et-Loire|38:Isère|39:Jura|40:Landes|41:Loir-et-Cher|42:Loire|43:Haute-Loire|44:Loire-Atlantique|45:Loiret|46:Lot|47:Lot-et-Garonne|48:Lozère|49:Maine-et-Loire|50:Manche|51:Marne|52:Haute-Marne|53:Mayenne|54:Meurthe-et-Moselle|55:Meuse|56:Morbihan|57:Moselle|58:Nièvre|59:Nord|60:Oise|61:Orne|62:Pas-de-Calais|63:Puy-de-Dôme|64:Pyrénées-Atlantiques|65:Hautes-Pyrénées|66:Pyrénées-Orientales|67:Bas-Rhin|68:Haut-Rhin|69:Rhône|70:Haute-Saône|71:Saône-et-Loire|72:Sarthe|73:Savoie|74:Haute-Savoie|75:Paris|76:Seine-Maritime|77:Seine-et-Marne|78:Yvelines|79:Deux-Sèvres|80:Somme|81:Tarn|82:Tarn-et-Garonne|83:Var|84:Vaucluse|85:Vendée|86:Vienne|87:Haute-Vienne|88:Vosges|89:Yonne|90:Territoire de Belfort|91:Essonne|92:Hauts-de-Seine|93:Seine-Saint-Denis|94:Val-de-Marne|95:Val-d'Oise|971:Guadeloupe|972:Martinique|973:Guyane|974:La Réunion|976:Mayotte";
+  var DEPTS=DEPT_RAW.split('|').map(function(s){ var i=s.indexOf(':'); return {code:s.slice(0,i),nom:s.slice(i+1)}; });
+  function depNorm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+  function depSuggest(inp,boxId){
+    var box=byId(boxId); if(!box)return;
+    var val=inp.value, cut=Math.max(val.lastIndexOf(','),val.lastIndexOf(';')), tok=val.slice(cut+1).trim();
+    if(tok.length<1){ box.classList.add('hidden'); return; }
+    var lc=tok.toLowerCase(), nt=depNorm(tok);
+    var m=DEPTS.filter(function(d){ return d.code.toLowerCase().indexOf(lc)===0 || depNorm(d.nom).indexOf(nt)>=0; }).slice(0,8);
+    if(!m.length){ box.classList.add('hidden'); return; }
+    box.innerHTML=m.map(function(d){ return '<div data-code="'+d.code+'">'+d.code+' — '+esc(d.nom)+'</div>'; }).join('');
+    box.classList.remove('hidden');
+    box.querySelectorAll('div').forEach(function(el){ el.onmousedown=function(e){ e.preventDefault();
+      var code=el.getAttribute('data-code'), before=val.slice(0,cut+1);
+      inp.value=(before?before.replace(/\s+$/,'')+' ':'')+code+', ';
+      box.classList.add('hidden'); inp.focus();
+      var ev; try{ev=new Event('change',{bubbles:true});}catch(_){ev=document.createEvent('Event');ev.initEvent('change',true,false);} inp.dispatchEvent(ev);
+    }; });
+  }
+  if(byId('iz-deps')){ byId('iz-deps').addEventListener('input',function(){ depSuggest(this,'sugg-iz-deps'); }); byId('iz-deps').addEventListener('blur',function(){ setTimeout(function(){ var b=byId('sugg-iz-deps'); if(b)b.classList.add('hidden'); },150); }); }
   function izItemDep(it){ if(it.depCode)return String(it.depCode).toUpperCase(); var cp=String(it.cp||'').replace(/\D/g,''); if(cp.length>=2){ return (cp.slice(0,2)==='97'||cp.slice(0,2)==='98')?cp.slice(0,3):cp.slice(0,2); } return ''; }
   if(byId('iz-add'))byId('iz-add').onclick=function(){
     var v=byId('iz-ville').value.trim(); var deps=izParseDeps(byId('iz-deps').value); if(!v&&!deps.length)return;
@@ -1739,13 +1759,13 @@ button.big:active{transform:translateY(1px)}
         return '<div class="it"><div style="flex:1"><div class="fa-n">'+(ix+1)+'. '+esc(nom)+' <span style="color:var(--muted);font-weight:400">'+esc(tels.join(' / ')||'')+dist+'</span></div></div><div class="fa-a"><button data-izup="'+zone.id+'" data-ix="'+ix+'" title="Monter">▲</button><button data-izdn="'+zone.id+'" data-ix="'+ix+'" title="Descendre">▼</button>'+call+'<button class="no" data-izrm="'+zone.id+'" data-aid="'+esc(aid)+'" title="Retirer">✖</button></div></div>';
       }).join(''):'<div class="sub" style="margin:2px 0">Aucun agent classé. Ajoute-les ci-dessous (proposés du plus proche au plus loin).</div>';
       return '<div class="card"><div class="fa-n" style="font-size:16px">🚨 '+esc(zone.nom||'(sans ville)')+' <span style="color:var(--muted);font-weight:400">· rayon '+zone.rayon+' km · '+zone.agents.length+' agent'+(zone.agents.length>1?'s':'')+'</span></div>'
-        +'<div class="fa-d" style="margin:3px 0 4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">🗺️ Départements : <input type="text" class="iz-editdeps" data-z="'+zone.id+'" value="'+esc((zone.deps||[]).join(', '))+'" placeholder="ex. 01, 71, 69" style="width:150px"></div>'
+        +'<div class="fa-d" style="margin:3px 0 4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">🗺️ Départements : <span class="acwrap" style="display:inline-block"><input type="text" class="iz-editdeps" data-z="'+zone.id+'" value="'+esc((zone.deps||[]).join(', '))+'" placeholder="ex. 01, 71 ou nom…" autocomplete="off" style="width:170px"><div class="sugg hidden" id="sugg-izdeps-'+zone.id+'"></div></span></div>'
         +'<div class="acts" style="gap:12px;margin:0 0 6px"><label class="chk"><input type="checkbox" class="iz-eville" data-z="'+zone.id+'"'+(zone.byVille!==false?' checked':'')+'><span>🏙️ par ville (rayon)</span></label><label class="chk"><input type="checkbox" class="iz-edep" data-z="'+zone.id+'"'+(zone.byDep!==false?' checked':'')+'><span>🗺️ par département</span></label></div>'
         +'<div class="list" style="margin:6px 0">'+agentsHtml+'</div>'
         +'<div class="acwrap"><input type="text" class="iz-addq" data-z="'+zone.id+'" placeholder="Ajouter un agent (nom, ville…)" autocomplete="off"><div class="sugg hidden" id="sugg-izadd-'+zone.id+'"></div></div>'
         +'<div class="acts" style="margin-top:6px"><button class="no" data-izdel="'+zone.id+'">🗑️ Supprimer la zone</button></div></div>';
     }).join('');
-    wrap.querySelectorAll('.iz-editdeps').forEach(function(inp){ inp.addEventListener('change',function(){ var zid=inp.getAttribute('data-z'); var z=izLoad(),i; for(i=0;i<z.length;i++)if(z[i].id===zid)z[i].deps=izParseDeps(inp.value); izSave(z); renderInterv(); }); });
+    wrap.querySelectorAll('.iz-editdeps').forEach(function(inp){ var zid=inp.getAttribute('data-z'); inp.addEventListener('input',function(){ depSuggest(inp,'sugg-izdeps-'+zid); }); inp.addEventListener('blur',function(){ setTimeout(function(){ var b=byId('sugg-izdeps-'+zid); if(b)b.classList.add('hidden'); },150); }); inp.addEventListener('change',function(){ var z=izLoad(),i; for(i=0;i<z.length;i++)if(z[i].id===zid)z[i].deps=izParseDeps(inp.value); izSave(z); renderInterv(); }); });
     wrap.querySelectorAll('.iz-eville').forEach(function(c){ c.onclick=function(){ var zid=c.getAttribute('data-z'),z=izLoad(),i; for(i=0;i<z.length;i++)if(z[i].id===zid)z[i].byVille=c.checked; izSave(z); }; });
     wrap.querySelectorAll('.iz-edep').forEach(function(c){ c.onclick=function(){ var zid=c.getAttribute('data-z'),z=izLoad(),i; for(i=0;i<z.length;i++)if(z[i].id===zid)z[i].byDep=c.checked; izSave(z); }; });
     wrap.querySelectorAll('[data-izup]').forEach(function(b){b.onclick=function(){izMove(b.getAttribute('data-izup'),+b.getAttribute('data-ix'),-1);};});
