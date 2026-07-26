@@ -505,6 +505,7 @@ button.big:active{transform:translateY(1px)}
     <div class="card">
       <div class="lab" style="margin:0 0 6px">Nouvelle zone</div>
       <div class="grid2"><label class="f"><div class="lab">Ville pivot</div><div class="acwrap"><input type="text" id="iz-ville" placeholder="Ex. Chalon-sur-Saône…" autocomplete="off"><div class="sugg hidden" id="sugg-iz-ville"></div></div></label><label class="f"><div class="lab">Rayon (km)</div><input type="number" id="iz-radius" value="30" min="1" max="300"></label></div>
+      <label class="f" style="margin-top:6px"><div class="lab">Départements couverts (codes séparés par virgule, ex. 01, 71) — en plus du rayon</div><input type="text" id="iz-deps" placeholder="Ex. 01, 71, 69" autocomplete="off"></label>
       <button class="big ok" id="iz-add" style="margin-top:6px">➕ Créer la zone</button>
     </div>
     <div id="iz-list"></div>
@@ -1644,12 +1645,14 @@ button.big:active{transform:translateY(1px)}
   function izSave(z){ save('fkh_zones_interv',z); }
   var izSel=null, izT;
   if(byId('iz-ville'))byId('iz-ville').addEventListener('input',function(){ var q=this.value.trim(); izSel=null; clearTimeout(izT); if(q.length<2){byId('sugg-iz-ville').classList.add('hidden');return;} izT=setTimeout(function(){ cityAuto(q,'sugg-iz-ville',function(c){ var co=c.centre&&c.centre.coordinates; izSel={nom:c.nom,la:co?co[1]:null,lo:co?co[0]:null}; byId('iz-ville').value=c.nom; byId('sugg-iz-ville').classList.add('hidden'); }); },250); });
+  function izParseDeps(s){ return String(s||'').split(/[,;\s]+/).map(function(d){ d=d.trim().toUpperCase(); if(/^\d$/.test(d))d='0'+d; return d; }).filter(function(d){return /^(\d{2,3}|2A|2B)$/.test(d);}); }
+  function izItemDep(it){ if(it.depCode)return String(it.depCode).toUpperCase(); var cp=String(it.cp||'').replace(/\D/g,''); if(cp.length>=2){ return (cp.slice(0,2)==='97'||cp.slice(0,2)==='98')?cp.slice(0,3):cp.slice(0,2); } return ''; }
   if(byId('iz-add'))byId('iz-add').onclick=function(){
-    var v=byId('iz-ville').value.trim(); if(!v)return;
+    var v=byId('iz-ville').value.trim(); var deps=izParseDeps(byId('iz-deps').value); if(!v&&!deps.length)return;
     var rad=parseInt(byId('iz-radius').value,10)||30;
     var g=(izSel&&izSel.nom===v)?izSel:{nom:v,la:null,lo:null};
-    var z=izLoad(); z.push({id:'z'+Date.now(),nom:g.nom,la:g.la,lo:g.lo,rayon:rad,agents:[]}); izSave(z);
-    byId('iz-ville').value=''; byId('iz-radius').value='30'; izSel=null; renderInterv();
+    var z=izLoad(); z.push({id:'z'+Date.now(),nom:g.nom,la:g.la,lo:g.lo,rayon:rad,deps:deps,agents:[]}); izSave(z);
+    byId('iz-ville').value=''; byId('iz-radius').value='30'; byId('iz-deps').value=''; izSel=null; renderInterv();
   };
   function renderInterv(){
     var wrap=byId('iz-list'); if(!wrap)return;
@@ -1662,11 +1665,13 @@ button.big:active{transform:translateY(1px)}
         var call=tels.length?'<a class="call" href="tel:'+esc(tels[0].replace(/\s/g,''))+'">📞</a>':'';
         return '<div class="it"><div style="flex:1"><div class="fa-n">'+(ix+1)+'. '+esc(nom)+' <span style="color:var(--muted);font-weight:400">'+esc(tels.join(' / ')||'')+dist+'</span></div></div><div class="fa-a"><button data-izup="'+zone.id+'" data-ix="'+ix+'" title="Monter">▲</button><button data-izdn="'+zone.id+'" data-ix="'+ix+'" title="Descendre">▼</button>'+call+'<button class="no" data-izrm="'+zone.id+'" data-aid="'+esc(aid)+'" title="Retirer">✖</button></div></div>';
       }).join(''):'<div class="sub" style="margin:2px 0">Aucun agent classé. Ajoute-les ci-dessous (proposés du plus proche au plus loin).</div>';
-      return '<div class="card"><div class="fa-n" style="font-size:16px">🚨 '+esc(zone.nom)+' <span style="color:var(--muted);font-weight:400">· rayon '+zone.rayon+' km · '+zone.agents.length+' agent'+(zone.agents.length>1?'s':'')+'</span></div>'
+      return '<div class="card"><div class="fa-n" style="font-size:16px">🚨 '+esc(zone.nom||'(sans ville)')+' <span style="color:var(--muted);font-weight:400">· rayon '+zone.rayon+' km · '+zone.agents.length+' agent'+(zone.agents.length>1?'s':'')+'</span></div>'
+        +'<div class="fa-d" style="margin:3px 0 6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">🗺️ Départements : <input type="text" class="iz-editdeps" data-z="'+zone.id+'" value="'+esc((zone.deps||[]).join(', '))+'" placeholder="ex. 01, 71, 69" style="width:150px"></div>'
         +'<div class="list" style="margin:6px 0">'+agentsHtml+'</div>'
         +'<div class="acwrap"><input type="text" class="iz-addq" data-z="'+zone.id+'" placeholder="Ajouter un agent (nom, ville…)" autocomplete="off"><div class="sugg hidden" id="sugg-izadd-'+zone.id+'"></div></div>'
         +'<div class="acts" style="margin-top:6px"><button class="no" data-izdel="'+zone.id+'">🗑️ Supprimer la zone</button></div></div>';
     }).join('');
+    wrap.querySelectorAll('.iz-editdeps').forEach(function(inp){ inp.addEventListener('change',function(){ var zid=inp.getAttribute('data-z'); var z=izLoad(),i; for(i=0;i<z.length;i++)if(z[i].id===zid)z[i].deps=izParseDeps(inp.value); izSave(z); renderInterv(); }); });
     wrap.querySelectorAll('[data-izup]').forEach(function(b){b.onclick=function(){izMove(b.getAttribute('data-izup'),+b.getAttribute('data-ix'),-1);};});
     wrap.querySelectorAll('[data-izdn]').forEach(function(b){b.onclick=function(){izMove(b.getAttribute('data-izdn'),+b.getAttribute('data-ix'),1);};});
     wrap.querySelectorAll('[data-izrm]').forEach(function(b){b.onclick=function(){izRemove(b.getAttribute('data-izrm'),b.getAttribute('data-aid'));};});
@@ -1690,8 +1695,9 @@ button.big:active{transform:translateY(1px)}
   }
   function izZonesForItem(it){
     var z=izLoad(); if(!z.length)return [];
-    var v=(it.ville||'').toLowerCase().trim();
+    var v=(it.ville||'').toLowerCase().trim(), dep=izItemDep(it);
     return z.filter(function(zone){
+      if(zone.deps&&zone.deps.length&&dep&&zone.deps.indexOf(dep)>=0)return true;
       if(it.la!=null&&zone.la!=null){ return km(zone.la,zone.lo,it.la,it.lo)<=zone.rayon; }
       return v&&zone.nom&&v===zone.nom.toLowerCase().trim();
     });
