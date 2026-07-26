@@ -582,7 +582,7 @@ button.big:active{transform:translateY(1px)}
 
   byId('surv').addEventListener('change',genText);
 
-  function toMin(t){ var m=/^(\d{1,2}):(\d{2})$/.exec(t.trim()); return m?(+m[1]*60+ +m[2]):null; }
+  function toMin(t){ if(t==null)return null; var m=/^(\d{1,2}):(\d{2})$/.exec(String(t).trim()); return m?(+m[1]*60+ +m[2]):null; }
 
   // ---- Ville (communes de France) + code postal auto ----
   var BIG=[["Paris",48.8566,2.3522],["Marseille",43.2965,5.3698],["Lyon",45.764,4.8357],["Toulouse",43.6047,1.4442],["Nice",43.7102,7.262],["Nantes",47.2184,-1.5536],["Montpellier",43.6108,3.8767],["Strasbourg",48.5734,7.7521],["Bordeaux",44.8378,-0.5792],["Lille",50.6292,3.0573],["Rennes",48.1173,-1.6778],["Reims",49.2583,4.0317],["Saint-Étienne",45.4397,4.3872],["Le Havre",49.4944,0.1079],["Toulon",43.1242,5.928],["Grenoble",45.1885,5.7245],["Dijon",47.322,5.0415],["Angers",47.4784,-0.5632],["Nîmes",43.8367,4.3601],["Clermont-Ferrand",45.7772,3.087],["Le Mans",48.0061,0.1996],["Aix-en-Provence",43.5297,5.4474],["Brest",48.3904,-4.4861],["Tours",47.3941,0.6848],["Amiens",49.8941,2.2958],["Limoges",45.8336,1.2611],["Annecy",45.8992,6.1294],["Perpignan",42.6887,2.8948],["Besançon",47.2378,6.0241],["Metz",49.1193,6.1757],["Orléans",47.9029,1.9093],["Mulhouse",47.7508,7.3359],["Caen",49.1829,-0.3707],["Nancy",48.6921,6.1844],["Avignon",43.9493,4.8055],["Poitiers",46.5802,0.3404],["Bourges",47.081,2.3988],["Bayonne",43.4933,-1.4748],["Pau",43.2951,-0.3708],["La Rochelle",46.1603,-1.1511],["Chambéry",45.5646,5.9178],["Troyes",48.2973,4.0744],["Valence",44.9334,4.8924],["Belfort",47.6379,6.8628],["Lorient",47.7485,-3.37]];
