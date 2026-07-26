@@ -1100,7 +1100,7 @@ button.big:active{transform:translateY(1px)}
 
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
-  var BACKEND_URL = '';
+  var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
   var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null };
   function cloudHdr(){ return {'Content-Type':'application/json','X-App-Password':CLOUD.pass}; }
