@@ -165,6 +165,15 @@ button.big:active{transform:translateY(1px)}
 <div class="wrap">
   <section id="sec-demandes">
     <div><h1>Demandes</h1><p class="sub">Choisis ou écris · la ville remplit le code postal · les heures donnent la plage.</p></div>
+    <div class="card" style="border:2px solid var(--ok)">
+      <div class="lab" style="margin:0 0 6px">⚡ Capture express (pendant l'appel) — note en vrac, complète plus tard</div>
+      <textarea id="exp-text" placeholder="Tape ou dicte ce que tu entends : client, site, ville/CP, horaires, agent, n°, urgent…" style="min-height:82px;width:100%"></textarea>
+      <div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap;align-items:center">
+        <button type="button" id="exp-mic" title="Dictée vocale">🎤 Dicter</button>
+        <button type="button" class="big ok" id="exp-save" style="flex:1;min-width:160px">💾 Enregistrer dans Suivi (à compléter)</button>
+      </div>
+      <div id="exp-result" class="sub" style="margin:6px 0 0"></div>
+    </div>
     <div class="card">
       <button type="button" id="genr-toggle" class="big" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">🗓️ Générateur de missions récurrentes (planning fixe sur une période)</button>
       <div id="genr-form" class="hidden" style="margin-top:8px">
@@ -863,6 +872,12 @@ button.big:active{transform:translateY(1px)}
     byId('addedList').querySelectorAll('.rm').forEach(function(bt){bt.onclick=function(){added.splice(+bt.getAttribute('data-i'),1);renderAdded();renderOut();};});
   }
   byId('addBtn').onclick=function(){var cur=buildCurrent();if(!cur)return;added.push(cur);resetForm();renderAdded();renderOut();window.scrollTo(0,0);};
+  // ===== Capture express (prise d'appel rapide) + dictée vocale =====
+  (function(){ var ta=byId('exp-text'), mic=byId('exp-mic'), sv=byId('exp-save'), res=byId('exp-result'); if(!ta)return;
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition, rec=null, listening=false;
+    if(mic){ if(!SR){ mic.disabled=true; mic.style.opacity='.5'; mic.title='Dictée non supportée par ce navigateur (essaie Chrome)'; }
+      else mic.onclick=function(){ if(listening){ try{rec.stop();}catch(e){} return; } var secure=(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'); if(!secure){ res.innerHTML='<span style="color:var(--warn)">🎤 La dictée n\'est possible que sur le site EN LIGNE (https), pas en ouvrant le fichier en local. En attendant, tape à la main.</span>'; return; } rec=new SR(); rec.lang='fr-FR'; rec.continuous=true; rec.interimResults=true; var base=ta.value; rec.onresult=function(ev){ var fin='',intr=''; for(var i=ev.resultIndex;i<ev.results.length;i++){ var tr=ev.results[i][0].transcript; if(ev.results[i].isFinal)fin+=tr; else intr+=tr; } if(fin)base=(base+' '+fin).replace(/\s+/g,' ').trim(); ta.value=(base+(intr?' '+intr:'')).trim(); }; rec.onend=function(){ listening=false; mic.textContent='🎤 Dicter'; }; rec.onerror=function(ev){ listening=false; mic.textContent='🎤 Dicter'; var e=(ev&&ev.error)||''; var msg=(e==='not-allowed'||e==='service-not-allowed')?'🎤 Micro bloqué — clique le cadenas 🔒 dans la barre d\'adresse → Micro → Autoriser, puis réessaie.':(e==='no-speech')?'🎤 Rien entendu, réessaie.':(e==='network')?'🎤 Réseau indisponible pour la dictée.':'🎤 Dictée indisponible — tape à la main, ça marche pareil.'; res.innerHTML='<span style="color:var(--warn)">'+msg+'</span>'; }; try{ rec.start(); listening=true; mic.textContent='⏹️ Stop'; res.innerHTML='🎙️ Parle, j\'écris…'; }catch(e){ res.innerHTML='<span style="color:var(--warn)">🎤 Dictée indisponible ici — tape à la main.</span>'; } }; }
+    if(sv)sv.onclick=function(){ var txt=(ta.value||'').trim(); if(!txt){ res.innerHTML='<span style="color:var(--warn)">Écris ou dicte au moins un mot.</span>'; ta.focus(); return; } var now=Date.now(); var o={id:'exp'+now+'_'+Math.round(Math.random()*9999),texte:txt,titre:(txt.split('\n')[0]||txt).slice(0,60),statut:'recherche',motif:'',pris:now,valide:null,ville:(typeof extractVille==='function'?extractVille(txt):''),la:null,lo:null,assoc:[],_express:true}; SUIVI.unshift(o); if(typeof saveSuivi==='function')saveSuivi(); ta.value=''; res.innerHTML='✅ Enregistré dans <b>Suivi demandes → En recherche</b>. Complète-la là-bas quand tu veux.'; if(typeof renderSuivi==='function')renderSuivi(); setTimeout(function(){ if(res)res.innerHTML=''; },6000); }; })();
   ['sitename','adr-num','adr-type','adr-nom','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
   byId('adr-type').addEventListener('change',genText);
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
@@ -1127,7 +1142,7 @@ button.big:active{transform:translateY(1px)}
     var arr=SUIVI.filter(function(x){return x.statut===suiviBucket&&matchQ(x);});
     if(!arr.length){ wrap.innerHTML='<div class="svempty">'+(q?'Aucun résultat pour « '+esc(q)+' ».':'Aucune demande dans cette catégorie.')+'</div>'; return; }
     function svItem(x){
-      var meta='<span>📥 Prise en compte : '+fmtDT(x.pris)+'</span>';
+      var meta=(x.statut==='recherche'?'<span class="sv-rtimer" data-since="'+x.pris+'" style="font-weight:700;color:#e0a13b"></span>':'')+'<span>📥 En recherche depuis : '+fmtDT(x.pris)+'</span>';
       if(x.valide)meta+='<span>🏁 Traitée : '+fmtDT(x.valide)+'</span><span class="delai">⏱ Délai : '+fmtDelai(x.valide-x.pris)+'</span>';
       var body;
       if(x._pending){
@@ -1171,7 +1186,10 @@ button.big:active{transform:translateY(1px)}
     } else {
       wrap.innerHTML=arr.map(svItem).join('');
     }
+    if(typeof svTick==='function')svTick();
   }
+  function svTick(){ var now=Date.now(), els=document.querySelectorAll('#suiviList .sv-rtimer'); for(var i=0;i<els.length;i++){ var el=els[i],since=+el.getAttribute('data-since'); if(!since)continue; var s=Math.max(0,Math.floor((now-since)/1000)),d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),mi=Math.floor((s%3600)/60),se=s%60; var txt=d>0?(d+' j '+h+' h'):h>0?(h+' h '+mi+' min'):(mi+' min '+(se<10?'0':'')+se+' s'); el.textContent='⏱ '+txt+' · '; el.style.color=(s>=3*3600?'var(--bad)':(s>=3600?'#e0784b':'#e0a13b')); } }
+  setInterval(function(){ var sec=byId('sec-suivi'); if(!sec||sec.classList.contains('hidden')||suiviBucket!=='recherche')return; svTick(); },1000);
   // Aperçu live du texte à copier (Infos agent / Mission validée) : recalculé à chaque case cochée/décochée
   function plPreview(card){ if(!card)return; var out=card.querySelector('.pl-out'); if(!out)return; var id=out.getAttribute('data-id'),it=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;} if(!it)return; var lines=it.texte.split('\n'),arr=[]; card.querySelectorAll('input.pl').forEach(function(c){if(c.checked)arr.push(lines[+c.getAttribute('data-li')]);}); out.textContent=arr.join('\n')||'(rien de sélectionné)'; }
   byId('suiviList').addEventListener('click',function(e){
