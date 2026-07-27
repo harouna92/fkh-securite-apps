@@ -1515,7 +1515,9 @@ button.big:active{transform:translateY(1px)}
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
   var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done'];
-  var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null };
+  var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null };
+  // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
+  function applySectionAccess(){ var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=(!allowed)||allowed.indexOf(s)>=0; b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
   function cloudHdr(){ return {'Content-Type':'application/json','X-App-Password':CLOUD.pass}; }
   // ===== Photos R2 (via le Worker) =====
   function photoReady(){ return !!(CLOUD.on && CLOUD.base && CLOUD.pass); }
@@ -1656,7 +1658,7 @@ button.big:active{transform:translateY(1px)}
   function cloudPoll(){ clearTimeout(CLOUD.pollT); CLOUD.pollT=setTimeout(function(){ cloudPull().then(cloudPoll); },4000); }
   function cloudBar(txt,online){ var b=byId('cloudbar'); if(!b)return; b.style.display='flex'; b.querySelector('.cb-txt').textContent=txt; b.className='cloudbar '+(online?'cb-on':'cb-off'); }
   function cloudLogout(msg){ CLOUD.on=false; CLOUD.pass=''; try{sessionStorage.removeItem('fkh_pass');}catch(e){} clearTimeout(CLOUD.pollT); var lo=byId('loginOverlay'); if(lo)lo.style.display='flex'; if(msg)byId('login-err').textContent=msg; }
-  function cloudStart(){ CLOUD.on=true; try{sessionStorage.setItem('fkh_pass',CLOUD.pass);}catch(e){} var lo=byId('loginOverlay'); if(lo)lo.style.display='none'; cloudBar('☁︎ Connecté — données partagées',true); cloudToggleImport(); cloudPull().then(function(){ cloudPoll(); }); if(typeof asgOnConnect==='function')asgOnConnect(); }
+  function cloudStart(){ CLOUD.on=true; try{sessionStorage.setItem('fkh_pass',CLOUD.pass);}catch(e){} var lo=byId('loginOverlay'); if(lo)lo.style.display='none'; if(typeof applySectionAccess==='function')applySectionAccess(); cloudBar(CLOUD.sections?'☁︎ Connecté — accès restreint':'☁︎ Connecté — données partagées',true); cloudToggleImport(); cloudPull().then(function(){ cloudPoll(); }); if(typeof asgOnConnect==='function')asgOnConnect(); }
   // Y a-t-il des données locales pas encore dans le classeur commun ? (sert à n'afficher le bouton que quand c'est utile)
   function cloudHasLocalData(){ for(var i=0;i<SYNC_KEYS.length;i++){ var v=localStorage.getItem(SYNC_KEYS[i]); if(v&&v.length>2&&v!=='[]'&&v!=='{}')return true; } return false; }
   function cloudToggleImport(){ var ib=byId('cloud-import'); if(ib)ib.style.display=(CLOUD.on&&cloudHasLocalData())?'':'none'; }
@@ -1672,7 +1674,7 @@ button.big:active{transform:translateY(1px)}
   function cloudLogin(pass){
     var err=byId('login-err'); err.textContent=''; var btn=byId('login-btn'); btn.disabled=true; btn.textContent='Connexion…';
     fetch(CLOUD.base+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pass})})
-      .then(function(r){return r.json();}).then(function(j){ btn.disabled=false; btn.textContent='Se connecter'; if(j&&j.ok){ CLOUD.pass=pass; cloudStart(); } else { err.textContent='Mot de passe incorrect.'; } })
+      .then(function(r){return r.json();}).then(function(j){ btn.disabled=false; btn.textContent='Se connecter'; if(j&&j.ok){ CLOUD.pass=pass; CLOUD.role=j.role||'full'; CLOUD.sections=(j.sections&&j.sections.length)?j.sections:null; cloudStart(); } else { err.textContent='Mot de passe incorrect.'; } })
       .catch(function(){ btn.disabled=false; btn.textContent='Se connecter'; err.textContent='Serveur injoignable. Vérifie ta connexion.'; });
   }
   /* ===== Assistant — porte Claude (routes /msg du Worker) ===== */
@@ -2782,7 +2784,7 @@ button.big:active{transform:translateY(1px)}
     var saved=null; try{saved=sessionStorage.getItem('fkh_pass');}catch(e){}
     if(saved){ CLOUD.pass=saved;
       fetch(CLOUD.base+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:saved})})
-        .then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){cloudStart();} else {if(lo)lo.style.display='flex';} })
+        .then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ CLOUD.role=j.role||'full'; CLOUD.sections=(j.sections&&j.sections.length)?j.sections:null; cloudStart(); } else {if(lo)lo.style.display='flex';} })
         .catch(function(){ if(lo)lo.style.display='flex'; });
     } else { if(lo)lo.style.display='flex'; }
   })();

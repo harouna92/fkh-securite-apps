@@ -40,19 +40,32 @@ export default {
 
     const path = url.pathname.replace(/\/+$/, "") || "/";
 
-    // --- Connexion : valide le mot de passe commun ---
+    // Sections autorisées pour les 2 accès restreints (memes 3 sections).
+    const RESTRICTED_SECTIONS = ["demandes", "suiviappels", "interv"];
+    // Renvoie le rôle correspondant au mot de passe, ou null si invalide.
+    const roleFor = (pw) => {
+      if (!pw) return null;
+      if (typeof env.APP_PASSWORD === "string" && env.APP_PASSWORD.length > 0 && pw === env.APP_PASSWORD)
+        return { role: "full", sections: null };
+      for (const v of ["APP_PASSWORD_R1", "APP_PASSWORD_R2"]) {
+        if (typeof env[v] === "string" && env[v].length > 0 && pw === env[v])
+          return { role: v, sections: RESTRICTED_SECTIONS };
+      }
+      return null;
+    };
+
+    // --- Connexion : valide le mot de passe (complet ou restreint) et renvoie les sections autorisées ---
     if (path === "/login" && request.method === "POST") {
       let body = {};
       try { body = await request.json(); } catch (_) {}
-      const ok = typeof env.APP_PASSWORD === "string" &&
-                 env.APP_PASSWORD.length > 0 &&
-                 (body.password || "") === env.APP_PASSWORD;
-      return json({ ok });
+      const r = roleFor(body.password || "");
+      if (!r) return json({ ok: false });
+      return json({ ok: true, role: r.role, sections: r.sections });
     }
 
-    // --- Toutes les autres routes exigent le mot de passe ---
+    // --- Toutes les autres routes exigent un mot de passe valide (complet OU restreint) ---
     const pass = request.headers.get("X-App-Password") || "";
-    if (!env.APP_PASSWORD || pass !== env.APP_PASSWORD) {
+    if (!roleFor(pass)) {
       return json({ error: "unauthorized" }, 401);
     }
 
