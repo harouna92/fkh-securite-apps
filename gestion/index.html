@@ -1065,7 +1065,11 @@ button.big:active{transform:translateY(1px)}
       if(byId('val-cnt-aff'))byId('val-cnt-aff').textContent=aff.length;
       document.querySelectorAll('.valsub').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-v')===valSub);});
       var show=(valSub==='aff')?aff:toaff;
-      wrap.innerHTML=show.length?show.map(svItem).join(''):'<div class="svempty">Aucune mission '+(valSub==='aff'?'affectée':'à affecter')+(vf||vt?' sur cette période':'')+'.</div>';
+      var nowT=Date.now(); function isPast(x){ if(!x.mdate)return false; var t=new Date(x.mdate+'T'+((x.mheure||'23:59'))+':00'); return !isNaN(t.getTime())&&t.getTime()<nowT; }
+      var up=show.filter(function(x){return !isPast(x);}), pst=show.filter(isPast);
+      var h=up.length?up.map(svItem).join(''):'<div class="svempty">Aucune mission '+(valSub==='aff'?'affectée':'à affecter')+' en cours / à venir'+(vf||vt?' sur cette période':'')+'.</div>';
+      if(pst.length){ h+='<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--muted);font-weight:700;padding:6px 2px">▸ '+pst.length+' déjà passée'+(pst.length>1?'s':'')+' (traitée'+(pst.length>1?'s':'')+') — afficher</summary><div style="opacity:.55;margin-top:6px">'+pst.map(svItem).join('')+'</div></details>'; }
+      wrap.innerHTML=h;
     } else {
       wrap.innerHTML=arr.map(svItem).join('');
     }
