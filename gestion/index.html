@@ -127,7 +127,7 @@ button.big:active{transform:translateY(1px)}
 <div class="top">
   <div class="brand"><span class="dot"></span>GESTION</div>
   <div class="tabs" id="tabs">
-    <button data-s="demandes" class="on">Demandes</button>
+    <button data-s="demandes" class="on">🛡️ Gardiennage</button>
     <button data-s="prise">Prise de service</button>
     <button data-s="fin">Fin de service</button>
     <button data-s="suivi">Suivi demandes</button>
@@ -164,7 +164,7 @@ button.big:active{transform:translateY(1px)}
 
 <div class="wrap">
   <section id="sec-demandes">
-    <div><h1>Demandes</h1><p class="sub">Choisis ou écris · la ville remplit le code postal · les heures donnent la plage.</p></div>
+    <div><h1>🛡️ Gardiennage</h1><p class="sub">Demandes de gardiennage · choisis ou écris · la ville remplit le code postal · les heures donnent la plage.</p></div>
     <div class="card" style="border:2px solid var(--ok)">
       <div class="lab" style="margin:0 0 6px">⚡ Capture express (pendant l'appel) — note en vrac, complète plus tard</div>
       <textarea id="exp-text" placeholder="Tape ou dicte ce que tu entends : client, site, ville/CP, horaires, agent, n°, urgent…" style="min-height:82px;width:100%"></textarea>
@@ -691,7 +691,13 @@ button.big:active{transform:translateY(1px)}
       if(typed && list.indexOf(typed)<0) html+='<div class="addnew" data-v="'+esc(typed)+'">➕ Ajouter « '+esc(typed)+' »</div>';
       if(!html){ box.classList.add('hidden'); return; }
       box.innerHTML=html; box.classList.remove('hidden');
-      box.querySelectorAll('div').forEach(function(d){ d.addEventListener('mousedown',function(e){ e.preventDefault(); inp.value=d.getAttribute('data-v'); commit(); box.classList.add('hidden'); if(cb)cb(); genText(); }); });
+      box.querySelectorAll('div').forEach(function(d){
+        // mousedown : empêche le blur de l'input (mais NE sélectionne pas ici).
+        d.addEventListener('mousedown',function(e){ e.preventDefault(); });
+        // click : sélection réelle + fermeture immédiate du menu — fiable au tap mobile.
+        function choose(e){ if(e)e.preventDefault(); inp.value=d.getAttribute('data-v'); commit(); box.classList.add('hidden'); if(cb)cb(); genText(); }
+        d.addEventListener('click',choose);
+      });
     }
     inp.addEventListener('focus',open);
     inp.addEventListener('input',function(){ open(); if(cb)cb(); genText(); });
@@ -2869,7 +2875,7 @@ button.big:active{transform:translateY(1px)}
   if(byId('tc-cancel'))byId('tc-cancel').onclick=function(){ tcReset(); byId('tc-panel').classList.add('hidden'); };
   if(byId('tc-save'))byId('tc-save').onclick=tcSave;
   if(byId('tc-photo'))byId('tc-photo').onchange=function(){ var f=this.files&&this.files[0]; if(!f)return; if(typeof photoReady!=='function'||!photoReady()){ alert('Connexion en ligne requise pour envoyer la photo (connecte-toi en ligne).'); this.value=''; return; } var lbl=byId('tc-photo-lbl'),agent=(byId('tc-agent').value||'agent').trim(),ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg',key='tenue/'+(tnorm(agent).replace(/[^A-Z0-9]/gi,'_').toLowerCase()||'agent')+'/'+Date.now()+'.'+ext; if(lbl)lbl.textContent='⏳ envoi…'; photoUpload(key,f,function(res){ if(res&&res.ok){ tcPhotoKey=key; tcPhotoShow(); } else { tcPhotoShow(); alert('Échec de l\'envoi de la photo'+(res&&res.error?' ('+res.error+')':'')+'.'); } }); };
-  if(byId('tc-agent'))byId('tc-agent').addEventListener('input',function(){ var q=this.value.toLowerCase().trim(),box=byId('sugg-tc-agent'); if(q.length<1||typeof FA==='undefined'||!FA){box.classList.add('hidden');return;} var m=FA.filter(function(a){return (a.nom||'').toLowerCase().indexOf(q)>=0;}).slice(0,6); if(!m.length){box.classList.add('hidden');return;} box.innerHTML=m.map(function(a){return '<div data-v="'+esc(a.nom||'')+'">'+esc(a.nom||'')+'</div>';}).join(''); box.classList.remove('hidden'); box.querySelectorAll('div').forEach(function(d){d.onmousedown=function(e){e.preventDefault();byId('tc-agent').value=d.getAttribute('data-v');box.classList.add('hidden');};}); });
+  if(byId('tc-agent'))byId('tc-agent').addEventListener('input',function(){ var q=this.value.toLowerCase().trim(),box=byId('sugg-tc-agent'); if(q.length<1||typeof FA==='undefined'||!FA){box.classList.add('hidden');return;} var m=FA.filter(function(a){return (a.nom||'').toLowerCase().indexOf(q)>=0;}).slice(0,6); if(!m.length){box.classList.add('hidden');return;} box.innerHTML=m.map(function(a){return '<div data-v="'+esc(a.nom||'')+'">'+esc(a.nom||'')+'</div>';}).join(''); box.classList.remove('hidden'); box.querySelectorAll('div').forEach(function(d){d.addEventListener('mousedown',function(e){e.preventDefault();});d.addEventListener('click',function(e){e.preventDefault();byId('tc-agent').value=d.getAttribute('data-v');box.classList.add('hidden');});}); });
 
   (function initCloud(){
     var lo=byId('loginOverlay');
