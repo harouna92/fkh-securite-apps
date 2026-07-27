@@ -1581,7 +1581,22 @@ button.big:active{transform:translateY(1px)}
     var agents=Object.keys(byA).map(function(k){return byA[k].rec;}).sort(function(a,b){return String(b['Date contrôle']).localeCompare(String(a['Date contrôle']));});
     var stale=agents.filter(function(c){var d=ctrlDays(c['Date contrôle']);return d!=null&&d>14;});
     var never=[]; (FA||[]).forEach(function(a){if(a.nom&&!agentCtrl(a.nom))never.push(a.nom);});
-    var H='<div class="card"><div class="lab" style="margin:0 0 6px">⚠️ À recontrôler (plus de 2 semaines)</div>';
+    // ---- Tableau de bord visuel ----
+    var complet=agents.filter(function(c){return String(c['Statut tenue']||'').toLowerCase().indexOf('incomplet')<0;}).length;
+    var incomplet=agents.length-complet;
+    var noMens=agents.filter(function(c){return !(c.Pointure||c['T. pantalon']||c['T. haut']);}).length;
+    var D=(typeof distLoad==='function')?distLoad():{}, dvals=Object.keys(D).map(function(k){return D[k];});
+    var distPending=dvals.filter(function(r){return r.statut&&r.statut!=='recu';}).length;
+    var distUrgent=dvals.filter(function(r){return r.urgence==='urgent'&&r.statut!=='recu';}).length;
+    var distRecu=dvals.filter(function(r){return r.statut==='recu';}).length;
+    var totalSuivi=agents.length+never.length, pct=totalSuivi?Math.round(complet/totalSuivi*100):0;
+    function tk(ic,lab,val,col){ return '<div style="flex:1;min-width:112px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card)"><div style="font-size:26px;font-weight:800;line-height:1'+(col?';color:'+col:'')+'">'+val+'</div><div class="sub" style="margin:3px 0 0">'+ic+' '+lab+'</div></div>'; }
+    var H='<div class="card"><div class="lab" style="margin:0 0 8px">🦺 Tableau de bord tenues</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap">'+tk('🟢','Complètes',complet,'var(--ok)')+tk('🟠','Incomplètes',incomplet,incomplet?'var(--warn)':'')+tk('🔴','Jamais contrôlés',never.length,never.length?'var(--bad)':'')+tk('⏰','À recontrôler',stale.length,stale.length?'var(--bad)':'')+tk('📏','Sans mensurations',noMens,noMens?'var(--warn)':'')+'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">'+tk('🎽','Distributions en cours',distPending,distPending?'var(--warn)':'')+tk('🔴','Urgentes',distUrgent,distUrgent?'var(--bad)':'')+tk('✅','Tenues reçues',distRecu,'var(--ok)')+'</div>'
+      +'<div style="margin-top:10px"><div class="sub" style="margin:0 0 3px">Conformité (tenues complètes / agents suivis) — <b>'+pct+'%</b></div><div style="height:10px;border-radius:6px;background:var(--panel2);overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--ok);transition:width .4s"></div></div></div>'
+      +'</div>';
+    H+='<div class="card"><div class="lab" style="margin:0 0 6px">⚠️ À recontrôler (plus de 2 semaines)</div>';
     H+= stale.length? '<div class="near">'+stale.map(function(c){var d=ctrlDays(c['Date contrôle']);return '<div class="n"><span>'+esc(c.Agent||'—')+'</span><span class="d" style="color:var(--bad)">contrôlé il y a '+d+' j</span></div>';}).join('')+'</div>' : '<div class="hint" style="margin:0">Aucun — tous contrôlés il y a moins de 2 semaines. 👍</div>';
     if(never.length)H+='<div class="hint" style="margin-top:8px;color:var(--bad)">🔴 Jamais contrôlés (en fiche agent) : '+esc(never.join(', '))+'</div>';
     H+='</div>';
