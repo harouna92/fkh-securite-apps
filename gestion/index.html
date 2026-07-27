@@ -123,6 +123,7 @@ button.big:active{transform:translateY(1px)}
 .cloudbar .cb-txt{flex:1}
 .cloudbar button{font-family:inherit;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
 #notif-bell{position:fixed;top:7px;right:9px;z-index:90;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:17px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#logout-fab{position:fixed;top:7px;right:53px;z-index:90;height:38px;padding:0 12px;border-radius:19px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);display:none}
 #notif-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:none}
 .notif-ov{display:none;position:fixed;inset:0;z-index:130;background:rgba(0,0,0,.55);align-items:flex-start;justify-content:center;padding:36px 14px;overflow:auto}
 .notif-ov.show{display:flex}
@@ -161,8 +162,9 @@ button.big:active{transform:translateY(1px)}
   <input id="gsearch" placeholder="🔎 Rechercher partout : agent, site, client, mission…" autocomplete="off" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font-size:14px">
   <div id="gsearch-res" class="hidden" style="position:absolute;z-index:60;left:10px;right:10px;top:100%;margin-top:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;max-height:65vh;overflow:auto;box-shadow:0 8px 28px rgba(0,0,0,.35)"></div>
 </div>
-<div class="cloudbar" id="cloudbar"><span class="cb-txt"></span><button type="button" id="cloud-import">Importer mes données locales</button><button type="button" id="cloud-logout">🔓 Déconnexion</button></div>
+<div class="cloudbar" id="cloudbar"><span class="cb-txt"></span><button type="button" id="cloud-import">Importer mes données locales</button></div>
 
+<button type="button" id="logout-fab" title="Se déconnecter" aria-label="Se déconnecter">🔓 Déconnexion</button>
 <button type="button" id="notif-bell" title="Notifications" aria-label="Notifications">🔔<span id="notif-badge"></span></button>
 <div class="notif-ov" id="notif-ov">
   <div class="notif-box">
@@ -1758,6 +1760,15 @@ button.big:active{transform:translateY(1px)}
   }
   function cloudApply(k,v){
     if(v==null || localStorage.getItem(k)===v) return; // identique / notre propre écho
+    if(k==='fkh_suivisite'){ // #11 : fusion au lieu d'écraser (garde la coche la plus récente par appel)
+      var rem={}; try{rem=JSON.parse(v)||{};}catch(_){rem={};}
+      var merged=ssMerge(ssLoad(),rem), mv=JSON.stringify(merged);
+      try{ localStorage.setItem('fkh_suivisite',mv); }catch(e){}
+      if(mv!==v && typeof cloudPush==='function')cloudPush('fkh_suivisite'); // le local avait des coches plus récentes -> on renvoie la version fusionnée
+      if(byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')&&typeof renderSuiviAppels==='function')renderSuiviAppels();
+      if(byId('sec-suivisite')&&!byId('sec-suivisite').classList.contains('hidden')&&typeof renderSuiviSite==='function')renderSuiviSite();
+      return;
+    }
     try{ localStorage.setItem(k,v); }catch(e){}
     try{
       if(k==='fkh_suivi'){ SUIVI=load('fkh_suivi'); SUIVI.forEach(function(x){delete x._pending;delete x._pick;delete x._pick2;}); if(typeof renderSuivi==='function')renderSuivi(); }
@@ -1780,8 +1791,8 @@ button.big:active{transform:translateY(1px)}
   }
   function cloudPoll(){ clearTimeout(CLOUD.pollT); CLOUD.pollT=setTimeout(function(){ cloudPull().then(cloudPoll); },4000); }
   function cloudBar(txt,online){ var b=byId('cloudbar'); if(!b)return; b.style.display='flex'; b.querySelector('.cb-txt').textContent=txt; b.className='cloudbar '+(online?'cb-on':'cb-off'); }
-  function cloudLogout(msg){ CLOUD.on=false; CLOUD.pass=''; try{sessionStorage.removeItem('fkh_pass');}catch(e){} clearTimeout(CLOUD.pollT); var lo=byId('loginOverlay'); if(lo)lo.style.display='flex'; if(msg)byId('login-err').textContent=msg; }
-  function cloudStart(){ CLOUD.on=true; try{sessionStorage.setItem('fkh_pass',CLOUD.pass);}catch(e){} var lo=byId('loginOverlay'); if(lo)lo.style.display='none'; if(typeof applySectionAccess==='function')applySectionAccess(); cloudBar(CLOUD.sections?'☁︎ Connecté — accès restreint':'☁︎ Connecté — données partagées',true); cloudToggleImport(); cloudPull().then(function(){ cloudPoll(); }); if(typeof asgOnConnect==='function')asgOnConnect(); }
+  function cloudLogout(msg){ CLOUD.on=false; CLOUD.pass=''; try{sessionStorage.removeItem('fkh_pass');}catch(e){} clearTimeout(CLOUD.pollT); var lo=byId('loginOverlay'); if(lo)lo.style.display='flex'; if(msg)byId('login-err').textContent=msg; var _lf=byId('logout-fab'); if(_lf)_lf.style.display='none'; }
+  function cloudStart(){ CLOUD.on=true; try{sessionStorage.setItem('fkh_pass',CLOUD.pass);}catch(e){} var lo=byId('loginOverlay'); if(lo)lo.style.display='none'; var _lf=byId('logout-fab'); if(_lf)_lf.style.display='block'; if(typeof applySectionAccess==='function')applySectionAccess(); cloudBar(CLOUD.sections?'☁︎ Connecté — accès restreint':'☁︎ Connecté — données partagées',true); cloudToggleImport(); cloudPull().then(function(){ cloudPoll(); }); if(typeof asgOnConnect==='function')asgOnConnect(); }
   // Y a-t-il des données locales pas encore dans le classeur commun ? (sert à n'afficher le bouton que quand c'est utile)
   function cloudHasLocalData(){ for(var i=0;i<SYNC_KEYS.length;i++){ var v=localStorage.getItem(SYNC_KEYS[i]); if(v&&v.length>2&&v!=='[]'&&v!=='{}')return true; } return false; }
   function cloudToggleImport(){ var ib=byId('cloud-import'); if(ib)ib.style.display=(CLOUD.on&&cloudHasLocalData())?'':'none'; }
@@ -2479,6 +2490,9 @@ button.big:active{transform:translateY(1px)}
   function ssSliceMatch(m){ if(ssSlice==='all')return true; var mn=toMin(m.mheure); if(mn==null)return true; var h=Math.floor(mn/60), day=(h>=8&&h<20); return ssSlice==='jour'?day:!day; }
   function ssLoad(){ var s=load('fkh_suivisite'); return (s&&typeof s==='object'&&!Array.isArray(s))?s:{}; }
   function ssSave(s){ save('fkh_suivisite',s); }
+  // #11 Fusion anti-écrasement : pour chaque (mission,appel), on garde l'enregistrement le PLUS RÉCENT (champ `at`).
+  // Évite qu'une synchro distante « dernier qui écrit gagne » ne fasse réapparaître un appel déjà coché.
+  function ssMerge(a,b){ a=a||{}; b=b||{}; var out={},mid,key; for(mid in a)out[mid]=Object.assign({},a[mid]); for(mid in b){ if(!out[mid]){out[mid]=Object.assign({},b[mid]);continue;} for(key in b[mid]){ var ra=out[mid][key],rb=b[mid][key]; if(!ra){out[mid][key]=rb;continue;} out[mid][key]=((rb&&rb.at||0)>(ra&&ra.at||0))?rb:ra; } } return out; }
   function ssParams(){ var p=load('fkh_ss_params'); if(!p||typeof p!=='object'||Array.isArray(p))p={}; return {before:(p.before!=null?p.before:15), route:(p.route!=null?p.route:30)}; }
   function ssNowHM(){ var d=new Date(); return pad2(d.getHours())+':'+pad2(d.getMinutes()); }
   function ssMissions(from,to){ return SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; }).sort(function(a,b){var da=(a.mdate||'')+' '+(a.mheure||''),db=(b.mdate||'')+' '+(b.mheure||'');return da<db?-1:da>db?1:0;}); }
@@ -2556,7 +2570,7 @@ button.big:active{transform:translateY(1px)}
   (function(){ var t=impTodayISO(); if(byId('ss-from')&&!byId('ss-from').value)byId('ss-from').value=t; if(byId('ss-to')&&!byId('ss-to').value)byId('ss-to').value=t; })();
 
   // ===== Suivi des appels : agenda chronologique des appels à faire (issus des missions) =====
-  function saSet(mid,key,patch){ var S=ssLoad(); if(!S[mid])S[mid]={}; var r=S[mid][key]||{}; for(var k in patch)r[k]=patch[k]; S[mid][key]=r; ssSave(S); }
+  function saSet(mid,key,patch){ var S=ssLoad(); if(!S[mid])S[mid]={}; var r=S[mid][key]||{}; for(var k in patch)r[k]=patch[k]; r.at=Date.now(); S[mid][key]=r; ssSave(S); }
   var saType='all', saSlice='all';
   function saTypeMatch(key){ if(saType==='all')return true; if(saType==='avant')return key==='j15'||key==='route'; if(saType==='prise')return key==='prise'; if(saType==='pendant')return key.indexOf('ctrl')===0; if(saType==='fin')return key==='fin'; return true; }
   function saSliceMatch(e){ if(saSlice==='all')return true; var m=toMin(e.mheure); if(m==null)return true; var h=Math.floor(m/60), day=(h>=8&&h<20); return saSlice==='jour'?day:!day; }
@@ -2990,7 +3004,8 @@ button.big:active{transform:translateY(1px)}
     if(!CLOUD.base){ if(lo)lo.style.display='none'; return; } // pas de backend => 100% local, rien ne change
     byId('login-btn').addEventListener('click',function(){ cloudLogin(byId('login-pass').value); });
     byId('login-pass').addEventListener('keydown',function(e){ if(e.key==='Enter')cloudLogin(this.value); });
-    byId('login-local').addEventListener('click',function(){ if(lo)lo.style.display='none'; cloudBar('⚠︎ Hors-ligne — données de cet appareil seulement',false); cloudToggleImport(); });
+    byId('login-local').addEventListener('click',function(){ if(lo)lo.style.display='none'; cloudBar('⚠︎ Hors-ligne — données de cet appareil seulement',false); cloudToggleImport(); var _lf=byId('logout-fab'); if(_lf)_lf.style.display='block'; });
+    var lfab=byId('logout-fab'); if(lfab)lfab.addEventListener('click',function(){ if(confirm('Se déconnecter de l\'application ? Il faudra retaper le mot de passe pour revenir.'))cloudLogout(); });
     var ib=byId('cloud-import'); if(ib)ib.addEventListener('click',function(){cloudImportLocal(ib);});
     var lob=byId('cloud-logout'); if(lob)lob.addEventListener('click',function(){ if(confirm('Se déconnecter de l\'application ? Il faudra retaper le mot de passe pour revenir.'))cloudLogout(); });
     var saved=null; try{saved=sessionStorage.getItem('fkh_pass');}catch(e){}
