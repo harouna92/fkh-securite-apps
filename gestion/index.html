@@ -2584,7 +2584,7 @@ button.big:active{transform:translateY(1px)}
       var edate=(m.mdate?svcAddDays(m.mdate,Math.floor(abs/1440)):''); // date RÉELLE de l'appel (report après minuit)
       if(from&&edate&&edate<from)return; if(to&&edate&&edate>to)return; // filtre sur la date réelle -> l'appel de 01h d'une nuit du 27 apparaît dans la vue du 28
       out.push({mid:m.id,mdate:m.mdate||'',edate:edate,site:m.siteAgent||m.titre||'—',siteBDC:m.siteBDC||'',client:m.client||'',ville:m.ville||'',cp:m.cp||'',mheure:m.mheure||'',agent:_ag?(_ag.nom||''):'',agentTel:_tel,agentId:m.agentId||'',key:s.key,label:s.label,heure:s.heure,abs:abs,type:s.type}); }); });
-    out.sort(function(a,b){ var da=a.edate||a.mdate||'',db=b.edate||b.mdate||''; if(da!==db)return da<db?-1:1; return a.abs-b.abs; });
+    out.sort(function(a,b){ var da=a.edate||a.mdate||'',db=b.edate||b.mdate||''; if(da!==db)return da<db?-1:1; return (a.abs%1440)-(b.abs%1440); }); // tri sur l'heure RÉELLE de la journée (00:00 avant 07:30)
     return out;
   }
   function renderSuiviAppels(){
@@ -2592,7 +2592,7 @@ button.big:active{transform:translateY(1px)}
     var from=byId('sa-from')?byId('sa-from').value:'', to=byId('sa-to')?byId('sa-to').value:'';
     var lbl=(from||to)?('du '+(from?from.split('-').reverse().join('/'):'…')+' au '+(to?to.split('-').reverse().join('/'):'…')):'toute la période';
     var entries=saEntries(from,to).filter(function(e){return saTypeMatch(e.key)&&saSliceMatch(e);});
-    if(saType==='all'&&typeof csgLoad==='function'){ csgLoad().forEach(function(c){ if(from&&(!c.mdate||c.mdate<from))return; if(to&&(!c.mdate||c.mdate>to))return; var heure=c.heure||'',site='',agent=''; if(c.mid){ var m=csgMissById(c.mid); if(m){ site=m.siteAgent||m.titre||''; if(!heure)heure=m.mheure||''; if(m.agentId&&faById(m.agentId))agent=faById(m.agentId).nom||''; } } var e={consigne:true,cid:c.id,mid:c.mid||'',mdate:c.mdate||'',edate:c.mdate||'',heure:heure,mheure:heure,abs:(toMin(heure)||0),texte:c.texte,client:c.client||'',site:site,agent:agent,done:!!c.done,note:c.note||'',key:'csg'}; if(!saSliceMatch(e))return; entries.push(e); }); entries.sort(function(a,b){ var da=a.edate||a.mdate||'',db=b.edate||b.mdate||''; if(da!==db)return da<db?-1:1; return (a.abs||0)-(b.abs||0); }); }
+    if(saType==='all'&&typeof csgLoad==='function'){ csgLoad().forEach(function(c){ if(from&&(!c.mdate||c.mdate<from))return; if(to&&(!c.mdate||c.mdate>to))return; var heure=c.heure||'',site='',agent=''; if(c.mid){ var m=csgMissById(c.mid); if(m){ site=m.siteAgent||m.titre||''; if(!heure)heure=m.mheure||''; if(m.agentId&&faById(m.agentId))agent=faById(m.agentId).nom||''; } } var e={consigne:true,cid:c.id,mid:c.mid||'',mdate:c.mdate||'',edate:c.mdate||'',heure:heure,mheure:heure,abs:(toMin(heure)||0),texte:c.texte,client:c.client||'',site:site,agent:agent,done:!!c.done,note:c.note||'',key:'csg'}; if(!saSliceMatch(e))return; entries.push(e); }); entries.sort(function(a,b){ var da=a.edate||a.mdate||'',db=b.edate||b.mdate||''; if(da!==db)return da<db?-1:1; return ((a.abs||0)%1440)-((b.abs||0)%1440); }); }
     document.querySelectorAll('.sa-type').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-ty')===saType);});
     document.querySelectorAll('.sa-slice').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-sl')===saSlice);});
     var slLbl=saSlice==='jour'?' · ☀️ tranche jour (8h→20h)':saSlice==='nuit'?' · 🌙 tranche nuit (20h→8h)':'';
