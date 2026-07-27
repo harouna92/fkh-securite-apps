@@ -1881,31 +1881,42 @@ button.big:active{transform:translateY(1px)}
   var svcTab='synth';
   function svcNeedPhoto(s){ return s.key==='prise'||s.key==='fin'||s.key==='tenue'||s.key.indexOf('ctrl')===0; }
   function svcShortLbl(s){ if(s.key==='prise')return 'Prise'; if(s.key==='fin')return 'Fin'; if(s.key==='tenue')return 'Tenue'; if(s.key==='j15')return 'Pré-prise'; if(s.key==='route')return 'Route'; if(s.key.indexOf('ctrl')===0)return 'Contrôle '+((+s.key.slice(4))+1); return s.label; }
+  var SVC_GRACE=15; // minutes de tolérance après l'heure prévue avant de considérer une étape « en retard »
+  function svcStepMs(m,s){ if(!s.heure||!m.mdate)return null; var start=toMin(m.mheure),mn=toMin(s.heure); if(mn==null)return null; var abs=mn; if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn<start)abs=mn+1440; return new Date(m.mdate+'T00:00:00').getTime()+abs*60000; }
+  function svcDue(m,s){ var ms=svcStepMs(m,s); return ms==null?true:(Date.now()>ms+SVC_GRACE*60000); }
+  // État d'une vacation : 'complet' (tout fait + photos), 'retard' (une étape échue non faite/sans photo), 'encours' (rien d'échu, en attente)
+  function svcState(m){ var S=ssLoad(),st=S[m.id]||{},steps=ssSteps(m); function dn(s){return !!(st[s.key]&&st[s.key].done);} function ph(s){return !!(st[s.key]&&st[s.key].photoKey);} var phSteps=steps.filter(svcNeedPhoto); if(steps.every(dn)&&phSteps.every(ph))return 'complet'; var lateA=steps.some(function(s){return !dn(s)&&svcDue(m,s);}); var lateP=phSteps.some(function(s){return !ph(s)&&svcDue(m,s);}); return (lateA||lateP)?'retard':'encours'; }
   function svcSynthCard(m){
     var S=ssLoad(), st=S[m.id]||{}, steps=ssSteps(m);
     var site=m.siteAgent||m.titre||'—', ag=(m.agentId&&faById(m.agentId))?faById(m.agentId).nom:'';
     var pl=(typeof apPlan==='function')?apPlan(m):null;
-    // Appels prévus / faits
-    var missA=steps.filter(function(s){ return !(st[s.key]&&st[s.key].done); });
-    var totA=steps.length, doneA=totA-missA.length;
-    // Photos prévues / présentes
-    var phSteps=steps.filter(svcNeedPhoto);
-    var missP=phSteps.filter(function(s){ return !(st[s.key]&&st[s.key].photoKey); });
-    var totP=phSteps.length, doneP=totP-missP.length;
+    function dn(s){return !!(st[s.key]&&st[s.key].done);} function ph(s){return !!(st[s.key]&&st[s.key].photoKey);}
+    // Appels : faits / en retard (échus non faits) / à venir (heure pas encore passée)
+    var totA=steps.length, doneA=steps.filter(dn).length;
+    var lateA=steps.filter(function(s){return !dn(s)&&svcDue(m,s);});
+    var pendA=steps.filter(function(s){return !dn(s)&&!svcDue(m,s);});
+    // Photos idem
+    var phSteps=steps.filter(svcNeedPhoto), totP=phSteps.length, doneP=phSteps.filter(ph).length;
+    var lateP=phSteps.filter(function(s){return !ph(s)&&svcDue(m,s);});
+    var pendP=phSteps.filter(function(s){return !ph(s)&&!svcDue(m,s);});
     // Client avisé prise / fin
     var pr=st.prise||{}, fn=st.fin||{};
     function cliBadge(lbl,rec,exists){ if(!exists)return ''; if(!rec.done)return '<span style="display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:1px 8px;margin:2px 4px 0 0;font-size:12px">'+lbl+' : ⏳ appel pas encore fait</span>'; var ok=!!rec.avise; return '<span style="display:inline-block;background:'+(ok?'rgba(40,160,80,.14)':'rgba(200,0,0,.14)')+';border:1px solid var(--line);border-radius:8px;padding:1px 8px;margin:2px 4px 0 0;font-size:12px;font-weight:700;color:'+(ok?'var(--ok)':'var(--bad)')+'">'+lbl+' : '+(ok?'✅ client avisé':'❌ client NON avisé')+'</span>'; }
     var hasPrise=steps.some(function(s){return s.key==='prise';}), hasFin=steps.some(function(s){return s.key==='fin';});
-    // Ligne appels
-    function pill(txt,ok){ return '<span style="display:inline-block;background:'+(ok?'rgba(40,160,80,.14)':'rgba(224,161,59,.16)')+';border:1px solid var(--line);border-radius:8px;padding:2px 9px;margin:2px 6px 0 0;font-size:12.5px;font-weight:700;color:'+(ok?'var(--ok)':'#e0a13b')+'">'+txt+'</span>'; }
-    var aOk=missA.length===0, pOk=missP.length===0;
-    var appelsLine=pill((aOk?'✅':'⚠️')+' Appels '+doneA+'/'+totA,aOk)+(missA.length?'<span class="sub" style="font-size:12px">manquants : '+missA.map(svcShortLbl).map(esc).join(', ')+'</span>':'');
-    // Ligne photos avec liens voir
-    var phLinks=phSteps.map(function(s){ var r=st[s.key]||{}; if(r.photoKey)return '<a href="#" class="svc-ph" data-k="'+esc(r.photoKey)+'" style="font-size:12px;color:#6ea8fe;margin-right:8px">🖼️ '+esc(svcShortLbl(s))+'</a>'; return '<span style="font-size:12px;color:var(--bad);margin-right:8px">❌ '+esc(svcShortLbl(s))+'</span>'; }).join('');
-    var photosLine=pill((pOk?'✅':'⚠️')+' Photos '+doneP+'/'+totP,pOk)+(totP?'<div style="margin-top:3px">'+phLinks+'</div>':'<span class="sub" style="font-size:12px">aucune photo attendue</span>');
+    // pill : cls = 'ok' (vert) | 'warn' (orange, en retard) | 'neu' (neutre, en cours)
+    function pill(txt,cls){ var bg=cls==='ok'?'rgba(40,160,80,.14)':cls==='warn'?'rgba(224,161,59,.16)':'var(--panel2)', col=cls==='ok'?'var(--ok)':cls==='warn'?'#e0a13b':'var(--muted)'; return '<span style="display:inline-block;background:'+bg+';border:1px solid var(--line);border-radius:8px;padding:2px 9px;margin:2px 6px 0 0;font-size:12.5px;font-weight:700;color:'+col+'">'+txt+'</span>'; }
+    var aCls=doneA===totA?'ok':(lateA.length?'warn':'neu'), aIc=doneA===totA?'✅':(lateA.length?'⚠️':'🕓');
+    var appelsLine=pill(aIc+' Appels '+doneA+'/'+totA,aCls)
+      +(lateA.length?'<span class="sub" style="font-size:12px;color:#e0a13b">en retard : '+lateA.map(svcShortLbl).map(esc).join(', ')+'</span>':'')
+      +(pendA.length?'<span class="sub" style="font-size:12px"> · à venir : '+pendA.map(svcShortLbl).map(esc).join(', ')+'</span>':'');
+    var phLinks=phSteps.map(function(s){ var r=st[s.key]||{}; if(r.photoKey)return '<a href="#" class="svc-ph" data-k="'+esc(r.photoKey)+'" style="font-size:12px;color:#6ea8fe;margin-right:8px">🖼️ '+esc(svcShortLbl(s))+'</a>'; var late=svcDue(m,s); return '<span style="font-size:12px;color:'+(late?'var(--bad)':'var(--muted)')+';margin-right:8px">'+(late?'❌':'🕓')+' '+esc(svcShortLbl(s))+'</span>'; }).join('');
+    var pCls=doneP===totP?'ok':(lateP.length?'warn':'neu'), pIc=doneP===totP?'✅':(lateP.length?'⚠️':'🕓');
+    var photosLine=pill(pIc+' Photos '+doneP+'/'+totP,pCls)+(totP?'<div style="margin-top:3px">'+phLinks+'</div>':'<span class="sub" style="font-size:12px">aucune photo attendue</span>');
     var cliLine=cliBadge('🟢 Prise',pr,hasPrise)+cliBadge('🔚 Fin',fn,hasFin);
-    var complet=aOk&&pOk;
-    var globalPill='<span style="float:right;font-weight:800;font-size:12.5px;color:'+(complet?'var(--ok)':'#e0a13b')+'">'+(complet?'✅ complet':'⚠️ incomplet')+'</span>';
+    var stt=svcState(m);
+    var gTxt=stt==='complet'?'✅ complet':stt==='retard'?'⚠️ en retard':'🕓 en cours';
+    var gCol=stt==='complet'?'var(--ok)':stt==='retard'?'#e0a13b':'var(--muted)';
+    var globalPill='<span style="float:right;font-weight:800;font-size:12.5px;color:'+gCol+'">'+gTxt+'</span>';
     var head='<div class="fa-n" style="font-size:15.5px">'+globalPill+esc(site)+(m.ville?' <span style="color:var(--muted);font-weight:400">· '+esc(m.ville):'')+'</span> <span style="color:var(--muted);font-weight:400">'+esc(m.mdate||'')+(m.mheure?' '+esc(m.mheure):'')+'</span>'+(pl&&pl.night?' <span style="color:#e0784b">🌙 nuit</span>':'')+'</div><div class="fa-d" style="margin:2px 0 6px">'+(m.client?'🏢 '+esc(m.client)+' · ':'')+(ag?('👤 '+esc(ag)):'<span style="color:var(--warn)">⚠ agent à affecter</span>')+'</div>';
     return '<div class="card" style="padding:10px">'+head
       +'<div style="margin-bottom:4px">'+appelsLine+'</div>'
@@ -1922,8 +1933,8 @@ button.big:active{transform:translateY(1px)}
       var miss=ssMissions(from,to).filter(function(m){ if(!q)return true; var ag=(m.agentId&&faById(m.agentId))?faById(m.agentId).nom:''; return (String(ag)+' '+String(m.client||'')+' '+String(m.siteAgent||m.titre||'')+' '+String(m.ville||'')).toLowerCase().indexOf(q)>=0; });
       if(typeof apDeconflict==='function')apDeconflict(miss,10);
       if(!miss.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune vacation (mission validée) '+esc(periode0)+(q?' pour ce filtre':'')+'.</div></div>'; return; }
-      var nComplet=0; miss.forEach(function(m){ var S=ssLoad(),st=S[m.id]||{},steps=ssSteps(m); var aOk=steps.every(function(s){return st[s.key]&&st[s.key].done;}); var pOk=steps.filter(svcNeedPhoto).every(function(s){return st[s.key]&&st[s.key].photoKey;}); if(aOk&&pOk)nComplet++; });
-      var head='<div class="card"><div class="lab" style="margin:0 0 2px">'+miss.length+' vacation'+(miss.length>1?'s':'')+' — '+esc(periode0)+'</div><div class="fa-d" style="margin:0">✅ '+nComplet+' complète'+(nComplet>1?'s':'')+' · <span style="color:#e0a13b;font-weight:700">'+(miss.length-nComplet)+' incomplète'+((miss.length-nComplet)>1?'s':'')+'</span> <span class="sub">(tous les appels faits + toutes les photos présentes)</span></div></div>';
+      var nComplet=0,nRetard=0,nCours=0; miss.forEach(function(m){ var s=svcState(m); if(s==='complet')nComplet++; else if(s==='retard')nRetard++; else nCours++; });
+      var head='<div class="card"><div class="lab" style="margin:0 0 2px">'+miss.length+' vacation'+(miss.length>1?'s':'')+' — '+esc(periode0)+'</div><div class="fa-d" style="margin:0">✅ '+nComplet+' complète'+(nComplet>1?'s':'')+' · <span style="color:#e0a13b;font-weight:700">⚠️ '+nRetard+' en retard</span> · <span style="color:var(--muted)">🕓 '+nCours+' en cours</span></div><div class="sub" style="margin:2px 0 0">« En retard » = une étape dont l\'heure prévue (+'+SVC_GRACE+' min) est passée sans appel/photo. Les étapes à venir ne comptent pas.</div></div>';
       wrap.innerHTML=head+miss.map(svcSynthCard).join('');
       wrap.querySelectorAll('.svc-ph').forEach(function(a){ a.onclick=function(ev){ ev.preventDefault(); if(typeof photoOpen==='function')photoOpen(a.getAttribute('data-k')); }; });
       wrap.querySelectorAll('.svc-goappels').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); var tb=document.querySelector('#tabs button[data-s="suiviappels"]'); if(tb)tb.click(); }; });
