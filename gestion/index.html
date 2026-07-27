@@ -1,8 +1,17 @@
+<meta charset="utf-8">
 <title>GESTION</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0c1017">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GESTION">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg">
 <style>
 :root{--bg:#eef1f5;--panel:#fff;--panel2:#f4f6fa;--line:#d3d9e3;--ink:#141922;--muted:#5c6473;--brand:#2456c7;--brand-ink:#fff;--ok:#137a3b;--okbg:#e4f5ea;--bad:#c02626;--badbg:#fbe7e7;--warn:#9a6100;--warnbg:#fbf0dc;--mono:ui-monospace,Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;}
 @media (prefers-color-scheme:dark){:root{--bg:#0c1017;--panel:#151b26;--panel2:#1b2330;--line:#2a3444;--ink:#e8ecf3;--muted:#94a0b3;--brand:#5b8bff;--brand-ink:#0c1017;--ok:#43c777;--okbg:#12281b;--bad:#ff6b6b;--badbg:#2a1515;--warn:#f0b34a;--warnbg:#2a2010;}}
@@ -175,7 +184,13 @@ button.big:active{transform:translateY(1px)}
     <div class="lab" style="margin:12px 0 6px">Quelles actions me notifient ?</div>
     <div id="notif-cats"></div>
     <div id="notif-sound-wrap"><label class="chk" style="margin-top:4px"><input type="checkbox" id="notif-sound"><span>🔊 Petit son à chaque notification</span></label></div>
-    <p class="sub" style="margin:12px 0 0;font-size:12px;line-height:1.5">📱💻 <b>Niveau 1</b> : fonctionne quand l'appli est ouverte (onglet ouvert), sur téléphone comme sur ordinateur. Le <b>Niveau 2</b> (recevoir même l'appli fermée) viendra ensuite.</p>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">
+      <div class="lab" style="margin:0 0 4px">📴 Recevoir même quand l'appli est fermée (Niveau 2)</div>
+      <p class="sub" id="notif-n2-status" style="margin:0 0 8px;font-size:12.5px">—</p>
+      <button type="button" class="big" id="notif-n2-btn">📴 Activer les notifications appli fermée</button>
+      <p class="sub" id="notif-n2-hint" style="margin:8px 0 0;font-size:11.5px;line-height:1.5"></p>
+    </div>
+    <p class="sub" style="margin:12px 0 0;font-size:12px;line-height:1.5">📱💻 <b>Niveau 1</b> : quand l'appli est ouverte. <b>Niveau 2</b> : même fermée (nécessite d'être connecté ; sur iPhone, ajoute d'abord l'appli à l'écran d'accueil).</p>
   </div>
 </div>
 
@@ -380,6 +395,7 @@ button.big:active{transform:translateY(1px)}
           <label class="f"><div class="lab">Fichier CSV</div><input type="file" id="imp-file" accept=".csv,text/csv,text/plain"></label>
           <label class="chk" style="align-self:end"><input type="checkbox" id="imp-empty" checked><span>Importer aussi les créneaux sans agent (« à affecter »)</span></label>
         </div>
+        <label class="chk" style="margin-top:6px"><input type="checkbox" id="imp-past"><span>📅 Importer aussi les missions des <b>dates passées</b> (avant aujourd'hui) — sinon seules aujourd'hui + à venir</span></label>
         <label class="f"><div class="lab">…ou colle le contenu ici</div><textarea id="imp-text" placeholder="Colle le CSV (séparateur ; )" style="min-height:60px"></textarea></label>
         <div class="acts" style="margin-top:6px"><button class="ok" id="imp-analyse">🔎 Analyser</button><button id="imp-cancel">Fermer</button></div>
         <div id="imp-err" class="hint" style="color:var(--bad)"></div>
@@ -395,7 +411,7 @@ button.big:active{transform:translateY(1px)}
     <input id="suivi-q" placeholder="🔎 Filtrer (site, ville, client, agent…)" autocomplete="off" style="width:100%;margin:8px 0 4px">
     <div id="val-controls" class="hidden">
       <div class="subtabs" style="margin:6px 0"><button type="button" class="valsub on" data-v="toaff">✅ À affecter <span class="cnt" id="val-cnt-toaff">0</span></button><button type="button" class="valsub" data-v="aff">👤 Affectées <span class="cnt" id="val-cnt-aff">0</span></button></div>
-      <div class="card" style="padding:8px"><div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="val-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="val-to"></label></div><div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:6px"><button type="button" class="val-preset" data-d="all">Tout</button><button type="button" class="val-preset" data-d="1">Aujourd'hui</button><button type="button" class="val-preset" data-d="7">7 j</button><button type="button" class="val-preset" data-d="30">30 j</button></div></div>
+      <div class="card" style="padding:8px"><div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="val-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="val-to"></label></div><div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:6px"><button type="button" class="val-preset" data-d="all">Tout</button><button type="button" class="val-preset" data-d="1">Aujourd'hui</button><button type="button" class="val-preset" data-d="7">7 j</button><button type="button" class="val-preset" data-d="30">30 j</button></div><div class="grid2" style="margin-top:8px"><label class="f"><div class="lab">🏢 Client</div><select id="val-client"><option value="">Tous les clients</option></select></label><label class="f"><div class="lab">📍 Site</div><select id="val-site"><option value="">Tous les sites</option></select></label></div></div>
     </div>
     <div class="suivilist" id="suiviList"></div>
   </section>
@@ -634,7 +650,32 @@ button.big:active{transform:translateY(1px)}
     <div id="dsp-result"></div>
   </section>
   <section id="sec-interv" class="hidden">
-    <div><h1>🚨 Zones d'intervention</h1><p class="sub">Crée une zone (ville + rayon), puis classe tes agents par ordre de priorité d'appel. Quand une demande tombe dans une zone, l'appli te ressort direct la liste priorisée des agents à appeler.</p></div>
+    <div><h1>🚨 Interventions</h1><p class="sub">Demande d'intervention (agent ADS, à partir de maintenant, durée 1 h par défaut) · puis les zones d'agents priorisés.</p></div>
+    <div class="card">
+      <div class="lab" style="margin:0 0 8px">🚨 Nouvelle demande d'intervention</div>
+      <div class="grid2">
+        <label class="f"><div class="lab">Client / donneur d'ordre</div><div class="cbx"><input id="iv-client" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="iv-client" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-iv-client"></div></div></label>
+        <label class="f"><div class="lab">Nom du site</div><input id="iv-site" placeholder="Nom du site" autocomplete="off"></label>
+      </div>
+      <div class="grid2">
+        <label class="f"><div class="lab">Type de site</div><div class="cbx"><input id="iv-sitetype" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="iv-sitetype" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-iv-sitetype"></div></div></label>
+        <label class="f"><div class="lab">Type de prestation</div><select id="iv-presta"><option>Intervention</option><option>Ronde</option></select></label>
+      </div>
+      <div class="grid2">
+        <label class="f"><div class="lab">Ville</div><div class="acwrap"><input type="text" id="iv-ville" placeholder="Tape ou choisis une ville…" autocomplete="off"><div class="sugg hidden" id="sugg-iv-ville"></div></div></label>
+        <label class="f"><div class="lab">Code postal</div><input id="iv-cp" placeholder="Rempli par la ville" autocomplete="off" inputmode="numeric"></label>
+      </div>
+      <div class="lab" style="margin:10px 0 4px">⏱ À partir de maintenant — durée 1 h par défaut</div>
+      <div class="grid2">
+        <label class="f"><div class="lab">Date</div><input type="date" id="iv-date"></label>
+        <label class="f"><div class="lab">Heure de début</div><input type="time" id="iv-hdeb"></label>
+      </div>
+      <label class="f"><div class="lab">Heure de fin <span style="color:var(--muted);font-weight:400">(auto = début + 1 h, modifiable)</span></div><input type="time" id="iv-hfin"></label>
+      <div class="lab" style="margin:10px 0 3px">📋 Texte à copier</div>
+      <div class="outbox" id="iv-out">Remplis la demande…</div>
+      <div class="acts" style="margin-top:8px;gap:8px;flex-wrap:wrap"><button class="ok" id="iv-copy">📋 Copier</button><button class="big ok" id="iv-send" style="flex:1;min-width:200px">✅ Envoyer vers Suivi (mission validée)</button></div>
+    </div>
+    <div class="lab" style="margin:16px 0 6px;font-size:15px">🗺️ Zones d'intervention — agents priorisés par zone</div>
     <div class="card">
       <div class="lab" style="margin:0 0 6px">Nouvelle zone</div>
       <div class="grid2"><label class="f"><div class="lab">Ville pivot</div><div class="acwrap"><input type="text" id="iz-ville" placeholder="Ex. Chalon-sur-Saône…" autocomplete="off"><div class="sugg hidden" id="sugg-iz-ville"></div></div></label><label class="f"><div class="lab">Rayon (km)</div><input type="number" id="iz-radius" value="30" min="1" max="300"></label></div>
@@ -1210,7 +1251,15 @@ button.big:active{transform:translateY(1px)}
     if(suiviBucket==='validee'){
       var byD=function(a,b){var da=a.mdate||'9999-99-99',db=b.mdate||'9999-99-99';return da>db?1:(da<db?-1:0);};
       var vf=(byId('val-from')&&byId('val-from').value)||'', vt=(byId('val-to')&&byId('val-to').value)||'';
-      function inPer(x){ var d=x.mdate||''; if(vf&&(!d||d<vf))return false; if(vt&&(!d||d>vt))return false; return true; }
+      var vcl=(byId('val-client')&&byId('val-client').value)||'', vsi=(byId('val-site')&&byId('val-site').value)||'';
+      // Peuple les listes Client / Site à partir de toutes les missions validées (Site restreint au client choisi)
+      (function(){
+        var allV=SUIVI.filter(function(x){return x.statut==='validee';}), cs={}, ss={};
+        allV.forEach(function(x){ if(x.client)cs[x.client]=1; if(!vcl||(x.client||'')===vcl){ var s=x.siteAgent||x.titre||''; if(s)ss[s]=1; } });
+        var selC=byId('val-client'); if(selC){ selC.innerHTML='<option value="">Tous les clients</option>'+Object.keys(cs).sort().map(function(c){return '<option value="'+esc(c)+'"'+(c===vcl?' selected':'')+'>'+esc(c)+'</option>';}).join(''); if(selC.value!==vcl){selC.value='';vcl='';} }
+        var selS=byId('val-site'); if(selS){ selS.innerHTML='<option value="">Tous les sites</option>'+Object.keys(ss).sort().map(function(s){return '<option value="'+esc(s)+'"'+(s===vsi?' selected':'')+'>'+esc(s)+'</option>';}).join(''); if(selS.value!==vsi){selS.value='';vsi='';} }
+      })();
+      function inPer(x){ var d=x.mdate||''; if(vf&&(!d||d<vf))return false; if(vt&&(!d||d>vt))return false; if(vcl&&(x.client||'')!==vcl)return false; if(vsi&&(x.siteAgent||x.titre||'')!==vsi)return false; return true; }
       var toaff=arr.filter(function(x){return !x.agentId&&inPer(x);}).sort(byD), aff=arr.filter(function(x){return x.agentId&&inPer(x);}).sort(byD);
       if(byId('val-cnt-toaff'))byId('val-cnt-toaff').textContent=toaff.length;
       if(byId('val-cnt-aff'))byId('val-cnt-aff').textContent=aff.length;
@@ -1285,6 +1334,8 @@ button.big:active{transform:translateY(1px)}
   document.querySelectorAll('.val-preset').forEach(function(b){ b.addEventListener('click',function(){ var d=b.getAttribute('data-d'); if(d==='all'){ byId('val-from').value=''; byId('val-to').value=''; } else { var n=parseInt(d,10)||1,t=impTodayISO(); byId('val-from').value=t; byId('val-to').value=svcAddDays(t,n-1); } renderSuivi(); }); });
   if(byId('val-from'))byId('val-from').addEventListener('change',function(){renderSuivi();});
   if(byId('val-to'))byId('val-to').addEventListener('change',function(){renderSuivi();});
+  if(byId('val-client'))byId('val-client').addEventListener('change',function(){ if(byId('val-site'))byId('val-site').value=''; renderSuivi(); });
+  if(byId('val-site'))byId('val-site').addEventListener('change',function(){renderSuivi();});
   function flash(btn,msg){var o=btn.getAttribute('data-o')||btn.textContent;btn.setAttribute('data-o',o);btn.textContent=msg;setTimeout(function(){btn.textContent=btn.getAttribute('data-o');},1500);}
   byId('toSuivi').onclick=function(){
     var n=pushToSuivi(); if(!n){flash(byId('toSuivi'),'Rien à envoyer');return;}
@@ -1963,7 +2014,7 @@ button.big:active{transform:translateY(1px)}
       function endHM(txt){ var m=/(\d{1,2}):(\d{2})\s*$/.exec(String(txt||'')); return m?(('0'+m[1]).slice(-2)+':'+m[2]):''; }
       // Unité de comparaison mission = site + date + horaire début + horaire fin (pas la Référence)
       var existMiss={}; SUIVI.forEach(function(x){ if(x.mdate){ existMiss[siteNorm(x.siteBDC||x.siteAgent||x.titre||'')+'|'+x.mdate+'|'+(x.mheure||'')+'|'+endHM(x.mfin)]=true; } });
-      var includeEmpty=byId('imp-empty').checked;
+      var includeEmpty=byId('imp-empty').checked, includePast=byId('imp-past')&&byId('imp-past').checked;
       var agentsByPhone={}, missions=[], sites={}, past=0, dupRef=0, emptySkipped=0, frais=0;
       data.forEach(function(r,idx){
         var dt=impDMY(r[C.deb]); if(!dt)return;
@@ -1977,7 +2028,7 @@ button.big:active{transform:translateY(1px)}
           if(existPhones[pk]){ agentRef={id:existPhones[pk].id}; }
           else { if(!agentsByPhone[pk])agentsByPhone[pk]={nom:nom,tel:impNormPhone(rawTel),ville:ville,cp:C.cp>=0?String(r[C.cp]||'').trim():'',n:0}; agentsByPhone[pk].n++; if(nom&&!agentsByPhone[pk].nom)agentsByPhone[pk].nom=nom; agentRef={newKey:pk}; }
         }
-        if(isFuture){
+        if(isFuture||includePast){
           var ref=C.ref>=0?String(r[C.ref]||'').trim():'';
           var bdc=C.site>=0?String(r[C.site]||'').trim():''; var sn=siteNorm(bdc);
           var endh=(C.fin>=0)?((impDMY(r[C.fin])||{}).heure||''):'';
@@ -1990,7 +2041,7 @@ button.big:active{transform:translateY(1px)}
           existMiss[mk]=true;
         } else past++;
       });
-      IMP={agentsByPhone:agentsByPhone,missions:missions,sites:sites,past:past,dupRef:dupRef,emptySkipped:emptySkipped,frais:frais};
+      IMP={agentsByPhone:agentsByPhone,missions:missions,sites:sites,past:past,dupRef:dupRef,emptySkipped:emptySkipped,frais:frais,includePast:includePast};
       impRenderPreview();
     }
     var txt=(byId('imp-text').value||'').trim();
@@ -2004,7 +2055,7 @@ button.big:active{transform:translateY(1px)}
     var miss=IMP.missions, aff=miss.filter(function(m){return m.agentRef;}).length, toaff=miss.length-aff;
     var siteKeys=Object.keys(IMP.sites);
     var h='<div class="card" style="margin-top:10px;background:var(--panel2)"><div class="lab" style="margin:0 0 6px">Aperçu — rien n\'est encore enregistré</div><ul style="margin:0 0 8px 18px;padding:0;line-height:1.7">';
-    h+='<li><b>'+miss.length+'</b> mission'+(miss.length>1?'s':'')+' (aujourd\'hui + à venir) — <b>'+aff+'</b> avec agent · <b>'+toaff+'</b> à affecter</li>';
+    h+='<li><b>'+miss.length+'</b> mission'+(miss.length>1?'s':'')+' '+(IMP.includePast?'(toutes dates)':'(aujourd\'hui + à venir)')+' — <b>'+aff+'</b> avec agent · <b>'+toaff+'</b> à affecter</li>';
     h+='<li><b>'+newAg+'</b> nouvelle'+(newAg>1?'s':'')+' fiche'+(newAg>1?'s':'')+' agent (n° pas déjà en base)</li>';
     if(IMP.dupRef)h+='<li>'+IMP.dupRef+' mission(s) déjà en base (même site + date + horaires) — ignorées</li>';
     if(IMP.emptySkipped)h+='<li>'+IMP.emptySkipped+' créneau(x) sans agent ignoré(s)</li>';
@@ -2213,6 +2264,34 @@ button.big:active{transform:translateY(1px)}
   if(byId('dsp-day'))byId('dsp-day').addEventListener('change',function(){renderDispatch();});
   if(byId('dsp-all'))byId('dsp-all').onclick=function(){ dspMissions().forEach(function(m){DSP.sel[m.id]=true;}); renderDispatch(); };
   if(byId('dsp-none'))byId('dsp-none').onclick=function(){ DSP.sel={}; renderDispatch(); };
+
+  // ===== #3b Formulaire de demande d'intervention (agent ADS, durée 1 h par défaut) =====
+  (function ivForm(){
+    if(!byId('iv-client'))return;
+    mkCombo('iv-client',CLIENTS,'fkh_clients');
+    mkCombo('iv-sitetype',["Magasin","Banque","Site professionnel","Entrepôt","Chantier"],'fkh_sites');
+    if(byId('iv-date')&&!byId('iv-date').value)byId('iv-date').value=impTodayISO();
+    var ivSel=null, ivT;
+    byId('iv-ville').addEventListener('input',function(){ var q=this.value.trim(); ivSel=null; clearTimeout(ivT); if(q.length<2){byId('sugg-iv-ville').classList.add('hidden');return;} ivT=setTimeout(function(){ cityAuto(q,'sugg-iv-ville',function(c){ var co=c.centre&&c.centre.coordinates; ivSel={nom:c.nom,cp:(c.codesPostaux&&c.codesPostaux[0])||'',la:co?co[1]:null,lo:co?co[0]:null,dep:(c.departement&&c.departement.code)||'',depnom:(c.departement&&c.departement.nom)||''}; byId('iv-ville').value=c.nom; if(ivSel.cp)byId('iv-cp').value=ivSel.cp; byId('sugg-iv-ville').classList.add('hidden'); ivGen(); }); },250); ivGen(); });
+    function addHour(hm){ var p=String(hm||'').split(':'); if(p.length<2)return ''; var m=((+p[0]*60+ +p[1]+60)%1440+1440)%1440; return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+(m%60)).slice(-2); }
+    byId('iv-hdeb').addEventListener('change',function(){ if(this.value)byId('iv-hfin').value=addHour(this.value); ivGen(); });
+    ['iv-site','iv-cp','iv-date','iv-hfin'].forEach(function(id){ if(byId(id))byId(id).addEventListener('input',ivGen); });
+    if(byId('iv-presta'))byId('iv-presta').addEventListener('change',ivGen);
+    function ivData(){ return {client:byId('iv-client').value.trim(),site:byId('iv-site').value.trim(),st:byId('iv-sitetype').value.trim(),ville:byId('iv-ville').value.trim(),cp:byId('iv-cp').value.trim(),date:byId('iv-date').value,hd:byId('iv-hdeb').value,hf:byId('iv-hfin').value,presta:byId('iv-presta').value}; }
+    function ivGen(){ var d=ivData(),L=[]; if(!(d.client||d.site||d.ville||d.hd)){ byId('iv-out').textContent='Remplis la demande…'; return; } L.push('Prestation : '+(d.presta||'Intervention')); L.push('Type d\'agent : ADS'); if(d.client)L.push('Client : '+d.client); if(d.site)L.push('Site : '+d.site); if(d.st)L.push('Type de site : '+d.st); if(d.ville)L.push('Ville : '+d.ville+(d.cp?' ('+d.cp+')':'')); if(d.date)L.push('Date : '+d.date.split('-').reverse().join('/')); if(d.hd)L.push('Début : '+d.hd); if(d.hf)L.push('Fin : '+d.hf); byId('iv-out').textContent=L.join('\n'); }
+    window._ivGen=ivGen;
+    if(byId('iv-copy'))byId('iv-copy').onclick=function(){ var t=byId('iv-out').textContent; if(!t||t.indexOf('Remplis')===0)return; if(navigator.clipboard)navigator.clipboard.writeText(t); if(typeof flash==='function')flash(this,'Copié'); };
+    if(byId('iv-send'))byId('iv-send').onclick=function(){
+      var d=ivData(); if(!(d.site||d.client||d.ville)){ alert('Renseigne au moins le site, le client ou la ville.'); return; }
+      if(!d.hd&&!confirm('Pas d\'heure de début — envoyer quand même ?'))return;
+      var now=Date.now(), finTxt=(d.hf&&d.date)?(d.date.split('-').reverse().join('/')+' '+d.hf):(d.hf||''), titre=(d.site||d.presta||'Intervention')+(d.ville?' — '+d.ville:'');
+      SUIVI.unshift({id:'iv'+now+'_'+Math.round(Math.random()*9999),texte:byId('iv-out').textContent,titre:titre,statut:'validee',motif:'',pris:now,valide:now,ville:d.ville||'',cp:d.cp||'',la:ivSel?ivSel.la:null,lo:ivSel?ivSel.lo:null,dep:ivSel?ivSel.dep:'',depnom:ivSel?ivSel.depnom:'',assoc:[],mdate:d.date||'',mheure:d.hd||'',mfin:finTxt,client:d.client||'',siteAgent:d.site||titre,siteBDC:'',poste:'',ref:'',prestation:d.presta||'Intervention',src:'interv'});
+      if(typeof saveSuivi==='function')saveSuivi();
+      ['iv-site','iv-hdeb','iv-hfin'].forEach(function(id){if(byId(id))byId(id).value='';}); ivGen();
+      if(typeof flash==='function')flash(this,'✅ Envoyée dans Suivi'); else alert('✅ Envoyée dans Suivi');
+      if(typeof renderSuivi==='function')renderSuivi();
+    };
+  })();
 
   // ===== Zones d'intervention : listes d'agents priorisées par zone (ville + rayon) =====
   function izLoad(){ var z=load('fkh_zones_interv'); return Array.isArray(z)?z:[]; }
@@ -2577,7 +2656,7 @@ button.big:active{transform:translateY(1px)}
   function saEntries(from,to){
     // #13 On inclut aussi les missions démarrant la VEILLE de `from` : leurs appels d'après-minuit tombent dans la période demandée (continuité de nuit à travers minuit).
     var fromV=from?svcAddDays(from,-1):'';
-    var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(!d)return false; if(from&&d<fromV)return false; if(to&&d>to)return false; return true; });
+    var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if((from||to)&&!d)return false; if(from&&d&&d<fromV)return false; if(to&&d&&d>to)return false; return true; });
     if(typeof apDeconflict==='function')apDeconflict(missions,10);
     var out=[];
     missions.forEach(function(m){ var start=toMin(m.mheure); var _ag=(m.agentId&&faById(m.agentId))?faById(m.agentId):null; var _tel=(_ag&&_ag.tels&&_ag.tels[0])?_ag.tels[0]:''; ssSteps(m).forEach(function(s){ if(!s.heure)return; var mn=toMin(s.heure),abs=(mn==null?0:mn); if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn!=null&&mn<start)abs=mn+1440;
@@ -2991,10 +3070,49 @@ button.big:active{transform:translateY(1px)}
     var wrap=byId('notif-cats'); if(wrap)wrap.innerHTML=NOTIF_CATS.map(function(t){ return '<label><input type="checkbox" class="notif-cat" data-k="'+t.k+'"'+(NOTIF.cfg.cats[t.k]?' checked':'')+'><span>'+t.ic+' '+t.lbl+'</span></label>'; }).join('');
     if(wrap)wrap.querySelectorAll('.notif-cat').forEach(function(c){ c.addEventListener('change',function(){ NOTIF.cfg.cats[this.getAttribute('data-k')]=this.checked; notifSaveCfg(); notifScan(); }); });
   }
+  // ===== Niveau 2 : push même appli fermée (service worker + Web Push) =====
+  var VAPID_PUBLIC='BPgtjrioK0ucyYk1XxWToj1OlSOiNWBNUQJX4KFXxczKb2NqGTbCSkoXee59LBFsd7GwoPtgz5I1XWX8VSnzdZY';
+  function urlB64ToU8(b64){ var pad='='.repeat((4-b64.length%4)%4),base=(b64+pad).replace(/-/g,'+').replace(/_/g,'/'),raw=atob(base),arr=new Uint8Array(raw.length); for(var i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i); return arr; }
+  function n2IsIOS(){ return /iPad|iPhone|iPod/.test(navigator.userAgent||'')||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1); }
+  function n2Standalone(){ return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }
+  function n2Supported(){ return ('serviceWorker' in navigator)&&('PushManager' in window)&&('Notification' in window); }
+  function notifN2Status(){
+    var st=byId('notif-n2-status'), btn=byId('notif-n2-btn'), hint=byId('notif-n2-hint'); if(!st||!btn)return; if(hint)hint.textContent='';
+    if(!window._N2_BACKEND_READY){ st.textContent='🔜 Bientôt : réception même appli fermée (backend en cours de finalisation).'; btn.style.display='none'; return; }
+    if(n2IsIOS()&&!n2Standalone()){ st.textContent='📲 Sur iPhone : bouton Partager → « Sur l\'écran d\'accueil », puis rouvre l\'appli depuis l\'icône pour activer.'; btn.style.display='none'; return; }
+    if(!n2Supported()){ st.textContent='⚠️ Ce navigateur ne gère pas les notifications appli fermée.'; btn.style.display='none'; return; }
+    if(typeof CLOUD==='undefined'||!CLOUD.on){ st.textContent='🔌 Connecte-toi d\'abord (les notifs appli fermée passent par le serveur).'; btn.style.display='none'; return; }
+    btn.style.display='block'; btn.disabled=false;
+    navigator.serviceWorker.ready.then(function(reg){ return reg.pushManager.getSubscription(); }).then(function(sub){
+      if(sub){ st.textContent='✅ Activées sur cet appareil — alertes reçues même appli fermée.'; btn.textContent='🔕 Désactiver (appli fermée)'; btn.setAttribute('data-on','1'); }
+      else { st.textContent='Clique pour activer, puis autorise les notifications.'; btn.textContent='📴 Activer les notifications appli fermée'; btn.removeAttribute('data-on'); }
+    }).catch(function(){ st.textContent='Clique pour activer.'; });
+  }
+  function notifN2Subscribe(){
+    var btn=byId('notif-n2-btn'), st=byId('notif-n2-status');
+    if(btn.getAttribute('data-on')){
+      navigator.serviceWorker.ready.then(function(reg){ return reg.pushManager.getSubscription(); }).then(function(sub){ if(!sub)return; var ep=sub.endpoint; return sub.unsubscribe().then(function(){ if(CLOUD.on)fetch(CLOUD.base+'/push/unsubscribe',{method:'POST',headers:cloudHdr(),body:JSON.stringify({endpoint:ep})}).catch(function(){}); }); }).then(function(){ notifN2Status(); });
+      return;
+    }
+    if(typeof CLOUD==='undefined'||!CLOUD.on){ notifN2Status(); return; }
+    btn.disabled=true; st.textContent='Activation…';
+    Notification.requestPermission().then(function(p){
+      if(p!=='granted'){ btn.disabled=false; st.textContent='🚫 Autorisation refusée.'; return; }
+      navigator.serviceWorker.ready.then(function(reg){
+        return reg.pushManager.getSubscription().then(function(s){ return s||reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToU8(VAPID_PUBLIC)}); });
+      }).then(function(sub){
+        return fetch(CLOUD.base+'/push/subscribe',{method:'POST',headers:cloudHdr(),body:JSON.stringify({sub:sub})}).then(function(r){return r.json();});
+      }).then(function(){ btn.disabled=false; if(NOTIF.cfg&&!NOTIF.cfg.on){NOTIF.cfg.on=true;notifSaveCfg();notifRenderPanel();} notifN2Status(); try{new Notification('📴 Appli fermée activée',{body:'Cet appareil recevra les alertes même l\'appli fermée.'});}catch(e){} })
+        .catch(function(){ btn.disabled=false; st.textContent='❌ Échec. Réessaie.'; });
+    });
+  }
+
   (function initNotif(){
     if(!byId('notif-bell'))return;
     notifLoadCfg();
-    byId('notif-bell').addEventListener('click',function(){ notifRenderPanel(); byId('notif-ov').classList.add('show'); });
+    if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('sw.js').catch(function(){}); }catch(e){} }
+    if(byId('notif-n2-btn'))byId('notif-n2-btn').addEventListener('click',notifN2Subscribe);
+    byId('notif-bell').addEventListener('click',function(){ notifRenderPanel(); notifN2Status(); byId('notif-ov').classList.add('show'); });
     byId('notif-close').addEventListener('click',function(){ byId('notif-ov').classList.remove('show'); });
     byId('notif-ov').addEventListener('click',function(e){ if(e.target===this)this.classList.remove('show'); });
     byId('notif-enable').addEventListener('click',function(){ if(!('Notification' in window)){ notifRenderPanel(); return; } Notification.requestPermission().then(function(){ if(notifPerm()==='granted'&&!NOTIF.cfg.on){ NOTIF.cfg.on=true; notifSaveCfg(); } notifRenderPanel(); notifScan(); try{ new Notification('🔔 Notifications activées',{body:'Tu recevras les alertes ici quand l\'appli est ouverte.'}); }catch(e){} }); });

@@ -1,0 +1,13 @@
+{
+  "name": "GESTION — FKH Sécurité",
+  "short_name": "GESTION",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c1017",
+  "theme_color": "#0c1017",
+  "icons": [
+    { "src": "icon.svg", "sizes": "192x192 512x512 any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
