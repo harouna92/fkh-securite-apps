@@ -145,6 +145,10 @@ button.big:active{transform:translateY(1px)}
     <button data-s="supervision">📊 Supervision</button>
   </div>
 </div>
+<div id="gsearch-wrap" style="position:relative;max-width:1100px;margin:8px auto 0;padding:0 10px">
+  <input id="gsearch" placeholder="🔎 Rechercher partout : agent, site, client, mission…" autocomplete="off" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font-size:14px">
+  <div id="gsearch-res" class="hidden" style="position:absolute;z-index:60;left:10px;right:10px;top:100%;margin-top:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;max-height:65vh;overflow:auto;box-shadow:0 8px 28px rgba(0,0,0,.35)"></div>
+</div>
 <div class="cloudbar" id="cloudbar"><span class="cb-txt"></span><button type="button" id="cloud-import">Importer mes données locales</button></div>
 
 <div class="login-ov" id="loginOverlay">
@@ -628,6 +632,33 @@ button.big:active{transform:translateY(1px)}
   var byId=function(x){return document.getElementById(x)};
   var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','appels','suivisite','supervision'];
   document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
+  // ===== Recherche globale (agents / sites / clients / missions) =====
+  (function(){ var inp=byId('gsearch'), box=byId('gsearch-res'); if(!inp||!box)return;
+    function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+    function goTab(sec){ var b=document.querySelector('#tabs button[data-s="'+sec+'"]'); if(b)b.click(); }
+    function hide(){ box.classList.add('hidden'); box.innerHTML=''; }
+    function render(q){ var nq=norm(q).trim(); if(nq.length<2){ hide(); return; }
+      var agents=(typeof FA!=='undefined'&&FA?FA:[]).filter(function(a){ return norm((a.nom||'')+' '+((a.tels||[]).join(' '))+' '+(a.ville||'')+' '+(a.matricule||'')).indexOf(nq)>=0; });
+      var siteSet={}; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.siteAgent)siteSet[m.siteAgent]=1; }); (load('fkh_site_noms')||[]).forEach(function(s){ if(s)siteSet[s]=1; }); var sites=Object.keys(siteSet).filter(function(s){return norm(s).indexOf(nq)>=0;});
+      var cliSet={}; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.client)cliSet[m.client]=1; }); (load('fkh_clients')||[]).forEach(function(c){ if(typeof c==='string')cliSet[c]=1; else if(c&&c.nom)cliSet[c.nom]=1; }); var clients=Object.keys(cliSet).filter(function(c){return norm(c).indexOf(nq)>=0;});
+      function sec(title,arr,rf){ if(!arr.length)return ''; return '<div class="lab" style="margin:6px 10px 2px;font-size:11px">'+title+' ('+arr.length+')</div>'+arr.slice(0,8).map(rf).join('')+(arr.length>8?'<div class="sub" style="margin:2px 12px 4px">+ '+(arr.length-8)+' autres — précise ta recherche</div>':''); }
+      var h='';
+      h+=sec('👤 Agents',agents,function(a){ var d=[a.ville,(a.tels&&a.tels[0])||'',a.matricule?('mat '+a.matricule):''].filter(Boolean).join(' · '); return '<div class="gs-row" data-t="agent" data-v="'+esc(a.nom||'')+'" style="padding:7px 12px;cursor:pointer;border-top:1px solid var(--line)"><b>👤 '+esc(a.nom||'—')+'</b>'+(d?' <span class="sub">'+esc(d)+'</span>':'')+'</div>'; });
+      h+=sec('📍 Sites',sites,function(s){ return '<div class="gs-row" data-t="site" data-v="'+esc(s)+'" style="padding:7px 12px;cursor:pointer;border-top:1px solid var(--line)">📍 '+esc(s)+'</div>'; });
+      h+=sec('🏢 Clients',clients,function(c){ return '<div class="gs-row" data-t="client" data-v="'+esc(c)+'" style="padding:7px 12px;cursor:pointer;border-top:1px solid var(--line)">🏢 '+esc(c)+'</div>'; });
+      if(!h)h='<div class="sub" style="padding:10px 12px;margin:0">Aucun résultat pour « '+esc(q)+' » dans la base.</div>';
+      else h='<div class="sub" style="padding:6px 12px 0;margin:0">'+(agents.length+sites.length+clients.length)+' résultat(s) — clique pour ouvrir</div>'+h;
+      box.innerHTML=h; box.classList.remove('hidden');
+      box.querySelectorAll('.gs-row').forEach(function(r){ r.onclick=function(){ var t=r.getAttribute('data-t'),v=r.getAttribute('data-v'); hide(); inp.value='';
+        if(t==='agent'){ goTab('fiche'); var fs=byId('fa-search'); if(fs){ fs.value=v; fs.dispatchEvent(new Event('input',{bubbles:true})); if(fs.scrollIntoView)fs.scrollIntoView({behavior:'smooth',block:'center'}); } }
+        else { goTab('services'); if(byId('svc-from'))byId('svc-from').value=''; if(byId('svc-to'))byId('svc-to').value=''; var sq=byId('svc-q'); if(sq){ sq.value=v; sq.dispatchEvent(new Event('input',{bubbles:true})); } if(typeof renderServices==='function')renderServices(); }
+      }; });
+    }
+    var tmr=null; inp.addEventListener('input',function(){ clearTimeout(tmr); var q=inp.value; tmr=setTimeout(function(){render(q);},150); });
+    inp.addEventListener('focus',function(){ if(inp.value.trim().length>=2)render(inp.value); });
+    inp.addEventListener('keydown',function(e){ if(e.key==='Escape')hide(); });
+    document.addEventListener('click',function(e){ var w=byId('gsearch-wrap'); if(w&&!w.contains(e.target))hide(); });
+  })();
 
   function load(k){ try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];} }
   function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} if(typeof cloudPush==='function')cloudPush(k); }
