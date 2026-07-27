@@ -1001,6 +1001,12 @@ button.big:active{transform:translateY(1px)}
     else{ m=txt.match(/(\d{2})\/(\d{2})\/(\d{4})/); if(m){d=m[3]+'-'+m[2]+'-'+m[1];} }
     m=txt.match(/(\d{1,2})\s*[:hH]\s*(\d{2})/); if(m){h=('0'+m[1]).slice(-2)+':'+m[2];}
     return {date:d,heure:h}; }
+  // Détection de doublon d'affectation : même agent sur des créneaux qui se chevauchent (même date)
+  function missEndMin(x){ var f=x.mfin||x.finRaw||''; var m=/(\d{1,2}):(\d{2})\s*$/.exec(String(f)); return m?(+m[1]*60+ +m[2]):null; }
+  function missEndTxt(x){ var e=missEndMin(x); return e==null?'':(('0'+Math.floor((e%1440)/60)).slice(-2)+':'+('0'+(e%60)).slice(-2)); }
+  function missRange(x){ var s=toMin(x.mheure); if(s==null)return null; var e=missEndMin(x); if(e==null)e=s+720; if(e<=s)e+=1440; return [s,e]; }
+  function agentTimeConflicts(aid,it){ var out=[]; if(!aid||typeof SUIVI==='undefined')return out; var r0=missRange(it); if(!r0)return out; SUIVI.forEach(function(m){ if(m.id===it.id||m.agentId!==aid||m.statut!=='validee')return; if((m.mdate||'')!==(it.mdate||''))return; var r=missRange(m); if(!r)return; if(r0[0]<r[1]&&r[0]<r0[1])out.push(m); }); return out; }
+  function affpickWithCheck(it,aid){ var cf=agentTimeConflicts(aid,it); if(cf.length){ var an=(faById(aid)&&faById(aid).nom)||'Cet agent'; var msg='⚠️ '+an+' est déjà planifié le '+(it.mdate||'?')+' :\n'+cf.map(function(m){return '• '+(m.siteAgent||m.titre||'?')+' de '+(m.mheure||'?')+(missEndTxt(m)?' à '+missEndTxt(m):'');}).join('\n')+'\n\nChevauchement avec cette mission ('+(it.mheure||'?')+(missEndTxt(it)?' à '+missEndTxt(it):'')+'). L\'affecter quand même ?'; if(!confirm(msg))return false; } return true; }
   function renderAffect(x){
     if(x.statut!=='validee')return '';
     var out='';
@@ -1098,7 +1104,7 @@ button.big:active{transform:translateY(1px)}
     else if(act==='affclose'){ delete it._affect;delete it._affnew; }
     else if(act==='affremove'){ if(!confirm('Retirer l\'agent de cette mission ? Elle repassera « à affecter ».'))return; delete it.agentId; delete it._affect;delete it._affnew;delete it._afq; saveSuivi(); renderSuivi(); return; }
     else if(act==='affnew'){ it._affnew=!it._affnew; }
-    else if(act==='affpick'){ it.agentId=b.getAttribute('data-aid'); delete it._affect;delete it._affnew;delete it._afq; saveSuivi(); renderSuivi(); return; }
+    else if(act==='affpick'){ var _aid=b.getAttribute('data-aid'); if(typeof affpickWithCheck==='function'&&!affpickWithCheck(it,_aid))return; it.agentId=_aid; delete it._affect;delete it._affnew;delete it._afq; saveSuivi(); renderSuivi(); return; }
     else if(act==='affcreate'){ var nom=(it._afnom||'').trim(),tels=parseTels(it._aftel||''),ville=(it._afville||'').trim(),existing=null; tels.forEach(function(t){var k=telKey(t);if(k)FA.forEach(function(a){(a.tels||[]).forEach(function(tt){if(telKey(tt)===k)existing=a;});});}); if(existing){it.agentId=existing.id;} else { var g=it._afgeo||{},sameV=(g.nom===ville); FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tels:tels,ville:ville,cp:sameV?(g.cp||''):'',la:sameV?g.la:null,lo:sameV?g.lo:null,dep:sameV?(g.dep||''):'',depnom:sameV?(g.depnom||''):'',fiab:'',voiture:null,ads:null}); it.agentId=FA[FA.length-1].id; saveFA(); if(typeof renderFA==='function')renderFA(); } delete it._affect;delete it._affnew;delete it._afnom;delete it._aftel;delete it._afville;delete it._afgeo;delete it._afq; saveSuivi(); renderSuivi(); return; }
     else if(act==='apon'){ if(typeof apPlan==='function'){ var _ap=apPlan(it); if(_ap)apSetOn(it.id,!_ap.on); } }
     else if(act==='apnb'){ if(typeof apPlan==='function'){ var _ad=+b.getAttribute('data-d'),_ap2=apPlan(it); if(_ap2)apSetNb(it.id,_ap2.nb+_ad); } }
