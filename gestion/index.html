@@ -1706,7 +1706,8 @@ button.big:active{transform:translateY(1px)}
     var incomplet=agents.length-complet;
     var noMens=agents.filter(function(c){return !(c.Pointure||c['T. pantalon']||c['T. haut']);}).length;
     var D=(typeof distLoad==='function')?distLoad():{}, dvals=Object.keys(D).map(function(k){return D[k];});
-    var distPending=dvals.filter(function(r){return r.statut&&r.statut!=='recu';}).length;
+    var distPreaff=dvals.filter(function(r){return r.statut==='preaffecte';}).length;
+    var distEnCours=dvals.filter(function(r){return r.statut==='encours'||r.statut==='envoye';}).length;
     var distUrgent=dvals.filter(function(r){return r.urgence==='urgent'&&r.statut!=='recu';}).length;
     var distRecu=dvals.filter(function(r){return r.statut==='recu';}).length;
     var totalSuivi=agents.length+never.length, pct=totalSuivi?Math.round(complet/totalSuivi*100):0;
@@ -1716,13 +1717,13 @@ button.big:active{transform:translateY(1px)}
     agents.forEach(function(c){ var inc=String(c['Statut tenue']||'').toLowerCase().indexOf('incomplet')>=0,d=ctrlDays(c['Date contrôle']),nm=c.Agent||'—',noM=!(c.Pointure||c['T. pantalon']||c['T. haut']); if(inc)L_incomplet.push(li(nm,c.Manquants?('manque : '+c.Manquants):'incomplète')); else L_complet.push(li(nm,'complète')); if(noM)L_nomens.push(li(nm,'mensurations à saisir')); if(d!=null&&d>14)L_stale.push(li(nm,'contrôlé il y a '+d+' j')); });
     var L_never=never.map(function(n){return li(n,'jamais contrôlé');});
     function nameFromKey(k){ var a=(FA||[]).filter(function(x){return tnorm(x.nom)===k;})[0]; return a?a.nom:k; }
-    var L_pend=[],L_urg=[],L_recu=[];
-    Object.keys(D).forEach(function(k){ var r=D[k],nm=nameFromKey(k); if(r.statut==='recu')L_recu.push(li(nm,(r.pieces||'')+' · reçu')); else if(r.statut){ L_pend.push(li(nm,(r.pieces||'')+' · '+(DIST_LBL[r.statut]||'')+(r.urgence==='urgent'?' · 🔴 URGENT':''))); if(r.urgence==='urgent')L_urg.push(li(nm,(r.pieces||'')+' · URGENT')); } });
-    TEN_DRILL={complet:L_complet,incomplet:L_incomplet,never:L_never,stale:L_stale,nomens:L_nomens,distpend:L_pend,disturg:L_urg,distrecu:L_recu};
+    var L_preaff=[],L_encours=[],L_urg=[],L_recu=[];
+    Object.keys(D).forEach(function(k){ var r=D[k],nm=nameFromKey(k); var u=(r.urgence==='urgent'&&r.statut!=='recu')?' · 🔴 URGENT':''; if(r.statut==='recu')L_recu.push(li(nm,(r.pieces||'')+' · reçu')); else if(r.statut==='preaffecte')L_preaff.push(li(nm,(r.pieces||'')+' · 🟡 pré-affecté'+u)); else if(r.statut==='encours'||r.statut==='envoye')L_encours.push(li(nm,(r.pieces||'')+' · '+(DIST_LBL[r.statut]||'')+u)); if(r.urgence==='urgent'&&r.statut!=='recu')L_urg.push(li(nm,(r.pieces||'')+' · URGENT · '+(DIST_LBL[r.statut]||'à envoyer'))); });
+    TEN_DRILL={complet:L_complet,incomplet:L_incomplet,never:L_never,stale:L_stale,nomens:L_nomens,distpreaff:L_preaff,distencours:L_encours,disturg:L_urg,distrecu:L_recu};
     function tk(ic,lab,val,col,key){ return '<div'+(key&&val?' class="tk" data-tdrill="'+key+'"':'')+' style="'+(key&&val?'cursor:pointer;':'')+'flex:1;min-width:112px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card)"><div style="font-size:26px;font-weight:800;line-height:1'+(col?';color:'+col:'')+'">'+val+'</div><div class="sub" style="margin:3px 0 0">'+ic+' '+lab+(key&&val?' 🔎':'')+'</div></div>'; }
     var H='<div class="card"><div class="lab" style="margin:0 0 8px">🦺 Tableau de bord tenues <span class="sub" style="font-weight:400">— clique un chiffre 🔎</span></div>'
       +'<div style="display:flex;gap:8px;flex-wrap:wrap">'+tk('🟢','Complètes',complet,'var(--ok)','complet')+tk('🟠','Incomplètes',incomplet,incomplet?'var(--warn)':'','incomplet')+tk('🔴','Jamais contrôlés',never.length,never.length?'var(--bad)':'','never')+tk('⏰','À recontrôler',stale.length,stale.length?'var(--bad)':'','stale')+tk('📏','Sans mensurations',noMens,noMens?'var(--warn)':'','nomens')+'</div>'
-      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">'+tk('🎽','Distributions en cours',distPending,distPending?'var(--warn)':'','distpend')+tk('🔴','Urgentes',distUrgent,distUrgent?'var(--bad)':'','disturg')+tk('✅','Tenues reçues',distRecu,'var(--ok)','distrecu')+'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">'+tk('🟡','Pré-affectées',distPreaff,distPreaff?'var(--warn)':'','distpreaff')+tk('📦','Distribution en cours',distEnCours,distEnCours?'var(--warn)':'','distencours')+tk('🔴','Urgentes',distUrgent,distUrgent?'var(--bad)':'','disturg')+tk('✅','Tenues reçues',distRecu,'var(--ok)','distrecu')+'</div><div class="sub" style="margin:4px 0 0">🟡 Pré-affecté = pièces définies, pas encore expédiées · 📦 En cours = envoi en cours + envoyé · ✅ Reçu</div>'
       +'<div id="ten-drill" style="margin-top:8px"></div>'
       +'<div style="margin-top:10px"><div class="sub" style="margin:0 0 3px">Conformité (tenues complètes / agents suivis) — <b>'+pct+'%</b></div><div style="height:10px;border-radius:6px;background:var(--panel2);overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--ok);transition:width .4s"></div></div></div>'
       +'</div>';
