@@ -363,6 +363,7 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Ville</div><div class="acwrap"><input type="text" id="fa-ville" placeholder="Ville de l'agent…" autocomplete="off"><div class="sugg hidden" id="sugg-fa-ville"></div></div></label>
         <label class="f"><div class="lab">Fiabilité (à définir ensemble)</div><select id="fa-fiab"><option value="">— à définir —</option><option>✅ Fiable</option><option>🟡 Moyennement fiable</option><option>🔴 Non fiable</option><option>⚪ À évaluer</option></select></label>
       </div>
+      <label class="f"><div class="lab">Adresse (voie, complément…)</div><input id="fa-adresse" placeholder="Ex. 12 rue des Lilas, bât. B" autocomplete="off"></label>
       <div class="grid2">
         <label class="chk"><input type="checkbox" id="fa-voiture"><span>🚗 Véhicule</span></label>
         <label class="chk"><input type="checkbox" id="fa-ads"><span>🛡️ ADS</span></label>
@@ -1133,17 +1134,17 @@ button.big:active{transform:translateY(1px)}
   byId('fa-refville').addEventListener('input',function(){var q=this.value.trim();faRef=null;clearTimeout(faRT);if(q.length<2){byId('sugg-fa-refville').classList.add('hidden');renderFA();return;}faRT=setTimeout(function(){cityAuto(q,'sugg-fa-refville',function(c){var co=c.centre&&c.centre.coordinates;faRef={nom:c.nom,la:co?co[1]:null,lo:co?co[0]:null};byId('fa-refville').value=c.nom;byId('sugg-fa-refville').classList.add('hidden');renderFA();});},250);});
   ['fa-radius','fa-f-ads','fa-f-voiture','fa-f-verif'].forEach(function(id){byId(id).addEventListener('change',renderFA);});
   byId('fa-search').addEventListener('input',renderFA);
-  function resetFAform(){ ['fa-nom','fa-tel','fa-ville','fa-interv'].forEach(function(id){byId(id).value='';}); byId('fa-fiab').value=''; byId('fa-voiture').checked=false; byId('fa-ads').checked=false; byId('fa-verif').checked=true; byId('fa-err').textContent=''; faSel=null; faEdit=null; byId('fa-add').textContent='➕ Ajouter l\'agent'; }
+  function resetFAform(){ ['fa-nom','fa-tel','fa-ville','fa-interv','fa-adresse'].forEach(function(id){if(byId(id))byId(id).value='';}); byId('fa-fiab').value=''; byId('fa-voiture').checked=false; byId('fa-ads').checked=false; byId('fa-verif').checked=true; byId('fa-err').textContent=''; faSel=null; faEdit=null; byId('fa-add').textContent='➕ Ajouter l\'agent'; }
   byId('fa-add').onclick=function(){
-    var nom=byId('fa-nom').value.trim(),tels=parseTels(byId('fa-tel').value),ville=byId('fa-ville').value.trim(),fiab=byId('fa-fiab').value,voiture=byId('fa-voiture').checked,ads=byId('fa-ads').checked,interv=parseTels(byId('fa-interv').value),verif=byId('fa-verif').checked;
+    var nom=byId('fa-nom').value.trim(),tels=parseTels(byId('fa-tel').value),ville=byId('fa-ville').value.trim(),fiab=byId('fa-fiab').value,voiture=byId('fa-voiture').checked,ads=byId('fa-ads').checked,interv=parseTels(byId('fa-interv').value),verif=byId('fa-verif').checked,adresse=(byId('fa-adresse')?byId('fa-adresse').value.trim():'');
     if(!(nom||tels.length||ville))return;
     var used={}; FA.forEach(function(a){ if(a.id!==faEdit&&a.tels) a.tels.forEach(function(t){var k=telKey(t);if(k)used[k]=a.nom||'un autre agent';}); });
     var conflict=null; tels.forEach(function(t){var k=telKey(t);if(k&&used[k])conflict=t+' → déjà attribué à '+used[k];});
     if(conflict){ byId('fa-err').textContent='⚠️ '+conflict; return; }
     byId('fa-err').textContent='';
     var g=(faSel&&faSel.nom===ville)?faSel:{nom:ville,cp:'',la:null,lo:null,dep:'',depnom:''};
-    if(faEdit){ var a=null,i; for(i=0;i<FA.length;i++)if(FA[i].id===faEdit){a=FA[i];break;} if(a){a.nom=nom;a.tels=tels;a.ville=g.nom;a.cp=g.cp;a.la=g.la;a.lo=g.lo;a.dep=g.dep;a.depnom=g.depnom;a.fiab=fiab;a.voiture=voiture;a.ads=ads;a.interv=interv;a.verifie=verif;} }
-    else { FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tels:tels,ville:g.nom,cp:g.cp,la:g.la,lo:g.lo,dep:g.dep,depnom:g.depnom,fiab:fiab,voiture:voiture,ads:ads,interv:interv,verifie:verif}); }
+    if(faEdit){ var a=null,i; for(i=0;i<FA.length;i++)if(FA[i].id===faEdit){a=FA[i];break;} if(a){a.nom=nom;a.tels=tels;a.ville=g.nom;a.cp=g.cp;a.la=g.la;a.lo=g.lo;a.dep=g.dep;a.depnom=g.depnom;a.fiab=fiab;a.voiture=voiture;a.ads=ads;a.interv=interv;a.verifie=verif;a.adresse=adresse;} }
+    else { FA.push({id:'a'+Date.now()+'_'+Math.round(Math.random()*100000),nom:nom,tels:tels,ville:g.nom,cp:g.cp,la:g.la,lo:g.lo,dep:g.dep,depnom:g.depnom,fiab:fiab,voiture:voiture,ads:ads,interv:interv,verifie:verif,adresse:adresse}); }
     saveFA(); resetFAform(); renderFA();
   };
   function renderFA(){
@@ -1164,7 +1165,7 @@ button.big:active{transform:translateY(1px)}
     byId('fa-list').innerHTML=arr.map(function(a){
       var tags=(a.voiture?'🚗 ':'')+(a.ads?'🛡️ADS ':'');
       var tels=a.tels||(a.tel?[a.tel]:[]);
-      var parts=[a.ville]; if(a._d!=null)parts.push(a._d+' km'); parts.push(a.cp); if(tels.length)parts.push(tels.join(' / ')); if(a.fiab)parts.push(a.fiab);
+      var parts=[a.ville]; if(a._d!=null)parts.push(a._d+' km'); parts.push(a.cp); if(a.adresse)parts.push('📍 '+a.adresse); if(tels.length)parts.push(tels.join(' / ')); if(a.fiab)parts.push(a.fiab);
       var an=anMap[tnorm(a.nom)]||[];
       var anBlock=an.length?'<details style="margin-top:4px"><summary style="cursor:pointer;color:var(--bad);font-weight:700;font-size:13px">⚠ '+an.length+' anomalie'+(an.length>1?'s':'')+' — voir / traiter</summary><div class="fa-d" style="margin-top:4px;line-height:1.7">'+an.map(function(x){return x.ic+' '+esc(x.type)+(x.step?' <span style="color:var(--muted)">('+esc(x.step)+')</span>':'')+(x.when?' <span style="color:var(--muted)">· '+esc(x.when)+'</span>':'')+(x.detail?' <span style="color:var(--muted)">· '+esc(x.detail)+'</span>':'');}).join('<br>')+'<div style="margin-top:4px"><a class="sub" href="#" data-goanom="1" style="color:#6ea8fe">→ Ouvrir la supervision Anomalies</a></div></div></details>':'';
       var d=(tags?tags+'· ':'')+parts.filter(Boolean).map(esc).join(' · ')+(agentMissing(a).length?' <span style="color:var(--warn)">⚠ '+agentMissing(a).map(esc).join(' · ')+'</span>':'')+tenueBadge(a)+((a.interv&&a.interv.length)?'<br><span style="color:#e0784b">🚨 Intervention : '+a.interv.map(esc).join(', ')+'</span>':'')+anBlock;
@@ -1178,7 +1179,7 @@ button.big:active{transform:translateY(1px)}
     byId('fa-list').querySelectorAll('.dist-pieces').forEach(function(inp){ inp.addEventListener('change',function(){ distSet(inp.getAttribute('data-ag'),{pieces:inp.value}); }); });
     byId('fa-list').querySelectorAll('.faphoto-det').forEach(function(det){ var nom=det.getAttribute('data-nom'); det.addEventListener('toggle',function(){ if(det.open)faPhotoLoad(det,nom); }); var up=det.querySelector('.faphoto-up'); if(up)up.onchange=function(){ var f=up.files&&up.files[0]; if(!f)return; if(typeof photoReady!=='function'||!photoReady()){ alert('Connexion en ligne requise pour envoyer la photo.'); up.value=''; return; } var ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg',key=photoAgentPrefix(nom)+Date.now()+'.'+ext,lbl=up.parentNode; lbl.childNodes[0].nodeValue='⏳ envoi…'; photoUpload(key,f,function(res){ if(res&&res.ok){ lbl.childNodes[0].nodeValue='✅ ajoutée'; agentAttachPhoto(nom,key); det.open=true; faPhotoLoad(det,nom); } else { lbl.childNodes[0].nodeValue='📤 Ajouter une photo'; alert('Échec de l\'envoi.'); } }); }; });
     byId('fa-list').querySelectorAll('[data-goanom]').forEach(function(b){b.onclick=function(ev){ev.preventDefault(); var tb=document.querySelector('#tabs button[data-s="supervision"]'); if(tb)tb.click(); supTab='anom'; if(typeof renderSupervision==='function')renderSupervision(); if(byId('sup-body')&&byId('sup-body').scrollIntoView)byId('sup-body').scrollIntoView({behavior:'smooth',block:'start'});};});
-    byId('fa-list').querySelectorAll('[data-fae]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fae'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id){a=FA[i];break;}if(a){byId('fa-nom').value=a.nom||'';byId('fa-tel').value=(a.tels||(a.tel?[a.tel]:[])).join('\n');byId('fa-ville').value=a.ville||'';byId('fa-fiab').value=a.fiab||'';byId('fa-voiture').checked=!!a.voiture;byId('fa-ads').checked=!!a.ads;byId('fa-verif').checked=!!a.verifie;byId('fa-interv').value=(a.interv||[]).join('\n');faSel={nom:a.ville,cp:a.cp,la:a.la,lo:a.lo,dep:a.dep,depnom:a.depnom};faEdit=a.id;byId('fa-add').textContent='✔️ Enregistrer';window.scrollTo(0,0);}};});
+    byId('fa-list').querySelectorAll('[data-fae]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fae'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id){a=FA[i];break;}if(a){byId('fa-nom').value=a.nom||'';byId('fa-tel').value=(a.tels||(a.tel?[a.tel]:[])).join('\n');byId('fa-ville').value=a.ville||'';byId('fa-fiab').value=a.fiab||'';byId('fa-voiture').checked=!!a.voiture;byId('fa-ads').checked=!!a.ads;byId('fa-verif').checked=!!a.verifie;byId('fa-interv').value=(a.interv||[]).join('\n');if(byId('fa-adresse'))byId('fa-adresse').value=a.adresse||'';faSel={nom:a.ville,cp:a.cp,la:a.la,lo:a.lo,dep:a.dep,depnom:a.depnom};faEdit=a.id;byId('fa-add').textContent='✔️ Enregistrer';window.scrollTo(0,0);}};});
   }
   renderFA();
 
