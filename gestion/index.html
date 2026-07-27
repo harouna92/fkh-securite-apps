@@ -1739,9 +1739,10 @@ button.big:active{transform:translateY(1px)}
       // Unité de comparaison mission = site + date + horaire début + horaire fin (pas la Référence)
       var existMiss={}; SUIVI.forEach(function(x){ if(x.mdate){ existMiss[siteNorm(x.siteBDC||x.siteAgent||x.titre||'')+'|'+x.mdate+'|'+(x.mheure||'')+'|'+endHM(x.mfin)]=true; } });
       var includeEmpty=byId('imp-empty').checked;
-      var agentsByPhone={}, missions=[], sites={}, past=0, dupRef=0, emptySkipped=0;
+      var agentsByPhone={}, missions=[], sites={}, past=0, dupRef=0, emptySkipped=0, frais=0;
       data.forEach(function(r,idx){
         var dt=impDMY(r[C.deb]); if(!dt)return;
+        var spec=C.spec>=0?String(r[C.spec]||''):''; if(/frais|d[eé]placement|indemnit|forfait/i.test(spec)){ frais++; return; } // lignes 'Frais de déplacement' = pas des missions
         var isFuture=dt.date>=today;
         var nom=String(r[C.collab]||'').replace(/\*+/g,'').replace(/\s+/g,' ').trim();
         var rawTel=C.tel>=0?r[C.tel]:''; var pk=impPhoneKey(rawTel);
@@ -1764,7 +1765,7 @@ button.big:active{transform:translateY(1px)}
           existMiss[mk]=true;
         } else past++;
       });
-      IMP={agentsByPhone:agentsByPhone,missions:missions,sites:sites,past:past,dupRef:dupRef,emptySkipped:emptySkipped};
+      IMP={agentsByPhone:agentsByPhone,missions:missions,sites:sites,past:past,dupRef:dupRef,emptySkipped:emptySkipped,frais:frais};
       impRenderPreview();
     }
     var txt=(byId('imp-text').value||'').trim();
@@ -1783,6 +1784,7 @@ button.big:active{transform:translateY(1px)}
     if(IMP.dupRef)h+='<li>'+IMP.dupRef+' mission(s) déjà en base (même site + date + horaires) — ignorées</li>';
     if(IMP.emptySkipped)h+='<li>'+IMP.emptySkipped+' créneau(x) sans agent ignoré(s)</li>';
     if(IMP.past)h+='<li>'+IMP.past+' ligne(s) passée(s) — agents récupérés, pas de mission</li>';
+    if(IMP.frais)h+='<li>'+IMP.frais+' ligne(s) « frais de déplacement » ignorée(s) (pas des missions)</li>';
     h+='</ul>';
     if(siteKeys.length){ h+='<div class="lab" style="margin:10px 0 4px">Noms de sites envoyés à l\'agent — corrige si besoin (mémorisé)</div><div style="max-height:220px;overflow:auto">';
       siteKeys.forEach(function(k){ var s=IMP.sites[k]; h+='<div style="margin-bottom:6px"><input class="imp-site" data-k="'+esc(k)+'" value="'+esc(s.agent)+'" style="width:100%"><div style="font-size:11px;color:var(--muted);margin-top:1px">BDC : '+esc(s.bdc)+'</div></div>'; });
