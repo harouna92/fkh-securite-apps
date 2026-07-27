@@ -467,6 +467,18 @@ button.big:active{transform:translateY(1px)}
       <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><span class="sub" style="margin:0;align-self:center">Tranche :</span><button type="button" class="sa-slice on" data-sl="all">Toutes</button><button type="button" class="sa-slice" data-sl="jour">☀️ Jour 8h→20h</button><button type="button" class="sa-slice" data-sl="nuit">🌙 Nuit 20h→8h</button></div>
       <button type="button" class="big" id="sa-reset" style="margin-top:8px;background:var(--panel2);color:var(--ink);border:1px solid var(--line)">↺ Revenir au défaut (aujourd'hui · tous · chronologique)</button>
     </div>
+    <div class="card">
+      <button type="button" id="csg-toggle" class="big" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">📋 Ajouter une consigne / tâche à l'opérateur</button>
+      <div id="csg-form" class="hidden" style="margin-top:8px">
+        <p class="sub" style="margin:0 0 6px">La consigne apparaît dans l'agenda ci-dessous et remonte en pop-up ~5 min avant son heure, comme un appel.</p>
+        <label class="f"><div class="lab">La consigne / tâche (ce que l'opérateur doit faire)</div><textarea id="csg-texte" placeholder="Ex. Appeler le client SPIG pour confirmer l'effectif de nuit…"></textarea></label>
+        <div class="grid2" style="margin-top:6px"><label class="f"><div class="lab">Date</div><input type="date" id="csg-date"></label><label class="f"><div class="lab">Heure (créneau où ça remonte)</div><input type="time" id="csg-heure"></label></div>
+        <label class="f" style="margin-top:6px"><div class="lab">Rattacher à une vacation (optionnel — reprend son heure/client si tu laisses vide)</div><select id="csg-mid"><option value="">— aucune (consigne libre sur le créneau) —</option></select></label>
+        <label class="f" style="margin-top:6px"><div class="lab">Client / repère (optionnel)</div><input id="csg-client" placeholder="Ex. SPIG SECURITE" autocomplete="off"></label>
+        <button type="button" class="big ok" id="csg-add" style="margin-top:8px">➕ Ajouter la consigne</button>
+        <div id="csg-list" style="margin-top:10px"></div>
+      </div>
+    </div>
     <div id="sa-alert" style="position:fixed;right:12px;bottom:14px;z-index:59;max-width:340px;max-height:62vh;overflow:auto;background:var(--panel);border:2px solid var(--bad);border-radius:12px;padding:10px 12px;box-shadow:0 6px 24px rgba(0,0,0,.45);display:none"></div>
     <div id="sa-body"></div>
     <div style="display:none">
@@ -1482,7 +1494,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null };
   function cloudHdr(){ return {'Content-Type':'application/json','X-App-Password':CLOUD.pass}; }
   // ===== Photos R2 (via le Worker) =====
@@ -2379,16 +2391,18 @@ button.big:active{transform:translateY(1px)}
     var from=byId('sa-from')?byId('sa-from').value:'', to=byId('sa-to')?byId('sa-to').value:'';
     var lbl=(from||to)?('du '+(from?from.split('-').reverse().join('/'):'…')+' au '+(to?to.split('-').reverse().join('/'):'…')):'toute la période';
     var entries=saEntries(from,to).filter(function(e){return saTypeMatch(e.key)&&saSliceMatch(e);});
+    if(saType==='all'&&typeof csgLoad==='function'){ csgLoad().forEach(function(c){ if(from&&(!c.mdate||c.mdate<from))return; if(to&&(!c.mdate||c.mdate>to))return; var heure=c.heure||'',site='',agent=''; if(c.mid){ var m=csgMissById(c.mid); if(m){ site=m.siteAgent||m.titre||''; if(!heure)heure=m.mheure||''; if(m.agentId&&faById(m.agentId))agent=faById(m.agentId).nom||''; } } var e={consigne:true,cid:c.id,mid:c.mid||'',mdate:c.mdate||'',heure:heure,mheure:heure,abs:(toMin(heure)||0),texte:c.texte,client:c.client||'',site:site,agent:agent,done:!!c.done,note:c.note||'',key:'csg'}; if(!saSliceMatch(e))return; entries.push(e); }); entries.sort(function(a,b){ if((a.mdate||'')!==(b.mdate||''))return (a.mdate||'')<(b.mdate||'')?-1:1; return (a.abs||0)-(b.abs||0); }); }
     document.querySelectorAll('.sa-type').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-ty')===saType);});
     document.querySelectorAll('.sa-slice').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-sl')===saSlice);});
     var slLbl=saSlice==='jour'?' · ☀️ tranche jour (8h→20h)':saSlice==='nuit'?' · 🌙 tranche nuit (20h→8h)':'';
     if(!entries.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucun appel '+esc(lbl)+slLbl+(saType!=='all'?' (type filtré)':'')+'. (Il faut des missions validées avec une heure sur cette période.)</div></div>'; return; }
-    var S=ssLoad(), doneN=0, cnt={prise:0,fin:0,route:0,j15:0,ctrl:0,tenue:0}; entries.forEach(function(e){ if(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done)doneN++; var k=e.key; if(cnt[k]!=null)cnt[k]++; else if(k.indexOf('ctrl')===0)cnt.ctrl++; });
+    var S=ssLoad(), doneN=0, cnt={prise:0,fin:0,route:0,j15:0,ctrl:0,tenue:0}; entries.forEach(function(e){ if(e.consigne){ if(e.done)doneN++; return; } if(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done)doneN++; var k=e.key; if(cnt[k]!=null)cnt[k]++; else if(k.indexOf('ctrl')===0)cnt.ctrl++; });
     var STATUTS=['','✅ RAS','⚠️ Injoignable','🔄 Autre'];
     function saCnt(ic,lb,n){ return n?'<span style="display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:1px 8px;margin:2px 4px 0 0;font-size:12px;font-weight:700">'+ic+' '+lb+' : '+n+'</span>':''; }
     var breakdown=saCnt('🚗','Route',cnt.route)+saCnt('☎','Pré-prise',cnt.j15)+saCnt('🟢','Prise',cnt.prise)+saCnt('🎛️','Contrôle',cnt.ctrl)+saCnt('🦺','Tenue',cnt.tenue)+saCnt('🔚','Fin',cnt.fin);
     var head='<div class="card"><div class="lab" style="margin:0 0 4px">'+entries.length+' appel'+(entries.length>1?'s':'')+' — '+esc(lbl)+slLbl+'</div><div class="fa-d" style="margin:0 0 4px">✅ '+doneN+' fait'+(doneN>1?'s':'')+' · <span style="color:var(--warn);font-weight:700">'+(entries.length-doneN)+' à faire</span></div><div>'+breakdown+'</div></div>';
     var saCard=function(e){
+      if(e.consigne)return consigneCard(e);
       var r=(S[e.mid]&&S[e.mid][e.key])||{}, done=!!r.done, d0='data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'"';
       var extra=done?(' <span style="color:var(--ok)">✓ '+esc(r.hm||'')+'</span>'+(r.retard>0?' <span style="color:var(--bad)">saisie +'+r.retard+' min</span>':'')):'';
       if(done&&(e.key==='prise'||e.key==='fin')&&!r.avise)extra+=' <span style="color:var(--bad);font-weight:700">⚠ CLIENT NON AVISÉ</span>';
@@ -2412,13 +2426,14 @@ button.big:active{transform:translateY(1px)}
       return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" style="padding:8px'+(done?';opacity:.6':'')+'"><div class="fa-n"><span class="sa-tag"></span><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+(e.key==='tenue'?'<span style="color:#e0784b;font-weight:800">'+e.label+'</span>':e.label)+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'+ctx
         +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">'+fields+'</div></div>';
     };
-    var isDone=function(e){ return !!(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done); };
+    var isDone=function(e){ if(e.consigne)return !!e.done; return !!(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done); };
     var todoL=entries.filter(function(e){return !isDone(e);}), doneL=entries.filter(isDone);
     wrap.innerHTML=head
       +(todoL.length?todoL.map(saCard).join(''):'<div class="card"><div class="sub" style="margin:0;color:var(--ok)">✅ Tous les appels de cette période sont faits.</div></div>')
       +(doneL.length?'<details style="margin-top:12px"><summary style="cursor:pointer;color:var(--muted);font-weight:700;padding:6px 2px">✅ '+doneL.length+' appel'+(doneL.length>1?'s':'')+' fait'+(doneL.length>1?'s':'')+' — masqué'+(doneL.length>1?'s':'')+', cliquer pour afficher</summary><div style="opacity:.7;margin-top:6px">'+doneL.map(saCard).join('')+'</div></details>':'');
     entries.forEach(function(e){ var hasPhoto=(e.key==='prise'||e.key==='fin'||e.key==='tenue'||e.key.indexOf('ctrl')===0); if(!hasPhoto||typeof photoWire!=='function')return; var upId='saph-'+String(e.mid).replace(/[^a-zA-Z0-9]/g,'')+'-'+e.key; photoWire(upId,function(f){ var ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg'; return 'appel/'+e.mid+'/'+e.key+'/'+Date.now()+'.'+ext; },function(key){ if(e.key==='tenue')saSet(e.mid,e.key,{tenuePhoto:true,photoKey:key}); else saSet(e.mid,e.key,{photo:'Photo horodatée',photoKey:key}); renderSuiviAppels(); }); });
     document.querySelectorAll('#sa-body .sa-photo-view').forEach(function(a){ a.onclick=function(ev){ ev.preventDefault(); if(typeof photoOpen==='function')photoOpen(a.getAttribute('data-k')); }; });
+    document.querySelectorAll('#sa-body .csg-del').forEach(function(b){ b.onclick=function(){ if(!confirm('Supprimer cette consigne ?'))return; csgDel(b.getAttribute('data-cid')); renderSuiviAppels(); if(typeof csgRenderList==='function')csgRenderList(); }; });
     saColorize(); if(typeof saAlert==='function')saAlert();
   }
   function saGolive(){ var g=load('fkh_sa_golive'); if(typeof g==='string'&&g){ var t=new Date(g).getTime(); if(!isNaN(t))return t; } return new Date('2026-07-26T18:40:00').getTime(); }
@@ -2435,16 +2450,18 @@ button.big:active{transform:translateY(1px)}
       var ctx=c.querySelector('.fa-d')?c.querySelector('.fa-d').innerHTML:'';
       return '<div style="border-top:1px solid var(--line);padding-top:6px;margin-top:6px"><div style="font-weight:600">'+lvl+' '+(tit?tit.innerHTML:'')+'</div><div class="fa-d" style="font-size:12px;line-height:1.6">'+ctx+'</div><button class="ok sa-alertdone" data-idx="'+i+'" style="margin-top:5px">✅ Fait</button></div>';
     }).join('');
-    box.querySelectorAll('.sa-alertdone').forEach(function(b){ b.onclick=function(){ var cb=due[+b.getAttribute('data-idx')].c.querySelector('.sa-done'); if(cb){cb.checked=true; cb.dispatchEvent(new Event('change',{bubbles:true}));} }; });
+    box.querySelectorAll('.sa-alertdone').forEach(function(b){ b.onclick=function(){ var cb=due[+b.getAttribute('data-idx')].c.querySelector('.sa-done,.csg-done'); if(cb){cb.checked=true; cb.dispatchEvent(new Event('change',{bubbles:true}));} }; });
   }
   setInterval(function(){ if(byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')){ if(typeof saColorize==='function')saColorize(); if(typeof saAlert==='function')saAlert(); } },10000);
   if(byId('sa-body')){
     byId('sa-body').addEventListener('change',function(e){
-      var t=e.target, mid=t.getAttribute('data-mid'), key=t.getAttribute('data-key'); if(!mid)return;
+      var t=e.target;
+      if(t.classList.contains('csg-done')){ csgSet(t.getAttribute('data-cid'),{done:t.checked,doneAt:Date.now()}); renderSuiviAppels(); return; }
+      var mid=t.getAttribute('data-mid'), key=t.getAttribute('data-key'); if(!mid)return;
       if(t.classList.contains('sa-done')){ if(t.checked){ var now=ssNowHM(),rt=toMin(now)-toMin(t.getAttribute('data-h')); saSet(mid,key,{done:true,hm:now,at:Date.now(),retard:(rt==null?null:rt)}); } else { saSet(mid,key,{done:false}); } renderSuiviAppels(); }
       else if(t.classList.contains('sa-f')){ var f=t.getAttribute('data-f'),v=(t.type==='checkbox')?t.checked:t.value,p={}; p[f]=v; saSet(mid,key,p); if(f==='avise'||f==='agRetard')renderSuiviAppels(); }
     });
-    byId('sa-body').addEventListener('input',function(e){ var t=e.target; if(t.classList.contains('sa-f')&&(t.type==='text'||t.type==='number')){ var f=t.getAttribute('data-f'),p={}; p[f]=t.value; saSet(t.getAttribute('data-mid'),t.getAttribute('data-key'),p); } });
+    byId('sa-body').addEventListener('input',function(e){ var t=e.target; if(t.classList.contains('csg-note')){ csgSet(t.getAttribute('data-cid'),{note:t.value}); return; } if(t.classList.contains('sa-f')&&(t.type==='text'||t.type==='number')){ var f=t.getAttribute('data-f'),p={}; p[f]=t.value; saSet(t.getAttribute('data-mid'),t.getAttribute('data-key'),p); } });
   }
   document.querySelectorAll('.sa-preset').forEach(function(b){ b.addEventListener('click',function(){ var d=b.getAttribute('data-d'),t=impTodayISO(); if(d==='all'){ byId('sa-from').value=''; byId('sa-to').value=''; } else { var n=parseInt(d,10)||1; byId('sa-from').value=t; byId('sa-to').value=svcAddDays(t,n-1); } renderSuiviAppels(); }); });
   if(byId('sa-from'))byId('sa-from').addEventListener('change',renderSuiviAppels);
@@ -2454,6 +2471,36 @@ button.big:active{transform:translateY(1px)}
   if(byId('sa-reset'))byId('sa-reset').onclick=function(){ saType='all'; saSlice='all'; var t=impTodayISO(); if(byId('sa-from'))byId('sa-from').value=t; if(byId('sa-to'))byId('sa-to').value=t; renderSuiviAppels(); };
   (function(){ var t=impTodayISO(); if(byId('sa-from')&&!byId('sa-from').value)byId('sa-from').value=t; if(byId('sa-to')&&!byId('sa-to').value)byId('sa-to').value=t; })();
   (function(){ function tick(){ var el=byId('sa-clock'); if(!el)return; var d=new Date(); el.textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2); } tick(); setInterval(tick,1000); })();
+  // ===== Consignes / tâches libres greffées dans l'agenda des appels =====
+  function csgLoad(){ var a=load('fkh_consignes'); return Array.isArray(a)?a:[]; }
+  function csgSave(a){ save('fkh_consignes',a); }
+  function csgSet(cid,patch){ var a=csgLoad(); for(var i=0;i<a.length;i++){ if(String(a[i].id)===String(cid)){ for(var k in patch)a[i][k]=patch[k]; break; } } csgSave(a); }
+  function csgDel(cid){ csgSave(csgLoad().filter(function(c){return String(c.id)!==String(cid);})); }
+  function csgNewId(){ return 'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+  function csgMissById(id){ for(var i=0;i<SUIVI.length;i++)if(String(SUIVI[i].id)===String(id))return SUIVI[i]; return null; }
+  function consigneCard(e){
+    var done=!!e.done, d0='data-cid="'+esc(e.cid)+'"';
+    var ct=(e.mdate&&e.heure)?(new Date(e.mdate+'T00:00:00').getTime()+(toMin(e.heure)||0)*60000):'';
+    var loc=[e.client,e.site].filter(Boolean).map(esc).join(' · ');
+    var head='<div class="fa-n"><span class="sa-tag"></span>📋 <b style="color:#7b61ff">CONSIGNE'+(e.heure?' — '+esc(e.heure):'')+'</b>'+(e.heure?' <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span>':'')+(loc?' · '+loc:'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+(done?' <span style="color:var(--ok)">✓ fait</span>':'')+'</div>';
+    var body='<div class="fa-d" style="margin:4px 0;white-space:pre-wrap;font-size:14px">'+esc(e.texte||'')+'</div>';
+    var fait='<label class="chk" style="margin:0"><input type="checkbox" class="csg-done" '+d0+(done?' checked':'')+'><span>Fait</span></label>';
+    var note='<input class="csg-note" '+d0+' placeholder="commentaire / résultat…" value="'+esc(e.note||'')+'" style="flex:1;min-width:140px">';
+    var del='<button class="csg-del" '+d0+' title="Supprimer" style="width:30px;height:30px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);cursor:pointer">🗑️</button>';
+    return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" style="padding:8px;border-left:4px solid #7b61ff'+(done?';opacity:.6':'')+'">'+head+body+'<div class="acts" style="gap:8px;margin-top:4px;flex-wrap:wrap;align-items:center">'+fait+note+del+'</div></div>';
+  }
+  function csgFillMid(){ var sel=byId('csg-mid'); if(!sel)return; var d=byId('csg-date')?byId('csg-date').value:''; var ms=SUIVI.filter(function(x){return x.statut==='validee'&&(!d||x.mdate===d);}); var cur=sel.value; sel.innerHTML='<option value="">— aucune (consigne libre sur le créneau) —</option>'+ms.map(function(m){ var s=m.siteAgent||m.titre||'—'; return '<option value="'+esc(m.id)+'">'+esc(s)+(m.mheure?' · '+esc(m.mheure):'')+(m.mdate?' ('+esc(m.mdate)+')':'')+'</option>'; }).join(''); if(cur)sel.value=cur; }
+  function csgRenderList(){ var box=byId('csg-list'); if(!box)return; var a=csgLoad().slice().sort(function(x,y){ var dx=(x.mdate||'')+' '+(x.heure||''),dy=(y.mdate||'')+' '+(y.heure||''); return dx<dy?1:dx>dy?-1:0; }); if(!a.length){ box.innerHTML='<div class="sub" style="margin:0">Aucune consigne enregistrée.</div>'; return; } box.innerHTML='<div class="lab" style="margin:0 0 4px">'+a.length+' consigne'+(a.length>1?'s':'')+'</div><div class="list">'+a.map(function(c){ var m=c.mid?csgMissById(c.mid):null, site=m?(m.siteAgent||m.titre||''):''; return '<div class="it"><div style="flex:1"><div class="fa-n">'+(c.done?'✅':'📋')+' <span style="color:var(--muted);font-weight:400">'+esc(c.mdate||'')+(c.heure?' '+esc(c.heure):'')+'</span> '+esc((c.client||site)?('· '+(c.client||site)):'')+'</div><div class="fa-d">'+esc(c.texte||'')+'</div></div><button class="no csg-dellist" data-cid="'+esc(c.id)+'" title="Supprimer" style="width:30px;height:30px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);cursor:pointer">🗑️</button></div>'; }).join('')+'</div>'; box.querySelectorAll('.csg-dellist').forEach(function(b){ b.onclick=function(){ if(!confirm('Supprimer cette consigne ?'))return; csgDel(b.getAttribute('data-cid')); csgRenderList(); if(typeof renderSuiviAppels==='function')renderSuiviAppels(); }; }); }
+  if(byId('csg-toggle'))byId('csg-toggle').onclick=function(){ var f=byId('csg-form'); if(!f)return; if(f.classList.contains('hidden')){ f.classList.remove('hidden'); if(byId('csg-date')&&!byId('csg-date').value)byId('csg-date').value=impTodayISO(); csgFillMid(); csgRenderList(); } else f.classList.add('hidden'); };
+  if(byId('csg-date'))byId('csg-date').addEventListener('change',csgFillMid);
+  if(byId('csg-add'))byId('csg-add').onclick=function(){
+    var texte=(byId('csg-texte').value||'').trim(); if(!texte){ alert('Écris la consigne à donner.'); return; }
+    var mid=byId('csg-mid').value||'', mdate=byId('csg-date').value||impTodayISO(), heure=byId('csg-heure').value||'', client=(byId('csg-client').value||'').trim();
+    if(mid){ var m=csgMissById(mid); if(m){ if(!heure)heure=m.mheure||''; if(!client)client=m.client||''; if(m.mdate)mdate=m.mdate; } }
+    var a=csgLoad(); a.push({id:csgNewId(),texte:texte,mid:mid,mdate:mdate,heure:heure,client:client,done:false,note:'',at:Date.now()}); csgSave(a);
+    byId('csg-texte').value=''; byId('csg-heure').value=''; byId('csg-client').value=''; byId('csg-mid').value='';
+    csgRenderList(); if(typeof renderSuiviAppels==='function')renderSuiviAppels();
+  };
 
   // ===== Supervision : tableau de bord + anomalies (à partir des appels pointés / missions / tenues) =====
   var supTab='oper', SUP_DRILL={}, SUP_ANOM=[], supShowDone=false;
