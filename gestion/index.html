@@ -2303,7 +2303,8 @@ button.big:active{transform:translateY(1px)}
     var STATUTS=['','✅ RAS','⚠️ Injoignable','🔄 Autre'];
     function saCnt(ic,lb,n){ return n?'<span style="display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:1px 8px;margin:2px 4px 0 0;font-size:12px;font-weight:700">'+ic+' '+lb+' : '+n+'</span>':''; }
     var breakdown=saCnt('🚗','Route',cnt.route)+saCnt('☎','Pré-prise',cnt.j15)+saCnt('🟢','Prise',cnt.prise)+saCnt('🎛️','Contrôle',cnt.ctrl)+saCnt('🦺','Tenue',cnt.tenue)+saCnt('🔚','Fin',cnt.fin);
-    wrap.innerHTML='<div class="card"><div class="lab" style="margin:0 0 4px">'+entries.length+' appel'+(entries.length>1?'s':'')+' — '+esc(lbl)+slLbl+'</div><div class="fa-d" style="margin:0 0 4px">✅ '+doneN+' fait'+(doneN>1?'s':'')+' · <span style="color:var(--warn);font-weight:700">'+(entries.length-doneN)+' à faire</span></div><div>'+breakdown+'</div></div>'+entries.map(function(e){
+    var head='<div class="card"><div class="lab" style="margin:0 0 4px">'+entries.length+' appel'+(entries.length>1?'s':'')+' — '+esc(lbl)+slLbl+'</div><div class="fa-d" style="margin:0 0 4px">✅ '+doneN+' fait'+(doneN>1?'s':'')+' · <span style="color:var(--warn);font-weight:700">'+(entries.length-doneN)+' à faire</span></div><div>'+breakdown+'</div></div>';
+    var saCard=function(e){
       var r=(S[e.mid]&&S[e.mid][e.key])||{}, done=!!r.done, d0='data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'"';
       var extra=done?(' <span style="color:var(--ok)">✓ '+esc(r.hm||'')+'</span>'+(r.retard>0?' <span style="color:var(--bad)">saisie +'+r.retard+' min</span>':'')):'';
       if(done&&(e.key==='prise'||e.key==='fin')&&!r.avise)extra+=' <span style="color:var(--bad);font-weight:700">⚠ CLIENT NON AVISÉ</span>';
@@ -2326,7 +2327,12 @@ button.big:active{transform:translateY(1px)}
       var ctx='<div class="fa-d" style="margin:4px 0 2px;line-height:1.7">'+cl.join('<br>')+'</div>';
       return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" style="padding:8px'+(done?';opacity:.6':'')+'"><div class="fa-n"><span class="sa-tag"></span><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+(e.key==='tenue'?'<span style="color:#e0784b;font-weight:800">'+e.label+'</span>':e.label)+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'+ctx
         +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">'+fields+'</div></div>';
-    }).join('');
+    };
+    var isDone=function(e){ return !!(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done); };
+    var todoL=entries.filter(function(e){return !isDone(e);}), doneL=entries.filter(isDone);
+    wrap.innerHTML=head
+      +(todoL.length?todoL.map(saCard).join(''):'<div class="card"><div class="sub" style="margin:0;color:var(--ok)">✅ Tous les appels de cette période sont faits.</div></div>')
+      +(doneL.length?'<details style="margin-top:12px"><summary style="cursor:pointer;color:var(--muted);font-weight:700;padding:6px 2px">✅ '+doneL.length+' appel'+(doneL.length>1?'s':'')+' fait'+(doneL.length>1?'s':'')+' — masqué'+(doneL.length>1?'s':'')+', cliquer pour afficher</summary><div style="opacity:.7;margin-top:6px">'+doneL.map(saCard).join('')+'</div></details>':'');
     entries.forEach(function(e){ var hasPhoto=(e.key==='prise'||e.key==='fin'||e.key==='tenue'||e.key.indexOf('ctrl')===0); if(!hasPhoto||typeof photoWire!=='function')return; var upId='saph-'+String(e.mid).replace(/[^a-zA-Z0-9]/g,'')+'-'+e.key; photoWire(upId,function(f){ var ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg'; return 'appel/'+e.mid+'/'+e.key+'/'+Date.now()+'.'+ext; },function(key){ if(e.key==='tenue')saSet(e.mid,e.key,{tenuePhoto:true,photoKey:key}); else saSet(e.mid,e.key,{photo:'Photo horodatée',photoKey:key}); renderSuiviAppels(); }); });
     document.querySelectorAll('#sa-body .sa-photo-view').forEach(function(a){ a.onclick=function(ev){ ev.preventDefault(); if(typeof photoOpen==='function')photoOpen(a.getAttribute('data-k')); }; });
     saColorize(); if(typeof saAlert==='function')saAlert();
