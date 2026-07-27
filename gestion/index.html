@@ -2575,11 +2575,16 @@ button.big:active{transform:translateY(1px)}
   function saTypeMatch(key){ if(saType==='all')return true; if(saType==='avant')return key==='j15'||key==='route'; if(saType==='prise')return key==='prise'; if(saType==='pendant')return key.indexOf('ctrl')===0; if(saType==='fin')return key==='fin'; return true; }
   function saSliceMatch(e){ if(saSlice==='all')return true; var m=toMin(e.mheure); if(m==null)return true; var h=Math.floor(m/60), day=(h>=8&&h<20); return saSlice==='jour'?day:!day; }
   function saEntries(from,to){
-    var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; });
+    // #13 On inclut aussi les missions démarrant la VEILLE de `from` : leurs appels d'après-minuit tombent dans la période demandée (continuité de nuit à travers minuit).
+    var fromV=from?svcAddDays(from,-1):'';
+    var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(!d)return false; if(from&&d<fromV)return false; if(to&&d>to)return false; return true; });
     if(typeof apDeconflict==='function')apDeconflict(missions,10);
     var out=[];
-    missions.forEach(function(m){ var start=toMin(m.mheure); var _ag=(m.agentId&&faById(m.agentId))?faById(m.agentId):null; var _tel=(_ag&&_ag.tels&&_ag.tels[0])?_ag.tels[0]:''; ssSteps(m).forEach(function(s){ if(!s.heure)return; var mn=toMin(s.heure),abs=(mn==null?0:mn); if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn!=null&&mn<start)abs=mn+1440; out.push({mid:m.id,mdate:m.mdate||'',site:m.siteAgent||m.titre||'—',siteBDC:m.siteBDC||'',client:m.client||'',ville:m.ville||'',cp:m.cp||'',mheure:m.mheure||'',agent:_ag?(_ag.nom||''):'',agentTel:_tel,agentId:m.agentId||'',key:s.key,label:s.label,heure:s.heure,abs:abs,type:s.type}); }); });
-    out.sort(function(a,b){ if(a.mdate!==b.mdate)return a.mdate<b.mdate?-1:1; return a.abs-b.abs; });
+    missions.forEach(function(m){ var start=toMin(m.mheure); var _ag=(m.agentId&&faById(m.agentId))?faById(m.agentId):null; var _tel=(_ag&&_ag.tels&&_ag.tels[0])?_ag.tels[0]:''; ssSteps(m).forEach(function(s){ if(!s.heure)return; var mn=toMin(s.heure),abs=(mn==null?0:mn); if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn!=null&&mn<start)abs=mn+1440;
+      var edate=(m.mdate?svcAddDays(m.mdate,Math.floor(abs/1440)):''); // date RÉELLE de l'appel (report après minuit)
+      if(from&&edate&&edate<from)return; if(to&&edate&&edate>to)return; // filtre sur la date réelle -> l'appel de 01h d'une nuit du 27 apparaît dans la vue du 28
+      out.push({mid:m.id,mdate:m.mdate||'',edate:edate,site:m.siteAgent||m.titre||'—',siteBDC:m.siteBDC||'',client:m.client||'',ville:m.ville||'',cp:m.cp||'',mheure:m.mheure||'',agent:_ag?(_ag.nom||''):'',agentTel:_tel,agentId:m.agentId||'',key:s.key,label:s.label,heure:s.heure,abs:abs,type:s.type}); }); });
+    out.sort(function(a,b){ var da=a.edate||a.mdate||'',db=b.edate||b.mdate||''; if(da!==db)return da<db?-1:1; return a.abs-b.abs; });
     return out;
   }
   function renderSuiviAppels(){
@@ -2587,7 +2592,7 @@ button.big:active{transform:translateY(1px)}
     var from=byId('sa-from')?byId('sa-from').value:'', to=byId('sa-to')?byId('sa-to').value:'';
     var lbl=(from||to)?('du '+(from?from.split('-').reverse().join('/'):'…')+' au '+(to?to.split('-').reverse().join('/'):'…')):'toute la période';
     var entries=saEntries(from,to).filter(function(e){return saTypeMatch(e.key)&&saSliceMatch(e);});
-    if(saType==='all'&&typeof csgLoad==='function'){ csgLoad().forEach(function(c){ if(from&&(!c.mdate||c.mdate<from))return; if(to&&(!c.mdate||c.mdate>to))return; var heure=c.heure||'',site='',agent=''; if(c.mid){ var m=csgMissById(c.mid); if(m){ site=m.siteAgent||m.titre||''; if(!heure)heure=m.mheure||''; if(m.agentId&&faById(m.agentId))agent=faById(m.agentId).nom||''; } } var e={consigne:true,cid:c.id,mid:c.mid||'',mdate:c.mdate||'',heure:heure,mheure:heure,abs:(toMin(heure)||0),texte:c.texte,client:c.client||'',site:site,agent:agent,done:!!c.done,note:c.note||'',key:'csg'}; if(!saSliceMatch(e))return; entries.push(e); }); entries.sort(function(a,b){ if((a.mdate||'')!==(b.mdate||''))return (a.mdate||'')<(b.mdate||'')?-1:1; return (a.abs||0)-(b.abs||0); }); }
+    if(saType==='all'&&typeof csgLoad==='function'){ csgLoad().forEach(function(c){ if(from&&(!c.mdate||c.mdate<from))return; if(to&&(!c.mdate||c.mdate>to))return; var heure=c.heure||'',site='',agent=''; if(c.mid){ var m=csgMissById(c.mid); if(m){ site=m.siteAgent||m.titre||''; if(!heure)heure=m.mheure||''; if(m.agentId&&faById(m.agentId))agent=faById(m.agentId).nom||''; } } var e={consigne:true,cid:c.id,mid:c.mid||'',mdate:c.mdate||'',edate:c.mdate||'',heure:heure,mheure:heure,abs:(toMin(heure)||0),texte:c.texte,client:c.client||'',site:site,agent:agent,done:!!c.done,note:c.note||'',key:'csg'}; if(!saSliceMatch(e))return; entries.push(e); }); entries.sort(function(a,b){ var da=a.edate||a.mdate||'',db=b.edate||b.mdate||''; if(da!==db)return da<db?-1:1; return (a.abs||0)-(b.abs||0); }); }
     document.querySelectorAll('.sa-type').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-ty')===saType);});
     document.querySelectorAll('.sa-slice').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-sl')===saSlice);});
     var slLbl=saSlice==='jour'?' · ☀️ tranche jour (8h→20h)':saSlice==='nuit'?' · 🌙 tranche nuit (20h→8h)':'';
