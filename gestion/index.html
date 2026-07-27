@@ -1501,7 +1501,41 @@ button.big:active{transform:translateY(1px)}
   // Widget réutilisable : bouton d'import photo -> upload R2 -> callback(key). id unique requis.
   function photoBtn(id,label){ return '<label class="btn" style="cursor:pointer;font-size:12px">'+(label||'📷 Importer la photo')+'<input type="file" accept="image/*" id="'+id+'" style="display:none"></label>'; }
   function photoWire(id,keyFn,onDone){ var inp=byId(id); if(!inp)return; inp.onchange=function(){ var f=inp.files&&inp.files[0]; if(!f)return; if(!photoReady()){ alert('Connexion cloud requise pour envoyer la photo (connecte-toi en ligne).'); return; } var lbl=inp.parentNode; var old=lbl.textContent; lbl.childNodes[0].nodeValue='⏳ envoi…'; var key=keyFn(f); photoUpload(key,f,function(res){ if(res&&res.ok){ lbl.childNodes[0].nodeValue='✅ photo envoyée'; if(onDone)onDone(key,res); } else { lbl.childNodes[0].nodeValue=old; alert('Échec de l\'envoi de la photo'+(res&&res.error?' ('+res.error+')':'')+'.'); } }); }; }
-  function renderRepertoire(){ var body=byId('rep-body'); if(!body)return; if(!photoReady()){ body.innerHTML='<div class="sub" style="margin:0">Connecte-toi en ligne pour voir les photos stockées dans R2.</div>'; return; } body.innerHTML='<div class="sub" style="margin:0">Chargement…</div>'; photoList('',function(keys){ if(!keys.length){ body.innerHTML='<div class="sub" style="margin:0">Aucune photo pour l\'instant.</div>'; return; } keys.sort(function(a,b){ return String(b.uploaded||'').localeCompare(String(a.uploaded||'')); }); var groups={}; keys.forEach(function(o){ var g=String(o.key).split('/')[0]||'autres'; (groups[g]=groups[g]||[]).push(o); }); var GL={appel:'📞 Appels (prise / fin / contrôle)',controle:'🚨 Contrôles (via anomalies)',tenue:'🦺 Contrôles tenue'}; body.innerHTML='<div class="sub" style="margin:0 0 6px">'+keys.length+' photo'+(keys.length>1?'s':'')+'</div>'+Object.keys(groups).map(function(g){ return '<div class="lab" style="margin:8px 0 4px">'+(GL[g]||g)+' ('+groups[g].length+')</div><div style="display:flex;flex-wrap:wrap;gap:8px">'+groups[g].map(function(o){ var mt=photoMeta(o.key); return '<div style="text-align:center;width:122px">'+photoThumbTag(o.key)+'<div class="sub" style="margin:2px 0 0;font-size:10.5px;line-height:1.3">'+(mt.agent?'<b>👤 '+esc(mt.agent)+'</b><br>':'')+(mt.site?'📍 '+esc(mt.site)+'<br>':'')+esc(o.uploaded?String(o.uploaded).slice(0,10):'')+'</div></div>'; }).join('')+'</div>'; }).join(''); photoHydrate(body); }); }
+  // Classe une photo dans un bloc métier à partir de sa clé
+  function photoBloc(key){ var p=String(key||'').split('/'), cat=p[0]; if(cat==='tenue')return 'tenue'; if(cat==='controle')return 'controle'; if(cat==='appel'){ var st=p[2]||''; if(st==='prise')return 'prise'; if(st==='fin')return 'fin'; if(st==='tenue')return 'tenue'; if(st.indexOf('ctrl')===0)return 'controle'; return 'controle'; } return 'autres'; }
+  var repMode='jour', repDate='';
+  function repISO(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+  function repRange(){ var d=repDate||impTodayISO(); var p=d.split('-'), base=new Date(+p[0],+p[1]-1,+p[2]), from,to; if(repMode==='semaine'){ var wd=(base.getDay()+6)%7, mon=new Date(base); mon.setDate(base.getDate()-wd); var sun=new Date(mon); sun.setDate(mon.getDate()+6); from=repISO(mon); to=repISO(sun); } else if(repMode==='mois'){ from=p[0]+'-'+p[1]+'-01'; var last=new Date(+p[0],+p[1],0); to=p[0]+'-'+p[1]+'-'+pad2(last.getDate()); } else { from=d; to=d; } return {from:from,to:to}; }
+  function repRangeLbl(){ var r=repRange(); var f=r.from.split('-').reverse().join('/'), t=r.to.split('-').reverse().join('/'); return repMode==='jour'?('le '+f):('du '+f+' au '+t); }
+  function renderRepertoire(){
+    var body=byId('rep-body'); if(!body)return;
+    if(!repDate)repDate=impTodayISO();
+    if(!photoReady()){ body.innerHTML='<div class="sub" style="margin:0">Connecte-toi en ligne pour voir les photos stockées dans R2.</div>'; return; }
+    body.innerHTML='<div class="sub" style="margin:0">Chargement…</div>';
+    photoList('',function(all){
+      var rg=repRange();
+      var keys=(all||[]).filter(function(o){ var du=String(o.uploaded||'').slice(0,10); return du&&du>=rg.from&&du<=rg.to; });
+      keys.sort(function(a,b){ return String(b.uploaded||'').localeCompare(String(a.uploaded||'')); });
+      var bmk=function(m){ return repMode===m?' on':''; };
+      var ctrl='<div class="card" style="padding:8px;margin-bottom:8px"><div class="lab" style="margin:0 0 6px">🗓️ Filtre temporel</div>'
+        +'<div class="acts" style="gap:6px;flex-wrap:wrap;align-items:center">'
+        +'<button type="button" class="rep-mode'+bmk('jour')+'" data-m="jour">Jour</button>'
+        +'<button type="button" class="rep-mode'+bmk('semaine')+'" data-m="semaine">Semaine</button>'
+        +'<button type="button" class="rep-mode'+bmk('mois')+'" data-m="mois">Mois</button>'
+        +'<input type="date" id="rep-date" value="'+esc(repDate)+'" style="min-width:150px">'
+        +'<button type="button" id="rep-reset" title="Revenir au jour même">↺ Réinitialiser (jour J)</button>'
+        +'</div><div class="sub" style="margin:6px 0 0">Photos '+repRangeLbl()+' · <b>'+keys.length+'</b> photo'+(keys.length>1?'s':'')+' (sur '+(all?all.length:0)+' au total).</div></div>';
+      var BL=[['prise','🟢 Prise de service'],['fin','🔚 Fin de service'],['controle','🎛️ Contrôle pendant le service'],['tenue','🦺 Photos des tenues']];
+      var groups={}; keys.forEach(function(o){ var g=photoBloc(o.key); (groups[g]=groups[g]||[]).push(o); });
+      var blocsHtml=BL.map(function(bl){ var g=bl[0], arr=groups[g]; if(!arr||!arr.length)return ''; return '<div class="lab" style="margin:10px 0 4px">'+bl[1]+' ('+arr.length+')</div><div style="display:flex;flex-wrap:wrap;gap:8px">'+arr.map(function(o){ var mt=photoMeta(o.key); return '<div style="text-align:center;width:122px">'+photoThumbTag(o.key)+'<div class="sub" style="margin:2px 0 0;font-size:10.5px;line-height:1.3">'+(mt.agent?'<b>👤 '+esc(mt.agent)+'</b><br>':'')+(mt.site?'📍 '+esc(mt.site)+'<br>':'')+esc(o.uploaded?String(o.uploaded).slice(0,10):'')+'</div></div>'; }).join('')+'</div>'; }).join('');
+      var other=groups.autres&&groups.autres.length?('<div class="lab" style="margin:10px 0 4px">📦 Autres ('+groups.autres.length+')</div><div style="display:flex;flex-wrap:wrap;gap:8px">'+groups.autres.map(function(o){ var mt=photoMeta(o.key); return '<div style="text-align:center;width:122px">'+photoThumbTag(o.key)+'<div class="sub" style="margin:2px 0 0;font-size:10.5px;line-height:1.3">'+(mt.agent?'<b>👤 '+esc(mt.agent)+'</b><br>':'')+(mt.site?'📍 '+esc(mt.site)+'<br>':'')+esc(o.uploaded?String(o.uploaded).slice(0,10):'')+'</div></div>'; }).join('')+'</div>'):'';
+      body.innerHTML=ctrl+(keys.length?(blocsHtml+other):'<div class="card"><div class="sub" style="margin:0">Aucune photo '+repRangeLbl()+'. Change le filtre ou clique « Réinitialiser ».</div></div>');
+      body.querySelectorAll('.rep-mode').forEach(function(b){ b.onclick=function(){ repMode=b.getAttribute('data-m'); renderRepertoire(); }; });
+      var rd=byId('rep-date'); if(rd)rd.onchange=function(){ repDate=rd.value||impTodayISO(); renderRepertoire(); };
+      var rr=byId('rep-reset'); if(rr)rr.onclick=function(){ repMode='jour'; repDate=impTodayISO(); renderRepertoire(); };
+      photoHydrate(body);
+    });
+  }
   if(byId('rep-open'))byId('rep-open').onclick=function(){ var b=byId('rep-body'); if(!b)return; if(b.classList.contains('hidden')){ b.classList.remove('hidden'); renderRepertoire(); } else { b.classList.add('hidden'); } };
   // ===== Affecter des tenues aux agents en mission (filtré jour/nuit + client) =====
   var tafSlice='all', tafSelDates=[], TAF_DRILL={};
