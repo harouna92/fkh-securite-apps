@@ -122,6 +122,18 @@ button.big:active{transform:translateY(1px)}
 .cloudbar.cb-on{background:var(--okbg);color:var(--ok)}.cloudbar.cb-off{background:var(--warnbg);color:var(--warn)}
 .cloudbar .cb-txt{flex:1}
 .cloudbar button{font-family:inherit;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+#notif-bell{position:fixed;top:7px;right:9px;z-index:90;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:17px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#notif-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:none}
+.notif-ov{display:none;position:fixed;inset:0;z-index:130;background:rgba(0,0,0,.55);align-items:flex-start;justify-content:center;padding:36px 14px;overflow:auto}
+.notif-ov.show{display:flex}
+.notif-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:440px;width:100%;padding:16px;box-shadow:0 14px 44px rgba(0,0,0,.45)}
+.notif-hd{display:flex;justify-content:space-between;align-items:center;margin:0 0 6px;font-size:17px}
+.notif-hd button{background:none;border:none;color:var(--muted);font-size:19px;cursor:pointer;padding:2px 6px}
+#notif-cats label{display:flex;align-items:center;justify-content:flex-start;gap:9px;padding:7px 8px;font-size:14px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;cursor:pointer}
+#notif-cats label input{flex:0 0 auto;margin:0}
+#notif-cats label span{flex:1;text-align:left}
+#notif-enable{width:100%;margin:2px 0 4px}
+.notif-off #notif-cats,.notif-off #notif-sound-wrap{opacity:.45;pointer-events:none}
 </style>
 
 <div class="top">
@@ -150,6 +162,20 @@ button.big:active{transform:translateY(1px)}
   <div id="gsearch-res" class="hidden" style="position:absolute;z-index:60;left:10px;right:10px;top:100%;margin-top:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;max-height:65vh;overflow:auto;box-shadow:0 8px 28px rgba(0,0,0,.35)"></div>
 </div>
 <div class="cloudbar" id="cloudbar"><span class="cb-txt"></span><button type="button" id="cloud-import">Importer mes données locales</button><button type="button" id="cloud-logout">🔓 Déconnexion</button></div>
+
+<button type="button" id="notif-bell" title="Notifications" aria-label="Notifications">🔔<span id="notif-badge"></span></button>
+<div class="notif-ov" id="notif-ov">
+  <div class="notif-box">
+    <div class="notif-hd"><span>🔔 Notifications</span><button type="button" id="notif-close" aria-label="Fermer">✕</button></div>
+    <p class="sub" id="notif-status" style="margin:0 0 8px">—</p>
+    <button type="button" class="big" id="notif-enable">🔔 Activer les notifications sur cet appareil</button>
+    <label class="chk" style="margin-top:4px"><input type="checkbox" id="notif-on"><span><b>M'envoyer des notifications</b></span></label>
+    <div class="lab" style="margin:12px 0 6px">Quelles actions me notifient ?</div>
+    <div id="notif-cats"></div>
+    <div id="notif-sound-wrap"><label class="chk" style="margin-top:4px"><input type="checkbox" id="notif-sound"><span>🔊 Petit son à chaque notification</span></label></div>
+    <p class="sub" style="margin:12px 0 0;font-size:12px;line-height:1.5">📱💻 <b>Niveau 1</b> : fonctionne quand l'appli est ouverte (onglet ouvert), sur téléphone comme sur ordinateur. Le <b>Niveau 2</b> (recevoir même l'appli fermée) viendra ensuite.</p>
+  </div>
+</div>
 
 <div class="login-ov" id="loginOverlay">
   <div class="login-box">
@@ -1743,6 +1769,7 @@ button.big:active{transform:translateY(1px)}
       else if(k==='fkh_services'){ if(typeof renderServices==='function')renderServices(); }
       else { var fns=COMBO_REFRESH[k]; if(fns)fns.forEach(function(f){try{f();}catch(e){}}); } // clés « combos » (clients, agents…) : listes rafraîchies en direct
     }catch(e){}
+    if(typeof notifScan==='function')notifScan(); // notifs : réagir aux changements distants (nouvelle demande, etc.)
   }
   function cloudPull(){
     if(!CLOUD.on) return Promise.resolve();
@@ -2889,6 +2916,74 @@ button.big:active{transform:translateY(1px)}
   if(byId('tc-save'))byId('tc-save').onclick=tcSave;
   if(byId('tc-photo'))byId('tc-photo').onchange=function(){ var f=this.files&&this.files[0]; if(!f)return; if(typeof photoReady!=='function'||!photoReady()){ alert('Connexion en ligne requise pour envoyer la photo (connecte-toi en ligne).'); this.value=''; return; } var lbl=byId('tc-photo-lbl'),agent=(byId('tc-agent').value||'agent').trim(),ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg',key='tenue/'+(tnorm(agent).replace(/[^A-Z0-9]/gi,'_').toLowerCase()||'agent')+'/'+Date.now()+'.'+ext; if(lbl)lbl.textContent='⏳ envoi…'; photoUpload(key,f,function(res){ if(res&&res.ok){ tcPhotoKey=key; tcPhotoShow(); } else { tcPhotoShow(); alert('Échec de l\'envoi de la photo'+(res&&res.error?' ('+res.error+')':'')+'.'); } }); };
   if(byId('tc-agent'))byId('tc-agent').addEventListener('input',function(){ var q=this.value.toLowerCase().trim(),box=byId('sugg-tc-agent'); if(q.length<1||typeof FA==='undefined'||!FA){box.classList.add('hidden');return;} var m=FA.filter(function(a){return (a.nom||'').toLowerCase().indexOf(q)>=0;}).slice(0,6); if(!m.length){box.classList.add('hidden');return;} box.innerHTML=m.map(function(a){return '<div data-v="'+esc(a.nom||'')+'">'+esc(a.nom||'')+'</div>';}).join(''); box.classList.remove('hidden'); box.querySelectorAll('div').forEach(function(d){d.addEventListener('mousedown',function(e){e.preventDefault();});d.addEventListener('click',function(e){e.preventDefault();byId('tc-agent').value=d.getAttribute('data-v');box.classList.add('hidden');});}); });
+
+  // ===== #6 Notifications — Niveau 1 (appli ouverte, téléphone + ordinateur) =====
+  var NOTIF={ cfg:null, seen:{}, knownRech:null, primed:false, audio:null };
+  var NOTIF_CATS=[
+    {k:'appel_retard',   ic:'🔴', lbl:'Appel de contrôle en retard (+5 min)'},
+    {k:'appel_danger',   ic:'⛔', lbl:'Appel non fait (+10 min) — danger'},
+    {k:'nouvelle_demande',ic:'🆕', lbl:'Nouvelle demande reçue (en recherche)'},
+    {k:'demande_1h',     ic:'🕵️', lbl:'Demande en recherche depuis + d\'1 h'},
+    {k:'prise_retard',   ic:'🕓', lbl:'Agent en retard à la prise de service'}
+  ];
+  function notifLoadCfg(){ var c=null; try{c=JSON.parse(localStorage.getItem('fkh_notif_cfg')||'null');}catch(e){} if(!c||typeof c!=='object')c={}; if(typeof c.on!=='boolean')c.on=false; if(typeof c.sound!=='boolean')c.sound=true; if(!c.cats||typeof c.cats!=='object')c.cats={}; NOTIF_CATS.forEach(function(t){ if(typeof c.cats[t.k]!=='boolean')c.cats[t.k]=true; }); NOTIF.cfg=c; }
+  function notifSaveCfg(){ try{localStorage.setItem('fkh_notif_cfg',JSON.stringify(NOTIF.cfg));}catch(e){} }
+  function notifPerm(){ return ('Notification' in window)?Notification.permission:'unsupported'; }
+  function notifCanFire(){ return NOTIF.cfg && NOTIF.cfg.on && notifPerm()==='granted'; }
+  function notifBeep(){ if(!NOTIF.cfg||!NOTIF.cfg.sound)return; try{ var C=window.AudioContext||window.webkitAudioContext; if(!C)return; NOTIF.audio=NOTIF.audio||new C(); var a=NOTIF.audio; if(a.state==='suspended')a.resume(); var o=a.createOscillator(),g=a.createGain(); o.type='sine'; o.frequency.value=880; g.gain.value=0.08; o.connect(g); g.connect(a.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+0.35); o.stop(a.currentTime+0.36); }catch(e){} }
+  function notifFire(a){ try{ var n=new Notification(a.title,{body:a.body,tag:a.cat+':'+a.key}); n.onclick=function(){ try{window.focus();}catch(e){} var btn=document.querySelector('#tabs button[data-s="'+a.go+'"]'); if(btn)btn.click(); try{n.close();}catch(e){} }; }catch(e){} notifBeep(); }
+  function notifThresholdAlerts(){
+    var now=Date.now(), out=[];
+    try{ var S=(typeof ssLoad==='function')?ssLoad():{}, gl=(typeof saGolive==='function')?saGolive():0;
+      if(typeof saEntries==='function')saEntries('','').forEach(function(e){
+        if(e.consigne||!e.mdate)return;
+        var r=S[e.mid]&&S[e.mid][e.key], done=r&&r.done;
+        if(e.key==='prise'&&done&&r.agRetard)out.push({cat:'prise_retard',key:e.mid,title:'🕓 Agent en retard à la prise',body:(e.agent||'Agent')+' — '+(e.site||'')+(r.agRetardMin?' · '+r.agRetardMin+' min':''),go:'suiviappels'});
+        if(done)return;
+        var ct=new Date(e.mdate+'T00:00:00').getTime()+(e.abs||0)*60000; if(!ct||ct<gl)return;
+        var dmin=(now-ct)/60000, loc=(e.label||'Appel')+' — '+(e.site||'');
+        if(dmin>=10)out.push({cat:'appel_danger',key:e.mid+'|'+e.key,title:'⛔ Appel NON FAIT',body:loc+' · prévu '+e.heure+' (+'+Math.floor(dmin)+' min)',go:'suiviappels'});
+        else if(dmin>=4.5)out.push({cat:'appel_retard',key:e.mid+'|'+e.key,title:'🔴 Appel en retard',body:loc+' · prévu '+e.heure,go:'suiviappels'});
+      });
+    }catch(_){}
+    try{ SUIVI.forEach(function(m){ if(m.statut==='recherche'&&m.pris&&(now-m.pris)>=3600000)out.push({cat:'demande_1h',key:m.id,title:'🕵️ Demande en recherche > 1 h',body:(m.titre||'Demande').slice(0,60)+(m.client?' — '+m.client:''),go:'suivi'}); }); }catch(_){}
+    return out;
+  }
+  function notifScan(){
+    if(!NOTIF.cfg)return;
+    var active=notifThresholdAlerts(), activeKeys={}, badge=0;
+    active.forEach(function(a){ var kk=a.cat+':'+a.key; activeKeys[kk]=1; if(NOTIF.cfg.cats[a.cat])badge++;
+      if(NOTIF.cfg.cats[a.cat]&&!NOTIF.seen[kk]){ if(NOTIF.primed&&notifCanFire())notifFire(a); NOTIF.seen[kk]=1; } });
+    Object.keys(NOTIF.seen).forEach(function(kk){ if(!activeKeys[kk])delete NOTIF.seen[kk]; });
+    var rechIds=[]; try{ SUIVI.forEach(function(m){ if(m.statut==='recherche')rechIds.push(m.id); }); }catch(_){}
+    if(NOTIF.knownRech===null){ NOTIF.knownRech={}; rechIds.forEach(function(id){NOTIF.knownRech[id]=1;}); }
+    else rechIds.forEach(function(id){ if(!NOTIF.knownRech[id]){ NOTIF.knownRech[id]=1; if(NOTIF.cfg.cats.nouvelle_demande&&notifCanFire()){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){m=SUIVI[i];break;} notifFire({cat:'nouvelle_demande',key:id,title:'🆕 Nouvelle demande',body:(m&&m.titre?m.titre.slice(0,60):'Nouvelle demande')+((m&&m.client)?' — '+m.client:''),go:'suivi'}); } } });
+    Object.keys(NOTIF.knownRech).forEach(function(id){ if(rechIds.indexOf(id)<0)delete NOTIF.knownRech[id]; });
+    NOTIF.primed=true; notifBadge(badge);
+  }
+  function notifBadge(n){ var b=byId('notif-badge'); if(!b)return; if(n>0){ b.textContent=n>99?'99+':n; b.style.display='block'; } else b.style.display='none'; }
+  function notifRenderPanel(){
+    var st=byId('notif-status'), en=byId('notif-enable'), on=byId('notif-on'), snd=byId('notif-sound'), box=byId('notif-ov').querySelector('.notif-box'), p=notifPerm();
+    if(st){ st.textContent = p==='unsupported'?'⚠️ Cet appareil / navigateur ne gère pas les notifications.' : p==='granted'?'✅ Autorisées sur cet appareil.' : p==='denied'?'🚫 Bloquées dans les réglages du navigateur — réactive-les pour ce site.' : '🔔 À autoriser : clique le bouton ci-dessous.'; }
+    if(en)en.style.display=(p==='granted'||p==='unsupported')?'none':'block';
+    if(on)on.checked=!!NOTIF.cfg.on;
+    if(snd)snd.checked=!!NOTIF.cfg.sound;
+    if(box)box.classList.toggle('notif-off',!NOTIF.cfg.on);
+    var wrap=byId('notif-cats'); if(wrap)wrap.innerHTML=NOTIF_CATS.map(function(t){ return '<label><input type="checkbox" class="notif-cat" data-k="'+t.k+'"'+(NOTIF.cfg.cats[t.k]?' checked':'')+'><span>'+t.ic+' '+t.lbl+'</span></label>'; }).join('');
+    if(wrap)wrap.querySelectorAll('.notif-cat').forEach(function(c){ c.addEventListener('change',function(){ NOTIF.cfg.cats[this.getAttribute('data-k')]=this.checked; notifSaveCfg(); notifScan(); }); });
+  }
+  (function initNotif(){
+    if(!byId('notif-bell'))return;
+    notifLoadCfg();
+    byId('notif-bell').addEventListener('click',function(){ notifRenderPanel(); byId('notif-ov').classList.add('show'); });
+    byId('notif-close').addEventListener('click',function(){ byId('notif-ov').classList.remove('show'); });
+    byId('notif-ov').addEventListener('click',function(e){ if(e.target===this)this.classList.remove('show'); });
+    byId('notif-enable').addEventListener('click',function(){ if(!('Notification' in window)){ notifRenderPanel(); return; } Notification.requestPermission().then(function(){ if(notifPerm()==='granted'&&!NOTIF.cfg.on){ NOTIF.cfg.on=true; notifSaveCfg(); } notifRenderPanel(); notifScan(); try{ new Notification('🔔 Notifications activées',{body:'Tu recevras les alertes ici quand l\'appli est ouverte.'}); }catch(e){} }); });
+    byId('notif-on').addEventListener('change',function(){ NOTIF.cfg.on=this.checked; notifSaveCfg(); if(this.checked&&notifPerm()==='default'){ Notification.requestPermission().then(function(){ notifRenderPanel(); notifScan(); }); } else { notifRenderPanel(); notifScan(); } });
+    byId('notif-sound').addEventListener('change',function(){ NOTIF.cfg.sound=this.checked; notifSaveCfg(); if(this.checked)notifBeep(); });
+    notifScan();               // 1er passage = amorçage silencieux (pas de rafale à l'ouverture)
+    setInterval(notifScan,20000);
+  })();
 
   (function initCloud(){
     var lo=byId('loginOverlay');
