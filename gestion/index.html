@@ -541,8 +541,9 @@ button.big:active{transform:translateY(1px)}
     <div class="card">
       <div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="svc-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="svc-to"></label></div>
       <div class="acts" style="flex-wrap:wrap;gap:6px;margin:8px 0 2px"><button type="button" class="svc-preset" data-d="1">Aujourd'hui</button><button type="button" class="svc-preset" data-d="3">3 j</button><button type="button" class="svc-preset" data-d="7">7 j</button><button type="button" class="svc-preset" data-d="20">20 j</button><button type="button" class="svc-preset" data-d="40">40 j</button><button type="button" class="svc-preset" data-d="all">Tout</button></div>
-      <label class="f" style="margin-top:6px"><div class="lab">Agent</div><input id="svc-q" placeholder="Filtrer par agent…" autocomplete="off"></label>
+      <label class="f" style="margin-top:6px"><div class="lab">Agent / client / site</div><input id="svc-q" placeholder="Filtrer par agent, client, site…" autocomplete="off"></label>
     </div>
+    <div class="subtabs" id="svcTabs"><button type="button" data-t="synth" class="on">🎯 Synthèse par vacation</button><button type="button" data-t="jour">🗒️ Journal prises/fins</button></div>
     <div id="svc-body"></div>
   </section>
   <section id="sec-dispatch" class="hidden">
@@ -1831,10 +1832,58 @@ button.big:active{transform:translateY(1px)}
   if(byId('imp-cancel'))byId('imp-cancel').onclick=function(){ byId('imp-panel').classList.add('hidden'); };
   if(byId('imp-analyse'))byId('imp-analyse').onclick=impAnalyse;
 
+  var svcTab='synth';
+  function svcNeedPhoto(s){ return s.key==='prise'||s.key==='fin'||s.key==='tenue'||s.key.indexOf('ctrl')===0; }
+  function svcShortLbl(s){ if(s.key==='prise')return 'Prise'; if(s.key==='fin')return 'Fin'; if(s.key==='tenue')return 'Tenue'; if(s.key==='j15')return 'Pré-prise'; if(s.key==='route')return 'Route'; if(s.key.indexOf('ctrl')===0)return 'Contrôle '+((+s.key.slice(4))+1); return s.label; }
+  function svcSynthCard(m){
+    var S=ssLoad(), st=S[m.id]||{}, steps=ssSteps(m);
+    var site=m.siteAgent||m.titre||'—', ag=(m.agentId&&faById(m.agentId))?faById(m.agentId).nom:'';
+    var pl=(typeof apPlan==='function')?apPlan(m):null;
+    // Appels prévus / faits
+    var missA=steps.filter(function(s){ return !(st[s.key]&&st[s.key].done); });
+    var totA=steps.length, doneA=totA-missA.length;
+    // Photos prévues / présentes
+    var phSteps=steps.filter(svcNeedPhoto);
+    var missP=phSteps.filter(function(s){ return !(st[s.key]&&st[s.key].photoKey); });
+    var totP=phSteps.length, doneP=totP-missP.length;
+    // Client avisé prise / fin
+    var pr=st.prise||{}, fn=st.fin||{};
+    function cliBadge(lbl,rec,exists){ if(!exists)return ''; if(!rec.done)return '<span style="display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:1px 8px;margin:2px 4px 0 0;font-size:12px">'+lbl+' : ⏳ appel pas encore fait</span>'; var ok=!!rec.avise; return '<span style="display:inline-block;background:'+(ok?'rgba(40,160,80,.14)':'rgba(200,0,0,.14)')+';border:1px solid var(--line);border-radius:8px;padding:1px 8px;margin:2px 4px 0 0;font-size:12px;font-weight:700;color:'+(ok?'var(--ok)':'var(--bad)')+'">'+lbl+' : '+(ok?'✅ client avisé':'❌ client NON avisé')+'</span>'; }
+    var hasPrise=steps.some(function(s){return s.key==='prise';}), hasFin=steps.some(function(s){return s.key==='fin';});
+    // Ligne appels
+    function pill(txt,ok){ return '<span style="display:inline-block;background:'+(ok?'rgba(40,160,80,.14)':'rgba(224,161,59,.16)')+';border:1px solid var(--line);border-radius:8px;padding:2px 9px;margin:2px 6px 0 0;font-size:12.5px;font-weight:700;color:'+(ok?'var(--ok)':'#e0a13b')+'">'+txt+'</span>'; }
+    var aOk=missA.length===0, pOk=missP.length===0;
+    var appelsLine=pill((aOk?'✅':'⚠️')+' Appels '+doneA+'/'+totA,aOk)+(missA.length?'<span class="sub" style="font-size:12px">manquants : '+missA.map(svcShortLbl).map(esc).join(', ')+'</span>':'');
+    // Ligne photos avec liens voir
+    var phLinks=phSteps.map(function(s){ var r=st[s.key]||{}; if(r.photoKey)return '<a href="#" class="svc-ph" data-k="'+esc(r.photoKey)+'" style="font-size:12px;color:#6ea8fe;margin-right:8px">🖼️ '+esc(svcShortLbl(s))+'</a>'; return '<span style="font-size:12px;color:var(--bad);margin-right:8px">❌ '+esc(svcShortLbl(s))+'</span>'; }).join('');
+    var photosLine=pill((pOk?'✅':'⚠️')+' Photos '+doneP+'/'+totP,pOk)+(totP?'<div style="margin-top:3px">'+phLinks+'</div>':'<span class="sub" style="font-size:12px">aucune photo attendue</span>');
+    var cliLine=cliBadge('🟢 Prise',pr,hasPrise)+cliBadge('🔚 Fin',fn,hasFin);
+    var complet=aOk&&pOk;
+    var globalPill='<span style="float:right;font-weight:800;font-size:12.5px;color:'+(complet?'var(--ok)':'#e0a13b')+'">'+(complet?'✅ complet':'⚠️ incomplet')+'</span>';
+    var head='<div class="fa-n" style="font-size:15.5px">'+globalPill+esc(site)+(m.ville?' <span style="color:var(--muted);font-weight:400">· '+esc(m.ville):'')+'</span> <span style="color:var(--muted);font-weight:400">'+esc(m.mdate||'')+(m.mheure?' '+esc(m.mheure):'')+'</span>'+(pl&&pl.night?' <span style="color:#e0784b">🌙 nuit</span>':'')+'</div><div class="fa-d" style="margin:2px 0 6px">'+(m.client?'🏢 '+esc(m.client)+' · ':'')+(ag?('👤 '+esc(ag)):'<span style="color:var(--warn)">⚠ agent à affecter</span>')+'</div>';
+    return '<div class="card" style="padding:10px">'+head
+      +'<div style="margin-bottom:4px">'+appelsLine+'</div>'
+      +'<div style="margin-bottom:4px">'+photosLine+'</div>'
+      +(cliLine?'<div class="fa-d" style="margin-top:4px">'+cliLine+'</div>':'')
+      +'<div class="acts" style="margin-top:6px"><button type="button" class="svc-goappels" data-mid="'+esc(m.id)+'" style="font-size:12px">→ ouvrir dans Suivi des appels</button></div></div>';
+  }
   function renderServices(){
     var wrap=byId('svc-body'); if(!wrap)return;
-    var SV=load('fkh_services');
+    document.querySelectorAll('#svcTabs button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===svcTab);});
     var from=byId('svc-from')?byId('svc-from').value:'', to=byId('svc-to')?byId('svc-to').value:'', q=(byId('svc-q')?byId('svc-q').value:'').toLowerCase().trim();
+    var periode0=(from||to)?('du '+(from?from.split('-').reverse().join('/'):'…')+' au '+(to?to.split('-').reverse().join('/'):'…')):'toute la période';
+    if(svcTab==='synth'){
+      var miss=ssMissions(from,to).filter(function(m){ if(!q)return true; var ag=(m.agentId&&faById(m.agentId))?faById(m.agentId).nom:''; return (String(ag)+' '+String(m.client||'')+' '+String(m.siteAgent||m.titre||'')+' '+String(m.ville||'')).toLowerCase().indexOf(q)>=0; });
+      if(typeof apDeconflict==='function')apDeconflict(miss,10);
+      if(!miss.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune vacation (mission validée) '+esc(periode0)+(q?' pour ce filtre':'')+'.</div></div>'; return; }
+      var nComplet=0; miss.forEach(function(m){ var S=ssLoad(),st=S[m.id]||{},steps=ssSteps(m); var aOk=steps.every(function(s){return st[s.key]&&st[s.key].done;}); var pOk=steps.filter(svcNeedPhoto).every(function(s){return st[s.key]&&st[s.key].photoKey;}); if(aOk&&pOk)nComplet++; });
+      var head='<div class="card"><div class="lab" style="margin:0 0 2px">'+miss.length+' vacation'+(miss.length>1?'s':'')+' — '+esc(periode0)+'</div><div class="fa-d" style="margin:0">✅ '+nComplet+' complète'+(nComplet>1?'s':'')+' · <span style="color:#e0a13b;font-weight:700">'+(miss.length-nComplet)+' incomplète'+((miss.length-nComplet)>1?'s':'')+'</span> <span class="sub">(tous les appels faits + toutes les photos présentes)</span></div></div>';
+      wrap.innerHTML=head+miss.map(svcSynthCard).join('');
+      wrap.querySelectorAll('.svc-ph').forEach(function(a){ a.onclick=function(ev){ ev.preventDefault(); if(typeof photoOpen==='function')photoOpen(a.getAttribute('data-k')); }; });
+      wrap.querySelectorAll('.svc-goappels').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); var tb=document.querySelector('#tabs button[data-s="suiviappels"]'); if(tb)tb.click(); }; });
+      return;
+    }
+    var SV=load('fkh_services');
     function svcDate(x){ return x.mdate||(x.at?new Date(x.at).toISOString().slice(0,10):''); }
     var arr=(SV||[]).filter(function(x){
       var xd=svcDate(x);
@@ -1864,6 +1913,7 @@ button.big:active{transform:translateY(1px)}
   if(byId('svc-from'))byId('svc-from').addEventListener('change',renderServices);
   if(byId('svc-to'))byId('svc-to').addEventListener('change',renderServices);
   if(byId('svc-q'))byId('svc-q').addEventListener('input',renderServices);
+  document.querySelectorAll('#svcTabs button').forEach(function(b){ b.onclick=function(){ svcTab=b.getAttribute('data-t'); renderServices(); }; });
   document.querySelectorAll('.svc-preset').forEach(function(b){ b.addEventListener('click',function(){
     var d=b.getAttribute('data-d'); var t=impTodayISO();
     if(d==='all'){ byId('svc-from').value=''; byId('svc-to').value=''; }
