@@ -152,6 +152,9 @@ button.big:active{transform:translateY(1px)}
 .gexp-day{padding:5px 13px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);font-size:13px;font-weight:700;cursor:pointer}
 .gexp-day.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
 .gexp-grp{font-size:10.5px;font-weight:800;letter-spacing:.6px;color:var(--muted);margin:11px 0 4px;text-transform:uppercase}
+#gexp-bar.reorder .gexp-day{cursor:grab;box-shadow:0 0 0 1px var(--brand) inset;touch-action:none}
+#gexp-bar.reorder .gexp-day.gexp-dragging{opacity:.5;cursor:grabbing}
+#gexp-reorder.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
 #gexp-newdem{background:#1f6f43;color:#fff;border-color:#1f6f43}
 #gexp-addvac{background:#2a4a8a;color:#fff;border-color:#2a4a8a}
 </style>
@@ -226,8 +229,10 @@ button.big:active{transform:translateY(1px)}
       <div class="gexp-row">
         <input id="gexp-in" placeholder="📝 Note codée : c AQUILA s Carrefour 83000 1930 2200 x2 !" autocomplete="off">
         <button type="button" id="gexp-do" title="Transcrire">✨ Transcrire</button>
+        <button type="button" id="gexp-reorder" title="Réorganiser les boutons (glisser-déposer)">↕️</button>
         <button type="button" id="gexp-help" title="Aide codes">❔</button>
       </div>
+      <div id="gexp-reorder-hint" class="hidden" style="margin-top:6px;padding:6px 9px;border:1px dashed var(--brand);border-radius:9px;background:var(--panel2);font-size:12px">✋ <b>Mode réorganiser</b> — glisse les rectangles pour les ranger dans ton ordre. Reclique <b>↕️</b> pour terminer. <button type="button" id="gexp-reorder-reset" style="padding:2px 8px;font-size:11px;margin-left:6px">↺ Ordre d'origine</button></div>
       <div class="gexp-grp">🏢 Client &amp; lieu</div>
       <div class="gexp-row" style="margin-top:2px;flex-wrap:wrap"><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-clientbtn">🏢 Client ▾</button><div id="gexp-clientdd" class="sugg hidden" style="left:0;right:auto;min-width:200px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-sitebtn">🏬 Type de site ▾</button><div id="gexp-sitedd" class="sugg hidden" style="left:0;right:auto;min-width:190px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-villebtn">📍 Ville ▾</button><div id="gexp-villedd" class="sugg hidden" style="left:0;right:auto;min-width:210px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-cpbtn">🔢 Code postal ▾</button><div id="gexp-cpdd" class="sugg hidden" style="left:0;right:auto;min-width:210px"></div></span></div>
       <div class="gexp-grp">🗓️ Quand</div>
@@ -3386,6 +3391,30 @@ button.big:active{transform:translateY(1px)}
     if(byId('gexp-datebtn'))byId('gexp-datebtn').addEventListener('click',function(){ var dp=byId('gexp-datepanel'); if(!dp)return; if(dp.classList.contains('hidden')){ dp.classList.remove('hidden'); if(byId('gexp-date-in')&&!byId('gexp-date-in').value)byId('gexp-date-in').value=impTodayISO(); } else dp.classList.add('hidden'); });
     if(byId('gexp-date-apply'))byId('gexp-date-apply').addEventListener('click',function(){ gexpDate=byId('gexp-date-in').value||''; gexpH1=byId('gexp-hh1').value||''; gexpH2=byId('gexp-hh2').value||''; gexpChip('gexp-h1btn',gexpH1?'Début '+gexpH1:''); gexpChip('gexp-h2btn',gexpH2?'Fin '+gexpH2:''); byId('gexp-datepanel').classList.add('hidden'); byId('gexp-datebtn').classList.toggle('on', !!(gexpDate||gexpH1||gexpH2)); document.querySelectorAll('.gexp-day[data-d]').forEach(function(x){x.classList.remove('on');}); doTranscribe(); });
     if(byId('gexp-date-cancel'))byId('gexp-date-cancel').addEventListener('click',function(){ byId('gexp-datepanel').classList.add('hidden'); });
+    // ==== Réorganiser les rectangles par glisser-déposer (tactile + souris), mémorisé par appareil ====
+    (function gexpReorder(){
+      var bar=byId('gexp-bar'), tglBtn=byId('gexp-reorder'); if(!bar||!tglBtn)return;
+      var LSKEY='fkh_gexp_order';
+      function unitOf(btn){ var p=btn.parentElement; return (p&&p.tagName==='SPAN')?p:btn; }
+      function btnOf(unit){ return unit.classList&&unit.classList.contains('gexp-day')?unit:unit.querySelector('.gexp-day'); }
+      function keyOf(unit){ var b=btnOf(unit); if(!b)return null; return b.id||('day-'+b.getAttribute('data-d')); }
+      function sortRows(){ return Array.prototype.filter.call(bar.querySelectorAll('.gexp-row'),function(r){ return r.querySelector('.gexp-day'); }); }
+      function saveOrder(){ var o={}; sortRows().forEach(function(r,i){ o[i]=Array.prototype.map.call(r.children,function(u){ return keyOf(u); }).filter(Boolean); }); try{ localStorage.setItem(LSKEY,JSON.stringify(o)); }catch(e){} }
+      function applyOrder(){ var o=null; try{ o=JSON.parse(localStorage.getItem(LSKEY)||'null'); }catch(e){} if(!o)return; sortRows().forEach(function(r,i){ var want=o[i]; if(!want)return; var map={}; Array.prototype.forEach.call(r.children,function(u){ var k=keyOf(u); if(k)map[k]=u; }); want.forEach(function(k){ if(map[k])r.appendChild(map[k]); }); }); }
+      applyOrder();
+      var active=false;
+      function setMode(on){ active=on; bar.classList.toggle('reorder',on); tglBtn.classList.toggle('on',on); var h=byId('gexp-reorder-hint'); if(h)h.classList.toggle('hidden',!on); }
+      tglBtn.addEventListener('click',function(e){ e.preventDefault(); setMode(!active); });
+      var rr=byId('gexp-reorder-reset'); if(rr)rr.addEventListener('click',function(){ try{ localStorage.removeItem(LSKEY); }catch(e){} location.reload(); });
+      // Bloque le clic normal des rectangles quand on est en mode réorganiser
+      bar.addEventListener('click',function(e){ if(active){ var b=e.target.closest?e.target.closest('.gexp-day'):null; if(b){ e.preventDefault(); e.stopPropagation(); } } },true);
+      // Glisser via Pointer Events (marche à la souris ET au doigt)
+      var drag=null;
+      bar.addEventListener('pointerdown',function(e){ if(!active)return; var b=e.target.closest?e.target.closest('.gexp-day'):null; if(!b)return; var u=unitOf(b); if(u.parentElement&&!u.parentElement.classList.contains('gexp-row'))u=b; e.preventDefault(); drag=u; u.classList.add('gexp-dragging'); if(b.setPointerCapture)try{b.setPointerCapture(e.pointerId);}catch(_){}} );
+      bar.addEventListener('pointermove',function(e){ if(!active||!drag)return; var row=drag.parentElement; if(!row)return; var under=document.elementFromPoint(e.clientX,e.clientY); if(!under)return; var target=under.closest?under.closest('.gexp-day'):null; if(!target)return; var tu=unitOf(target); if(tu===drag||tu.parentElement!==row)return; var r=tu.getBoundingClientRect(); var after=(e.clientX> (r.left+r.width/2)); row.insertBefore(drag, after?tu.nextSibling:tu); });
+      function endDrag(){ if(!drag)return; drag.classList.remove('gexp-dragging'); drag=null; saveOrder(); }
+      bar.addEventListener('pointerup',endDrag); bar.addEventListener('pointercancel',endDrag);
+    })();
     if(byId('gexp-help'))byId('gexp-help').onclick=function(){ alert('Codes de la note rapide :\n• Heure : 1 à 4 chiffres — 8→08:00, 845→08:45, 1945→19:45\n• Vacation : deux heures — « 1930 2200 » → 19:30 à 22:00\n• 5 chiffres = code postal (remplit la ville)\n• c = Client · s = Type de site · v = Ville (ex. « c AQUILA s Magasin v Dijon »)\n• d = date (d 28 → le 28 du mois · d 2808 → 28/08 · d auj / d dem)\n• x2 = 2 agents · ! = urgent\n• Boutons Aujourd\'hui / Demain / 🕛 H24\n• tout autre mot va dans les notes'); };
   })();
 
