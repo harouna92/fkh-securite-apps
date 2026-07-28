@@ -151,6 +151,9 @@ button.big:active{transform:translateY(1px)}
 #gexp-help{width:38px;padding:0}
 .gexp-day{padding:5px 13px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);font-size:13px;font-weight:700;cursor:pointer}
 .gexp-day.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.gexp-grp{font-size:10.5px;font-weight:800;letter-spacing:.6px;color:var(--muted);margin:11px 0 4px;text-transform:uppercase}
+#gexp-newdem{background:#1f6f43;color:#fff;border-color:#1f6f43}
+#gexp-addvac{background:#2a4a8a;color:#fff;border-color:#2a4a8a}
 </style>
 
 <div class="top">
@@ -225,13 +228,15 @@ button.big:active{transform:translateY(1px)}
         <button type="button" id="gexp-do" title="Transcrire">✨ Transcrire</button>
         <button type="button" id="gexp-help" title="Aide codes">❔</button>
       </div>
-      <div class="gexp-row" style="margin-top:6px;flex-wrap:wrap"><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-clientbtn">🏢 Client ▾</button><div id="gexp-clientdd" class="sugg hidden" style="left:0;right:auto;min-width:200px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-sitebtn">🏬 Type de site ▾</button><div id="gexp-sitedd" class="sugg hidden" style="left:0;right:auto;min-width:190px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-villebtn">📍 Ville ▾</button><div id="gexp-villedd" class="sugg hidden" style="left:0;right:auto;min-width:210px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-cpbtn">🔢 Code postal ▾</button><div id="gexp-cpdd" class="sugg hidden" style="left:0;right:auto;min-width:210px"></div></span><button type="button" class="gexp-day" id="gexp-datebtn">📅 Date précise</button><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-h1btn">🕐 Heure de début ▾</button><div id="gexp-h1dd" class="sugg hidden" style="left:0;right:auto;min-width:170px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-h2btn">🕕 Heure de fin ▾</button><div id="gexp-h2dd" class="sugg hidden" style="left:0;right:auto;min-width:170px"></div></span><button type="button" class="gexp-day" id="gexp-addvac" title="Mémorise cette vacation (date + heures) et permet d'en saisir une autre">➕ Vacation suivante</button></div>
+      <div class="gexp-grp">🏢 Client &amp; lieu</div>
+      <div class="gexp-row" style="margin-top:2px;flex-wrap:wrap"><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-clientbtn">🏢 Client ▾</button><div id="gexp-clientdd" class="sugg hidden" style="left:0;right:auto;min-width:200px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-sitebtn">🏬 Type de site ▾</button><div id="gexp-sitedd" class="sugg hidden" style="left:0;right:auto;min-width:190px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-villebtn">📍 Ville ▾</button><div id="gexp-villedd" class="sugg hidden" style="left:0;right:auto;min-width:210px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-cpbtn">🔢 Code postal ▾</button><div id="gexp-cpdd" class="sugg hidden" style="left:0;right:auto;min-width:210px"></div></span></div>
+      <div class="gexp-grp">🗓️ Quand</div>
+      <div class="gexp-row" style="margin-top:2px;flex-wrap:wrap"><button type="button" class="gexp-day" data-d="0">Aujourd'hui</button><button type="button" class="gexp-day" data-d="1">Demain</button><button type="button" class="gexp-day" id="gexp-datebtn">📅 Date précise</button><button type="button" class="gexp-day" id="gexp-asap" title="Dès que possible">🚀 Dès que possible</button><button type="button" class="gexp-day" id="gexp-h24" title="Service 24h/24">🕛 H24</button><button type="button" class="gexp-day" id="gexp-agence" title="Horaires d'agence">🏢 Horaires d'agence</button><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-h1btn">🕐 Heure de début ▾</button><div id="gexp-h1dd" class="sugg hidden" style="left:0;right:auto;min-width:170px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-h2btn">🕕 Heure de fin ▾</button><div id="gexp-h2dd" class="sugg hidden" style="left:0;right:auto;min-width:170px"></div></span></div>
       <div id="gexp-datepanel" class="hidden" style="margin-top:6px;padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">
         <div class="grid2"><label class="f"><div class="lab">Date</div><input type="date" id="gexp-date-in"></label></div>
         <div class="grid2" style="margin-top:6px"><label class="f"><div class="lab">De</div><input type="time" id="gexp-hh1"></label><label class="f"><div class="lab">À</div><input type="time" id="gexp-hh2"></label></div>
         <div class="acts" style="margin-top:8px"><button type="button" class="ok" id="gexp-date-apply">✅ Appliquer</button><button type="button" id="gexp-date-cancel">Annuler</button></div>
       </div>
-      <div class="gexp-row" style="margin-top:6px;flex-wrap:wrap"><span class="sub" style="margin:0">📅</span><button type="button" class="gexp-day" data-d="0">Aujourd'hui</button><button type="button" class="gexp-day" data-d="1">Demain</button><button type="button" class="gexp-day" id="gexp-asap" title="Dès que possible">🚀 Dès que possible</button><button type="button" class="gexp-day" id="gexp-h24" title="Service 24h/24">🕛 H24</button><button type="button" class="gexp-day" id="gexp-agence" title="Horaires d'agence">🏢 Horaires d'agence</button></div>
       <div id="gexp-asappanel" class="hidden" style="margin-top:6px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">
         <div class="sub" style="margin:0 0 8px">🚀 <b>Dès que possible</b> — et ça se termine quand ?</div>
         <div class="gexp-row" style="flex-wrap:wrap;gap:6px">
@@ -244,13 +249,16 @@ button.big:active{transform:translateY(1px)}
           <div class="acts" style="margin-top:8px"><button type="button" class="ok" id="gexp-asap-apply">✅ Appliquer</button><button type="button" id="gexp-asap-none">Sans précision</button></div>
         </div>
       </div>
-      <div class="gexp-row" style="margin-top:6px;flex-wrap:wrap"><button type="button" class="gexp-day" id="gexp-depfix" title="Départ fixe">🚪 Départ fixe</button><button type="button" class="gexp-day" id="gexp-deparr" title="Départ à l'arrivée du personnel">👥 Départ à l'arrivée du personnel</button></div>
+      <div class="gexp-grp">🚪 Départ</div>
+      <div class="gexp-row" style="margin-top:2px;flex-wrap:wrap"><button type="button" class="gexp-day" id="gexp-depfix" title="Départ fixe">🚪 Départ fixe</button><button type="button" class="gexp-day" id="gexp-deparr" title="Départ à l'arrivée du personnel">👥 Départ à l'arrivée du personnel</button></div>
       <div id="gexp-h24panel" class="hidden" style="margin-top:6px;padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">
         <div class="sub" style="margin:0 0 6px">🕛 H24 — horaires + fin</div>
         <div class="grid2"><label class="f"><div class="lab">Heure de début</div><input type="time" id="gexp-h24h1"></label><label class="f"><div class="lab">Heure de fin</div><input type="time" id="gexp-h24h2"></label></div>
         <label class="f" style="margin-top:6px"><div class="lab">Date de fin (si autre jour)</div><input type="date" id="gexp-h24date"></label>
         <div class="acts" style="margin-top:8px"><button type="button" class="ok" id="gexp-h24apply">✅ Appliquer</button></div>
       </div>
+      <div class="gexp-grp">⚡ Actions</div>
+      <div class="gexp-row" style="margin-top:2px;flex-wrap:wrap"><button type="button" class="gexp-day" id="gexp-addvac" title="Mémorise cette vacation (date + heures) et prépare-en une autre dans la même demande">➕ Vacation suivante</button><button type="button" class="gexp-day" id="gexp-newdem" title="Enregistre la demande en cours et prépare-en une nouvelle">➕ Nouvelle demande</button></div>
       <div id="gexp-prev" class="hidden" style="margin-top:8px"></div>
     </div>
   </section>
@@ -3315,6 +3323,11 @@ button.big:active{transform:translateY(1px)}
       document.querySelectorAll('.gexp-day[data-d]').forEach(function(x){x.classList.remove('on');});
       gexpChip('gexp-h1btn',''); gexpChip('gexp-h2btn',''); var db=byId('gexp-datebtn'); if(db)db.classList.remove('on');
       inp.value=stripTimeTokens(inp.value); doTranscribe();
+    });
+    if(byId('gexp-newdem'))byId('gexp-newdem').addEventListener('click',function(){
+      if(!gexpHasCur()){ alert('Renseigne d\'abord une demande (client, ville, heures…), puis clique « ➕ Nouvelle demande » pour en préparer une autre.'); return; }
+      doTranscribe(); gexpAdded.push(gexpPayload()); inp.value=''; if(window._gexpReset)window._gexpReset(); doTranscribe();
+      if(typeof flash==='function')flash(this,'✔ Demande mise de côté — saisis la suivante');
     });
     if(byId('gexp-asap-none'))byId('gexp-asap-none').addEventListener('click',function(){ asapClear(); asapModeSel=''; byId('gexp-asappanel').classList.add('hidden'); doTranscribe(); });
     if(byId('gexp-depfix'))byId('gexp-depfix').addEventListener('click',function(){ gexpDepart=(gexpDepart==='fixe')?'':'fixe'; this.classList.toggle('on',gexpDepart==='fixe'); byId('gexp-deparr').classList.remove('on'); doTranscribe(); });
