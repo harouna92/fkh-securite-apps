@@ -178,6 +178,17 @@ async function aiAnalyzeImage(env, b64, media) {
   if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
   return aiParseJson(await r.json());
 }
+// #3 Vision : une photo censee montrer un agent en tenue montre-t-elle plutot un batiment ?
+function b64FromBuf(buf) { let bin = ""; const bytes = new Uint8Array(buf), chunk = 0x8000; for (let i = 0; i < bytes.length; i += chunk) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk)); return btoa(bin); }
+async function aiCheckPhoto(env, b64, media) {
+  const content = [
+    { type: "text", text: "Tu verifies une photo censee montrer un AGENT DE SECURITE EN TENUE (uniforme). Dis si elle montre bien une PERSONNE en tenue, ou plutot un BATIMENT / lieu / objet sans personne (erreur probable de l'agent). Reponds UNIQUEMENT en JSON strict : {\"contenu\":\"personne|batiment|autre\",\"tenue_visible\":true|false,\"resume\":\"\"}." },
+    { type: "image", source: { type: "base64", media_type: media || "image/jpeg", data: b64 } },
+  ];
+  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 200, messages: [{ role: "user", content: content }] }) });
+  if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
+  return aiParseJson(await r.json());
+}
 async function aiScan(env, maxCalls, force) {
   if (!env.RINGOVER_API_KEY || !env.OPENAI_API_KEY || !env.ANTHROPIC_API_KEY) return { error: "keys_missing" };
   // Liste blanche stricte : on n'analyse QUE les numéros suivis (avec leur règle entrant/sortant)
@@ -275,6 +286,27 @@ export default {
       return json({ ok: true, key: key });
     }
 
+    // --- PUBLIC (à token) : ingestion d'un mail (BDC) transféré par le Gmail Apps Script → pipeline IA existant ---
+    if (path === "/mail/ingest" && request.method === "POST") {
+      const tok = url.searchParams.get("k") || "";
+      const expected = env.MAIL_INGEST_TOKEN || "fkh-mail-ingest-2026";
+      if (tok !== expected) return json({ error: "bad_token" }, 403);
+      if (!env.ANTHROPIC_API_KEY) return json({ error: "keys_missing" }, 502);
+      let b = {}; try { b = await request.json(); } catch (_) {}
+      const msgId = String(b.msgId || "").replace(/[^\w-]/g, "") || ("m" + Date.now());
+      const cdr = "mail_" + msgId;
+      const text = (String(b.subject || "") + "\n" + String(b.body || "")).slice(0, 8000);
+      if (!text.trim()) return json({ error: "empty" }, 400);
+      const exist = await env.DB.prepare("SELECT cdr_id FROM ai_calls WHERE cdr_id = ?").bind(cdr).first();
+      if (exist) return json({ ok: true, skipped: "already" });
+      let data = {}, isDem = 0;
+      try { const an = await aiAnalyze(env, text); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], transcript: text.slice(0, 2000), number: String(b.from || "mail"), direction: "in", source: "mail", start: new Date().toISOString() }; isDem = data.demandes.length ? 1 : 0; }
+      catch (e) { data = { error: String((e && e.message) || e) }; }
+      await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(cdr, Date.now(), isDem, JSON.stringify(data)).run();
+      if (isDem) { try { await pushAll(env, aiDemandeNotif({ cdr_id: cdr, direction: "in" }, data.demandes)); } catch (e) {} }
+      return json({ ok: true, detected: isDem ? data.demandes.length : 0 });
+    }
+
     // --- Toutes les autres routes exigent un mot de passe valide (complet OU restreint) ---
     const pass = request.headers.get("X-App-Password") || "";
     if (!roleFor(pass)) {
@@ -350,6 +382,22 @@ export default {
       if (!data) return json({ error: "empty" }, 400);
       try { const an = await aiAnalyzeImage(env, data, media); return json({ ok: true, resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [] }); }
       catch (e) { return json({ error: String((e && e.message) || e) }, 502); }
+    }
+    // --- IA vision : vérifier qu'une photo « tenue » montre bien une personne en tenue (pas un bâtiment) ---
+    if (path === "/ai/check-photo" && request.method === "POST") {
+      if (!env.ANTHROPIC_API_KEY) return json({ error: "keys_missing" }, 502);
+      if (!env.PHOTOS) return json({ error: "no_bucket" }, 500);
+      let b = {}; try { b = await request.json(); } catch (_) {}
+      const key = String(b.key || "");
+      if (!key) return json({ error: "empty" }, 400);
+      const obj = await env.PHOTOS.get(key);
+      if (!obj) return json({ error: "not_found" }, 404);
+      try {
+        const b64 = b64FromBuf(await obj.arrayBuffer());
+        const media = (obj.httpMetadata && obj.httpMetadata.contentType) || "image/jpeg";
+        const an = await aiCheckPhoto(env, b64, media);
+        return json({ ok: true, contenu: an.contenu || "autre", tenue_visible: !!an.tenue_visible, resume: an.resume || "" });
+      } catch (e) { return json({ error: String((e && e.message) || e) }, 502); }
     }
     if (path === "/ai/demandes" && request.method === "GET") {
       const rs = await env.DB.prepare("SELECT cdr_id, at, data FROM ai_calls WHERE is_demande = 1 AND dismissed = 0 AND created = 0 ORDER BY at DESC LIMIT 50").all();

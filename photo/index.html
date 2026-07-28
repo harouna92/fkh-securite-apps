@@ -38,10 +38,13 @@
   var API='https://fkh-gestion-api.hacamara2.workers.dev';
   var TOKEN='fkh-photo-link-2026';
   var q=new URLSearchParams(location.search);
-  var agent=(q.get('a')||'').trim(), type=(q.get('t')||'prise').trim(), mid=(q.get('m')||'').trim(), site=(q.get('s')||'').trim();
+  // Lien permanent par agent : aid = identifiant fiche agent ; name = son nom. Pas de type (l'agence déduit l'étape via l'horodatage).
+  var aid=(q.get('aid')||'').trim();
+  var agent=(q.get('name')||q.get('a')||'').trim(), type=(q.get('t')||(aid?'':'prise')).trim(), mid=(q.get('m')||'').trim(), site=(q.get('s')||'').trim();
   var TYPES={prise:'🟢 Prise de service',fin:'🔚 Fin de service',tenue:'🦺 Contrôle tenue',controle:'🎛️ Contrôle pendant service'};
   var v=document.getElementById('v'), c=document.getElementById('c'), snap=document.getElementById('snap'), send=document.getElementById('send'), retry=document.getElementById('retry'), msg=document.getElementById('msg'), prev=document.getElementById('preview');
-  document.getElementById('ctx').innerHTML='<span class="badge">'+(TYPES[type]||type)+'</span>'+(agent?'<span class="badge">👤 '+esc(agent)+'</span>':'')+(site?'<span class="badge">📍 '+esc(site)+'</span>':'');
+  document.getElementById('ctx').innerHTML=(type?'<span class="badge">'+(TYPES[type]||type)+'</span>':'')+(agent?'<span class="badge">👤 '+esc(agent)+'</span>':'')+(site?'<span class="badge">📍 '+esc(site)+'</span>':'');
+  if(aid)msg.innerHTML='<span style="color:#8aa">Photo horodatée automatiquement (date, heure, position). Prends-la au moment du service.</span>';
   if(type==='tenue')msg.innerHTML='<span style="color:#e0a13b">🦺 Cadre bien l\'AGENT en tenue (pas le bâtiment).</span>';
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});}
   function pad(n){return (n<10?'0':'')+n;}
@@ -55,7 +58,7 @@
     var W=v.videoWidth, H=v.videoHeight; c.width=W; c.height=H; var x=c.getContext('2d'); x.drawImage(v,0,0,W,H);
     // tampon horodaté en bas
     var d=new Date(); var stamp=pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
-    var line2=(agent?agent+' · ':'')+(TYPES[type]||type).replace(/^[^ ]+ /,'');
+    var line2=aid?(agent||''):((agent?agent+' · ':'')+(TYPES[type]||type||'').replace(/^[^ ]+ /,''));
     var line3=gpsCity?('📍 '+(gpsStreet?gpsStreet+', ':'')+gpsCity):'';
     var fs=Math.max(16,Math.round(W/32)); x.font='bold '+fs+'px system-ui,sans-serif'; x.textBaseline='bottom';
     var nl=line3?3:2, bh=fs*(nl*1.25+0.5); x.fillStyle='rgba(0,0,0,.55)'; x.fillRect(0,H-bh,W,bh);
@@ -68,7 +71,7 @@
     send.disabled=true; send.textContent='⏳ Envoi…'; msg.className=''; msg.textContent='';
     var safe=(agent||'agent').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'').toLowerCase()||'agent';
     var citySlug=(gpsCity||'').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'').toLowerCase()||'ville_inconnue';
-    var base = mid ? ('appel/'+mid+'/'+(type==='controle'?'ctrl':type)) : ('agent/'+type+'/'+safe+'/'+citySlug);
+    var base = mid ? ('appel/'+mid+'/'+(type==='controle'?'ctrl':type)) : (aid ? ('agent/'+aid+'/'+citySlug) : ('agent/'+type+'/'+safe+'/'+citySlug));
     var key = base+'/'+Date.now()+'.jpg';
     fetch(API+'/agent-photo?k='+encodeURIComponent(TOKEN)+'&key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'image/jpeg'},body:blob}).then(function(r){return r.json();}).then(function(j){
       if(j&&j.ok){ msg.className='good'; msg.textContent='✅ Photo envoyée. Merci !'; send.style.display='none'; retry.textContent='📷 Prendre une autre photo'; if(stream)stream.getTracks().forEach(function(t){t.stop();}); }
