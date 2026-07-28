@@ -1361,6 +1361,62 @@ button.big:active{transform:translateY(1px)}
     }
     return out;
   }
+  // ==== Vacations : extraction des dates d'une demande + découpage à la validation (1 mission par vacation) ====
+  function frMonthNum(s){ s=String(s||'').toLowerCase(); var M=[['janv','01'],['févr','02'],['fevr','02'],['mars','03'],['avr','04'],['mai','05'],['juin','06'],['juil','07'],['aoû','08'],['aou','08'],['août','08'],['sept','09'],['oct','10'],['nov','11'],['déc','12'],['dec','12']]; for(var i=0;i<M.length;i++){ if(s.indexOf(M[i][0])>=0)return M[i][1]; } return ''; }
+  function svYearFor(mm,dd){ try{ var now=new Date(), y=now.getFullYear(); var cand=new Date(y+'-'+mm+'-'+dd+'T00:00:00'); var today=new Date(now.getFullYear(),now.getMonth(),now.getDate()); if(!isNaN(cand.getTime())&&cand.getTime()<today.getTime()-7*864e5)y++; return String(y); }catch(e){ return String((new Date()).getFullYear()); } }
+  function frDateToISO(raw){
+    var s=String(raw||'').trim(); if(!s)return '';
+    var m=s.match(/(\d{4})-(\d{2})-(\d{2})/); if(m)return m[1]+'-'+m[2]+'-'+m[3];
+    m=s.match(/(\d{1,2})\s*\/\s*(\d{1,2})(?:\s*\/\s*(\d{2,4}))?/); // jj/mm[/aaaa]
+    if(m){ var dd=('0'+m[1]).slice(-2), mm=('0'+m[2]).slice(-2), yy=m[3]; if(yy){ if(yy.length===2)yy='20'+yy; } else { yy=svYearFor(mm,dd); } return yy+'-'+mm+'-'+dd; }
+    m=s.match(/(\d{1,2})\s*(?:er|ère|ere)?\s*(janv|févr|fevr|mars|avr|mai|juin|juil|aoû|aou|août|sept|oct|nov|déc|dec)/i);
+    if(m){ var mo=frMonthNum(m[2]); if(mo){ var d2=('0'+m[1]).slice(-2); return svYearFor(mo,d2)+'-'+mo+'-'+d2; } }
+    return '';
+  }
+  function parseHoraires(raw){
+    var t=String(raw||'').match(/\d{1,2}\s*[hH:]\s*\d{0,2}/g)||[];
+    function nm(x){ var mm=x.match(/(\d{1,2})\s*[hH:]\s*(\d{0,2})/); return mm?(('0'+mm[1]).slice(-2)+':'+(mm[2]?('0'+mm[2]).slice(-2):'00')):''; }
+    return { mheure: t[0]?nm(t[0]):'', mfin: t[1]?nm(t[1]):'' };
+  }
+  function svExtractVacations(x){
+    var out=[];
+    if(x && Array.isArray(x.vacations) && x.vacations.length){
+      x.vacations.forEach(function(v){ var hor=v.horaires||((v.h1&&v.h2)?(v.h1+' → '+v.h2):(v.h1||v.h2||'')); var ph=parseHoraires(hor); out.push({dateLabel:(v.date||''), horLabel:hor, mdate:frDateToISO(v.date||''), mheure:ph.mheure, mfin:ph.mfin}); });
+      return out;
+    }
+    var lines=String((x&&x.texte)||'').split('\n');
+    lines.forEach(function(ln){ var m=ln.match(/^\s*Vacation(?:\s*\d+)?\s*:\s*(.+)$/i); if(m){ var body=m[1].trim(); if(!body)return; var ph=parseHoraires(body); out.push({dateLabel:body.replace(/\s*\d{1,2}\s*[hH:].*$/,'').replace(/^le\s+/i,'').trim(), horLabel:body, mdate:frDateToISO(body), mheure:ph.mheure, mfin:ph.mfin}); } });
+    if(out.length)return out;
+    var dl=lines.filter(function(l){return /^\s*Date\s*:/i.test(l);})[0]||'';
+    var hl=lines.filter(function(l){return /^\s*Horaires\s*:/i.test(l);})[0]||'';
+    if(dl||hl){ var ph2=parseHoraires(hl); out.push({dateLabel:dl.replace(/^\s*Date\s*:\s*/i,'').trim(), horLabel:hl.replace(/^\s*Horaires\s*:\s*/i,'').trim(), mdate:frDateToISO(dl), mheure:ph2.mheure, mfin:ph2.mfin}); }
+    return out;
+  }
+  function svSplitIntoVacations(base, vac){
+    var now=Date.now(), gid=base.id, tot=vac.length;
+    var siteLbl=(base.siteAgent||base.site||base.titre||'Mission');
+    var shared=JSON.parse(JSON.stringify(base)); Object.keys(shared).forEach(function(k){ if(k.charAt(0)==='_')delete shared[k]; });
+    var bodyTxt=String(shared.texte||'').split('\n').filter(function(l){ return !/^\s*(Vacation(?:\s*\d+)?|Date|Horaires|Début|Fin)\s*:/i.test(l); }).join('\n').replace(/\n{2,}/g,'\n').trim();
+    function applyVac(it,v,idx){
+      it.statut='validee'; it.valide=now; it.motif=''; delete it._pending; delete it.aiPending;
+      it.mdate=v.mdate||''; it.mheure=v.mheure||''; it.mfin=v.mfin||'';
+      it.vacGroup=gid; it.vacIdx=idx+1; it.vacTotal=tot;
+      var dlab=v.dateLabel||(v.mdate?v.mdate.split('-').reverse().join('/'):'');
+      it.titre=siteLbl+' — Vac '+(idx+1)+'/'+tot+(dlab?' · '+dlab:'');
+      var hdr='▶ Vacation '+(idx+1)+'/'+tot+' : '+[dlab,(v.horLabel||[v.mheure,v.mfin].filter(Boolean).join(' → '))].filter(Boolean).join(' · ');
+      it.texte=hdr+(bodyTxt?'\n'+bodyTxt:'');
+    }
+    applyVac(base, vac[0], 0);
+    for(var i=1;i<tot;i++){ var clone=JSON.parse(JSON.stringify(shared)); Object.keys(clone).forEach(function(k){ if(k.charAt(0)==='_')delete clone[k]; }); delete clone.agentId; clone.assoc=[]; clone.id='vac'+now+'_'+i+'_'+Math.round(Math.random()*9999); applyVac(clone, vac[i], i); SUIVI.unshift(clone); }
+  }
+  // Valide une demande : si ≥2 vacations → découpe en 1 mission par vacation, sinon 1 mission simple.
+  function svValidateSplit(it){
+    var vac=svExtractVacations(it);
+    if(vac.length>=2){ svSplitIntoVacations(it, vac); return vac.length; }
+    it.statut='validee'; it.valide=Date.now(); it.motif=''; delete it._pending; delete it.aiPending;
+    if(vac.length===1){ if(!it.mdate)it.mdate=vac[0].mdate||''; if(!it.mheure)it.mheure=vac[0].mheure||''; if(!it.mfin)it.mfin=vac[0].mfin||''; }
+    return 1;
+  }
   // Une demande en recherche sans aucune date décelable (ni mdate, ni date dans le texte) → à signaler.
   function svNoDate(x){
     if(!x||x.statut!=='recherche')return false;
@@ -1470,7 +1526,7 @@ button.big:active{transform:translateY(1px)}
     var id=b.getAttribute('data-id'), act=b.getAttribute('data-act'), it=null,i;
     for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;}
     if(!it)return;
-    if(act==='trouve'){it.statut='validee';it.valide=Date.now();it.motif='';delete it._pending;}
+    if(act==='trouve'){ svValidateSplit(it); }
     else if(act==='annule'){it._pending='annulee';}
     else if(act==='nongere'){it._pending='nongeree';}
     else if(act==='cancel'){delete it._pending;}
@@ -2933,7 +2989,7 @@ button.big:active{transform:translateY(1px)}
   }
   function aiLoadDemandes(){ if(typeof CLOUD==='undefined'||!CLOUD.on)return; fetch(CLOUD.base+'/ai/demandes',{headers:cloudHdr()}).then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ aiDetected=(j.items||[]).map(aiNormItem); aiAutoCreate(); } }).catch(function(){}); }
   function aiRouteNear(it,bd){ if(bd.la==null)return; bd.near.forEach(function(x){ fetch('https://router.project-osrm.org/route/v1/driving/'+bd.lo+','+bd.la+';'+x.lo+','+x.la+'?overview=false').then(function(r){return r.json();}).then(function(jj){ if(jj&&jj.routes&&jj.routes[0]){ var mn=Math.round(jj.routes[0].duration/60),hh=Math.floor(mn/60),mm=mn%60,dur=hh?(hh+'h'+(mm?('0'+mm).slice(-2):'')):(mn+' min'); it.texte=it.texte.replace('↦ '+x.n+' à '+x.d+' km','↦ '+x.n+' à '+x.d+' km · '+dur+' de route'); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderSuivi==='function')renderSuivi(); } }).catch(function(){}); }); }
-  function aiAutoCreate(){ var changed=false, firstNew=null; (aiDetected||[]).forEach(function(call){ var dems=call.demandes||[]; dems.forEach(function(d,idx){ var id='ai_'+call.cdr_id+'_'+idx; if(SUIVI.some(function(m){return String(m.id)===id;}))return; var bd=aiBuildDemande(call,d), now=Date.now(); var it={id:id,texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:d.client||'',la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,aiPending:true,aiCdr:call.cdr_id}; SUIVI.unshift(it); changed=true; if(!firstNew)firstNew=it; aiRouteNear(it,bd); }); if(dems.length&&CLOUD.on)fetch(CLOUD.base+'/ai/created',{method:'POST',headers:cloudHdr(),body:JSON.stringify({cdr_id:call.cdr_id})}).catch(function(){}); }); if(changed){ if(typeof saveSuivi==='function')saveSuivi(); aiDetected=[]; if(typeof renderSuivi==='function')renderSuivi(); if(byId('sec-supervision')&&!byId('sec-supervision').classList.contains('hidden')&&supTab==='oper')renderSupervision(); if(firstNew&&typeof notifFire==='function'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:firstNew.id,title:'🤖 Demande détectée (à vérifier)',body:(firstNew.titre||'')+' — Suivi demandes',go:'suivi'}); } }
+  function aiAutoCreate(){ var changed=false, firstNew=null; (aiDetected||[]).forEach(function(call){ var dems=call.demandes||[]; dems.forEach(function(d,idx){ var id='ai_'+call.cdr_id+'_'+idx; if(SUIVI.some(function(m){return String(m.id)===id;}))return; var bd=aiBuildDemande(call,d), now=Date.now(); var it={id:id,texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:d.client||'',la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiCdr:call.cdr_id}; SUIVI.unshift(it); changed=true; if(!firstNew)firstNew=it; aiRouteNear(it,bd); }); if(dems.length&&CLOUD.on)fetch(CLOUD.base+'/ai/created',{method:'POST',headers:cloudHdr(),body:JSON.stringify({cdr_id:call.cdr_id})}).catch(function(){}); }); if(changed){ if(typeof saveSuivi==='function')saveSuivi(); aiDetected=[]; if(typeof renderSuivi==='function')renderSuivi(); if(byId('sec-supervision')&&!byId('sec-supervision').classList.contains('hidden')&&supTab==='oper')renderSupervision(); if(firstNew&&typeof notifFire==='function'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:firstNew.id,title:'🤖 Demande détectée (à vérifier)',body:(firstNew.titre||'')+' — Suivi demandes',go:'suivi'}); } }
   function aiScanNow(force){ if(typeof CLOUD==='undefined'||!CLOUD.on){ alert('Connecte-toi (en ligne).'); return; } if(force&&!confirm('Re-analyser les appels récents (même déjà traités) avec la logique à jour ? Cela ré-analyse et peut avoir un petit coût.'))return; var b=byId(force?'ai-reana-btn':'ai-scan-btn'); if(b){b.disabled=true;b.textContent='⏳ …';} fetch(CLOUD.base+'/ai/scan'+(force?'?force=1':''),{method:'POST',headers:cloudHdr()}).then(function(r){return r.json();}).then(function(j){ if(b){b.disabled=false;b.textContent=force?'🔁 Re-analyser':'🔄 Scanner maintenant';} if(j&&j.ok){ var m=(force?'Re-analyse':'Scan')+' terminé : '+(j.processed||0)+' appel(s) analysé(s), '+(j.detected||0)+' demande(s) détectée(s).'+(j.note?' ('+j.note+')':''); if(!(j.processed)&&j.diag){ m+='\n\nDiagnostic (fenêtre '+(j.window_h||'?')+'h) :\n• '+j.diag.fetched+' appel(s) trouvé(s) sur Ringover\n• '+j.diag.answered+' décroché(s)\n• '+j.diag.withRecord+' avec enregistrement\n• '+j.diag.whitelisted+' sur un numéro suivi\n→ '+(j.diag.fetched===0?'Aucun appel dans la fenêtre.':(j.diag.withRecord===0?'Aucun appel enregistré (active l\'enregistrement Ringover).':(j.diag.whitelisted===0?'Aucun appel sur un numéro suivi.':'Aucun appel ne réunit décroché + enregistré + numéro suivi.'))); } alert(m); aiLoadDemandes(); } else { alert('Scan : '+((j&&j.error)||'erreur')+((j&&j.status)?' ('+j.status+')':'')); } }).catch(function(){ if(b){b.disabled=false;b.textContent=force?'🔁 Re-analyser':'🔄 Scanner maintenant';} alert('Serveur injoignable.'); }); }
   function aiBuildDemande(call,d){ var sel=(d.ville&&typeof commSearch==='function')?(commSearch(d.ville,1)||[])[0]:null; if(!sel&&d.cp&&typeof commByCP==='function')sel=(commByCP(d.cp,1)||[])[0];
     var cp=d.cp||(sel&&sel.codesPostaux?sel.codesPostaux[0]:''), vn=sel?sel.nom:(d.ville||''); var la=(sel&&sel.centre)?sel.centre.coordinates[1]:null, lo=(sel&&sel.centre)?sel.centre.coordinates[0]:null;
@@ -3074,7 +3130,16 @@ button.big:active{transform:translateY(1px)}
   if(byId('sa-body')){
     byId('sa-body').addEventListener('change',function(e){
       var t=e.target;
-      if(t.classList.contains('csg-done')){ csgSet(t.getAttribute('data-cid'),{done:t.checked,doneAt:Date.now()}); renderSuiviAppels(); return; }
+      if(t.classList.contains('csg-done')){ var _cid=t.getAttribute('data-cid'); csgSet(_cid,{done:t.checked,doneAt:Date.now()});
+        if(t.checked){ var _c=csgLoad().filter(function(x){return String(x.id)===String(_cid);})[0];
+          if(_c&&_c._valid&&_c._valid.demandeId){ var _dem=null; for(var _di=0;_di<SUIVI.length;_di++){ if(String(SUIVI[_di].id)===String(_c._valid.demandeId)){ _dem=SUIVI[_di]; break; } }
+            if(_dem&&_dem.statut==='recherche'){
+              if(_c._valid.type==='annuler'){ _dem.statut='annulee'; _dem.motif='Annulée par le client'; _dem.valide=Date.now(); delete _dem.aiPending; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderSuivi==='function')renderSuivi(); renderSuiviAppels(); alert('❌ Client a annulé — la demande passe en « Annulée » et sort de la file « en recherche ».'); return; }
+              else { var _n=svValidateSplit(_dem); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderSuivi==='function')renderSuivi(); renderSuiviAppels(); alert('✅ Client a validé — la demande part dans « Validées »'+(_n>1?(', découpée en '+_n+' vacations (1 par date).'):'.')); return; }
+            }
+          }
+        }
+        renderSuiviAppels(); return; }
       var mid=t.getAttribute('data-mid'), key=t.getAttribute('data-key'); if(!mid)return;
       if(t.classList.contains('sa-done')){ if(t.checked){ var now=ssNowHM(),rt=toMin(now)-toMin(t.getAttribute('data-h'));
           // Blocage : cochable seulement à partir de 5 min avant l'heure prévue
