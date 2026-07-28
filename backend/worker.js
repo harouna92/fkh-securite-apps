@@ -51,9 +51,11 @@ async function pushOne(env, row) {
   } catch (e) { return 0; }
 }
 async function pushAll(env) {
-  if (!env.VAPID_PRIVATE) return;
+  if (!env.VAPID_PRIVATE) return 0;
   const rs = await env.DB.prepare("SELECT endpoint, sub FROM push_subs").all();
-  await Promise.allSettled((rs.results || []).map((row) => pushOne(env, row)));
+  const rows = rs.results || [];
+  await Promise.allSettled(rows.map((row) => pushOne(env, row)));
+  return rows.length;
 }
 // Y a-t-il de NOUVELLES demandes « en recherche » entre l'ancienne et la nouvelle valeur ?
 function newRechercheIds(oldV, newV) {
@@ -170,8 +172,8 @@ export default {
     }
     // Envoi de test : notifie tous les appareils abonnés (pour vérifier le circuit)
     if (path === "/push/test" && request.method === "POST") {
-      await pushAll(env);
-      return json({ ok: true });
+      const sent = await pushAll(env);
+      return json({ ok: true, sent });
     }
 
     // --- Upload d'une photo vers R2 (corps = octets de l'image, ?key=chemin/dans/le/bucket) ---
