@@ -1473,8 +1473,11 @@ button.big:active{transform:translateY(1px)}
       var zdLine=(x.depCode&&ZDIFF[x.depCode])?'<div class="meta" style="color:var(--bad);font-weight:600"><span>🔺 Zone difficile'+(x.depNom?' : '+esc(x.depNom)+' ('+esc(x.depCode)+')':'')+'</span></div>':'';
       var cdLine=(x.statut==='validee'&&x.mdate&&typeof missCountdown==='function')?(function(){var cd=missCountdown(x);return cd?'<div class="meta" style="font-weight:700;color:var(--accent,#6ea8fe)"><span>'+cd+(x.mdate?' <span style="color:var(--muted);font-weight:400">('+esc(x.mdate)+(x.mheure?' '+esc(x.mheure):'')+')</span>':'')+'</span></div>':'';})():'';
       var izLine=(typeof izPriorityLine==='function')?izPriorityLine(x):'';
+      var vacTag=(x.statut==='validee'&&x.vacIdx)?'<div class="meta" style="color:var(--ok);font-weight:600"><span>🗂️ Vacation '+x.vacIdx+'/'+x.vacTotal+'</span></div>':'';
+      var vacSplitBtn='';
+      if(x.statut==='validee'&&!x.vacIdx){ var _vv=svExtractVacations(x); if(_vv.length>=2)vacSplitBtn='<div class="acts" style="margin-top:2px"><button class="ok" data-act="splitvac" data-id="'+x.id+'" title="Cette mission validée contient '+_vv.length+' dates : la découper en '+_vv.length+' vacations distinctes (1 carte par date)">🔪 Découper en '+_vv.length+' vacations</button></div>'; }
       var svBrd=x.aiPending?'#7b61ff':(svNoDate(x)?'var(--bad)':'');
-      return '<div class="sv"'+(svBrd?' style="border:1.5px solid '+svBrd+'"':'')+'><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+aiPendLine+noDateLine+cdLine+bigCitiesLine(x)+assocLine+zdLine+izLine+'<div class="svm">'+esc(x.texte)+'</div>'+body+pickBtn+editPanel+pickPanel+nearPanel+renderAffect(x)+'</div>';
+      return '<div class="sv"'+(svBrd?' style="border:1.5px solid '+svBrd+'"':'')+'><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+vacTag+aiPendLine+noDateLine+cdLine+bigCitiesLine(x)+assocLine+zdLine+izLine+'<div class="svm">'+esc(x.texte)+'</div>'+vacSplitBtn+body+pickBtn+editPanel+pickPanel+nearPanel+renderAffect(x)+'</div>';
     }
     if(suiviBucket==='validee'){
       var byD=function(a,b){var da=a.mdate||'9999-99-99',db=b.mdate||'9999-99-99';return da>db?1:(da<db?-1:0);};
@@ -1530,6 +1533,7 @@ button.big:active{transform:translateY(1px)}
     for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;}
     if(!it)return;
     if(act==='trouve'){ svValidateSplit(it); }
+    else if(act==='splitvac'){ var _sv=svExtractVacations(it); if(_sv.length>=2){ svSplitIntoVacations(it,_sv); saveSuivi(); renderSuivi(); } return; }
     else if(act==='annule'){it._pending='annulee';}
     else if(act==='nongere'){it._pending='nongeree';}
     else if(act==='cancel'){delete it._pending;}
@@ -1718,7 +1722,9 @@ button.big:active{transform:translateY(1px)}
   function renderZone(){
     var box=byId('zone-map'); if(!box)return;
     var zdBox=byId('zone-diff');
-    if(zdBox){ var dc=Object.keys(ZDIFF); zdBox.innerHTML=dc.length?dc.sort().map(function(cd){return '<div class="it"><span class="pill" style="background:var(--badbg);color:var(--bad);min-width:22px;text-align:center">🔺</span><span style="flex:1">'+esc(ZDIFF[cd].nom||'')+' ('+esc(cd)+')</span><button data-zdrm="'+esc(cd)+'" aria-label="Retirer" style="width:28px;height:28px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--bad);cursor:pointer">✕</button></div>';}).join(''):'<div class="hint">Aucune zone difficile. Marque-les depuis Suivi demandes → 🔺 Zone difficile.</div>'; zdBox.querySelectorAll('[data-zdrm]').forEach(function(bt){bt.onclick=function(){delete ZDIFF[bt.getAttribute('data-zdrm')];saveZDIFF();renderZone();};}); }
+    if(zdBox){ var dc=Object.keys(ZDIFF); zdBox.innerHTML=dc.length?dc.sort().map(function(cd){
+        var villes=[]; if(typeof SUIVI!=='undefined')SUIVI.forEach(function(m){ if(String(m.depCode||'')===String(cd)){ var v=m.ville||''; if(v&&villes.indexOf(v)<0)villes.push(v); } });
+        return '<div class="it"><span class="pill" style="background:var(--badbg);color:var(--bad);min-width:22px;text-align:center">🔺</span><span style="flex:1">'+esc(ZDIFF[cd].nom||'')+' ('+esc(cd)+')'+(villes.length?'<br><span style="color:var(--muted);font-size:12.5px">📍 '+esc(villes.join(' · '))+'</span>':'')+'</span><button data-zdrm="'+esc(cd)+'" aria-label="Retirer" style="width:28px;height:28px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--bad);cursor:pointer">✕</button></div>';}).join(''):'<div class="hint">Aucune zone difficile. Marque-les depuis Suivi demandes → 🔺 Zone difficile.</div>'; zdBox.querySelectorAll('[data-zdrm]').forEach(function(bt){bt.onclick=function(){delete ZDIFF[bt.getAttribute('data-zdrm')];saveZDIFF();renderZone();};}); }
     if(!GEO){ box.innerHTML='<div class="hint" style="text-align:center;padding:24px">Chargement de la carte…</div>'; fetch('https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements-version-simplifiee.geojson').then(function(r){return r.json();}).then(function(j){GEO=j;renderZone();}).catch(function(){box.innerHTML='<div class="hint" style="text-align:center;padding:24px">Carte indisponible (connexion requise au 1er chargement).</div>';}); return; }
     var feats=GEO.features.filter(function(f){var c=(f.properties.code||'')+'';return c.indexOf('97')!==0&&c.indexOf('98')!==0;});
     var counts=deptCounts(),max=1; feats.forEach(function(f){var n=counts[f.properties.code]||0;if(n>max)max=n;});
