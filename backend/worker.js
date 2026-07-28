@@ -106,6 +106,35 @@ function demandeNotif(m) {
   if (m.urgent && body.indexOf("URGENT") < 0) body = "🔴 URGENT\n" + body;
   return { title: "🆕 Nouvelle demande — " + String(head).slice(0, 40), body: (body || "Une demande vient de passer en recherche.").slice(0, 1600), url: "/fkh-securite-apps/gestion/", tag: "fkh-" + (m.id || Date.now()) };
 }
+// Notification pour une (ou plusieurs) demande(s) détectée(s) automatiquement par l'IA dans un appel.
+function aiDemandeNotif(call, demandes) {
+  const dir = call && call.direction === "out" ? "sortant" : "entrant";
+  let head, L = [];
+  if (demandes.length === 1) {
+    const d = demandes[0];
+    head = d.client || d.site || d.ville || "Demande";
+    if (d.client) L.push("🏢 " + d.client);
+    if (d.site) L.push("🏬 " + d.site);
+    const vc = [d.ville, d.cp ? "(" + d.cp + ")" : ""].filter(Boolean).join(" ");
+    if (vc) L.push("📍 " + vc);
+    const v0 = (Array.isArray(d.vacations) && d.vacations[0]) || null;
+    if (v0) L.push("🕐 " + [v0.date, v0.horaires].filter(Boolean).join(" · "));
+    if (Array.isArray(d.vacations) && d.vacations.length > 1) L.push("＋ " + (d.vacations.length - 1) + " autre(s) date(s)");
+    if (d.urgent) L.unshift("🔴 URGENT");
+  } else {
+    head = demandes.length + " sites";
+    demandes.slice(0, 4).forEach((d) => L.push("• " + [d.site || d.client || "Site", d.ville].filter(Boolean).join(" — ")));
+    if (demandes.length > 4) L.push("…");
+  }
+  L.push("");
+  L.push("👉 Déjà dans Suivi demandes (en recherche). À vérifier avant de lancer la recherche.");
+  return {
+    title: "🤖 Demande détectée par l'IA — " + String(head).slice(0, 34),
+    body: ("📞 Appel " + dir + "\n" + L.join("\n")).slice(0, 1600),
+    url: "/fkh-securite-apps/gestion/",
+    tag: "fkh-ai-" + (call && call.cdr_id ? call.cdr_id : Date.now()),
+  };
+}
 // Quelles demandes viennent de passer « en recherche » entre l'ancienne et la nouvelle valeur ?
 function newRechercheItems(oldV, newV) {
   let o = [], n = [];
@@ -148,8 +177,9 @@ async function aiScan(env, maxCalls, force) {
   let watchMap = {};
   try { const wr = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_ai_numbers'").first(); const list = wr && wr.v ? JSON.parse(wr.v) : []; (Array.isArray(list) ? list : []).forEach((w) => { const k = numKey(w.n || w.number); if (k) watchMap[k] = w.dir || "both"; }); } catch (e) {}
   if (!Object.keys(watchMap).length) return { ok: true, processed: 0, detected: 0, note: "aucun numéro suivi" };
-  const now = new Date(), from = new Date(now.getTime() - 2 * 3600 * 1000);
-  const p = new URLSearchParams({ limit_count: "50", start_date: from.toISOString(), end_date: now.toISOString() });
+  // Le cron regarde les 2 dernières heures (temps réel) ; une re-analyse manuelle (force) remonte à 24 h pour rattraper un appel plus ancien de la journée.
+  const now = new Date(), lookbackH = force ? 24 : 2, from = new Date(now.getTime() - lookbackH * 3600 * 1000);
+  const p = new URLSearchParams({ limit_count: force ? "100" : "50", start_date: from.toISOString(), end_date: now.toISOString() });
   const r = await fetch("https://public-api.ringover.com/v2/calls?" + p.toString(), { headers: { Authorization: env.RINGOVER_API_KEY } });
   if (!r.ok) return { error: "ringover", status: r.status };
   const j = await r.json();
@@ -173,7 +203,8 @@ async function aiScan(env, maxCalls, force) {
       else data = { skip: "no_transcript" };
     } catch (e) { data = { error: String((e && e.message) || e) }; }
     await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(id, Date.now(), isDem, JSON.stringify(data)).run();
-    processed++; if (isDem) detected++;
+    processed++;
+    if (isDem) { detected++; try { await pushAll(env, aiDemandeNotif({ cdr_id: id, direction: c.direction }, data.demandes)); } catch (e) {} }
   }
   return { ok: true, processed, detected, total_in: calls.length };
 }
@@ -271,7 +302,7 @@ export default {
     // --- IA : scanner les appels entrants et récupérer les demandes détectées ---
     if (path === "/ai/scan" && request.method === "POST") {
       const force = url.searchParams.get("force") === "1";
-      const res = await aiScan(env, force ? 12 : 8, force);
+      const res = await aiScan(env, force ? 20 : 8, force);
       return json(res, res && res.error ? 502 : 200);
     }
     if (path === "/ai/demandes" && request.method === "GET") {
