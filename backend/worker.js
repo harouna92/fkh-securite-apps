@@ -259,6 +259,19 @@ export default {
       return json({ ok: true, role: r.role, sections: r.sections });
     }
 
+    // --- PUBLIC (à token) : dépôt d'une photo par un agent via un lien (pas de mot de passe appli) ---
+    if (path === "/agent-photo" && request.method === "POST") {
+      if (!env.PHOTOS) return json({ error: "no_bucket" }, 500);
+      const tok = url.searchParams.get("k") || "";
+      const expected = env.AGENT_PHOTO_TOKEN || "fkh-photo-link-2026";
+      if (tok !== expected) return json({ error: "bad_token" }, 403);
+      const key = url.searchParams.get("key") || "";
+      if (!key || !/^(agent|tenue|appel)\//.test(key) || key.indexOf("..") >= 0) return json({ error: "bad_key" }, 400);
+      const ct = request.headers.get("Content-Type") || "image/jpeg";
+      await env.PHOTOS.put(key, request.body, { httpMetadata: { contentType: ct } });
+      return json({ ok: true, key: key });
+    }
+
     // --- Toutes les autres routes exigent un mot de passe valide (complet OU restreint) ---
     const pass = request.headers.get("X-App-Password") || "";
     if (!roleFor(pass)) {

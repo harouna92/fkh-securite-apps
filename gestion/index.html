@@ -678,6 +678,14 @@ button.big:active{transform:translateY(1px)}
   <section id="sec-tenues" class="hidden">
     <div><h1>🦺 Tenues</h1><p class="sub">État des tenues par agent (contrôle ≥ toutes les 2 semaines) + stock. Tu peux maintenant saisir/modifier un contrôle directement ici.</p></div>
     <div class="card"><button type="button" class="big" id="rep-open" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">📁 Répertoire des photos (R2)</button><div id="rep-body" class="hidden" style="margin-top:8px"></div></div>
+    <div class="card"><button type="button" class="big" id="plink-open" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">🔗 Générer un lien photo (à envoyer à un agent)</button>
+      <div id="plink-body" class="hidden" style="margin-top:8px">
+        <p class="sub" style="margin:0 0 8px">L'agent clique le lien → sa caméra s'ouvre → il prend une photo horodatée → elle arrive directement dans l'appli. Choisis l'agent et le type, puis copie le lien.</p>
+        <div class="grid2"><label class="f"><div class="lab">Agent</div><input id="plink-agent" placeholder="Nom de l'agent…" autocomplete="off"></label><label class="f"><div class="lab">Type de photo</div><select id="plink-type"><option value="tenue">🦺 Contrôle tenue</option><option value="prise">🟢 Prise de service</option><option value="fin">🔚 Fin de service</option><option value="controle">🎛️ Contrôle pendant service</option></select></label></div>
+        <div class="acts" style="margin-top:8px;flex-wrap:wrap"><button class="ok" id="plink-copy">📋 Copier le lien</button><button id="plink-wa">🟢 Envoyer par WhatsApp</button><button id="plink-sms">💬 Envoyer par SMS</button></div>
+        <div id="plink-out" class="outbox" style="margin-top:8px;font-size:12px;word-break:break-all;display:none"></div>
+      </div>
+    </div>
     <div class="card"><button type="button" class="big" id="taf-open" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">🎽 Affecter des tenues aux agents en mission (filtré)</button>
       <div id="taf-panel" class="hidden" style="margin-top:8px">
         <div class="acts" style="gap:6px;flex-wrap:wrap;align-items:center"><span class="sub" style="margin:0">Tranche :</span><button type="button" class="taf-sl on" data-sl="all">Toutes</button><button type="button" class="taf-sl" data-sl="jour">☀️ Jour 8h→20h</button><button type="button" class="taf-sl" data-sl="nuit">🌙 Nuit 20h→8h</button><span class="sub" style="margin:0 0 0 8px">Client :</span><select id="taf-client" style="width:auto;min-width:160px"><option value="">Tous les clients</option></select></div>
@@ -2026,7 +2034,7 @@ button.big:active{transform:translateY(1px)}
   function photoBtn(id,label){ return '<label class="btn" style="cursor:pointer;font-size:12px">'+(label||'📷 Importer la photo')+'<input type="file" accept="image/*" id="'+id+'" style="display:none"></label>'; }
   function photoWire(id,keyFn,onDone){ var inp=byId(id); if(!inp)return; inp.onchange=function(){ var f=inp.files&&inp.files[0]; if(!f)return; if(!photoReady()){ alert('Connexion cloud requise pour envoyer la photo (connecte-toi en ligne).'); return; } var lbl=inp.parentNode; var old=lbl.textContent; lbl.childNodes[0].nodeValue='⏳ envoi…'; var key=keyFn(f); photoUpload(key,f,function(res){ if(res&&res.ok){ lbl.childNodes[0].nodeValue='✅ photo envoyée'; if(onDone)onDone(key,res); } else { lbl.childNodes[0].nodeValue=old; alert('Échec de l\'envoi de la photo'+(res&&res.error?' ('+res.error+')':'')+'.'); } }); }; }
   // Classe une photo dans un bloc métier à partir de sa clé
-  function photoBloc(key){ var p=String(key||'').split('/'), cat=p[0]; if(cat==='tenue')return 'tenue'; if(cat==='controle')return 'controle'; if(cat==='appel'){ var st=p[2]||''; if(st==='prise')return 'prise'; if(st==='fin')return 'fin'; if(st==='tenue')return 'tenue'; if(st.indexOf('ctrl')===0)return 'controle'; return 'controle'; } return 'autres'; }
+  function photoBloc(key){ var p=String(key||'').split('/'), cat=p[0]; if(cat==='tenue')return 'tenue'; if(cat==='controle')return 'controle'; if(cat==='agent'){ var s2=p[1]||''; if(s2==='prise')return 'prise'; if(s2==='fin')return 'fin'; if(s2==='tenue')return 'tenue'; if(s2==='controle')return 'controle'; return 'autres'; } if(cat==='appel'){ var st=p[2]||''; if(st==='prise')return 'prise'; if(st==='fin')return 'fin'; if(st==='tenue')return 'tenue'; if(st.indexOf('ctrl')===0)return 'controle'; return 'controle'; } return 'autres'; }
   var repMode='jour', repDate='';
   function repISO(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
   function repRange(){ var d=repDate||impTodayISO(); var p=d.split('-'), base=new Date(+p[0],+p[1]-1,+p[2]), from,to; if(repMode==='semaine'){ var wd=(base.getDay()+6)%7, mon=new Date(base); mon.setDate(base.getDate()-wd); var sun=new Date(mon); sun.setDate(mon.getDate()+6); from=repISO(mon); to=repISO(sun); } else if(repMode==='mois'){ from=p[0]+'-'+p[1]+'-01'; var last=new Date(+p[0],+p[1],0); to=p[0]+'-'+p[1]+'-'+pad2(last.getDate()); } else { from=d; to=d; } return {from:from,to:to}; }
@@ -2067,6 +2075,12 @@ button.big:active{transform:translateY(1px)}
     });
   }
   if(byId('rep-open'))byId('rep-open').onclick=function(){ var b=byId('rep-body'); if(!b)return; if(b.classList.contains('hidden')){ b.classList.remove('hidden'); renderRepertoire(); } else { b.classList.add('hidden'); } };
+  function photoLinkBuild(){ var a=(byId('plink-agent')&&byId('plink-agent').value||'').trim(), t=(byId('plink-type')&&byId('plink-type').value)||'tenue'; if(!a){ if(byId('plink-out')){byId('plink-out').style.display='block';byId('plink-out').textContent='Écris d\'abord le nom de l\'agent.';} return ''; } var url='https://harouna92.github.io/fkh-securite-apps/photo/?a='+encodeURIComponent(a)+'&t='+encodeURIComponent(t); if(byId('plink-out')){ byId('plink-out').style.display='block'; byId('plink-out').textContent=url; } return url; }
+  function photoLinkMsg(a,url){ return 'Bonjour'+(a?' '+a:'')+', merci de prendre la photo demandée via ce lien (elle est horodatée automatiquement) : '+url; }
+  if(byId('plink-open'))byId('plink-open').onclick=function(){ var b=byId('plink-body'); if(b)b.classList.toggle('hidden'); };
+  if(byId('plink-copy'))byId('plink-copy').onclick=function(){ var u=photoLinkBuild(); if(u&&navigator.clipboard)navigator.clipboard.writeText(u); if(u)flash(this,'Copié ✓'); };
+  if(byId('plink-wa'))byId('plink-wa').onclick=function(){ var a=(byId('plink-agent').value||'').trim(), u=photoLinkBuild(); if(!u)return; window.open('https://wa.me/?text='+encodeURIComponent(photoLinkMsg(a,u)),'_blank'); };
+  if(byId('plink-sms'))byId('plink-sms').onclick=function(){ var a=(byId('plink-agent').value||'').trim(), u=photoLinkBuild(); if(!u)return; window.open('sms:?&body='+encodeURIComponent(photoLinkMsg(a,u)),'_blank'); };
   // ===== Affecter des tenues aux agents en mission (filtré jour/nuit + client) =====
   var tafSlice='all', tafSelDates=[], TAF_DRILL={};
   function tafWeekDates(){ var d=new Date(),day=(d.getDay()+6)%7,mon=new Date(d); mon.setDate(d.getDate()-day); var out=[]; for(var i=0;i<7;i++){ var x=new Date(mon); x.setDate(mon.getDate()+i); out.push(x.getFullYear()+'-'+('0'+(x.getMonth()+1)).slice(-2)+'-'+('0'+x.getDate()).slice(-2)); } return out; }

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FKH Sécurité — Photo</title>
+<style>
+  :root{--bg:#0f1420;--panel:#1c2230;--line:#334;--ink:#e8eefc;--muted:#8aa;--ok:#137a3b;--bad:#c02626;--accent:#6ea8fe;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  .wrap{max-width:520px;margin:0 auto;padding:14px}
+  h1{font-size:18px;margin:6px 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 10px}
+  .badge{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-weight:700;margin:4px 6px 4px 0}
+  video,canvas,#preview img{width:100%;border-radius:14px;background:#000;display:block}
+  .btn{width:100%;padding:15px;border-radius:13px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:17px;font-weight:700;cursor:pointer;margin-top:10px}
+  .btn.ok{background:var(--ok);border-color:var(--ok)}
+  .btn.snap{background:var(--accent);border-color:var(--accent);color:#04122b}
+  #msg{margin-top:12px;font-weight:600;text-align:center;min-height:22px}
+  .err{color:var(--bad)} .good{color:#41d67f}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📸 FKH Sécurité</h1>
+  <p class="sub">Prends la photo demandée. Elle est horodatée automatiquement et envoyée à l'agence.</p>
+  <div id="ctx"></div>
+  <video id="v" autoplay playsinline muted></video>
+  <canvas id="c" style="display:none"></canvas>
+  <div id="preview" style="display:none"></div>
+  <button class="btn snap" id="snap">📷 Prendre la photo</button>
+  <button class="btn ok" id="send" style="display:none">✅ Envoyer à l'agence</button>
+  <button class="btn" id="retry" style="display:none">🔄 Reprendre</button>
+  <div id="msg"></div>
+</div>
+<script>
+(function(){
+  var API='https://fkh-gestion-api.hacamara2.workers.dev';
+  var TOKEN='fkh-photo-link-2026';
+  var q=new URLSearchParams(location.search);
+  var agent=(q.get('a')||'').trim(), type=(q.get('t')||'prise').trim(), mid=(q.get('m')||'').trim(), site=(q.get('s')||'').trim();
+  var TYPES={prise:'🟢 Prise de service',fin:'🔚 Fin de service',tenue:'🦺 Contrôle tenue',controle:'🎛️ Contrôle pendant service'};
+  var v=document.getElementById('v'), c=document.getElementById('c'), snap=document.getElementById('snap'), send=document.getElementById('send'), retry=document.getElementById('retry'), msg=document.getElementById('msg'), prev=document.getElementById('preview');
+  document.getElementById('ctx').innerHTML='<span class="badge">'+(TYPES[type]||type)+'</span>'+(agent?'<span class="badge">👤 '+esc(agent)+'</span>':'')+(site?'<span class="badge">📍 '+esc(site)+'</span>':'');
+  if(type==='tenue')msg.innerHTML='<span style="color:#e0a13b">🦺 Cadre bien l\'AGENT en tenue (pas le bâtiment).</span>';
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});}
+  function pad(n){return (n<10?'0':'')+n;}
+  var stream=null;
+  navigator.mediaDevices.getUserMedia({video:{facingMode:(type==='tenue'?'environment':'environment'),width:{ideal:1280}},audio:false}).then(function(s){ stream=s; v.srcObject=s; }).catch(function(){ msg.className='err'; msg.textContent='Impossible d\'accéder à la caméra. Autorise l\'accès et recharge la page.'; snap.style.display='none'; });
+  var blob=null;
+  snap.onclick=function(){
+    if(!v.videoWidth){ msg.textContent='Caméra pas prête, réessaie.'; return; }
+    var W=v.videoWidth, H=v.videoHeight; c.width=W; c.height=H; var x=c.getContext('2d'); x.drawImage(v,0,0,W,H);
+    // tampon horodaté en bas
+    var d=new Date(); var stamp=pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+    var line2=(agent?agent+' · ':'')+(TYPES[type]||type).replace(/^[^ ]+ /,'');
+    var fs=Math.max(16,Math.round(W/32)); x.font='bold '+fs+'px system-ui,sans-serif'; x.textBaseline='bottom';
+    var bh=fs*2.6; x.fillStyle='rgba(0,0,0,.55)'; x.fillRect(0,H-bh,W,bh);
+    x.fillStyle='#fff'; x.fillText('🕐 '+stamp, 12, H-fs-8); x.fillText(line2, 12, H-6);
+    c.toBlob(function(b){ blob=b; prev.innerHTML='<img src="'+URL.createObjectURL(b)+'">'; prev.style.display='block'; v.style.display='none'; snap.style.display='none'; send.style.display='block'; retry.style.display='block'; msg.textContent=''; },'image/jpeg',0.85);
+  };
+  retry.onclick=function(){ blob=null; prev.style.display='none'; v.style.display='block'; snap.style.display='block'; send.style.display='none'; retry.style.display='none'; msg.textContent=''; };
+  send.onclick=function(){
+    if(!blob){ return; }
+    send.disabled=true; send.textContent='⏳ Envoi…'; msg.className=''; msg.textContent='';
+    var safe=(agent||'agent').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'').toLowerCase()||'agent';
+    var base = mid ? ('appel/'+mid+'/'+(type==='controle'?'ctrl':type)) : ('agent/'+type+'/'+safe);
+    var key = base+'/'+Date.now()+'.jpg';
+    fetch(API+'/agent-photo?k='+encodeURIComponent(TOKEN)+'&key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'image/jpeg'},body:blob}).then(function(r){return r.json();}).then(function(j){
+      if(j&&j.ok){ msg.className='good'; msg.textContent='✅ Photo envoyée. Merci !'; send.style.display='none'; retry.textContent='📷 Prendre une autre photo'; if(stream)stream.getTracks().forEach(function(t){t.stop();}); }
+      else { send.disabled=false; send.textContent='✅ Envoyer à l\'agence'; msg.className='err'; msg.textContent='Échec : '+((j&&j.error)||'réessaie'); }
+    }).catch(function(){ send.disabled=false; send.textContent='✅ Envoyer à l\'agence'; msg.className='err'; msg.textContent='Réseau indisponible, réessaie.'; });
+  };
+})();
+</script>
+</body>
+</html>
