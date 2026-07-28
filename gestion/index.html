@@ -264,6 +264,12 @@ button.big:active{transform:translateY(1px)}
         <label class="f" style="margin-top:6px"><div class="lab">Date de fin (si autre jour)</div><input type="date" id="gexp-h24date"></label>
         <div class="acts" style="margin-top:8px"><button type="button" class="ok" id="gexp-h24apply">✅ Appliquer</button></div>
       </div>
+      <div id="gexp-agencepanel" class="hidden" style="margin-top:6px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">
+        <div class="sub" style="margin:0 0 8px">🏢 <b>Horaires d'agence</b> — jusqu'à 2 créneaux (ex. 08h00–12h30 · 13h45–18h00)</div>
+        <div class="grid2"><label class="f"><div class="lab">Créneau 1 — de</div><button type="button" class="gtime" id="gexp-ag-s1a" data-ph="-- de --">-- de --</button></label><label class="f"><div class="lab">à</div><button type="button" class="gtime" id="gexp-ag-s1b" data-ph="-- à --">-- à --</button></label></div>
+        <div class="grid2" style="margin-top:6px"><label class="f"><div class="lab">Créneau 2 — de <span style="color:var(--muted)">(optionnel)</span></div><button type="button" class="gtime" id="gexp-ag-s2a" data-ph="-- de --">-- de --</button></label><label class="f"><div class="lab">à</div><button type="button" class="gtime" id="gexp-ag-s2b" data-ph="-- à --">-- à --</button></label></div>
+        <div class="acts" style="margin-top:8px"><button type="button" class="ok" id="gexp-ag-apply">✅ Terminer</button></div>
+      </div>
       <div class="gexp-grp">⚡ Actions</div>
       <div class="gexp-row" style="margin-top:2px;flex-wrap:wrap"><button type="button" class="gexp-day" id="gexp-addvac" title="Ajouter une ou plusieurs vacations (date + heure début + heure fin ; la nuit peut finir le lendemain)">🗓️ Vacations (plusieurs jours)</button><button type="button" class="gexp-day" id="gexp-newdem" title="Enregistre la demande en cours et prépare-en une nouvelle">➕ Nouvelle demande</button></div>
       <div id="gexp-vacpanel" class="hidden" style="margin-top:6px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">
@@ -781,19 +787,38 @@ button.big:active{transform:translateY(1px)}
   // ===== Sélecteur d'heure en GRILLE de boutons (paquets 15 min) — partagé note rapide + Demandes =====
   function tbGet(el){ return el?(el.getAttribute('data-v')||''):''; }
   function tbSet(el,v){ if(!el)return; el.setAttribute('data-v',v||''); el.textContent=v?v.replace(':','h'):(el.getAttribute('data-ph')||'--'); el.classList.toggle('set',!!v); }
+  function posPop(pop,anchor){ var r=anchor.getBoundingClientRect(), pw=pop.offsetWidth, ph=pop.offsetHeight, sx=window.pageXOffset, sy=window.pageYOffset; var left=Math.max(6+sx, Math.min(r.left+sx, sx+window.innerWidth-pw-6)); var top=(r.bottom+sy+4); if(r.bottom+ph+8>window.innerHeight && r.top-ph-4>0)top=r.top+sy-ph-4; pop.style.left=left+'px'; pop.style.top=top+'px'; }
+  function popClose(pop,anchor){ setTimeout(function(){ function h2(e){ if(!pop.contains(e.target)&&e.target!==anchor){ if(pop.parentNode)pop.parentNode.removeChild(pop); document.removeEventListener('click',h2); } } document.addEventListener('click',h2); },0); }
   function openTimeGrid(anchor,cur,onPick){
     var old=byId('gtp-pop'); if(old)old.parentNode.removeChild(old);
     var pop=document.createElement('div'); pop.id='gtp-pop'; pop.className='gtp';
     var h=''; for(var H=0;H<24;H++)for(var M=0;M<60;M+=15){ var v=('0'+H).slice(-2)+':'+('0'+M).slice(-2); h+='<button type="button" data-v="'+v+'"'+(v===cur?' class="on"':'')+'>'+('0'+H).slice(-2)+'h'+('0'+M).slice(-2)+'</button>'; }
     pop.innerHTML='<div class="gtp-grid">'+h+'</div>';
-    document.body.appendChild(pop);
-    var r=anchor.getBoundingClientRect(), pw=pop.offsetWidth, ph=pop.offsetHeight, sx=window.pageXOffset, sy=window.pageYOffset;
-    var left=Math.max(6+sx, Math.min(r.left+sx, sx+window.innerWidth-pw-6));
-    var top=(r.bottom+sy+4); if(r.bottom+ph+8>window.innerHeight && r.top-ph-4>0)top=r.top+sy-ph-4;
-    pop.style.left=left+'px'; pop.style.top=top+'px';
+    document.body.appendChild(pop); posPop(pop,anchor);
     pop.querySelectorAll('button[data-v]').forEach(function(b){ b.addEventListener('mousedown',function(e){e.preventDefault();}); b.addEventListener('click',function(){ var val=b.getAttribute('data-v'); if(pop.parentNode)pop.parentNode.removeChild(pop); onPick(val); }); });
-    setTimeout(function(){ function h2(e){ if(!pop.contains(e.target)&&e.target!==anchor){ if(pop.parentNode)pop.parentNode.removeChild(pop); document.removeEventListener('click',h2); } } document.addEventListener('click',h2); },0);
+    popClose(pop,anchor);
     var onb=pop.querySelector('button.on'); if(onb){ if(onb.scrollIntoView)onb.scrollIntoView({block:'center'}); } else { var d8=pop.querySelector('button[data-v="08:00"]'); if(d8)pop.scrollTop=Math.max(0, d8.offsetTop-4); }
+  }
+  // Petit calendrier flottant sous le rectangle
+  function openDatePop(anchor,cur,onPick){
+    var old=byId('gtp-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='gtp-pop'; pop.className='gtp'; pop.style.width='auto'; pop.style.padding='8px';
+    pop.innerHTML='<div style="font-size:12px;color:var(--muted);margin-bottom:5px">📅 Choisis la date</div><input type="date" class="gtp-date" value="'+(cur||'')+'" style="font-size:15px;padding:7px;width:170px">';
+    document.body.appendChild(pop); posPop(pop,anchor);
+    var di=pop.querySelector('.gtp-date');
+    di.addEventListener('change',function(){ var v=di.value; if(pop.parentNode)pop.parentNode.removeChild(pop); onPick(v); });
+    setTimeout(function(){ try{di.focus();}catch(e){} if(di.showPicker){try{di.showPicker();}catch(e){}} },40);
+    popClose(pop,anchor);
+  }
+  // Boîte « boucle » : ajouter une autre vacation ou terminer
+  function openLoopPop(anchor,onAdd,onDone){
+    var old=byId('gtp-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='gtp-pop'; pop.className='gtp'; pop.style.width='auto'; pop.style.padding='8px';
+    pop.innerHTML='<div style="display:flex;flex-direction:column;gap:6px"><button type="button" class="ok gtp-add" style="padding:9px 14px">➕ Ajouter une autre vacation</button><button type="button" class="gtp-done" style="padding:9px 14px">✅ Terminé</button></div>';
+    document.body.appendChild(pop); posPop(pop,anchor);
+    pop.querySelector('.gtp-add').addEventListener('click',function(){ if(pop.parentNode)pop.parentNode.removeChild(pop); onAdd(); });
+    pop.querySelector('.gtp-done').addEventListener('click',function(){ if(pop.parentNode)pop.parentNode.removeChild(pop); if(onDone)onDone(); });
+    popClose(pop,anchor);
   }
   // Branche un bouton .gtime sur la grille : clic -> grille -> data-v + callback
   function bindTimeBtn(el,onPick){ if(!el)return; el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); openTimeGrid(el, tbGet(el), function(v){ tbSet(el,v); if(onPick)onPick(v); }); }); }
@@ -3365,10 +3390,10 @@ button.big:active{transform:translateY(1px)}
       if(!h24&&!gexpAgence){ if(VL.length>1){ VL.forEach(function(v,i){ L.push('Vacation '+(i+1)+' : '+vacLine(v)); }); } else if(VL.length===1){ var v=VL[0]; if(v.date&&v.dateFin&&v.dateFin!==v.date){ L.push('Vacation : '+vacLine(v)); } else { if(v.date)L.push('Date : '+fmtd(v.date)); if(v.h1&&v.h2)L.push('Vacation : de '+v.h1+' à '+v.h2); else if(v.h1)L.push('Début : '+v.h1); else if(v.h2)L.push('Fin : '+v.h2); } } }
       if(asap){ var _a='🚀 Dès que possible'; if(gexpAsapMode==='today'&&gexpAsapH)_a+=' — fin aujourd\'hui à '+gexpAsapH; else if(gexpAsapMode==='tomorrow'&&gexpAsapH)_a+=' — fin demain à '+gexpAsapH; else if(gexpAsapMode==='date'&&gexpAsapDate)_a+=' — fin le '+fmtd(gexpAsapDate)+(gexpAsapH?' à '+gexpAsapH:''); L.push(_a); }
       if(depart==='fixe')L.push('Départ : fixe'); else if(depart==='arrivee')L.push('Départ : à l\'arrivée du personnel');
-      if(gexpAgence)L.push('Vacation : horaires d\'agence');
+      if(gexpAgence){ var _ag='Vacation : horaires d\'agence'; var _s1=(gexpAgS1a&&gexpAgS1b)?(gexpAgS1a+'-'+gexpAgS1b):''; var _s2=(gexpAgS2a&&gexpAgS2b)?(gexpAgS2a+'-'+gexpAgS2b):''; var _sl=[_s1,_s2].filter(Boolean); if(_sl.length)_ag+=' : '+_sl.join(' · '); L.push(_ag); }
       if(h24){ L.push('Vacation : H24 (24 h/24)'); if(gexpH24H1)L.push('Début : '+gexpH24H1); if(gexpH24End||gexpH24H2){ var _fd=fmtd(gexpH24End); L.push('Fin : '+[_fd,(gexpH24H2?'à '+gexpH24H2:'')].filter(Boolean).join(' ')); } }
       if(R.agents)L.push('Agents : '+R.agents); if(R.notes.length)L.push('Notes : '+R.notes.join(' ')); if(R.urgent)L.push('🔴 URGENT'); return L.join('\n'); }
-    var lastR=null,lastSel=null,lastTxt='',gexpDate='',gexpH24=false,gexpAsap=false,gexpDepart='',gexpH1='',gexpH2='',gexpH24End='',gexpH24H1='',gexpH24H2='',gexpClient='',gexpSite='',gexpVille='',gexpVilleSel=null,gexpCP='',gexpAsapH='',gexpAsapDate='',gexpAgence=false,gexpVacs=[],gexpAdded=[],lastDateIso='',gexpAsapMode='';
+    var lastR=null,lastSel=null,lastTxt='',gexpDate='',gexpH24=false,gexpAsap=false,gexpDepart='',gexpH1='',gexpH2='',gexpH24End='',gexpH24H1='',gexpH24H2='',gexpClient='',gexpSite='',gexpVille='',gexpVilleSel=null,gexpCP='',gexpAsapH='',gexpAsapDate='',gexpAgence=false,gexpAgS1a='',gexpAgS1b='',gexpAgS2a='',gexpAgS2b='',gexpVacs=[],gexpAdded=[],lastDateIso='',gexpAsapMode='';
     function gexpHasCur(){ return !!(inp.value.trim()||gexpDate||gexpH1||gexpH2||gexpH24||gexpAsap||gexpDepart||gexpClient||gexpSite||gexpVille||gexpCP||gexpAgence||gexpVacs.length); }
     function gexpPayload(){ var now=Date.now(), vn=lastSel?lastSel.nom:(lastR.ville||''), cp=lastR.cp||(lastSel&&lastSel.codesPostaux?lastSel.codesPostaux[0]:''), co=lastSel&&lastSel.centre?lastSel.centre.coordinates:null, v0=gexpVacs[0]||null, dIso=(v0&&v0.date)||lastDateIso||'', dFin=(v0&&v0.dateFin)||'', H1=(v0&&v0.h1)||gexpH1||lastR.hours[0]||'', H2=(v0&&v0.h2)||gexpH2||lastR.hours[1]||'', hh=gexpH24?'':H1, mfin=(!gexpH24&&H2)?(((dFin||dIso)?((dFin||dIso).split('-').reverse().join('/')+' '):'')+H2):'';
       return {id:'gx'+now+'_'+Math.round(Math.random()*9999),texte:lastTxt,titre:(lastR.site||lastR.client||vn||'Demande gardiennage').slice(0,60),statut:'recherche',motif:'',pris:now,valide:null,ville:vn,cp:cp,la:co?co[1]:null,lo:co?co[0]:null,assoc:[],mdate:dIso,mheure:hh,mfin:mfin,h24:gexpH24,urgent:!!lastR.urgent,_express:true}; }
@@ -3394,7 +3419,10 @@ button.big:active{transform:translateY(1px)}
     document.querySelectorAll('.gexp-asapmode').forEach(function(b){ b.addEventListener('click',function(){ asapModeSel=b.getAttribute('data-am'); document.querySelectorAll('.gexp-asapmode').forEach(function(x){x.classList.toggle('on',x===b);}); byId('gexp-asap-zone').classList.remove('hidden'); byId('gexp-asap-datewrap').style.display=(asapModeSel==='date')?'':'none'; if(asapModeSel==='date'&&byId('gexp-asap-date')&&!byId('gexp-asap-date').value)byId('gexp-asap-date').value=(typeof svcAddDays==='function')?svcAddDays(impTodayISO(),1):''; }); });
     bindTimeBtn(byId('gexp-asap-h'));
     if(byId('gexp-asap-apply'))byId('gexp-asap-apply').addEventListener('click',function(){ if(!asapModeSel){ alert('Choisis d\'abord : Aujourd\'hui à…, Demain à…, ou À une date…'); return; } gexpAsapMode=asapModeSel; gexpAsapH=tbGet(byId('gexp-asap-h')); gexpAsapDate=(asapModeSel==='date')?(byId('gexp-asap-date').value||''):''; byId('gexp-asappanel').classList.add('hidden'); doTranscribe(); });
-    if(byId('gexp-agence'))byId('gexp-agence').addEventListener('click',function(){ gexpAgence=!gexpAgence; this.classList.toggle('on',gexpAgence); doTranscribe(); });
+    function agLive(){ gexpAgS1a=tbGet(byId('gexp-ag-s1a')); gexpAgS1b=tbGet(byId('gexp-ag-s1b')); gexpAgS2a=tbGet(byId('gexp-ag-s2a')); gexpAgS2b=tbGet(byId('gexp-ag-s2b')); doTranscribe(); }
+    if(byId('gexp-agence'))byId('gexp-agence').addEventListener('click',function(){ gexpAgence=!gexpAgence; this.classList.toggle('on',gexpAgence); var pn=byId('gexp-agencepanel'); if(gexpAgence){ showPanelUnder('gexp-agencepanel',this); } else { if(pn)pn.classList.add('hidden'); gexpAgS1a=gexpAgS1b=gexpAgS2a=gexpAgS2b=''; ['gexp-ag-s1a','gexp-ag-s1b','gexp-ag-s2a','gexp-ag-s2b'].forEach(function(id){tbSet(byId(id),'');}); } doTranscribe(); });
+    ['gexp-ag-s1a','gexp-ag-s1b','gexp-ag-s2a','gexp-ag-s2b'].forEach(function(id){ bindTimeBtn(byId(id),agLive); });
+    if(byId('gexp-ag-apply'))byId('gexp-ag-apply').addEventListener('click',function(){ agLive(); byId('gexp-agencepanel').classList.add('hidden'); });
     function stripTimeTokens(s){ var toks=String(s||'').trim().split(/\s+/), out=[], skip=false; for(var i=0;i<toks.length;i++){ var t=toks[i]; if(!t)continue; if(skip){skip=false; continue;} if(t.toLowerCase()==='d'){ skip=true; continue; } if(/^\d{1,4}$/.test(t))continue; out.push(t); } return out.join(' '); }
     function vacNextDate(){ if(gexpVacs.length){ var last=gexpVacs[gexpVacs.length-1], base=last.dateFin||last.date; if(base&&typeof svcAddDays==='function')return svcAddDays(base, last.dateFin?0:1); } var R=parse(inp.value); return R.date||gexpDate||(typeof impTodayISO==='function'?impTodayISO():''); }
     function vacRenderList(){ var box=byId('gexp-vaclist'); if(!box)return; if(!gexpVacs.length){ box.innerHTML='<div class="sub" style="margin:0">Aucune vacation ajoutée pour l\'instant.</div>'; return; } box.innerHTML=gexpVacs.map(function(v,i){ return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--line)"><span style="flex:1"><b>Vacation '+(i+1)+'</b> : '+esc(vacLine(v))+'</span><button type="button" data-vacrm="'+i+'" style="width:28px;height:28px;padding:0">✕</button></div>'; }).join(''); box.querySelectorAll('[data-vacrm]').forEach(function(b){ b.onclick=function(){ gexpVacs.splice(+b.getAttribute('data-vacrm'),1); vacRenderList(); doTranscribe(); }; }); }
@@ -3424,7 +3452,7 @@ button.big:active{transform:translateY(1px)}
     if(byId('gexp-depfix'))byId('gexp-depfix').addEventListener('click',function(){ gexpDepart=(gexpDepart==='fixe')?'':'fixe'; this.classList.toggle('on',gexpDepart==='fixe'); byId('gexp-deparr').classList.remove('on'); doTranscribe(); });
     if(byId('gexp-deparr'))byId('gexp-deparr').addEventListener('click',function(){ gexpDepart=(gexpDepart==='arrivee')?'':'arrivee'; this.classList.toggle('on',gexpDepart==='arrivee'); byId('gexp-depfix').classList.remove('on'); doTranscribe(); });
     function gexpIns(tok){ var v=inp.value.replace(/\s+$/,''); inp.value=(v?v+' ':'')+tok; inp.focus(); }
-    window._gexpReset=function(){ gexpDate='';gexpH1='';gexpH2='';gexpH24=false;gexpAsap=false;gexpDepart='';gexpH24End='';gexpH24H1='';gexpH24H2='';gexpClient='';gexpSite='';gexpVille='';gexpVilleSel=null;gexpCP='';gexpAsapH='';gexpAsapDate='';gexpAsapMode='';gexpAgence=false;gexpVacs=[];lastDateIso=''; if(byId('gexp-asap-date'))byId('gexp-asap-date').value=''; ['gexp-asap-h','gexp-hh1','gexp-hh2','gexp-h24h1','gexp-h24h2','gexp-vac-h1','gexp-vac-h2'].forEach(function(id){tbSet(byId(id),'');}); ['gexp-asap-zone'].forEach(function(id){var z=byId(id); if(z)z.classList.add('hidden');}); if(byId('gexp-asap-datewrap'))byId('gexp-asap-datewrap').style.display='none'; document.querySelectorAll('.gexp-day').forEach(function(x){ if(x.tagName!=='SELECT')x.classList.remove('on'); }); ['gexp-clientbtn','gexp-sitebtn','gexp-villebtn','gexp-cpbtn','gexp-h1btn','gexp-h2btn'].forEach(function(id){var b=byId(id); if(b){ b.classList.remove('on'); if(b.getAttribute('data-lbl'))b.textContent=b.getAttribute('data-lbl'); }}); ['gexp-datepanel','gexp-h24panel','gexp-asappanel','gexp-vacpanel'].forEach(function(id){var dp=byId(id); if(dp)dp.classList.add('hidden');}); ['gexp-vac-date','gexp-vac-datefin'].forEach(function(id){var i=byId(id); if(i)i.value='';}); };
+    window._gexpReset=function(){ gexpDate='';gexpH1='';gexpH2='';gexpH24=false;gexpAsap=false;gexpDepart='';gexpH24End='';gexpH24H1='';gexpH24H2='';gexpClient='';gexpSite='';gexpVille='';gexpVilleSel=null;gexpCP='';gexpAsapH='';gexpAsapDate='';gexpAsapMode='';gexpAgence=false;gexpAgS1a='';gexpAgS1b='';gexpAgS2a='';gexpAgS2b='';gexpVacs=[];lastDateIso=''; ['gexp-ag-s1a','gexp-ag-s1b','gexp-ag-s2a','gexp-ag-s2b'].forEach(function(id){tbSet(byId(id),'');}); if(byId('gexp-agencepanel'))byId('gexp-agencepanel').classList.add('hidden'); if(byId('gexp-asap-date'))byId('gexp-asap-date').value=''; ['gexp-asap-h','gexp-hh1','gexp-hh2','gexp-h24h1','gexp-h24h2','gexp-vac-h1','gexp-vac-h2'].forEach(function(id){tbSet(byId(id),'');}); ['gexp-asap-zone'].forEach(function(id){var z=byId(id); if(z)z.classList.add('hidden');}); if(byId('gexp-asap-datewrap'))byId('gexp-asap-datewrap').style.display='none'; document.querySelectorAll('.gexp-day').forEach(function(x){ if(x.tagName!=='SELECT')x.classList.remove('on'); }); ['gexp-clientbtn','gexp-sitebtn','gexp-villebtn','gexp-cpbtn','gexp-h1btn','gexp-h2btn'].forEach(function(id){var b=byId(id); if(b){ b.classList.remove('on'); if(b.getAttribute('data-lbl'))b.textContent=b.getAttribute('data-lbl'); }}); ['gexp-datepanel','gexp-h24panel','gexp-asappanel','gexp-vacpanel'].forEach(function(id){var dp=byId(id); if(dp)dp.classList.add('hidden');}); ['gexp-vac-date','gexp-vac-datefin'].forEach(function(id){var i=byId(id); if(i)i.value='';}); };
     function gexpChip(btnId,val){ var b=byId(btnId); if(!b)return; if(!b.getAttribute('data-lbl'))b.setAttribute('data-lbl',b.textContent); if(val){ b.classList.add('on'); b.textContent=val+' ▾'; } else { b.classList.remove('on'); b.textContent=b.getAttribute('data-lbl'); } }
     (function(){ var btn=byId('gexp-clientbtn'), dd=byId('gexp-clientdd'); if(!btn||!dd)return; var cs=(typeof CLIENTS!=='undefined'?CLIENTS.slice():[]); try{ (load('fkh_clients')||[]).forEach(function(c){ if(cs.indexOf(c)<0)cs.push(c); }); }catch(e){} cs.sort(); dd.innerHTML=cs.map(function(c){return '<div data-c="'+esc(c)+'">'+esc(c)+'</div>';}).join(''); btn.addEventListener('click',function(e){ e.stopPropagation(); dd.classList.toggle('hidden'); }); dd.querySelectorAll('div').forEach(function(d){ d.addEventListener('mousedown',function(e){e.preventDefault();}); d.addEventListener('click',function(){ gexpClient=d.getAttribute('data-c'); gexpChip('gexp-clientbtn',gexpClient); dd.classList.add('hidden'); doTranscribe(); }); }); document.addEventListener('click',function(e){ if(!dd.classList.contains('hidden') && e.target!==btn && !dd.contains(e.target))dd.classList.add('hidden'); }); })();
     (function(){ var btn=byId('gexp-sitebtn'), dd=byId('gexp-sitedd'); if(!btn||!dd)return;
@@ -3473,14 +3501,28 @@ button.big:active{transform:translateY(1px)}
     gexpHourChip('gexp-h1btn','gexp-h1dd','Début',function(v){gexpH1=v;},function(){return gexpH1;});
     gexpHourChip('gexp-h2btn','gexp-h2dd','Fin',function(v){gexpH2=v;},function(){return gexpH2;});
     // Applique en direct les champs Date précise (pas besoin de cliquer « Appliquer » — le but est d'aller vite)
-    // Affiche un panneau JUSTE sous le rectangle cliqué (collé à sa rangée)
-    function showPanelUnder(panelId, trigger){ var p=byId(panelId); if(!p)return; var row=trigger&&trigger.closest?trigger.closest('.gexp-row'):null; if(row&&row.parentNode)row.parentNode.insertBefore(p, row.nextSibling); p.classList.remove('hidden'); }
+    // Affiche un panneau en boîte flottante PILE sous le rectangle cliqué
+    function hideAllPanels(except){ ['gexp-datepanel','gexp-h24panel','gexp-asappanel','gexp-vacpanel','gexp-agencepanel'].forEach(function(id){ if(id!==except){ var p=byId(id); if(p)p.classList.add('hidden'); } }); }
+    function showPanelUnder(panelId, trigger){ var p=byId(panelId); if(!p)return; hideAllPanels(panelId); var bar=byId('gexp-bar'); if(bar&&trigger&&trigger.getBoundingClientRect){ var br=bar.getBoundingClientRect(), cr=trigger.getBoundingClientRect(); var w=Math.min(360, br.width-12); var left=cr.left-br.left; if(left+w>br.width-6)left=Math.max(6, br.width-6-w); p.style.position='absolute'; p.style.left=left+'px'; p.style.right='auto'; p.style.top=(cr.bottom-br.top+4)+'px'; p.style.width=w+'px'; p.style.zIndex='150'; } p.classList.remove('hidden'); }
     function gexpDateLive(){ gexpDate=byId('gexp-date-in').value||''; gexpH1=tbGet(byId('gexp-hh1')); gexpH2=tbGet(byId('gexp-hh2')); gexpChip('gexp-h1btn',gexpH1?'Début '+gexpH1:''); gexpChip('gexp-h2btn',gexpH2?'Fin '+gexpH2:''); if(byId('gexp-datebtn'))byId('gexp-datebtn').classList.toggle('on', !!(gexpDate||gexpH1||gexpH2)); document.querySelectorAll('.gexp-day[data-d]').forEach(function(x){x.classList.remove('on');}); doTranscribe(); }
-    if(byId('gexp-datebtn'))byId('gexp-datebtn').addEventListener('click',function(){ var dp=byId('gexp-datepanel'); if(!dp)return; if(dp.classList.contains('hidden')){ showPanelUnder('gexp-datepanel',this); if(byId('gexp-date-in')&&!byId('gexp-date-in').value){ byId('gexp-date-in').value=impTodayISO(); gexpDateLive(); } } else dp.classList.add('hidden'); });
-    if(byId('gexp-date-in'))byId('gexp-date-in').addEventListener('change',gexpDateLive);
-    bindTimeBtn(byId('gexp-hh1'),gexpDateLive); bindTimeBtn(byId('gexp-hh2'),gexpDateLive);
-    if(byId('gexp-date-apply'))byId('gexp-date-apply').addEventListener('click',function(){ gexpDateLive(); byId('gexp-datepanel').classList.add('hidden'); });
-    if(byId('gexp-date-cancel'))byId('gexp-date-cancel').addEventListener('click',function(){ byId('gexp-datepanel').classList.add('hidden'); });
+    // Flux guidé « Date précise » : calendrier → heure de début → heure de fin → boucle (autre vacation)
+    function gexpDateFlow(anchor){
+      openDatePop(anchor, gexpDate||impTodayISO(), function(dv){
+        gexpDate=dv||''; if(byId('gexp-datebtn'))byId('gexp-datebtn').classList.add('on'); document.querySelectorAll('.gexp-day[data-d]').forEach(function(x){x.classList.remove('on');}); doTranscribe();
+        openTimeGrid(anchor, gexpH1||'', function(v1){
+          gexpH1=v1; gexpChip('gexp-h1btn','Début '+v1); doTranscribe();
+          openTimeGrid(anchor, gexpH2||'', function(v2){
+            gexpH2=v2; gexpChip('gexp-h2btn','Fin '+v2); doTranscribe();
+            openLoopPop(anchor, function(){
+              if(gexpDate||gexpH1||gexpH2)gexpVacs.push({date:gexpDate,h1:gexpH1,h2:gexpH2,dateFin:''});
+              gexpDate='';gexpH1='';gexpH2=''; document.querySelectorAll('.gexp-day[data-d]').forEach(function(x){x.classList.remove('on');}); gexpChip('gexp-h1btn',''); gexpChip('gexp-h2btn',''); var db=byId('gexp-datebtn'); if(db)db.classList.remove('on'); doTranscribe();
+              gexpDateFlow(anchor);
+            });
+          });
+        });
+      });
+    }
+    if(byId('gexp-datebtn'))byId('gexp-datebtn').addEventListener('click',function(e){ e.stopPropagation(); gexpDateFlow(this); });
     // ==== Réorganiser les rectangles par glisser-déposer (tactile + souris), mémorisé par appareil ====
     (function gexpReorder(){
       var bar=byId('gexp-bar'), tglBtn=byId('gexp-reorder'); if(!bar||!tglBtn)return;
