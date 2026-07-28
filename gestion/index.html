@@ -1418,6 +1418,8 @@ button.big:active{transform:translateY(1px)}
     var dl=lines.filter(function(l){return /^\s*Date\s*:/i.test(l);})[0]||'';
     var hl=lines.filter(function(l){return /^\s*Horaires\s*:/i.test(l);})[0]||'';
     if(dl||hl){ var ph2=parseHoraires(hl); out.push({dateLabel:dl.replace(/^\s*Date\s*:\s*/i,'').trim(), horLabel:hl.replace(/^\s*Horaires\s*:\s*/i,'').trim(), mdate:frDateToISO(dl), mheure:ph2.mheure, mfin:ph2.mfin}); }
+    // Repli : mission structurée (mheure/mfin) sans ligne de vacation (ex. import CSV) → une vacation à partir des heures.
+    if(!out.length && x && x.mheure){ out.push({dateLabel:(x.mdate?String(x.mdate).split('-').reverse().join('/'):''), horLabel:(x.mheure+(x.mfin?' → '+x.mfin:'')), mdate:x.mdate||'', mheure:x.mheure, mfin:x.mfin||''}); }
     return out;
   }
   // Découpage par défaut : un créneau > 12h est coupé en tranches de 12h (ex. 08h→04h = 20h → 08h-20h + 20h-04h ; H24 → 2×12h). ≤ 12h reste tel quel.
@@ -1515,10 +1517,10 @@ button.big:active{transform:translateY(1px)}
       var cdLine=(x.statut==='validee'&&x.mdate&&typeof missCountdown==='function')?(function(){var cd=missCountdown(x);return cd?'<div class="meta" style="font-weight:700;color:var(--accent,#6ea8fe)"><span>'+cd+(x.mdate?' <span style="color:var(--muted);font-weight:400">('+esc(x.mdate)+(x.mheure?' '+esc(x.mheure):'')+')</span>':'')+'</span></div>':'';})():'';
       var izLine=(typeof izPriorityLine==='function')?izPriorityLine(x):'';
       var vacTag=(x.statut==='validee'&&x.vacIdx)?'<div class="meta" style="color:var(--ok);font-weight:600"><span>🗂️ Vacation '+x.vacIdx+'/'+x.vacTotal+'</span></div>':'';
-      var vacSplitBtn='';
-      if(x.statut==='validee'&&!x.vacIdx){ var _vv=svExtractVacations(x); if(_vv.length>=2)vacSplitBtn='<div class="acts" style="margin-top:2px"><button class="ok" data-act="splitvac" data-id="'+x.id+'" title="Cette mission validée contient '+_vv.length+' dates : la découper en '+_vv.length+' vacations distinctes (1 carte par date)">🔪 Découper en '+_vv.length+' vacations</button></div>'; }
+      var vacSplitBtn='', over12line='';
+      if(x.statut==='validee'&&!x.vacIdx){ var _vv=svExtractVacations(x); if(_vv.length>=2){ over12line='<div class="meta" style="background:rgba(224,74,74,.14);border:1.5px solid var(--bad);border-radius:10px;padding:7px 10px;margin-top:4px"><span style="color:var(--bad);font-weight:700">⚠️ Créneau > 12h — une vacation ne doit pas dépasser 12h. À découper ↓</span></div>'; vacSplitBtn='<div class="acts" style="margin-top:2px"><button class="ok" data-act="splitvac" data-id="'+x.id+'" title="Découper en '+_vv.length+' vacations de 12h maximum">🔪 Découper en '+_vv.length+' vacations (12h max)</button></div>'; } }
       var svBrd=x.aiPending?'#7b61ff':(svNoDate(x)?'var(--bad)':'');
-      return '<div class="sv"'+(svBrd?' style="border:1.5px solid '+svBrd+'"':'')+'><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+vacTag+aiPendLine+noDateLine+cdLine+bigCitiesLine(x)+assocLine+zdLine+izLine+'<div class="svm">'+esc(x.texte)+'</div>'+vacSplitBtn+body+pickBtn+editPanel+pickPanel+nearPanel+renderAffect(x)+'</div>';
+      return '<div class="sv"'+(svBrd?' style="border:1.5px solid '+svBrd+'"':'')+'><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+vacTag+over12line+aiPendLine+noDateLine+cdLine+bigCitiesLine(x)+assocLine+zdLine+izLine+'<div class="svm">'+esc(x.texte)+'</div>'+vacSplitBtn+body+pickBtn+editPanel+pickPanel+nearPanel+renderAffect(x)+'</div>';
     }
     if(suiviBucket==='validee'){
       var byD=function(a,b){var da=a.mdate||'9999-99-99',db=b.mdate||'9999-99-99';return da>db?1:(da<db?-1:0);};
