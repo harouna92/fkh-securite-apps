@@ -3213,16 +3213,17 @@ button.big:active{transform:translateY(1px)}
     function fixTop(){ var t=document.querySelector('.top'), b=byId('gexp-bar'); if(t&&b)b.style.top=t.offsetHeight+'px'; }
     fixTop(); window.addEventListener('resize',fixTop); setTimeout(fixTop,400);
     function fmtH(t){ if(t.length<=2)return ('0'+t).slice(-2)+':00'; if(t.length===3)return '0'+t.charAt(0)+':'+t.slice(1); return t.slice(0,2)+':'+t.slice(2); }
+    function isPlain(t){ if(!t)return false; var l=t.toLowerCase(); return !(l==='c'||l==='s'||l==='v'||/^\d{1,5}$/.test(t)||/^x\d+$/i.test(t)||t==='!'); }
     function parse(str){ var toks=String(str||'').trim().split(/\s+/), R={client:'',site:'',ville:'',cp:'',hours:[],agents:'',urgent:false,notes:[]}, cur=null;
-      toks.forEach(function(t){ if(!t)return; var lt=t.toLowerCase();
-        if(lt==='c'){cur='client';return;} if(lt==='s'){cur='site';return;} if(lt==='v'){cur='ville';return;}
-        if(/^\d{5}$/.test(t)){ R.cp=t; cur=null; return; }
-        if(/^\d{1,4}$/.test(t)){ R.hours.push(fmtH(t)); cur=null; return; }
-        if(/^x\d+$/i.test(t)){ R.agents=t.slice(1); cur=null; return; }
-        if(t==='!'){ R.urgent=true; cur=null; return; }
+      for(var i=0;i<toks.length;i++){ var t=toks[i]; if(!t)continue; var lt=t.toLowerCase();
+        if(lt==='c'){cur='client';continue;} if(lt==='s'){cur='site';continue;} if(lt==='v'){cur='ville';continue;}
+        if(/^\d{5}$/.test(t)){ R.cp=t; if(!R.ville&&cur===null){ if(R.notes.length){ R.ville=R.notes.pop(); } else { var nx=toks[i+1]; if(nx&&isPlain(nx)){ R.ville=nx; toks[i+1]=''; } } } cur=null; continue; }
+        if(/^\d{1,4}$/.test(t)){ R.hours.push(fmtH(t)); cur=null; continue; }
+        if(/^x\d+$/i.test(t)){ R.agents=t.slice(1); cur=null; continue; }
+        if(t==='!'){ R.urgent=true; cur=null; continue; }
         if(cur){ R[cur]=(R[cur]?R[cur]+' ':'')+t; } else R.notes.push(t);
-      }); return R; }
-    function resolveVille(R){ var sel=null; if(R.cp&&typeof commByCP==='function'){ var c=commByCP(R.cp,1); if(c&&c[0])sel=c[0]; } else if(R.ville&&typeof commSearch==='function'){ var c2=commSearch(R.ville,1); if(c2&&c2[0])sel=c2[0]; } return sel; }
+      } return R; }
+    function resolveVille(R){ var sel=null; if(R.ville&&typeof commSearch==='function'){ var c=commSearch(R.ville,1); if(c&&c[0])sel=c[0]; } if(!sel&&R.cp&&typeof commByCP==='function'){ var c2=commByCP(R.cp,1); if(c2&&c2[0])sel=c2[0]; } return sel; }
     function toText(R,sel,dateIso){ var L=['Prestation : Gardiennage','Type d\'agent : ADS']; if(R.client)L.push('Client : '+R.client); if(R.site)L.push('Site : '+R.site); var vn=sel?sel.nom:R.ville, cp=R.cp||(sel&&sel.codesPostaux?sel.codesPostaux[0]:''); if(vn||cp)L.push('Ville : '+(vn||'')+(cp?(vn?' ':'')+'('+cp+')':'')); if(dateIso)L.push('Date : '+dateIso.split('-').reverse().join('/')); if(R.hours.length>=2)L.push('Vacation : de '+R.hours[0]+' à '+R.hours[1]); else if(R.hours.length===1)L.push('Heure : '+R.hours[0]); if(R.agents)L.push('Agents : '+R.agents); if(R.notes.length)L.push('Notes : '+R.notes.join(' ')); if(R.urgent)L.push('🔴 URGENT'); return L.join('\n'); }
     var lastR=null,lastSel=null,lastTxt='',gexpDate='';
     function doTranscribe(){ var p=byId('gexp-prev'); if(!inp.value.trim()){ p.classList.add('hidden'); return; } var R=parse(inp.value), sel=resolveVille(R), txt=toText(R,sel,gexpDate); lastR=R; lastSel=sel; lastTxt=txt;
