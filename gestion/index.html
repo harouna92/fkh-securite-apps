@@ -169,8 +169,8 @@ button.big:active{transform:translateY(1px)}
 <div class="top">
   <div class="brand"><span class="dot"></span>GESTION</div>
   <div class="tabs" id="tabs">
-    <button data-s="demandes" class="on">Demandes</button>
-    <button data-s="noterapide">📝 Prise de note rapide</button>
+    <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
+    <button data-s="demandes">🛡️ Gardiennage</button>
     <button data-s="prise">Prise de service</button>
     <button data-s="fin">Fin de service</button>
     <button data-s="suivi">Suivi demandes</button>
@@ -230,7 +230,7 @@ button.big:active{transform:translateY(1px)}
 </div>
 
 <div class="wrap">
-  <section id="sec-noterapide" class="hidden">
+  <section id="sec-noterapide">
     <div><h1>📝 Prise de note rapide</h1><p class="sub">Note codée + petits rectangles · tout va dans l'aperçu · « Envoyer en recherche » crée la demande.</p></div>
     <div id="gexp-bar">
       <div class="gexp-row"><input id="gexp-in" placeholder="📝 Note codée : c AQUILA s Carrefour 83000 1930 2200 x2 !" autocomplete="off" style="flex:1"></div>
@@ -276,8 +276,8 @@ button.big:active{transform:translateY(1px)}
       <div id="gexp-prev" class="hidden" style="margin-top:8px"></div>
     </div>
   </section>
-  <section id="sec-demandes">
-    <div><h1>Demandes</h1><p class="sub">Choisis ou écris · la ville remplit le code postal · les heures donnent la plage.</p></div>
+  <section id="sec-demandes" class="hidden">
+    <div><h1>🛡️ Gardiennage</h1><p class="sub">Choisis ou écris · la ville remplit le code postal · les heures donnent la plage.</p></div>
     <div class="card">
       <button type="button" id="genr-toggle" class="big" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">🗓️ Générateur de missions récurrentes (planning fixe sur une période)</button>
       <div id="genr-form" class="hidden" style="margin-top:8px">
@@ -3344,9 +3344,11 @@ button.big:active{transform:translateY(1px)}
     fixTop(); window.addEventListener('resize',fixTop); setTimeout(fixTop,400);
     function fmtH(t){ if(t.length<=2)return ('0'+t).slice(-2)+':00'; if(t.length===3)return '0'+t.charAt(0)+':'+t.slice(1); return t.slice(0,2)+':'+t.slice(2); }
     function parseDate(t){ var today=(typeof impTodayISO==='function')?impTodayISO():'', y=today.slice(0,4), mo=today.slice(5,7); if(/^\d{1,2}$/.test(t))return y+'-'+mo+'-'+('0'+t).slice(-2); if(/^\d{4}$/.test(t))return y+'-'+t.slice(2,4)+'-'+t.slice(0,2); if(/^\d{6}$/.test(t))return '20'+t.slice(4)+'-'+t.slice(2,4)+'-'+t.slice(0,2); if(/^\d{8}$/.test(t))return t.slice(4)+'-'+t.slice(2,4)+'-'+t.slice(0,2); return ''; }
-    function isPlain(t){ if(!t)return false; var l=t.toLowerCase(); return !(l==='c'||l==='s'||l==='v'||l==='d'||/^\d{1,5}$/.test(t)||/^x\d+$/i.test(t)||t==='!'); }
+    function isPlain(t){ if(!t)return false; var l=t.toLowerCase(); return !(l==='c'||l==='s'||l==='v'||l==='d'||t.charAt(0)==='@'||/^\d{1,5}$/.test(t)||/^x\d+$/i.test(t)||t==='!'); }
+    function setDateTok(R,dr){ var dl=(dr||'').toLowerCase(); if(/^(auj|ajd|today)$/.test(dl)){R.date=(typeof impTodayISO==='function')?impTodayISO():'';return true;} if(/^(dem|dm|demain)$/.test(dl)){R.date=(typeof svcAddDays==='function')?svcAddDays(impTodayISO(),1):'';return true;} if(/^\d{1,8}$/.test(dr)){R.date=parseDate(dr);return true;} return false; }
     function parse(str){ var toks=String(str||'').trim().split(/\s+/), R={client:'',site:'',ville:'',cp:'',date:'',hours:[],agents:'',urgent:false,notes:[]}, cur=null;
       for(var i=0;i<toks.length;i++){ var t=toks[i]; if(!t)continue; var lt=t.toLowerCase();
+        if(t.charAt(0)==='@'){ var dr=t.slice(1); if(!dr){ cur='date'; continue; } setDateTok(R,dr); cur=null; continue; }
         if(lt==='c'){cur='client';continue;} if(lt==='s'){cur='site';continue;} if(lt==='v'){cur='ville';continue;} if(lt==='d'){cur='date';continue;}
         if(cur==='date'){ if(/^(auj|ajd|today)$/.test(lt)){R.date=(typeof impTodayISO==='function')?impTodayISO():'';cur=null;continue;} if(/^(dem|dm|demain)$/.test(lt)){R.date=(typeof svcAddDays==='function')?svcAddDays(impTodayISO(),1):'';cur=null;continue;} if(/^\d{1,8}$/.test(t)){R.date=parseDate(t);cur=null;continue;} cur=null; }
         if(/^\d{5}$/.test(t)){ R.cp=t; if(!R.ville&&cur===null){ if(R.notes.length){ R.ville=R.notes.pop(); } else { var nx=toks[i+1]; if(nx&&isPlain(nx)){ R.ville=nx; toks[i+1]=''; } } } cur=null; continue; }
@@ -3426,11 +3428,16 @@ button.big:active{transform:translateY(1px)}
     function gexpChip(btnId,val){ var b=byId(btnId); if(!b)return; if(!b.getAttribute('data-lbl'))b.setAttribute('data-lbl',b.textContent); if(val){ b.classList.add('on'); b.textContent=val+' ▾'; } else { b.classList.remove('on'); b.textContent=b.getAttribute('data-lbl'); } }
     (function(){ var btn=byId('gexp-clientbtn'), dd=byId('gexp-clientdd'); if(!btn||!dd)return; var cs=(typeof CLIENTS!=='undefined'?CLIENTS.slice():[]); try{ (load('fkh_clients')||[]).forEach(function(c){ if(cs.indexOf(c)<0)cs.push(c); }); }catch(e){} cs.sort(); dd.innerHTML=cs.map(function(c){return '<div data-c="'+esc(c)+'">'+esc(c)+'</div>';}).join(''); btn.addEventListener('click',function(e){ e.stopPropagation(); dd.classList.toggle('hidden'); }); dd.querySelectorAll('div').forEach(function(d){ d.addEventListener('mousedown',function(e){e.preventDefault();}); d.addEventListener('click',function(){ gexpClient=d.getAttribute('data-c'); gexpChip('gexp-clientbtn',gexpClient); dd.classList.add('hidden'); doTranscribe(); }); }); document.addEventListener('click',function(e){ if(!dd.classList.contains('hidden') && e.target!==btn && !dd.contains(e.target))dd.classList.add('hidden'); }); })();
     (function(){ var btn=byId('gexp-sitebtn'), dd=byId('gexp-sitedd'); if(!btn||!dd)return;
-      var st=['Magasin','Banque','Site professionnel','Entrepôt','Chantier','Bureaux','Immeuble','Zone commerciale']; try{ (load('fkh_sites')||[]).forEach(function(s){ if(st.indexOf(s)<0)st.push(s); }); }catch(e){}
+      var DEFAULTS=['Magasin','Banque','Site professionnel','Entrepôt','Chantier','Bureaux','Immeuble','Zone commerciale'];
+      var st=[];
+      function rebuild(){ var hidden=[]; try{hidden=load('fkh_sites_hidden')||[];}catch(e){} var fs=[]; try{fs=load('fkh_sites')||[];}catch(e){} st=[]; DEFAULTS.concat(fs).forEach(function(s){ if(s&&st.indexOf(s)<0&&hidden.indexOf(s)<0)st.push(s); }); }
+      rebuild();
       function pick(v){ if(!v)return; gexpSite=v; gexpChip('gexp-sitebtn',v); dd.classList.add('hidden'); doTranscribe(); }
-      function addNew(v){ v=(v||'').trim(); if(!v)return; if(st.indexOf(v)<0){ st.push(v); try{ var fs=load('fkh_sites')||[]; if(fs.indexOf(v)<0){fs.push(v); save('fkh_sites',fs);} }catch(e){} } pick(v); }
-      function render(){ dd.innerHTML='<div style="display:flex;gap:4px;padding:6px;border-bottom:1px solid var(--line)"><input class="gexp-newtype" placeholder="Nouveau type…" autocomplete="off" style="flex:1;min-width:0"><button type="button" class="ok gexp-newadd" style="padding:4px 10px">➕</button></div>'+st.map(function(s){return '<div data-s="'+esc(s)+'">'+esc(s)+'</div>';}).join('');
-        dd.querySelectorAll('div[data-s]').forEach(function(d){ d.addEventListener('mousedown',function(e){e.preventDefault();}); d.addEventListener('click',function(){ pick(d.getAttribute('data-s')); }); });
+      function addNew(v){ v=(v||'').trim(); if(!v)return; try{ var fs=load('fkh_sites')||[]; if(fs.indexOf(v)<0){fs.push(v); save('fkh_sites',fs);} var hid=load('fkh_sites_hidden')||[]; var k=hid.indexOf(v); if(k>=0){hid.splice(k,1);save('fkh_sites_hidden',hid);} }catch(e){} rebuild(); pick(v); }
+      function delItem(v){ try{ var fs=load('fkh_sites')||[], i=fs.indexOf(v); if(i>=0){ fs.splice(i,1); save('fkh_sites',fs); } else { var hid=load('fkh_sites_hidden')||[]; if(hid.indexOf(v)<0){hid.push(v); save('fkh_sites_hidden',hid);} } }catch(e){} rebuild(); render(); }
+      function render(){ dd.innerHTML='<div style="display:flex;gap:4px;padding:6px;border-bottom:1px solid var(--line)"><input class="gexp-newtype" placeholder="Nouveau type…" autocomplete="off" style="flex:1;min-width:0"><button type="button" class="ok gexp-newadd" style="padding:4px 10px">➕</button></div>'+st.map(function(s){return '<div style="display:flex;align-items:center"><span data-s="'+esc(s)+'" style="flex:1;padding:6px 8px;cursor:pointer">'+esc(s)+'</span><button type="button" class="gexp-sitedel" data-del="'+esc(s)+'" title="Supprimer" style="width:26px;height:26px;padding:0;margin-right:4px;background:transparent;border:none;color:var(--muted);cursor:pointer">✕</button></div>';}).join('');
+        dd.querySelectorAll('span[data-s]').forEach(function(d){ d.addEventListener('mousedown',function(e){e.preventDefault();}); d.addEventListener('click',function(){ pick(d.getAttribute('data-s')); }); });
+        dd.querySelectorAll('.gexp-sitedel').forEach(function(b){ b.addEventListener('mousedown',function(e){e.preventDefault();}); b.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); delItem(b.getAttribute('data-del')); }); });
         var ni=dd.querySelector('.gexp-newtype'), na=dd.querySelector('.gexp-newadd');
         if(na)na.addEventListener('click',function(e){ e.preventDefault(); addNew(ni.value); });
         if(ni)ni.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); addNew(ni.value); } }); }
@@ -3498,7 +3505,7 @@ button.big:active{transform:translateY(1px)}
       function endDrag(){ if(!drag)return; drag.classList.remove('gexp-dragging'); drag=null; saveOrder(); }
       bar.addEventListener('pointerup',endDrag); bar.addEventListener('pointercancel',endDrag);
     })();
-    if(byId('gexp-help'))byId('gexp-help').onclick=function(){ alert('Codes de la note rapide :\n• Heure : 1 à 4 chiffres — 8→08:00, 845→08:45, 1945→19:45\n• Vacation : deux heures — « 1930 2200 » → 19:30 à 22:00\n• 5 chiffres = code postal (remplit la ville)\n• c = Client · s = Type de site · v = Ville (ex. « c AQUILA s Magasin v Dijon »)\n• d = date (d 28 → le 28 du mois · d 2808 → 28/08 · d auj / d dem)\n• x2 = 2 agents · ! = urgent\n• Boutons Aujourd\'hui / Demain / 🕛 H24\n• tout autre mot va dans les notes'); };
+    if(byId('gexp-help'))byId('gexp-help').onclick=function(){ alert('Codes de la note rapide :\n• Heure : 1 à 4 chiffres — 8→08:00, 845→08:45, 1945→19:45\n• Vacation : deux heures — « 1930 2200 » → 19:30 à 22:00\n• 5 chiffres = code postal (remplit la ville)\n• c = Client · s = Type de site · v = Ville (ex. « c AQUILA s Magasin v Dijon »)\n• @ = date (@1 → le 1er · @2808 → 28/08 · @auj / @dem) — « d » marche aussi\n• x2 = 2 agents · ! = urgent\n• Boutons Aujourd\'hui / Demain / 🕛 H24\n• tout autre mot va dans les notes'); };
   })();
 
   (function initCloud(){
