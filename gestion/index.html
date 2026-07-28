@@ -2304,11 +2304,12 @@ button.big:active{transform:translateY(1px)}
         var call=c.tel?'<a class="btn call" href="tel:'+esc(String(c.tel).replace(/\s/g,''))+'">📞</a>':'';
         var chk='<label class="chk" style="margin:0"><input type="checkbox" class="ivcall-done" data-x="'+esc(x.id)+'" data-ci="'+ci+'"'+(c.done?' checked':'')+'><span>Appelé</span></label>';
         var sel='<select class="ivcall-resp" data-x="'+esc(x.id)+'" data-ci="'+ci+'">'+IVRESP.map(function(r){return '<option value="'+esc(r)+'"'+(c.resp===r?' selected':'')+'>'+(r||'— réponse —')+'</option>';}).join('')+'</select>';
+        var tsel='<select class="ivcall-tries" data-x="'+esc(x.id)+'" data-ci="'+ci+'" title="Nombre d\'essais d\'appel">'+['','1','2','3','4+'].map(function(t){return '<option value="'+esc(t)+'"'+(String(c.tries||'')===t?' selected':'')+'>'+(t?'☎×'+t:'☎ essais ?')+'</option>';}).join('')+'</select>';
         var isActive=(ci===activeIdx), startedAt=ci>0?(calls[ci-1].ts||null):(x.recherche_at||null);
-        var state=c.done?('<span style="color:var(--ok);font-weight:600">✅ appelé à '+esc(c.at||'')+(c.resp?' · '+esc(c.resp):'')+'</span>')
+        var state=c.done?('<span style="color:var(--ok);font-weight:600">✅ appelé à '+esc(c.at||'')+(c.tries?' · ☎×'+esc(c.tries):'')+(c.resp?' · '+esc(c.resp):'')+'</span>')
           :isActive?('<span style="color:#e0784b;font-weight:700">⏱ appel en cours : <span class="iv-timer" data-since="'+(startedAt||'')+'"></span></span>')
           :'<span style="color:var(--muted)">en attente</span>';
-        return '<div class="it" style="flex-wrap:wrap;gap:6px'+(isActive?';border:2px solid #e0784b':(c.done?';opacity:.6':''))+'"><div style="flex:1;min-width:150px"><div class="fa-n">'+(ci+1)+'. '+tags+esc(c.nom||(a?a.nom:'—'))+' <span style="color:var(--muted);font-weight:400">'+esc(c.tel||'')+dist+'</span></div><div class="fa-d">'+state+'</div></div><div class="fa-a" style="gap:6px;flex-wrap:wrap;align-items:center">'+call+chk+sel+'<button class="ok" data-ivaff="'+esc(x.id)+'" data-aid="'+esc(c.aid)+'">✅ Affecter</button></div></div>';
+        return '<div class="it" style="flex-wrap:wrap;gap:6px'+(isActive?';border:2px solid #e0784b':(c.done?';opacity:.6':''))+'"><div style="flex:1;min-width:150px"><div class="fa-n">'+(ci+1)+'. '+tags+esc(c.nom||(a?a.nom:'—'))+' <span style="color:var(--muted);font-weight:400">'+esc(c.tel||'')+dist+'</span></div><div class="fa-d">'+state+'</div></div><div class="fa-a" style="gap:6px;flex-wrap:wrap;align-items:center">'+call+chk+sel+tsel+'<button class="ok" data-ivaff="'+esc(x.id)+'" data-aid="'+esc(c.aid)+'">✅ Affecter</button></div></div>';
       }).join('');
       return '<div class="lab" style="margin:8px 0 4px">📞 '+doneN+'/'+calls.length+' appelés — appelle dans l\'ordre : coche « Appelé » + réponse, le chrono passe au suivant</div><div class="list">'+rows+'</div>';
     }
@@ -2344,9 +2345,11 @@ button.big:active{transform:translateY(1px)}
     });
     if(byId('iv-list'))byId('iv-list').addEventListener('change',function(e){
       var t=e.target, xid=t.getAttribute('data-x'); if(!xid)return; var ci=+t.getAttribute('data-ci'), arr=ivLoad(),it=null,i; for(i=0;i<arr.length;i++)if(arr[i].id===xid){it=arr[i];break;} if(!it||!it.calls||!it.calls[ci])return;
-      if(t.classList.contains('ivcall-done')){ it.calls[ci].done=t.checked; it.calls[ci].at=t.checked?ivNowHM():null; it.calls[ci].ts=t.checked?Date.now():null; }
+      var reRender=false;
+      if(t.classList.contains('ivcall-done')){ it.calls[ci].done=t.checked; it.calls[ci].at=t.checked?ivNowHM():null; it.calls[ci].ts=t.checked?Date.now():null; if(t.checked&&!it.calls[ci].tries)it.calls[ci].tries='1'; reRender=true; }
       else if(t.classList.contains('ivcall-resp')){ it.calls[ci].resp=t.value; }
-      ivSave(arr); ivRender();
+      else if(t.classList.contains('ivcall-tries')){ it.calls[ci].tries=t.value; }
+      ivSave(arr); if(reRender)ivRender();
     });
     ivRender();
     function addHour(hm){ var p=String(hm||'').split(':'); if(p.length<2)return ''; var m=((+p[0]*60+ +p[1]+60)%1440+1440)%1440; return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+(m%60)).slice(-2); }
