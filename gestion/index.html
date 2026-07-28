@@ -1188,15 +1188,29 @@ button.big:active{transform:translateY(1px)}
     });
     list.sort(function(x,y){return x.d-y.d;}); return list;
   }
+  function hmMin(m){ m=((m%1440)+1440)%1440; return pad2(Math.floor(m/60))+':'+pad2(m%60); }
+  // Dispo d'un agent (par son planning de missions validées) vis-à-vis d'un créneau cible {date, start(min), end(min)}.
+  function agentDispo(aid, target){
+    if(!target||target.start==null||typeof SUIVI==='undefined')return null;
+    var planned=[], conflict=null, chain=false;
+    SUIVI.forEach(function(m){ if(m.agentId!==aid||m.statut!=='validee')return; if((m.mdate||'')!==target.date)return; var r=(typeof missRange==='function')?missRange(m):null; if(!r)return;
+      var lbl=(m.siteAgent||m.titre||'mission')+' '+(m.mheure||'')+((typeof missEndTxt==='function'&&missEndTxt(m))?'→'+missEndTxt(m):''); planned.push(lbl);
+      if(r[0]<target.end&&target.start<r[1])conflict=lbl; else if(r[1]<=target.start&&(target.start-r[1])<=15)chain=true; });
+    if(conflict)return {b:'🔴',c:'var(--bad)',t:'Déjà en mission',planned:planned,extra:conflict};
+    if(chain)return {b:'🔗',c:'#e0784b',t:'Enchaînable — finit juste avant',planned:planned};
+    return {b:'🟢',c:'var(--ok)',t:'Libre à ce créneau',planned:planned};
+  }
   function renderNear(it){
     if(it.la==null){ return '<div class="pickp"><div class="hint">'+(it._nogeo?'📍 Ville non géolocalisée — distances indisponibles.':'⏳ Localisation de '+esc(it.ville||extractVille(it.texte)||'la ville')+'…')+'</div><div class="acts" style="margin-top:6px"><button data-act="nearclose" data-id="'+it.id+'">Fermer</button></div></div>'; }
+    var _vac=(typeof svExtractVacations==='function')?svExtractVacations(it):[], _v0=_vac[0]||null, nearTarget=null;
+    if(_v0&&_v0.mdate&&_v0.mheure){ var _ts=toMin(_v0.mheure), _te=_v0.mfin?toMin(_v0.mfin):null; if(_ts!=null){ if(_te==null)_te=_ts+720; if(_te<=_ts)_te+=1440; nearTarget={date:_v0.mdate,start:_ts,end:_te}; } }
     var rad=it._rad||100, list=nearAgents(it);
     var radOpts=[20,30,50,75,100,150,200,300].map(function(r){return '<option value="'+r+'"'+(r===rad?' selected':'')+'>'+r+' km</option>';}).join('');
     var head='<div class="lab" style="margin:0 0 5px">🔍 Agents proches de '+esc(it.ville||'?')+'</div>'
       +'<div class="hm" style="margin-bottom:7px;flex-wrap:wrap"><span style="color:var(--muted);font-weight:400;font-size:12.5px">Rayon</span><select data-nrad="'+it.id+'" style="flex:0 0 auto;width:auto;padding:6px 8px;font-size:13px">'+radOpts+'</select>'
       +'<label style="display:flex;align-items:center;gap:4px;font-size:12.5px;margin-left:6px;cursor:pointer"><input type="checkbox" data-nads="'+it.id+'"'+(it._nads?' checked':'')+' style="width:16px;height:16px;padding:0;margin:0">🛡️ADS</label>'
       +'<label style="display:flex;align-items:center;gap:4px;font-size:12.5px;cursor:pointer"><input type="checkbox" data-nvoit="'+it.id+'"'+(it._nvoit?' checked':'')+' style="width:16px;height:16px;padding:0;margin:0">🚗 Véhicule</label></div>';
-    var cnt='<div class="hint" style="margin:0 0 6px">'+list.length+' agent'+(list.length>1?'s':'')+' à ≤ '+rad+' km'+((it._nads||it._nvoit)?' (filtré)':'')+'</div>';
+    var cnt='<div class="hint" style="margin:0 0 6px">'+list.length+' agent'+(list.length>1?'s':'')+' à ≤ '+rad+' km'+((it._nads||it._nvoit)?' (filtré)':'')+'</div>'+(nearTarget?'<div class="hint" style="margin:0 0 6px;color:#6ea8fe;font-weight:600">📅 Dispo vérifiée pour : '+esc(nearTarget.date.split('-').reverse().join('/'))+' · '+hmMin(nearTarget.start)+'→'+hmMin(nearTarget.end)+'</div>':'');
     var body;
     if(!list.length) body='<div class="svempty" style="padding:12px">Aucun agent dans ce rayon.'+(FA.length?'':' (Fiche agent vide.)')+'</div>';
     else body='<div class="list">'+list.map(function(o){
@@ -1205,7 +1219,9 @@ button.big:active{transform:translateY(1px)}
       var durV=(it._agDur&&it._agDur[a.id]), durTxt=(durV?' · 🚗 '+durV+' de route':(durV===null?' · 🚗 …':''));
       var d=(tags?tags+'· ':'')+[a.ville,o.d+' km'+durTxt,tels.join(' / '),a.fiab].filter(Boolean).map(esc).join(' · ');
       var call=tels.map(function(t){return '<a class="call" href="tel:'+esc(t.replace(/\s/g,''))+'" title="Appeler '+esc(t)+'">📞</a>';}).join('');
-      return '<div class="fa"'+(assoc?' style="background:var(--okbg);border-radius:9px;padding:8px"':'')+'><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+(d||'—')+'</div></div><div class="fa-a">'+call+'<button data-act="nassoc" data-id="'+it.id+'" data-aid="'+a.id+'"'+(assoc?' style="color:var(--ok);border-color:var(--ok)"':'')+' title="'+(assoc?'Retirer de la demande':'Associer à la demande')+'">'+(assoc?'✓':'➕')+'</button></div></div>';
+      var dispo=nearTarget?agentDispo(a.id,nearTarget):null;
+      var dispoLine=dispo?('<div class="fa-d" style="font-weight:600;color:'+dispo.c+'">'+dispo.b+' '+esc(dispo.t)+(dispo.extra?' <span style="font-weight:400;color:var(--muted)">('+esc(dispo.extra)+')</span>':'')+(dispo.planned.length?'<br><span style="font-weight:400;color:var(--muted);font-size:12px">🗓️ planifié : '+esc(dispo.planned.join(' ; '))+'</span>':'')+'</div>'):'';
+      return '<div class="fa"'+(assoc?' style="background:var(--okbg);border-radius:9px;padding:8px"':'')+'><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+(d||'—')+'</div>'+dispoLine+'</div><div class="fa-a">'+call+'<button data-act="nassoc" data-id="'+it.id+'" data-aid="'+a.id+'"'+(assoc?' style="color:var(--ok);border-color:var(--ok)"':'')+' title="'+(assoc?'Retirer de la demande':'Associer à la demande')+'">'+(assoc?'✓':'➕')+'</button></div></div>';
     }).join('')+'</div>';
     return '<div class="pickp">'+head+cnt+body+'<div class="acts" style="margin-top:8px"><button data-act="nearclose" data-id="'+it.id+'">Fermer</button></div></div>';
   }
