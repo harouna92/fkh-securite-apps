@@ -160,6 +160,29 @@ export default {
       return json({ error: "unauthorized" }, 401);
     }
 
+    // --- Ringover : journal d'appels pour vérifier ce qui a été réellement appelé ---
+    if (path === "/ringover/calls" && request.method === "GET") {
+      if (!env.RINGOVER_API_KEY) return json({ error: "no_key" }, 500);
+      const from = url.searchParams.get("from") || ""; // YYYY-MM-DD
+      const to = url.searchParams.get("to") || from;
+      const p = new URLSearchParams({ limit_count: "1000" });
+      if (from) p.set("start_date", from + "T00:00:00.000Z");
+      if (to) p.set("end_date", to + "T23:59:59.999Z");
+      try {
+        const r = await fetch("https://public-api.ringover.com/v2/calls?" + p.toString(), { headers: { Authorization: env.RINGOVER_API_KEY } });
+        if (!r.ok) return json({ error: "ringover", status: r.status }, 502);
+        const j = await r.json();
+        const calls = (j.call_list || []).map((c) => ({
+          number: String(c.contact_number || ""),
+          start: c.start_time || "",
+          answered: !!c.is_answered,
+          direction: c.direction || "",
+          duration: c.total_duration || 0,
+        }));
+        return json({ ok: true, total: j.total_call_count || calls.length, calls });
+      } catch (e) { return json({ error: "ringover_fetch" }, 502); }
+    }
+
     // --- Lecture des changements depuis un horodatage ---
     if (path === "/state" && request.method === "GET") {
       const since = parseInt(url.searchParams.get("since") || "0", 10) || 0;
