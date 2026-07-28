@@ -2297,8 +2297,20 @@ button.big:active{transform:translateY(1px)}
     function ivAgentsBlock(x){
       var calls=x.calls||[];
       if(!calls.length)return '<div class="fa-d" style="color:var(--warn);margin-top:6px">Aucune zone d\'intervention ne couvre '+esc(x.ville||'')+(x.dep?' (dép. '+esc(x.dep)+')':'')+'. Ajoute une zone plus bas pour cette ville / ce département.</div>';
-      var rows=calls.map(function(c,ci){ var a=faById(c.aid); var dist=(a&&a.la!=null&&x.la!=null)?(' · '+km(x.la,x.lo,a.la,a.lo)+' km'):''; var tags=a?((a.voiture?'🚗 ':'')+(a.ads?'🛡️ ':'')):''; var call=c.tel?'<a class="btn call" href="tel:'+esc(String(c.tel).replace(/\s/g,''))+'">📞</a>':''; var chk='<label class="chk" style="margin:0"><input type="checkbox" class="ivcall-done" data-x="'+esc(x.id)+'" data-ci="'+ci+'"'+(c.done?' checked':'')+'><span>Appelé</span></label>'; var sel='<select class="ivcall-resp" data-x="'+esc(x.id)+'" data-ci="'+ci+'">'+IVRESP.map(function(r){return '<option value="'+esc(r)+'"'+(c.resp===r?' selected':'')+'>'+(r||'— réponse —')+'</option>';}).join('')+'</select>'; return '<div class="it" style="flex-wrap:wrap;gap:6px'+(c.done?';opacity:.7':'')+'"><div style="flex:1;min-width:150px"><div class="fa-n">'+(ci+1)+'. '+tags+esc(c.nom||(a?a.nom:'—'))+' <span style="color:var(--muted);font-weight:400">'+esc(c.tel||'')+dist+(c.done&&c.at?' · ✅ '+esc(c.at):'')+'</span></div></div><div class="fa-a" style="gap:6px;flex-wrap:wrap;align-items:center">'+call+chk+sel+'<button class="ok" data-ivaff="'+esc(x.id)+'" data-aid="'+esc(c.aid)+'">✅ Affecter</button></div></div>'; }).join('');
-      return '<div class="lab" style="margin:8px 0 4px">📞 Agents à appeler (ordre de priorité) — coche « Appelé » et indique la réponse</div><div class="list">'+rows+'</div>';
+      var doneN=0,k; for(k=0;k<calls.length;k++)if(calls[k].done)doneN++;
+      var activeIdx=-1; for(k=0;k<calls.length;k++){ if(!calls[k].done){ activeIdx=k; break; } }
+      var rows=calls.map(function(c,ci){
+        var a=faById(c.aid); var dist=(a&&a.la!=null&&x.la!=null)?(' · '+km(x.la,x.lo,a.la,a.lo)+' km'):''; var tags=a?((a.voiture?'🚗 ':'')+(a.ads?'🛡️ ':'')):'';
+        var call=c.tel?'<a class="btn call" href="tel:'+esc(String(c.tel).replace(/\s/g,''))+'">📞</a>':'';
+        var chk='<label class="chk" style="margin:0"><input type="checkbox" class="ivcall-done" data-x="'+esc(x.id)+'" data-ci="'+ci+'"'+(c.done?' checked':'')+'><span>Appelé</span></label>';
+        var sel='<select class="ivcall-resp" data-x="'+esc(x.id)+'" data-ci="'+ci+'">'+IVRESP.map(function(r){return '<option value="'+esc(r)+'"'+(c.resp===r?' selected':'')+'>'+(r||'— réponse —')+'</option>';}).join('')+'</select>';
+        var isActive=(ci===activeIdx), startedAt=ci>0?(calls[ci-1].ts||null):(x.recherche_at||null);
+        var state=c.done?('<span style="color:var(--ok);font-weight:600">✅ appelé à '+esc(c.at||'')+(c.resp?' · '+esc(c.resp):'')+'</span>')
+          :isActive?('<span style="color:#e0784b;font-weight:700">⏱ appel en cours : <span class="iv-timer" data-since="'+(startedAt||'')+'"></span></span>')
+          :'<span style="color:var(--muted)">en attente</span>';
+        return '<div class="it" style="flex-wrap:wrap;gap:6px'+(isActive?';border:2px solid #e0784b':(c.done?';opacity:.6':''))+'"><div style="flex:1;min-width:150px"><div class="fa-n">'+(ci+1)+'. '+tags+esc(c.nom||(a?a.nom:'—'))+' <span style="color:var(--muted);font-weight:400">'+esc(c.tel||'')+dist+'</span></div><div class="fa-d">'+state+'</div></div><div class="fa-a" style="gap:6px;flex-wrap:wrap;align-items:center">'+call+chk+sel+'<button class="ok" data-ivaff="'+esc(x.id)+'" data-aid="'+esc(c.aid)+'">✅ Affecter</button></div></div>';
+      }).join('');
+      return '<div class="lab" style="margin:8px 0 4px">📞 '+doneN+'/'+calls.length+' appelés — appelle dans l\'ordre : coche « Appelé » + réponse, le chrono passe au suivant</div><div class="list">'+rows+'</div>';
     }
     function ivHead(x){ var t=(x.presta||'Intervention')+(x.site?' · '+esc(x.site):'')+(x.ville?' · '+esc(x.ville)+(x.cp?' ('+esc(x.cp)+')':''):''); var when=(x.date?x.date.split('-').reverse().join('/'):'')+(x.hdeb?' '+esc(x.hdeb):'')+(x.hfin?' → '+esc(x.hfin):''); return '<div class="fa-n" style="font-size:15px">🚨 '+t+'</div><div class="fa-d">'+(x.client?'🏢 '+esc(x.client)+' · ':'')+esc(when)+'</div>'; }
     function ivNowHM(){ var d=new Date(); return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
@@ -2332,7 +2344,7 @@ button.big:active{transform:translateY(1px)}
     });
     if(byId('iv-list'))byId('iv-list').addEventListener('change',function(e){
       var t=e.target, xid=t.getAttribute('data-x'); if(!xid)return; var ci=+t.getAttribute('data-ci'), arr=ivLoad(),it=null,i; for(i=0;i<arr.length;i++)if(arr[i].id===xid){it=arr[i];break;} if(!it||!it.calls||!it.calls[ci])return;
-      if(t.classList.contains('ivcall-done')){ it.calls[ci].done=t.checked; it.calls[ci].at=t.checked?ivNowHM():null; }
+      if(t.classList.contains('ivcall-done')){ it.calls[ci].done=t.checked; it.calls[ci].at=t.checked?ivNowHM():null; it.calls[ci].ts=t.checked?Date.now():null; }
       else if(t.classList.contains('ivcall-resp')){ it.calls[ci].resp=t.value; }
       ivSave(arr); ivRender();
     });
