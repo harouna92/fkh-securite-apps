@@ -183,9 +183,15 @@ async function aiScan(env, maxCalls, force) {
   const r = await fetch("https://public-api.ringover.com/v2/calls?" + p.toString(), { headers: { Authorization: env.RINGOVER_API_KEY } });
   if (!r.ok) return { error: "ringover", status: r.status };
   const j = await r.json();
-  const calls = (j.call_list || []).filter((c) => {
-    if (!c.is_answered || !c.record || typeof c.record !== "string" || c.record.indexOf("http") !== 0) return false;
+  const all = j.call_list || [];
+  const diag = { fetched: all.length, answered: 0, withRecord: 0, whitelisted: 0 };
+  const calls = all.filter((c) => {
+    if (c.is_answered) diag.answered++;
+    const hasRec = c.record && typeof c.record === "string" && c.record.indexOf("http") === 0;
+    if (hasRec) diag.withRecord++;
     const rule = watchMap[numKey(c.contact_number)];
+    if (rule && (rule === "both" || rule === c.direction)) diag.whitelisted++;
+    if (!c.is_answered || !hasRec) return false;
     if (!rule) return false;
     return rule === "both" || rule === c.direction;
   });
@@ -206,7 +212,7 @@ async function aiScan(env, maxCalls, force) {
     processed++;
     if (isDem) { detected++; try { await pushAll(env, aiDemandeNotif({ cdr_id: id, direction: c.direction }, data.demandes)); } catch (e) {} }
   }
-  return { ok: true, processed, detected, total_in: calls.length };
+  return { ok: true, processed, detected, total_in: calls.length, window_h: lookbackH, diag };
 }
 
 export default {
