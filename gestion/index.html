@@ -3206,6 +3206,7 @@ button.big:active{transform:translateY(1px)}
   }
   // ===== Niveau 2 : push même appli fermée (service worker + Web Push) =====
   var VAPID_PUBLIC='BPgtjrioK0ucyYk1XxWToj1OlSOiNWBNUQJX4KFXxczKb2NqGTbCSkoXee59LBFsd7GwoPtgz5I1XWX8VSnzdZY';
+  window._N2_BACKEND_READY=true; // backend push déployé (table push_subs + /push/subscribe + envoi VAPID)
   function urlB64ToU8(b64){ var pad='='.repeat((4-b64.length%4)%4),base=(b64+pad).replace(/-/g,'+').replace(/_/g,'/'),raw=atob(base),arr=new Uint8Array(raw.length); for(var i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i); return arr; }
   function n2IsIOS(){ return /iPad|iPhone|iPod/.test(navigator.userAgent||'')||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1); }
   function n2Standalone(){ return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }

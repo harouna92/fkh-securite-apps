@@ -5,7 +5,7 @@ self.addEventListener('install', function(e){ self.skipWaiting(); });
 self.addEventListener('activate', function(e){ e.waitUntil(self.clients.claim()); });
 
 self.addEventListener('push', function(e){
-  var d = { title: 'GESTION', body: '', url: GEST_URL, tag: 'fkh-' + Date.now() };
+  var d = { title: 'GESTION — FKH Sécurité', body: '🔍 Du nouveau : une demande vient de passer « en recherche ». Ouvre l\'appli pour la traiter.', url: GEST_URL, tag: 'fkh-' + Date.now() };
   try {
     if (e.data) {
       var j = e.data.json();

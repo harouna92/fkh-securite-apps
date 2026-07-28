@@ -25,8 +25,48 @@ function corsHeaders(origin) {
   };
 }
 
+// ===== Niveau 2 — Web Push (notifications appli fermée) =====
+// Envoi « sans charge utile » : le téléphone reçoit un signal signé VAPID, le service worker
+// affiche une notification générique. Le détail s'affiche en ouvrant l'appli.
+const VAPID_PUB = "BPgtjrioK0ucyYk1XxWToj1OlSOiNWBNUQJX4KFXxczKb2NqGTbCSkoXee59LBFsd7GwoPtgz5I1XWX8VSnzdZY";
+const b64uToBytes = (s) => { const pad = "=".repeat((4 - (s.length % 4)) % 4); const raw = atob((s + pad).replace(/-/g, "+").replace(/_/g, "/")); const a = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) a[i] = raw.charCodeAt(i); return a; };
+const bytesToB64u = (buf) => { const b = new Uint8Array(buf); let s = ""; for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };
+async function vapidAuthHeader(env, endpoint) {
+  const pub = b64uToBytes(VAPID_PUB); // 65 octets : 0x04 | x(32) | y(32)
+  const jwk = { kty: "EC", crv: "P-256", d: env.VAPID_PRIVATE, x: bytesToB64u(pub.slice(1, 33)), y: bytesToB64u(pub.slice(33, 65)) };
+  const key = await crypto.subtle.importKey("jwk", jwk, { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]);
+  const enc = new TextEncoder();
+  const header = bytesToB64u(enc.encode(JSON.stringify({ typ: "JWT", alg: "ES256" })));
+  const payload = bytesToB64u(enc.encode(JSON.stringify({ aud: new URL(endpoint).origin, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub: "mailto:hacamara2@gmail.com" })));
+  const sig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, enc.encode(header + "." + payload));
+  return `vapid t=${header}.${payload}.${bytesToB64u(sig)}, k=${VAPID_PUB}`;
+}
+async function pushOne(env, row) {
+  try {
+    const sub = JSON.parse(row.sub); const endpoint = sub.endpoint || row.endpoint;
+    const auth = await vapidAuthHeader(env, endpoint);
+    const r = await fetch(endpoint, { method: "POST", headers: { Authorization: auth, TTL: "86400", Urgency: "high" } });
+    if (r.status === 404 || r.status === 410) await env.DB.prepare("DELETE FROM push_subs WHERE endpoint = ?").bind(row.endpoint).run();
+    return r.status;
+  } catch (e) { return 0; }
+}
+async function pushAll(env) {
+  if (!env.VAPID_PRIVATE) return;
+  const rs = await env.DB.prepare("SELECT endpoint, sub FROM push_subs").all();
+  await Promise.allSettled((rs.results || []).map((row) => pushOne(env, row)));
+}
+// Y a-t-il de NOUVELLES demandes « en recherche » entre l'ancienne et la nouvelle valeur ?
+function newRechercheIds(oldV, newV) {
+  let o = [], n = [];
+  try { o = JSON.parse(oldV || "[]") || []; } catch (_) {}
+  try { n = JSON.parse(newV || "[]") || []; } catch (_) {}
+  if (!Array.isArray(o)) o = []; if (!Array.isArray(n)) n = [];
+  const was = {}; o.forEach((m) => { if (m && m.id) was[m.id] = m.statut; });
+  return n.filter((m) => m && m.statut === "recherche" && was[m.id] !== "recherche").map((m) => m.id);
+}
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const origin = request.headers.get("Origin");
     const cors = corsHeaders(origin);
@@ -97,8 +137,41 @@ export default {
       const batch = items.map((it) =>
         stmt.bind(String(it.k), typeof it.v === "string" ? it.v : JSON.stringify(it.v), now)
       );
+      // Niveau 2 : compare avec l'ancienne valeur AVANT écriture — nouvelle demande « en recherche » => push
+      const PUSH_KEYS = ["fkh_suivi", "fkh_interv"];
+      let notifyPush = false;
+      for (const it of items) {
+        if (!PUSH_KEYS.includes(String(it.k))) continue;
+        try {
+          const old = await env.DB.prepare("SELECT v FROM store WHERE k = ?").bind(String(it.k)).first();
+          const nv = typeof it.v === "string" ? it.v : JSON.stringify(it.v);
+          if (newRechercheIds(old ? old.v : "[]", nv).length) notifyPush = true;
+        } catch (_) {}
+      }
       await env.DB.batch(batch);
+      if (notifyPush && ctx && ctx.waitUntil) ctx.waitUntil(pushAll(env));
       return json({ ok: true, now });
+    }
+
+    // --- Niveau 2 : abonnements Web Push (notifications appli fermée) ---
+    if (path === "/push/subscribe" && request.method === "POST") {
+      let body = {}; try { body = await request.json(); } catch (_) {}
+      const sub = body.sub || body.subscription;
+      if (!sub || !sub.endpoint) return json({ error: "subscription manquante" }, 400);
+      await env.DB.prepare("INSERT INTO push_subs (endpoint, sub, at) VALUES (?, ?, ?) ON CONFLICT(endpoint) DO UPDATE SET sub = excluded.sub, at = excluded.at")
+        .bind(String(sub.endpoint), JSON.stringify(sub), Date.now()).run();
+      return json({ ok: true });
+    }
+    if (path === "/push/unsubscribe" && request.method === "POST") {
+      let body = {}; try { body = await request.json(); } catch (_) {}
+      if (!body.endpoint) return json({ error: "endpoint manquant" }, 400);
+      await env.DB.prepare("DELETE FROM push_subs WHERE endpoint = ?").bind(String(body.endpoint)).run();
+      return json({ ok: true });
+    }
+    // Envoi de test : notifie tous les appareils abonnés (pour vérifier le circuit)
+    if (path === "/push/test" && request.method === "POST") {
+      await pushAll(env);
+      return json({ ok: true });
     }
 
     // --- Upload d'une photo vers R2 (corps = octets de l'image, ?key=chemin/dans/le/bucket) ---
