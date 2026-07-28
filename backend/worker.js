@@ -161,7 +161,7 @@ async function aiTranscribe(env, audioUrl) {
   const j = await r.json();
   return j.text || "";
 }
-const AI_PROMPT_BASE = "Tu analyses un message (appel transcrit, mail, SMS ou capture d'ecran) d'une societe de securite privee. Determine s'il contient une (ou plusieurs) demande(s) operationnelle(s), de trois NATURES possibles :\n- GARDIENNAGE : un agent est POSTE pour SURVEILLER un site sur une vacation / une duree (nuit, week-end, chantier, magasin...). Surveillance statique, l'agent reste sur place.\n- INTERVENTION : un DEPLACEMENT PONCTUEL declenche par une ALARME / une levee de doute / une alerte (l'agent se rend sur place, verifie, repart). Ponctuel, dure typiquement 1 h.\n- RONDE : un ou plusieurs PASSAGES de verification / pointage / tournee sur un ou plusieurs sites.\nEn cas de DOUTE entre gardiennage et intervention/ronde, choisis GARDIENNAGE.\nReponds UNIQUEMENT en JSON strict, sans aucun texte autour :\n{\"is_demande\": true|false, \"resume\": \"\", \"demandes\": [{\"nature\":\"gardiennage|intervention|ronde\",\"client\":\"\",\"ville\":\"\",\"cp\":\"\",\"site\":\"\",\"type_site\":\"\",\"nb_agents\":\"\",\"urgent\":true,\"vacations\":[{\"date\":\"\",\"horaires\":\"\"}]}]}\nREGLES ABSOLUES :\n- 'nature' est OBLIGATOIRE pour CHAQUE demande : exactement 'gardiennage', 'intervention' ou 'ronde'.\n- Reprends le NOM DU CLIENT / donneur d'ordre exactement comme il est dit (Securitas, Sotel, etc.) dans 'client'. C'est souvent une societe de securite qui nous sous-traite.\n- UNE demande = UN SEUL SITE. Si le message concerne PLUSIEURS SITES differents (villes ou lieux differents), cree PLUSIEURS entrees distinctes dans 'demandes', une par site. NE JAMAIS regrouper plusieurs sites dans une seule demande.\n- Pour un MEME site (gardiennage) demande sur PLUSIEURS DATES : c'est UNE SEULE demande, mais mets UNE entree PAR DATE dans 'vacations', chaque entree = {date, horaires (creneau de cette date)}. NE PAS regrouper toutes les dates ensemble. Pour une intervention ou une ronde ponctuelle, 'vacations' peut rester vide (ou contenir la date/heure prevue si elle est precisee).\n- is_demande=false et demandes=[] si ce n'est NI du gardiennage, NI une intervention, NI une ronde (facture, RH, commercial, conversation, autre).\n- Laisse \"\" si une info est absente. resume = 1 phrase courte resumant le message.";
+const AI_PROMPT_BASE = "Tu analyses un message (appel transcrit, mail, SMS ou capture d'ecran) d'une societe de securite privee. Determine s'il contient une (ou plusieurs) demande(s) operationnelle(s), de trois NATURES possibles :\n- GARDIENNAGE : un agent est POSTE pour SURVEILLER un site sur une vacation / une duree (nuit, week-end, chantier, magasin...). Surveillance statique, l'agent reste sur place.\n- INTERVENTION : un DEPLACEMENT PONCTUEL declenche par une ALARME / une levee de doute / une alerte (l'agent se rend sur place, verifie, repart). Ponctuel, dure typiquement 1 h.\n- RONDE : un ou plusieurs PASSAGES de verification / pointage / tournee sur un ou plusieurs sites.\nEn cas de DOUTE entre gardiennage et intervention/ronde, choisis GARDIENNAGE.\nReponds UNIQUEMENT en JSON strict, sans aucun texte autour :\n{\"is_demande\": true|false, \"resume\": \"\", \"demandes\": [{\"nature\":\"gardiennage|intervention|ronde\",\"client\":\"\",\"ville\":\"\",\"cp\":\"\",\"site\":\"\",\"type_site\":\"\",\"nb_agents\":\"\",\"urgent\":true,\"vacations\":[{\"date\":\"\",\"horaires\":\"\"}]}],\"arrets\":[{\"client\":\"\",\"site\":\"\",\"ville\":\"\",\"motif\":\"\"}]}\nREGLES ABSOLUES :\n- 'nature' est OBLIGATOIRE pour CHAQUE demande : exactement 'gardiennage', 'intervention' ou 'ronde'.\n- Reprends le NOM DU CLIENT / donneur d'ordre exactement comme il est dit (Securitas, Sotel, etc.) dans 'client'. C'est souvent une societe de securite qui nous sous-traite.\n- UNE demande = UN SEUL SITE. Si le message concerne PLUSIEURS SITES differents (villes ou lieux differents), cree PLUSIEURS entrees distinctes dans 'demandes', une par site. NE JAMAIS regrouper plusieurs sites dans une seule demande.\n- Pour un MEME site (gardiennage) demande sur PLUSIEURS DATES : c'est UNE SEULE demande, mais mets UNE entree PAR DATE dans 'vacations', chaque entree = {date, horaires (creneau de cette date)}. NE PAS regrouper toutes les dates ensemble. Pour une intervention ou une ronde ponctuelle, 'vacations' peut rester vide (ou contenir la date/heure prevue si elle est precisee).\n- ARRET / ANNULATION a l'initiative du CLIENT : si le message est un client qui ARRETE, ANNULE ou met FIN a une prestation de gardiennage EN COURS (ex. « on arrete la surveillance du site X », « plus besoin d'agent a partir de demain », « on suspend la mission »), NE le mets PAS dans 'demandes' → mets une entree dans 'arrets' {client, site, ville, motif}. C'est le client qui prend l'initiative de l'arret.\n- is_demande=false, demandes=[] et arrets=[] si ce n'est NI du gardiennage, NI une intervention, NI une ronde, NI un arret (facture, RH, commercial, conversation, autre).\n- Laisse \"\" si une info est absente. resume = 1 phrase courte resumant le message.";
 function aiParseJson(j) { const txt = (j.content && j.content[0] && j.content[0].text) || "{}"; const m = txt.match(/\{[\s\S]*\}/); try { return JSON.parse(m ? m[0] : txt); } catch (e) { return { is_demande: false, resume: "analyse illisible" }; } }
 async function aiAnalyze(env, transcript, direction) {
   const dirLine = direction === "in" ? "\n\nContexte : appel ENTRANT (le correspondant nous appelle)."
@@ -224,7 +224,7 @@ async function aiScan(env, maxCalls, force) {
     let data = {}, isDem = 0;
     try {
       const transcript = await aiTranscribe(env, c.record);
-      if (transcript) { const an = await aiAnalyze(env, transcript, c.direction); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], transcript: transcript.slice(0, 2000), number: c.contact_number, direction: c.direction, start: c.start_time }; isDem = (data.demandes.length) ? 1 : 0; }
+      if (transcript) { const an = await aiAnalyze(env, transcript, c.direction); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [], transcript: transcript.slice(0, 2000), number: c.contact_number, direction: c.direction, start: c.start_time }; isDem = (data.demandes.length || data.arrets.length) ? 1 : 0; }
       else data = { skip: "no_transcript" };
     } catch (e) { data = { error: String((e && e.message) || e) }; }
     await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(id, Date.now(), isDem, JSON.stringify(data)).run();
@@ -234,8 +234,32 @@ async function aiScan(env, maxCalls, force) {
   return { ok: true, processed, detected, total_in: calls.length, window_h: lookbackH, diag };
 }
 
+// ===== Assistant (porte Claude) : réponse automatique aux messages des collaborateurs =====
+async function aiAssistantReply(env, canal, auteur, texte) {
+  const ctxLine = canal === "retour"
+    ? "Le collaborateur SIGNALE UN BESOIN ou une OBSERVATION sur l'application. Accuse reception avec bienveillance, reformule le besoin en 1 phrase, et indique qu'il est transmis a l'equipe pour etude. Ne promets aucun delai."
+    : "Le collaborateur POSE UNE QUESTION ou demande une ANALYSE. Reponds de facon concrete et utile.";
+  const sys = "Tu es l'assistant interne de l'application GESTION de FKH SECURITE (societe de securite privee francaise). L'appli gere : demandes de gardiennage, interventions/rondes sur alarme, prise et fin de service, suivi des appels de controle, fiches agents (repertoire geolocalise), tenues, supervision et anomalies, photos terrain horodatees. " + ctxLine + " Reponds en FRANCAIS, de facon breve et claire (8 lignes maximum), sans formules inutiles.";
+  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 600, system: sys, messages: [{ role: "user", content: (auteur ? ("De " + auteur + " : ") : "") + texte }] }) });
+  if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
+  const j = await r.json();
+  return (j.content && j.content[0] && j.content[0].text) || "";
+}
+async function replyToMsg(env, id, canal, auteur, texte) {
+  if (!env.ANTHROPIC_API_KEY) return;
+  try {
+    const rep = await aiAssistantReply(env, canal, auteur, texte);
+    if (rep) await env.DB.prepare("UPDATE messages SET reponse = ?, replied_at = ?, statut = 'repondu' WHERE id = ?").bind(rep, Date.now(), id).run();
+  } catch (e) { /* on laisse statut='nouveau' → le cron réessaiera */ }
+}
+async function aiReplyPending(env) {
+  if (!env.ANTHROPIC_API_KEY) return;
+  const rs = await env.DB.prepare("SELECT id, canal, auteur, texte FROM messages WHERE statut = 'nouveau' ORDER BY id ASC LIMIT 5").all();
+  for (const m of (rs.results || [])) await replyToMsg(env, m.id, m.canal, m.auteur, m.texte);
+}
+
 export default {
-  async scheduled(event, env, ctx) { ctx.waitUntil(aiScan(env, 8)); },
+  async scheduled(event, env, ctx) { ctx.waitUntil(aiScan(env, 8)); ctx.waitUntil(aiReplyPending(env)); },
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const origin = request.headers.get("Origin");
@@ -300,7 +324,7 @@ export default {
       const exist = await env.DB.prepare("SELECT cdr_id FROM ai_calls WHERE cdr_id = ?").bind(cdr).first();
       if (exist) return json({ ok: true, skipped: "already" });
       let data = {}, isDem = 0;
-      try { const an = await aiAnalyze(env, text); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], transcript: text.slice(0, 2000), number: String(b.from || "mail"), direction: "in", source: "mail", start: new Date().toISOString() }; isDem = data.demandes.length ? 1 : 0; }
+      try { const an = await aiAnalyze(env, text); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [], transcript: text.slice(0, 2000), number: String(b.from || "mail"), direction: "in", source: "mail", start: new Date().toISOString() }; isDem = (data.demandes.length || data.arrets.length) ? 1 : 0; }
       catch (e) { data = { error: String((e && e.message) || e) }; }
       await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(cdr, Date.now(), isDem, JSON.stringify(data)).run();
       if (isDem) { try { await pushAll(env, aiDemandeNotif({ cdr_id: cdr, direction: "in" }, data.demandes)); } catch (e) {} }
@@ -370,7 +394,7 @@ export default {
       let b = {}; try { b = await request.json(); } catch (_) {}
       const text = String(b.text || "").slice(0, 8000);
       if (!text.trim()) return json({ error: "empty" }, 400);
-      try { const an = await aiAnalyze(env, text); return json({ ok: true, resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [] }); }
+      try { const an = await aiAnalyze(env, text); return json({ ok: true, resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [] }); }
       catch (e) { return json({ error: String((e && e.message) || e) }, 502); }
     }
     // --- IA : analyser une CAPTURE D'ÉCRAN (image) et en extraire les demandes de gardiennage ---
@@ -380,7 +404,7 @@ export default {
       const data = String(b.image || "").replace(/^data:[^,]*,/, "");
       const media = String(b.media_type || "image/png");
       if (!data) return json({ error: "empty" }, 400);
-      try { const an = await aiAnalyzeImage(env, data, media); return json({ ok: true, resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [] }); }
+      try { const an = await aiAnalyzeImage(env, data, media); return json({ ok: true, resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [] }); }
       catch (e) { return json({ error: String((e && e.message) || e) }, 502); }
     }
     // --- IA vision : vérifier qu'une photo « tenue » montre bien une personne en tenue (pas un bâtiment) ---
@@ -537,6 +561,10 @@ export default {
         .bind(canal, auteur, texte, fichier, now)
         .run();
       const id = rs.meta && rs.meta.last_row_id;
+      // Réponse IA automatique (les 2 canaux) — en arrière-plan pour répondre vite au POST.
+      if (id) ctx.waitUntil(replyToMsg(env, id, canal, auteur, texte));
+      // Canal « analyse » : notifie l'équipe (Zeus) pour qu'il puisse vérifier / corriger la réponse.
+      if (id && canal === "analyse") ctx.waitUntil((async () => { try { await pushAll(env, { title: "💬 Question Assistant" + (auteur ? " — " + auteur : ""), body: texte.slice(0, 140), url: "/fkh-securite-apps/gestion/", tag: "fkh-asg-" + id }); } catch (e) {} })());
       return json({ ok: true, id, now });
     }
 
