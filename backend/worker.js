@@ -41,7 +41,7 @@ export default {
     const path = url.pathname.replace(/\/+$/, "") || "/";
 
     // Sections autorisées pour les 2 accès restreints (memes 3 sections).
-    const RESTRICTED_SECTIONS = ["demandes", "suiviappels", "interv"];
+    const RESTRICTED_SECTIONS = ["demandes", "noterapide", "suiviappels", "interv"];
     // Renvoie le rôle correspondant au mot de passe, ou null si invalide.
     const roleFor = (pw) => {
       if (!pw) return null;

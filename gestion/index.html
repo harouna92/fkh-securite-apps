@@ -156,7 +156,8 @@ button.big:active{transform:translateY(1px)}
 <div class="top">
   <div class="brand"><span class="dot"></span>GESTION</div>
   <div class="tabs" id="tabs">
-    <button data-s="demandes" class="on">🛡️ Gardiennage</button>
+    <button data-s="demandes" class="on">🛡️ Demandes</button>
+    <button data-s="noterapide">📝 Prise de note rapide</button>
     <button data-s="prise">Prise de service</button>
     <button data-s="fin">Fin de service</button>
     <button data-s="suivi">Suivi demandes</button>
@@ -214,8 +215,8 @@ button.big:active{transform:translateY(1px)}
 </div>
 
 <div class="wrap">
-  <section id="sec-demandes">
-    <div><h1>🛡️ Gardiennage</h1><p class="sub">Demandes de gardiennage · choisis ou écris · la ville remplit le code postal · les heures donnent la plage.</p></div>
+  <section id="sec-noterapide" class="hidden">
+    <div><h1>📝 Prise de note rapide</h1><p class="sub">Note codée + petits rectangles · tout va dans l'aperçu · « Envoyer en recherche » crée la demande.</p></div>
     <div id="gexp-bar">
       <div class="gexp-row">
         <input id="gexp-in" placeholder="📝 Note codée : c AQUILA s Carrefour 83000 1930 2200 x2 !" autocomplete="off">
@@ -243,7 +244,19 @@ button.big:active{transform:translateY(1px)}
       </div>
       <div id="gexp-prev" class="hidden" style="margin-top:8px"></div>
     </div>
-    <div class="card hidden" id="genr-card-holder">
+  </section>
+  <section id="sec-demandes">
+    <div><h1>🛡️ Demandes</h1><p class="sub">Demandes de gardiennage · choisis ou écris · la ville remplit le code postal · les heures donnent la plage.</p></div>
+    <div class="card" style="border:2px solid var(--ok)">
+      <div class="lab" style="margin:0 0 6px">⚡ Capture express (pendant l'appel) — note en vrac, complète plus tard</div>
+      <textarea id="exp-text" placeholder="Tape ou dicte ce que tu entends : client, site, ville/CP, horaires, agent, n°, urgent…" style="min-height:82px;width:100%"></textarea>
+      <div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap;align-items:center">
+        <button type="button" id="exp-mic" title="Dictée vocale">🎤 Dicter</button>
+        <button type="button" class="big ok" id="exp-save" style="flex:1;min-width:160px">💾 Enregistrer dans Suivi (à compléter)</button>
+      </div>
+      <div id="exp-result" class="sub" style="margin:6px 0 0"></div>
+    </div>
+    <div class="card">
       <button type="button" id="genr-toggle" class="big" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">🗓️ Générateur de missions récurrentes (planning fixe sur une période)</button>
       <div id="genr-form" class="hidden" style="margin-top:8px">
         <p class="sub" style="margin:0 0 6px">Crée automatiquement une <b>mission validée par jour concerné</b> sur toute la période. Ex. lun→sam 13h-20h15 + dim 8h30-13h.</p>
@@ -267,6 +280,7 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Client / donneur d'ordre</div><div class="cbx"><input id="client" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="client" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-client"></div></div></label>
       </div>
       <div class="grid2">
+        <label class="f"><div class="lab">Type d'agent</div><div class="cbx"><input id="agent" placeholder="ADS, SSIAP, maître-chien…" autocomplete="off"><button type="button" class="cbtn" data-for="agent" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-agent"></div></div></label>
         <label class="f"><div class="lab">Type de site</div><div class="cbx"><input id="sitetype" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="sitetype" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-sitetype"></div></div></label>
       </div>
       <div class="grid2">
@@ -274,6 +288,7 @@ button.big:active{transform:translateY(1px)}
         <label class="f"><div class="lab">Ville</div><div class="acwrap"><input type="text" id="ville" placeholder="Tape ou choisis une ville…" autocomplete="off"><button type="button" class="cbtn" id="ville-btn" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg"></div></div></label>
       </div>
       <label class="f"><div class="lab">Code postal</div><div class="acwrap"><input id="cp" placeholder="Rempli par la ville · ou tape un code postal" autocomplete="off" inputmode="numeric"><div class="sugg hidden" id="sugg-cp"></div></div></label>
+      <label class="f"><div class="lab">Nom du site</div><input id="sitename" placeholder="Ex. GIFI, Carrefour…" autocomplete="off"></label>
 
       <div id="vacsWrap">
         <div class="lab" style="margin:0 0 5px">Vacations</div>
@@ -740,7 +755,7 @@ button.big:active{transform:translateY(1px)}
 <script>
 (function(){
   var byId=function(x){return document.getElementById(x)};
-  var secs=['demandes','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision'];
+  var secs=['demandes','noterapide','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision'];
   document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
   // ===== Recherche globale (agents / sites / clients / missions) =====
   (function(){ var inp=byId('gsearch'), box=byId('gsearch-res'); if(!inp||!box)return;
@@ -807,6 +822,7 @@ button.big:active{transform:translateY(1px)}
   }
   var CLIENTS=["SECURITAS","AQUILA","RANC DEVELOPPEMENT","SOTEL","GAMBRINUS","SAS BULLION","P2S","NEW ANGEL'S","FKH","COPS","ERYMA"];
   mkCombo('client',CLIENTS,'fkh_clients');
+  mkCombo('agent',["ADS","SSIAP","Maître-chien"],'fkh_agents');
   mkCombo('sitetype',["Magasin","Banque","Site professionnel"],'fkh_sites');
   // Heures (00–23) + minutes (pas de 5) — options réutilisées dans chaque vacation
   function pad2(n){return ('0'+n).slice(-2);}
@@ -936,8 +952,9 @@ button.big:active{transform:translateY(1px)}
     var villeName=sel?sel.nom:byId('ville').value.trim(),cp=byId('cp').value.trim();
     var L=[];
     if(on('client')&&byId('client').value.trim())L.push('Client : '+byId('client').value.trim());
+    if(on('sitename')&&byId('sitename').value.trim())L.push('Site : '+byId('sitename').value.trim());
     if(on('presta'))L.push('Prestation : Gardiennage');
-    if(on('agenttype'))L.push('Type d\'agent : ADS');
+    if(on('agenttype')&&byId('agent').value.trim())L.push('Type d\'agent : '+byId('agent').value.trim());
     if(on('sitetype')&&byId('sitetype').value.trim())L.push('Type de site : '+byId('sitetype').value.trim());
     if(on('surv')&&byId('surv').value)L.push('Surveillance : '+byId('surv').value);
     if(on('ville')&&villeName)L.push('Lieu : '+villeName+(cp?' ('+cp+')':''));
@@ -951,13 +968,14 @@ button.big:active{transform:translateY(1px)}
   }
   var added=[];
   function buildCurrent(){
-    var client=byId('client').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
+    var client=byId('client').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),sitename=byId('sitename').value.trim(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
     var vacs=readVacs();
-    if(!(client||siteT||sel||byId('ville').value.trim()||notes||vacs.length)) return '';
+    if(!(client||agent||siteT||sel||byId('ville').value.trim()||notes||vacs.length||sitename)) return '';
     var L=[];
     if(client)L.push('Client : '+client);
+    if(sitename)L.push('Site : '+sitename);
     L.push('Prestation : Gardiennage');
-    L.push('Type d\'agent : ADS');
+    if(agent)L.push('Type d\'agent : '+agent);
     if(siteT)L.push('Type de site : '+siteT);
     if(surv)L.push('Surveillance : '+surv);
     if(sel){L.push('Ville : '+sel.nom+(cp?' ('+cp+')':''));(sel._near||[]).forEach(function(x){L.push(x.n+(x.cp?' '+x.cp:'')+' à '+x.d+' km'+(x.dur?' · '+x.dur:''));});meas.forEach(function(x){L.push('↳ '+x.n+(x.cp?' '+x.cp:'')+' à '+x.km+' km'+(x.dur?' · '+x.dur:''));});}else if(byId('ville').value.trim())L.push('Ville : '+byId('ville').value.trim()+(cp?' ('+cp+')':''));
@@ -991,7 +1009,7 @@ button.big:active{transform:translateY(1px)}
     if(mic){ if(!SR){ mic.disabled=true; mic.style.opacity='.5'; mic.title='Dictée non supportée par ce navigateur (essaie Chrome)'; }
       else mic.onclick=function(){ if(listening){ try{rec.stop();}catch(e){} return; } var secure=(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'); if(!secure){ res.innerHTML='<span style="color:var(--warn)">🎤 La dictée n\'est possible que sur le site EN LIGNE (https), pas en ouvrant le fichier en local. En attendant, tape à la main.</span>'; return; } rec=new SR(); rec.lang='fr-FR'; rec.continuous=true; rec.interimResults=true; var base=ta.value; rec.onresult=function(ev){ var fin='',intr=''; for(var i=ev.resultIndex;i<ev.results.length;i++){ var tr=ev.results[i][0].transcript; if(ev.results[i].isFinal)fin+=tr; else intr+=tr; } if(fin)base=(base+' '+fin).replace(/\s+/g,' ').trim(); ta.value=(base+(intr?' '+intr:'')).trim(); }; rec.onend=function(){ listening=false; mic.textContent='🎤 Dicter'; }; rec.onerror=function(ev){ listening=false; mic.textContent='🎤 Dicter'; var e=(ev&&ev.error)||''; var msg=(e==='not-allowed'||e==='service-not-allowed')?'🎤 Micro bloqué — clique le cadenas 🔒 dans la barre d\'adresse → Micro → Autoriser, puis réessaie.':(e==='no-speech')?'🎤 Rien entendu, réessaie.':(e==='network')?'🎤 Réseau indisponible pour la dictée.':'🎤 Dictée indisponible — tape à la main, ça marche pareil.'; res.innerHTML='<span style="color:var(--warn)">'+msg+'</span>'; }; try{ rec.start(); listening=true; mic.textContent='⏹️ Stop'; res.innerHTML='🎙️ Parle, j\'écris…'; }catch(e){ res.innerHTML='<span style="color:var(--warn)">🎤 Dictée indisponible ici — tape à la main.</span>'; } }; }
     if(sv)sv.onclick=function(){ var txt=(ta.value||'').trim(); if(!txt){ res.innerHTML='<span style="color:var(--warn)">Écris ou dicte au moins un mot.</span>'; ta.focus(); return; } var now=Date.now(); var o={id:'exp'+now+'_'+Math.round(Math.random()*9999),texte:txt,titre:(txt.split('\n')[0]||txt).slice(0,60),statut:'recherche',motif:'',pris:now,valide:null,ville:(typeof extractVille==='function'?extractVille(txt):''),la:null,lo:null,assoc:[],_express:true}; SUIVI.unshift(o); if(typeof saveSuivi==='function')saveSuivi(); ta.value=''; res.innerHTML='✅ Enregistré dans <b>Suivi demandes → En recherche</b>. Complète-la là-bas quand tu veux.'; if(typeof renderSuivi==='function')renderSuivi(); setTimeout(function(){ if(res)res.innerHTML=''; },6000); }; })();
-  ['adr-num','adr-type','adr-nom','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
+  ['sitename','adr-num','adr-type','adr-nom','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
   byId('adr-type').addEventListener('change',genText);
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
   byId('agentToggle').addEventListener('click',function(){ byId('agentBlock').classList.toggle('hidden'); genText(); });
@@ -3219,11 +3237,6 @@ button.big:active{transform:translateY(1px)}
     byId('notif-sound').addEventListener('change',function(){ NOTIF.cfg.sound=this.checked; notifSaveCfg(); if(this.checked)notifBeep(); });
     notifScan();               // 1er passage = amorçage silencieux (pas de rafale à l'ouverture)
     setInterval(notifScan,20000);
-  })();
-
-  (function initExp(){
-    // Déplace le générateur de missions récurrentes de Gardiennage vers Suivi demandes
-    var g=byId('genr-card-holder'); if(g){ g.classList.remove('hidden'); var host=byId('sec-suivi'), before=byId('suiviTabs'); if(host){ if(before)host.insertBefore(g,before); else host.appendChild(g); } }
   })();
 
   (function gexpBar(){
