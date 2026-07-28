@@ -477,6 +477,15 @@ button.big:active{transform:translateY(1px)}
         <div id="imp-preview"></div>
       </div>
     </div>
+    <div class="card" id="paste-card">
+      <button type="button" class="big" id="paste-open" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">📩 Coller une demande reçue (mail / SMS)</button>
+      <div id="paste-panel" class="hidden" style="margin-top:10px">
+        <p class="sub" style="margin:0 0 8px">Colle le <b>texte d'un mail ou d'un SMS</b> de demande (ex. « Auriez-vous de la disponibilité… CMSE DIGOIN/LE 03/08 08H 18H/TRAVAUX »). L'IA en extrait la demande et la dépose dans <b>En recherche</b> avec la mention « 🤖 à vérifier ». Tu affines ensuite, puis elle rejoint les autres demandes normalement.</p>
+        <textarea id="paste-text" placeholder="Colle ici le texte de la demande reçue…" style="min-height:90px;width:100%"></textarea>
+        <div class="acts" style="margin-top:6px"><button class="ok" id="paste-analyse">🔎 Analyser et déposer en recherche</button><button id="paste-cancel">Fermer</button></div>
+        <div id="paste-msg" class="hint"></div>
+      </div>
+    </div>
     <div class="subtabs" id="suiviTabs">
       <button data-b="recherche" class="on">🔎 En recherche <span class="cnt" id="cnt-recherche">0</span></button>
       <button data-b="validee">✅ Validées <span class="cnt" id="cnt-validee">0</span></button>
@@ -2366,6 +2375,9 @@ button.big:active{transform:translateY(1px)}
   if(byId('imp-open'))byId('imp-open').onclick=function(){ byId('imp-panel').classList.toggle('hidden'); };
   if(byId('imp-cancel'))byId('imp-cancel').onclick=function(){ byId('imp-panel').classList.add('hidden'); };
   if(byId('imp-analyse'))byId('imp-analyse').onclick=impAnalyse;
+  if(byId('paste-open'))byId('paste-open').onclick=function(){ byId('paste-panel').classList.toggle('hidden'); };
+  if(byId('paste-cancel'))byId('paste-cancel').onclick=function(){ byId('paste-panel').classList.add('hidden'); };
+  if(byId('paste-analyse'))byId('paste-analyse').onclick=pasteAnalyse;
 
   var svcTab='synth';
   function svcNeedPhoto(s){ return s.key==='prise'||s.key==='fin'||s.key==='tenue'||s.key.indexOf('ctrl')===0; }
@@ -3003,8 +3015,28 @@ button.big:active{transform:translateY(1px)}
   function aiBuildDemande(call,d){ var sel=(d.ville&&typeof commSearch==='function')?(commSearch(d.ville,1)||[])[0]:null; if(!sel&&d.cp&&typeof commByCP==='function')sel=(commByCP(d.cp,1)||[])[0];
     var cp=d.cp||(sel&&sel.codesPostaux?sel.codesPostaux[0]:''), vn=sel?sel.nom:(d.ville||''); var la=(sel&&sel.centre)?sel.centre.coordinates[1]:null, lo=(sel&&sel.centre)?sel.centre.coordinates[0]:null;
     var near=(la!=null&&typeof BIG!=='undefined')?BIG.map(function(b){return {n:b[0],la:b[1],lo:b[2],d:Math.round(km(la,lo,b[1],b[2]))};}).filter(function(x){return x.d>1&&x.n!==vn;}).sort(function(a,b){return a.d-b.d;}).slice(0,2):[];
-    var L=['Prestation : Gardiennage','Type d\'agent : ADS']; if(d.client)L.push('Client : '+d.client); if(d.type_site)L.push('Type de site : '+d.type_site); if(d.site)L.push('Site : '+d.site); if(vn||cp)L.push('Ville : '+vn+(cp?' ('+cp+')':'')); near.forEach(function(x){ L.push('↦ '+x.n+' à '+x.d+' km'); }); var vacs=d.vacations||[]; if(vacs.length>1){ vacs.forEach(function(v,i){ L.push('Vacation '+(i+1)+' : '+(v.date?'le '+v.date:'')+(v.horaires?' '+v.horaires:'')); }); } else if(vacs.length===1){ if(vacs[0].date)L.push('Date : '+vacs[0].date); if(vacs[0].horaires)L.push('Horaires : '+vacs[0].horaires); } if(d.nb_agents)L.push('Agents : '+d.nb_agents); if(d.urgent)L.push('🔴 URGENT'); if(call.resume)L.push('Notes : '+call.resume); L.push('🤖 Détecté depuis un appel Ringover');
+    var L=['Prestation : Gardiennage','Type d\'agent : ADS']; if(d.client)L.push('Client : '+d.client); if(d.type_site)L.push('Type de site : '+d.type_site); if(d.site)L.push('Site : '+d.site); if(vn||cp)L.push('Ville : '+vn+(cp?' ('+cp+')':'')); near.forEach(function(x){ L.push('↦ '+x.n+' à '+x.d+' km'); }); var vacs=d.vacations||[]; if(vacs.length>1){ vacs.forEach(function(v,i){ L.push('Vacation '+(i+1)+' : '+(v.date?'le '+v.date:'')+(v.horaires?' '+v.horaires:'')); }); } else if(vacs.length===1){ if(vacs[0].date)L.push('Date : '+vacs[0].date); if(vacs[0].horaires)L.push('Horaires : '+vacs[0].horaires); } if(d.nb_agents)L.push('Agents : '+d.nb_agents); if(d.urgent)L.push('🔴 URGENT'); if(call.resume)L.push('Notes : '+call.resume); L.push(call._paste?'🤖 Extrait d\'un mail / SMS collé':'🤖 Détecté depuis un appel Ringover');
     return {texte:L.join('\n'),titre:(d.site||d.client||d.ville||'Demande détectée').slice(0,60),vn:vn,cp:cp,la:la,lo:lo,near:near}; }
+  function pasteAnalyse(){
+    var ta=byId('paste-text'), msg=byId('paste-msg'), btn=byId('paste-analyse');
+    var text=(ta&&ta.value||'').trim();
+    if(!text){ if(msg){msg.style.color='var(--bad)';msg.textContent='Colle d\'abord le texte de la demande.';} return; }
+    if(typeof CLOUD==='undefined'||!CLOUD.on){ if(msg){msg.style.color='var(--bad)';msg.textContent='Connecte-toi (en ligne) : l\'analyse se fait côté serveur.';} return; }
+    if(btn){btn.disabled=true;btn.textContent='⏳ Analyse…';} if(msg){msg.style.color='var(--muted)';msg.textContent='⏳ L\'IA lit le texte…';}
+    fetch(CLOUD.base+'/ai/parse-text',{method:'POST',headers:cloudHdr(),body:JSON.stringify({text:text})}).then(function(r){return r.json();}).then(function(j){
+      if(btn){btn.disabled=false;btn.textContent='🔎 Analyser et déposer en recherche';}
+      if(!(j&&j.ok)){ if(msg){msg.style.color='var(--bad)';msg.textContent='Erreur : '+((j&&j.error)||'analyse impossible');} return; }
+      var dems=(j.demandes||[]);
+      if(!dems.length){ if(msg){msg.style.color='var(--warn)';msg.textContent='Aucune demande de gardiennage détectée dans ce texte.';} return; }
+      var now=Date.now(), n=0;
+      dems.forEach(function(d,idx){ var call={resume:j.resume||'',_paste:true}; var bd=aiBuildDemande(call,d); var it={id:'mail'+now+'_'+idx+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:d.client||'',la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,source:'mail'}; SUIVI.unshift(it); if(typeof aiRouteNear==='function')aiRouteNear(it,bd); n++; });
+      if(typeof saveSuivi==='function')saveSuivi();
+      if(msg){msg.style.color='var(--ok)';msg.textContent='✅ '+n+' demande(s) déposée(s) en recherche (à vérifier).';}
+      if(ta)ta.value='';
+      if(typeof suiviBucket!=='undefined')suiviBucket='recherche';
+      if(typeof renderSuivi==='function')renderSuivi();
+    }).catch(function(){ if(btn){btn.disabled=false;btn.textContent='🔎 Analyser et déposer en recherche';} if(msg){msg.style.color='var(--bad)';msg.textContent='Serveur injoignable.';} });
+  }
   function aiCreateDemande(key){ var pr=String(key).split('|'),cdr=pr[0],idx=+pr[1]; var call=aiDetected.filter(function(x){return String(x.cdr_id)===String(cdr);})[0]; if(!call||!call.demandes||!call.demandes[idx])return; var d=call.demandes[idx];
     var bd=aiBuildDemande(call,d), vn=bd.vn, cp=bd.cp, la=bd.la, lo=bd.lo, near=bd.near;
     var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:vn,cp:cp,client:d.client||'',la:la,lo:lo,assoc:[],urgent:!!d.urgent,_express:true};

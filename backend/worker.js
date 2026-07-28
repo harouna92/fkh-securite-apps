@@ -311,6 +311,15 @@ export default {
       const res = await aiScan(env, force ? 20 : 8, force);
       return json(res, res && res.error ? 502 : 200);
     }
+    // --- IA : analyser un texte COLLÉ (mail/SMS) et en extraire les demandes de gardiennage ---
+    if (path === "/ai/parse-text" && request.method === "POST") {
+      if (!env.ANTHROPIC_API_KEY) return json({ error: "keys_missing" }, 502);
+      let b = {}; try { b = await request.json(); } catch (_) {}
+      const text = String(b.text || "").slice(0, 8000);
+      if (!text.trim()) return json({ error: "empty" }, 400);
+      try { const an = await aiAnalyze(env, text); return json({ ok: true, resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [] }); }
+      catch (e) { return json({ error: String((e && e.message) || e) }, 502); }
+    }
     if (path === "/ai/demandes" && request.method === "GET") {
       const rs = await env.DB.prepare("SELECT cdr_id, at, data FROM ai_calls WHERE is_demande = 1 AND dismissed = 0 AND created = 0 ORDER BY at DESC LIMIT 50").all();
       const items = (rs.results || []).map((row) => Object.assign({ cdr_id: row.cdr_id, at: row.at }, safeParse(row.data)));
