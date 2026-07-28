@@ -12,3 +12,7 @@ database_id = "1533502f-2761-4563-9a7f-ff1e6456229d"
 [[r2_buckets]]
 binding = "PHOTOS"
 bucket_name = "fkh-tenues-photos"
+
+# IA : scan automatique des appels entrants toutes les 2 minutes (détection demandes de gardiennage)
+[triggers]
+crons = ["*/2 * * * *"]

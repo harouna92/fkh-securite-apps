@@ -116,7 +116,58 @@ function newRechercheItems(oldV, newV) {
   return n.filter((m) => m && m.statut === "recherche" && was[m.id] !== "recherche");
 }
 
+// ===== IA : détecter les demandes de gardiennage dans les appels entrants =====
+function safeParse(s) { try { return JSON.parse(s) || {}; } catch (e) { return {}; } }
+async function aiTranscribe(env, audioUrl) {
+  let a = await fetch(audioUrl, { headers: { Authorization: env.RINGOVER_API_KEY } });
+  if (!a.ok) a = await fetch(audioUrl);
+  if (!a.ok) throw new Error("audio " + a.status);
+  const blob = await a.blob();
+  const form = new FormData();
+  form.append("file", blob, "call.mp3");
+  form.append("model", "whisper-1");
+  form.append("language", "fr");
+  const r = await fetch("https://api.openai.com/v1/audio/transcriptions", { method: "POST", headers: { Authorization: "Bearer " + env.OPENAI_API_KEY }, body: form });
+  if (!r.ok) throw new Error("whisper " + r.status + " " + (await r.text()).slice(0, 120));
+  const j = await r.json();
+  return j.text || "";
+}
+async function aiAnalyze(env, transcript) {
+  const prompt = "Tu analyses la transcription d'un appel telephonique RECU par une societe de securite privee (gardiennage). Determine si l'appelant demande une prestation de GARDIENNAGE (surveillance, agent de securite, ADS, ronde...). Reponds UNIQUEMENT en JSON strict, sans aucun texte autour :\n{\"is_demande\": true|false, \"client\": \"\", \"ville\": \"\", \"cp\": \"\", \"site\": \"\", \"type_site\": \"\", \"date\": \"\", \"horaires\": \"\", \"nb_agents\": \"\", \"urgent\": true|false, \"resume\": \"\"}\n- is_demande=false si ce n'est pas une demande de gardiennage (facture, RH, autre).\n- Laisse \"\" si une info est absente. resume = 1 phrase courte.\n\nTranscription :\n\"\"\"" + transcript + "\"\"\"";
+  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 500, messages: [{ role: "user", content: prompt }] }) });
+  if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
+  const j = await r.json();
+  const txt = (j.content && j.content[0] && j.content[0].text) || "{}";
+  const m = txt.match(/\{[\s\S]*\}/);
+  try { return JSON.parse(m ? m[0] : txt); } catch (e) { return { is_demande: false, resume: "analyse illisible" }; }
+}
+async function aiScan(env, maxCalls) {
+  if (!env.RINGOVER_API_KEY || !env.OPENAI_API_KEY || !env.ANTHROPIC_API_KEY) return { error: "keys_missing" };
+  const now = new Date(), from = new Date(now.getTime() - 2 * 3600 * 1000);
+  const p = new URLSearchParams({ limit_count: "50", start_date: from.toISOString(), end_date: now.toISOString() });
+  const r = await fetch("https://public-api.ringover.com/v2/calls?" + p.toString(), { headers: { Authorization: env.RINGOVER_API_KEY } });
+  if (!r.ok) return { error: "ringover", status: r.status };
+  const j = await r.json();
+  const calls = (j.call_list || []).filter((c) => c.direction === "in" && c.is_answered && c.record && typeof c.record === "string" && c.record.indexOf("http") === 0);
+  let processed = 0, detected = 0;
+  for (const c of calls.slice(0, maxCalls || 8)) {
+    const id = String(c.cdr_id);
+    const exist = await env.DB.prepare("SELECT cdr_id FROM ai_calls WHERE cdr_id = ?").bind(id).first();
+    if (exist) continue;
+    let data = {}, isDem = 0;
+    try {
+      const transcript = await aiTranscribe(env, c.record);
+      if (transcript) { const an = await aiAnalyze(env, transcript); data = { ...an, transcript: transcript.slice(0, 2000), number: c.contact_number, start: c.start_time }; isDem = an.is_demande ? 1 : 0; }
+      else data = { skip: "no_transcript" };
+    } catch (e) { data = { error: String((e && e.message) || e) }; }
+    await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(id, Date.now(), isDem, JSON.stringify(data)).run();
+    processed++; if (isDem) detected++;
+  }
+  return { ok: true, processed, detected, total_in: calls.length };
+}
+
 export default {
+  async scheduled(event, env, ctx) { ctx.waitUntil(aiScan(env, 8)); },
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const origin = request.headers.get("Origin");
@@ -203,6 +254,25 @@ export default {
           sample,
         });
       } catch (e) { return json({ error: "fetch" }, 502); }
+    }
+
+    // --- IA : scanner les appels entrants et récupérer les demandes détectées ---
+    if (path === "/ai/scan" && request.method === "POST") {
+      const res = await aiScan(env, 8);
+      return json(res, res && res.error ? 502 : 200);
+    }
+    if (path === "/ai/demandes" && request.method === "GET") {
+      const rs = await env.DB.prepare("SELECT cdr_id, at, data FROM ai_calls WHERE is_demande = 1 AND dismissed = 0 AND created = 0 ORDER BY at DESC LIMIT 50").all();
+      const items = (rs.results || []).map((row) => Object.assign({ cdr_id: row.cdr_id, at: row.at }, safeParse(row.data)));
+      return json({ ok: true, items });
+    }
+    if ((path === "/ai/dismiss" || path === "/ai/created") && request.method === "POST") {
+      let b = {}; try { b = await request.json(); } catch (_) {}
+      if (b.cdr_id) {
+        const col = path === "/ai/dismiss" ? "dismissed" : "created";
+        await env.DB.prepare("UPDATE ai_calls SET " + col + " = 1 WHERE cdr_id = ?").bind(String(b.cdr_id)).run();
+      }
+      return json({ ok: true });
     }
 
     // --- Lecture des changements depuis un horodatage ---
