@@ -2785,7 +2785,13 @@ button.big:active{transform:translateY(1px)}
     document.querySelectorAll('.sa-slice').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-sl')===saSlice);});
     var slLbl=saSlice==='jour'?' · ☀️ tranche jour (8h→20h)':saSlice==='nuit'?' · 🌙 tranche nuit (20h→8h)':'';
     if(!entries.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucun appel '+esc(lbl)+slLbl+(saType!=='all'?' (type filtré)':'')+'. (Il faut des missions validées avec une heure sur cette période.)</div></div>'; return; }
-    var S=ssLoad(), doneN=0, cnt={prise:0,fin:0,route:0,j15:0,ctrl:0,tenue:0}; entries.forEach(function(e){ if(e.consigne){ if(e.done)doneN++; return; } if(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done)doneN++; var k=e.key; if(cnt[k]!=null)cnt[k]++; else if(k.indexOf('ctrl')===0)cnt.ctrl++; });
+    var S=ssLoad();
+    // Remise en file : toute coche faite AVANT la fenêtre H-5 est invalidée (tout de suite si l'appel n'est pas encore dû, sinon au passage de 03h00 après le cochage)
+    (function(){ var nowS=Date.now(), chg=false;
+      entries.forEach(function(e){ if(e.consigne||!e.mdate)return; var r=S[e.mid]&&S[e.mid][e.key]; if(!r||!r.done)return; var ct=new Date(e.mdate+'T00:00:00').getTime()+(e.abs||0)*60000; var ref=r.doneTs||r.at||0; if(!ref||ref>=ct-300000)return; var dR=new Date(ref), t3=new Date(dR.getFullYear(),dR.getMonth(),dR.getDate(),3,0,0,0).getTime(); if(ref>=t3)t3+=86400000; if(nowS<ct-300000||nowS>=t3){ r.done=false; r.at=Date.now(); r.earlyReset=true; S[e.mid][e.key]=r; chg=true; } });
+      if(chg)ssSave(S);
+    })();
+    var doneN=0, cnt={prise:0,fin:0,route:0,j15:0,ctrl:0,tenue:0}; entries.forEach(function(e){ if(e.consigne){ if(e.done)doneN++; return; } if(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done)doneN++; var k=e.key; if(cnt[k]!=null)cnt[k]++; else if(k.indexOf('ctrl')===0)cnt.ctrl++; });
     var STATUTS=['','✅ RAS','⚠️ Injoignable','🔄 Autre'];
     function saCnt(ic,lb,n){ return n?'<span style="display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:1px 8px;margin:2px 4px 0 0;font-size:12px;font-weight:700">'+ic+' '+lb+' : '+n+'</span>':''; }
     var breakdown=saCnt('🚗','Route',cnt.route)+saCnt('☎','Pré-prise',cnt.j15)+saCnt('🟢','Prise',cnt.prise)+saCnt('🎛️','Contrôle',cnt.ctrl)+saCnt('🦺','Tenue',cnt.tenue)+saCnt('🔚','Fin',cnt.fin);
@@ -2812,11 +2818,14 @@ button.big:active{transform:translateY(1px)}
       var fields=(e.key==='prise')?(fait+agret+photoSel+photoUp+avise+note):(e.key==='fin')?(fait+photoSel+photoUp+avise+note):(e.key==='route')?(fait+prisRoute+note):(e.key==='j15')?(fait+ponctuel+note):(e.key==='tenue')?(fait+tenueSel+tenuePh+photoUp+note):(fait+statut+photoSel+photoUp+note);
       var cl=[]; if(e.client)cl.push('🏢 Client : '+esc(e.client)); cl.push('📍 Site : '+esc(e.site)+(e.siteBDC&&e.siteBDC!==e.site?' <span style="color:var(--muted)">(BDC : '+esc(e.siteBDC)+')</span>':'')); if(e.ville||e.cp)cl.push('Ville : '+[esc(e.ville),esc(e.cp)].filter(Boolean).join(' ')); if(e.mheure)cl.push('🕐 Heure prévue : '+esc(e.mheure)); cl.push('👤 Agent : '+(e.agent?esc(e.agent):'<span style="color:var(--warn)">⚠ à affecter</span>')); if(e.agentTel)cl.push('📞 Numéro : <a class="call" href="tel:'+esc(String(e.agentTel).replace(/\s/g,''))+'">'+esc(e.agentTel)+'</a>');
       var ctx='<div class="fa-d" style="margin:4px 0 2px;line-height:1.7">'+cl.join('<br>')+'</div>';
-      return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" style="padding:8px'+(done?';opacity:.6':'')+'"><div class="fa-n"><span class="sa-tag"></span><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+(e.key==='tenue'?'<span style="color:#e0784b;font-weight:800">'+e.label+'</span>':e.label)+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'+ctx
+      return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" data-hideat="'+(done?(Math.max(+ct||0,(r.doneTs||r.at||0))+120000):0)+'" style="padding:8px'+(done?';opacity:.6':'')+'"><div class="fa-n"><span class="sa-tag"></span><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+(e.key==='tenue'?'<span style="color:#e0784b;font-weight:800">'+e.label+'</span>':e.label)+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'+ctx
         +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">'+fields+'</div></div>';
     };
     var isDone=function(e){ if(e.consigne)return !!e.done; return !!(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done); };
-    var todoL=entries.filter(function(e){return !isDone(e);}), doneL=entries.filter(isDone);
+    // Une carte cochée reste visible jusqu'à 2 min après l'heure prévue (ou 2 min après le cochage si coché en retard)
+    var hideAt=function(e){ if(e.consigne)return 0; var r=(S[e.mid]&&S[e.mid][e.key])||{}; if(!r.done)return 0; var ct=e.mdate?(new Date(e.mdate+'T00:00:00').getTime()+(e.abs||0)*60000):0; return Math.max(ct||0,(r.doneTs||r.at||0))+120000; };
+    var nowT=Date.now();
+    var todoL=entries.filter(function(e){ return !isDone(e) || (!e.consigne && hideAt(e)>nowT); }), doneL=entries.filter(function(e){ return isDone(e) && (e.consigne || hideAt(e)<=nowT); });
     wrap.innerHTML=head
       +(todoL.length?todoL.map(saCard).join(''):'<div class="card"><div class="sub" style="margin:0;color:var(--ok)">✅ Tous les appels de cette période sont faits.</div></div>')
       +(doneL.length?'<details style="margin-top:12px"><summary style="cursor:pointer;color:var(--muted);font-weight:700;padding:6px 2px">✅ '+doneL.length+' appel'+(doneL.length>1?'s':'')+' fait'+(doneL.length>1?'s':'')+' — masqué'+(doneL.length>1?'s':'')+', cliquer pour afficher</summary><div style="opacity:.7;margin-top:6px">'+doneL.map(saCard).join('')+'</div></details>':'');
@@ -2841,13 +2850,19 @@ button.big:active{transform:translateY(1px)}
     }).join('');
     box.querySelectorAll('.sa-alertdone').forEach(function(b){ b.onclick=function(){ var cb=due[+b.getAttribute('data-idx')].c.querySelector('.sa-done,.csg-done'); if(cb){cb.checked=true; cb.dispatchEvent(new Event('change',{bubbles:true}));} }; });
   }
-  setInterval(function(){ if(byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')){ if(typeof saColorize==='function')saColorize(); if(typeof saAlert==='function')saAlert(); } },10000);
+  setInterval(function(){ if(byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')){ if(typeof saColorize==='function')saColorize(); if(typeof saAlert==='function')saAlert(); var _n=Date.now(),_need=false; document.querySelectorAll('#sa-body .sacard[data-done="1"]').forEach(function(c){ var ha=+c.getAttribute('data-hideat'); if(ha&&ha<=_n&&!c.closest('details'))_need=true; }); if(_need&&typeof renderSuiviAppels==='function')renderSuiviAppels(); } },10000);
   if(byId('sa-body')){
     byId('sa-body').addEventListener('change',function(e){
       var t=e.target;
       if(t.classList.contains('csg-done')){ csgSet(t.getAttribute('data-cid'),{done:t.checked,doneAt:Date.now()}); renderSuiviAppels(); return; }
       var mid=t.getAttribute('data-mid'), key=t.getAttribute('data-key'); if(!mid)return;
-      if(t.classList.contains('sa-done')){ if(t.checked){ var now=ssNowHM(),rt=toMin(now)-toMin(t.getAttribute('data-h')); saSet(mid,key,{done:true,hm:now,at:Date.now(),retard:(rt==null?null:rt)}); } else { saSet(mid,key,{done:false}); } renderSuiviAppels(); }
+      if(t.classList.contains('sa-done')){ if(t.checked){ var now=ssNowHM(),rt=toMin(now)-toMin(t.getAttribute('data-h'));
+          // Blocage : cochable seulement à partir de 5 min avant l'heure prévue
+          var card=t.closest('.sacard'), ct=card?+card.getAttribute('data-ct'):0, tooEarly=false;
+          if(ct){ tooEarly=Date.now()<ct-5*60000; }
+          else if(rt!=null){ var rtn=rt; if(rtn>720)rtn-=1440; if(rtn<-720)rtn+=1440; tooEarly=rtn<-5; }
+          if(tooEarly){ t.checked=false; alert('⏳ Trop tôt — cette case ne peut être cochée qu\'à partir de 5 minutes avant l\'heure prévue ('+(t.getAttribute('data-h')||'')+').'); return; }
+          saSet(mid,key,{done:true,hm:now,at:Date.now(),doneTs:Date.now(),retard:(rt==null?null:rt)}); } else { saSet(mid,key,{done:false}); } renderSuiviAppels(); }
       else if(t.classList.contains('sa-f')){ var f=t.getAttribute('data-f'),v=(t.type==='checkbox')?t.checked:t.value,p={}; p[f]=v; saSet(mid,key,p); if(f==='avise'||f==='agRetard')renderSuiviAppels(); }
     });
     byId('sa-body').addEventListener('input',function(e){ var t=e.target; if(t.classList.contains('csg-note')){ csgSet(t.getAttribute('data-cid'),{note:t.value}); return; } if(t.classList.contains('sa-f')&&(t.type==='text'||t.type==='number')){ var f=t.getAttribute('data-f'),p={}; p[f]=t.value; saSet(t.getAttribute('data-mid'),t.getAttribute('data-key'),p); } });
