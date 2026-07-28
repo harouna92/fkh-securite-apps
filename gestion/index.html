@@ -1123,7 +1123,8 @@ button.big:active{transform:translateY(1px)}
     else body='<div class="list">'+list.map(function(o){
       var a=o.a, assoc=(it.assoc||[]).indexOf(a.id)>=0, tels=a.tels||(a.tel?[a.tel]:[]);
       var tags=(a.voiture?'🚗 ':'')+(a.ads?'🛡️ADS ':'');
-      var d=(tags?tags+'· ':'')+[a.ville,o.d+' km',tels.join(' / '),a.fiab].filter(Boolean).map(esc).join(' · ');
+      var durV=(it._agDur&&it._agDur[a.id]), durTxt=(durV?' · 🚗 '+durV+' de route':(durV===null?' · 🚗 …':''));
+      var d=(tags?tags+'· ':'')+[a.ville,o.d+' km'+durTxt,tels.join(' / '),a.fiab].filter(Boolean).map(esc).join(' · ');
       var call=tels.map(function(t){return '<a class="call" href="tel:'+esc(t.replace(/\s/g,''))+'" title="Appeler '+esc(t)+'">📞</a>';}).join('');
       return '<div class="fa"'+(assoc?' style="background:var(--okbg);border-radius:9px;padding:8px"':'')+'><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+(d||'—')+'</div></div><div class="fa-a">'+call+'<button data-act="nassoc" data-id="'+it.id+'" data-aid="'+a.id+'"'+(assoc?' style="color:var(--ok);border-color:var(--ok)"':'')+' title="'+(assoc?'Retirer de la demande':'Associer à la demande')+'">'+(assoc?'✓':'➕')+'</button></div></div>';
     }).join('')+'</div>';
@@ -1350,6 +1351,22 @@ button.big:active{transform:translateY(1px)}
       wrap.innerHTML=arr.map(svItem).join('');
     }
     if(typeof svTick==='function')svTick();
+    if(typeof nearRouteScan==='function')nearRouteScan();
+  }
+  // Temps de trajet voiture (OSRM) pour les agents proches d'une demande — même moteur que la section Demandes
+  var _nearRouteBusy=false;
+  function nearRouteScan(){
+    if(_nearRouteBusy)return;
+    var items=(typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(x){return x._near&&x.la!=null&&x.lo!=null;});
+    if(!items.length)return;
+    var jobs=[];
+    items.forEach(function(it){ if(!it._agDur)it._agDur={}; nearAgents(it).slice(0,6).forEach(function(o){ if(it._agDur[o.a.id]===undefined&&o.a.la!=null&&o.a.lo!=null)jobs.push({it:it,a:o.a}); }); });
+    if(!jobs.length)return;
+    _nearRouteBusy=true; var idx=0, changed=false;
+    function done(){ _nearRouteBusy=false; if(changed&&byId('sec-suivi')&&!byId('sec-suivi').classList.contains('hidden')&&SUIVI.some(function(x){return x._near;}))renderSuivi(); }
+    function next(){ if(idx>=jobs.length){ done(); return; } var job=jobs[idx++], it=job.it, a=job.a; it._agDur[a.id]=null;
+      fetch('https://router.project-osrm.org/route/v1/driving/'+it.lo+','+it.la+';'+a.lo+','+a.la+'?overview=false').then(function(r){return r.json();}).then(function(j){ if(j&&j.routes&&j.routes[0]){ var min=Math.round(j.routes[0].duration/60),hh=Math.floor(min/60),mm=min%60; it._agDur[a.id]=hh?(hh+'h'+(mm?pad2(mm):'')):(min+' min'); changed=true; } setTimeout(next,130); }).catch(function(){ if(it._agDur&&it._agDur[a.id]===null)delete it._agDur[a.id]; setTimeout(next,130); }); }
+    next();
   }
   function svTick(){ var now=Date.now(), els=document.querySelectorAll('#suiviList .sv-rtimer'); for(var i=0;i<els.length;i++){ var el=els[i],since=+el.getAttribute('data-since'); if(!since)continue; var s=Math.max(0,Math.floor((now-since)/1000)),d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),mi=Math.floor((s%3600)/60),se=s%60; var txt=d>0?(d+' j '+h+' h'):h>0?(h+' h '+mi+' min'):(mi+' min '+(se<10?'0':'')+se+' s'); el.textContent='⏱ '+txt+' · '; el.style.color=(s>=3*3600?'var(--bad)':(s>=3600?'#e0784b':'#e0a13b')); } }
   setInterval(function(){ var sec=byId('sec-suivi'); if(!sec||sec.classList.contains('hidden')||suiviBucket!=='recherche')return; svTick(); },1000);
@@ -3417,8 +3434,11 @@ button.big:active{transform:translateY(1px)}
     }
     gexpHourChip('gexp-h1btn','gexp-h1dd','Début',function(v){gexpH1=v;},function(){return gexpH1;});
     gexpHourChip('gexp-h2btn','gexp-h2dd','Fin',function(v){gexpH2=v;},function(){return gexpH2;});
-    if(byId('gexp-datebtn'))byId('gexp-datebtn').addEventListener('click',function(){ var dp=byId('gexp-datepanel'); if(!dp)return; if(dp.classList.contains('hidden')){ dp.classList.remove('hidden'); if(byId('gexp-date-in')&&!byId('gexp-date-in').value)byId('gexp-date-in').value=impTodayISO(); } else dp.classList.add('hidden'); });
-    if(byId('gexp-date-apply'))byId('gexp-date-apply').addEventListener('click',function(){ gexpDate=byId('gexp-date-in').value||''; gexpH1=byId('gexp-hh1').value||''; gexpH2=byId('gexp-hh2').value||''; gexpChip('gexp-h1btn',gexpH1?'Début '+gexpH1:''); gexpChip('gexp-h2btn',gexpH2?'Fin '+gexpH2:''); byId('gexp-datepanel').classList.add('hidden'); byId('gexp-datebtn').classList.toggle('on', !!(gexpDate||gexpH1||gexpH2)); document.querySelectorAll('.gexp-day[data-d]').forEach(function(x){x.classList.remove('on');}); doTranscribe(); });
+    // Applique en direct les champs Date précise (pas besoin de cliquer « Appliquer » — le but est d'aller vite)
+    function gexpDateLive(){ gexpDate=byId('gexp-date-in').value||''; gexpH1=byId('gexp-hh1').value||''; gexpH2=byId('gexp-hh2').value||''; gexpChip('gexp-h1btn',gexpH1?'Début '+gexpH1:''); gexpChip('gexp-h2btn',gexpH2?'Fin '+gexpH2:''); if(byId('gexp-datebtn'))byId('gexp-datebtn').classList.toggle('on', !!(gexpDate||gexpH1||gexpH2)); document.querySelectorAll('.gexp-day[data-d]').forEach(function(x){x.classList.remove('on');}); doTranscribe(); }
+    if(byId('gexp-datebtn'))byId('gexp-datebtn').addEventListener('click',function(){ var dp=byId('gexp-datepanel'); if(!dp)return; if(dp.classList.contains('hidden')){ dp.classList.remove('hidden'); if(byId('gexp-date-in')&&!byId('gexp-date-in').value){ byId('gexp-date-in').value=impTodayISO(); gexpDateLive(); } } else dp.classList.add('hidden'); });
+    ['gexp-date-in','gexp-hh1','gexp-hh2'].forEach(function(id){ var e=byId(id); if(e)e.addEventListener('change',gexpDateLive); });
+    if(byId('gexp-date-apply'))byId('gexp-date-apply').addEventListener('click',function(){ gexpDateLive(); byId('gexp-datepanel').classList.add('hidden'); });
     if(byId('gexp-date-cancel'))byId('gexp-date-cancel').addEventListener('click',function(){ byId('gexp-datepanel').classList.add('hidden'); });
     // ==== Réorganiser les rectangles par glisser-déposer (tactile + souris), mémorisé par appareil ====
     (function gexpReorder(){
