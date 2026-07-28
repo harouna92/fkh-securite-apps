@@ -483,6 +483,8 @@ button.big:active{transform:translateY(1px)}
         <p class="sub" style="margin:0 0 8px">Colle le <b>texte d'un mail ou d'un SMS</b> de demande (ex. « Auriez-vous de la disponibilité… CMSE DIGOIN/LE 03/08 08H 18H/TRAVAUX »). L'IA en extrait la demande et la dépose dans <b>En recherche</b> avec la mention « 🤖 à vérifier ». Tu affines ensuite, puis elle rejoint les autres demandes normalement.</p>
         <textarea id="paste-text" placeholder="Colle ici le texte de la demande reçue…" style="min-height:90px;width:100%"></textarea>
         <div class="acts" style="margin-top:6px"><button class="ok" id="paste-analyse">🔎 Analyser et déposer en recherche</button><button id="paste-cancel">Fermer</button></div>
+        <div class="lab" style="margin:10px 0 3px">📸 …ou dépose une capture d'écran de la demande</div>
+        <div class="acts" style="gap:8px;align-items:center;flex-wrap:wrap"><label class="btn" style="cursor:pointer;padding:9px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)"><span id="paste-img-lbl">🖼️ Choisir / prendre une photo</span><input type="file" accept="image/*" id="paste-img" style="display:none"></label></div>
         <div id="paste-msg" class="hint"></div>
       </div>
     </div>
@@ -2421,6 +2423,7 @@ button.big:active{transform:translateY(1px)}
   if(byId('paste-open'))byId('paste-open').onclick=function(){ byId('paste-panel').classList.toggle('hidden'); };
   if(byId('paste-cancel'))byId('paste-cancel').onclick=function(){ byId('paste-panel').classList.add('hidden'); };
   if(byId('paste-analyse'))byId('paste-analyse').onclick=pasteAnalyse;
+  if(byId('paste-img'))byId('paste-img').onchange=function(){ var f=this.files&&this.files[0]; if(f)pasteAnalyseImg(f); this.value=''; };
 
   var svcTab='synth';
   function svcNeedPhoto(s){ return s.key==='prise'||s.key==='fin'||s.key==='tenue'||s.key.indexOf('ctrl')===0; }
@@ -3086,6 +3089,18 @@ button.big:active{transform:translateY(1px)}
     if(totMin>0)L.push('🧮 Total : '+fmtDurMin(totMin)+' — '+vacs.length+' vacation'+(vacs.length>1?'s':'')+(d.nb_agents&&(+d.nb_agents>1)?' × '+(+d.nb_agents)+' agents = '+fmtDurMin(totMin*(+d.nb_agents)):''));
     L.push(call._paste?'🤖 Extrait d\'un mail / SMS collé':'🤖 Détecté depuis un appel Ringover');
     return {texte:L.join('\n'),titre:(d.site||d.client||d.ville||'Demande détectée').slice(0,60),vn:vn,cp:cp,la:la,lo:lo,near:near}; }
+  // Dépose en « recherche » les demandes renvoyées par l'IA (texte collé OU capture d'écran).
+  function pasteDeposit(j,msg,origin){
+    if(!(j&&j.ok)){ if(msg){msg.style.color='var(--bad)';msg.textContent='Erreur : '+((j&&j.error)||'analyse impossible');} return; }
+    var dems=(j.demandes||[]);
+    if(!dems.length){ if(msg){msg.style.color='var(--warn)';msg.textContent='Aucune demande de gardiennage détectée '+(origin==='img'?'dans cette image.':'dans ce texte.');} return; }
+    var now=Date.now(), n=0;
+    dems.forEach(function(d,idx){ var call={resume:j.resume||'',_paste:true}; var bd=aiBuildDemande(call,d); var it={id:'mail'+now+'_'+idx+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:d.client||'',la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,source:(origin==='img'?'capture':'mail')}; SUIVI.unshift(it); if(typeof aiRouteNear==='function')aiRouteNear(it,bd); n++; });
+    if(typeof saveSuivi==='function')saveSuivi();
+    if(msg){msg.style.color='var(--ok)';msg.textContent='✅ '+n+' demande(s) déposée(s) en recherche (à vérifier).';}
+    if(typeof suiviBucket!=='undefined')suiviBucket='recherche';
+    if(typeof renderSuivi==='function')renderSuivi();
+  }
   function pasteAnalyse(){
     var ta=byId('paste-text'), msg=byId('paste-msg'), btn=byId('paste-analyse');
     var text=(ta&&ta.value||'').trim();
@@ -3094,17 +3109,16 @@ button.big:active{transform:translateY(1px)}
     if(btn){btn.disabled=true;btn.textContent='⏳ Analyse…';} if(msg){msg.style.color='var(--muted)';msg.textContent='⏳ L\'IA lit le texte…';}
     fetch(CLOUD.base+'/ai/parse-text',{method:'POST',headers:cloudHdr(),body:JSON.stringify({text:text})}).then(function(r){return r.json();}).then(function(j){
       if(btn){btn.disabled=false;btn.textContent='🔎 Analyser et déposer en recherche';}
-      if(!(j&&j.ok)){ if(msg){msg.style.color='var(--bad)';msg.textContent='Erreur : '+((j&&j.error)||'analyse impossible');} return; }
-      var dems=(j.demandes||[]);
-      if(!dems.length){ if(msg){msg.style.color='var(--warn)';msg.textContent='Aucune demande de gardiennage détectée dans ce texte.';} return; }
-      var now=Date.now(), n=0;
-      dems.forEach(function(d,idx){ var call={resume:j.resume||'',_paste:true}; var bd=aiBuildDemande(call,d); var it={id:'mail'+now+'_'+idx+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:d.client||'',la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,source:'mail'}; SUIVI.unshift(it); if(typeof aiRouteNear==='function')aiRouteNear(it,bd); n++; });
-      if(typeof saveSuivi==='function')saveSuivi();
-      if(msg){msg.style.color='var(--ok)';msg.textContent='✅ '+n+' demande(s) déposée(s) en recherche (à vérifier).';}
-      if(ta)ta.value='';
-      if(typeof suiviBucket!=='undefined')suiviBucket='recherche';
-      if(typeof renderSuivi==='function')renderSuivi();
+      pasteDeposit(j,msg,'text'); if((j&&j.ok&&(j.demandes||[]).length)&&ta)ta.value='';
     }).catch(function(){ if(btn){btn.disabled=false;btn.textContent='🔎 Analyser et déposer en recherche';} if(msg){msg.style.color='var(--bad)';msg.textContent='Serveur injoignable.';} });
+  }
+  function pasteAnalyseImg(file){
+    var msg=byId('paste-msg'), lbl=byId('paste-img-lbl');
+    if(!file){ return; }
+    if(typeof CLOUD==='undefined'||!CLOUD.on){ if(msg){msg.style.color='var(--bad)';msg.textContent='Connecte-toi (en ligne) : l\'analyse se fait côté serveur.';} return; }
+    if(file.size>5*1024*1024){ if(msg){msg.style.color='var(--bad)';msg.textContent='Image trop lourde (max 5 Mo).';} return; }
+    if(lbl)lbl.textContent='⏳ Lecture de l\'image…'; if(msg){msg.style.color='var(--muted)';msg.textContent='⏳ L\'IA lit la capture d\'écran…';}
+    var rd=new FileReader(); rd.onload=function(){ var b64=String(rd.result||''); fetch(CLOUD.base+'/ai/parse-image',{method:'POST',headers:cloudHdr(),body:JSON.stringify({image:b64,media_type:file.type||'image/png'})}).then(function(r){return r.json();}).then(function(j){ if(lbl)lbl.textContent='🖼️ Choisir / prendre une photo'; pasteDeposit(j,msg,'img'); }).catch(function(){ if(lbl)lbl.textContent='🖼️ Choisir / prendre une photo'; if(msg){msg.style.color='var(--bad)';msg.textContent='Serveur injoignable.';} }); }; rd.readAsDataURL(file);
   }
   function aiCreateDemande(key){ var pr=String(key).split('|'),cdr=pr[0],idx=+pr[1]; var call=aiDetected.filter(function(x){return String(x.cdr_id)===String(cdr);})[0]; if(!call||!call.demandes||!call.demandes[idx])return; var d=call.demandes[idx];
     var bd=aiBuildDemande(call,d), vn=bd.vn, cp=bd.cp, la=bd.la, lo=bd.lo, near=bd.near;

@@ -161,14 +161,19 @@ async function aiTranscribe(env, audioUrl) {
   const j = await r.json();
   return j.text || "";
 }
+const AI_PROMPT_BASE = "Tu analyses un message (appel transcrit, mail, SMS ou capture d'ecran) d'une societe de securite privee (gardiennage). Determine s'il s'agit d'une (ou plusieurs) demande(s) de GARDIENNAGE (surveillance, agent de securite, ADS, ronde...). Reponds UNIQUEMENT en JSON strict, sans aucun texte autour :\n{\"is_demande\": true|false, \"resume\": \"\", \"demandes\": [{\"client\":\"\",\"ville\":\"\",\"cp\":\"\",\"site\":\"\",\"type_site\":\"\",\"nb_agents\":\"\",\"urgent\":true,\"vacations\":[{\"date\":\"\",\"horaires\":\"\"}]}]}\nREGLES ABSOLUES :\n- UNE demande = UN SEUL SITE. Si le message concerne PLUSIEURS SITES differents (villes ou lieux differents), cree PLUSIEURS entrees distinctes dans 'demandes', une par site. NE JAMAIS regrouper plusieurs sites dans une seule demande.\n- Pour un MEME site demande sur PLUSIEURS DATES : c'est UNE SEULE demande, mais mets UNE entree PAR DATE dans 'vacations', chaque entree = {date, horaires (creneau de cette date)}. NE PAS regrouper toutes les dates ensemble.\n- is_demande=false et demandes=[] si ce n'est pas une demande de gardiennage (facture, RH, autre).\n- Laisse \"\" si une info est absente. resume = 1 phrase courte resumant le message.";
+function aiParseJson(j) { const txt = (j.content && j.content[0] && j.content[0].text) || "{}"; const m = txt.match(/\{[\s\S]*\}/); try { return JSON.parse(m ? m[0] : txt); } catch (e) { return { is_demande: false, resume: "analyse illisible" }; } }
 async function aiAnalyze(env, transcript) {
-  const prompt = "Tu analyses la transcription d'un appel telephonique d'une societe de securite privee (gardiennage). Determine s'il s'agit d'une (ou plusieurs) demande(s) de GARDIENNAGE (surveillance, agent de securite, ADS, ronde...). Reponds UNIQUEMENT en JSON strict, sans aucun texte autour :\n{\"is_demande\": true|false, \"resume\": \"\", \"demandes\": [{\"client\":\"\",\"ville\":\"\",\"cp\":\"\",\"site\":\"\",\"type_site\":\"\",\"nb_agents\":\"\",\"urgent\":true,\"vacations\":[{\"date\":\"\",\"horaires\":\"\"}]}]}\nREGLES ABSOLUES :\n- UNE demande = UN SEUL SITE. Si l'appel concerne PLUSIEURS SITES differents (villes ou lieux differents), cree PLUSIEURS entrees distinctes dans 'demandes', une par site. NE JAMAIS regrouper plusieurs sites dans une seule demande.\n- Pour un MEME site demande sur PLUSIEURS DATES : c'est UNE SEULE demande, mais mets UNE entree PAR DATE dans 'vacations', chaque entree = {date, horaires (creneau de cette date)}. NE PAS regrouper toutes les dates ensemble.\n- is_demande=false et demandes=[] si ce n'est pas une demande de gardiennage (facture, RH, autre).\n- Laisse \"\" si une info est absente. resume = 1 phrase courte resumant l'appel.\n\nTranscription :\n\"\"\"" + transcript + "\"\"\"";
+  const prompt = AI_PROMPT_BASE + "\n\nTexte a analyser :\n\"\"\"" + transcript + "\"\"\"";
   const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 500, messages: [{ role: "user", content: prompt }] }) });
   if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
-  const j = await r.json();
-  const txt = (j.content && j.content[0] && j.content[0].text) || "{}";
-  const m = txt.match(/\{[\s\S]*\}/);
-  try { return JSON.parse(m ? m[0] : txt); } catch (e) { return { is_demande: false, resume: "analyse illisible" }; }
+  return aiParseJson(await r.json());
+}
+async function aiAnalyzeImage(env, b64, media) {
+  const content = [ { type: "text", text: AI_PROMPT_BASE + "\n\nAnalyse cette capture d'ecran (demande recue) :" }, { type: "image", source: { type: "base64", media_type: media || "image/png", data: b64 } } ];
+  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 600, messages: [{ role: "user", content: content }] }) });
+  if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
+  return aiParseJson(await r.json());
 }
 async function aiScan(env, maxCalls, force) {
   if (!env.RINGOVER_API_KEY || !env.OPENAI_API_KEY || !env.ANTHROPIC_API_KEY) return { error: "keys_missing" };
@@ -318,6 +323,16 @@ export default {
       const text = String(b.text || "").slice(0, 8000);
       if (!text.trim()) return json({ error: "empty" }, 400);
       try { const an = await aiAnalyze(env, text); return json({ ok: true, resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [] }); }
+      catch (e) { return json({ error: String((e && e.message) || e) }, 502); }
+    }
+    // --- IA : analyser une CAPTURE D'ÉCRAN (image) et en extraire les demandes de gardiennage ---
+    if (path === "/ai/parse-image" && request.method === "POST") {
+      if (!env.ANTHROPIC_API_KEY) return json({ error: "keys_missing" }, 502);
+      let b = {}; try { b = await request.json(); } catch (_) {}
+      const data = String(b.image || "").replace(/^data:[^,]*,/, "");
+      const media = String(b.media_type || "image/png");
+      if (!data) return json({ error: "empty" }, 400);
+      try { const an = await aiAnalyzeImage(env, data, media); return json({ ok: true, resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [] }); }
       catch (e) { return json({ error: String((e && e.message) || e) }, 502); }
     }
     if (path === "/ai/demandes" && request.method === "GET") {
