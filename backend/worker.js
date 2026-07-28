@@ -41,30 +41,79 @@ async function vapidAuthHeader(env, endpoint) {
   const sig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, enc.encode(header + "." + payload));
   return `vapid t=${header}.${payload}.${bytesToB64u(sig)}, k=${VAPID_PUB}`;
 }
-async function pushOne(env, row) {
+function u8concat() { let len = 0; for (let i = 0; i < arguments.length; i++) len += arguments[i].length; const out = new Uint8Array(len); let o = 0; for (let i = 0; i < arguments.length; i++) { out.set(arguments[i], o); o += arguments[i].length; } return out; }
+// Chiffre la charge utile pour un abonné (RFC 8291 / aes128gcm) — le téléphone peut ainsi
+// afficher le vrai contenu de la demande, même appli fermée.
+async function encryptPayload(p256dhB64, authB64, plaintext) {
+  const uaPublic = b64uToBytes(p256dhB64);   // 65 octets
+  const authSecret = b64uToBytes(authB64);   // 16 octets
+  const asKeys = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveBits"]);
+  const asPublicRaw = new Uint8Array(await crypto.subtle.exportKey("raw", asKeys.publicKey)); // 65 octets
+  const uaKey = await crypto.subtle.importKey("raw", uaPublic, { name: "ECDH", namedCurve: "P-256" }, false, []);
+  const ecdh = new Uint8Array(await crypto.subtle.deriveBits({ name: "ECDH", public: uaKey }, asKeys.privateKey, 256));
+  const enc = new TextEncoder();
+  const keyInfo = u8concat(enc.encode("WebPush: info"), new Uint8Array([0]), uaPublic, asPublicRaw);
+  const ecdhKey = await crypto.subtle.importKey("raw", ecdh, "HKDF", false, ["deriveBits"]);
+  const ikm = new Uint8Array(await crypto.subtle.deriveBits({ name: "HKDF", hash: "SHA-256", salt: authSecret, info: keyInfo }, ecdhKey, 256));
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const ikmKey = await crypto.subtle.importKey("raw", ikm, "HKDF", false, ["deriveBits"]);
+  const cekBits = await crypto.subtle.deriveBits({ name: "HKDF", hash: "SHA-256", salt: salt, info: enc.encode("Content-Encoding: aes128gcm\0") }, ikmKey, 128);
+  const nonceBits = await crypto.subtle.deriveBits({ name: "HKDF", hash: "SHA-256", salt: salt, info: enc.encode("Content-Encoding: nonce\0") }, ikmKey, 96);
+  const cek = await crypto.subtle.importKey("raw", cekBits, { name: "AES-GCM" }, false, ["encrypt"]);
+  const record = u8concat(plaintext, new Uint8Array([2])); // délimiteur dernier enregistrement
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: new Uint8Array(nonceBits), tagLength: 128 }, cek, record));
+  const rs = new Uint8Array(4); new DataView(rs.buffer).setUint32(0, 4096);
+  return u8concat(salt, rs, new Uint8Array([asPublicRaw.length]), asPublicRaw, ct);
+}
+async function pushOne(env, row, plaintext) {
   try {
     const sub = JSON.parse(row.sub); const endpoint = sub.endpoint || row.endpoint;
-    const auth = await vapidAuthHeader(env, endpoint);
-    const r = await fetch(endpoint, { method: "POST", headers: { Authorization: auth, TTL: "86400", Urgency: "high" } });
+    const headers = { Authorization: await vapidAuthHeader(env, endpoint), TTL: "86400", Urgency: "high" };
+    let body = null;
+    if (plaintext && sub.keys && sub.keys.p256dh && sub.keys.auth) {
+      body = await encryptPayload(sub.keys.p256dh, sub.keys.auth, plaintext);
+      headers["Content-Encoding"] = "aes128gcm";
+      headers["Content-Type"] = "application/octet-stream";
+    }
+    const r = await fetch(endpoint, { method: "POST", headers: headers, body: body });
     if (r.status === 404 || r.status === 410) await env.DB.prepare("DELETE FROM push_subs WHERE endpoint = ?").bind(row.endpoint).run();
     return r.status;
   } catch (e) { return 0; }
 }
-async function pushAll(env) {
+// Notifie tous les appareils. payloadObj = { title, body, url, tag } (facultatif).
+async function pushAll(env, payloadObj) {
   if (!env.VAPID_PRIVATE) return 0;
   const rs = await env.DB.prepare("SELECT endpoint, sub FROM push_subs").all();
   const rows = rs.results || [];
-  await Promise.allSettled(rows.map((row) => pushOne(env, row)));
+  const plaintext = payloadObj ? new TextEncoder().encode(JSON.stringify(payloadObj)) : null;
+  await Promise.allSettled(rows.map((row) => pushOne(env, row, plaintext)));
   return rows.length;
 }
-// Y a-t-il de NOUVELLES demandes « en recherche » entre l'ancienne et la nouvelle valeur ?
-function newRechercheIds(oldV, newV) {
+// Construit le contenu de la notification à partir d'une demande de gardiennage.
+function demandeNotif(m) {
+  const head = m.client || m.ville || m.titre || "Demande";
+  let body = "";
+  if (m.texte) {
+    body = String(m.texte);
+  } else {
+    const L = [];
+    if (m.client) L.push("🏢 Client : " + m.client);
+    const vc = [m.ville, m.cp ? "(" + m.cp + ")" : ""].filter(Boolean).join(" ");
+    if (vc) L.push("📍 " + vc);
+    if (m.mheure) L.push("🕐 " + m.mheure + (m.mfin ? " → " + m.mfin : ""));
+    body = L.join("\n");
+  }
+  if (m.urgent && body.indexOf("URGENT") < 0) body = "🔴 URGENT\n" + body;
+  return { title: "🆕 Nouvelle demande — " + String(head).slice(0, 40), body: (body || "Une demande vient de passer en recherche.").slice(0, 1600), url: "/fkh-securite-apps/gestion/", tag: "fkh-" + (m.id || Date.now()) };
+}
+// Quelles demandes viennent de passer « en recherche » entre l'ancienne et la nouvelle valeur ?
+function newRechercheItems(oldV, newV) {
   let o = [], n = [];
   try { o = JSON.parse(oldV || "[]") || []; } catch (_) {}
   try { n = JSON.parse(newV || "[]") || []; } catch (_) {}
   if (!Array.isArray(o)) o = []; if (!Array.isArray(n)) n = [];
   const was = {}; o.forEach((m) => { if (m && m.id) was[m.id] = m.statut; });
-  return n.filter((m) => m && m.statut === "recherche" && was[m.id] !== "recherche").map((m) => m.id);
+  return n.filter((m) => m && m.statut === "recherche" && was[m.id] !== "recherche");
 }
 
 export default {
@@ -141,17 +190,21 @@ export default {
       );
       // Niveau 2 : compare avec l'ancienne valeur AVANT écriture — nouvelle demande « en recherche » => push
       const PUSH_KEYS = ["fkh_suivi", "fkh_interv"];
-      let notifyPush = false;
+      let fresh = [];
       for (const it of items) {
         if (!PUSH_KEYS.includes(String(it.k))) continue;
         try {
           const old = await env.DB.prepare("SELECT v FROM store WHERE k = ?").bind(String(it.k)).first();
           const nv = typeof it.v === "string" ? it.v : JSON.stringify(it.v);
-          if (newRechercheIds(old ? old.v : "[]", nv).length) notifyPush = true;
+          fresh = fresh.concat(newRechercheItems(old ? old.v : "[]", nv));
         } catch (_) {}
       }
       await env.DB.batch(batch);
-      if (notifyPush && ctx && ctx.waitUntil) ctx.waitUntil(pushAll(env));
+      if (fresh.length && ctx && ctx.waitUntil) {
+        ctx.waitUntil((async () => {
+          for (const m of fresh.slice(0, 5)) await pushAll(env, demandeNotif(m));
+        })());
+      }
       return json({ ok: true, now });
     }
 
@@ -172,7 +225,7 @@ export default {
     }
     // Envoi de test : notifie tous les appareils abonnés (pour vérifier le circuit)
     if (path === "/push/test" && request.method === "POST") {
-      const sent = await pushAll(env);
+      const sent = await pushAll(env, { title: "🧪 Test — GESTION", body: "Test de notification appli fermée.\n🏢 Client : DÉMO\n📍 Ville : Dijon (21000)\n🏬 Type de site : Magasin\n🕐 Vacation : 20:00 → 06:00\n🔴 Ceci est un exemple.", url: "/fkh-securite-apps/gestion/", tag: "fkh-test-" + Date.now() });
       return json({ ok: true, sent });
     }
 
