@@ -811,10 +811,10 @@ button.big:active{transform:translateY(1px)}
     popClose(pop,anchor);
   }
   // Boîte « boucle » : ajouter une autre vacation ou terminer
-  function openLoopPop(anchor,onAdd,onDone){
+  function openLoopPop(anchor,onAdd,onDone,addLabel){
     var old=byId('gtp-pop'); if(old)old.parentNode.removeChild(old);
     var pop=document.createElement('div'); pop.id='gtp-pop'; pop.className='gtp'; pop.style.width='auto'; pop.style.padding='8px';
-    pop.innerHTML='<div style="display:flex;flex-direction:column;gap:6px"><button type="button" class="ok gtp-add" style="padding:9px 14px">➕ Ajouter une autre vacation</button><button type="button" class="gtp-done" style="padding:9px 14px">✅ Terminé</button></div>';
+    pop.innerHTML='<div style="display:flex;flex-direction:column;gap:6px"><button type="button" class="ok gtp-add" style="padding:9px 14px">'+(addLabel||'➕ Ajouter une autre vacation')+'</button><button type="button" class="gtp-done" style="padding:9px 14px">✅ Terminé</button></div>';
     document.body.appendChild(pop); posPop(pop,anchor);
     pop.querySelector('.gtp-add').addEventListener('click',function(){ if(pop.parentNode)pop.parentNode.removeChild(pop); onAdd(); });
     pop.querySelector('.gtp-done').addEventListener('click',function(){ if(pop.parentNode)pop.parentNode.removeChild(pop); if(onDone)onDone(); });
@@ -3410,19 +3410,33 @@ button.big:active{transform:translateY(1px)}
     inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); doTranscribe(); } });
     inp.addEventListener('input',function(){ doTranscribe(); });
     document.querySelectorAll('.gexp-day[data-d]').forEach(function(b){ b.addEventListener('click',function(){ var iso=svcAddDays(impTodayISO(),+b.getAttribute('data-d')); gexpDate=(gexpDate===iso)?'':iso; document.querySelectorAll('.gexp-day[data-d]').forEach(function(x){ x.classList.toggle('on', x===b && !!gexpDate); }); doTranscribe(); }); });
-    if(byId('gexp-h24'))byId('gexp-h24').addEventListener('click',function(){ gexpH24=!gexpH24; this.classList.toggle('on',gexpH24); var pn=byId('gexp-h24panel'); if(gexpH24){ showPanelUnder('gexp-h24panel',this); } else { if(pn)pn.classList.add('hidden'); gexpH24End='';gexpH24H1='';gexpH24H2=''; } doTranscribe(); });
-    bindTimeBtn(byId('gexp-h24h1')); bindTimeBtn(byId('gexp-h24h2'));
-    if(byId('gexp-h24apply'))byId('gexp-h24apply').addEventListener('click',function(){ gexpH24H1=tbGet(byId('gexp-h24h1')); gexpH24H2=tbGet(byId('gexp-h24h2')); gexpH24End=byId('gexp-h24date').value||''; byId('gexp-h24panel').classList.add('hidden'); doTranscribe(); });
+    // Flux guidé H24 : heure début → heure fin → proposer une date de fin (autre jour)
+    function h24Flow(anchor){
+      openTimeGrid(anchor, gexpH24H1||'', function(a){ gexpH24H1=a; tbSet(byId('gexp-h24h1'),a); doTranscribe();
+        openTimeGrid(anchor, gexpH24H2||'', function(b){ gexpH24H2=b; tbSet(byId('gexp-h24h2'),b); doTranscribe();
+          openLoopPop(anchor, function(){ openDatePop(anchor, gexpH24End||impTodayISO(), function(d){ gexpH24End=d||''; doTranscribe(); }); }, null, '📅 Fin un autre jour');
+        });
+      });
+    }
+    if(byId('gexp-h24'))byId('gexp-h24').addEventListener('click',function(e){ e.stopPropagation(); gexpH24=!gexpH24; this.classList.toggle('on',gexpH24); if(gexpH24){ h24Flow(this); } else { gexpH24End='';gexpH24H1='';gexpH24H2=''; tbSet(byId('gexp-h24h1'),''); tbSet(byId('gexp-h24h2'),''); } doTranscribe(); });
     function asapClear(){ gexpAsapMode='';gexpAsapH='';gexpAsapDate=''; if(byId('gexp-asap-h'))byId('gexp-asap-h').value=''; if(byId('gexp-asap-date'))byId('gexp-asap-date').value=''; document.querySelectorAll('.gexp-asapmode').forEach(function(x){x.classList.remove('on');}); if(byId('gexp-asap-zone'))byId('gexp-asap-zone').classList.add('hidden'); if(byId('gexp-asap-datewrap'))byId('gexp-asap-datewrap').style.display='none'; }
     if(byId('gexp-asap'))byId('gexp-asap').addEventListener('click',function(){ gexpAsap=!gexpAsap; this.classList.toggle('on',gexpAsap); var pn=byId('gexp-asappanel'); if(gexpAsap){ showPanelUnder('gexp-asappanel',this); } else { if(pn)pn.classList.add('hidden'); asapClear(); } doTranscribe(); });
     var asapModeSel='';
     document.querySelectorAll('.gexp-asapmode').forEach(function(b){ b.addEventListener('click',function(){ asapModeSel=b.getAttribute('data-am'); document.querySelectorAll('.gexp-asapmode').forEach(function(x){x.classList.toggle('on',x===b);}); byId('gexp-asap-zone').classList.remove('hidden'); byId('gexp-asap-datewrap').style.display=(asapModeSel==='date')?'':'none'; if(asapModeSel==='date'&&byId('gexp-asap-date')&&!byId('gexp-asap-date').value)byId('gexp-asap-date').value=(typeof svcAddDays==='function')?svcAddDays(impTodayISO(),1):''; }); });
     bindTimeBtn(byId('gexp-asap-h'));
     if(byId('gexp-asap-apply'))byId('gexp-asap-apply').addEventListener('click',function(){ if(!asapModeSel){ alert('Choisis d\'abord : Aujourd\'hui à…, Demain à…, ou À une date…'); return; } gexpAsapMode=asapModeSel; gexpAsapH=tbGet(byId('gexp-asap-h')); gexpAsapDate=(asapModeSel==='date')?(byId('gexp-asap-date').value||''):''; byId('gexp-asappanel').classList.add('hidden'); doTranscribe(); });
-    function agLive(){ gexpAgS1a=tbGet(byId('gexp-ag-s1a')); gexpAgS1b=tbGet(byId('gexp-ag-s1b')); gexpAgS2a=tbGet(byId('gexp-ag-s2a')); gexpAgS2b=tbGet(byId('gexp-ag-s2b')); doTranscribe(); }
-    if(byId('gexp-agence'))byId('gexp-agence').addEventListener('click',function(){ gexpAgence=!gexpAgence; this.classList.toggle('on',gexpAgence); var pn=byId('gexp-agencepanel'); if(gexpAgence){ showPanelUnder('gexp-agencepanel',this); } else { if(pn)pn.classList.add('hidden'); gexpAgS1a=gexpAgS1b=gexpAgS2a=gexpAgS2b=''; ['gexp-ag-s1a','gexp-ag-s1b','gexp-ag-s2a','gexp-ag-s2b'].forEach(function(id){tbSet(byId(id),'');}); } doTranscribe(); });
-    ['gexp-ag-s1a','gexp-ag-s1b','gexp-ag-s2a','gexp-ag-s2b'].forEach(function(id){ bindTimeBtn(byId(id),agLive); });
-    if(byId('gexp-ag-apply'))byId('gexp-ag-apply').addEventListener('click',function(){ agLive(); byId('gexp-agencepanel').classList.add('hidden'); });
+    // Flux guidé Horaires d'agence : créneau 1 début → fin → proposer un 2ᵉ créneau → début → fin
+    function agenceFlow(anchor){
+      openTimeGrid(anchor, gexpAgS1a||'', function(a){ gexpAgS1a=a; tbSet(byId('gexp-ag-s1a'),a); doTranscribe();
+        openTimeGrid(anchor, gexpAgS1b||'', function(b){ gexpAgS1b=b; tbSet(byId('gexp-ag-s1b'),b); doTranscribe();
+          openLoopPop(anchor, function(){
+            openTimeGrid(anchor, gexpAgS2a||'', function(c){ gexpAgS2a=c; tbSet(byId('gexp-ag-s2a'),c); doTranscribe();
+              openTimeGrid(anchor, gexpAgS2b||'', function(d){ gexpAgS2b=d; tbSet(byId('gexp-ag-s2b'),d); doTranscribe(); }); });
+          }, null, '➕ Ajouter un 2ᵉ créneau');
+        });
+      });
+    }
+    if(byId('gexp-agence'))byId('gexp-agence').addEventListener('click',function(e){ e.stopPropagation(); gexpAgence=!gexpAgence; this.classList.toggle('on',gexpAgence); if(gexpAgence){ agenceFlow(this); } else { gexpAgS1a=gexpAgS1b=gexpAgS2a=gexpAgS2b=''; ['gexp-ag-s1a','gexp-ag-s1b','gexp-ag-s2a','gexp-ag-s2b'].forEach(function(id){tbSet(byId(id),'');}); } doTranscribe(); });
     function stripTimeTokens(s){ var toks=String(s||'').trim().split(/\s+/), out=[], skip=false; for(var i=0;i<toks.length;i++){ var t=toks[i]; if(!t)continue; if(skip){skip=false; continue;} if(t.toLowerCase()==='d'){ skip=true; continue; } if(/^\d{1,4}$/.test(t))continue; out.push(t); } return out.join(' '); }
     function vacNextDate(){ if(gexpVacs.length){ var last=gexpVacs[gexpVacs.length-1], base=last.dateFin||last.date; if(base&&typeof svcAddDays==='function')return svcAddDays(base, last.dateFin?0:1); } var R=parse(inp.value); return R.date||gexpDate||(typeof impTodayISO==='function'?impTodayISO():''); }
     function vacRenderList(){ var box=byId('gexp-vaclist'); if(!box)return; if(!gexpVacs.length){ box.innerHTML='<div class="sub" style="margin:0">Aucune vacation ajoutée pour l\'instant.</div>'; return; } box.innerHTML=gexpVacs.map(function(v,i){ return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--line)"><span style="flex:1"><b>Vacation '+(i+1)+'</b> : '+esc(vacLine(v))+'</span><button type="button" data-vacrm="'+i+'" style="width:28px;height:28px;padding:0">✕</button></div>'; }).join(''); box.querySelectorAll('[data-vacrm]').forEach(function(b){ b.onclick=function(){ gexpVacs.splice(+b.getAttribute('data-vacrm'),1); vacRenderList(); doTranscribe(); }; }); }
