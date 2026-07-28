@@ -793,7 +793,7 @@ button.big:active{transform:translateY(1px)}
     pop.style.left=left+'px'; pop.style.top=top+'px';
     pop.querySelectorAll('button[data-v]').forEach(function(b){ b.addEventListener('mousedown',function(e){e.preventDefault();}); b.addEventListener('click',function(){ var val=b.getAttribute('data-v'); if(pop.parentNode)pop.parentNode.removeChild(pop); onPick(val); }); });
     setTimeout(function(){ function h2(e){ if(!pop.contains(e.target)&&e.target!==anchor){ if(pop.parentNode)pop.parentNode.removeChild(pop); document.removeEventListener('click',h2); } } document.addEventListener('click',h2); },0);
-    var onb=pop.querySelector('button.on'); if(onb&&onb.scrollIntoView)onb.scrollIntoView({block:'center'});
+    var onb=pop.querySelector('button.on'); if(onb){ if(onb.scrollIntoView)onb.scrollIntoView({block:'center'}); } else { var d8=pop.querySelector('button[data-v="08:00"]'); if(d8)pop.scrollTop=Math.max(0, d8.offsetTop-4); }
   }
   // Branche un bouton .gtime sur la grille : clic -> grille -> data-v + callback
   function bindTimeBtn(el,onPick){ if(!el)return; el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); openTimeGrid(el, tbGet(el), function(v){ tbSet(el,v); if(onPick)onPick(v); }); }); }
