@@ -2993,7 +2993,23 @@ button.big:active{transform:translateY(1px)}
   (function(){ var t=impTodayISO(); if(byId('ss-from')&&!byId('ss-from').value)byId('ss-from').value=t; if(byId('ss-to')&&!byId('ss-to').value)byId('ss-to').value=t; })();
 
   // ===== Suivi des appels : agenda chronologique des appels à faire (issus des missions) =====
-  function saSet(mid,key,patch){ var S=ssLoad(); if(!S[mid])S[mid]={}; var r=S[mid][key]||{}; for(var k in patch)r[k]=patch[k]; r.at=Date.now(); S[mid][key]=r; ssSave(S); }
+  function saSet(mid,key,patch){ var S=ssLoad(); if(!S[mid])S[mid]={}; var r=S[mid][key]||{}; for(var k in patch)r[k]=patch[k]; r.at=Date.now(); S[mid][key]=r; ssSave(S);
+    // Contrôle tenue « Fait / photo prise » → enregistre un contrôle DATÉ DU JOUR (sinon l'agent est re-sollicité chaque jour car agentCtrl ne voit aucun contrôle récent).
+    if(key==='tenue'){ var tc=String(r.tenueCtrl||''); var refusOrWait=tc.indexOf('REFUS')>=0||tc.indexOf('attente')>=0; if(!refusOrWait&&(tc.indexOf('Fait')>=0||r.tenuePhoto||r.photoKey||r.done))saTenueRegister(mid,r); }
+  }
+  // Enregistre (ou met à jour) un contrôle de tenue à la date du jour pour l'agent de la mission — coupe la re-sollicitation quotidienne.
+  function saTenueRegister(mid,r){
+    var m=null,i; for(i=0;i<SUIVI.length;i++)if(String(SUIVI[i].id)===String(mid)){m=SUIVI[i];break;}
+    var ag=(m&&m.agentId&&typeof faById==='function')?faById(m.agentId):null; var nom=ag?(ag.nom||''):''; if(!nom)return;
+    var today=(typeof impTodayISO==='function')?impTodayISO():new Date().toISOString().slice(0,10);
+    var T=load('fkh_tenues_ctrl'); if(!Array.isArray(T))T=[];
+    var n=(typeof tnorm==='function')?tnorm(nom):nom, idx=-1;
+    for(i=0;i<T.length;i++){ var cn=(typeof tnorm==='function')?tnorm(T[i].Agent||''):(T[i].Agent||''); if(cn&&(cn===n||cn.indexOf(n)>=0||n.indexOf(cn)>=0)){ idx=i; break; } }
+    var site=(m&&(m.siteAgent||m.titre))||'';
+    if(idx>=0){ T[idx]['Date contrôle']=today; if(site&&!T[idx].Site)T[idx].Site=site; if(r.photoKey)T[idx].photoKey=r.photoKey; if(!T[idx]['Statut tenue'])T[idx]['Statut tenue']='Complet'; }
+    else { T.push({'Date contrôle':today,'Agent':nom,'Site':site,'Société':'','Pointure':'','T. pantalon':'','T. haut':'','Statut tenue':'Complet','Manquants':'','Urgence':'','photoKey':r.photoKey||''}); }
+    save('fkh_tenues_ctrl',T); TCTRL=T;
+  }
   var saType='all', saSlice='all', roCalls=null, roPeriod='', aiDetected=[];
   // Rend un item compatible : si pas de tableau `demandes` (ancien format à plat), on le reconstruit en une demande unique.
   function aiNormItem(it){
