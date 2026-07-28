@@ -1423,12 +1423,13 @@ button.big:active{transform:translateY(1px)}
     return out;
   }
   // Découpage par défaut : un créneau > 12h est coupé en tranches de 12h (ex. 08h→04h = 20h → 08h-20h + 20h-04h ; H24 → 2×12h). ≤ 12h reste tel quel.
-  function expandVac12h(v){
+  function expandVacRule(v, ruleMin){
+    ruleMin=(ruleMin==null)?720:ruleMin;
     var S=(v.mheure!=null&&v.mheure!=='')?toMin(v.mheure):null, E=(v.mfin!=null&&v.mfin!=='')?toMin(v.mfin):null;
     if(S==null||E==null)return [v];
-    if(E<=S)E+=1440; var dur=E-S; if(dur<=720)return [v];
+    if(E<=S)E+=1440; var dur=E-S; if(ruleMin<=0 || dur<=ruleMin)return [v];
     var out=[], baseISO=v.mdate||'';
-    for(var cs=S; cs<E; cs+=720){ var ce=Math.min(cs+720,E), dayOff=Math.floor(cs/1440);
+    for(var cs=S; cs<E; cs+=ruleMin){ var ce=Math.min(cs+ruleMin,E), dayOff=Math.floor(cs/1440);
       var md=(baseISO&&typeof svcAddDays==='function')?svcAddDays(baseISO,dayOff):baseISO;
       var h1=hmMin(cs), h2=hmMin(ce);
       var dlab=(dayOff===0&&v.dateLabel)?v.dateLabel:(md?md.split('-').reverse().join('/'):(v.dateLabel||''));
@@ -1436,7 +1437,9 @@ button.big:active{transform:translateY(1px)}
     }
     return out;
   }
-  function svExtractVacations(x){ var raw=svExtractRaw(x); var out=[]; raw.forEach(function(v){ expandVac12h(v).forEach(function(w){ out.push(w); }); }); return out; }
+  function svExtractVacations(x, ruleMin){ var raw=svExtractRaw(x); var out=[]; raw.forEach(function(v){ expandVacRule(v, ruleMin).forEach(function(w){ out.push(w); }); }); return out; }
+  // Le sélecteur de découpage n'a de sens que si au moins un créneau dépasse la plus petite tranche proposée (6h).
+  function svNeedsPicker(x){ return svExtractRaw(x).some(function(v){ var S=(v.mheure)?toMin(v.mheure):null,E=(v.mfin)?toMin(v.mfin):null; if(S==null||E==null)return false; if(E<=S)E+=1440; return (E-S)>360; }); }
   function svSplitIntoVacations(base, vac){
     var now=Date.now(), gid=base.id, tot=vac.length;
     var siteLbl=(base.siteAgent||base.site||base.titre||'Mission');
@@ -1456,8 +1459,8 @@ button.big:active{transform:translateY(1px)}
     for(var i=1;i<tot;i++){ var clone=JSON.parse(JSON.stringify(shared)); Object.keys(clone).forEach(function(k){ if(k.charAt(0)==='_')delete clone[k]; }); delete clone.agentId; clone.assoc=[]; clone.id='vac'+now+'_'+i+'_'+Math.round(Math.random()*9999); applyVac(clone, vac[i], i); SUIVI.unshift(clone); }
   }
   // Valide une demande : si ≥2 vacations → découpe en 1 mission par vacation, sinon 1 mission simple.
-  function svValidateSplit(it){
-    var vac=svExtractVacations(it);
+  function svValidateSplit(it, ruleMin){
+    var vac=svExtractVacations(it, ruleMin);
     if(vac.length>=2){ svSplitIntoVacations(it, vac); return vac.length; }
     it.statut='validee'; it.valide=Date.now(); it.motif=''; delete it._pending; delete it.aiPending;
     if(vac.length===1){ if(!it.mdate)it.mdate=vac[0].mdate||''; if(!it.mheure)it.mheure=vac[0].mheure||''; if(!it.mfin)it.mfin=vac[0].mfin||''; }
@@ -1519,8 +1522,9 @@ button.big:active{transform:translateY(1px)}
       var vacTag=(x.statut==='validee'&&x.vacIdx)?'<div class="meta" style="color:var(--ok);font-weight:600"><span>🗂️ Vacation '+x.vacIdx+'/'+x.vacTotal+'</span></div>':'';
       var vacSplitBtn='', over12line='';
       if(x.statut==='validee'&&!x.vacIdx){ var _vv=svExtractVacations(x); if(_vv.length>=2){ over12line='<div class="meta" style="background:rgba(224,74,74,.14);border:1.5px solid var(--bad);border-radius:10px;padding:7px 10px;margin-top:4px"><span style="color:var(--bad);font-weight:700">⚠️ Créneau > 12h — une vacation ne doit pas dépasser 12h. À découper ↓</span></div>'; vacSplitBtn='<div class="acts" style="margin-top:2px"><button class="ok" data-act="splitvac" data-id="'+x.id+'" title="Découper en '+_vv.length+' vacations de 12h maximum">🔪 Découper en '+_vv.length+' vacations (12h max)</button></div>'; } }
+      var splitPickPanel=(x.statut==='recherche'&&x._splitpick)?('<div class="pickp" style="border:1.5px solid #6ea8fe"><div class="lab" style="margin:0 0 5px;color:#6ea8fe">🔪 Découpage des vacations avant validation</div><div class="acts" style="flex-wrap:wrap;gap:6px;align-items:center"><button class="ok" data-act="dovalidate" data-rule="720" data-id="'+x.id+'">12h (défaut)</button><button data-act="dovalidate" data-rule="480" data-id="'+x.id+'">8h</button><button data-act="dovalidate" data-rule="360" data-id="'+x.id+'">6h</button><span style="display:inline-flex;align-items:center;gap:4px">Perso <input class="splitcustom" type="number" min="1" max="24" step="1" placeholder="h" style="width:56px;padding:5px"> h <button data-act="dovalidate" data-rule="custom" data-id="'+x.id+'">Appliquer</button></span><button data-act="dovalidate" data-rule="0" data-id="'+x.id+'" title="Valider sans découper">Garder tel quel</button><button data-act="splitcancel" data-id="'+x.id+'">Annuler</button></div></div>'):'';
       var svBrd=x.aiPending?'#7b61ff':(svNoDate(x)?'var(--bad)':'');
-      return '<div class="sv"'+(svBrd?' style="border:1.5px solid '+svBrd+'"':'')+'><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+vacTag+over12line+aiPendLine+noDateLine+cdLine+bigCitiesLine(x)+assocLine+zdLine+izLine+'<div class="svm">'+esc(x.texte)+'</div>'+vacSplitBtn+body+pickBtn+editPanel+pickPanel+nearPanel+renderAffect(x)+'</div>';
+      return '<div class="sv"'+(svBrd?' style="border:1.5px solid '+svBrd+'"':'')+'><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+vacTag+over12line+aiPendLine+noDateLine+cdLine+bigCitiesLine(x)+assocLine+zdLine+izLine+'<div class="svm">'+esc(x.texte)+'</div>'+vacSplitBtn+body+splitPickPanel+pickBtn+editPanel+pickPanel+nearPanel+renderAffect(x)+'</div>';
     }
     if(suiviBucket==='validee'){
       var byD=function(a,b){var da=a.mdate||'9999-99-99',db=b.mdate||'9999-99-99';return da>db?1:(da<db?-1:0);};
@@ -1575,7 +1579,9 @@ button.big:active{transform:translateY(1px)}
     var id=b.getAttribute('data-id'), act=b.getAttribute('data-act'), it=null,i;
     for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;}
     if(!it)return;
-    if(act==='trouve'){ svValidateSplit(it); }
+    if(act==='trouve'){ if(svNeedsPicker(it)){ it._splitpick=true; renderSuivi(); return; } svValidateSplit(it); }
+    else if(act==='dovalidate'){ var _rule=b.getAttribute('data-rule'), _rm; if(_rule==='custom'){ var _inp=b.closest('.sv')?b.closest('.sv').querySelector('.splitcustom'):null; var _h=_inp?parseFloat(_inp.value):0; _rm=(_h>0)?Math.round(_h*60):0; } else _rm=parseInt(_rule,10)||0; delete it._splitpick; svValidateSplit(it,_rm); saveSuivi(); renderSuivi(); return; }
+    else if(act==='splitcancel'){ delete it._splitpick; renderSuivi(); return; }
     else if(act==='splitvac'){ var _sv=svExtractVacations(it); if(_sv.length>=2){ svSplitIntoVacations(it,_sv); saveSuivi(); renderSuivi(); } return; }
     else if(act==='annule'){it._pending='annulee';}
     else if(act==='nongere'){it._pending='nongeree';}
