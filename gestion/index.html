@@ -2274,19 +2274,25 @@ button.big:active{transform:translateY(1px)}
   })();
 
   var TEN_DRILL={};
+  var TEN_F={client:'',sl:'all',from:'',to:'',allDates:false};
   function renderTenues(){
     var wrap=byId('ten-body'); if(!wrap)return;
     if(!TCTRL)TCTRL=load('fkh_tenues_ctrl'); if(!TSTOCK)TSTOCK=load('fkh_tenues_stock');
     if(!(TCTRL&&TCTRL.length)){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune donnée tenue chargée. Connecte-toi avec le mot de passe commun pour les recevoir depuis le classeur partagé.</div></div>'; return; }
     var byA={}; TCTRL.forEach(function(c){var n=tnorm(c.Agent);if(!n)return;var d=String(c['Date contrôle']||'');if(!byA[n]||d>byA[n]._d)byA[n]={rec:c,_d:d};});
     var agents=Object.keys(byA).map(function(k){return byA[k].rec;}).sort(function(a,b){return String(b['Date contrôle']).localeCompare(String(a['Date contrôle']));});
+    // ===== FILTRE des vues (client + jour/nuit + période) — défaut : 7 jours à venir. Base = missions planifiées. =====
+    if(!TEN_F.allDates&&!TEN_F.from&&!TEN_F.to){ TEN_F.from=impTodayISO(); TEN_F.to=svcAddDays(impTodayISO(),7); }
+    var _today=impTodayISO(), _allowed={}, _planned={};
+    (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.statut!=='validee'||!m.agentId)return; if(TEN_F.client&&m.client!==TEN_F.client)return; var mn=(typeof toMin==='function')?toMin(m.mheure):null,h=(mn!=null)?Math.floor(mn/60):null,isDay=(h!=null&&h>=8&&h<20); if(TEN_F.sl==='jour'&&h!=null&&!isDay)return; if(TEN_F.sl==='nuit'&&h!=null&&isDay)return; var d=m.mdate||''; if(!TEN_F.allDates){ if(!d)return; if(TEN_F.from&&d<TEN_F.from)return; if(TEN_F.to&&d>TEN_F.to)return; } var a=(typeof faById==='function')?faById(m.agentId):null; if(!a||!a.nom)return; _allowed[tnorm(a.nom)]=1; if(!_planned[a.id]||(d&&d<_planned[a.id].d0))_planned[a.id]={a:a,d0:d||_today}; });
+    agents=agents.filter(function(c){return _allowed[tnorm(c.Agent)];});
     var stale=agents.filter(function(c){var d=ctrlDays(c['Date contrôle']);return d!=null&&d>14;});
-    var never=[]; (FA||[]).forEach(function(a){if(a.nom&&!agentCtrl(a.nom))never.push(a.nom);});
+    var never=[]; (FA||[]).forEach(function(a){if(a.nom&&!agentCtrl(a.nom)&&_allowed[tnorm(a.nom)])never.push(a.nom);});
     // ---- Tableau de bord visuel ----
     var complet=agents.filter(function(c){return String(c['Statut tenue']||'').toLowerCase().indexOf('incomplet')<0;}).length;
     var incomplet=agents.length-complet;
     var noMens=agents.filter(function(c){return !(c.Pointure||c['T. pantalon']||c['T. haut']);}).length;
-    var D=(typeof distLoad==='function')?distLoad():{}, dvals=Object.keys(D).map(function(k){return D[k];});
+    var _Draw=(typeof distLoad==='function')?distLoad():{}, D={}; Object.keys(_Draw).forEach(function(k){ if(_allowed[k])D[k]=_Draw[k]; }); var dvals=Object.keys(D).map(function(k){return D[k];});
     var distPreaff=dvals.filter(function(r){return r.statut==='preaffecte';}).length;
     var distEnCours=dvals.filter(function(r){return r.statut==='encours'||r.statut==='envoye';}).length;
     var distUrgent=dvals.filter(function(r){return distIsUrgent(r);}).length;
@@ -2302,8 +2308,7 @@ button.big:active{transform:translateY(1px)}
     function frd(d){ return d?(' le '+String(d).split('-').reverse().join('/')):''; }
     Object.keys(D).forEach(function(k){ var r=D[k],nm=nameFromKey(k); var urg=distIsUrgent(r),up=distUrgArr(r),u=urg?' · 🔴 URGENT'+(up.length?' ('+up.join(', ')+')':''):''; if(r.statut==='recu')L_recu.push(li(nm,(r.pieces||'')+' · ✅ reçu'+frd(r.dateRecu))); else if(r.statut==='preaffecte')L_preaff.push(li(nm,(r.pieces||'')+' · 🟡 pré-affecté'+frd(r.updated)+u)); else if(r.statut==='encours'||r.statut==='envoye')L_encours.push(li(nm,(r.pieces||'')+' · '+(DIST_LBL[r.statut]||'')+(r.dateEnvoi?' · 🚚 envoyé'+frd(r.dateEnvoi):'')+u)); if(urg)L_urg.push(li(nm,(up.length?up.join(', '):(r.pieces||''))+' · URGENT · '+(DIST_LBL[r.statut]||'à envoyer'))); });
     // URGENCES TENUE (règle définie) : agent PLANIFIÉ (≤7 j) à qui il manque le GILET, le LOGO ou le MATRICULE (ou les 3).
-    var _today=impTodayISO(), _in7=(typeof svcAddDays==='function')?svcAddDays(_today,7):_today, _planned={};
-    (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.statut!=='validee'||!m.agentId)return; var dd=m.mdate||''; if(!dd||dd<_today||dd>_in7)return; var a=(typeof faById==='function')?faById(m.agentId):null; if(a&&(!_planned[a.id]||dd<_planned[a.id].d0))_planned[a.id]={a:a,d0:dd}; });
+    // (_planned et _today sont déjà calculés plus haut via le FILTRE — l'urgence porte sur la période filtrée, défaut 7 j.)
     var L_urgGilet=[],L_urgLogo=[],L_urgMat=[],L_urg3=[];
     Object.keys(_planned).forEach(function(id){ var a=_planned[id].a,d0=_planned[id].d0,c=(typeof agentCtrl==='function')?agentCtrl(a.nom):null,rr=(typeof distGet==='function')?distGet(a.nom):null,ums=(typeof matState==='function')?matState(a.nom):{num:''}; var mg=needsSend(c,rr,'Gilet'),ml=needsSend(c,rr,'Logo'),mm=!ums.num; var when='planifié le '+d0.split('-').reverse().join('/'); if(mg)L_urgGilet.push(li(a.nom,when+' — il manque le GILET')); if(ml)L_urgLogo.push(li(a.nom,when+' — il manque le LOGO')); if(mm)L_urgMat.push(li(a.nom,when+' — il manque le MATRICULE')); if(mg&&ml&&mm)L_urg3.push(li(a.nom,when+' — il manque GILET + LOGO + MATRICULE')); });
     // Matricule NON RENSEIGNÉ (aucun n°) — pour les agents planifiés (≤7 j) et ceux qui ont déjà une distribution de tenue.
@@ -2328,7 +2333,19 @@ button.big:active{transform:translateY(1px)}
     });
     TEN_DRILL={complet:L_complet,incomplet:L_incomplet,never:L_never,stale:L_stale,nomens:L_nomens,distpreaff:L_preaff,distencours:L_encours,disturg:L_urg,distrecu:L_recu,cmd:L_cmd,cmdUrg:L_cmdUrg,matImp:L_matImp,pret:L_pret,urgGilet:L_urgGilet,urgLogo:L_urgLogo,urgMat:L_urgMat,urg3:L_urg3,matNonRens:L_matNonRens,planNotReady:L_planNotReady,sentNotRecu:L_sentNotRecu,cmdVol:L_cmdVol,noGilet:L_noGilet,noLogo:L_noLogo,noMat:L_noMat,no3:L_no3,noAddr:L_noAddr};
     function tk(ic,lab,val,col,key){ return '<div'+(key&&val?' class="tk" data-tdrill="'+key+'"':'')+' style="'+(key&&val?'cursor:pointer;':'')+'flex:1;min-width:112px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card)"><div style="font-size:26px;font-weight:800;line-height:1'+(col?';color:'+col:'')+'">'+val+'</div><div class="sub" style="margin:3px 0 0">'+ic+' '+lab+(key&&val?' 🔎':'')+'</div></div>'; }
-    var H='<div class="card"><div class="lab" style="margin:0 0 8px">🦺 Tableau de bord tenues <span class="sub" style="font-weight:400">— clique un chiffre 🔎</span></div>'
+    var _cli={}; (typeof CLIENTS!=='undefined'?CLIENTS:[]).forEach(function(c){if(c)_cli[c]=1;}); (load('fkh_clients')||[]).forEach(function(c){if(c)_cli[c]=1;}); (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){if(m.client)_cli[m.client]=1;});
+    var _cliOpts='<option value="">Tous les clients</option>'+Object.keys(_cli).sort().map(function(c){return '<option value="'+esc(c)+'"'+(c===TEN_F.client?' selected':'')+'>'+esc(c)+'</option>';}).join('');
+    var _perTxt=TEN_F.allDates?'toutes dates':('du '+(TEN_F.from?TEN_F.from.split('-').reverse().join('/'):'?')+' au '+(TEN_F.to?TEN_F.to.split('-').reverse().join('/'):'?'));
+    var filterBar='<div class="card"><div class="acts" style="gap:6px;flex-wrap:wrap;align-items:center"><b style="font-size:13px">🔎 Filtre</b>'
+      +'<select id="ten-f-client" style="width:auto;min-width:150px">'+_cliOpts+'</select>'
+      +'<button type="button" class="ten-f-sl'+(TEN_F.sl==='all'?' ok':'')+'" data-sl="all" style="font-size:12px">Jour + Nuit</button>'
+      +'<button type="button" class="ten-f-sl'+(TEN_F.sl==='jour'?' ok':'')+'" data-sl="jour" style="font-size:12px">☀️ Jour 8h→20h</button>'
+      +'<button type="button" class="ten-f-sl'+(TEN_F.sl==='nuit'?' ok':'')+'" data-sl="nuit" style="font-size:12px">🌙 Nuit 20h→8h</button>'
+      +'<span class="sub" style="margin:0 0 0 4px">📅</span><input type="date" id="ten-f-from" value="'+esc(TEN_F.allDates?'':TEN_F.from)+'"'+(TEN_F.allDates?' disabled':'')+' style="width:auto;padding:4px 6px"><span class="sub" style="margin:0">→</span><input type="date" id="ten-f-to" value="'+esc(TEN_F.allDates?'':TEN_F.to)+'"'+(TEN_F.allDates?' disabled':'')+' style="width:auto;padding:4px 6px">'
+      +'<label class="chk" style="margin:0;font-size:12px"><input type="checkbox" id="ten-f-all"'+(TEN_F.allDates?' checked':'')+'>Toutes dates</label>'
+      +'<button type="button" id="ten-f-reset" class="ok" style="font-size:12px">↺ Réinitialiser (7 j)</button></div>'
+      +'<div class="sub" style="margin:5px 0 0">Vues portant sur les agents planifiés '+esc(_perTxt)+(TEN_F.client?' · client '+esc(TEN_F.client):'')+(TEN_F.sl!=='all'?(' · '+(TEN_F.sl==='jour'?'jour':'nuit')):'')+' — '+agents.length+' agent'+(agents.length>1?'s':'')+'.</div></div>';
+    var H=filterBar+'<div class="card"><div class="lab" style="margin:0 0 8px">🦺 Tableau de bord tenues <span class="sub" style="font-weight:400">— clique un chiffre 🔎</span></div>'
       +'<div class="lab" style="margin:2px 0 4px;color:var(--bad)">🎽 Qui n\'a pas quoi — à tout moment (tous les agents suivis)</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+tk('🦺','Sans gilet',L_noGilet.length,L_noGilet.length?'var(--bad)':'','noGilet')+tk('🏷️','Sans logo',L_noLogo.length,L_noLogo.length?'var(--bad)':'','noLogo')+tk('🔢','Sans matricule',L_noMat.length,L_noMat.length?'var(--bad)':'','noMat')+tk('🆘','Sans les 3',L_no3.length,L_no3.length?'var(--bad)':'','no3')+tk('📍','Sans adresse',L_noAddr.length,L_noAddr.length?'var(--bad)':'','noAddr')+'</div><div class="sub" style="margin:4px 0 8px">Clique un chiffre puis un nom → sa fiche pour équiper l\'agent. « Sans gilet / logo » = agent suivi non confirmé équipé de cette pièce.</div>'
       +'<div style="display:flex;gap:8px;flex-wrap:wrap">'+tk('🟢','Complètes',complet,'var(--ok)','complet')+tk('🟠','Incomplètes',incomplet,incomplet?'var(--warn)':'','incomplet')+tk('🔴','Jamais contrôlés',never.length,never.length?'var(--bad)':'','never')+tk('⏰','À recontrôler',stale.length,stale.length?'var(--bad)':'','stale')+tk('📏','Sans mensurations',noMens,noMens?'var(--warn)':'','nomens')+'</div>'
       +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">'+tk('🟡','Pré-affectées',distPreaff,distPreaff?'var(--warn)':'','distpreaff')+tk('📦','Distribution en cours',distEnCours,distEnCours?'var(--warn)':'','distencours')+tk('🔴','Urgentes',distUrgent,distUrgent?'var(--bad)':'','disturg')+tk('✅','Tenues reçues',distRecu,'var(--ok)','distrecu')+'</div><div class="sub" style="margin:4px 0 0">🟡 Pré-affecté = pièces définies, pas encore expédiées · 📦 En cours = envoi en cours + envoyé · ✅ Reçu</div>'
@@ -2366,7 +2383,15 @@ button.big:active{transform:translateY(1px)}
   function tenWireFix(pan,nom){ var as=pan.querySelector('.tfx-addr-save'),af=pan.querySelector('.tfx-addr'); if(as&&af)as.onclick=function(){ var a=(typeof faByNom==='function')?faByNom(nom):null; if(a){ a.adresse=(af.value||'').trim(); if(typeof saveFA==='function')saveFA(); as.textContent='✅ Enregistré'; setTimeout(function(){ if(typeof renderTenues==='function')renderTenues(); },500); } };
     if(typeof wireDistHandlers==='function')wireDistHandlers(pan);
     pan.querySelectorAll('.tfx-fiche').forEach(function(l){ l.onclick=function(ev){ ev.preventDefault(); var tb=document.querySelector('#tabs button[data-s="fiche"]'); if(tb)tb.click(); var s=byId('fa-search'); if(s){ s.value=nom; s.dispatchEvent(new Event('input',{bubbles:true})); } }; }); }
+  if(byId('ten-body'))byId('ten-body').addEventListener('change',function(ev){ var t=ev.target; if(!t||!t.id)return;
+    if(t.id==='ten-f-client'){ TEN_F.client=t.value; renderTenues(); return; }
+    if(t.id==='ten-f-from'){ TEN_F.from=t.value; TEN_F.allDates=false; renderTenues(); return; }
+    if(t.id==='ten-f-to'){ TEN_F.to=t.value; TEN_F.allDates=false; renderTenues(); return; }
+    if(t.id==='ten-f-all'){ TEN_F.allDates=t.checked; renderTenues(); return; }
+  });
   if(byId('ten-body'))byId('ten-body').addEventListener('click',function(ev){
+    var sl=ev.target.closest('.ten-f-sl'); if(sl){ TEN_F.sl=sl.getAttribute('data-sl')||'all'; renderTenues(); return; }
+    if(ev.target.closest('#ten-f-reset')){ TEN_F.client=''; TEN_F.sl='all'; TEN_F.allDates=false; TEN_F.from=impTodayISO(); TEN_F.to=svcAddDays(impTodayISO(),7); renderTenues(); return; }
     var ag=ev.target.closest('[data-agname]'); if(ag){ ev.preventDefault(); var nm=ag.getAttribute('data-agname'); var tb=document.querySelector('#tabs button[data-s="fiche"]'); if(tb)tb.click(); var s=byId('fa-search'); if(s){ s.value=nm; s.dispatchEvent(new Event('input',{bubbles:true})); } if(byId('fa-list')&&byId('fa-list').scrollIntoView)byId('fa-list').scrollIntoView({behavior:'smooth',block:'start'}); return; }
     var k=ev.target.closest('[data-tdrill]'); if(!k)return; var key=k.getAttribute('data-tdrill'),box=byId('ten-drill'); if(!box)return;
     if(box.getAttribute('data-cur')===key){ box.innerHTML=''; box.removeAttribute('data-cur'); return; }
