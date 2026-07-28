@@ -143,12 +143,22 @@ async function aiAnalyze(env, transcript) {
 }
 async function aiScan(env, maxCalls) {
   if (!env.RINGOVER_API_KEY || !env.OPENAI_API_KEY || !env.ANTHROPIC_API_KEY) return { error: "keys_missing" };
+  // Liste blanche stricte : on n'analyse QUE les numéros suivis (avec leur règle entrant/sortant)
+  const numKey = (n) => { let d = String(n || "").replace(/\D/g, ""); if (d.length > 9) d = d.slice(-9); return d; };
+  let watchMap = {};
+  try { const wr = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_ai_numbers'").first(); const list = wr && wr.v ? JSON.parse(wr.v) : []; (Array.isArray(list) ? list : []).forEach((w) => { const k = numKey(w.n || w.number); if (k) watchMap[k] = w.dir || "both"; }); } catch (e) {}
+  if (!Object.keys(watchMap).length) return { ok: true, processed: 0, detected: 0, note: "aucun numéro suivi" };
   const now = new Date(), from = new Date(now.getTime() - 2 * 3600 * 1000);
   const p = new URLSearchParams({ limit_count: "50", start_date: from.toISOString(), end_date: now.toISOString() });
   const r = await fetch("https://public-api.ringover.com/v2/calls?" + p.toString(), { headers: { Authorization: env.RINGOVER_API_KEY } });
   if (!r.ok) return { error: "ringover", status: r.status };
   const j = await r.json();
-  const calls = (j.call_list || []).filter((c) => c.direction === "in" && c.is_answered && c.record && typeof c.record === "string" && c.record.indexOf("http") === 0);
+  const calls = (j.call_list || []).filter((c) => {
+    if (!c.is_answered || !c.record || typeof c.record !== "string" || c.record.indexOf("http") !== 0) return false;
+    const rule = watchMap[numKey(c.contact_number)];
+    if (!rule) return false;
+    return rule === "both" || rule === c.direction;
+  });
   let processed = 0, detected = 0;
   for (const c of calls.slice(0, maxCalls || 8)) {
     const id = String(c.cdr_id);
