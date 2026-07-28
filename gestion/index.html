@@ -155,6 +155,12 @@ button.big:active{transform:translateY(1px)}
 #gexp-bar.reorder .gexp-day{cursor:grab;box-shadow:0 0 0 1px var(--brand) inset;touch-action:none}
 #gexp-bar.reorder .gexp-day.gexp-dragging{opacity:.5;cursor:grabbing}
 #gexp-reorder.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.gtime{padding:7px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--ink);font-weight:700;cursor:pointer;min-width:70px;text-align:center;font-size:14px}
+.gtime.set{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.gtp{position:absolute;z-index:200;background:var(--panel);border:1px solid var(--brand);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.45);padding:7px;max-height:290px;overflow:auto;width:236px}
+.gtp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.gtp-grid button{padding:8px 2px;border:1px solid var(--line);border-radius:7px;background:var(--panel2);color:var(--ink);font-size:12.5px;font-weight:700;cursor:pointer}
+.gtp-grid button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
 #gexp-newdem{background:#1f6f43;color:#fff;border-color:#1f6f43}
 #gexp-addvac{background:#2a4a8a;color:#fff;border-color:#2a4a8a}
 </style>
@@ -226,20 +232,15 @@ button.big:active{transform:translateY(1px)}
   <section id="sec-noterapide" class="hidden">
     <div><h1>📝 Prise de note rapide</h1><p class="sub">Note codée + petits rectangles · tout va dans l'aperçu · « Envoyer en recherche » crée la demande.</p></div>
     <div id="gexp-bar">
-      <div class="gexp-row">
-        <input id="gexp-in" placeholder="📝 Note codée : c AQUILA s Carrefour 83000 1930 2200 x2 !" autocomplete="off">
-        <button type="button" id="gexp-do" title="Transcrire">✨ Transcrire</button>
-        <button type="button" id="gexp-reorder" title="Réorganiser les boutons (glisser-déposer)">↕️</button>
-        <button type="button" id="gexp-help" title="Aide codes">❔</button>
-      </div>
-      <div id="gexp-reorder-hint" class="hidden" style="margin-top:6px;padding:6px 9px;border:1px dashed var(--brand);border-radius:9px;background:var(--panel2);font-size:12px">✋ <b>Mode réorganiser</b> — glisse les rectangles pour les ranger dans ton ordre. Reclique <b>↕️</b> pour terminer. <button type="button" id="gexp-reorder-reset" style="padding:2px 8px;font-size:11px;margin-left:6px">↺ Ordre d'origine</button></div>
+      <div class="gexp-row"><input id="gexp-in" placeholder="📝 Note codée : c AQUILA s Carrefour 83000 1930 2200 x2 !" autocomplete="off" style="flex:1"></div>
+      <div class="gexp-row" style="margin-top:6px"><button type="button" id="gexp-do" title="Transcrire" style="flex:1">✨ Transcrire</button><button type="button" id="gexp-help" title="Aide codes">❔</button></div>
       <div class="gexp-grp">🏢 Client &amp; lieu</div>
       <div class="gexp-row" style="margin-top:2px;flex-wrap:wrap"><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-clientbtn">🏢 Client ▾</button><div id="gexp-clientdd" class="sugg hidden" style="left:0;right:auto;min-width:200px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-sitebtn">🏬 Type de site ▾</button><div id="gexp-sitedd" class="sugg hidden" style="left:0;right:auto;min-width:190px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-villebtn">📍 Ville ▾</button><div id="gexp-villedd" class="sugg hidden" style="left:0;right:auto;min-width:210px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-cpbtn">🔢 Code postal ▾</button><div id="gexp-cpdd" class="sugg hidden" style="left:0;right:auto;min-width:210px"></div></span></div>
       <div class="gexp-grp">🗓️ Quand</div>
       <div class="gexp-row" style="margin-top:2px;flex-wrap:wrap"><button type="button" class="gexp-day" data-d="0">Aujourd'hui</button><button type="button" class="gexp-day" data-d="1">Demain</button><button type="button" class="gexp-day" id="gexp-datebtn">📅 Date précise</button><button type="button" class="gexp-day" id="gexp-asap" title="Dès que possible">🚀 Dès que possible</button><button type="button" class="gexp-day" id="gexp-h24" title="Service 24h/24">🕛 H24</button><button type="button" class="gexp-day" id="gexp-agence" title="Horaires d'agence">🏢 Horaires d'agence</button><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-h1btn">🕐 Heure de début ▾</button><div id="gexp-h1dd" class="sugg hidden" style="left:0;right:auto;min-width:170px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-h2btn">🕕 Heure de fin ▾</button><div id="gexp-h2dd" class="sugg hidden" style="left:0;right:auto;min-width:170px"></div></span></div>
       <div id="gexp-datepanel" class="hidden" style="margin-top:6px;padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">
         <div class="grid2"><label class="f"><div class="lab">Date</div><input type="date" id="gexp-date-in"></label></div>
-        <div class="grid2" style="margin-top:6px"><label class="f"><div class="lab">De</div><select id="gexp-hh1"><option value="">--</option></select></label><label class="f"><div class="lab">À</div><select id="gexp-hh2"><option value="">--</option></select></label></div>
+        <div class="grid2" style="margin-top:6px"><label class="f"><div class="lab">De</div><button type="button" class="gtime" id="gexp-hh1" data-ph="-- choisir --">-- choisir --</button></label><label class="f"><div class="lab">À</div><button type="button" class="gtime" id="gexp-hh2" data-ph="-- choisir --">-- choisir --</button></label></div>
         <div class="acts" style="margin-top:8px"><button type="button" class="ok" id="gexp-date-apply">✅ Appliquer</button><button type="button" id="gexp-date-cancel">Annuler</button></div>
       </div>
       <div id="gexp-asappanel" class="hidden" style="margin-top:6px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">
@@ -250,7 +251,7 @@ button.big:active{transform:translateY(1px)}
           <button type="button" class="gexp-day gexp-asapmode" data-am="date">📅 À une date…</button>
         </div>
         <div id="gexp-asap-zone" class="hidden" style="margin-top:8px">
-          <div class="grid2"><label class="f" id="gexp-asap-datewrap" style="display:none"><div class="lab">Date de fin</div><input type="date" id="gexp-asap-date"></label><label class="f"><div class="lab">Heure de fin</div><select id="gexp-asap-h"><option value="">--</option></select></label></div>
+          <div class="grid2"><label class="f" id="gexp-asap-datewrap" style="display:none"><div class="lab">Date de fin</div><input type="date" id="gexp-asap-date"></label><label class="f"><div class="lab">Heure de fin</div><button type="button" class="gtime" id="gexp-asap-h" data-ph="-- choisir --">-- choisir --</button></label></div>
           <div class="acts" style="margin-top:8px"><button type="button" class="ok" id="gexp-asap-apply">✅ Appliquer</button><button type="button" id="gexp-asap-none">Sans précision</button></div>
         </div>
       </div>
@@ -258,7 +259,7 @@ button.big:active{transform:translateY(1px)}
       <div class="gexp-row" style="margin-top:2px;flex-wrap:wrap"><button type="button" class="gexp-day" id="gexp-depfix" title="Départ fixe">🚪 Départ fixe</button><button type="button" class="gexp-day" id="gexp-deparr" title="Départ à l'arrivée du personnel">👥 Départ à l'arrivée du personnel</button></div>
       <div id="gexp-h24panel" class="hidden" style="margin-top:6px;padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">
         <div class="sub" style="margin:0 0 6px">🕛 H24 — horaires + fin</div>
-        <div class="grid2"><label class="f"><div class="lab">Heure de début</div><select id="gexp-h24h1"><option value="">--</option></select></label><label class="f"><div class="lab">Heure de fin</div><select id="gexp-h24h2"><option value="">--</option></select></label></div>
+        <div class="grid2"><label class="f"><div class="lab">Heure de début</div><button type="button" class="gtime" id="gexp-h24h1" data-ph="-- choisir --">-- choisir --</button></label><label class="f"><div class="lab">Heure de fin</div><button type="button" class="gtime" id="gexp-h24h2" data-ph="-- choisir --">-- choisir --</button></label></div>
         <label class="f" style="margin-top:6px"><div class="lab">Date de fin (si autre jour)</div><input type="date" id="gexp-h24date"></label>
         <div class="acts" style="margin-top:8px"><button type="button" class="ok" id="gexp-h24apply">✅ Appliquer</button></div>
       </div>
@@ -268,7 +269,7 @@ button.big:active{transform:translateY(1px)}
         <div class="sub" style="margin:0 0 8px">🗓️ <b>Vacations</b> — un créneau par ligne · la nuit peut finir le lendemain (ex. 20h00 → 08h00 le lendemain)</div>
         <div id="gexp-vaclist" style="margin-bottom:8px"></div>
         <div class="grid2"><label class="f"><div class="lab">Date de début</div><input type="date" id="gexp-vac-date"></label><label class="f"><div class="lab">Date de fin <span style="color:var(--muted)">(si le lendemain)</span></div><input type="date" id="gexp-vac-datefin"></label></div>
-        <div class="grid2" style="margin-top:6px"><label class="f"><div class="lab">Heure de début</div><select id="gexp-vac-h1"><option value="">--</option></select></label><label class="f"><div class="lab">Heure de fin</div><select id="gexp-vac-h2"><option value="">--</option></select></label></div>
+        <div class="grid2" style="margin-top:6px"><label class="f"><div class="lab">Heure de début</div><button type="button" class="gtime" id="gexp-vac-h1" data-ph="-- choisir --">-- choisir --</button></label><label class="f"><div class="lab">Heure de fin</div><button type="button" class="gtime" id="gexp-vac-h2" data-ph="-- choisir --">-- choisir --</button></label></div>
         <div class="acts" style="margin-top:8px;flex-wrap:wrap;gap:6px"><button type="button" class="ok" id="gexp-vac-add" style="flex:1;min-width:180px">➕ Ajouter cette vacation</button><button type="button" id="gexp-vac-done">✅ Terminer</button></div>
       </div>
       <div id="gexp-prev" class="hidden" style="margin-top:8px"></div>
@@ -776,6 +777,25 @@ button.big:active{transform:translateY(1px)}
 <script>
 (function(){
   var byId=function(x){return document.getElementById(x)};
+  // ===== Sélecteur d'heure en GRILLE de boutons (paquets 15 min) — partagé note rapide + Demandes =====
+  function tbGet(el){ return el?(el.getAttribute('data-v')||''):''; }
+  function tbSet(el,v){ if(!el)return; el.setAttribute('data-v',v||''); el.textContent=v?v.replace(':','h'):(el.getAttribute('data-ph')||'--'); el.classList.toggle('set',!!v); }
+  function openTimeGrid(anchor,cur,onPick){
+    var old=byId('gtp-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='gtp-pop'; pop.className='gtp';
+    var h=''; for(var H=0;H<24;H++)for(var M=0;M<60;M+=15){ var v=('0'+H).slice(-2)+':'+('0'+M).slice(-2); h+='<button type="button" data-v="'+v+'"'+(v===cur?' class="on"':'')+'>'+('0'+H).slice(-2)+'h'+('0'+M).slice(-2)+'</button>'; }
+    pop.innerHTML='<div class="gtp-grid">'+h+'</div>';
+    document.body.appendChild(pop);
+    var r=anchor.getBoundingClientRect(), pw=pop.offsetWidth, ph=pop.offsetHeight, sx=window.pageXOffset, sy=window.pageYOffset;
+    var left=Math.max(6+sx, Math.min(r.left+sx, sx+window.innerWidth-pw-6));
+    var top=(r.bottom+sy+4); if(r.bottom+ph+8>window.innerHeight && r.top-ph-4>0)top=r.top+sy-ph-4;
+    pop.style.left=left+'px'; pop.style.top=top+'px';
+    pop.querySelectorAll('button[data-v]').forEach(function(b){ b.addEventListener('mousedown',function(e){e.preventDefault();}); b.addEventListener('click',function(){ var val=b.getAttribute('data-v'); if(pop.parentNode)pop.parentNode.removeChild(pop); onPick(val); }); });
+    setTimeout(function(){ function h2(e){ if(!pop.contains(e.target)&&e.target!==anchor){ if(pop.parentNode)pop.parentNode.removeChild(pop); document.removeEventListener('click',h2); } } document.addEventListener('click',h2); },0);
+    var onb=pop.querySelector('button.on'); if(onb&&onb.scrollIntoView)onb.scrollIntoView({block:'center'});
+  }
+  // Branche un bouton .gtime sur la grille : clic -> grille -> data-v + callback
+  function bindTimeBtn(el,onPick){ if(!el)return; el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); openTimeGrid(el, tbGet(el), function(v){ tbSet(el,v); if(onPick)onPick(v); }); }); }
   var secs=['demandes','noterapide','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision'];
   document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
   // ===== Recherche globale (agents / sites / clients / missions) =====
@@ -925,18 +945,19 @@ button.big:active{transform:translateY(1px)}
       +'<div class="grid2"><label class="f"><div class="lab">Quand ?</div><select class="v-quand"><option value="date">Date précise</option><option value="asap">Dès que possible</option></select></label>'
       +'<label class="f v-datewrap"><div class="lab">Date de début</div><input type="date" class="v-date"></label></div>'
       +'<label class="chk"><input type="checkbox" class="v-h24"><span>🕓 <b>H24</b> (24h/24, en continu)</span></label>'
-      +'<div class="grid2 v-hours"><label class="f"><div class="lab">Heure de début</div><select class="v-tdeb">'+TOPTS+'</select></label>'
-      +'<label class="f"><div class="lab v-finlab">Heure de fin</div><select class="v-tfin">'+TOPTS+'</select></label></div>'
+      +'<div class="grid2 v-hours"><label class="f"><div class="lab">Heure de début</div><button type="button" class="gtime v-tdeb" data-ph="-- choisir --">-- choisir --</button></label>'
+      +'<label class="f"><div class="lab v-finlab">Heure de fin</div><button type="button" class="gtime v-tfin" data-ph="-- choisir --">-- choisir --</button></label></div>'
       +'<label class="chk v-arrwrap"><input type="checkbox" class="v-arr"><span>Fin à l\'arrivée du personnel (heure indicative)</span></label>'
       +'<label class="f"><div class="lab">Date de fin</div><input type="date" class="v-datefin"><div class="hint v-dfhint">Vide = même jour</div></label>'
       +'<div class="hint v-amp" style="margin:0"></div>';
     el.querySelectorAll('input,select').forEach(function(x){ var h=function(){vacRefresh(el);genText();}; x.addEventListener('input',h); x.addEventListener('change',h); });
+    el.querySelectorAll('.gtime').forEach(function(bt){ bindTimeBtn(bt,function(){ vacRefresh(el); genText(); }); });
     el.querySelector('.v-arr').addEventListener('change',function(){ el.querySelector('.v-finlab').textContent=this.checked?'Heure de fin (indicative)':'Heure de fin'; });
     el.querySelector('.v-del').addEventListener('click',function(){ if(document.querySelectorAll('#vacsList .vac').length>1){ el.remove(); renumVac(); genText(); } });
     return el;
   }
   function renumVac(){ var els=document.querySelectorAll('#vacsList .vac'); els.forEach(function(el,i){ el.querySelector('.vac-n').textContent='Vacation '+(i+1); el.querySelector('.v-del').style.visibility=els.length>1?'visible':'hidden'; }); }
-  function readVac(el){ return {quand:el.querySelector('.v-quand').value,h24:el.querySelector('.v-h24').checked,date:el.querySelector('.v-date').value,dateFin:el.querySelector('.v-datefin').value,deb:el.querySelector('.v-tdeb').value,fin:el.querySelector('.v-tfin').value,arr:el.querySelector('.v-arr').checked}; }
+  function readVac(el){ return {quand:el.querySelector('.v-quand').value,h24:el.querySelector('.v-h24').checked,date:el.querySelector('.v-date').value,dateFin:el.querySelector('.v-datefin').value,deb:tbGet(el.querySelector('.v-tdeb')),fin:tbGet(el.querySelector('.v-tfin')),arr:el.querySelector('.v-arr').checked}; }
   function vacRefresh(el){ var v=readVac(el); el.querySelector('.v-datewrap').classList.toggle('hidden',v.quand==='asap'); el.querySelector('.v-hours').classList.toggle('hidden',v.h24); el.querySelector('.v-arrwrap').classList.toggle('hidden',v.h24); el.querySelector('.v-dfhint').textContent=v.h24?'Vide = jusqu\'à nouvel ordre':'Vide = même jour'; el.querySelector('.v-amp').textContent=(!v.h24&&v.deb&&v.fin&&!v.arr)?('🕐 '+ampl(v.deb,v.fin)):''; }
   function addVac(){ var el=makeVac(); byId('vacsList').appendChild(el); renumVac(); return el; }
   byId('addVac').addEventListener('click',function(){ addVac(); genText(); });
@@ -3348,32 +3369,35 @@ button.big:active{transform:translateY(1px)}
     inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); doTranscribe(); } });
     inp.addEventListener('input',function(){ doTranscribe(); });
     document.querySelectorAll('.gexp-day[data-d]').forEach(function(b){ b.addEventListener('click',function(){ var iso=svcAddDays(impTodayISO(),+b.getAttribute('data-d')); gexpDate=(gexpDate===iso)?'':iso; document.querySelectorAll('.gexp-day[data-d]').forEach(function(x){ x.classList.toggle('on', x===b && !!gexpDate); }); doTranscribe(); }); });
-    if(byId('gexp-h24'))byId('gexp-h24').addEventListener('click',function(){ gexpH24=!gexpH24; this.classList.toggle('on',gexpH24); var pn=byId('gexp-h24panel'); if(gexpH24){ if(pn)pn.classList.remove('hidden'); } else { if(pn)pn.classList.add('hidden'); gexpH24End='';gexpH24H1='';gexpH24H2=''; } doTranscribe(); });
-    if(byId('gexp-h24apply'))byId('gexp-h24apply').addEventListener('click',function(){ gexpH24H1=byId('gexp-h24h1').value||''; gexpH24H2=byId('gexp-h24h2').value||''; gexpH24End=byId('gexp-h24date').value||''; byId('gexp-h24panel').classList.add('hidden'); doTranscribe(); });
+    if(byId('gexp-h24'))byId('gexp-h24').addEventListener('click',function(){ gexpH24=!gexpH24; this.classList.toggle('on',gexpH24); var pn=byId('gexp-h24panel'); if(gexpH24){ showPanelUnder('gexp-h24panel',this); } else { if(pn)pn.classList.add('hidden'); gexpH24End='';gexpH24H1='';gexpH24H2=''; } doTranscribe(); });
+    bindTimeBtn(byId('gexp-h24h1')); bindTimeBtn(byId('gexp-h24h2'));
+    if(byId('gexp-h24apply'))byId('gexp-h24apply').addEventListener('click',function(){ gexpH24H1=tbGet(byId('gexp-h24h1')); gexpH24H2=tbGet(byId('gexp-h24h2')); gexpH24End=byId('gexp-h24date').value||''; byId('gexp-h24panel').classList.add('hidden'); doTranscribe(); });
     function asapClear(){ gexpAsapMode='';gexpAsapH='';gexpAsapDate=''; if(byId('gexp-asap-h'))byId('gexp-asap-h').value=''; if(byId('gexp-asap-date'))byId('gexp-asap-date').value=''; document.querySelectorAll('.gexp-asapmode').forEach(function(x){x.classList.remove('on');}); if(byId('gexp-asap-zone'))byId('gexp-asap-zone').classList.add('hidden'); if(byId('gexp-asap-datewrap'))byId('gexp-asap-datewrap').style.display='none'; }
-    if(byId('gexp-asap'))byId('gexp-asap').addEventListener('click',function(){ gexpAsap=!gexpAsap; this.classList.toggle('on',gexpAsap); var pn=byId('gexp-asappanel'); if(gexpAsap){ if(pn)pn.classList.remove('hidden'); } else { if(pn)pn.classList.add('hidden'); asapClear(); } doTranscribe(); });
+    if(byId('gexp-asap'))byId('gexp-asap').addEventListener('click',function(){ gexpAsap=!gexpAsap; this.classList.toggle('on',gexpAsap); var pn=byId('gexp-asappanel'); if(gexpAsap){ showPanelUnder('gexp-asappanel',this); } else { if(pn)pn.classList.add('hidden'); asapClear(); } doTranscribe(); });
     var asapModeSel='';
     document.querySelectorAll('.gexp-asapmode').forEach(function(b){ b.addEventListener('click',function(){ asapModeSel=b.getAttribute('data-am'); document.querySelectorAll('.gexp-asapmode').forEach(function(x){x.classList.toggle('on',x===b);}); byId('gexp-asap-zone').classList.remove('hidden'); byId('gexp-asap-datewrap').style.display=(asapModeSel==='date')?'':'none'; if(asapModeSel==='date'&&byId('gexp-asap-date')&&!byId('gexp-asap-date').value)byId('gexp-asap-date').value=(typeof svcAddDays==='function')?svcAddDays(impTodayISO(),1):''; }); });
-    if(byId('gexp-asap-apply'))byId('gexp-asap-apply').addEventListener('click',function(){ if(!asapModeSel){ alert('Choisis d\'abord : Aujourd\'hui à…, Demain à…, ou À une date…'); return; } gexpAsapMode=asapModeSel; gexpAsapH=byId('gexp-asap-h').value||''; gexpAsapDate=(asapModeSel==='date')?(byId('gexp-asap-date').value||''):''; byId('gexp-asappanel').classList.add('hidden'); doTranscribe(); });
+    bindTimeBtn(byId('gexp-asap-h'));
+    if(byId('gexp-asap-apply'))byId('gexp-asap-apply').addEventListener('click',function(){ if(!asapModeSel){ alert('Choisis d\'abord : Aujourd\'hui à…, Demain à…, ou À une date…'); return; } gexpAsapMode=asapModeSel; gexpAsapH=tbGet(byId('gexp-asap-h')); gexpAsapDate=(asapModeSel==='date')?(byId('gexp-asap-date').value||''):''; byId('gexp-asappanel').classList.add('hidden'); doTranscribe(); });
     if(byId('gexp-agence'))byId('gexp-agence').addEventListener('click',function(){ gexpAgence=!gexpAgence; this.classList.toggle('on',gexpAgence); doTranscribe(); });
     function stripTimeTokens(s){ var toks=String(s||'').trim().split(/\s+/), out=[], skip=false; for(var i=0;i<toks.length;i++){ var t=toks[i]; if(!t)continue; if(skip){skip=false; continue;} if(t.toLowerCase()==='d'){ skip=true; continue; } if(/^\d{1,4}$/.test(t))continue; out.push(t); } return out.join(' '); }
     function vacNextDate(){ if(gexpVacs.length){ var last=gexpVacs[gexpVacs.length-1], base=last.dateFin||last.date; if(base&&typeof svcAddDays==='function')return svcAddDays(base, last.dateFin?0:1); } var R=parse(inp.value); return R.date||gexpDate||(typeof impTodayISO==='function'?impTodayISO():''); }
     function vacRenderList(){ var box=byId('gexp-vaclist'); if(!box)return; if(!gexpVacs.length){ box.innerHTML='<div class="sub" style="margin:0">Aucune vacation ajoutée pour l\'instant.</div>'; return; } box.innerHTML=gexpVacs.map(function(v,i){ return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--line)"><span style="flex:1"><b>Vacation '+(i+1)+'</b> : '+esc(vacLine(v))+'</span><button type="button" data-vacrm="'+i+'" style="width:28px;height:28px;padding:0">✕</button></div>'; }).join(''); box.querySelectorAll('[data-vacrm]').forEach(function(b){ b.onclick=function(){ gexpVacs.splice(+b.getAttribute('data-vacrm'),1); vacRenderList(); doTranscribe(); }; }); }
-    function vacFillForm(){ var R=parse(inp.value), dIso=R.date||gexpDate, HH=(gexpH1||gexpH2)?[gexpH1,gexpH2].filter(Boolean):R.hours; if(byId('gexp-vac-date'))byId('gexp-vac-date').value=dIso||vacNextDate(); if(byId('gexp-vac-datefin'))byId('gexp-vac-datefin').value=''; if(byId('gexp-vac-h1'))byId('gexp-vac-h1').value=HH[0]||''; if(byId('gexp-vac-h2'))byId('gexp-vac-h2').value=HH[1]||''; }
+    function vacFillForm(){ var R=parse(inp.value), dIso=R.date||gexpDate, HH=(gexpH1||gexpH2)?[gexpH1,gexpH2].filter(Boolean):R.hours; if(byId('gexp-vac-date'))byId('gexp-vac-date').value=dIso||vacNextDate(); if(byId('gexp-vac-datefin'))byId('gexp-vac-datefin').value=''; tbSet(byId('gexp-vac-h1'),HH[0]||''); tbSet(byId('gexp-vac-h2'),HH[1]||''); }
     if(byId('gexp-addvac'))byId('gexp-addvac').addEventListener('click',function(){
       var pn=byId('gexp-vacpanel'); if(!pn)return;
-      if(pn.classList.contains('hidden')){ vacFillForm(); vacRenderList(); pn.classList.remove('hidden'); } else pn.classList.add('hidden');
+      if(pn.classList.contains('hidden')){ vacFillForm(); vacRenderList(); showPanelUnder('gexp-vacpanel',this); } else pn.classList.add('hidden');
     });
     if(byId('gexp-vac-add'))byId('gexp-vac-add').addEventListener('click',function(){
-      var d=byId('gexp-vac-date').value||'', df=byId('gexp-vac-datefin').value||'', h1=byId('gexp-vac-h1').value||'', h2=byId('gexp-vac-h2').value||'';
+      var d=byId('gexp-vac-date').value||'', df=byId('gexp-vac-datefin').value||'', h1=tbGet(byId('gexp-vac-h1')), h2=tbGet(byId('gexp-vac-h2'));
       if(!(d||h1||h2)){ alert('Renseigne au moins une date ou des heures pour cette vacation.'); return; }
       gexpVacs.push({date:d,h1:h1,h2:h2,dateFin:df});
       // La 1re vacation « absorbe » les valeurs des rectangles (pour ne pas compter deux fois)
       gexpDate='';gexpH1='';gexpH2=''; document.querySelectorAll('.gexp-day[data-d]').forEach(function(x){x.classList.remove('on');}); gexpChip('gexp-h1btn',''); gexpChip('gexp-h2btn',''); var db=byId('gexp-datebtn'); if(db)db.classList.remove('on');
       // Prépare automatiquement la vacation suivante (jour d'après)
-      byId('gexp-vac-date').value=vacNextDate(); byId('gexp-vac-datefin').value=''; byId('gexp-vac-h1').value=''; byId('gexp-vac-h2').value='';
+      byId('gexp-vac-date').value=vacNextDate(); byId('gexp-vac-datefin').value=''; tbSet(byId('gexp-vac-h1'),''); tbSet(byId('gexp-vac-h2'),'');
       vacRenderList(); doTranscribe(); if(typeof flash==='function')flash(this,'✔ Vacation ajoutée — saisis la suivante ou clique Terminer');
     });
+    bindTimeBtn(byId('gexp-vac-h1')); bindTimeBtn(byId('gexp-vac-h2'));
     if(byId('gexp-vac-done'))byId('gexp-vac-done').addEventListener('click',function(){ byId('gexp-vacpanel').classList.add('hidden'); doTranscribe(); });
     if(byId('gexp-newdem'))byId('gexp-newdem').addEventListener('click',function(){
       if(!gexpHasCur()){ alert('Renseigne d\'abord une demande (client, ville, heures…), puis clique « ➕ Nouvelle demande » pour en préparer une autre.'); return; }
@@ -3384,7 +3408,7 @@ button.big:active{transform:translateY(1px)}
     if(byId('gexp-depfix'))byId('gexp-depfix').addEventListener('click',function(){ gexpDepart=(gexpDepart==='fixe')?'':'fixe'; this.classList.toggle('on',gexpDepart==='fixe'); byId('gexp-deparr').classList.remove('on'); doTranscribe(); });
     if(byId('gexp-deparr'))byId('gexp-deparr').addEventListener('click',function(){ gexpDepart=(gexpDepart==='arrivee')?'':'arrivee'; this.classList.toggle('on',gexpDepart==='arrivee'); byId('gexp-depfix').classList.remove('on'); doTranscribe(); });
     function gexpIns(tok){ var v=inp.value.replace(/\s+$/,''); inp.value=(v?v+' ':'')+tok; inp.focus(); }
-    window._gexpReset=function(){ gexpDate='';gexpH1='';gexpH2='';gexpH24=false;gexpAsap=false;gexpDepart='';gexpH24End='';gexpH24H1='';gexpH24H2='';gexpClient='';gexpSite='';gexpVille='';gexpVilleSel=null;gexpCP='';gexpAsapH='';gexpAsapDate='';gexpAsapMode='';gexpAgence=false;gexpVacs=[];lastDateIso=''; ['gexp-asap-h','gexp-asap-date'].forEach(function(id){var i=byId(id); if(i)i.value='';}); ['gexp-asap-zone'].forEach(function(id){var z=byId(id); if(z)z.classList.add('hidden');}); if(byId('gexp-asap-datewrap'))byId('gexp-asap-datewrap').style.display='none'; document.querySelectorAll('.gexp-day').forEach(function(x){ if(x.tagName!=='SELECT')x.classList.remove('on'); }); ['gexp-clientbtn','gexp-sitebtn','gexp-villebtn','gexp-cpbtn','gexp-h1btn','gexp-h2btn'].forEach(function(id){var b=byId(id); if(b){ b.classList.remove('on'); if(b.getAttribute('data-lbl'))b.textContent=b.getAttribute('data-lbl'); }}); ['gexp-datepanel','gexp-h24panel','gexp-asappanel','gexp-vacpanel'].forEach(function(id){var dp=byId(id); if(dp)dp.classList.add('hidden');}); ['gexp-vac-date','gexp-vac-datefin','gexp-vac-h1','gexp-vac-h2'].forEach(function(id){var i=byId(id); if(i)i.value='';}); };
+    window._gexpReset=function(){ gexpDate='';gexpH1='';gexpH2='';gexpH24=false;gexpAsap=false;gexpDepart='';gexpH24End='';gexpH24H1='';gexpH24H2='';gexpClient='';gexpSite='';gexpVille='';gexpVilleSel=null;gexpCP='';gexpAsapH='';gexpAsapDate='';gexpAsapMode='';gexpAgence=false;gexpVacs=[];lastDateIso=''; if(byId('gexp-asap-date'))byId('gexp-asap-date').value=''; ['gexp-asap-h','gexp-hh1','gexp-hh2','gexp-h24h1','gexp-h24h2','gexp-vac-h1','gexp-vac-h2'].forEach(function(id){tbSet(byId(id),'');}); ['gexp-asap-zone'].forEach(function(id){var z=byId(id); if(z)z.classList.add('hidden');}); if(byId('gexp-asap-datewrap'))byId('gexp-asap-datewrap').style.display='none'; document.querySelectorAll('.gexp-day').forEach(function(x){ if(x.tagName!=='SELECT')x.classList.remove('on'); }); ['gexp-clientbtn','gexp-sitebtn','gexp-villebtn','gexp-cpbtn','gexp-h1btn','gexp-h2btn'].forEach(function(id){var b=byId(id); if(b){ b.classList.remove('on'); if(b.getAttribute('data-lbl'))b.textContent=b.getAttribute('data-lbl'); }}); ['gexp-datepanel','gexp-h24panel','gexp-asappanel','gexp-vacpanel'].forEach(function(id){var dp=byId(id); if(dp)dp.classList.add('hidden');}); ['gexp-vac-date','gexp-vac-datefin'].forEach(function(id){var i=byId(id); if(i)i.value='';}); };
     function gexpChip(btnId,val){ var b=byId(btnId); if(!b)return; if(!b.getAttribute('data-lbl'))b.setAttribute('data-lbl',b.textContent); if(val){ b.classList.add('on'); b.textContent=val+' ▾'; } else { b.classList.remove('on'); b.textContent=b.getAttribute('data-lbl'); } }
     (function(){ var btn=byId('gexp-clientbtn'), dd=byId('gexp-clientdd'); if(!btn||!dd)return; var cs=(typeof CLIENTS!=='undefined'?CLIENTS.slice():[]); try{ (load('fkh_clients')||[]).forEach(function(c){ if(cs.indexOf(c)<0)cs.push(c); }); }catch(e){} cs.sort(); dd.innerHTML=cs.map(function(c){return '<div data-c="'+esc(c)+'">'+esc(c)+'</div>';}).join(''); btn.addEventListener('click',function(e){ e.stopPropagation(); dd.classList.toggle('hidden'); }); dd.querySelectorAll('div').forEach(function(d){ d.addEventListener('mousedown',function(e){e.preventDefault();}); d.addEventListener('click',function(){ gexpClient=d.getAttribute('data-c'); gexpChip('gexp-clientbtn',gexpClient); dd.classList.add('hidden'); doTranscribe(); }); }); document.addEventListener('click',function(e){ if(!dd.classList.contains('hidden') && e.target!==btn && !dd.contains(e.target))dd.classList.add('hidden'); }); })();
     (function(){ var btn=byId('gexp-sitebtn'), dd=byId('gexp-sitedd'); if(!btn||!dd)return;
@@ -3422,22 +3446,18 @@ button.big:active{transform:translateY(1px)}
       btn.addEventListener('click',function(e){ e.stopPropagation(); if(dd.classList.contains('hidden'))open(); else dd.classList.add('hidden'); });
       document.addEventListener('click',function(e){ if(!dd.classList.contains('hidden') && e.target!==btn && !dd.contains(e.target))dd.classList.add('hidden'); });
     })();
-    function gexpHourChip(btnId,ddId,label,setter,getter){ var btn=byId(btnId), dd=byId(ddId); if(!btn||!dd)return;
-      function open(){ dd.innerHTML='<div style="padding:8px;display:flex;gap:6px;align-items:center"><select class="gexp-hin" style="flex:1">'+gexp15Opts(getter()||'')+'</select><button type="button" class="ok gexp-happly" style="padding:4px 10px">✅</button></div>'; var hi=dd.querySelector('.gexp-hin'), ap=dd.querySelector('.gexp-happly');
-        function apply(){ var v=hi.value||''; setter(v); gexpChip(btnId, v?label+' '+v:''); dd.classList.add('hidden'); doTranscribe(); }
-        ap.addEventListener('mousedown',function(e){e.preventDefault();}); ap.addEventListener('click',apply);
-        hi.addEventListener('change',apply);
-        dd.classList.remove('hidden'); setTimeout(function(){hi.focus();},50);
-      }
-      btn.addEventListener('click',function(e){ e.stopPropagation(); if(dd.classList.contains('hidden'))open(); else dd.classList.add('hidden'); });
-      document.addEventListener('click',function(e){ if(!dd.classList.contains('hidden') && e.target!==btn && !dd.contains(e.target))dd.classList.add('hidden'); });
+    function gexpHourChip(btnId,ddId,label,setter,getter){ var btn=byId(btnId); if(!btn)return;
+      btn.addEventListener('click',function(e){ e.stopPropagation(); openTimeGrid(btn, getter()||'', function(v){ setter(v); gexpChip(btnId, v?label+' '+v:''); doTranscribe(); }); });
     }
     gexpHourChip('gexp-h1btn','gexp-h1dd','Début',function(v){gexpH1=v;},function(){return gexpH1;});
     gexpHourChip('gexp-h2btn','gexp-h2dd','Fin',function(v){gexpH2=v;},function(){return gexpH2;});
     // Applique en direct les champs Date précise (pas besoin de cliquer « Appliquer » — le but est d'aller vite)
-    function gexpDateLive(){ gexpDate=byId('gexp-date-in').value||''; gexpH1=byId('gexp-hh1').value||''; gexpH2=byId('gexp-hh2').value||''; gexpChip('gexp-h1btn',gexpH1?'Début '+gexpH1:''); gexpChip('gexp-h2btn',gexpH2?'Fin '+gexpH2:''); if(byId('gexp-datebtn'))byId('gexp-datebtn').classList.toggle('on', !!(gexpDate||gexpH1||gexpH2)); document.querySelectorAll('.gexp-day[data-d]').forEach(function(x){x.classList.remove('on');}); doTranscribe(); }
-    if(byId('gexp-datebtn'))byId('gexp-datebtn').addEventListener('click',function(){ var dp=byId('gexp-datepanel'); if(!dp)return; if(dp.classList.contains('hidden')){ dp.classList.remove('hidden'); if(byId('gexp-date-in')&&!byId('gexp-date-in').value){ byId('gexp-date-in').value=impTodayISO(); gexpDateLive(); } } else dp.classList.add('hidden'); });
-    ['gexp-date-in','gexp-hh1','gexp-hh2'].forEach(function(id){ var e=byId(id); if(e)e.addEventListener('change',gexpDateLive); });
+    // Affiche un panneau JUSTE sous le rectangle cliqué (collé à sa rangée)
+    function showPanelUnder(panelId, trigger){ var p=byId(panelId); if(!p)return; var row=trigger&&trigger.closest?trigger.closest('.gexp-row'):null; if(row&&row.parentNode)row.parentNode.insertBefore(p, row.nextSibling); p.classList.remove('hidden'); }
+    function gexpDateLive(){ gexpDate=byId('gexp-date-in').value||''; gexpH1=tbGet(byId('gexp-hh1')); gexpH2=tbGet(byId('gexp-hh2')); gexpChip('gexp-h1btn',gexpH1?'Début '+gexpH1:''); gexpChip('gexp-h2btn',gexpH2?'Fin '+gexpH2:''); if(byId('gexp-datebtn'))byId('gexp-datebtn').classList.toggle('on', !!(gexpDate||gexpH1||gexpH2)); document.querySelectorAll('.gexp-day[data-d]').forEach(function(x){x.classList.remove('on');}); doTranscribe(); }
+    if(byId('gexp-datebtn'))byId('gexp-datebtn').addEventListener('click',function(){ var dp=byId('gexp-datepanel'); if(!dp)return; if(dp.classList.contains('hidden')){ showPanelUnder('gexp-datepanel',this); if(byId('gexp-date-in')&&!byId('gexp-date-in').value){ byId('gexp-date-in').value=impTodayISO(); gexpDateLive(); } } else dp.classList.add('hidden'); });
+    if(byId('gexp-date-in'))byId('gexp-date-in').addEventListener('change',gexpDateLive);
+    bindTimeBtn(byId('gexp-hh1'),gexpDateLive); bindTimeBtn(byId('gexp-hh2'),gexpDateLive);
     if(byId('gexp-date-apply'))byId('gexp-date-apply').addEventListener('click',function(){ gexpDateLive(); byId('gexp-datepanel').classList.add('hidden'); });
     if(byId('gexp-date-cancel'))byId('gexp-date-cancel').addEventListener('click',function(){ byId('gexp-datepanel').classList.add('hidden'); });
     // ==== Réorganiser les rectangles par glisser-déposer (tactile + souris), mémorisé par appareil ====
