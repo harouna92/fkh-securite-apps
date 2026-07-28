@@ -3316,6 +3316,32 @@ button.big:active{transform:translateY(1px)}
   setInterval(function(){ if(typeof CLOUD!=='undefined'&&CLOUD.on&&typeof aiLoadDemandes==='function')aiLoadDemandes(); },60000);
   // Et une première fois ~4 s après le chargement (rattrapage immédiat à l'ouverture).
   setTimeout(function(){ if(typeof CLOUD!=='undefined'&&CLOUD.on&&typeof aiLoadDemandes==='function')aiLoadDemandes(); },4000);
+
+  // ===== Au clic sur un numéro (tout lien tel:) → proposer Appel normal / WhatsApp / SMS =====
+  (function(){
+    function waNum(raw){ var d=String(raw||'').replace(/[^\d+]/g,''); d=d.replace(/^\+/,''); if(d.indexOf('00')===0)d=d.slice(2); if(d.length===10&&d.charAt(0)==='0')d='33'+d.slice(1); else if(d.length===9)d='33'+d; return d; }
+    function closeMenu(){ var m=byId('call-choice'); if(m)m.parentNode.removeChild(m); }
+    if(!byId('cc-style')){ var st=document.createElement('style'); st.id='cc-style'; st.textContent='#call-choice .cc-opt{text-decoration:none;padding:10px 12px;border-radius:9px;display:flex;align-items:center;gap:10px;color:var(--txt,#e8eefc);font-weight:600;font-size:14px}#call-choice .cc-opt:hover{background:var(--panel2,#2a3446)}'; document.head.appendChild(st); }
+    document.addEventListener('click',function(e){
+      var a=e.target.closest?e.target.closest('a[href^="tel:"]'):null;
+      if(!a){ if(!(e.target.closest&&e.target.closest('#call-choice')))closeMenu(); return; }
+      e.preventDefault(); e.stopPropagation();
+      var num=a.getAttribute('href').replace(/^tel:/,''); var wa=waNum(num);
+      closeMenu();
+      var m=document.createElement('div'); m.id='call-choice';
+      m.style.cssText='position:fixed;z-index:99999;background:var(--panel,#1c2230);border:1px solid var(--line,#3a4257);border-radius:12px;box-shadow:0 10px 34px rgba(0,0,0,.55);padding:6px;display:flex;flex-direction:column;gap:3px;min-width:190px';
+      m.innerHTML='<div style="font-size:12px;color:var(--muted,#8aa);padding:5px 10px 3px;font-weight:700">'+esc(num)+'</div>'
+        +'<a href="tel:'+esc(num)+'" class="cc-opt">📞 Appel normal</a>'
+        +'<a href="https://wa.me/'+esc(wa)+'" target="_blank" rel="noopener" class="cc-opt">🟢 WhatsApp</a>'
+        +'<a href="sms:'+esc(num)+'" class="cc-opt">💬 SMS</a>';
+      document.body.appendChild(m);
+      var vw=window.innerWidth, vh=window.innerHeight, mw=m.offsetWidth, mh=m.offsetHeight;
+      var x=Math.min(e.clientX, vw-mw-8), y=Math.min(e.clientY+6, vh-mh-8);
+      m.style.left=Math.max(8,x)+'px'; m.style.top=Math.max(8,y)+'px';
+      m.querySelectorAll('.cc-opt').forEach(function(o){ o.addEventListener('click',function(){ setTimeout(closeMenu,60); }); });
+    }, true);
+    window.addEventListener('scroll',closeMenu,true); window.addEventListener('resize',closeMenu);
+  })();
   if(byId('sup-body'))byId('sup-body').addEventListener('click',function(e){
     var go=e.target.closest('.drill-go'); if(go){ var box0=byId('sup-drill'),ck=box0&&box0.getAttribute('data-cur'),gi=+go.getAttribute('data-idx'); var git=(SUP_DRILL&&SUP_DRILL[ck]&&SUP_DRILL[ck][gi]); drillGo(git); return; }
     var k=e.target.closest('[data-drill]'); if(!k)return; var key=k.getAttribute('data-drill'), box=byId('sup-drill'); if(!box)return; if(box.getAttribute('data-cur')===key){box.innerHTML='';box.removeAttribute('data-cur');return;} var list=(SUP_DRILL&&SUP_DRILL[key])||[]; box.setAttribute('data-cur',key); box.innerHTML='<div class="card" style="border:2px solid #6ea8fe"><div class="lab" style="margin:0 0 6px">🔎 '+list.length+' élément'+(list.length>1?'s':'')+' <span class="sub" style="font-weight:400">— clique une ligne pour aller la traiter</span></div>'+(list.length?'<div class="list">'+list.map(function(it,idx){ if(it.mat){ var ms=(typeof matState==='function')?matState(it.nom):{num:'',imp:false,env:false,recu:false}; return '<div class="it" style="flex-direction:column;align-items:stretch"><div class="fa-n">👤 '+esc(it.who||'—')+'</div><div class="acts" style="gap:6px;margin-top:4px;flex-wrap:wrap;align-items:center"><input class="mat-inp" data-nom="'+esc(it.nom||'')+'" value="'+esc(ms.num)+'" placeholder="n° matricule (7 chiffres)" inputmode="numeric" maxlength="7" style="width:180px"><button type="button" class="mat-save" data-nom="'+esc(it.nom||'')+'" style="font-size:12px">💾 Enregistrer</button><button type="button" class="mat-flag'+(ms.imp?' ok':'')+'" data-nom="'+esc(it.nom||'')+'" data-flag="imp" style="font-size:11px">🖨️ imprimé</button><button type="button" class="mat-flag'+(ms.env?' ok':'')+'" data-nom="'+esc(it.nom||'')+'" data-flag="env" style="font-size:11px">🚚 envoyé</button><button type="button" class="mat-flag'+(ms.recu?' ok':'')+'" data-nom="'+esc(it.nom||'')+'" data-flag="recu" style="font-size:11px">✅ reçu</button></div></div>'; } var cl=!!it.act; return '<div class="it'+(cl?' drill-go':'')+'" data-idx="'+idx+'"'+(cl?' style="cursor:pointer"':'')+'><div style="flex:1"><div class="fa-n">'+esc(it.who||'—')+'</div><div class="fa-d">'+esc(it.sub||'')+'</div></div>'+(cl?'<div style="align-self:center;color:#6ea8fe;font-size:12px;white-space:nowrap;margin-left:8px">'+esc(drillActLbl(it.act))+' ›</div>':'')+'</div>';}).join('')+'</div>':'<div class="sub" style="margin:0">Aucun élément.</div>')+'</div>'; if(box.scrollIntoView)box.scrollIntoView({behavior:'smooth',block:'nearest'}); });
