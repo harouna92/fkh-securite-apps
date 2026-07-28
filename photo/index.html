@@ -12,10 +12,14 @@
   h1{font-size:18px;margin:6px 0 2px}
   .sub{color:var(--muted);font-size:13px;margin:0 0 10px}
   .badge{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-weight:700;margin:4px 6px 4px 0}
-  video,canvas,#preview img{width:100%;border-radius:14px;background:#000;display:block}
+  video,canvas,#preview img{width:100%;max-height:46vh;object-fit:cover;border-radius:14px;background:#000;display:block}
   .btn{width:100%;padding:15px;border-radius:13px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:17px;font-weight:700;cursor:pointer;margin-top:10px}
   .btn.ok{background:var(--ok);border-color:var(--ok)}
   .btn.snap{background:var(--accent);border-color:var(--accent);color:#04122b}
+  /* Barre de capture toujours visible en bas, sans avoir à scroller */
+  #cam-actions{position:sticky;bottom:0;background:var(--bg);padding:8px 0 6px;z-index:5;box-shadow:0 -8px 12px -6px var(--bg)}
+  #done{display:none;text-align:center;padding:30px 10px}
+  #done .big-ok{font-size:44px;margin-bottom:6px}
   #msg{margin-top:12px;font-weight:600;text-align:center;min-height:22px}
   .err{color:var(--bad)} .good{color:#41d67f}
 </style>
@@ -28,10 +32,13 @@
   <video id="v" autoplay playsinline muted></video>
   <canvas id="c" style="display:none"></canvas>
   <div id="preview" style="display:none"></div>
-  <button class="btn snap" id="snap">📷 Prendre la photo</button>
-  <button class="btn ok" id="send" style="display:none">✅ Envoyer à l'agence</button>
-  <button class="btn" id="retry" style="display:none">🔄 Reprendre</button>
-  <div id="msg"></div>
+  <div id="cam-actions">
+    <button class="btn snap" id="snap">📷 Prendre la photo</button>
+    <button class="btn ok" id="send" style="display:none">✅ Envoyer à l'agence</button>
+    <button class="btn" id="retry" style="display:none">🔄 Reprendre</button>
+    <div id="msg"></div>
+  </div>
+  <div id="done"><div class="big-ok">✅</div><div style="font-size:18px;font-weight:700">Photo envoyée à l'agence</div><p class="sub" style="margin-top:8px">Merci ! Vous pouvez fermer cette page.</p></div>
 </div>
 <script>
 (function(){
@@ -74,7 +81,7 @@
     var base = mid ? ('appel/'+mid+'/'+(type==='controle'?'ctrl':type)) : (aid ? ('agent/'+aid+'/'+citySlug) : ('agent/'+type+'/'+safe+'/'+citySlug));
     var key = base+'/'+Date.now()+'.jpg';
     fetch(API+'/agent-photo?k='+encodeURIComponent(TOKEN)+'&key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'image/jpeg'},body:blob}).then(function(r){return r.json();}).then(function(j){
-      if(j&&j.ok){ msg.className='good'; msg.textContent='✅ Photo envoyée. Merci !'; send.style.display='none'; retry.textContent='📷 Prendre une autre photo'; if(stream)stream.getTracks().forEach(function(t){t.stop();}); }
+      if(j&&j.ok){ if(stream)stream.getTracks().forEach(function(t){t.stop();}); v.style.display='none'; prev.style.display='none'; document.getElementById('cam-actions').style.display='none'; document.getElementById('ctx').style.display='none'; document.getElementById('done').style.display='block'; setTimeout(function(){ try{ window.close(); }catch(e){} },1200); }
       else { send.disabled=false; send.textContent='✅ Envoyer à l\'agence'; msg.className='err'; msg.textContent='Échec : '+((j&&j.error)||'réessaie'); }
     }).catch(function(){ send.disabled=false; send.textContent='✅ Envoyer à l\'agence'; msg.className='err'; msg.textContent='Réseau indisponible, réessaie.'; });
   };
