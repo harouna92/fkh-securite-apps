@@ -156,7 +156,7 @@ button.big:active{transform:translateY(1px)}
 <div class="top">
   <div class="brand"><span class="dot"></span>GESTION</div>
   <div class="tabs" id="tabs">
-    <button data-s="demandes" class="on">🛡️ Demandes</button>
+    <button data-s="demandes" class="on">Demandes</button>
     <button data-s="noterapide">📝 Prise de note rapide</button>
     <button data-s="prise">Prise de service</button>
     <button data-s="fin">Fin de service</button>
@@ -246,16 +246,7 @@ button.big:active{transform:translateY(1px)}
     </div>
   </section>
   <section id="sec-demandes">
-    <div><h1>🛡️ Demandes</h1><p class="sub">Demandes de gardiennage · choisis ou écris · la ville remplit le code postal · les heures donnent la plage.</p></div>
-    <div class="card" style="border:2px solid var(--ok)">
-      <div class="lab" style="margin:0 0 6px">⚡ Capture express (pendant l'appel) — note en vrac, complète plus tard</div>
-      <textarea id="exp-text" placeholder="Tape ou dicte ce que tu entends : client, site, ville/CP, horaires, agent, n°, urgent…" style="min-height:82px;width:100%"></textarea>
-      <div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap;align-items:center">
-        <button type="button" id="exp-mic" title="Dictée vocale">🎤 Dicter</button>
-        <button type="button" class="big ok" id="exp-save" style="flex:1;min-width:160px">💾 Enregistrer dans Suivi (à compléter)</button>
-      </div>
-      <div id="exp-result" class="sub" style="margin:6px 0 0"></div>
-    </div>
+    <div><h1>Demandes</h1><p class="sub">Choisis ou écris · la ville remplit le code postal · les heures donnent la plage.</p></div>
     <div class="card">
       <button type="button" id="genr-toggle" class="big" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">🗓️ Générateur de missions récurrentes (planning fixe sur une période)</button>
       <div id="genr-form" class="hidden" style="margin-top:8px">
@@ -278,6 +269,7 @@ button.big:active{transform:translateY(1px)}
     <div class="card">
       <div class="grid2">
         <label class="f"><div class="lab">Client / donneur d'ordre</div><div class="cbx"><input id="client" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="client" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-client"></div></div></label>
+        <label class="f"><div class="lab">Prestation</div><div class="cbx"><input id="type" placeholder="Choisir ou écrire…" autocomplete="off"><button type="button" class="cbtn" data-for="type" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-type"></div></div></label>
       </div>
       <div class="grid2">
         <label class="f"><div class="lab">Type d'agent</div><div class="cbx"><input id="agent" placeholder="ADS, SSIAP, maître-chien…" autocomplete="off"><button type="button" class="cbtn" data-for="agent" tabindex="-1" aria-label="Ouvrir la liste">▾</button><div class="sugg hidden" id="sugg-agent"></div></div></label>
@@ -822,12 +814,13 @@ button.big:active{transform:translateY(1px)}
   }
   var CLIENTS=["SECURITAS","AQUILA","RANC DEVELOPPEMENT","SOTEL","GAMBRINUS","SAS BULLION","P2S","NEW ANGEL'S","FKH","COPS","ERYMA"];
   mkCombo('client',CLIENTS,'fkh_clients');
+  mkCombo('type',["Gardiennage","Ronde","Intervention sur alarme"],'fkh_presta');
   mkCombo('agent',["ADS","SSIAP","Maître-chien"],'fkh_agents');
   mkCombo('sitetype',["Magasin","Banque","Site professionnel"],'fkh_sites');
   // Heures (00–23) + minutes (pas de 5) — options réutilisées dans chaque vacation
   function pad2(n){return ('0'+n).slice(-2);}
-  var HOPTS='<option value="">--</option>', MOPTS='', TOPTS='<option value="">--</option>';
-  (function(){ for(var h=0;h<24;h++)HOPTS+='<option>'+pad2(h)+'</option>'; for(var m=0;m<60;m+=5)MOPTS+='<option>'+pad2(m)+'</option>'; for(var H=0;H<24;H++)for(var M=0;M<60;M+=15){ var v=pad2(H)+':'+pad2(M); TOPTS+='<option value="'+v+'">'+pad2(H)+'h'+pad2(M)+'</option>'; } })();
+  var HOPTS='<option value="">--</option>', MOPTS='';
+  (function(){ for(var h=0;h<24;h++)HOPTS+='<option>'+pad2(h)+'</option>'; for(var m=0;m<60;m+=5)MOPTS+='<option>'+pad2(m)+'</option>'; })();
   function hmv(deb,min){ return deb?(deb+':'+(min||'00')):''; }
   function ampl(s,e){ var a=toMin(s),b=toMin(e); if(a==null||b==null)return ''; var dur=b-a; if(dur<=0)dur+=1440; var h=Math.floor(dur/60),m=dur%60; return s+' → '+e+' · '+h+'h'+(m?pad2(m):'')+(b<=a?' (nuit)':''); }
   function duree(s,e){ var a=toMin(s),b=toMin(e); if(a==null||b==null)return ''; var dur=b-a; if(dur<=0)dur+=1440; var h=Math.floor(dur/60),m=dur%60; return h+'h'+(m?pad2(m):'')+(b<=a?' (nuit)':''); }
@@ -901,8 +894,8 @@ button.big:active{transform:translateY(1px)}
       +'<div class="grid2"><label class="f"><div class="lab">Quand ?</div><select class="v-quand"><option value="date">Date précise</option><option value="asap">Dès que possible</option></select></label>'
       +'<label class="f v-datewrap"><div class="lab">Date de début</div><input type="date" class="v-date"></label></div>'
       +'<label class="chk"><input type="checkbox" class="v-h24"><span>🕓 <b>H24</b> (24h/24, en continu)</span></label>'
-      +'<div class="grid2 v-hours"><label class="f"><div class="lab">Heure de début</div><select class="v-tdeb">'+TOPTS+'</select></label>'
-      +'<label class="f"><div class="lab v-finlab">Heure de fin</div><select class="v-tfin">'+TOPTS+'</select></label></div>'
+      +'<div class="grid2 v-hours"><label class="f"><div class="lab">Heure de début</div><div class="hm"><select class="v-dh">'+HOPTS+'</select><span>h</span><select class="v-dm">'+MOPTS+'</select></div></label>'
+      +'<label class="f"><div class="lab v-finlab">Heure de fin</div><div class="hm"><select class="v-fh">'+HOPTS+'</select><span>h</span><select class="v-fm">'+MOPTS+'</select></div></label></div>'
       +'<label class="chk v-arrwrap"><input type="checkbox" class="v-arr"><span>Fin à l\'arrivée du personnel (heure indicative)</span></label>'
       +'<label class="f"><div class="lab">Date de fin</div><input type="date" class="v-datefin"><div class="hint v-dfhint">Vide = même jour</div></label>'
       +'<div class="hint v-amp" style="margin:0"></div>';
@@ -912,7 +905,7 @@ button.big:active{transform:translateY(1px)}
     return el;
   }
   function renumVac(){ var els=document.querySelectorAll('#vacsList .vac'); els.forEach(function(el,i){ el.querySelector('.vac-n').textContent='Vacation '+(i+1); el.querySelector('.v-del').style.visibility=els.length>1?'visible':'hidden'; }); }
-  function readVac(el){ return {quand:el.querySelector('.v-quand').value,h24:el.querySelector('.v-h24').checked,date:el.querySelector('.v-date').value,dateFin:el.querySelector('.v-datefin').value,deb:el.querySelector('.v-tdeb').value,fin:el.querySelector('.v-tfin').value,arr:el.querySelector('.v-arr').checked}; }
+  function readVac(el){ return {quand:el.querySelector('.v-quand').value,h24:el.querySelector('.v-h24').checked,date:el.querySelector('.v-date').value,dateFin:el.querySelector('.v-datefin').value,deb:hmv(el.querySelector('.v-dh').value,el.querySelector('.v-dm').value),fin:hmv(el.querySelector('.v-fh').value,el.querySelector('.v-fm').value),arr:el.querySelector('.v-arr').checked}; }
   function vacRefresh(el){ var v=readVac(el); el.querySelector('.v-datewrap').classList.toggle('hidden',v.quand==='asap'); el.querySelector('.v-hours').classList.toggle('hidden',v.h24); el.querySelector('.v-arrwrap').classList.toggle('hidden',v.h24); el.querySelector('.v-dfhint').textContent=v.h24?'Vide = jusqu\'à nouvel ordre':'Vide = même jour'; el.querySelector('.v-amp').textContent=(!v.h24&&v.deb&&v.fin&&!v.arr)?('🕐 '+ampl(v.deb,v.fin)):''; }
   function addVac(){ var el=makeVac(); byId('vacsList').appendChild(el); renumVac(); return el; }
   byId('addVac').addEventListener('click',function(){ addVac(); genText(); });
@@ -953,7 +946,7 @@ button.big:active{transform:translateY(1px)}
     var L=[];
     if(on('client')&&byId('client').value.trim())L.push('Client : '+byId('client').value.trim());
     if(on('sitename')&&byId('sitename').value.trim())L.push('Site : '+byId('sitename').value.trim());
-    if(on('presta'))L.push('Prestation : Gardiennage');
+    if(on('presta')&&byId('type').value.trim())L.push('Prestation : '+byId('type').value.trim());
     if(on('agenttype')&&byId('agent').value.trim())L.push('Type d\'agent : '+byId('agent').value.trim());
     if(on('sitetype')&&byId('sitetype').value.trim())L.push('Type de site : '+byId('sitetype').value.trim());
     if(on('surv')&&byId('surv').value)L.push('Surveillance : '+byId('surv').value);
@@ -968,13 +961,13 @@ button.big:active{transform:translateY(1px)}
   }
   var added=[];
   function buildCurrent(){
-    var client=byId('client').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),sitename=byId('sitename').value.trim(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
+    var client=byId('client').value.trim(),type=byId('type').value.trim(),agent=byId('agent').value.trim(),siteT=byId('sitetype').value.trim(),surv=byId('surv').value,cp=byId('cp').value.trim(),sitename=byId('sitename').value.trim(),ag=byId('agents').value.trim(),ref=byId('ref').value.trim(),notes=byId('notes').value.trim();
     var vacs=readVacs();
-    if(!(client||agent||siteT||sel||byId('ville').value.trim()||notes||vacs.length||sitename)) return '';
+    if(!(client||type||agent||siteT||sel||byId('ville').value.trim()||notes||vacs.length||sitename)) return '';
     var L=[];
     if(client)L.push('Client : '+client);
     if(sitename)L.push('Site : '+sitename);
-    L.push('Prestation : Gardiennage');
+    if(type)L.push('Prestation : '+type);
     if(agent)L.push('Type d\'agent : '+agent);
     if(siteT)L.push('Type de site : '+siteT);
     if(surv)L.push('Surveillance : '+surv);
