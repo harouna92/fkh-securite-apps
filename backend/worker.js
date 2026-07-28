@@ -141,7 +141,7 @@ async function aiAnalyze(env, transcript) {
   const m = txt.match(/\{[\s\S]*\}/);
   try { return JSON.parse(m ? m[0] : txt); } catch (e) { return { is_demande: false, resume: "analyse illisible" }; }
 }
-async function aiScan(env, maxCalls) {
+async function aiScan(env, maxCalls, force) {
   if (!env.RINGOVER_API_KEY || !env.OPENAI_API_KEY || !env.ANTHROPIC_API_KEY) return { error: "keys_missing" };
   // Liste blanche stricte : on n'analyse QUE les numéros suivis (avec leur règle entrant/sortant)
   const numKey = (n) => { let d = String(n || "").replace(/\D/g, ""); if (d.length > 9) d = d.slice(-9); return d; };
@@ -162,8 +162,10 @@ async function aiScan(env, maxCalls) {
   let processed = 0, detected = 0;
   for (const c of calls.slice(0, maxCalls || 8)) {
     const id = String(c.cdr_id);
-    const exist = await env.DB.prepare("SELECT cdr_id FROM ai_calls WHERE cdr_id = ?").bind(id).first();
-    if (exist) continue;
+    if (!force) {
+      const exist = await env.DB.prepare("SELECT cdr_id FROM ai_calls WHERE cdr_id = ?").bind(id).first();
+      if (exist) continue;
+    }
     let data = {}, isDem = 0;
     try {
       const transcript = await aiTranscribe(env, c.record);
@@ -268,7 +270,8 @@ export default {
 
     // --- IA : scanner les appels entrants et récupérer les demandes détectées ---
     if (path === "/ai/scan" && request.method === "POST") {
-      const res = await aiScan(env, 8);
+      const force = url.searchParams.get("force") === "1";
+      const res = await aiScan(env, force ? 12 : 8, force);
       return json(res, res && res.error ? 502 : 200);
     }
     if (path === "/ai/demandes" && request.method === "GET") {
