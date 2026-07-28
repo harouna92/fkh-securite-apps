@@ -133,7 +133,7 @@ async function aiTranscribe(env, audioUrl) {
   return j.text || "";
 }
 async function aiAnalyze(env, transcript) {
-  const prompt = "Tu analyses la transcription d'un appel telephonique RECU par une societe de securite privee (gardiennage). Determine si l'appelant demande une prestation de GARDIENNAGE (surveillance, agent de securite, ADS, ronde...). Reponds UNIQUEMENT en JSON strict, sans aucun texte autour :\n{\"is_demande\": true|false, \"client\": \"\", \"ville\": \"\", \"cp\": \"\", \"site\": \"\", \"type_site\": \"\", \"date\": \"\", \"horaires\": \"\", \"nb_agents\": \"\", \"urgent\": true|false, \"resume\": \"\"}\n- is_demande=false si ce n'est pas une demande de gardiennage (facture, RH, autre).\n- Laisse \"\" si une info est absente. resume = 1 phrase courte.\n\nTranscription :\n\"\"\"" + transcript + "\"\"\"";
+  const prompt = "Tu analyses la transcription d'un appel telephonique d'une societe de securite privee (gardiennage). Determine s'il s'agit d'une (ou plusieurs) demande(s) de GARDIENNAGE (surveillance, agent de securite, ADS, ronde...). Reponds UNIQUEMENT en JSON strict, sans aucun texte autour :\n{\"is_demande\": true|false, \"resume\": \"\", \"demandes\": [{\"client\":\"\",\"ville\":\"\",\"cp\":\"\",\"site\":\"\",\"type_site\":\"\",\"nb_agents\":\"\",\"urgent\":true,\"vacations\":[{\"date\":\"\",\"horaires\":\"\"}]}]}\nREGLES ABSOLUES :\n- UNE demande = UN SEUL SITE. Si l'appel concerne PLUSIEURS SITES differents (villes ou lieux differents), cree PLUSIEURS entrees distinctes dans 'demandes', une par site. NE JAMAIS regrouper plusieurs sites dans une seule demande.\n- Pour un MEME site demande sur PLUSIEURS DATES : c'est UNE SEULE demande, mais mets UNE entree PAR DATE dans 'vacations', chaque entree = {date, horaires (creneau de cette date)}. NE PAS regrouper toutes les dates ensemble.\n- is_demande=false et demandes=[] si ce n'est pas une demande de gardiennage (facture, RH, autre).\n- Laisse \"\" si une info est absente. resume = 1 phrase courte resumant l'appel.\n\nTranscription :\n\"\"\"" + transcript + "\"\"\"";
   const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 500, messages: [{ role: "user", content: prompt }] }) });
   if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
   const j = await r.json();
@@ -167,7 +167,7 @@ async function aiScan(env, maxCalls) {
     let data = {}, isDem = 0;
     try {
       const transcript = await aiTranscribe(env, c.record);
-      if (transcript) { const an = await aiAnalyze(env, transcript); data = { ...an, transcript: transcript.slice(0, 2000), number: c.contact_number, start: c.start_time }; isDem = an.is_demande ? 1 : 0; }
+      if (transcript) { const an = await aiAnalyze(env, transcript); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], transcript: transcript.slice(0, 2000), number: c.contact_number, direction: c.direction, start: c.start_time }; isDem = (data.demandes.length) ? 1 : 0; }
       else data = { skip: "no_transcript" };
     } catch (e) { data = { error: String((e && e.message) || e) }; }
     await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(id, Date.now(), isDem, JSON.stringify(data)).run();
