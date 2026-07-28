@@ -848,8 +848,8 @@ button.big:active{transform:translateY(1px)}
   mkCombo('sitetype',["Magasin","Banque","Site professionnel"],'fkh_sites');
   // Heures (00–23) + minutes (pas de 5) — options réutilisées dans chaque vacation
   function pad2(n){return ('0'+n).slice(-2);}
-  var HOPTS='<option value="">--</option>', MOPTS='';
-  (function(){ for(var h=0;h<24;h++)HOPTS+='<option>'+pad2(h)+'</option>'; for(var m=0;m<60;m+=5)MOPTS+='<option>'+pad2(m)+'</option>'; })();
+  var HOPTS='<option value="">--</option>', MOPTS='', TOPTS='<option value="">--</option>';
+  (function(){ for(var h=0;h<24;h++)HOPTS+='<option>'+pad2(h)+'</option>'; for(var m=0;m<60;m+=5)MOPTS+='<option>'+pad2(m)+'</option>'; for(var H=0;H<24;H++)for(var M=0;M<60;M+=15){ var v=pad2(H)+':'+pad2(M); TOPTS+='<option value="'+v+'">'+pad2(H)+'h'+pad2(M)+'</option>'; } })();
   function hmv(deb,min){ return deb?(deb+':'+(min||'00')):''; }
   function ampl(s,e){ var a=toMin(s),b=toMin(e); if(a==null||b==null)return ''; var dur=b-a; if(dur<=0)dur+=1440; var h=Math.floor(dur/60),m=dur%60; return s+' → '+e+' · '+h+'h'+(m?pad2(m):'')+(b<=a?' (nuit)':''); }
   function duree(s,e){ var a=toMin(s),b=toMin(e); if(a==null||b==null)return ''; var dur=b-a; if(dur<=0)dur+=1440; var h=Math.floor(dur/60),m=dur%60; return h+'h'+(m?pad2(m):'')+(b<=a?' (nuit)':''); }
@@ -872,12 +872,14 @@ button.big:active{transform:translateY(1px)}
   function quickPick(name){byId('ville').value=name;byId('sugg').classList.add('hidden');fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(name)+'&fields=nom,code,departement,region,centre,codesPostaux,population&boost=population&limit=1').then(function(r){return r.json();}).then(function(list){if(list&&list[0])pick(list[0]);}).catch(function(){});}
   // ===== Liste EXHAUSTIVE des communes de France (embarquée communes.json, recherche locale) =====
   var COMMUNES=null, COMMUNES_IDX=null;
-  function commNorm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,' ').replace(/\s+/g,' ').trim(); }
+  function commNorm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,' ').replace(/\bste\b/g,'sainte').replace(/\bst\b/g,'saint').replace(/\s+/g,' ').trim(); }
   (function loadCommunes(){ try{ fetch('communes.json').then(function(r){return r.json();}).then(function(a){ if(Array.isArray(a)&&a.length){ COMMUNES=a; COMMUNES_IDX=a.map(function(row){return commNorm(row[0]);}); } }).catch(function(){}); }catch(e){} })();
   function commToDept(cp){ cp=String(cp||'').replace(/\D/g,''); if(cp.length>=2){ return (cp.slice(0,2)==='97'||cp.slice(0,2)==='98')?cp.slice(0,3):cp.slice(0,2); } return ''; }
   function commDeptNom(code){ if(typeof DEPTS!=='undefined'&&DEPTS){ for(var i=0;i<DEPTS.length;i++)if(DEPTS[i].code===code)return DEPTS[i].nom; } return ''; }
   function commObj(row){ var cp=row[1]||'',dep=commToDept(cp); return { nom:row[0], codesPostaux:[cp], centre:{coordinates:[row[3],row[2]]}, departement:{code:dep,nom:commDeptNom(dep)} }; }
-  function commSearch(q,limit){ if(!COMMUNES)return null; var nq=commNorm(q); if(!nq)return []; limit=limit||25; var pref=[],sub=[]; for(var i=0;i<COMMUNES_IDX.length;i++){ var p=COMMUNES_IDX[i].indexOf(nq); if(p===0){ pref.push(i); } else if(p>0){ if(sub.length<300)sub.push(i); } if(pref.length>800)break; } pref.sort(function(a,b){ return COMMUNES_IDX[a].length-COMMUNES_IDX[b].length; }); return pref.concat(sub).slice(0,limit).map(function(i){return commObj(COMMUNES[i]);}); }
+  function commSearch(q,limit){ if(!COMMUNES)return null; var nq=commNorm(q); if(!nq)return []; limit=limit||25; var pref=[],sub=[]; for(var i=0;i<COMMUNES_IDX.length;i++){ var p=COMMUNES_IDX[i].indexOf(nq); if(p===0){ pref.push(i); } else if(p>0){ if(sub.length<300)sub.push(i); } if(pref.length>800)break; }
+    if(!pref.length&&!sub.length){ var words=nq.split(' ').filter(Boolean); if(words.length){ for(var j=0;j<COMMUNES_IDX.length&&sub.length<limit;j++){ var ok=true; for(var w=0;w<words.length;w++){ if(COMMUNES_IDX[j].indexOf(words[w])<0){ ok=false; break; } } if(ok)sub.push(j); } } }
+    pref.sort(function(a,b){ return COMMUNES_IDX[a].length-COMMUNES_IDX[b].length; }); return pref.concat(sub).slice(0,limit).map(function(i){return commObj(COMMUNES[i]);}); }
   function commByCP(cp,limit){ if(!COMMUNES)return null; cp=String(cp||'').replace(/\D/g,''); if(!cp)return []; limit=limit||25; var out=[]; for(var i=0;i<COMMUNES.length&&out.length<limit;i++){ if(String(COMMUNES[i][1]||'').indexOf(cp)===0)out.push(commObj(COMMUNES[i])); } return out; }
 
   function search(q){var loc=commSearch(q,25); if(loc){var box=byId('sugg');if(!loc.length){box.classList.add('hidden');return;}box.innerHTML='';loc.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+esc(c.nom)+'</span> <span class="cp">'+esc(cp)+'</span>';d.onclick=function(){pick(c);};box.appendChild(d);});box.classList.remove('hidden');return;} fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(q)+'&fields=nom,code,departement,region,centre,codesPostaux,population&boost=population&limit=25').then(function(r){return r.json();}).then(function(list){if(!Array.isArray(list)||!list.length){byId('sugg').classList.add('hidden');return;}var box=byId('sugg');box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+c.nom+'</span> <span class="cp">'+cp+'</span>';d.onclick=function(){pick(c);};box.appendChild(d);});box.classList.remove('hidden');}).catch(function(){byId('sugg').classList.add('hidden');});}
@@ -923,8 +925,8 @@ button.big:active{transform:translateY(1px)}
       +'<div class="grid2"><label class="f"><div class="lab">Quand ?</div><select class="v-quand"><option value="date">Date précise</option><option value="asap">Dès que possible</option></select></label>'
       +'<label class="f v-datewrap"><div class="lab">Date de début</div><input type="date" class="v-date"></label></div>'
       +'<label class="chk"><input type="checkbox" class="v-h24"><span>🕓 <b>H24</b> (24h/24, en continu)</span></label>'
-      +'<div class="grid2 v-hours"><label class="f"><div class="lab">Heure de début</div><div class="hm"><select class="v-dh">'+HOPTS+'</select><span>h</span><select class="v-dm">'+MOPTS+'</select></div></label>'
-      +'<label class="f"><div class="lab v-finlab">Heure de fin</div><div class="hm"><select class="v-fh">'+HOPTS+'</select><span>h</span><select class="v-fm">'+MOPTS+'</select></div></label></div>'
+      +'<div class="grid2 v-hours"><label class="f"><div class="lab">Heure de début</div><select class="v-tdeb">'+TOPTS+'</select></label>'
+      +'<label class="f"><div class="lab v-finlab">Heure de fin</div><select class="v-tfin">'+TOPTS+'</select></label></div>'
       +'<label class="chk v-arrwrap"><input type="checkbox" class="v-arr"><span>Fin à l\'arrivée du personnel (heure indicative)</span></label>'
       +'<label class="f"><div class="lab">Date de fin</div><input type="date" class="v-datefin"><div class="hint v-dfhint">Vide = même jour</div></label>'
       +'<div class="hint v-amp" style="margin:0"></div>';
@@ -934,7 +936,7 @@ button.big:active{transform:translateY(1px)}
     return el;
   }
   function renumVac(){ var els=document.querySelectorAll('#vacsList .vac'); els.forEach(function(el,i){ el.querySelector('.vac-n').textContent='Vacation '+(i+1); el.querySelector('.v-del').style.visibility=els.length>1?'visible':'hidden'; }); }
-  function readVac(el){ return {quand:el.querySelector('.v-quand').value,h24:el.querySelector('.v-h24').checked,date:el.querySelector('.v-date').value,dateFin:el.querySelector('.v-datefin').value,deb:hmv(el.querySelector('.v-dh').value,el.querySelector('.v-dm').value),fin:hmv(el.querySelector('.v-fh').value,el.querySelector('.v-fm').value),arr:el.querySelector('.v-arr').checked}; }
+  function readVac(el){ return {quand:el.querySelector('.v-quand').value,h24:el.querySelector('.v-h24').checked,date:el.querySelector('.v-date').value,dateFin:el.querySelector('.v-datefin').value,deb:el.querySelector('.v-tdeb').value,fin:el.querySelector('.v-tfin').value,arr:el.querySelector('.v-arr').checked}; }
   function vacRefresh(el){ var v=readVac(el); el.querySelector('.v-datewrap').classList.toggle('hidden',v.quand==='asap'); el.querySelector('.v-hours').classList.toggle('hidden',v.h24); el.querySelector('.v-arrwrap').classList.toggle('hidden',v.h24); el.querySelector('.v-dfhint').textContent=v.h24?'Vide = jusqu\'à nouvel ordre':'Vide = même jour'; el.querySelector('.v-amp').textContent=(!v.h24&&v.deb&&v.fin&&!v.arr)?('🕐 '+ampl(v.deb,v.fin)):''; }
   function addVac(){ var el=makeVac(); byId('vacsList').appendChild(el); renumVac(); return el; }
   byId('addVac').addEventListener('click',function(){ addVac(); genText(); });
