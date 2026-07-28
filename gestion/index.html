@@ -1406,7 +1406,7 @@ button.big:active{transform:translateY(1px)}
     function nm(x){ var mm=x.match(/(\d{1,2})\s*[hH:]\s*(\d{0,2})/); return mm?(('0'+mm[1]).slice(-2)+':'+(mm[2]?('0'+mm[2]).slice(-2):'00')):''; }
     return { mheure: t[0]?nm(t[0]):'', mfin: t[1]?nm(t[1]):'' };
   }
-  function svExtractVacations(x){
+  function svExtractRaw(x){
     var out=[];
     if(x && Array.isArray(x.vacations) && x.vacations.length){
       x.vacations.forEach(function(v){ var hor=v.horaires||((v.h1&&v.h2)?(v.h1+' → '+v.h2):(v.h1||v.h2||'')); var ph=parseHoraires(hor); out.push({dateLabel:(v.date||''), horLabel:hor, mdate:frDateToISO(v.date||''), mheure:ph.mheure, mfin:ph.mfin}); });
@@ -1420,6 +1420,21 @@ button.big:active{transform:translateY(1px)}
     if(dl||hl){ var ph2=parseHoraires(hl); out.push({dateLabel:dl.replace(/^\s*Date\s*:\s*/i,'').trim(), horLabel:hl.replace(/^\s*Horaires\s*:\s*/i,'').trim(), mdate:frDateToISO(dl), mheure:ph2.mheure, mfin:ph2.mfin}); }
     return out;
   }
+  // Découpage par défaut : un créneau > 12h est coupé en tranches de 12h (ex. 08h→04h = 20h → 08h-20h + 20h-04h ; H24 → 2×12h). ≤ 12h reste tel quel.
+  function expandVac12h(v){
+    var S=(v.mheure!=null&&v.mheure!=='')?toMin(v.mheure):null, E=(v.mfin!=null&&v.mfin!=='')?toMin(v.mfin):null;
+    if(S==null||E==null)return [v];
+    if(E<=S)E+=1440; var dur=E-S; if(dur<=720)return [v];
+    var out=[], baseISO=v.mdate||'';
+    for(var cs=S; cs<E; cs+=720){ var ce=Math.min(cs+720,E), dayOff=Math.floor(cs/1440);
+      var md=(baseISO&&typeof svcAddDays==='function')?svcAddDays(baseISO,dayOff):baseISO;
+      var h1=hmMin(cs), h2=hmMin(ce);
+      var dlab=(dayOff===0&&v.dateLabel)?v.dateLabel:(md?md.split('-').reverse().join('/'):(v.dateLabel||''));
+      out.push({dateLabel:dlab, horLabel:h1+' → '+h2, mdate:md, mheure:h1, mfin:h2});
+    }
+    return out;
+  }
+  function svExtractVacations(x){ var raw=svExtractRaw(x); var out=[]; raw.forEach(function(v){ expandVac12h(v).forEach(function(w){ out.push(w); }); }); return out; }
   function svSplitIntoVacations(base, vac){
     var now=Date.now(), gid=base.id, tot=vac.length;
     var siteLbl=(base.siteAgent||base.site||base.titre||'Mission');
