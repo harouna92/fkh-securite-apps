@@ -2287,7 +2287,8 @@ button.big:active{transform:translateY(1px)}
     (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.statut!=='validee'||!m.agentId)return; if(TEN_F.client&&m.client!==TEN_F.client)return; var mn=(typeof toMin==='function')?toMin(m.mheure):null,h=(mn!=null)?Math.floor(mn/60):null,isDay=(h!=null&&h>=8&&h<20); if(TEN_F.sl==='jour'&&h!=null&&!isDay)return; if(TEN_F.sl==='nuit'&&h!=null&&isDay)return; var d=m.mdate||''; if(!TEN_F.allDates){ if(!d)return; if(TEN_F.from&&d<TEN_F.from)return; if(TEN_F.to&&d>TEN_F.to)return; } var a=(typeof faById==='function')?faById(m.agentId):null; if(!a||!a.nom)return; _allowed[tnorm(a.nom)]=1; if(!_planned[a.id]||(d&&d<_planned[a.id].d0))_planned[a.id]={a:a,d0:d||_today}; });
     agents=agents.filter(function(c){return _allowed[tnorm(c.Agent)];});
     var stale=agents.filter(function(c){var d=ctrlDays(c['Date contrôle']);return d!=null&&d>14;});
-    var never=[]; (FA||[]).forEach(function(a){if(a.nom&&!agentCtrl(a.nom)&&_allowed[tnorm(a.nom)])never.push(a.nom);});
+    // « Jamais contrôlés » = TOUS les agents de la fiche jamais contrôlés (indépendant du filtre 7 j — c'est une vue de gestion globale, avec recherche par nom dans le drill).
+    var never=[]; (FA||[]).forEach(function(a){if(a.nom&&!agentCtrl(a.nom))never.push(a.nom);});
     // ---- Tableau de bord visuel ----
     var complet=agents.filter(function(c){return String(c['Statut tenue']||'').toLowerCase().indexOf('incomplet')<0;}).length;
     var incomplet=agents.length-complet;
@@ -2399,9 +2400,11 @@ button.big:active{transform:translateY(1px)}
     var _noLink=list.length&&list[0]&&list[0].noLink;
     box.innerHTML='<div class="card" style="border:2px solid #6ea8fe;margin:0">'
       +'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 6px"><div class="lab" style="margin:0">🔎 '+list.length+' '+(_noLink?'ligne'+(list.length>1?'s':''):'agent'+(list.length>1?'s':'')+' — clique un nom pour corriger ici')+'</div><button type="button" class="tdrill-back" style="font-size:12px">↩︎ Retour aux vues</button></div>'
+      +((!_noLink&&list.length>5)?'<input type="text" class="tdrill-search" placeholder="🔎 filtrer par nom d\'agent…" style="width:100%;margin:0 0 6px;padding:6px 8px">':'')
       +(list.length?'<div class="list">'+list.map(function(it,idx){ if(it.noLink)return '<div class="it"><div style="flex:1"><span style="font-weight:700">'+esc(it.who||'—')+'</span><div class="fa-d">'+esc(it.sub||'')+'</div></div></div>'; return '<div class="tdrow"><div class="it tdrill-head" data-idx="'+idx+'" style="cursor:pointer"><div style="flex:1"><div class="fa-n">👤 '+esc(it.who||'—')+'</div><div class="fa-d">'+esc(it.sub||'')+'</div></div><div style="align-self:center;color:#6ea8fe;font-size:16px;margin-left:6px">▾</div></div><div class="tdrill-panel hidden" data-idx="'+idx+'" style="padding:4px 6px 8px"></div></div>'; }).join('')+'</div>':'<div class="sub" style="margin:0">Aucun.</div>')
       +'</div>';
     var bk=box.querySelector('.tdrill-back'); if(bk)bk.onclick=function(){ box.innerHTML=''; box.removeAttribute('data-cur'); };
+    var sf=box.querySelector('.tdrill-search'); if(sf)sf.oninput=function(){ var q=this.value.toLowerCase(); box.querySelectorAll('.tdrow').forEach(function(row){ var nm=row.querySelector('.fa-n'); row.style.display=(!q||(nm&&nm.textContent.toLowerCase().indexOf(q)>=0))?'':'none'; }); };
     box.querySelectorAll('.tdrill-head').forEach(function(h){ h.onclick=function(){ var idx=+h.getAttribute('data-idx'),it=list[idx],pan=box.querySelector('.tdrill-panel[data-idx="'+idx+'"]'); if(!pan||!it)return; if(!pan.classList.contains('hidden')){ pan.classList.add('hidden'); return; } box.querySelectorAll('.tdrill-panel').forEach(function(p){p.classList.add('hidden');}); pan.innerHTML=tenFixPanel(key,it.who); pan.classList.remove('hidden'); tenWireFix(pan,it.who); }; });
     if(box.scrollIntoView)box.scrollIntoView({behavior:'smooth',block:'nearest'});
   });
