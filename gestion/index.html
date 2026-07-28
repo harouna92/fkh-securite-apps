@@ -3426,8 +3426,8 @@ button.big:active{transform:translateY(1px)}
     // Flux guidé H24 : heure début → heure fin → proposer une date de fin (autre jour)
     function h24Flow(anchor){
       openTimeGrid(anchor, gexpH24H1||'', function(a){ gexpH24H1=a; tbSet(byId('gexp-h24h1'),a); doTranscribe();
-        openTimeGrid(anchor, gexpH24H2||'', function(b){ gexpH24H2=b; tbSet(byId('gexp-h24h2'),b); doTranscribe();
-          openLoopPop(anchor, function(){ openDatePop(anchor, gexpH24End||impTodayISO(), function(d){ gexpH24End=d||''; doTranscribe(); }); }, null, '📅 Fin un autre jour');
+        openDatePop(anchor, gexpH24End||impTodayISO(), function(d){ gexpH24End=d||''; doTranscribe();
+          openTimeGrid(anchor, gexpH24H2||'', function(b){ gexpH24H2=b; tbSet(byId('gexp-h24h2'),b); doTranscribe(); });
         });
       });
     }
