@@ -183,6 +183,28 @@ export default {
       } catch (e) { return json({ error: "ringover_fetch" }, 502); }
     }
 
+    // --- Ringover : diagnostic — quels champs renvoie l'API (enregistrement ? transcription ?) ---
+    if (path === "/ringover/probe" && request.method === "GET") {
+      if (!env.RINGOVER_API_KEY) return json({ error: "no_key" }, 500);
+      try {
+        const r = await fetch("https://public-api.ringover.com/v2/calls?limit_count=5", { headers: { Authorization: env.RINGOVER_API_KEY } });
+        if (!r.ok) return json({ error: "ringover", status: r.status }, 502);
+        const j = await r.json();
+        const list = j.call_list || [];
+        const sample = list[0] || null;
+        // Cherche un appel qui a un enregistrement pour repérer les champs
+        const withRec = list.find((c) => c.record || c.record_url || c.recording || c.transcription || c.transcript) || null;
+        return json({
+          ok: true,
+          fields: sample ? Object.keys(sample) : [],
+          hasRecordField: sample ? ("record" in sample || "record_url" in sample || "recording" in sample) : false,
+          hasTranscriptField: sample ? ("transcription" in sample || "transcript" in sample) : false,
+          sampleWithRecord: withRec,
+          sample,
+        });
+      } catch (e) { return json({ error: "fetch" }, 502); }
+    }
+
     // --- Lecture des changements depuis un horodatage ---
     if (path === "/state" && request.method === "GET") {
       const since = parseInt(url.searchParams.get("since") || "0", 10) || 0;
