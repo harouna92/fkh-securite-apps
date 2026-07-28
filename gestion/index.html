@@ -635,7 +635,7 @@ button.big:active{transform:translateY(1px)}
         <div id="csg-list" style="margin-top:10px"></div>
       </div>
     </div>
-    <div id="sa-alert" style="position:fixed;right:12px;bottom:14px;z-index:59;max-width:340px;max-height:62vh;overflow:auto;background:var(--panel);border:2px solid var(--bad);border-radius:12px;padding:10px 12px;box-shadow:0 6px 24px rgba(0,0,0,.45);display:none"></div>
+    <div id="sa-alert" style="position:fixed;right:8px;bottom:10px;z-index:59;max-width:190px;max-height:42vh;overflow:auto;background:var(--panel);border:1.5px solid var(--bad);border-radius:9px;padding:5px 7px;font-size:11px;box-shadow:0 4px 16px rgba(0,0,0,.4);display:none"></div>
     <div id="sa-body"></div>
     <div style="display:none">
       <div id="th-lateBadge" class="th-late-badge" style="display:none"></div>
@@ -3015,11 +3015,10 @@ button.big:active{transform:translateY(1px)}
     if(!due.length){ box.style.display='none'; box.innerHTML=''; return; }
     due.sort(function(a,b){return b.dmin-a.dmin;});
     box.style.display='block';
-    box.innerHTML='<div style="font-weight:800;margin-bottom:4px">🔔 '+due.length+' appel'+(due.length>1?'s':'')+' à faire maintenant</div>'+due.slice(0,5).map(function(o,i){
-      var c=o.c, tit=c.querySelector('.fa-n')?c.querySelector('.fa-n').cloneNode(true):null; if(tit){var tg=tit.querySelector('.sa-tag'); if(tg)tg.remove();}
+    box.innerHTML='<div style="font-weight:800;margin-bottom:2px;font-size:11px">🔔 '+due.length+' à faire</div>'+due.slice(0,6).map(function(o,i){
+      var c=o.c, titTxt=(c.querySelector('.fa-n')?c.querySelector('.fa-n').textContent:'').replace(/\s+/g,' ').trim().slice(0,40);
       var lvl=o.dmin>=10?'⛔':(o.dmin>=4.5?'🔴':'🟡');
-      var ctx=c.querySelector('.fa-d')?c.querySelector('.fa-d').innerHTML:'';
-      return '<div style="border-top:1px solid var(--line);padding-top:6px;margin-top:6px"><div style="font-weight:600">'+lvl+' '+(tit?tit.innerHTML:'')+'</div><div class="fa-d" style="font-size:12px;line-height:1.6">'+ctx+'</div><button class="ok sa-alertdone" data-idx="'+i+'" style="margin-top:5px">✅ Fait</button></div>';
+      return '<div style="border-top:1px solid var(--line);padding-top:3px;margin-top:3px;display:flex;align-items:center;gap:5px"><span style="flex:1;font-size:10.5px;line-height:1.3">'+lvl+' '+esc(titTxt)+'</span><button class="ok sa-alertdone" data-idx="'+i+'" style="font-size:10px;padding:2px 6px;flex:0 0 auto">✅</button></div>';
     }).join('');
     box.querySelectorAll('.sa-alertdone').forEach(function(b){ b.onclick=function(){ var cb=due[+b.getAttribute('data-idx')].c.querySelector('.sa-done,.csg-done'); if(cb){cb.checked=true; cb.dispatchEvent(new Event('change',{bubbles:true}));} }; });
   }
