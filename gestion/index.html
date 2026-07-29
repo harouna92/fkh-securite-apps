@@ -969,12 +969,14 @@ button.big:active{transform:translateY(1px)}
       h+=sec('🏢 Clients',clients,function(c){ var ctel=CT[c]||''; var call=ctel?'<a class="gs-call call" href="tel:'+esc(String(ctel).replace(/\s/g,''))+'" title="Appeler '+esc(ctel)+'" style="float:right;text-decoration:none;font-weight:700">📞 '+esc(ctel)+'</a>':''; return '<div class="gs-row" data-t="client" data-v="'+esc(c)+'" style="padding:7px 12px;cursor:pointer;border-top:1px solid var(--line)">'+call+'🏢 '+esc(c)+(ctel?'':' <span class="sub">(pas de n°)</span>')+'</div>'; });
       if(!h)h='<div class="sub" style="padding:10px 12px;margin:0">Aucun résultat pour « '+esc(q)+' » dans la base.</div>';
       else h=(isQ?'':'<div class="sub" style="padding:6px 12px 0;margin:0">'+(agents.length+sites.length+clients.length)+' résultat(s) — clique pour ouvrir</div>')+h;
+      h+='<div style="padding:9px 12px;border-top:1px solid var(--line);text-align:center"><button class="gs-ai" data-q="'+esc(q)+'" style="font-size:12px;padding:6px 13px;cursor:pointer;background:var(--panel2);color:var(--ink);border:1px solid var(--brand,#3b6ef5);border-radius:9px">🤖 Pas trouvé ? Demander à l\'IA <span style="color:var(--muted)">(petit coût)</span></button></div>';
       box.innerHTML=h; box.classList.remove('hidden');
       box.querySelectorAll('.gs-row').forEach(function(r){ r.onclick=function(ev){ if(ev&&ev.target&&ev.target.closest&&ev.target.closest('.gs-call'))return; var t=r.getAttribute('data-t'),v=r.getAttribute('data-v'); hide(); inp.value='';
         if(t==='agent'){ goTab('fiche'); var fs=byId('fa-search'); if(fs){ fs.value=v; fs.dispatchEvent(new Event('input',{bubbles:true})); if(fs.scrollIntoView)fs.scrollIntoView({behavior:'smooth',block:'center'}); } }
         else { goTab('services'); if(byId('svc-from'))byId('svc-from').value=''; if(byId('svc-to'))byId('svc-to').value=''; var sq=byId('svc-q'); if(sq){ sq.value=v; sq.dispatchEvent(new Event('input',{bubbles:true})); } if(typeof renderServices==='function')renderServices(); }
       }; });
       box.querySelectorAll('.gs-print').forEach(function(bp){ bp.onclick=function(ev){ if(ev){ev.preventDefault();ev.stopPropagation();} svcQueryPrint(bp.getAttribute('data-q')||q); }; });
+      box.querySelectorAll('.gs-ai').forEach(function(bai){ bai.onclick=function(ev){ if(ev){ev.preventDefault();ev.stopPropagation();} var qq=bai.getAttribute('data-q')||q; hide(); inp.value=''; if(typeof window._askAI==='function')window._askAI(qq); }; });
     }
     var tmr=null; inp.addEventListener('input',function(){ clearTimeout(tmr); var q=inp.value; tmr=setTimeout(function(){render(q);},150); });
     inp.addEventListener('focus',function(){ if(inp.value.trim().length>=2)render(inp.value); });
@@ -2470,6 +2472,8 @@ button.big:active{transform:translateY(1px)}
     byId('ask-send').addEventListener('click',send);
     document.querySelectorAll('#ask-ov .ask-tabs button').forEach(function(b){ b.addEventListener('click',function(){ setCanal(b.getAttribute('data-c')); }); });
     byId('ask-full').addEventListener('click',function(e){ e.preventDefault(); close(); var btn=document.querySelector('#tabs button[data-s="assistant"]'); if(btn)btn.click(); });
+    // Déclencheur externe : la barre de recherche envoie une question à l'IA à la demande (coût sur clic seulement).
+    window._askAI=function(text){ open(); setCanal('analyse'); if(typeof CLOUD==='undefined'||!CLOUD.on){ byId('ask-status').textContent='🔌 Connecte-toi d\'abord pour utiliser l\'IA.'; return; } byId('ask-txt').value=text||''; if((text||'').trim())send(); };
   })();
 
   var TEN_DRILL={};
