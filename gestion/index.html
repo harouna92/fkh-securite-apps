@@ -138,6 +138,10 @@ button.big:active{transform:translateY(1px)}
 #notif-badge.nb-o{background:#e08600}
 #notif-badge.nb-r{background:#e5322d;animation:nbblink 1s steps(1,end) infinite}
 @keyframes nbblink{50%{opacity:.2}}
+#rech-bar{position:fixed;left:9px;bottom:9px;z-index:88;display:none;align-items:center;gap:7px;padding:8px 13px;border-radius:22px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.32);border:none}
+#rech-bar.rb-g{background:#1a9e5c}
+#rech-bar.rb-o{background:#e08600}
+#rech-bar.rb-r{background:#e5322d;animation:nbblink 1s steps(1,end) infinite}
 .notif-ov{display:none;position:fixed;inset:0;z-index:130;background:rgba(0,0,0,.55);align-items:flex-start;justify-content:center;padding:36px 14px;overflow:auto}
 .notif-ov.show{display:flex}
 .notif-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:440px;width:100%;padding:16px;box-shadow:0 14px 44px rgba(0,0,0,.45)}
@@ -201,6 +205,7 @@ button.big:active{transform:translateY(1px)}
 
 <button type="button" id="logout-fab" title="Se déconnecter" aria-label="Se déconnecter">🔓 Déconnexion</button>
 <button type="button" id="notif-bell" title="Notifications" aria-label="Notifications">🔔<span id="notif-badge"></span></button>
+<button type="button" id="rech-bar" title="Missions en recherche d'agent — cliquer pour les traiter"></button>
 <div class="notif-ov" id="notif-ov">
   <div class="notif-box">
     <div class="notif-hd"><span>🔔 Notifications</span><button type="button" id="notif-close" aria-label="Fermer">✕</button></div>
@@ -3919,9 +3924,10 @@ button.big:active{transform:translateY(1px)}
     if(NOTIF.knownRech===null){ NOTIF.knownRech={}; rechIds.forEach(function(id){NOTIF.knownRech[id]=1;}); }
     else rechIds.forEach(function(id){ if(!NOTIF.knownRech[id]){ NOTIF.knownRech[id]=1; if(NOTIF.cfg.cats.nouvelle_demande&&notifCanFire()){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){m=SUIVI[i];break;} notifFire({cat:'nouvelle_demande',key:id,title:'🆕 Nouvelle demande',body:(m&&m.titre?m.titre.slice(0,60):'Nouvelle demande')+((m&&m.client)?' — '+m.client:''),go:'suivi'}); } } });
     Object.keys(NOTIF.knownRech).forEach(function(id){ if(rechIds.indexOf(id)<0)delete NOTIF.knownRech[id]; });
-    NOTIF.primed=true; notifBadge(badge);
+    NOTIF.primed=true; notifBadge(badge); rechBar();
   }
   function notifBadge(n){ var b=byId('notif-badge'); if(!b)return; b.classList.remove('nb-g','nb-o','nb-r'); if(n>0){ b.textContent=n>99?'99+':n; b.style.display='block'; b.classList.add(n>=40?'nb-r':(n>=10?'nb-o':'nb-g')); } else b.style.display='none'; }
+  function rechBar(){ var el=byId('rech-bar'); if(!el)return; var n=0; try{ SUIVI.forEach(function(m){ if(m.statut==='recherche')n++; }); }catch(_){} el.classList.remove('rb-g','rb-o','rb-r'); if(n>0){ el.style.display='inline-flex'; el.textContent='🔍 '+n+' mission'+(n>1?'s':'')+' en recherche'; el.classList.add(n>=5?'rb-r':(n>2?'rb-o':'rb-g')); } else el.style.display='none'; }
   function notifRenderPanel(){
     var st=byId('notif-status'), en=byId('notif-enable'), on=byId('notif-on'), snd=byId('notif-sound'), box=byId('notif-ov').querySelector('.notif-box'), p=notifPerm();
     if(st){ st.textContent = p==='unsupported'?'⚠️ Cet appareil / navigateur ne gère pas les notifications.' : p==='granted'?'✅ Autorisées sur cet appareil.' : p==='denied'?'🚫 Bloquées dans les réglages du navigateur — réactive-les pour ce site.' : '🔔 À autoriser : clique le bouton ci-dessous.'; }
@@ -3978,6 +3984,7 @@ button.big:active{transform:translateY(1px)}
     if(byId('notif-n2-btn'))byId('notif-n2-btn').addEventListener('click',notifN2Subscribe);
     if(byId('notif-n2-test'))byId('notif-n2-test').addEventListener('click',function(){ var tb=this, res=byId('notif-n2-testres'); if(typeof CLOUD==='undefined'||!CLOUD.on){ if(res)res.textContent='🔌 Connecte-toi d\'abord.'; return; } tb.disabled=true; if(res)res.textContent='Envoi du test…'; fetch(CLOUD.base+'/push/test',{method:'POST',headers:cloudHdr()}).then(function(r){return r.json();}).then(function(j){ tb.disabled=false; if(res)res.textContent=(j&&j.ok)?('✅ Test envoyé à '+(j.sent!=null?j.sent:'tous les')+' appareil'+((j.sent==null||j.sent>1)?'s':'')+' abonné'+((j.sent==null||j.sent>1)?'s':'')+'. Ferme l\'appli sur le téléphone : la notification doit arriver.'):'❌ Échec, réessaie.'; }).catch(function(){ tb.disabled=false; if(res)res.textContent='❌ Serveur injoignable.'; }); });
     byId('notif-bell').addEventListener('click',function(){ notifRenderPanel(); notifN2Status(); byId('notif-ov').classList.add('show'); });
+    if(byId('rech-bar'))byId('rech-bar').addEventListener('click',function(){ var btn=document.querySelector('#tabs button[data-s="suivi"]'); if(btn)btn.click(); });
     byId('notif-close').addEventListener('click',function(){ byId('notif-ov').classList.remove('show'); });
     byId('notif-ov').addEventListener('click',function(e){ if(e.target===this)this.classList.remove('show'); });
     byId('notif-enable').addEventListener('click',function(){ if(!('Notification' in window)){ notifRenderPanel(); return; } Notification.requestPermission().then(function(){ if(notifPerm()==='granted'&&!NOTIF.cfg.on){ NOTIF.cfg.on=true; notifSaveCfg(); } notifRenderPanel(); notifScan(); try{ new Notification('🔔 Notifications activées',{body:'Tu recevras les alertes ici quand l\'appli est ouverte.'}); }catch(e){} }); });
