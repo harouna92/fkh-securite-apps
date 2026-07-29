@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b35</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b36</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -1318,23 +1318,29 @@ button.big:active{transform:translateY(1px)}
   function waNum(tel){ var d=String(tel||'').replace(/\D/g,''); if(!d)return ''; if(d.charAt(0)==='0')d='33'+d.slice(1); else if(d.slice(0,2)==='33'){} else if(d.length===9)d='33'+d; return d; }
   // Modèle de message agent : PERMANENT (fkh_msg_tpl, variables {client} {ville} {quand}). L'édition dans la zone d'envoi = PONCTUELLE (it._nmsg).
   var DEF_MSG_TPL='Bonjour, FKH SÉCURITÉ. Mission : {details}. Êtes-vous disponible ? Merci de me rappeler.';
-  var MSG_VARS=[{k:'client',lbl:'Client'},{k:'site',lbl:'Site'},{k:'ville',lbl:'Ville'},{k:'quand',lbl:'Date/heure'}];
+  var MSG_VARS=[{k:'client',lbl:'Client'},{k:'ville',lbl:'Ville'},{k:'site',lbl:'Site'},{k:'date',lbl:'Date'},{k:'hdebut',lbl:'Heure début'},{k:'hfin',lbl:'Heure fin'}];
+  var _JOURS_L=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'], _JOURS_C=['DIM','LUN','MAR','MER','JEU','VEN','SAM'];
+  function msgDayName(iso,fmt){ if(!iso||fmt==='none')return ''; var d=new Date(iso+'T12:00:00'); if(isNaN(d.getTime()))return ''; var i=d.getDay(); return fmt==='long'?_JOURS_L[i]:_JOURS_C[i]; }
   function msgTplLoad(){ var s=null; try{s=JSON.parse(localStorage.getItem('fkh_msg_tpl')||'null');}catch(e){} return (s&&typeof s==='string'&&s.trim())?s:DEF_MSG_TPL; }
-  // Choix PERMANENT des variables à inclure dans le message (cases à cocher).
-  function msgVarsLoad(){ var d={client:true,site:false,ville:true,quand:true}, s=null; try{s=JSON.parse(localStorage.getItem('fkh_msg_vars')||'null');}catch(e){} if(s&&typeof s==='object'&&!Array.isArray(s)){ MSG_VARS.forEach(function(v){ if(typeof s[v.k]==='boolean')d[v.k]=s[v.k]; }); } return d; }
-  function nearGroupMsg(it){ var when='';
+  // Choix PERMANENT des variables à inclure dans le message (cases à cocher) + format du jour (_dayfmt : court/long/none).
+  function msgVarsLoad(){ var d={client:true,ville:true,site:true,date:true,hdebut:true,hfin:true,_dayfmt:'court'}, s=null; try{s=JSON.parse(localStorage.getItem('fkh_msg_vars')||'null');}catch(e){} if(s&&typeof s==='object'&&!Array.isArray(s)){ MSG_VARS.forEach(function(v){ if(typeof s[v.k]==='boolean')d[v.k]=s[v.k]; }); if(s._dayfmt==='court'||s._dayfmt==='long'||s._dayfmt==='none')d._dayfmt=s._dayfmt; } return d; }
+  function nearGroupMsg(it){
     var v0=(typeof svExtractRaw==='function')?((svExtractRaw(it)||[])[0]||null):null;
-    if(v0&&v0.mdate){ when=v0.mdate.split('-').reverse().join('/')+(v0.mheure?' '+v0.mheure:'')+(v0.mfin?'→'+v0.mfin:''); }
-    else if(v0&&(v0.mheure||v0.horLabel)){ when=(v0.mheure||'')+(v0.mfin?'→'+v0.mfin:'')||v0.horLabel; }
-    else if(it.mdate){ when=it.mdate.split('-').reverse().join('/')+(it.mheure?' '+it.mheure:'')+(it.mfin?'→'+it.mfin:''); }
-    else if(it.mheure){ when=it.mheure+(it.mfin?'→'+it.mfin:''); }
-    var cfg=msgVarsLoad(), site=(it.site||it.siteAgent||'');
-    var det=[]; if(cfg.client&&it.client)det.push(it.client); if(cfg.site&&site)det.push(site); if(cfg.ville&&it.ville)det.push(it.ville); if(cfg.quand&&when)det.push(when);
+    var mdate=(v0&&v0.mdate)||it.mdate||'', mheure=(v0&&v0.mheure)||it.mheure||'', mfin=(v0&&v0.mfin)||it.mfin||'';
+    var cfg=msgVarsLoad(), site=(it.site||it.siteAgent||it.titre||'');
+    var dateStr=''; if(mdate){ var pp=mdate.split('-'), dn=msgDayName(mdate,cfg._dayfmt); dateStr=(dn?dn+' ':'')+(pp[2]+'/'+pp[1]); } else if(v0&&v0.dateLabel){ dateStr=v0.dateLabel; }
+    var det=[];
+    if(cfg.client&&it.client)det.push(it.client);
+    if(cfg.ville&&it.ville)det.push(it.ville);
+    if(cfg.site&&site)det.push(site);
+    if(cfg.date&&dateStr)det.push(dateStr);
+    if(cfg.hdebut&&cfg.hfin&&mheure&&mfin)det.push(mheure+'→'+mfin);
+    else { if(cfg.hdebut&&mheure)det.push(mheure); if(cfg.hfin&&mfin)det.push(mfin); }
     var detStr=det.join(' · '), t=msgTplLoad();
-    // Les variables cochées vont TOUJOURS dans le message : dans le repère {details} s'il existe, sinon en tête. Peu importe que la variable soit déjà dans le texte permanent ou pas.
+    // Les variables cochées vont TOUJOURS dans le message : repère {details} s'il existe, sinon en tête.
     if(/\{details\}/.test(t)){ t=t.replace(/\{details\}/g,detStr); }
-    else { t=t.replace(/\{client\}|\{site\}|\{ville\}|\{quand\}/g,'').replace(/[ \t]{2,}/g,' ').trim(); if(detStr)t=detStr+(t?'\n'+t:''); }
-    t=t.replace(/\{client\}|\{site\}|\{ville\}|\{quand\}/g,'');
+    else { t=t.replace(/\{client\}|\{site\}|\{ville\}|\{quand\}|\{date\}/g,'').replace(/[ \t]{2,}/g,' ').trim(); if(detStr)t=detStr+(t?'\n'+t:''); }
+    t=t.replace(/\{client\}|\{site\}|\{ville\}|\{quand\}|\{date\}/g,'');
     return t.replace(/[ \t]{2,}/g,' ').replace(/ +([.,!?])/g,'$1').replace(/:\s*\./g,'.').replace(/\s+·\s*$/,'').replace(/\n{3,}/g,'\n\n').trim(); }
   // Traçabilité des contacts d'une demande (qui a déjà été appelé / a reçu un message) — visible par tous, pour travailler en parallèle sans doublon.
   function opNow(){ try{ var o=load('fkh_operateurs'), t=impTodayISO(); return (o&&!Array.isArray(o)&&o[t])||''; }catch(e){ return ''; } }
@@ -1374,7 +1380,7 @@ button.big:active{transform:translateY(1px)}
     var waBtns=selAgents.map(function(o){ var n=waNum((o.a.tels&&o.a.tels[0])||o.a.tel); return n?('<button data-act="nwa" data-id="'+it.id+'" data-aid="'+o.a.id+'" style="background:#25d366;border-color:#25d366;color:#062e16;font-weight:600">🟢 '+esc(o.a.nom||'agent')+'</button>'):('<span style="color:var(--muted);font-size:12px;align-self:center">'+esc(o.a.nom||'agent')+' (pas de n°)</span>'); }).join(' ');
     var groupBar=list.length?('<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px">'
       +'<div class="hm" style="justify-content:space-between;flex-wrap:wrap;gap:6px"><b style="font-size:13px">📤 Envoi groupé — '+selN+' sélectionné'+(selN>1?'s':'')+'</b><span><button data-act="nselall" data-id="'+it.id+'">Tout cocher</button> <button data-act="nselnone" data-id="'+it.id+'">Aucun</button></span></div>'
-      +(selN?('<div class="hint" style="margin:4px 0 3px">Variables à inclure <b>(permanent)</b> : '+MSG_VARS.map(function(v){ return '<label style="display:inline-flex;align-items:center;gap:3px;margin:0 10px 3px 0;font-size:12px;cursor:pointer"><input type="checkbox" data-msgvar="'+v.k+'" data-id="'+it.id+'"'+(msgVarsLoad()[v.k]?' checked':'')+' style="width:15px;height:15px;padding:0;margin:0">'+v.lbl+'</label>'; }).join('')+'</div>'
+      +(selN?('<div class="hint" style="margin:4px 0 3px">Variables à inclure <b>(permanent)</b> : '+MSG_VARS.map(function(v){ return '<label style="display:inline-flex;align-items:center;gap:3px;margin:0 10px 3px 0;font-size:12px;cursor:pointer"><input type="checkbox" data-msgvar="'+v.k+'" data-id="'+it.id+'"'+(msgVarsLoad()[v.k]?' checked':'')+' style="width:15px;height:15px;padding:0;margin:0">'+v.lbl+'</label>'; }).join('')+' &nbsp;·&nbsp; Jour : <select data-dayfmt="1" data-id="'+it.id+'" style="width:auto;padding:2px 5px;font-size:12px">'+[['court','LUN'],['long','lundi'],['none','(aucun)']].map(function(o){return '<option value="'+o[0]+'"'+(msgVarsLoad()._dayfmt===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></div>'
           +'<textarea data-nmsg="'+it.id+'" rows="3" style="width:100%;margin:2px 0 6px;font-size:13px;border-radius:8px">'+esc(gmsg)+'</textarea>'
           +'<div class="hint" style="margin:0 0 6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">✍️ Ce texte ne vaut que pour <b>cet envoi</b>. <button data-act="tpledit" data-id="'+it.id+'" style="font-size:11px;padding:3px 8px">✏️ Modifier le modèle permanent</button></div>'
           +(it._tpledit?('<div class="pickp" style="border:1.5px solid #6ea8fe;margin:0 0 8px"><div class="lab" style="color:#6ea8fe;margin:0 0 3px">✏️ Modèle permanent — s\'applique à TOUS les prochains envois</div><textarea data-tpl="'+it.id+'" rows="3" style="width:100%;font-size:13px;border-radius:8px">'+esc(msgTplLoad())+'</textarea><div class="hint" style="margin:3px 0">Écris ton texte fixe et place <b>{details}</b> là où tu veux la liste des variables cochées (Client · Site · Ville · Date/heure). Ces cases se gèrent juste au-dessus.</div><div class="acts"><button class="ok" data-act="tplsave" data-id="'+it.id+'">💾 Enregistrer le modèle</button><button data-act="tplreset" data-id="'+it.id+'">↺ Défaut</button><button data-act="tplcancel" data-id="'+it.id+'">Annuler</button></div></div>'):'')
@@ -1867,6 +1873,7 @@ button.big:active{transform:translateY(1px)}
     var t2=e.target;
     if(t2.classList&&t2.classList.contains('ctc-st')){ var csid=t2.getAttribute('data-id'), csaid=t2.getAttribute('data-aid'), csit=null,cs; for(cs=0;cs<SUIVI.length;cs++)if(SUIVI[cs].id===csid){csit=SUIVI[cs];break;} if(csit){ if(!csit.contacts)csit.contacts={}; var cc=csit.contacts[csaid]||{}; cc.st=t2.value; if(t2.value)cc.c=true; cc.by=(typeof opNow==='function'?opNow():'')||cc.by||''; cc.at=Date.now(); csit.contacts[csaid]=cc; if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); } return; }
     if(t2.hasAttribute&&t2.hasAttribute('data-msgvar')){ var vk=t2.getAttribute('data-msgvar'), cfg=(typeof msgVarsLoad==='function')?msgVarsLoad():{}; cfg[vk]=t2.checked; save('fkh_msg_vars',cfg); var mvid=t2.getAttribute('data-id'), it3=null,mv; for(mv=0;mv<SUIVI.length;mv++)if(SUIVI[mv].id===mvid){it3=SUIVI[mv];break;} if(it3){ delete it3._nmsg; var card3=t2.closest('.sv'), ta3=card3?card3.querySelector('textarea[data-nmsg]'):null; if(ta3)ta3.value=nearGroupMsg(it3); else renderSuivi(); } return; }
+    if(t2.hasAttribute&&t2.hasAttribute('data-dayfmt')){ var dcfg=(typeof msgVarsLoad==='function')?msgVarsLoad():{}; dcfg._dayfmt=t2.value; save('fkh_msg_vars',dcfg); var dvid=t2.getAttribute('data-id'), it4=null,mw; for(mw=0;mw<SUIVI.length;mw++)if(SUIVI[mw].id===dvid){it4=SUIVI[mw];break;} if(it4){ delete it4._nmsg; var card4=t2.closest('.sv'), ta4=card4?card4.querySelector('textarea[data-nmsg]'):null; if(ta4)ta4.value=nearGroupMsg(it4); else renderSuivi(); } return; }
     if(t2.hasAttribute&&t2.hasAttribute('data-nsel')){ var sid=t2.getAttribute('data-nsel'),sit=null,si; for(si=0;si<SUIVI.length;si++)if(SUIVI[si].id===sid){sit=SUIVI[si];break;} if(sit){ sit._nsel=sit._nsel||{}; var said=t2.getAttribute('data-aid'); if(t2.checked)sit._nsel[said]=true; else delete sit._nsel[said]; renderSuivi(); } return; }
     var id=t2.getAttribute('data-nrad')||t2.getAttribute('data-nads')||t2.getAttribute('data-nvoit'); if(!id)return;
     var it=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;} if(!it)return;
