@@ -921,11 +921,12 @@ button.big:active{transform:translateY(1px)}
       else if(/semaine/.test(t)){ from=today; to=addD(today,6); win='cette semaine'; }
       var cli='', clis={}; (typeof CLIENTS!=='undefined'?CLIENTS:[]).forEach(function(c){clis[c]=1;}); (load('fkh_clients')||[]).forEach(function(c){ if(typeof c==='string')clis[c]=1; else if(c&&c.nom)clis[c.nom]=1; }); Object.keys(clis).forEach(function(c){ var nc=norm(c); if(nc&&nc.length>=3&&t.indexOf(nc)>=0)cli=c; });
       var wantUnassigned=/(pas|non|sans)\s*(encore\s*)?(affect|d[' ]?agent|agent)/.test(t);
-      var miss=(typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){ if(m.statut!=='validee')return false; var d=m.mdate||''; if(!d||d<from||d>to)return false; if(cli&&norm(m.client||'')!==norm(cli))return false; if(wantUnassigned&&m.agentId)return false; return true; });
+      var slice=/nuit/.test(t)?'nuit':((/journ|de jour|\bjour\b/.test(t))?'jour':'');
+      var miss=(typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){ if(m.statut!=='validee')return false; var d=m.mdate||''; if(!d||d<from||d>to)return false; if(cli&&norm(m.client||'')!==norm(cli))return false; if(wantUnassigned&&m.agentId)return false; if(slice&&m.mheure&&typeof toMin==='function'){ var _h=toMin(m.mheure); if(_h!=null){ var isDay=_h>=480&&_h<1200; if(slice==='jour'&&!isDay)return false; if(slice==='nuit'&&isDay)return false; } } return true; });
       miss.sort(function(a,b){ return (a.mdate||'')<(b.mdate||'')?-1:1; });
-      return {from:from,to:to,win:win,cli:cli,wantUnassigned:wantUnassigned,miss:miss};
+      return {from:from,to:to,win:win,cli:cli,slice:slice,wantUnassigned:wantUnassigned,miss:miss};
     }
-    function svcQueryHtml(q){ var r=svcQuery(q); var title='🤖 '+(r.wantUnassigned?'Sites planifiés NON affectés':'Missions planifiées')+' · '+r.win+(r.cli?' · '+esc(r.cli):'');
+    function svcQueryHtml(q){ var r=svcQuery(q); var title='🤖 '+(r.wantUnassigned?'Sites planifiés NON affectés':'Missions planifiées')+' · '+r.win+(r.cli?' · '+esc(r.cli):'')+(r.slice?' · '+(r.slice==='jour'?'☀️ journée':'🌙 nuit'):'');
       if(!r.miss.length)return '<div class="lab" style="margin:8px 10px 2px;color:#6ea8fe">'+title+'</div><div class="sub" style="padding:6px 12px">Aucun résultat.</div>';
       var rows=r.miss.slice(0,25).map(function(m){
         var site=m.site||m.siteAgent||m.titre||'—';
