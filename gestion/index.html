@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b44</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b45</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -1485,6 +1485,12 @@ button.big:active{transform:translateY(1px)}
   // Cherche dans le stock un article correspondant à la pièce (+ taille si fournie). Renvoie {found,qty,records}.
   function stockLookup(piece,size){ var st=(typeof TSTOCK!=='undefined'&&TSTOCK)?TSTOCK:[]; var pl=String(piece||'').toLowerCase().trim(); if(!pl)return {found:false,qty:0,records:[]}; var sz=String(size||'').toLowerCase().trim(); var recs=st.filter(function(s){ var sp=String(s['Pièce']||'').toLowerCase().trim(); if(!sp)return false; if(sp.indexOf(pl)<0&&pl.indexOf(sp)<0)return false; if(sz){ var ts=String(s.Taille||'').toLowerCase().trim(); if(ts&&ts!==sz)return false; } return true; }); var qty=recs.reduce(function(a,s){var q=parseInt(s['Qté en stock'],10);return a+(isNaN(q)?0:q);},0); return {found:recs.length>0,qty:qty,records:recs}; }
   function stockBadge(piece,size){ if(typeof DPIECES_NOSIZE!=='undefined'&&DPIECES_NOSIZE[piece]&&!size)size=''; var l=stockLookup(piece,size); if(l.found&&l.qty>0)return '<span style="font-size:10.5px;color:var(--ok)">📦 en stock ('+l.qty+(size?' · '+esc(size):'')+')</span>'; if(l.found)return '<span style="font-size:10.5px;color:var(--warn)">📦 stock 0'+(size?' · '+esc(size):'')+'</span>'; return '<span style="font-size:10.5px;color:var(--bad)">❌ pas en stock'+(size?' · '+esc(size):'')+'</span>'; }
+  // ---- Commandes / réappro : seuil de stock configurable + suivi des commandes passées ----
+  function tenSeuil(){ var s=parseInt(load('fkh_tenues_seuil'),10); return (isNaN(s)||s<0)?3:s; }
+  function tenCmdLoad(){ var o=load('fkh_tenues_cmd'); return (o&&typeof o==='object'&&!Array.isArray(o))?o:{}; }
+  function tenCmdKey(piece,size){ return String(piece||'').toLowerCase().trim()+'||'+String(size||'').toLowerCase().trim(); }
+  function tenCmdGet(piece,size){ return tenCmdLoad()[tenCmdKey(piece,size)]||null; }
+  function stockLevel(piece,size){ var l=stockLookup(piece,size); if(!l.found||l.qty<=0)return 'rupture'; if(l.qty<=tenSeuil())return 'bas'; return 'ok'; }
   function distUrgArr(r){ return Array.isArray(r.urgPieces)?r.urgPieces.slice():[]; }
   function distRecuArr(r){ return Array.isArray(r.recuPieces)?r.recuPieces.slice():[]; }
   function distEnvArr(r){ return Array.isArray(r.envPieces)?r.envPieces.slice():[]; }
@@ -2818,20 +2824,27 @@ button.big:active{transform:translateY(1px)}
   function svcState(m){ var S=ssLoad(),st=S[m.id]||{},steps=ssSteps(m); function dn(s){return !!(st[s.key]&&st[s.key].done);} function ph(s){return !!(st[s.key]&&st[s.key].photoKey);} var phSteps=steps.filter(svcNeedPhoto); if(steps.every(dn)&&phSteps.every(ph))return 'complet'; var lateA=steps.some(function(s){return !dn(s)&&svcDue(m,s);}); var lateP=phSteps.some(function(s){return !ph(s)&&svcDue(m,s);}); return (lateA||lateP)?'retard':'encours'; }
   // TOUTES les anomalies d'une vacation (une vacation peut en cumuler plusieurs).
   var SVC_ANOM_DEFS=[
-    {k:'pointage', c:'#8f1010', t:'🔴 Prise/fin de service NON pointée'},
-    {k:'ctrl',     c:'#ff7a7a', t:'🔴 Appel de contrôle non fait'},
-    {k:'avise',    c:'#e0b000', t:'🟡 Client non avisé (prise/fin)'},
-    {k:'retard',   c:'#e08600', t:'🟠 Agent en retard à la prise'},
-    {k:'photo',    c:'#7b61ff', t:'🟣 Photo manquante'}
+    {k:'pointage',   c:'#8f1010', t:'🔴 Prise/fin de service NON pointée'},
+    {k:'ctrl',       c:'#ff7a7a', t:'🔴 Appel de contrôle non fait'},
+    {k:'avise',      c:'#e0b000', t:'🟡 Client non avisé (prise/fin)'},
+    {k:'retard',     c:'#e08600', t:'🟠 Agent en retard à la prise'},
+    {k:'photoprise', c:'#7b61ff', t:'🟣 Photo de prise de service manquante'},
+    {k:'photofin',   c:'#9b6bff', t:'🟣 Photo de fin de service manquante'},
+    {k:'photoctrl',  c:'#6ea8fe', t:'🟣 Photo de contrôle (service) manquante'},
+    {k:'phototenue', c:'#c026d3', t:'🦺 Contrôle photo tenue manquant'}
   ];
   function svcAnomaliesAll(m){
     var S=ssLoad(), st=S[m.id]||{}, steps=ssSteps(m), hasPF=steps.some(function(s){return s.key==='prise'||s.key==='fin';}), out=[];
     function add(k){ var d=SVC_ANOM_DEFS.filter(function(x){return x.k===k;})[0]; if(d)out.push(d); }
+    function photoMiss(pred){ return steps.some(function(s){ var r=st[s.key]; return pred(s)&&r&&r.done&&!r.photoKey&&svcDue(m,s); }); }
     if(steps.some(function(s){ return (s.key==='prise'||s.key==='fin') && !(st[s.key]&&st[s.key].done) && svcDue(m,s); }))add('pointage');
     if(steps.some(function(s){ return s.key.indexOf('ctrl')===0 && !(st[s.key]&&st[s.key].done) && svcDue(m,s); }))add('ctrl');
     if(hasPF && ((st.prise&&st.prise.done&&!st.prise.avise) || (st.fin&&st.fin.done&&!st.fin.avise)))add('avise');
     if(steps.some(function(s){ var r=st[s.key]; return r&&r.done&&r.agRetard; }))add('retard');
-    if(steps.filter(svcNeedPhoto).some(function(s){ var r=st[s.key]; return r&&r.done&&!r.photoKey&&svcDue(m,s); }))add('photo');
+    if(photoMiss(function(s){return s.key==='prise';}))add('photoprise');
+    if(photoMiss(function(s){return s.key==='fin';}))add('photofin');
+    if(photoMiss(function(s){return s.key.indexOf('ctrl')===0;}))add('photoctrl');
+    if(photoMiss(function(s){return s.key==='tenue';}))add('phototenue');
     return out;
   }
   function svcAnomaly(m){ var a=svcAnomaliesAll(m); if(a.length)return a[0]; if(svcState(m)==='complet')return {c:'#1a9e5c', t:'🟢 Complet'}; return null; }
