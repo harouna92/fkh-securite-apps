@@ -2048,7 +2048,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   function applySectionAccess(){ var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=(!allowed)||allowed.indexOf(s)>=0; b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
@@ -3198,7 +3198,9 @@ button.big:active{transform:translateY(1px)}
     else { T.push({'Date contrôle':today,'Agent':nom,'Site':site,'Société':'','Pointure':'','T. pantalon':'','T. haut':'','Statut tenue':'Complet','Manquants':'','Urgence':'','photoKey':r.photoKey||''}); }
     save('fkh_tenues_ctrl',T); TCTRL=T;
   }
-  var saType='all', saSlice='all', roCalls=null, roPeriod='', aiDetected=[];
+  var saType='all', saSlice='all', roCalls=null, roPeriod='', aiDetected=[], saShowExcl=false;
+  function saExclLoad(){ try{ return JSON.parse(localStorage.getItem('fkh_sa_excl')||'{}')||{}; }catch(e){ return {}; } }
+  function saExclSave(x){ try{ localStorage.setItem('fkh_sa_excl',JSON.stringify(x)); }catch(e){} if(typeof cloudPush==='function')cloudPush('fkh_sa_excl'); }
   // Rend un item compatible : si pas de tableau `demandes` (ancien format à plat), on le reconstruit en une demande unique.
   function aiNormItem(it){
     if(it&&Array.isArray(it.demandes)&&it.demandes.length)return it;
@@ -3332,7 +3334,7 @@ button.big:active{transform:translateY(1px)}
     }).catch(function(){ if(btn){ btn.disabled=false; btn.textContent='🔌 Vérifier les appels'; } if(box)box.innerHTML='<div class="sub" style="color:var(--bad);margin:0">Ringover injoignable.</div>'; }); }
   function saTypeMatch(key){ if(saType==='all')return true; if(saType==='avant')return key==='j15'||key==='route'; if(saType==='prise')return key==='prise'; if(saType==='pendant')return key.indexOf('ctrl')===0; if(saType==='fin')return key==='fin'; return true; }
   function saSliceMatch(e){ if(saSlice==='all')return true; var m=toMin(e.mheure); if(m==null)return true; var h=Math.floor(m/60), day=(h>=8&&h<20); return saSlice==='jour'?day:!day; }
-  function saEntries(from,to){
+  function saEntries(from,to,inclExcl){
     // #13 On inclut aussi les missions démarrant la VEILLE de `from` : leurs appels d'après-minuit tombent dans la période demandée (continuité de nuit à travers minuit).
     var fromV=from?svcAddDays(from,-1):'';
     var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if((from||to)&&!d)return false; if(from&&d&&d<fromV)return false; if(to&&d&&d>to)return false; return true; });
@@ -3343,13 +3345,19 @@ button.big:active{transform:translateY(1px)}
       if(from&&edate&&edate<from)return; if(to&&edate&&edate>to)return; // filtre sur la date réelle -> l'appel de 01h d'une nuit du 27 apparaît dans la vue du 28
       out.push({mid:m.id,mdate:m.mdate||'',edate:edate,site:m.siteAgent||m.titre||'—',siteBDC:m.siteBDC||'',client:m.client||'',ville:m.ville||'',cp:m.cp||'',mheure:m.mheure||'',agent:_ag?(_ag.nom||''):'',agentTel:_tel,agentId:m.agentId||'',key:s.key,label:s.label,heure:s.heure,abs:abs,type:s.type}); }); });
     out.sort(function(a,b){ var da=a.edate||a.mdate||'',db=b.edate||b.mdate||''; if(da!==db)return da<db?-1:1; return (a.abs%1440)-(b.abs%1440); }); // tri sur l'heure RÉELLE de la journée (00:00 avant 07:30)
+    // #3 : les appels RETIRÉS par le superviseur (fkh_sa_excl) disparaissent partout (agenda + anomalies + opérationnel), sauf si on demande explicitement de les inclure.
+    if(!inclExcl){ var _ex=(typeof saExclLoad==='function')?saExclLoad():{}; out=out.filter(function(e){ return !_ex[String(e.mid)+'|'+e.key]; }); }
     return out;
   }
   function renderSuiviAppels(){
     var wrap=byId('sa-body'); if(!wrap)return;
     var from=byId('sa-from')?byId('sa-from').value:'', to=byId('sa-to')?byId('sa-to').value:'';
     var lbl=(from||to)?('du '+(from?from.split('-').reverse().join('/'):'…')+' au '+(to?to.split('-').reverse().join('/'):'…')):'toute la période';
-    var entries=saEntries(from,to).filter(function(e){return saTypeMatch(e.key)&&saSliceMatch(e);});
+    var entries=saEntries(from,to,true).filter(function(e){return saTypeMatch(e.key)&&saSliceMatch(e);});
+    // #3 (Jules) : le superviseur peut RETIRER des appels prise/fin/contrôle de l'agenda (stockés dans fkh_sa_excl, restaurables).
+    var _saEx=saExclLoad(); function saExK(e){ return String(e.mid)+'|'+e.key; }
+    var saExN=entries.filter(function(e){ return !e.consigne&&_saEx[saExK(e)]; }).length;
+    if(!saShowExcl)entries=entries.filter(function(e){ return e.consigne||!_saEx[saExK(e)]; });
     if(saType==='all'&&typeof csgLoad==='function'){ csgLoad().forEach(function(c){ if(from&&(!c.mdate||c.mdate<from))return; if(to&&(!c.mdate||c.mdate>to))return; var heure=c.heure||'',site='',agent=''; if(c.mid){ var m=csgMissById(c.mid); if(m){ site=m.siteAgent||m.titre||''; if(!heure)heure=m.mheure||''; if(m.agentId&&faById(m.agentId))agent=faById(m.agentId).nom||''; } } var e={consigne:true,cid:c.id,mid:c.mid||'',mdate:c.mdate||'',edate:c.mdate||'',heure:heure,mheure:heure,abs:(toMin(heure)||0),texte:c.texte,client:c.client||'',site:site,agent:agent,done:!!c.done,note:c.note||'',key:'csg',_valid:c._valid||null}; if(!saSliceMatch(e))return; entries.push(e); }); entries.sort(function(a,b){ var da=a.edate||a.mdate||'',db=b.edate||b.mdate||''; if(da!==db)return da<db?-1:1; return ((a.abs||0)%1440)-((b.abs||0)%1440); }); }
     document.querySelectorAll('.sa-type').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-ty')===saType);});
     document.querySelectorAll('.sa-slice').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-sl')===saSlice);});
@@ -3391,7 +3399,7 @@ button.big:active{transform:translateY(1px)}
       if(roCalls&&done){ var parts=[]; if(e.agentTel)parts.push('👤 agent : '+roBadge(e.agentTel,ct)); if((e.key==='prise'||e.key==='fin')&&r.avise){ var ctm={}; try{ctm=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(_){} var ctel=e.client?ctm[e.client]:''; if(ctel)parts.push('🏢 client : '+roBadge(ctel,ct)); } if(parts.length)roLine='<div class="fa-d" style="margin:3px 0 0;line-height:1.6">🔌 '+parts.join(' &nbsp;·&nbsp; ')+'</div>'; }
       var ctx='<div class="fa-d" style="margin:4px 0 2px;line-height:1.7">'+cl.join('<br>')+'</div>'+roLine;
       return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" data-hideat="'+(done?(Math.max(+ct||0,(r.doneTs||r.at||0))+120000):0)+'" style="padding:8px'+(done?';opacity:.6':'')+'"><div class="fa-n"><span class="sa-tag"></span><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+(e.key==='tenue'?'<span style="color:#e0784b;font-weight:800">'+e.label+'</span>':e.label)+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'+ctx
-        +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">'+fields+'</div></div>';
+        +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">'+fields+'<button type="button" class="sa-excl" data-exk="'+esc(saExK(e))+'" title="Retirer / restaurer cet appel de l\'agenda" style="font-size:11px;margin-left:auto;'+(_saEx[saExK(e)]?'color:var(--ok);border-color:var(--ok)':'color:var(--muted)')+'">'+(_saEx[saExK(e)]?'↩️ Restaurer':'🗑️ Retirer')+'</button></div></div>';
     };
     var isDone=function(e){ if(e.consigne)return !!e.done; return !!(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done); };
     // Une carte cochée reste visible jusqu'à 2 min après l'heure prévue (ou 2 min après le cochage si coché en retard)
@@ -3404,12 +3412,15 @@ button.big:active{transform:translateY(1px)}
     function sosCardBlock(title,arr,brd,bg){ return arr.length?('<div class="card" style="border:2px solid '+brd+';background:'+bg+';padding:8px"><div class="lab" style="margin:0 0 4px;color:'+brd+';font-weight:800;font-size:15px">'+title.replace('{n}',arr.length).replace('{s}',arr.length>1?'S':'')+'</div>'+arr.map(saCard).join('')+'</div>'):''; }
     var sosBlock=sosCardBlock('🆘 {n} APPEL{s} CLIENT — ❌ ANNULATION MISSION', sosAnn, '#c02626','rgba(200,0,0,.10)')
                + sosCardBlock('🆘 {n} APPEL{s} CLIENT — ✅ VALIDATION / ACCEPTATION MISSION', sosVal, '#137a3b','rgba(19,122,59,.10)');
-    wrap.innerHTML=sosBlock+head
+    var saExclBar=(saExN||saShowExcl)?('<div class="card" style="padding:6px 10px;border:1px solid #e0a13b"><label class="chk" style="margin:0;font-size:12.5px"><input type="checkbox" class="sa-excl-toggle"'+(saShowExcl?' checked':'')+'><span>🗑️ '+saExN+' appel'+(saExN>1?'s':'')+' retiré'+(saExN>1?'s':'')+' de l\'agenda — '+(saShowExcl?'affichés ci-dessous, clique « ↩️ Restaurer »':'cocher pour les afficher / restaurer')+'</span></label></div>'):'';
+    wrap.innerHTML=sosBlock+head+saExclBar
       +(todoL.length?todoL.map(saCard).join(''):'<div class="card"><div class="sub" style="margin:0;color:var(--ok)">✅ Tous les appels de cette période sont faits.</div></div>')
       +(doneL.length?'<details style="margin-top:12px"><summary style="cursor:pointer;color:var(--muted);font-weight:700;padding:6px 2px">✅ '+doneL.length+' appel'+(doneL.length>1?'s':'')+' fait'+(doneL.length>1?'s':'')+' — masqué'+(doneL.length>1?'s':'')+', cliquer pour afficher</summary><div style="opacity:.7;margin-top:6px">'+doneL.map(saCard).join('')+'</div></details>':'');
     entries.forEach(function(e){ var hasPhoto=(e.key==='prise'||e.key==='fin'||e.key==='tenue'||e.key.indexOf('ctrl')===0); if(!hasPhoto||typeof photoWire!=='function')return; var upId='saph-'+String(e.mid).replace(/[^a-zA-Z0-9]/g,'')+'-'+e.key; photoWire(upId,function(f){ var ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg'; return 'appel/'+e.mid+'/'+e.key+'/'+Date.now()+'.'+ext; },function(key){ if(e.key==='tenue')saSet(e.mid,e.key,{tenuePhoto:true,photoKey:key}); else saSet(e.mid,e.key,{photo:'Photo horodatée',photoKey:key}); renderSuiviAppels(); }); });
     document.querySelectorAll('#sa-body .sa-photo-view').forEach(function(a){ a.onclick=function(ev){ ev.preventDefault(); if(typeof photoOpen==='function')photoOpen(a.getAttribute('data-k')); }; });
     document.querySelectorAll('#sa-body .csg-del').forEach(function(b){ b.onclick=function(){ if(!confirm('Supprimer cette consigne ?'))return; csgDel(b.getAttribute('data-cid')); renderSuiviAppels(); if(typeof csgRenderList==='function')csgRenderList(); }; });
+    document.querySelectorAll('#sa-body .sa-excl').forEach(function(b){ b.onclick=function(){ var k=b.getAttribute('data-exk'),ex=saExclLoad(); if(ex[k]){ delete ex[k]; } else { if(!confirm('Retirer cet appel de l\'agenda (prise / fin / contrôle) ? Il sera masqué, mais restaurable à tout moment.'))return; ex[k]=Date.now(); } saExclSave(ex); renderSuiviAppels(); }; });
+    document.querySelectorAll('#sa-body .sa-excl-toggle').forEach(function(b){ b.onclick=function(){ saShowExcl=b.checked; renderSuiviAppels(); }; });
     saColorize(); if(typeof saAlert==='function')saAlert(); saSosTick();
   }
   function saSosTick(){ var now=Date.now(), sos=document.querySelectorAll('#sa-body .val-sos'); for(var i=0;i<sos.length;i++){ var sp=sos[i],dl=+sp.getAttribute('data-deadline'); if(!dl)continue; var left=Math.floor((dl-now)/1000); if(left>0){ var m=Math.floor(left/60),ss=left%60; sp.textContent='⏳ '+m+':'+(ss<10?'0':'')+ss; sp.style.color=(left<=60?'#ff2d2d':'var(--bad)'); } else { sp.textContent='⏰ 00:00 — appelle MAINTENANT'; sp.style.color='#ff2d2d'; } } }
