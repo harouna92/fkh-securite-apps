@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b31</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b32</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -1326,14 +1326,11 @@ button.big:active{transform:translateY(1px)}
     var cfg=msgVarsLoad(), site=(it.site||it.siteAgent||'');
     var det=[]; if(cfg.client&&it.client)det.push(it.client); if(cfg.site&&site)det.push(site); if(cfg.ville&&it.ville)det.push(it.ville); if(cfg.quand&&when)det.push(when);
     var detStr=det.join(' · '), t=msgTplLoad();
-    var hasPh=/\{details\}|\{client\}|\{site\}|\{ville\}|\{quand\}/.test(t);
-    t=t.replace(/\{details\}/g,detStr)
-       .replace(/\{client\}/g,(cfg.client&&it.client)?('pour '+it.client):'')
-       .replace(/\{site\}/g,(cfg.site&&site)?('— '+site):'')
-       .replace(/\{ville\}/g,(cfg.ville&&it.ville)?('à '+it.ville):'')
-       .replace(/\{quand\}/g,(cfg.quand&&when)?('le '+when):'');
-    if(!hasPh && detStr)t=t+'\n'+detStr; // modèle sans emplacement de variable → on ajoute les détails cochés
-    return t.replace(/[ \t]{2,}/g,' ').replace(/ +([.,!?])/g,'$1').replace(/\s+·\s*$/,'').replace(/:\s*\./,'.').replace(/\n{3,}/g,'\n\n').trim(); }
+    // Les variables cochées vont TOUJOURS dans le message : dans le repère {details} s'il existe, sinon en tête. Peu importe que la variable soit déjà dans le texte permanent ou pas.
+    if(/\{details\}/.test(t)){ t=t.replace(/\{details\}/g,detStr); }
+    else { t=t.replace(/\{client\}|\{site\}|\{ville\}|\{quand\}/g,'').replace(/[ \t]{2,}/g,' ').trim(); if(detStr)t=detStr+(t?'\n'+t:''); }
+    t=t.replace(/\{client\}|\{site\}|\{ville\}|\{quand\}/g,'');
+    return t.replace(/[ \t]{2,}/g,' ').replace(/ +([.,!?])/g,'$1').replace(/:\s*\./g,'.').replace(/\s+·\s*$/,'').replace(/\n{3,}/g,'\n\n').trim(); }
   // Traçabilité des contacts d'une demande (qui a déjà été appelé / a reçu un message) — visible par tous, pour travailler en parallèle sans doublon.
   function opNow(){ try{ var o=load('fkh_operateurs'), t=impTodayISO(); return (o&&!Array.isArray(o)&&o[t])||''; }catch(e){ return ''; } }
   function ctcMark(it,agId,kind){ if(!agId)return; if(!it.contacts)it.contacts={}; var c=it.contacts[agId]||{}; if(kind==='call')c.c=!c.c; if(kind==='msg')c.m=true; c.by=opNow()||c.by||''; c.at=Date.now(); it.contacts[agId]=c; if(typeof saveSuivi==='function')saveSuivi(); }
