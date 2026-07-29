@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b39</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b40</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -2790,6 +2790,7 @@ button.big:active{transform:translateY(1px)}
   if(byId('paste-img'))byId('paste-img').onchange=function(){ var f=this.files&&this.files[0]; if(f)pasteAnalyseImg(f); this.value=''; };
 
   var svcTab='synth';
+  var svcAnomFilter='';
   function svcNeedPhoto(s){ return s.key==='prise'||s.key==='fin'||s.key==='tenue'||s.key.indexOf('ctrl')===0; }
   function svcShortLbl(s){ if(s.key==='prise')return 'Prise'; if(s.key==='fin')return 'Fin'; if(s.key==='tenue')return 'Tenue'; if(s.key==='j15')return 'Pré-prise'; if(s.key==='route')return 'Route'; if(s.key.indexOf('ctrl')===0)return 'Contrôle '+((+s.key.slice(4))+1); return s.label; }
   var SVC_GRACE=15; // minutes de tolérance après l'heure prévue avant de considérer une étape « en retard »
@@ -2797,31 +2798,29 @@ button.big:active{transform:translateY(1px)}
   function svcDue(m,s){ var ms=svcStepMs(m,s); return ms==null?true:(Date.now()>ms+SVC_GRACE*60000); }
   // État d'une vacation : 'complet' (tout fait + photos), 'retard' (une étape échue non faite/sans photo), 'encours' (rien d'échu, en attente)
   function svcState(m){ var S=ssLoad(),st=S[m.id]||{},steps=ssSteps(m); function dn(s){return !!(st[s.key]&&st[s.key].done);} function ph(s){return !!(st[s.key]&&st[s.key].photoKey);} var phSteps=steps.filter(svcNeedPhoto); if(steps.every(dn)&&phSteps.every(ph))return 'complet'; var lateA=steps.some(function(s){return !dn(s)&&svcDue(m,s);}); var lateP=phSteps.some(function(s){return !ph(s)&&svcDue(m,s);}); return (lateA||lateP)?'retard':'encours'; }
-  // Code couleur d'anomalie d'une vacation (priorité : pointage manquant > client non avisé > retard > photo manquante > complet).
-  function svcAnomaly(m){
-    var S=ssLoad(), st=S[m.id]||{}, steps=ssSteps(m);
-    var hasPF=steps.some(function(s){return s.key==='prise'||s.key==='fin';});
-    // 🔴 FONCÉ : prise/fin de service échue et NON pointée par l'opérateur (le plus grave)
-    if(steps.some(function(s){ return (s.key==='prise'||s.key==='fin') && !(st[s.key]&&st[s.key].done) && svcDue(m,s); }))
-      return {c:'#8f1010', t:'🔴 Prise/fin de service NON pointée'};
-    // 🔴 CLAIR : appel de contrôle (ronde/2h) échu et NON fait
-    if(steps.some(function(s){ return s.key.indexOf('ctrl')===0 && !(st[s.key]&&st[s.key].done) && svcDue(m,s); }))
-      return {c:'#ff7a7a', t:'🔴 Appel de contrôle non fait'};
-    // 🟡 client non avisé (prise/fin faite mais avise=false)
-    if(hasPF && ((st.prise&&st.prise.done&&!st.prise.avise) || (st.fin&&st.fin.done&&!st.fin.avise)))
-      return {c:'#e0b000', t:'🟡 Client non avisé (prise/fin)'};
-    // 🟠 agent en retard
-    if(steps.some(function(s){ var r=st[s.key]; return r&&r.done&&r.agRetard; }))
-      return {c:'#e08600', t:'🟠 Agent en retard à la prise'};
-    // 🟣 photo manquante (pointé mais sans photo, ou photo due non fournie)
-    if(steps.filter(svcNeedPhoto).some(function(s){ var r=st[s.key]; return r&&r.done&&!r.photoKey&&svcDue(m,s); }))
-      return {c:'#7b61ff', t:'🟣 Photo manquante'};
-    if(svcState(m)==='complet') return {c:'#1a9e5c', t:'🟢 Complet'};
-    return null;
+  // TOUTES les anomalies d'une vacation (une vacation peut en cumuler plusieurs).
+  var SVC_ANOM_DEFS=[
+    {k:'pointage', c:'#8f1010', t:'🔴 Prise/fin de service NON pointée'},
+    {k:'ctrl',     c:'#ff7a7a', t:'🔴 Appel de contrôle non fait'},
+    {k:'avise',    c:'#e0b000', t:'🟡 Client non avisé (prise/fin)'},
+    {k:'retard',   c:'#e08600', t:'🟠 Agent en retard à la prise'},
+    {k:'photo',    c:'#7b61ff', t:'🟣 Photo manquante'}
+  ];
+  function svcAnomaliesAll(m){
+    var S=ssLoad(), st=S[m.id]||{}, steps=ssSteps(m), hasPF=steps.some(function(s){return s.key==='prise'||s.key==='fin';}), out=[];
+    function add(k){ var d=SVC_ANOM_DEFS.filter(function(x){return x.k===k;})[0]; if(d)out.push(d); }
+    if(steps.some(function(s){ return (s.key==='prise'||s.key==='fin') && !(st[s.key]&&st[s.key].done) && svcDue(m,s); }))add('pointage');
+    if(steps.some(function(s){ return s.key.indexOf('ctrl')===0 && !(st[s.key]&&st[s.key].done) && svcDue(m,s); }))add('ctrl');
+    if(hasPF && ((st.prise&&st.prise.done&&!st.prise.avise) || (st.fin&&st.fin.done&&!st.fin.avise)))add('avise');
+    if(steps.some(function(s){ var r=st[s.key]; return r&&r.done&&r.agRetard; }))add('retard');
+    if(steps.filter(svcNeedPhoto).some(function(s){ var r=st[s.key]; return r&&r.done&&!r.photoKey&&svcDue(m,s); }))add('photo');
+    return out;
   }
+  function svcAnomaly(m){ var a=svcAnomaliesAll(m); if(a.length)return a[0]; if(svcState(m)==='complet')return {c:'#1a9e5c', t:'🟢 Complet'}; return null; }
   function svcSynthCard(m){
     var S=ssLoad(), st=S[m.id]||{}, steps=ssSteps(m);
-    var _anom=svcAnomaly(m);
+    var _anomAll=svcAnomaliesAll(m), _anom=_anomAll[0]||(svcState(m)==='complet'?{c:'#1a9e5c',t:'🟢 Complet'}:null);
+    var _anomDots=_anomAll.length?('<div style="margin:0 0 5px;display:flex;align-items:center;gap:5px;flex-wrap:wrap">'+_anomAll.map(function(a){return '<span title="'+esc(a.t)+'" style="display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;color:'+a.c+'"><span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:'+a.c+'"></span>'+esc(a.t.replace(/^[^ ]+ /,''))+'</span>';}).join('')+'</div>'):'';
     var site=m.siteAgent||m.titre||'—', ag=(m.agentId&&faById(m.agentId))?faById(m.agentId).nom:'';
     var pl=(typeof apPlan==='function')?apPlan(m):null;
     function dn(s){return !!(st[s.key]&&st[s.key].done);} function ph(s){return !!(st[s.key]&&st[s.key].photoKey);}
@@ -2854,7 +2853,7 @@ button.big:active{transform:translateY(1px)}
     var finH=(typeof apFinHeure==='function')?apFinHeure(m):''; if(!finH&&m.mfin){ var _mp=String(m.mfin).trim().split(/\s+/); var _last=_mp[_mp.length-1]; if(/^\d{1,2}:\d{2}$/.test(_last))finH=_last; }
     var head='<div class="fa-n" style="font-size:15.5px">'+globalPill+esc(site)+(m.ville?' <span style="color:var(--muted);font-weight:400">· '+esc(m.ville):'')+'</span> <span style="color:var(--muted);font-weight:400">'+esc(m.mdate||'')+(m.mheure?' 🟢 '+esc(m.mheure):'')+(finH?' → 🔚 '+esc(finH):'')+'</span>'+(pl&&pl.night?' <span style="color:#e0784b">🌙 nuit</span>':'')+'</div><div class="fa-d" style="margin:2px 0 6px">'+(m.client?'🏢 '+esc(m.client)+' · ':'')+(ag?('👤 '+esc(ag)):'<span style="color:var(--warn)">⚠ agent à affecter</span>')+'</div>';
     return '<div class="card" style="padding:10px'+(_anom?';border-left:6px solid '+_anom.c:'')+'">'+head
-      +(_anom&&_anom.c!=='#1a9e5c'?'<div style="font-size:12px;font-weight:800;color:'+_anom.c+';margin:0 0 5px">'+esc(_anom.t)+'</div>':'')
+      +_anomDots
       +'<div style="margin-bottom:4px">'+appelsLine+'</div>'
       +'<div style="margin-bottom:4px">'+photosLine+'</div>'
       +(cliLine?'<div class="fa-d" style="margin-top:4px">'+cliLine+'</div>':'')
@@ -2870,8 +2869,13 @@ button.big:active{transform:translateY(1px)}
       if(typeof apDeconflict==='function')apDeconflict(miss,10);
       if(!miss.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune vacation (mission validée) '+esc(periode0)+(q?' pour ce filtre':'')+'.</div></div>'; return; }
       var nComplet=0,nRetard=0,nCours=0; miss.forEach(function(m){ var s=svcState(m); if(s==='complet')nComplet++; else if(s==='retard')nRetard++; else nCours++; });
-      var head='<div class="card"><div class="lab" style="margin:0 0 2px">'+miss.length+' vacation'+(miss.length>1?'s':'')+' — '+esc(periode0)+'</div><div class="fa-d" style="margin:0">✅ '+nComplet+' complète'+(nComplet>1?'s':'')+' · <span style="color:#e0a13b;font-weight:700">⚠️ '+nRetard+' en retard</span> · <span style="color:var(--muted)">🕓 '+nCours+' en cours</span></div><div class="sub" style="margin:2px 0 0">« En retard » = une étape dont l\'heure prévue (+'+SVC_GRACE+' min) est passée sans appel/photo. Les étapes à venir ne comptent pas.</div><div class="sub" style="margin:5px 0 0;font-size:11.5px;line-height:1.8">🎨 Bandes couleur (anomalie) : <b style="color:#8f1010">🔴 prise/fin non pointée</b> · <b style="color:#ff7a7a">🔴 contrôle non fait</b> · <b style="color:#e0b000">🟡 client non avisé</b> · <b style="color:#e08600">🟠 agent en retard</b> · <b style="color:#7b61ff">🟣 photo manquante</b> · <b style="color:#1a9e5c">🟢 complet</b></div></div>';
-      wrap.innerHTML=head+miss.map(svcSynthCard).join('');
+      // Compteur par TYPE d'anomalie (sous-sections cliquables)
+      var anomCnt={}; miss.forEach(function(m){ svcAnomaliesAll(m).forEach(function(a){ anomCnt[a.k]=(anomCnt[a.k]||0)+1; }); });
+      var chips='<div class="acts" style="flex-wrap:wrap;gap:6px;margin:7px 0 0"><button type="button" class="svc-anom'+(svcAnomFilter===''?' ok':'')+'" data-a="">Tout ('+miss.length+')</button>'+SVC_ANOM_DEFS.filter(function(d){return anomCnt[d.k];}).map(function(d){ return '<button type="button" class="svc-anom'+(svcAnomFilter===d.k?' ok':'')+'" data-a="'+d.k+'" style="border-color:'+d.c+';color:'+d.c+'"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'+d.c+';margin-right:4px"></span>'+esc(d.t.replace(/^[^ ]+ /,''))+' ('+anomCnt[d.k]+')</button>'; }).join('')+'</div>';
+      var head='<div class="card"><div class="lab" style="margin:0 0 2px">'+miss.length+' vacation'+(miss.length>1?'s':'')+' — '+esc(periode0)+'</div><div class="fa-d" style="margin:0">✅ '+nComplet+' complète'+(nComplet>1?'s':'')+' · <span style="color:#e0a13b;font-weight:700">⚠️ '+nRetard+' en retard</span> · <span style="color:var(--muted)">🕓 '+nCours+' en cours</span></div>'+chips+'<div class="sub" style="margin:6px 0 0;font-size:11.5px">Clique un type d\'anomalie pour ne voir que ces vacations. Une vacation peut cumuler plusieurs ronds.</div></div>';
+      var missShown=svcAnomFilter?miss.filter(function(m){ return svcAnomaliesAll(m).some(function(a){return a.k===svcAnomFilter;}); }):miss;
+      wrap.innerHTML=head+(missShown.length?missShown.map(svcSynthCard).join(''):'<div class="card"><div class="sub" style="margin:0">Aucune vacation pour ce type d\'anomalie.</div></div>');
+      wrap.querySelectorAll('.svc-anom').forEach(function(b){ b.onclick=function(){ svcAnomFilter=b.getAttribute('data-a')||''; renderServices(); }; });
       wrap.querySelectorAll('.svc-ph').forEach(function(a){ a.onclick=function(ev){ ev.preventDefault(); if(typeof photoOpen==='function')photoOpen(a.getAttribute('data-k')); }; });
       wrap.querySelectorAll('.svc-goappels').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); var tb=document.querySelector('#tabs button[data-s="suiviappels"]'); if(tb)tb.click(); }; });
       return;
@@ -2914,7 +2918,7 @@ button.big:active{transform:translateY(1px)}
     document.querySelectorAll('.svc-preset').forEach(function(x){x.classList.toggle('on',x===b);});
     renderServices();
   }); });
-  if(byId('svc-reset'))byId('svc-reset').addEventListener('click',function(){ var t=impTodayISO(); if(byId('svc-from'))byId('svc-from').value=t; if(byId('svc-to'))byId('svc-to').value=t; if(byId('svc-q'))byId('svc-q').value=''; svcTab='synth'; document.querySelectorAll('.svc-preset').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-d')==='1');}); renderServices(); });
+  if(byId('svc-reset'))byId('svc-reset').addEventListener('click',function(){ var t=impTodayISO(); if(byId('svc-from'))byId('svc-from').value=t; if(byId('svc-to'))byId('svc-to').value=t; if(byId('svc-q'))byId('svc-q').value=''; svcTab='synth'; svcAnomFilter=''; document.querySelectorAll('.svc-preset').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-d')==='1');}); renderServices(); });
   (function(){ var t=impTodayISO(); if(byId('svc-from')&&!byId('svc-from').value)byId('svc-from').value=t; if(byId('svc-to')&&!byId('svc-to').value)byId('svc-to').value=t; var p1=document.querySelector('.svc-preset[data-d="1"]'); if(p1)p1.classList.add('on'); })();
   // ===== Dispatch multi-sites : agents dans un rayon autour de plusieurs sites cochés =====
   var DSP={sel:{}};
