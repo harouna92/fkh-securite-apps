@@ -1306,18 +1306,23 @@ button.big:active{transform:translateY(1px)}
   // #4 Envoi groupé : numéro WhatsApp international + message pré-rempli depuis la demande.
   function waNum(tel){ var d=String(tel||'').replace(/\D/g,''); if(!d)return ''; if(d.charAt(0)==='0')d='33'+d.slice(1); else if(d.slice(0,2)==='33'){} else if(d.length===9)d='33'+d; return d; }
   // Modèle de message agent : PERMANENT (fkh_msg_tpl, variables {client} {ville} {quand}). L'édition dans la zone d'envoi = PONCTUELLE (it._nmsg).
-  var DEF_MSG_TPL='Bonjour, FKH SÉCURITÉ. Mission {client} {site} {ville} {quand}. Êtes-vous disponible ? Merci de me rappeler.';
+  var DEF_MSG_TPL='Bonjour, FKH SÉCURITÉ. Mission : {details}. Êtes-vous disponible ? Merci de me rappeler.';
   var MSG_VARS=[{k:'client',lbl:'Client'},{k:'site',lbl:'Site'},{k:'ville',lbl:'Ville'},{k:'quand',lbl:'Date/heure'}];
   function msgTplLoad(){ var s=null; try{s=JSON.parse(localStorage.getItem('fkh_msg_tpl')||'null');}catch(e){} return (s&&typeof s==='string'&&s.trim())?s:DEF_MSG_TPL; }
   // Choix PERMANENT des variables à inclure dans le message (cases à cocher).
   function msgVarsLoad(){ var d={client:true,site:false,ville:true,quand:true}, s=null; try{s=JSON.parse(localStorage.getItem('fkh_msg_vars')||'null');}catch(e){} if(s&&typeof s==='object'&&!Array.isArray(s)){ MSG_VARS.forEach(function(v){ if(typeof s[v.k]==='boolean')d[v.k]=s[v.k]; }); } return d; }
   function nearGroupMsg(it){ var vac=(typeof svExtractVacations==='function')?svExtractVacations(it):[], v0=vac[0]||null, when=''; if(v0&&v0.mdate){ when=v0.mdate.split('-').reverse().join('/')+(v0.mheure?' '+v0.mheure:'')+(v0.mfin?'→'+v0.mfin:''); }
-    var cfg=msgVarsLoad(), t=msgTplLoad();
-    t=t.replace(/\{client\}/g,(cfg.client&&it.client)?('pour '+it.client):'')
-       .replace(/\{site\}/g,(cfg.site&&(it.site||it.siteAgent))?('— '+(it.site||it.siteAgent)):'')
+    var cfg=msgVarsLoad(), site=(it.site||it.siteAgent||'');
+    var det=[]; if(cfg.client&&it.client)det.push(it.client); if(cfg.site&&site)det.push(site); if(cfg.ville&&it.ville)det.push(it.ville); if(cfg.quand&&when)det.push(when);
+    var detStr=det.join(' · '), t=msgTplLoad();
+    var hasPh=/\{details\}|\{client\}|\{site\}|\{ville\}|\{quand\}/.test(t);
+    t=t.replace(/\{details\}/g,detStr)
+       .replace(/\{client\}/g,(cfg.client&&it.client)?('pour '+it.client):'')
+       .replace(/\{site\}/g,(cfg.site&&site)?('— '+site):'')
        .replace(/\{ville\}/g,(cfg.ville&&it.ville)?('à '+it.ville):'')
        .replace(/\{quand\}/g,(cfg.quand&&when)?('le '+when):'');
-    return t.replace(/\s{2,}/g,' ').replace(/\s+([.,!?])/g,'$1').trim(); }
+    if(!hasPh && detStr)t=t+'\n'+detStr; // modèle sans emplacement de variable → on ajoute les détails cochés
+    return t.replace(/[ \t]{2,}/g,' ').replace(/ +([.,!?])/g,'$1').replace(/\s+·\s*$/,'').replace(/:\s*\./,'.').replace(/\n{3,}/g,'\n\n').trim(); }
   // Traçabilité des contacts d'une demande (qui a déjà été appelé / a reçu un message) — visible par tous, pour travailler en parallèle sans doublon.
   function opNow(){ try{ var o=load('fkh_operateurs'), t=impTodayISO(); return (o&&!Array.isArray(o)&&o[t])||''; }catch(e){ return ''; } }
   function ctcMark(it,agId,kind){ if(!agId)return; if(!it.contacts)it.contacts={}; var c=it.contacts[agId]||{}; if(kind==='call')c.c=!c.c; if(kind==='msg')c.m=true; c.by=opNow()||c.by||''; c.at=Date.now(); it.contacts[agId]=c; if(typeof saveSuivi==='function')saveSuivi(); }
@@ -1844,7 +1849,7 @@ button.big:active{transform:translateY(1px)}
     if(e.target.classList&&e.target.classList.contains('pl')){ plPreview(e.target.closest('.sv')); return; }
     if(e.target.classList&&(e.target.classList.contains('af-date')||e.target.classList.contains('af-h')||e.target.classList.contains('af-m'))){ var aid=e.target.getAttribute('data-id'),ai=null,k; for(k=0;k<SUIVI.length;k++)if(SUIVI[k].id===aid){ai=SUIVI[k];break;} if(ai){ var acard=e.target.closest('.sv'),dt=acard.querySelector('.af-date'),hh=acard.querySelector('.af-h'),mm=acard.querySelector('.af-m'); ai.mdate=dt?dt.value:ai.mdate; var H=hh?hh.value:'',M=mm?mm.value:''; ai.mheure=H?(H+':'+(M||'00')):''; saveSuivi(); renderSuivi(); } return; }
     var t2=e.target;
-    if(t2.hasAttribute&&t2.hasAttribute('data-msgvar')){ var vk=t2.getAttribute('data-msgvar'), cfg=(typeof msgVarsLoad==='function')?msgVarsLoad():{}; cfg[vk]=t2.checked; save('fkh_msg_vars',cfg); var mvid=t2.getAttribute('data-id'); if(mvid){ for(var mv=0;mv<SUIVI.length;mv++)if(SUIVI[mv].id===mvid){ delete SUIVI[mv]._nmsg; break; } } renderSuivi(); return; }
+    if(t2.hasAttribute&&t2.hasAttribute('data-msgvar')){ var vk=t2.getAttribute('data-msgvar'), cfg=(typeof msgVarsLoad==='function')?msgVarsLoad():{}; cfg[vk]=t2.checked; save('fkh_msg_vars',cfg); var mvid=t2.getAttribute('data-id'), it3=null,mv; for(mv=0;mv<SUIVI.length;mv++)if(SUIVI[mv].id===mvid){it3=SUIVI[mv];break;} if(it3){ delete it3._nmsg; var card3=t2.closest('.sv'), ta3=card3?card3.querySelector('textarea[data-nmsg]'):null; if(ta3)ta3.value=nearGroupMsg(it3); else renderSuivi(); } return; }
     if(t2.hasAttribute&&t2.hasAttribute('data-nsel')){ var sid=t2.getAttribute('data-nsel'),sit=null,si; for(si=0;si<SUIVI.length;si++)if(SUIVI[si].id===sid){sit=SUIVI[si];break;} if(sit){ sit._nsel=sit._nsel||{}; var said=t2.getAttribute('data-aid'); if(t2.checked)sit._nsel[said]=true; else delete sit._nsel[said]; renderSuivi(); } return; }
     var id=t2.getAttribute('data-nrad')||t2.getAttribute('data-nads')||t2.getAttribute('data-nvoit'); if(!id)return;
     var it=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;} if(!it)return;
