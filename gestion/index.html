@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b46</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b47</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -3718,9 +3718,9 @@ button.big:active{transform:translateY(1px)}
     var slLbl=saSlice==='jour'?' · ☀️ tranche jour (8h→20h)':saSlice==='nuit'?' · 🌙 tranche nuit (20h→8h)':'';
     if(!entries.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucun appel '+esc(lbl)+slLbl+(saType!=='all'?' (type filtré)':'')+'. (Il faut des missions validées avec une heure sur cette période.)</div></div>'; return; }
     var S=ssLoad();
-    // Remise en file : toute coche faite AVANT la fenêtre H-5 est invalidée (tout de suite si l'appel n'est pas encore dû, sinon au passage de 03h00 après le cochage)
+    // Remise en file : on n'annule QUE les coches faites AVANT le JOUR de la mission (vrai pré-cochage d'un jour futur). Une coche du même jour, même un peu en avance, RESTE (l'opérateur l'a réellement faite → elle ne doit pas revenir).
     (function(){ var nowS=Date.now(), chg=false;
-      entries.forEach(function(e){ if(e.consigne||!e.mdate)return; var r=S[e.mid]&&S[e.mid][e.key]; if(!r||!r.done)return; var ct=new Date(e.mdate+'T00:00:00').getTime()+(e.abs||0)*60000; var ref=r.doneTs||r.at||0; if(!ref||ref>=ct-300000)return; var dR=new Date(ref), t3=new Date(dR.getFullYear(),dR.getMonth(),dR.getDate(),3,0,0,0).getTime(); if(ref>=t3)t3+=86400000; if(nowS<ct-300000||nowS>=t3){ r.done=false; r.at=Date.now(); r.earlyReset=true; S[e.mid][e.key]=r; chg=true; } });
+      entries.forEach(function(e){ if(e.consigne||!e.mdate)return; var r=S[e.mid]&&S[e.mid][e.key]; if(!r||!r.done)return; var ref=r.doneTs||r.at||0; if(!ref)return; var schedDay=new Date(e.mdate+'T00:00:00').getTime(); if(ref<schedDay){ r.done=false; r.at=nowS; r.earlyReset=true; S[e.mid][e.key]=r; chg=true; } });
       if(chg)ssSave(S);
     })();
     var doneN=0, cnt={prise:0,fin:0,route:0,j15:0,ctrl:0,tenue:0}; entries.forEach(function(e){ if(e.consigne){ if(e.done)doneN++; return; } if(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done)doneN++; var k=e.key; if(cnt[k]!=null)cnt[k]++; else if(k.indexOf('ctrl')===0)cnt.ctrl++; });
