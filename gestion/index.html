@@ -627,7 +627,13 @@ button.big:active{transform:translateY(1px)}
   <section id="sec-suiviappels" class="hidden">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><h1 style="margin:0">📞 Suivi des appels</h1><div id="sa-clock" style="position:fixed;right:12px;top:10px;z-index:60;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;padding:6px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);box-shadow:0 4px 16px rgba(0,0,0,.35)">--:--:--</div></div>
     <p class="sub">Agenda chronologique des appels à faire (issus des missions validées). Pour chaque ligne : coche « Fait » (heure réelle enregistrée), choisis le statut, ajoute un commentaire. Heures 🇫🇷 + 🇲🇱.</p>
-    <div class="card">
+    <div class="card" style="border:2px solid var(--brand,#6ea8fe)">
+      <label class="f"><div class="lab">👤 Opérateur de service (qui gère les appels aujourd'hui)</div>
+        <select id="sa-operateur"><option value="">— Choisir l'opérateur —</option><option>Thiam</option><option>Traoré</option><option>Daniel</option><option>Jules</option></select></label>
+      <div class="sub" id="sa-operateur-info" style="margin:5px 0 0"></div>
+    </div>
+    <button type="button" id="sa-cfg-toggle" class="big" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">⚙️ Filtres &amp; configuration de l'affichage</button>
+    <div class="card" id="sa-filtres-card" style="display:none">
       <div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="sa-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="sa-to"></label></div>
       <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><button type="button" class="sa-preset" data-d="1">Aujourd'hui</button><button type="button" class="sa-preset" data-d="3">3 j</button><button type="button" class="sa-preset" data-d="7">7 j</button><button type="button" class="sa-preset" data-d="30">30 j</button><button type="button" class="sa-preset" data-d="all">Tout</button></div>
       <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><span class="sub" style="margin:0;align-self:center">Type :</span><button type="button" class="sa-type on" data-ty="all">Tous</button><button type="button" class="sa-type" data-ty="avant">☎ Avant</button><button type="button" class="sa-type" data-ty="prise">🟢 Prise</button><button type="button" class="sa-type" data-ty="pendant">🌙 Pendant</button><button type="button" class="sa-type" data-ty="fin">🔚 Fin</button></div>
@@ -2054,7 +2060,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   function applySectionAccess(){ var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=(!allowed)||allowed.indexOf(s)>=0; b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
@@ -3490,6 +3496,8 @@ button.big:active{transform:translateY(1px)}
   document.querySelectorAll('.sa-type').forEach(function(b){ b.addEventListener('click',function(){ saType=b.getAttribute('data-ty'); renderSuiviAppels(); }); });
   document.querySelectorAll('.sa-slice').forEach(function(b){ b.addEventListener('click',function(){ saSlice=b.getAttribute('data-sl'); renderSuiviAppels(); }); });
   if(byId('sa-reset'))byId('sa-reset').onclick=function(){ saType='all'; saSlice='all'; var t=impTodayISO(); if(byId('sa-from'))byId('sa-from').value=t; if(byId('sa-to'))byId('sa-to').value=t; renderSuiviAppels(); };
+  if(byId('sa-cfg-toggle'))byId('sa-cfg-toggle').onclick=function(){ var c=byId('sa-filtres-card'); if(c)c.style.display=(c.style.display==='none'||!c.style.display)?'block':'none'; };
+  (function(){ var sel=byId('sa-operateur'), info=byId('sa-operateur-info'); if(!sel)return; function ops(){ var o=load('fkh_operateurs'); return (o&&typeof o==='object'&&!Array.isArray(o))?o:{}; } function refresh(){ var t=impTodayISO(), o=ops(), n=o[t]||''; sel.value=n; if(info)info.innerHTML=n?('✅ <b>'+esc(n)+'</b> est de service aujourd\'hui ('+t+'). Toute anomalie d\'appel du jour lui sera rattachée.'):'⚠️ Choisis l\'opérateur de service : les anomalies d\'appels du jour seront rattachées à son nom.'; } sel.addEventListener('change',function(){ var t=impTodayISO(), o=ops(); if(sel.value)o[t]=sel.value; else delete o[t]; save('fkh_operateurs',o); refresh(); }); refresh(); })();
   (function(){ var t=impTodayISO(); if(byId('sa-from')&&!byId('sa-from').value)byId('sa-from').value=t; if(byId('sa-to')&&!byId('sa-to').value)byId('sa-to').value=t; })();
   (function(){ function tick(){ var el=byId('sa-clock'); if(!el)return; var d=new Date(); el.textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2); } tick(); setInterval(tick,1000); })();
   // ===== Consignes / tâches libres greffées dans l'agenda des appels =====
