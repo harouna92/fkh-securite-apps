@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b38</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b39</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -1329,6 +1329,9 @@ button.big:active{transform:translateY(1px)}
   function nearGroupMsg(it){
     var v0=(typeof svExtractRaw==='function')?((svExtractRaw(it)||[])[0]||null):null;
     var mdate=(v0&&v0.mdate)||it.mdate||'', mheure=(v0&&v0.mheure)||it.mheure||'', mfin=(v0&&v0.mfin)||it.mfin||'';
+    // Repli : lire date + heures dans le texte (format « début JJ/MM/AAAA » / « de HH:MM à HH:MM ») si pas déjà extraits.
+    if(!mdate){ var _dm=String(it.texte||'').match(/(?:d[ée]but|le|date)\D{0,5}(\d{1,2})\/(\d{1,2})\/(\d{2,4})/i)||String(it.texte||'').match(/\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/); if(_dm){ var _yy=_dm[3].length===2?('20'+_dm[3]):_dm[3]; mdate=_yy+'-'+('0'+_dm[2]).slice(-2)+'-'+('0'+_dm[1]).slice(-2); } }
+    if(!mheure){ var _hm=String(it.texte||'').match(/de\s+(\d{1,2}:\d{2})\s+[àa]\s+(\d{1,2}:\d{2})/i)||String(it.texte||'').match(/(\d{1,2}:\d{2})\s*(?:[-→]|à|a)\s*(\d{1,2}:\d{2})/i); if(_hm){ mheure=_hm[1]; mfin=_hm[2]; } }
     var cfg=msgVarsLoad();
     var client=it.client||msgField(it,['client','donneur d ordre']);
     var ville=it.ville||msgField(it,['ville']).replace(/\s*\(\d{4,5}\)\s*$/,'');
