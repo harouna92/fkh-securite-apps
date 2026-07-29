@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b42</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b43</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -1317,15 +1317,22 @@ button.big:active{transform:translateY(1px)}
   // #4 Envoi groupé : numéro WhatsApp international + message pré-rempli depuis la demande.
   function waNum(tel){ var d=String(tel||'').replace(/\D/g,''); if(!d)return ''; if(d.charAt(0)==='0')d='33'+d.slice(1); else if(d.slice(0,2)==='33'){} else if(d.length===9)d='33'+d; return d; }
   // Modèle de message agent : PERMANENT (fkh_msg_tpl, variables {client} {ville} {quand}). L'édition dans la zone d'envoi = PONCTUELLE (it._nmsg).
-  var DEF_MSG_TPL='Bonjour, FKH SÉCURITÉ. Mission : {details}. Êtes-vous disponible ? Merci de me rappeler.';
+  var DEF_MSG_TPL='Bonjour 👋\n{details}\nSi tu es dispo (ou quelqu\'un que tu connais), merci de ton retour 🙏';
   var MSG_VARS=[{k:'client',lbl:'Client'},{k:'ville',lbl:'Ville'},{k:'site',lbl:'Site'},{k:'date',lbl:'Date'},{k:'hdebut',lbl:'Heure début'},{k:'hfin',lbl:'Heure fin'}];
   var _JOURS_L=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'], _JOURS_C=['DIM','LUN','MAR','MER','JEU','VEN','SAM'];
   function msgDayName(iso,fmt){ if(!iso||fmt==='none')return ''; var d=new Date(iso+'T12:00:00'); if(isNaN(d.getTime()))return ''; var i=d.getDay(); return fmt==='long'?_JOURS_L[i]:_JOURS_C[i]; }
   function msgTplLoad(){ var s=null; try{s=JSON.parse(localStorage.getItem('fkh_msg_tpl')||'null');}catch(e){} return (s&&typeof s==='string'&&s.trim())?s:DEF_MSG_TPL; }
   // Choix PERMANENT des variables à inclure dans le message (cases à cocher) + format du jour (_dayfmt : court/long/none).
-  function msgVarsLoad(){ var d={client:true,ville:true,site:true,date:true,hdebut:true,hfin:true,_dayfmt:'court'}, s=null; try{s=JSON.parse(localStorage.getItem('fkh_msg_vars')||'null');}catch(e){} if(s&&typeof s==='object'&&!Array.isArray(s)){ MSG_VARS.forEach(function(v){ if(typeof s[v.k]==='boolean')d[v.k]=s[v.k]; }); if(s._dayfmt==='court'||s._dayfmt==='long'||s._dayfmt==='none')d._dayfmt=s._dayfmt; } return d; }
+  function msgVarsLoad(){ var d={client:false,ville:true,site:true,date:true,hdebut:true,hfin:true,_dayfmt:'long'}, s=null; try{s=JSON.parse(localStorage.getItem('fkh_msg_vars')||'null');}catch(e){} if(s&&typeof s==='object'&&!Array.isArray(s)){ MSG_VARS.forEach(function(v){ if(typeof s[v.k]==='boolean')d[v.k]=s[v.k]; }); if(s._dayfmt==='court'||s._dayfmt==='long'||s._dayfmt==='none')d._dayfmt=s._dayfmt; } return d; }
   // Lit un champ « Label : valeur » dans le texte de la demande (les infos IA y sont souvent, pas dans les champs structurés).
   function msgField(it,keys){ var lines=String((it&&it.texte)||'').split('\n'); for(var i=0;i<lines.length;i++){ var mm=lines[i].match(/^\s*([^:]+?)\s*:\s*(.+?)\s*$/); if(mm){ var k=mm[1].toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim(); if(keys.indexOf(k)>=0)return mm[2].trim(); } } return ''; }
+  // Toutes les dates/heures d'une demande (multi-vacations).
+  function msgAllDates(it){ var out=[];
+    var raw=(typeof svExtractRaw==='function')?(svExtractRaw(it)||[]):[];
+    raw.forEach(function(v){ if(v.mdate||v.mheure)out.push({mdate:v.mdate||'',mheure:v.mheure||'',mfin:v.mfin||''}); });
+    if(out.length<=1){ var txt=String(it.texte||''), re=/d[ée]but\s+(\d{1,2})\/(\d{1,2})\/(\d{2,4})[\s\S]{0,50}?de\s+(\d{1,2}:\d{2})\s+[àa]\s+(\d{1,2}:\d{2})/gi, mm, parsed=[]; while((mm=re.exec(txt))){ var yy=mm[3].length===2?('20'+mm[3]):mm[3]; parsed.push({mdate:yy+'-'+('0'+mm[2]).slice(-2)+'-'+('0'+mm[1]).slice(-2), mheure:mm[4], mfin:mm[5]}); } if(parsed.length>out.length)out=parsed; }
+    return out;
+  }
   function nearGroupMsg(it){
     var v0=(typeof svExtractRaw==='function')?((svExtractRaw(it)||[])[0]||null):null;
     var mdate=(v0&&v0.mdate)||it.mdate||'', mheure=(v0&&v0.mheure)||it.mheure||'', mfin=(v0&&v0.mfin)||it.mfin||'';
@@ -1337,14 +1344,19 @@ button.big:active{transform:translateY(1px)}
     var ville=it.ville||msgField(it,['ville']).replace(/\s*\(\d{4,5}\)\s*$/,'');
     var site=it.site||it.siteAgent||msgField(it,['site','nom du site'])||it.titre||'';
     var dateStr=''; if(mdate){ var pp=mdate.split('-'), dn=msgDayName(mdate,cfg._dayfmt); dateStr=(dn?dn+' ':'')+(pp[2]+'/'+pp[1]); } else if(v0&&v0.dateLabel){ dateStr=v0.dateLabel; } else { dateStr=msgField(it,['date']); }
-    var det=[];
-    if(cfg.client&&client)det.push(client);
-    if(cfg.ville&&ville)det.push(ville);
-    if(cfg.site&&site)det.push(site);
-    if(cfg.date&&dateStr)det.push(dateStr);
-    if(cfg.hdebut&&cfg.hfin&&mheure&&mfin)det.push(mheure+'→'+mfin);
-    else { if(cfg.hdebut&&mheure)det.push(mheure); if(cfg.hfin&&mfin)det.push(mfin); }
-    var detStr=det.join(' · '), t=msgTplLoad();
+    // Proposition C : « On a une mission [pour X] à Site, Ville (CP) : » puis une ligne par date « Jour DD/MM — de HhMM à HhMM »
+    var cp=it.cp||((msgField(it,['ville']).match(/\((\d{3,5})\)/)||[])[1])||msgField(it,['code postal','cp'])||'';
+    var bodyLines=[];
+    var lieu=[]; if(cfg.site&&site)lieu.push(site); if(cfg.ville&&ville)lieu.push(ville+(cp?(' ('+cp+')'):''));
+    bodyLines.push('On a une mission'+((cfg.client&&client)?(' pour '+client):'')+(lieu.length?(' à '+lieu.join(', ')):'')+' :');
+    if(cfg.date){
+      var _dates=msgAllDates(it); if(!_dates.length&&(mdate||mheure))_dates=[{mdate:mdate,mheure:mheure,mfin:mfin}];
+      function _hf(t){ return String(t||'').replace(':','h'); }
+      function _cap(s){ return s?(s.charAt(0).toUpperCase()+s.slice(1)):s; }
+      _dates.forEach(function(dd){ var dp=''; if(dd.mdate){ var qp=dd.mdate.split('-'), qn=_cap(msgDayName(dd.mdate,cfg._dayfmt)); dp=(qn?qn+' ':'')+(qp[2]+'/'+qp[1]); } var hb=cfg.hdebut?dd.mheure:'', he=cfg.hfin?dd.mfin:''; var hp=(hb&&he)?('de '+_hf(hb)+' à '+_hf(he)):(hb?('à partir de '+_hf(hb)):(he?('jusqu\'à '+_hf(he)):'')); var ln=[dp,hp].filter(Boolean).join(' — '); if(ln)bodyLines.push(ln); });
+    }
+    var detStr=bodyLines.join('\n');
+    var t=msgTplLoad();
     // Les variables cochées vont TOUJOURS dans le message : repère {details} s'il existe, sinon en tête.
     if(/\{details\}/.test(t)){ t=t.replace(/\{details\}/g,detStr); }
     else { t=t.replace(/\{client\}|\{site\}|\{ville\}|\{quand\}|\{date\}/g,'').replace(/[ \t]{2,}/g,' ').trim(); if(detStr)t=detStr+(t?'\n'+t:''); }
@@ -4139,8 +4151,8 @@ button.big:active{transform:translateY(1px)}
   // ===== #6 Notifications — Niveau 1 (appli ouverte, téléphone + ordinateur) =====
   var NOTIF={ cfg:null, seen:{}, knownRech:null, primed:false, audio:null };
   var NOTIF_CATS=[
-    {k:'appel_retard',   ic:'🔴', lbl:'Appel de contrôle en retard (+5 min)'},
-    {k:'appel_danger',   ic:'⛔', lbl:'Appel non fait (+10 min) — danger'},
+    {k:'appel_retard',   ic:'🔴', lbl:'Prise/fin de service en retard (+5 min)'},
+    {k:'appel_danger',   ic:'⛔', lbl:'Prise/fin de service non pointée (+10 min)'},
     {k:'nouvelle_demande',ic:'🆕', lbl:'Nouvelle demande reçue (en recherche)'},
     {k:'demande_1h',     ic:'🕵️', lbl:'Demande en recherche depuis + d\'1 h'},
     {k:'prise_retard',   ic:'🕓', lbl:'Agent en retard à la prise de service'}
@@ -4159,10 +4171,11 @@ button.big:active{transform:translateY(1px)}
         var r=S[e.mid]&&S[e.mid][e.key], done=r&&r.done;
         if(e.key==='prise'&&done&&r.agRetard)out.push({cat:'prise_retard',key:e.mid,title:'🕓 Agent en retard à la prise',body:(e.agent||'Agent')+' — '+(e.site||'')+(r.agRetardMin?' · '+r.agRetardMin+' min':''),go:'suiviappels'});
         if(done)return;
+        if(e.key!=='prise'&&e.key!=='fin')return; // notifs UNIQUEMENT pour la prise et la fin de service (plus de pré-prise / appels de contrôle)
         var ct=new Date(e.mdate+'T00:00:00').getTime()+(e.abs||0)*60000; if(!ct||ct<gl)return;
-        var dmin=(now-ct)/60000, loc=(e.label||'Appel')+' — '+(e.site||'');
-        if(dmin>=10)out.push({cat:'appel_danger',key:e.mid+'|'+e.key,title:'⛔ Appel NON FAIT',body:loc+' · prévu '+e.heure+' (+'+Math.floor(dmin)+' min)',go:'suiviappels'});
-        else if(dmin>=4.5)out.push({cat:'appel_retard',key:e.mid+'|'+e.key,title:'🔴 Appel en retard',body:loc+' · prévu '+e.heure,go:'suiviappels'});
+        var dmin=(now-ct)/60000, loc=(e.label||(e.key==='prise'?'Prise de service':'Fin de service'))+' — '+(e.site||'');
+        if(dmin>=10)out.push({cat:'appel_danger',key:e.mid+'|'+e.key,title:'⛔ '+(e.key==='prise'?'Prise':'Fin')+' de service NON pointée',body:loc+' · prévu '+e.heure+' (+'+Math.floor(dmin)+' min)',go:'suiviappels'});
+        else if(dmin>=4.5)out.push({cat:'appel_retard',key:e.mid+'|'+e.key,title:'🔴 '+(e.key==='prise'?'Prise':'Fin')+' de service en retard',body:loc+' · prévu '+e.heure,go:'suiviappels'});
       });
     }catch(_){}
     try{ SUIVI.forEach(function(m){ if(m.statut==='recherche'&&m.pris&&(now-m.pris)>=3600000)out.push({cat:'demande_1h',key:m.id,title:'🕵️ Demande en recherche > 1 h',body:(m.titre||'Demande').slice(0,60)+(m.client?' — '+m.client:''),go:'suivi'}); }); }catch(_){}
