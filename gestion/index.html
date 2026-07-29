@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b33</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b34</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -2779,8 +2779,28 @@ button.big:active{transform:translateY(1px)}
   function svcDue(m,s){ var ms=svcStepMs(m,s); return ms==null?true:(Date.now()>ms+SVC_GRACE*60000); }
   // État d'une vacation : 'complet' (tout fait + photos), 'retard' (une étape échue non faite/sans photo), 'encours' (rien d'échu, en attente)
   function svcState(m){ var S=ssLoad(),st=S[m.id]||{},steps=ssSteps(m); function dn(s){return !!(st[s.key]&&st[s.key].done);} function ph(s){return !!(st[s.key]&&st[s.key].photoKey);} var phSteps=steps.filter(svcNeedPhoto); if(steps.every(dn)&&phSteps.every(ph))return 'complet'; var lateA=steps.some(function(s){return !dn(s)&&svcDue(m,s);}); var lateP=phSteps.some(function(s){return !ph(s)&&svcDue(m,s);}); return (lateA||lateP)?'retard':'encours'; }
+  // Code couleur d'anomalie d'une vacation (priorité : pointage manquant > client non avisé > retard > photo manquante > complet).
+  function svcAnomaly(m){
+    var S=ssLoad(), st=S[m.id]||{}, steps=ssSteps(m);
+    var hasPF=steps.some(function(s){return s.key==='prise'||s.key==='fin';});
+    // 🔴 prise/fin échue et NON pointée par l'opérateur
+    if(steps.some(function(s){ return (s.key==='prise'||s.key==='fin') && !(st[s.key]&&st[s.key].done) && svcDue(m,s); }))
+      return {c:'#e5322d', t:'🔴 Prise/fin non pointée (appel opérateur manquant)'};
+    // 🟡 client non avisé (prise/fin faite mais avise=false)
+    if(hasPF && ((st.prise&&st.prise.done&&!st.prise.avise) || (st.fin&&st.fin.done&&!st.fin.avise)))
+      return {c:'#e0b000', t:'🟡 Client non avisé (prise/fin)'};
+    // 🟠 agent en retard
+    if(steps.some(function(s){ var r=st[s.key]; return r&&r.done&&r.agRetard; }))
+      return {c:'#e08600', t:'🟠 Agent en retard à la prise'};
+    // 🟣 photo manquante (pointé mais sans photo, ou photo due non fournie)
+    if(steps.filter(svcNeedPhoto).some(function(s){ var r=st[s.key]; return r&&r.done&&!r.photoKey&&svcDue(m,s); }))
+      return {c:'#7b61ff', t:'🟣 Photo manquante'};
+    if(svcState(m)==='complet') return {c:'#1a9e5c', t:'🟢 Complet'};
+    return null;
+  }
   function svcSynthCard(m){
     var S=ssLoad(), st=S[m.id]||{}, steps=ssSteps(m);
+    var _anom=svcAnomaly(m);
     var site=m.siteAgent||m.titre||'—', ag=(m.agentId&&faById(m.agentId))?faById(m.agentId).nom:'';
     var pl=(typeof apPlan==='function')?apPlan(m):null;
     function dn(s){return !!(st[s.key]&&st[s.key].done);} function ph(s){return !!(st[s.key]&&st[s.key].photoKey);}
@@ -2812,7 +2832,8 @@ button.big:active{transform:translateY(1px)}
     var globalPill='<span style="float:right;font-weight:800;font-size:12.5px;color:'+gCol+'">'+gTxt+'</span>';
     var finH=(typeof apFinHeure==='function')?apFinHeure(m):''; if(!finH&&m.mfin){ var _mp=String(m.mfin).trim().split(/\s+/); var _last=_mp[_mp.length-1]; if(/^\d{1,2}:\d{2}$/.test(_last))finH=_last; }
     var head='<div class="fa-n" style="font-size:15.5px">'+globalPill+esc(site)+(m.ville?' <span style="color:var(--muted);font-weight:400">· '+esc(m.ville):'')+'</span> <span style="color:var(--muted);font-weight:400">'+esc(m.mdate||'')+(m.mheure?' 🟢 '+esc(m.mheure):'')+(finH?' → 🔚 '+esc(finH):'')+'</span>'+(pl&&pl.night?' <span style="color:#e0784b">🌙 nuit</span>':'')+'</div><div class="fa-d" style="margin:2px 0 6px">'+(m.client?'🏢 '+esc(m.client)+' · ':'')+(ag?('👤 '+esc(ag)):'<span style="color:var(--warn)">⚠ agent à affecter</span>')+'</div>';
-    return '<div class="card" style="padding:10px">'+head
+    return '<div class="card" style="padding:10px'+(_anom?';border-left:6px solid '+_anom.c:'')+'">'+head
+      +(_anom&&_anom.c!=='#1a9e5c'?'<div style="font-size:12px;font-weight:800;color:'+_anom.c+';margin:0 0 5px">'+esc(_anom.t)+'</div>':'')
       +'<div style="margin-bottom:4px">'+appelsLine+'</div>'
       +'<div style="margin-bottom:4px">'+photosLine+'</div>'
       +(cliLine?'<div class="fa-d" style="margin-top:4px">'+cliLine+'</div>':'')
@@ -2828,7 +2849,7 @@ button.big:active{transform:translateY(1px)}
       if(typeof apDeconflict==='function')apDeconflict(miss,10);
       if(!miss.length){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune vacation (mission validée) '+esc(periode0)+(q?' pour ce filtre':'')+'.</div></div>'; return; }
       var nComplet=0,nRetard=0,nCours=0; miss.forEach(function(m){ var s=svcState(m); if(s==='complet')nComplet++; else if(s==='retard')nRetard++; else nCours++; });
-      var head='<div class="card"><div class="lab" style="margin:0 0 2px">'+miss.length+' vacation'+(miss.length>1?'s':'')+' — '+esc(periode0)+'</div><div class="fa-d" style="margin:0">✅ '+nComplet+' complète'+(nComplet>1?'s':'')+' · <span style="color:#e0a13b;font-weight:700">⚠️ '+nRetard+' en retard</span> · <span style="color:var(--muted)">🕓 '+nCours+' en cours</span></div><div class="sub" style="margin:2px 0 0">« En retard » = une étape dont l\'heure prévue (+'+SVC_GRACE+' min) est passée sans appel/photo. Les étapes à venir ne comptent pas.</div></div>';
+      var head='<div class="card"><div class="lab" style="margin:0 0 2px">'+miss.length+' vacation'+(miss.length>1?'s':'')+' — '+esc(periode0)+'</div><div class="fa-d" style="margin:0">✅ '+nComplet+' complète'+(nComplet>1?'s':'')+' · <span style="color:#e0a13b;font-weight:700">⚠️ '+nRetard+' en retard</span> · <span style="color:var(--muted)">🕓 '+nCours+' en cours</span></div><div class="sub" style="margin:2px 0 0">« En retard » = une étape dont l\'heure prévue (+'+SVC_GRACE+' min) est passée sans appel/photo. Les étapes à venir ne comptent pas.</div><div class="sub" style="margin:5px 0 0;font-size:11.5px;line-height:1.8">🎨 Bandes couleur (anomalie) : <b style="color:#e5322d">🔴 prise/fin non pointée</b> · <b style="color:#e0b000">🟡 client non avisé</b> · <b style="color:#e08600">🟠 agent en retard</b> · <b style="color:#7b61ff">🟣 photo manquante</b> · <b style="color:#1a9e5c">🟢 complet</b></div></div>';
       wrap.innerHTML=head+miss.map(svcSynthCard).join('');
       wrap.querySelectorAll('.svc-ph').forEach(function(a){ a.onclick=function(ev){ ev.preventDefault(); if(typeof photoOpen==='function')photoOpen(a.getAttribute('data-k')); }; });
       wrap.querySelectorAll('.svc-goappels').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); var tb=document.querySelector('#tabs button[data-s="suiviappels"]'); if(tb)tb.click(); }; });
