@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b37</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b38</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -1377,10 +1377,11 @@ button.big:active{transform:translateY(1px)}
       var ctBadge=(ct&&(ct.c||ct.m))?('<div class="fa-d" style="color:#1a9e5c;font-weight:700;font-size:12px;margin-top:2px">'+[ct.c?'☎️ déjà appelé':'',ct.m?'✉️ message envoyé':''].filter(Boolean).join(' · ')+(ct.by?' <span style="color:var(--muted);font-weight:400">— '+esc(ct.by)+'</span>':'')+'</div>'):'';
       var ctcBtn='<button data-act="nctc" data-id="'+it.id+'" data-aid="'+a.id+'" title="'+((ct&&ct.c)?'Retirer « appelé »':'Marquer comme appelé')+'"'+((ct&&ct.c)?' style="color:#1a9e5c;border-color:#1a9e5c"':'')+'>☎️'+((ct&&ct.c)?'✓':'')+'</button>';
       var ctcBtnM='<button data-act="nctcm" data-id="'+it.id+'" data-aid="'+a.id+'" title="'+((ct&&ct.m)?'Retirer « message envoyé »':'Marquer message envoyé')+'"'+((ct&&ct.m)?' style="color:#1a9e5c;border-color:#1a9e5c"':'')+'>✉️'+((ct&&ct.m)?'✓':'')+'</button>';
+      var _waN=(typeof waNum==='function')?waNum((a.tels&&a.tels[0])||a.tel):''; var waBtn1=_waN?'<button data-act="nwa" data-id="'+it.id+'" data-aid="'+a.id+'" title="Envoyer le message WhatsApp à cet agent (marque « message envoyé »)" style="background:#25d366;border-color:#25d366;color:#062e16;font-weight:700">🟢</button>':'';
       var CT_ST={attente:{t:'📞 j\'attends son retour',c:'#e08600'},dispo:{t:'✅ disponible',c:'#1a9e5c'},indispo:{t:'❌ indisponible (cette mission)',c:'#e5322d'},norep:{t:'📵 ne répond pas',c:'#8a8f98'}};
       var stCur=(ct&&ct.st&&CT_ST[ct.st])?ct.st:'';
       var stLine='<div class="fa-d" style="margin-top:3px;display:flex;align-items:center;gap:7px;flex-wrap:wrap"><select class="ctc-st" data-id="'+it.id+'" data-aid="'+a.id+'" style="width:auto;padding:3px 6px;font-size:12px;border-radius:7px"><option value="">— statut appel —</option>'+Object.keys(CT_ST).map(function(k){return '<option value="'+k+'"'+(stCur===k?' selected':'')+'>'+CT_ST[k].t+'</option>';}).join('')+'</select>'+(stCur?'<span style="color:'+CT_ST[stCur].c+';font-weight:700;font-size:12px">'+CT_ST[stCur].t+(ct&&ct.by?' <span style="color:var(--muted);font-weight:400">— '+esc(ct.by)+'</span>':'')+'</span>':'')+'</div>';
-      return '<div class="fa"'+(assoc?' style="background:var(--okbg);border-radius:9px;padding:8px"':'')+'><div style="flex:1"><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+(d||'—')+'</div>'+dispoLine+ctBadge+stLine+'</div><div class="fa-a">'+selChk+call+ctcBtn+ctcBtnM+'<button data-act="nassoc" data-id="'+it.id+'" data-aid="'+a.id+'"'+(assoc?' style="color:var(--ok);border-color:var(--ok)"':'')+' title="'+(assoc?'Retirer de la demande':'Associer à la demande')+'">'+(assoc?'✓':'➕')+'</button></div></div>';
+      return '<div class="fa"'+(assoc?' style="background:var(--okbg);border-radius:9px;padding:8px"':'')+'><div style="flex:1"><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+(d||'—')+'</div>'+dispoLine+ctBadge+stLine+'</div><div class="fa-a">'+selChk+call+waBtn1+ctcBtn+ctcBtnM+'<button data-act="nassoc" data-id="'+it.id+'" data-aid="'+a.id+'"'+(assoc?' style="color:var(--ok);border-color:var(--ok)"':'')+' title="'+(assoc?'Retirer de la demande':'Associer à la demande')+'">'+(assoc?'✓':'➕')+'</button></div></div>';
     }).join('')+'</div>';
     var selAgents=list.filter(function(o){return nsel[o.a.id];}), selN=selAgents.length, gmsg=(it._nmsg!=null?it._nmsg:nearGroupMsg(it));
     var waBtns=selAgents.map(function(o){ var n=waNum((o.a.tels&&o.a.tels[0])||o.a.tel); return n?('<button data-act="nwa" data-id="'+it.id+'" data-aid="'+o.a.id+'" style="background:#25d366;border-color:#25d366;color:#062e16;font-weight:600">🟢 '+esc(o.a.nom||'agent')+'</button>'):('<span style="color:var(--muted);font-size:12px;align-self:center">'+esc(o.a.nom||'agent')+' (pas de n°)</span>'); }).join(' ');
