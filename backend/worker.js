@@ -284,10 +284,14 @@ export default {
       // Rôles métier, PLUSIEURS comptes par rôle via pattern : APP_PASSWORD_OPERATEUR, _OPERATEUR2, _OPERATEUR3… (idem SUPERVISEUR/ADMIN/SUPERADMIN).
       // Accès complet (sections:null) pour l'instant ; `user` = identité pour l'attribution des anomalies. Ajouter une personne = créer un nouveau secret, SANS redéploiement.
       const ROLE_MAP = { OPERATEUR: "operateur", SUPERVISEUR: "superviseur", ADMIN: "admin", SUPERADMIN: "superadmin" };
+      // Vues autorisées par rôle. null = accès complet. Opérateur = restreint (défini avec Zeus, à affiner ensuite).
+      const SECTIONS_BY_ROLE = { operateur: ["suiviappels", "interv", "suivi", "demandes", "noterapide"] };
       for (const k of Object.keys(env)) {
         const mm = /^APP_PASSWORD_(SUPERADMIN|SUPERVISEUR|OPERATEUR|ADMIN)(\d*)$/.exec(k);
-        if (mm && typeof env[k] === "string" && env[k].length > 0 && pw === env[k])
-          return { role: ROLE_MAP[mm[1]], user: mm[1].toLowerCase() + "-" + (mm[2] || "1"), sections: null };
+        if (mm && typeof env[k] === "string" && env[k].length > 0 && pw === env[k]) {
+          const role = ROLE_MAP[mm[1]];
+          return { role: role, user: mm[1].toLowerCase() + "-" + (mm[2] || "1"), sections: SECTIONS_BY_ROLE[role] || null };
+        }
       }
       for (const v of ["APP_PASSWORD_R1", "APP_PASSWORD_R2"]) {
         if (typeof env[v] === "string" && env[v].length > 0 && pw === env[v])
