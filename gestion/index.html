@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b45</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b46</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -207,6 +207,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="appels">📞 Appels</button>
     <button data-s="suivisite">🏢 Suivi site</button>
     <button data-s="supervision">📊 Supervision</button>
+    <button data-s="tickets">🎫 Tickets</button>
   </div>
 </div>
 <div id="gsearch-wrap" style="position:relative;max-width:1100px;margin:8px auto 0;padding:0 10px">
@@ -848,6 +849,10 @@ button.big:active{transform:translateY(1px)}
     <div class="subtabs" id="supTabs"><button type="button" data-t="oper" class="on">⚡ Opérationnel</button><button type="button" data-t="board">📈 Tableau de bord</button><button type="button" data-t="anom">🚨 Anomalies</button></div>
     <div id="sup-body"></div>
   </section>
+  <section id="sec-tickets" class="hidden">
+    <div><h1>🎫 Tickets</h1><p class="sub">Confie une tâche à traiter. La personne fait le travail <b>directement depuis le ticket</b> (champ à renseigner + lien vers la fiche), et le <b>suivi se met à jour tout seul</b> (ex. 3/11 renseignées).</p></div>
+    <div id="tk-body"></div>
+  </section>
 </div>
 
 <script>
@@ -891,8 +896,8 @@ button.big:active{transform:translateY(1px)}
   }
   // Branche un bouton .gtime sur la grille : clic -> grille -> data-v + callback
   function bindTimeBtn(el,onPick){ if(!el)return; el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); openTimeGrid(el, tbGet(el), function(v){ tbSet(el,v); if(onPick)onPick(v); }); }); }
-  var secs=['demandes','noterapide','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
+  var secs=['demandes','noterapide','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
   // ===== Réorganiser les SECTIONS (onglets) par glisser-déposer — appui long, mémorisé par appareil =====
   (function tabReorder(){
     var bar=byId('tabs'); if(!bar)return; var LS='fkh_tabs_order';
@@ -2293,7 +2298,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_saved_views'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   function applySectionAccess(){ var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=(!allowed)||allowed.indexOf(s)>=0; b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
@@ -2848,6 +2853,42 @@ button.big:active{transform:translateY(1px)}
     return out;
   }
   function svcAnomaly(m){ var a=svcAnomaliesAll(m); if(a.length)return a[0]; if(svcState(m)==='complet')return {c:'#1a9e5c', t:'🟢 Complet'}; return null; }
+  // ===== 🎫 TICKETS — tâches déléguées, actionnables depuis le ticket + suivi vivant (data-driven) =====
+  var TK_OPEN={};
+  var TK_TYPES={
+    adresse:  { lbl:'Adresses manquantes', fieldLbl:'Adresse', ph:'Ex. 12 rue des Lilas, 21000 Dijon', get:function(a){return a.adresse||'';}, set:function(a,v){ a.adresse=String(v||'').trim(); save('fkh_fa',FA); }, missing:function(a){ return !(a.adresse&&String(a.adresse).trim()); } },
+    matricule:{ lbl:'Matricules manquants', fieldLbl:'N° matricule', ph:'Ex. 12345', get:function(a){ var m=(typeof matState==='function')?matState(a.nom):null; return (m&&m.num)||''; }, set:function(a,v){ if(typeof setAgentMatricule==='function')setAgentMatricule(a.nom,String(v||'').trim()); }, missing:function(a){ var m=(typeof matState==='function')?matState(a.nom):null; return !(m&&m.num); } }
+  };
+  function tkLoad(){ var a=load('fkh_tickets'); return Array.isArray(a)?a:[]; }
+  function tkSave(a){ save('fkh_tickets',a); }
+  function tkProgress(t){ var ty=TK_TYPES[t.type]; if(!ty)return {done:0,total:0}; var ids=t.targetIds||[],done=0; ids.forEach(function(id){ var a=faById(id); if(a&&!ty.missing(a))done++; }); return {done:done,total:ids.length}; }
+  function renderTickets(){
+    var wrap=byId('tk-body'); if(!wrap)return; var T=tkLoad();
+    var typeOpts=Object.keys(TK_TYPES).map(function(k){ var n=(typeof FA!=='undefined'?FA:[]).filter(function(a){return TK_TYPES[k].missing(a);}).length; return '<option value="'+k+'">'+TK_TYPES[k].lbl+' ('+n+' agents concernés)</option>'; }).join('');
+    var create='<div class="card"><div class="lab" style="margin:0 0 6px">➕ Nouveau ticket <span class="sub" style="font-weight:400">— la cible est détectée automatiquement</span></div>'
+      +'<div class="grid2"><label class="f"><div class="lab">Tâche</div><select id="tk-type">'+typeOpts+'</select></label><label class="f"><div class="lab">Destinataire</div><input id="tk-assignee" placeholder="Ex. Traoré, ou « opérateurs »" autocomplete="off"></label></div>'
+      +'<label class="f" style="margin-top:6px"><div class="lab">Consigne (facultatif)</div><input id="tk-consigne" placeholder="Ex. Appeler chaque agent pour récupérer son adresse postale"></label>'
+      +'<button class="big" id="tk-create" style="margin-top:8px">🎫 Créer le ticket</button></div>';
+    var list=T.length?T.slice().reverse().map(function(t){
+      var ty=TK_TYPES[t.type], p=tkProgress(t), pct=p.total?Math.round(p.done/p.total*100):100, open=!!TK_OPEN[t.id];
+      var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px"><div><b>'+esc(t.titre||(ty?ty.lbl:'Ticket'))+'</b>'+(t.assignee?' <span class="sub">→ '+esc(t.assignee)+'</span>':'')+'</div><div><button data-tkopen="'+esc(t.id)+'" style="font-size:12px">'+(open?'▾ Réduire':'▸ Ouvrir')+'</button> <button class="no" data-tkdel="'+esc(t.id)+'" style="font-size:12px">🗑️</button></div></div>'
+        +(t.consigne?'<div class="sub" style="margin:3px 0 0">'+esc(t.consigne)+'</div>':'')
+        +'<div style="margin:7px 0 0"><div style="height:9px;background:var(--panel2);border-radius:6px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+(p.total&&p.done>=p.total?'#1a9e5c':'#3b6ef5')+';transition:width .3s"></div></div><div class="sub" style="margin:3px 0 0"><b>'+p.done+'/'+p.total+'</b> renseignés'+(p.total&&p.done>=p.total?' · ✅ terminé':'')+'</div></div>';
+      if(open&&ty){
+        var rows=(t.targetIds||[]).map(function(id){ var a=faById(id); if(!a)return ''; var cur=ty.get(a), done=!ty.missing(a);
+          return '<div style="padding:8px 0;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="flex:1;min-width:120px;font-weight:600">'+(done?'✅ ':'')+esc(a.nom||'—')+'</span><input class="tk-field" data-tkid="'+esc(t.id)+'" data-aid="'+esc(id)+'" value="'+esc(cur)+'" placeholder="'+esc(ty.ph)+'" style="flex:2;min-width:170px;padding:6px 8px;border:1px solid '+(done?'#1a9e5c':'var(--line)')+';border-radius:8px;background:var(--panel2);color:var(--ink)"><button data-tkfiche="'+esc(a.nom||'')+'" style="font-size:12px">👤 fiche</button></div>';
+        }).join('');
+        h+='<div style="margin-top:6px"><div class="lab" style="margin:0 0 2px">'+esc(ty.fieldLbl)+' à renseigner directement ici :</div>'+(rows||'<div class="sub">Aucun élément (tout est renseigné 🎉).</div>')+'</div>';
+      }
+      return h+'</div>';
+    }).join(''):'<div class="card"><div class="sub" style="margin:0">Aucun ticket pour l\'instant. Crée-en un ci-dessus.</div></div>';
+    wrap.innerHTML=create+list;
+    if(byId('tk-create'))byId('tk-create').onclick=function(){ var type=byId('tk-type').value, ty=TK_TYPES[type]; if(!ty)return; var ids=(typeof FA!=='undefined'?FA:[]).filter(function(a){return ty.missing(a);}).map(function(a){return a.id;}); if(!ids.length){ alert('Aucun agent concerné — rien à faire pour cette tâche.'); return; } var arr=tkLoad(); arr.push({id:'tk'+Date.now()+'_'+Math.round(Math.random()*9999),type:type,titre:ty.lbl,consigne:(byId('tk-consigne').value||'').trim(),assignee:(byId('tk-assignee').value||'').trim(),targetIds:ids,by:(typeof opNow==='function'?opNow():''),at:Date.now()}); tkSave(arr); TK_OPEN[arr[arr.length-1].id]=true; renderTickets(); };
+    wrap.querySelectorAll('[data-tkopen]').forEach(function(b){ b.onclick=function(){ var id=b.getAttribute('data-tkopen'); TK_OPEN[id]=!TK_OPEN[id]; renderTickets(); }; });
+    wrap.querySelectorAll('[data-tkdel]').forEach(function(b){ b.onclick=function(){ var id=b.getAttribute('data-tkdel'); if(!confirm('Supprimer ce ticket ?'))return; tkSave(tkLoad().filter(function(x){return x.id!==id;})); renderTickets(); }; });
+    wrap.querySelectorAll('.tk-field').forEach(function(inp){ inp.addEventListener('change',function(){ var tid=inp.getAttribute('data-tkid'), aid=inp.getAttribute('data-aid'), t=tkLoad().filter(function(x){return x.id===tid;})[0]; if(!t)return; var ty=TK_TYPES[t.type], a=faById(aid); if(a&&ty){ ty.set(a,inp.value); renderTickets(); } }); });
+    wrap.querySelectorAll('[data-tkfiche]').forEach(function(b){ b.onclick=function(){ var nom=b.getAttribute('data-tkfiche'), tb=document.querySelector('#tabs button[data-s="fiche"]'); if(tb)tb.click(); var fs=byId('fa-search'); if(fs){ fs.value=nom; fs.dispatchEvent(new Event('input',{bubbles:true})); if(fs.scrollIntoView)fs.scrollIntoView({behavior:'smooth',block:'center'}); } }; });
+  }
   function svcSynthCard(m){
     var S=ssLoad(), st=S[m.id]||{}, steps=ssSteps(m);
     var _anomAll=svcAnomaliesAll(m), _anom=_anomAll[0]||(svcState(m)==='complet'?{c:'#1a9e5c',t:'🟢 Complet'}:null);
