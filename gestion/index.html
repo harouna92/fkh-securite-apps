@@ -1563,6 +1563,23 @@ button.big:active{transform:translateY(1px)}
     if(/(aujourd|demain|ce soir|cette nuit|d[eè]s que possible|asap|imm[eé]diat|urgent|h24|24\s*\/\s*24|en continu|permanent)/i.test(t))return false; // timing immédiat/continu
     return true;
   }
+  // #3 Priorité d'une demande = durée CONTINUE maximale d'une vacation (pas le cumul). H24 / ≥24h = très prioritaire, >12h = prioritaire.
+  function demPrioMin(x){
+    if(!x)return 0;
+    var best=0; function hit(m){ if(m>best)best=m; }
+    var isH24 = !!x.h24 || (Array.isArray(x.vacations)&&x.vacations.some(function(v){return v&&v.h24;})) || /\bh\s*24\b|24\s*\/\s*24|en\s*continu|permanent/i.test((x.texte||'')+' '+(x.titre||''));
+    if(isH24)hit(1440);
+    try{ (svExtractRaw(x)||[]).forEach(function(v){ if(v.mheure&&v.mfin){ var s=toMin(v.mheure),e=toMin(v.mfin); if(s!=null&&e!=null){ if(e<=s)e+=1440; hit(e-s); } } }); }catch(e){}
+    return best;
+  }
+  function demPrio(x){ var m=demPrioMin(x); return { min:m, lvl:(m>=1440?3:(m>720?2:1)) }; }
+  function demPrioLine(x){
+    if(!x||x.statut!=='recherche')return '';
+    var p=demPrio(x); if(p.lvl<2)return '';
+    var isH24=p.min>=1440, col=p.lvl===3?'#e5322d':'#e08600';
+    var lab=p.lvl===3?('🔴 TRÈS PRIORITAIRE — '+(isH24?'H24 / ≥ 24h':fmtDurMin(p.min))+' en continu'):('🟠 Prioritaire — '+fmtDurMin(p.min)+' en continu');
+    return '<div class="meta" style="background:'+(p.lvl===3?'rgba(229,50,45,.14)':'rgba(224,134,0,.14)')+';border:1.5px solid '+col+';border-radius:10px;padding:7px 10px;margin-top:4px"><span style="color:'+col+';font-weight:800">'+lab+'</span> <span style="color:var(--muted);font-size:12px">à traiter en priorité (superviseur / admin)</span></div>';
+  }
   function renderSuivi(){
     ['recherche','validee','annulee','nongeree'].forEach(function(b){var el=byId('cnt-'+b);if(el)el.textContent=SUIVI.filter(function(x){return x.statut===b;}).length;});
     document.querySelectorAll('#suiviTabs button').forEach(function(bt){bt.classList.toggle('on',bt.getAttribute('data-b')===suiviBucket);});
@@ -1611,7 +1628,7 @@ button.big:active{transform:translateY(1px)}
       if(x.statut==='validee'&&!x.vacIdx&&!x._splitpick){ var _rawv=(typeof svExtractRaw==='function')?svExtractRaw(x):[]; var _hasLong=_rawv.some(function(v){ var S=(v.mheure)?toMin(v.mheure):null,E=(v.mfin)?toMin(v.mfin):null; if(S==null||E==null)return false; if(E<=S)E+=1440; return (E-S)>720; }); var _multi=_rawv.length>=2; if(_hasLong||_multi){ over12line='<div class="meta" style="background:rgba(224,74,74,.14);border:1.5px solid var(--bad);border-radius:10px;padding:7px 10px;margin-top:4px"><span style="color:var(--bad);font-weight:700">'+(_hasLong?'⚠️ Créneau > 12h — une vacation ne doit pas dépasser 12h.':'🔪 Plusieurs vacations dans cette mission.')+' À découper ↓</span></div>'; vacSplitBtn='<div class="acts" style="margin-top:2px"><button class="ok" data-act="splitvac" data-id="'+x.id+'" title="Découper en vacations (choix de la règle)">🔪 Découper en vacations</button></div>'; } }
       var splitPickPanel=(x._splitpick)?('<div class="pickp" style="border:1.5px solid #6ea8fe"><div class="lab" style="margin:0 0 5px;color:#6ea8fe">🔪 Découpage en vacations — choisis la règle</div><div class="acts" style="flex-wrap:wrap;gap:6px;align-items:center"><button class="ok" data-act="dovalidate" data-rule="720" data-id="'+x.id+'">12h (défaut)</button><button data-act="dovalidate" data-rule="480" data-id="'+x.id+'">8h</button><button data-act="dovalidate" data-rule="360" data-id="'+x.id+'">6h</button><span style="display:inline-flex;align-items:center;gap:4px">Perso <input class="splitcustom" type="number" min="1" max="24" step="1" placeholder="h" style="width:56px;padding:5px"> h <button data-act="dovalidate" data-rule="custom" data-id="'+x.id+'">Appliquer</button></span><button data-act="dovalidate" data-rule="0" data-id="'+x.id+'" title="Valider sans découper">Garder tel quel</button><button data-act="splitcancel" data-id="'+x.id+'">Annuler</button></div></div>'):'';
       var svBrd=x.aiPending?'#7b61ff':(svNoDate(x)?'var(--bad)':'');
-      return '<div class="sv"'+(svBrd?' style="border:1.5px solid '+svBrd+'"':'')+'><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+vacTag+priseShiftLine+over12line+aiPendLine+noDateLine+cdLine+bigCitiesLine(x)+assocLine+zdLine+izLine+'<div class="svm">'+esc(x.texte)+'</div>'+vacSplitBtn+body+splitPickPanel+pickBtn+editPanel+pickPanel+nearPanel+renderAffect(x)+'</div>';
+      return '<div class="sv"'+(svBrd?' style="border:1.5px solid '+svBrd+'"':'')+'><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+demPrioLine(x)+vacTag+priseShiftLine+over12line+aiPendLine+noDateLine+cdLine+bigCitiesLine(x)+assocLine+zdLine+izLine+'<div class="svm">'+esc(x.texte)+'</div>'+vacSplitBtn+body+splitPickPanel+pickBtn+editPanel+pickPanel+nearPanel+renderAffect(x)+'</div>';
     }
     if(suiviBucket==='validee'){
       var byD=function(a,b){var da=a.mdate||'9999-99-99',db=b.mdate||'9999-99-99';return da>db?1:(da<db?-1:0);};
@@ -1636,7 +1653,9 @@ button.big:active{transform:translateY(1px)}
       if(pst.length){ h+='<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--muted);font-weight:700;padding:6px 2px">▸ '+pst.length+' déjà passée'+(pst.length>1?'s':'')+' (traitée'+(pst.length>1?'s':'')+') — afficher</summary><div style="opacity:.55;margin-top:6px">'+pst.map(svItem).join('')+'</div></details>'; }
       wrap.innerHTML=h;
     } else {
-      wrap.innerHTML=arr.map(svItem).join('');
+      var list=arr;
+      if(suiviBucket==='recherche'){ list=arr.map(function(x,i){return {x:x,l:demPrio(x).lvl,i:i};}).sort(function(a,b){ return (b.l-a.l)||(a.i-b.i); }).map(function(o){return o.x;}); }
+      wrap.innerHTML=list.map(svItem).join('');
     }
     if(typeof svTick==='function')svTick();
     if(typeof nearRouteScan==='function')nearRouteScan();
