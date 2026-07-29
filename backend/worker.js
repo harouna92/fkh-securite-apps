@@ -281,6 +281,12 @@ export default {
       if (!pw) return null;
       if (typeof env.APP_PASSWORD === "string" && env.APP_PASSWORD.length > 0 && pw === env.APP_PASSWORD)
         return { role: "full", sections: null };
+      // 4 rôles métier : reconnus mais ACCÈS COMPLET pour l'instant (sections:null = aucun filtre de vue). Le filtrage par rôle sera ajouté ensuite, défini avec Zeus.
+      const ROLE_ENVS = { APP_PASSWORD_OPERATEUR: "operateur", APP_PASSWORD_SUPERVISEUR: "superviseur", APP_PASSWORD_ADMIN: "admin", APP_PASSWORD_SUPERADMIN: "superadmin" };
+      for (const k in ROLE_ENVS) {
+        if (typeof env[k] === "string" && env[k].length > 0 && pw === env[k])
+          return { role: ROLE_ENVS[k], sections: null };
+      }
       for (const v of ["APP_PASSWORD_R1", "APP_PASSWORD_R2"]) {
         if (typeof env[v] === "string" && env[v].length > 0 && pw === env[v])
           return { role: v, sections: RESTRICTED_SECTIONS };
