@@ -1304,11 +1304,17 @@ button.big:active{transform:translateY(1px)}
   // #4 Envoi groupé : numéro WhatsApp international + message pré-rempli depuis la demande.
   function waNum(tel){ var d=String(tel||'').replace(/\D/g,''); if(!d)return ''; if(d.charAt(0)==='0')d='33'+d.slice(1); else if(d.slice(0,2)==='33'){} else if(d.length===9)d='33'+d; return d; }
   // Modèle de message agent : PERMANENT (fkh_msg_tpl, variables {client} {ville} {quand}). L'édition dans la zone d'envoi = PONCTUELLE (it._nmsg).
-  var DEF_MSG_TPL='Bonjour, FKH SÉCURITÉ. Mission {client} {ville} {quand}. Êtes-vous disponible ? Merci de me rappeler.';
+  var DEF_MSG_TPL='Bonjour, FKH SÉCURITÉ. Mission {client} {site} {ville} {quand}. Êtes-vous disponible ? Merci de me rappeler.';
+  var MSG_VARS=[{k:'client',lbl:'Client'},{k:'site',lbl:'Site'},{k:'ville',lbl:'Ville'},{k:'quand',lbl:'Date/heure'}];
   function msgTplLoad(){ var s=null; try{s=JSON.parse(localStorage.getItem('fkh_msg_tpl')||'null');}catch(e){} return (s&&typeof s==='string'&&s.trim())?s:DEF_MSG_TPL; }
+  // Choix PERMANENT des variables à inclure dans le message (cases à cocher).
+  function msgVarsLoad(){ var d={client:true,site:false,ville:true,quand:true}, s=null; try{s=JSON.parse(localStorage.getItem('fkh_msg_vars')||'null');}catch(e){} if(s&&typeof s==='object'&&!Array.isArray(s)){ MSG_VARS.forEach(function(v){ if(typeof s[v.k]==='boolean')d[v.k]=s[v.k]; }); } return d; }
   function nearGroupMsg(it){ var vac=(typeof svExtractVacations==='function')?svExtractVacations(it):[], v0=vac[0]||null, when=''; if(v0&&v0.mdate){ when=v0.mdate.split('-').reverse().join('/')+(v0.mheure?' '+v0.mheure:'')+(v0.mfin?'→'+v0.mfin:''); }
-    var t=msgTplLoad();
-    t=t.replace(/\{client\}/g,it.client?('pour '+it.client):'').replace(/\{ville\}/g,it.ville?('à '+it.ville):'').replace(/\{quand\}/g,when?('le '+when):'');
+    var cfg=msgVarsLoad(), t=msgTplLoad();
+    t=t.replace(/\{client\}/g,(cfg.client&&it.client)?('pour '+it.client):'')
+       .replace(/\{site\}/g,(cfg.site&&(it.site||it.siteAgent))?('— '+(it.site||it.siteAgent)):'')
+       .replace(/\{ville\}/g,(cfg.ville&&it.ville)?('à '+it.ville):'')
+       .replace(/\{quand\}/g,(cfg.quand&&when)?('le '+when):'');
     return t.replace(/\s{2,}/g,' ').replace(/\s+([.,!?])/g,'$1').trim(); }
   // Traçabilité des contacts d'une demande (qui a déjà été appelé / a reçu un message) — visible par tous, pour travailler en parallèle sans doublon.
   function opNow(){ try{ var o=load('fkh_operateurs'), t=impTodayISO(); return (o&&!Array.isArray(o)&&o[t])||''; }catch(e){ return ''; } }
@@ -1345,7 +1351,8 @@ button.big:active{transform:translateY(1px)}
     var waBtns=selAgents.map(function(o){ var n=waNum((o.a.tels&&o.a.tels[0])||o.a.tel); return n?('<button data-act="nwa" data-id="'+it.id+'" data-aid="'+o.a.id+'" style="background:#25d366;border-color:#25d366;color:#062e16;font-weight:600">🟢 '+esc(o.a.nom||'agent')+'</button>'):('<span style="color:var(--muted);font-size:12px;align-self:center">'+esc(o.a.nom||'agent')+' (pas de n°)</span>'); }).join(' ');
     var groupBar=list.length?('<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px">'
       +'<div class="hm" style="justify-content:space-between;flex-wrap:wrap;gap:6px"><b style="font-size:13px">📤 Envoi groupé — '+selN+' sélectionné'+(selN>1?'s':'')+'</b><span><button data-act="nselall" data-id="'+it.id+'">Tout cocher</button> <button data-act="nselnone" data-id="'+it.id+'">Aucun</button></span></div>'
-      +(selN?('<textarea data-nmsg="'+it.id+'" rows="3" style="width:100%;margin:6px 0;font-size:13px;border-radius:8px">'+esc(gmsg)+'</textarea>'
+      +(selN?('<div class="hint" style="margin:4px 0 3px">Variables à inclure <b>(permanent)</b> : '+MSG_VARS.map(function(v){ return '<label style="display:inline-flex;align-items:center;gap:3px;margin:0 10px 3px 0;font-size:12px;cursor:pointer"><input type="checkbox" data-msgvar="'+v.k+'" data-id="'+it.id+'"'+(msgVarsLoad()[v.k]?' checked':'')+' style="width:15px;height:15px;padding:0;margin:0">'+v.lbl+'</label>'; }).join('')+'</div>'
+          +'<textarea data-nmsg="'+it.id+'" rows="3" style="width:100%;margin:2px 0 6px;font-size:13px;border-radius:8px">'+esc(gmsg)+'</textarea>'
           +'<div class="hint" style="margin:0 0 6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">✍️ Ce texte ne vaut que pour <b>cet envoi</b>. <button data-act="tpledit" data-id="'+it.id+'" style="font-size:11px;padding:3px 8px">✏️ Modifier le modèle permanent</button></div>'
           +(it._tpledit?('<div class="pickp" style="border:1.5px solid #6ea8fe;margin:0 0 8px"><div class="lab" style="color:#6ea8fe;margin:0 0 3px">✏️ Modèle permanent — s\'applique à TOUS les prochains envois</div><textarea data-tpl="'+it.id+'" rows="3" style="width:100%;font-size:13px;border-radius:8px">'+esc(msgTplLoad())+'</textarea><div class="hint" style="margin:3px 0">Variables remplacées automatiquement : <b>{client}</b> · <b>{ville}</b> · <b>{quand}</b>.</div><div class="acts"><button class="ok" data-act="tplsave" data-id="'+it.id+'">💾 Enregistrer le modèle</button><button data-act="tplreset" data-id="'+it.id+'">↺ Défaut</button><button data-act="tplcancel" data-id="'+it.id+'">Annuler</button></div></div>'):'')
           +'<div class="hint" style="margin:0 0 4px">🟢 <b>WhatsApp</b> — clique <b>chaque bouton vert</b> : WhatsApp s\'ouvre avec le message déjà écrit, tu valides l\'envoi (WhatsApp n\'autorise pas l\'envoi à plusieurs en 1 clic) :</div><div style="display:flex;flex-wrap:wrap;gap:6px">'+waBtns+'</div>'
@@ -1835,6 +1842,7 @@ button.big:active{transform:translateY(1px)}
     if(e.target.classList&&e.target.classList.contains('pl')){ plPreview(e.target.closest('.sv')); return; }
     if(e.target.classList&&(e.target.classList.contains('af-date')||e.target.classList.contains('af-h')||e.target.classList.contains('af-m'))){ var aid=e.target.getAttribute('data-id'),ai=null,k; for(k=0;k<SUIVI.length;k++)if(SUIVI[k].id===aid){ai=SUIVI[k];break;} if(ai){ var acard=e.target.closest('.sv'),dt=acard.querySelector('.af-date'),hh=acard.querySelector('.af-h'),mm=acard.querySelector('.af-m'); ai.mdate=dt?dt.value:ai.mdate; var H=hh?hh.value:'',M=mm?mm.value:''; ai.mheure=H?(H+':'+(M||'00')):''; saveSuivi(); renderSuivi(); } return; }
     var t2=e.target;
+    if(t2.hasAttribute&&t2.hasAttribute('data-msgvar')){ var vk=t2.getAttribute('data-msgvar'), cfg=(typeof msgVarsLoad==='function')?msgVarsLoad():{}; cfg[vk]=t2.checked; save('fkh_msg_vars',cfg); var mvid=t2.getAttribute('data-id'); if(mvid){ for(var mv=0;mv<SUIVI.length;mv++)if(SUIVI[mv].id===mvid){ delete SUIVI[mv]._nmsg; break; } } renderSuivi(); return; }
     if(t2.hasAttribute&&t2.hasAttribute('data-nsel')){ var sid=t2.getAttribute('data-nsel'),sit=null,si; for(si=0;si<SUIVI.length;si++)if(SUIVI[si].id===sid){sit=SUIVI[si];break;} if(sit){ sit._nsel=sit._nsel||{}; var said=t2.getAttribute('data-aid'); if(t2.checked)sit._nsel[said]=true; else delete sit._nsel[said]; renderSuivi(); } return; }
     var id=t2.getAttribute('data-nrad')||t2.getAttribute('data-nads')||t2.getAttribute('data-nvoit'); if(!id)return;
     var it=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;} if(!it)return;
@@ -2219,7 +2227,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   function applySectionAccess(){ var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=(!allowed)||allowed.indexOf(s)>=0; b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
