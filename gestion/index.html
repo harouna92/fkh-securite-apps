@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b48</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b49</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -3754,7 +3754,7 @@ button.big:active{transform:translateY(1px)}
       if(roCalls&&done){ var parts=[]; if(e.agentTel)parts.push('👤 agent : '+roBadge(e.agentTel,ct)); if((e.key==='prise'||e.key==='fin')&&r.avise){ var ctm={}; try{ctm=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(_){} var ctel=e.client?ctm[e.client]:''; if(ctel)parts.push('🏢 client : '+roBadge(ctel,ct)); } if(parts.length)roLine='<div class="fa-d" style="margin:3px 0 0;line-height:1.6">🔌 '+parts.join(' &nbsp;·&nbsp; ')+'</div>'; }
       var ctx='<div class="fa-d" style="margin:4px 0 2px;line-height:1.7">'+cl.join('<br>')+'</div>'+roLine;
       return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" data-hideat="'+(done?(Math.max(+ct||0,(r.doneTs||r.at||0))+120000):0)+'" style="padding:8px'+(done?';opacity:.6':'')+'"><div class="fa-n"><span class="sa-tag"></span><b>'+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span> · '+(e.key==='tenue'?'<span style="color:#e0784b;font-weight:800">'+e.label+'</span>':e.label)+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'+ctx
-        +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">'+fields+'<button type="button" class="sa-excl" data-exk="'+esc(saExK(e))+'" title="Retirer / restaurer cet appel de l\'agenda" style="font-size:11px;margin-left:auto;'+(_saEx[saExK(e)]?'color:var(--ok);border-color:var(--ok)':'color:var(--muted)')+'">'+(_saEx[saExK(e)]?'↩️ Restaurer':'🗑️ Retirer')+'</button></div></div>';
+        +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">'+fields+((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur')?'':'<button type="button" class="sa-excl" data-exk="'+esc(saExK(e))+'" title="Retirer / restaurer cet appel de l\'agenda (superviseur)" style="font-size:11px;margin-left:auto;'+(_saEx[saExK(e)]?'color:var(--ok);border-color:var(--ok)':'color:var(--muted)')+'">'+(_saEx[saExK(e)]?'↩️ Restaurer':'🗑️ Retirer')+'</button>')+'</div></div>';
     };
     var isDone=function(e){ if(e.consigne)return !!e.done; return !!(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done); };
     // Une carte cochée reste visible jusqu'à 2 min après l'heure prévue (ou 2 min après le cochage si coché en retard)
@@ -3767,7 +3767,7 @@ button.big:active{transform:translateY(1px)}
     function sosCardBlock(title,arr,brd,bg){ return arr.length?('<div class="card" style="border:2px solid '+brd+';background:'+bg+';padding:8px"><div class="lab" style="margin:0 0 4px;color:'+brd+';font-weight:800;font-size:15px">'+title.replace('{n}',arr.length).replace('{s}',arr.length>1?'S':'')+'</div>'+arr.map(saCard).join('')+'</div>'):''; }
     var sosBlock=sosCardBlock('🆘 {n} APPEL{s} CLIENT — ❌ ANNULATION MISSION', sosAnn, '#c02626','rgba(200,0,0,.10)')
                + sosCardBlock('🆘 {n} APPEL{s} CLIENT — ✅ VALIDATION / ACCEPTATION MISSION', sosVal, '#137a3b','rgba(19,122,59,.10)');
-    var saExclBar=(saExN||saShowExcl)?('<div class="card" style="padding:6px 10px;border:1px solid #e0a13b"><label class="chk" style="margin:0;font-size:12.5px"><input type="checkbox" class="sa-excl-toggle"'+(saShowExcl?' checked':'')+'><span>🗑️ '+saExN+' appel'+(saExN>1?'s':'')+' retiré'+(saExN>1?'s':'')+' de l\'agenda — '+(saShowExcl?'affichés ci-dessous, clique « ↩️ Restaurer »':'cocher pour les afficher / restaurer')+'</span></label></div>'):'';
+    var saExclBar=((saExN||saShowExcl)&&!(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'))?('<div class="card" style="padding:6px 10px;border:1px solid #e0a13b"><label class="chk" style="margin:0;font-size:12.5px"><input type="checkbox" class="sa-excl-toggle"'+(saShowExcl?' checked':'')+'><span>🗑️ '+saExN+' appel'+(saExN>1?'s':'')+' retiré'+(saExN>1?'s':'')+' de l\'agenda — '+(saShowExcl?'affichés ci-dessous, clique « ↩️ Restaurer »':'cocher pour les afficher / restaurer')+'</span></label></div>'):'';
     wrap.innerHTML=sosBlock+head+saExclBar
       +(todoL.length?todoL.map(saCard).join(''):'<div class="card"><div class="sub" style="margin:0;color:var(--ok)">✅ Tous les appels de cette période sont faits.</div></div>')
       +(doneL.length?'<details style="margin-top:12px"><summary style="cursor:pointer;color:var(--muted);font-weight:700;padding:6px 2px">✅ '+doneL.length+' appel'+(doneL.length>1?'s':'')+' fait'+(doneL.length>1?'s':'')+' — masqué'+(doneL.length>1?'s':'')+', cliquer pour afficher</summary><div style="opacity:.7;margin-top:6px">'+doneL.map(saCard).join('')+'</div></details>':'');
