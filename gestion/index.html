@@ -134,6 +134,10 @@ button.big:active{transform:translateY(1px)}
 #notif-bell{position:fixed;top:7px;right:9px;z-index:90;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:17px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 #logout-fab{position:fixed;top:7px;right:53px;z-index:90;height:38px;padding:0 12px;border-radius:19px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);display:none}
 #notif-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:none}
+#notif-badge.nb-g{background:#1a9e5c}
+#notif-badge.nb-o{background:#e08600}
+#notif-badge.nb-r{background:#e5322d;animation:nbblink 1s steps(1,end) infinite}
+@keyframes nbblink{50%{opacity:.2}}
 .notif-ov{display:none;position:fixed;inset:0;z-index:130;background:rgba(0,0,0,.55);align-items:flex-start;justify-content:center;padding:36px 14px;overflow:auto}
 .notif-ov.show{display:flex}
 .notif-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:440px;width:100%;padding:16px;box-shadow:0 14px 44px rgba(0,0,0,.45)}
@@ -3917,7 +3921,7 @@ button.big:active{transform:translateY(1px)}
     Object.keys(NOTIF.knownRech).forEach(function(id){ if(rechIds.indexOf(id)<0)delete NOTIF.knownRech[id]; });
     NOTIF.primed=true; notifBadge(badge);
   }
-  function notifBadge(n){ var b=byId('notif-badge'); if(!b)return; if(n>0){ b.textContent=n>99?'99+':n; b.style.display='block'; } else b.style.display='none'; }
+  function notifBadge(n){ var b=byId('notif-badge'); if(!b)return; b.classList.remove('nb-g','nb-o','nb-r'); if(n>0){ b.textContent=n>99?'99+':n; b.style.display='block'; b.classList.add(n>=40?'nb-r':(n>=10?'nb-o':'nb-g')); } else b.style.display='none'; }
   function notifRenderPanel(){
     var st=byId('notif-status'), en=byId('notif-enable'), on=byId('notif-on'), snd=byId('notif-sound'), box=byId('notif-ov').querySelector('.notif-box'), p=notifPerm();
     if(st){ st.textContent = p==='unsupported'?'⚠️ Cet appareil / navigateur ne gère pas les notifications.' : p==='granted'?'✅ Autorisées sur cet appareil.' : p==='denied'?'🚫 Bloquées dans les réglages du navigateur — réactive-les pour ce site.' : '🔔 À autoriser : clique le bouton ci-dessous.'; }
