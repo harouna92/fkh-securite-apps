@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b53</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b54</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -2212,7 +2212,7 @@ button.big:active{transform:translateY(1px)}
     byId('th-out').textContent='📞 THIAM — APPELS ('+blocks.length+')\n\n'+blocks.map(function(b,i){return '— Site '+(i+1)+' —\n'+b;}).join('\n\n');
   }
   // ---- Suivi des appels (contrôleur de retard) ----
-  function thNowHM(){var d=new Date();return pad2(d.getHours())+':'+pad2(d.getMinutes());}
+  function thNowHM(){ try{ var p=frParts(); return p.hour+':'+p.minute; }catch(e){ var d=new Date(); return pad2(d.getHours())+':'+pad2(d.getMinutes()); } }
   function thIsLate(fr,done){if(done)return false;var m=toMin(fr);if(m==null)return false;var d=new Date();var diff=((d.getHours()*60+d.getMinutes())-m+1440)%1440;return diff>=5&&diff<=720;}
   function thComSel(c){var v=c.com||'';if(v==='Injoignable'||v==='RAS'||v==='Autre')return v;return v?'Autre':'';}
   function thComTxt(c){if(c.comtxt)return c.comtxt;var v=c.com||'';return (v&&v!=='Injoignable'&&v!=='RAS'&&v!=='Autre')?v:'';}
@@ -2315,7 +2315,7 @@ button.big:active{transform:translateY(1px)}
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
   var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd'];
-  var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null };
+  var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   function applySectionAccess(){ var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=(!allowed)||allowed.indexOf(s)>=0; b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
   function cloudHdr(){ return {'Content-Type':'application/json','X-App-Password':CLOUD.pass}; }
@@ -2511,7 +2511,7 @@ button.big:active{transform:translateY(1px)}
   function cloudLogin(pass){
     var err=byId('login-err'); err.textContent=''; var btn=byId('login-btn'); btn.disabled=true; btn.textContent='Connexion…';
     fetch(CLOUD.base+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pass})})
-      .then(function(r){return r.json();}).then(function(j){ btn.disabled=false; btn.textContent='Se connecter'; if(j&&j.ok){ CLOUD.pass=pass; CLOUD.role=j.role||'full'; CLOUD.sections=(j.sections&&j.sections.length)?j.sections:null; cloudStart(); } else { err.textContent='Mot de passe incorrect.'; } })
+      .then(function(r){return r.json();}).then(function(j){ btn.disabled=false; btn.textContent='Se connecter'; if(j&&j.ok){ CLOUD.pass=pass; CLOUD.role=j.role||'full'; CLOUD.user=j.user||''; CLOUD.sections=(j.sections&&j.sections.length)?j.sections:null; cloudStart(); } else { err.textContent='Mot de passe incorrect.'; } })
       .catch(function(){ btn.disabled=false; btn.textContent='Se connecter'; err.textContent='Serveur injoignable. Vérifie ta connexion.'; });
   }
   /* ===== Assistant — porte Claude (routes /msg du Worker) ===== */
@@ -2735,7 +2735,21 @@ button.big:active{transform:translateY(1px)}
   function impDMY(s){ var m=/(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/.exec(s||''); if(!m)return null; return {date:m[3]+'-'+m[2]+'-'+m[1],heure:m[4]?(('0'+m[4]).slice(-2)+':'+m[5]):''}; }
   function impTitleCase(s){ return String(s||'').toLowerCase().replace(/([a-zà-ÿ])([a-zà-ÿ']*)/g,function(_,a,b){return a.toUpperCase()+b;}); }
   function impSiteAgent(bdc){ var s=String(bdc||'').trim(); s=s.replace(/^N[°ºoº]\s*[A-Za-z0-9\-]+\s*\/?\s*/i,''); s=s.replace(/\s+/g,' ').trim(); if(!s)s=String(bdc||'').trim(); if(s&&s===s.toUpperCase())s=impTitleCase(s); return s; }
-  function impTodayISO(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+  // ===== Heure de FRANCE (Europe/Paris) — l'appli raisonne TOUJOURS en heure française, où que soit l'opérateur (Mali…). =====
+  var _FRPARTS=null,_FROFF=null;
+  function _frPartsFmt(){ if(!_FRPARTS)_FRPARTS=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); return _FRPARTS; }
+  function frParts(epoch){ var p={}; _frPartsFmt().formatToParts(new Date(epoch==null?Date.now():epoch)).forEach(function(x){p[x.type]=x.value;}); return p; }
+  function _frOffFmt(){ if(!_FROFF)_FROFF=new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Paris',hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}); return _FROFF; }
+  function _frOffMin(epoch){ try{ var p={}; _frOffFmt().formatToParts(new Date(epoch)).forEach(function(x){p[x.type]=x.value;}); return Math.round((Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute,+p.second)-epoch)/60000); }catch(e){ return -new Date(epoch).getTimezoneOffset(); } }
+  // Epoch RÉEL d'une heure « au mur » française : mdate 'YYYY-MM-DD' + minutes du jour (peut dépasser 1440 pour l'après-minuit).
+  function frMs(mdate,minutes){ if(!mdate)return null; var y=+mdate.slice(0,4),mo=+mdate.slice(5,7),d=+mdate.slice(8,10); var guess=Date.UTC(y,mo-1,d,0,0)+(minutes||0)*60000; var off=_frOffMin(guess),res=guess-off*60000,off2=_frOffMin(res); if(off2!==off)res=guess-off2*60000; return res; }
+  function impTodayISO(){ try{ var p=frParts(); return p.year+'-'+p.month+'-'+p.day; }catch(e){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); } }
+  // Fuseau d'AFFICHAGE selon le rôle : opérateur → Mali (son horloge) ; superviseur/admin/full → France. Le stockage reste en heure France (canonique).
+  function _dispTz(){ try{ return (typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur')?'Africa/Bamako':'Europe/Paris'; }catch(e){ return 'Europe/Paris'; } }
+  function dispIsMali(){ return _dispTz()==='Africa/Bamako'; }
+  var _DISPFMT={};
+  function dispHM(epoch){ if(epoch==null||epoch==='')return ''; var tz=_dispTz(); try{ var f=_DISPFMT[tz]||(_DISPFMT[tz]=new Intl.DateTimeFormat('en-CA',{timeZone:tz,hourCycle:'h23',hour:'2-digit',minute:'2-digit'})); var p={}; f.formatToParts(new Date(epoch)).forEach(function(x){p[x.type]=x.value;}); return p.hour+':'+p.minute; }catch(e){ return ''; } }
+  function dispHMfr(mdate,minutes){ var e=frMs(mdate,minutes); return e==null?'':dispHM(e); } // heure prévue (France) affichée dans le fuseau du rôle
   function impColMap(hdr){ var m={}; hdr.forEach(function(h,i){ m[String(h).trim().toLowerCase()]=i; });
     function get(names){ for(var j=0;j<names.length;j++){ if(m[names[j]]!=null)return m[names[j]]; } return -1; }
     return { deb:get(['date de début','date de debut']), client:get(['client']), site:get(['site']), rue:get(['rue']), cp:get(['code postal']), ville:get(['ville']), collab:get(['collaborateur']), tel:get(['téléphone du collaborateur','telephone du collaborateur']), spec:get(['spécialité','specialite']), fin:get(['date de fin']), stat:get(['statut']), ref:get(['référence','reference']) };
@@ -2858,7 +2872,7 @@ button.big:active{transform:translateY(1px)}
   function svcNeedPhoto(s){ return s.key==='prise'||s.key==='fin'||s.key==='tenue'||s.key.indexOf('ctrl')===0; }
   function svcShortLbl(s){ if(s.key==='prise')return 'Prise'; if(s.key==='fin')return 'Fin'; if(s.key==='tenue')return 'Tenue'; if(s.key==='j15')return 'Pré-prise'; if(s.key==='route')return 'Route'; if(s.key.indexOf('ctrl')===0)return 'Contrôle '+((+s.key.slice(4))+1); return s.label; }
   var SVC_GRACE=15; // minutes de tolérance après l'heure prévue avant de considérer une étape « en retard »
-  function svcStepMs(m,s){ if(!s.heure||!m.mdate)return null; var start=toMin(m.mheure),mn=toMin(s.heure); if(mn==null)return null; var abs=mn; if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn<start)abs=mn+1440; return new Date(m.mdate+'T00:00:00').getTime()+abs*60000; }
+  function svcStepMs(m,s){ if(!s.heure||!m.mdate)return null; var start=toMin(m.mheure),mn=toMin(s.heure); if(mn==null)return null; var abs=mn; if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn<start)abs=mn+1440; return frMs(m.mdate,abs); }
   function svcDue(m,s){ var ms=svcStepMs(m,s); return ms==null?true:(Date.now()>ms+SVC_GRACE*60000); }
   // État d'une vacation : 'complet' (tout fait + photos), 'retard' (une étape échue non faite/sans photo), 'encours' (rien d'échu, en attente)
   function svcState(m){ var S=ssLoad(),st=S[m.id]||{},steps=ssSteps(m); function dn(s){return !!(st[s.key]&&st[s.key].done);} function ph(s){return !!(st[s.key]&&st[s.key].photoKey);} var phSteps=steps.filter(svcNeedPhoto); if(steps.every(dn)&&phSteps.every(ph))return 'complet'; var lateA=steps.some(function(s){return !dn(s)&&svcDue(m,s);}); var lateP=phSteps.some(function(s){return !ph(s)&&svcDue(m,s);}); return (lateA||lateP)?'retard':'encours'; }
@@ -3484,7 +3498,7 @@ button.big:active{transform:translateY(1px)}
   // Évite qu'une synchro distante « dernier qui écrit gagne » ne fasse réapparaître un appel déjà coché.
   function ssMerge(a,b){ a=a||{}; b=b||{}; var out={},mid,key; for(mid in a)out[mid]=Object.assign({},a[mid]); for(mid in b){ if(!out[mid]){out[mid]=Object.assign({},b[mid]);continue;} for(key in b[mid]){ var ra=out[mid][key],rb=b[mid][key]; if(!ra){out[mid][key]=rb;continue;} out[mid][key]=((rb&&rb.at||0)>(ra&&ra.at||0))?rb:ra; } } return out; }
   function ssParams(){ var p=load('fkh_ss_params'); if(!p||typeof p!=='object'||Array.isArray(p))p={}; return {before:(p.before!=null?p.before:15), route:(p.route!=null?p.route:30)}; }
-  function ssNowHM(){ var d=new Date(); return pad2(d.getHours())+':'+pad2(d.getMinutes()); }
+  function ssNowHM(){ try{ var p=frParts(); return p.hour+':'+p.minute; }catch(e){ var d=new Date(); return pad2(d.getHours())+':'+pad2(d.getMinutes()); } }
   function ssMissions(from,to){ return SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; }).sort(function(a,b){var da=(a.mdate||'')+' '+(a.mheure||''),db=(b.mdate||'')+' '+(b.mheure||'');return da<db?-1:da>db?1:0;}); }
   function ssSteps(m){
     var P=ssParams(), steps=[], prise=m.mheure||'';
@@ -3703,18 +3717,20 @@ button.big:active{transform:translateY(1px)}
   function aiSimulate(){ aiDetected.unshift({cdr_id:'SIM'+Date.now(),at:Date.now(),number:'0383556677',direction:'in',start:new Date().toISOString(),resume:'Aquila demande des agents pour deux sites ; Securitas signale une alarme.',demandes:[{nature:'gardiennage',client:'AQUILA (simulation)',ville:'Houdemont',cp:'54180',site:'Aquila Houdemont',type_site:'Magasin',nb_agents:'1',urgent:true,vacations:[{date:'vendredi 01/08',horaires:'20h00 → 08h00'},{date:'samedi 02/08',horaires:'20h00 → 08h00'}]},{nature:'gardiennage',client:'AQUILA (simulation)',ville:'Nancy',cp:'54000',site:'Aquila Nancy Centre',type_site:'Magasin',nb_agents:'1',urgent:false,vacations:[]},{nature:'intervention',client:'SECURITAS (simulation)',ville:'Dijon',cp:'21000',site:'Alarme entrepôt Dijon',type_site:'Entrepôt',nb_agents:'1',urgent:true,vacations:[]}],_sim:true}); aiAutoCreate(); var tb=document.querySelector('#tabs button[data-s="suivi"]'); if(tb)tb.click(); if(typeof suiviBucket!=='undefined'){suiviBucket='recherche';} if(typeof renderSuivi==='function')renderSuivi(); alert('🤖 Simulation (appel mixte) : l\'IA a AIGUILLÉ 3 demandes selon leur nature.\n\n➡️ GARDIENNAGE → Suivi demandes → En recherche :\n• Aquila Houdemont : 2 vacations datées → mention violette « à vérifier ».\n• Aquila Nancy Centre : AUCUNE date → bandeau ROUGE « à compléter » + Supervision → Opérationnel.\n\n➡️ INTERVENTION sur alarme → section Interventions → En recherche :\n• Securitas / Alarme entrepôt Dijon → carte violette « à vérifier » + cascade d\'appels aux agents de la zone (Côte-d\'Or).\n\nOuvre l\'onglet 🚨 Interventions pour la voir. Clique « Vérifiée, confirmer » pour lever la mention.\n\n🔒 Simulation LOCALE — non synchronisée dans le cloud (disparaît au rechargement).'); }
   function aiNumImportClients(){ var tm={}; try{tm=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(e){} var a=aiNumLoad(),added=0; Object.keys(tm).forEach(function(cli){ var n=tm[cli]; if(!n)return; var k=String(n).replace(/\D/g,'').slice(-9); if(!a.some(function(x){return (x.n||'').replace(/\D/g,'').slice(-9)===k;})){ a.push({n:n,lbl:cli,dir:'both'}); added++; } }); aiNumSave(a); alert(added+' client(s) ajouté(s) à la liste des numéros suivis.'); renderSupervision(); }
   function roKey(n){ var d=String(n||'').replace(/\D/g,''); if(d.length>9)d=d.slice(-9); return d; }
-  function roMatch(num,ct){ if(!roCalls||!num)return null; var k=roKey(num); if(!k)return null; var win=120*60000, best=null; roCalls.forEach(function(c){ if(roKey(c.number)!==k)return; if(ct){ var t=new Date(c.start).getTime(); if(isNaN(t)||Math.abs(t-ct)>win)return; } if(!best||(c.answered&&!best.answered))best=c; }); return best; }
-  function roBadge(num,ct){ if(!roCalls||!num)return ''; var c=roMatch(num,ct); if(!c)return '<span style="color:var(--bad);font-weight:700">⚠ aucune trace d\'appel</span>'; if(c.answered){ var hh=''; try{hh=new Date(c.start).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}catch(e){} return '<span style="color:var(--ok);font-weight:700">✅ appel vérifié'+(hh?' à '+hh:'')+'</span>'; } return '<span style="color:#e0784b;font-weight:700">📵 appel émis, non décroché</span>'; }
+  // Fenêtre de rapprochement Ringover (± minutes autour de l'heure prévue) — réglable, défaut 15 min.
+  function roWin(){ var v=parseInt(localStorage.getItem('fkh_ro_win'),10); return (v&&v>0)?v:15; }
+  function roMatch(num,ct){ if(!roCalls||!num)return null; var k=roKey(num); if(!k)return null; var win=roWin()*60000, best=null; roCalls.forEach(function(c){ if(roKey(c.number)!==k)return; if(ct){ var t=new Date(c.start).getTime(); if(isNaN(t)||Math.abs(t-ct)>win)return; } if(!best||(c.answered&&!best.answered))best=c; }); return best; }
+  function roBadge(num,ct){ if(!roCalls||!num)return ''; var c=roMatch(num,ct); if(!c)return '<span style="color:var(--bad);font-weight:700">⚠ aucune trace d\'appel</span>'; var hh=''; try{hh=new Date(c.start).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}catch(e){} return '<span style="color:var(--ok);font-weight:700">✅ appel tracé'+(hh?' à '+hh:'')+'</span>'+(c.answered?'':' <span style="color:#e0784b;font-size:11px">(non décroché)</span>'); }
   function roProbe(){ if(typeof CLOUD==='undefined'||!CLOUD.on){ alert('Connecte-toi (en ligne).'); return; } var box=byId('sup-ro-results'), btn=byId('sup-ro-diag'); if(btn){btn.disabled=true;btn.textContent='⏳…';} if(box)box.innerHTML='<div class="sub" style="margin:0">⏳ Inspection de l\'API Ringover…</div>'; fetch(CLOUD.base+'/ringover/probe',{headers:cloudHdr()}).then(function(r){return r.json();}).then(function(j){ if(btn){btn.disabled=false;btn.textContent='🔍 Diagnostic API';} if(!(j&&j.ok)){ if(box)box.innerHTML='<div class="sub" style="color:var(--bad);margin:0">Erreur : '+((j&&j.error)||'?')+((j&&j.status)?' ('+j.status+')':'')+'</div>'; return; } if(box)box.innerHTML='<div class="fa-d" style="margin:0"><b>Champs disponibles d\'un appel :</b><br>'+esc((j.fields||[]).join(', '))+'<br><br>📼 Enregistrement dans l\'API : <b>'+(j.hasRecordField?'OUI ✅':'non trouvé')+'</b><br>📝 Transcription dans l\'API : <b>'+(j.hasTranscriptField?'OUI ✅':'non trouvée directement')+'</b></div><details style="margin-top:8px"><summary style="cursor:pointer;color:#6ea8fe">Voir le détail brut (à me montrer)</summary><pre style="white-space:pre-wrap;font-size:11px;max-height:220px;overflow:auto;background:var(--panel2);padding:8px;border-radius:8px">'+esc(JSON.stringify(j.sampleWithRecord||j.sample,null,2))+'</pre></details>'; }).catch(function(){ if(btn){btn.disabled=false;btn.textContent='🔍 Diagnostic API';} if(box)box.innerHTML='<div class="sub" style="color:var(--bad)">Ringover injoignable.</div>'; }); }
-  function roCopyProof(){ var rows=window._roRows||[]; if(!rows.length){ alert('Lance d\'abord une vérification.'); return; } var day=window._roDay||'', cli=window._roCli||''; var djj=day?day.split('-').reverse().join('/'):''; var L=['RAPPORT DE VÉRIFICATION DE SERVICE — FKH SÉCURITÉ']; if(cli)L.push('Client : '+cli); L.push('Date : '+djj); L.push('Appels de contrôle vérifiés via journal téléphonique :'); L.push(''); rows.forEach(function(x){ var mark=(x.sev===0?'✅':(x.sev===1?'📵':'⚠️')); L.push(mark+' '+(x.heure?x.heure+' — ':'')+x._who+' — '+x._lbl+' : '+x._st); }); var nOk=rows.filter(function(r){return r.sev===0;}).length; L.push(''); L.push(nOk+'/'+rows.length+' contrôle(s) confirmé(s) par un appel réel.'); var txt=L.join('\n'); if(navigator.clipboard)navigator.clipboard.writeText(txt); var b=byId('sup-ro-copy'); if(b){ var o=b.textContent; b.textContent='Copié ✓'; setTimeout(function(){b.textContent=o;},1500); } }
+  function roCopyProof(){ var rows=window._roRows||[]; if(!rows.length){ alert('Lance d\'abord une vérification.'); return; } var day=window._roDay||'', cli=window._roCli||''; var djj=day?day.split('-').reverse().join('/'):''; var L=['RAPPORT DE VÉRIFICATION DE SERVICE — FKH SÉCURITÉ']; if(cli)L.push('Client : '+cli); L.push('Date : '+djj); L.push('Appels de contrôle vérifiés via journal téléphonique :'); L.push(''); rows.forEach(function(x){ var mark=(x.sev===2?'⚠️':'✅'); L.push(mark+' '+(x.heure?x.heure+' — ':'')+x._who+' — '+x._lbl+' : '+x._st); }); var nOk=rows.filter(function(r){return r.sev!==2;}).length; L.push(''); L.push(nOk+'/'+rows.length+' contrôle(s) avec une trace d\'appel réelle.'); var txt=L.join('\n'); if(navigator.clipboard)navigator.clipboard.writeText(txt); var b=byId('sup-ro-copy'); if(b){ var o=b.textContent; b.textContent='Copié ✓'; setTimeout(function(){b.textContent=o;},1500); } }
   function roReportSup(){ if(typeof CLOUD==='undefined'||!CLOUD.on){ alert('Connecte-toi (en ligne) pour vérifier via Ringover.'); return; } var day=byId('sup-ro-date')?byId('sup-ro-date').value:impTodayISO(); if(!day){ alert('Choisis une date.'); return; } var box=byId('sup-ro-results'), btn=byId('sup-ro-btn'); if(btn){ btn.disabled=true; btn.textContent='⏳ Vérification…'; } if(box)box.innerHTML='<div class="sub" style="margin:0">⏳ Récupération des appels Ringover…</div>';
     fetch(CLOUD.base+'/ringover/calls?from='+encodeURIComponent(day)+'&to='+encodeURIComponent(day),{headers:cloudHdr()}).then(function(r){return r.json();}).then(function(j){ if(btn){ btn.disabled=false; btn.textContent='🔌 Vérifier les appels'; } if(!(j&&j.ok)){ if(box)box.innerHTML='<div class="sub" style="color:var(--bad);margin:0">Ringover : '+((j&&j.error)||'erreur')+((j&&j.status)?' ('+j.status+')':'')+'</div>'; return; } roCalls=j.calls||[]; roPeriod=day;
       var cli=byId('sup-ro-client')?byId('sup-ro-client').value:'';
       var ents=(typeof saEntries==='function')?saEntries(day,day):[], S=ssLoad(), ctm={}; try{ctm=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(_){}
       if(cli)ents=ents.filter(function(e){return (e.client||'')===cli;});
-      var rows=[]; ents.forEach(function(e){ var r=S[e.mid]&&S[e.mid][e.key]; if(!(r&&r.done))return; var ct=e.mdate?(new Date(e.mdate+'T00:00:00').getTime()+e.abs*60000):null;
-        if(e.agentTel){ var m=roMatch(e.agentTel,ct); rows.push({sev:m?(m.answered?0:1):2, who:'👤 '+esc(e.agent||e.agentTel), lbl:esc(e.label)+(e.site?' — '+esc(e.site):''), heure:e.heure, badge:roBadge(e.agentTel,ct), _who:(e.agent||e.agentTel), _lbl:e.label+(e.site?' — '+e.site:''), _st:(m?(m.answered?('appel vérifié à '+(function(){try{return new Date(m.start).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}catch(_e){return '';}})()):'appel émis, non décroché'):'AUCUNE TRACE d\'appel') }); }
-        if((e.key==='prise'||e.key==='fin')&&r.avise&&e.client&&ctm[e.client]){ var m2=roMatch(ctm[e.client],ct); rows.push({sev:m2?(m2.answered?0:1):2, who:'🏢 client '+esc(e.client), lbl:'Client avisé ('+esc(e.key)+')'+(e.site?' — '+esc(e.site):''), heure:e.heure, badge:roBadge(ctm[e.client],ct), _who:'client '+e.client, _lbl:'Client avisé ('+e.key+')'+(e.site?' — '+e.site:''), _st:(m2?(m2.answered?'appel vérifié':'appel émis, non décroché'):'AUCUNE TRACE d\'appel') }); } });
+      var rows=[]; ents.forEach(function(e){ var r=S[e.mid]&&S[e.mid][e.key]; if(!(r&&r.done))return; var ct=e.mdate?frMs(e.mdate,e.abs):null;
+        if(e.agentTel){ var m=roMatch(e.agentTel,ct); rows.push({sev:m?0:2, who:'👤 '+esc(e.agent||e.agentTel), lbl:esc(e.label)+(e.site?' — '+esc(e.site):''), heure:e.heure, badge:roBadge(e.agentTel,ct), _who:(e.agent||e.agentTel), _lbl:e.label+(e.site?' — '+e.site:''), _st:(m?('appel tracé'+(m.answered?'':' — non décroché')):'AUCUNE TRACE d\'appel') }); }
+        if((e.key==='prise'||e.key==='fin')&&r.avise&&e.client&&ctm[e.client]){ var m2=roMatch(ctm[e.client],ct); rows.push({sev:m2?0:2, who:'🏢 client '+esc(e.client), lbl:'Client avisé ('+esc(e.key)+')'+(e.site?' — '+esc(e.site):''), heure:e.heure, badge:roBadge(ctm[e.client],ct), _who:'client '+e.client, _lbl:'Client avisé ('+e.key+')'+(e.site?' — '+e.site:''), _st:(m2?('appel tracé'+(m2.answered?'':' — non décroché')):'AUCUNE TRACE d\'appel') }); } });
       rows.sort(function(a,b){return b.sev-a.sev;});
       window._roRows=rows; window._roDay=day; window._roCli=cli;
       if(!rows.length){ box.innerHTML='<div class="sub" style="margin:0">Aucune case cochée à vérifier pour le '+day.split('-').reverse().join('/')+(cli?' (client '+esc(cli)+')':'')+'.</div>'; return; }
@@ -3756,7 +3772,7 @@ button.big:active{transform:translateY(1px)}
     var S=ssLoad();
     // Remise en file : on n'annule QUE les coches faites AVANT le JOUR de la mission (vrai pré-cochage d'un jour futur). Une coche du même jour, même un peu en avance, RESTE (l'opérateur l'a réellement faite → elle ne doit pas revenir).
     (function(){ var nowS=Date.now(), chg=false;
-      entries.forEach(function(e){ if(e.consigne||!e.mdate)return; var r=S[e.mid]&&S[e.mid][e.key]; if(!r||!r.done)return; var ref=r.doneTs||r.at||0; if(!ref)return; var schedDay=new Date(e.mdate+'T00:00:00').getTime(); if(ref<schedDay){ r.done=false; r.at=nowS; r.earlyReset=true; S[e.mid][e.key]=r; chg=true; } });
+      entries.forEach(function(e){ if(e.consigne||!e.mdate)return; var r=S[e.mid]&&S[e.mid][e.key]; if(!r||!r.done)return; var ref=r.doneTs||r.at||0; if(!ref)return; var schedDay=frMs(e.mdate,0); if(ref<schedDay){ r.done=false; r.at=nowS; r.earlyReset=true; S[e.mid][e.key]=r; chg=true; } });
       if(chg)ssSave(S);
     })();
     var doneN=0, cnt={prise:0,fin:0,route:0,j15:0,ctrl:0,tenue:0}; entries.forEach(function(e){ if(e.consigne){ if(e.done)doneN++; return; } if(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done)doneN++; var k=e.key; if(cnt[k]!=null)cnt[k]++; else if(k.indexOf('ctrl')===0)cnt.ctrl++; });
@@ -3769,7 +3785,7 @@ button.big:active{transform:translateY(1px)}
       var r=(S[e.mid]&&S[e.mid][e.key])||{}, done=!!r.done, d0='data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'"';
       var extra=done?(' <span style="color:var(--ok)">✓ '+esc(r.hm||'')+'</span>'+(r.retard>0?' <span style="color:var(--bad)">saisie +'+r.retard+' min</span>':'')):'';
       if(done&&(e.key==='prise'||e.key==='fin')&&!r.avise)extra+=' <span style="color:var(--bad);font-weight:700">⚠ CLIENT NON AVISÉ</span>';
-      var ct=e.mdate?(new Date(e.mdate+'T00:00:00').getTime()+e.abs*60000):'';
+      var ct=e.mdate?frMs(e.mdate,e.abs):'';
       var _tooEarly=(ct&&Date.now()<ct-5*60000); var _lock=done||_tooEarly;
       var fait='<label class="chk" style="margin:0'+(_lock?';opacity:'+(_tooEarly?'.4':'.9')+';cursor:not-allowed':'')+'"'+(_tooEarly?' title="Grisé — cochable à partir de 5 min avant l\'heure ('+esc(e.heure)+')"':(done?' title="Fait — verrouillé. Seul le superviseur peut le ré-ouvrir (Supervision / Suivi site)."':''))+'><input type="checkbox" class="sa-done" '+d0+' data-h="'+esc(e.heure)+'"'+(done?' checked':'')+(_lock?' disabled':'')+'><span>Fait</span></label>';
       var note='<input class="sa-f" data-f="note" '+d0+' placeholder="commentaire…" value="'+esc(r.note||'')+'" style="flex:1;min-width:120px">';
@@ -3794,7 +3810,7 @@ button.big:active{transform:translateY(1px)}
     };
     var isDone=function(e){ if(e.consigne)return !!e.done; return !!(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done); };
     // Une carte cochée reste visible jusqu'à 2 min après l'heure prévue (ou 2 min après le cochage si coché en retard)
-    var hideAt=function(e){ if(e.consigne)return 0; var r=(S[e.mid]&&S[e.mid][e.key])||{}; if(!r.done)return 0; var ct=e.mdate?(new Date(e.mdate+'T00:00:00').getTime()+(e.abs||0)*60000):0; return Math.max(ct||0,(r.doneTs||r.at||0))+120000; };
+    var hideAt=function(e){ if(e.consigne)return 0; var r=(S[e.mid]&&S[e.mid][e.key])||{}; if(!r.done)return 0; var ct=e.mdate?frMs(e.mdate,e.abs||0):0; return Math.max(ct||0,(r.doneTs||r.at||0))+120000; };
     var nowT=Date.now();
     var todoL=entries.filter(function(e){ return !isDone(e) || (!e.consigne && hideAt(e)>nowT); }), doneL=entries.filter(function(e){ return isDone(e) && (e.consigne || hideAt(e)<=nowT); });
     var sosL=todoL.filter(function(e){ return e.consigne && e._valid; }); todoL=todoL.filter(function(e){ return !(e.consigne && e._valid); });
@@ -3876,7 +3892,7 @@ button.big:active{transform:translateY(1px)}
   function csgMissById(id){ for(var i=0;i<SUIVI.length;i++)if(String(SUIVI[i].id)===String(id))return SUIVI[i]; return null; }
   function consigneCard(e){
     var done=!!e.done, d0='data-cid="'+esc(e.cid)+'"';
-    var ct=(e.mdate&&e.heure)?(new Date(e.mdate+'T00:00:00').getTime()+(toMin(e.heure)||0)*60000):'';
+    var ct=(e.mdate&&e.heure)?frMs(e.mdate,toMin(e.heure)||0):'';
     var loc=[e.client,e.site].filter(Boolean).map(esc).join(' · ');
     var head='<div class="fa-n"><span class="sa-tag"></span>📋 <b style="color:#7b61ff">CONSIGNE'+(e.heure?' — '+esc(e.heure):'')+'</b>'+(e.heure?' <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span>':'')+(loc?' · '+loc:'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+(done?' <span style="color:var(--ok)">✓ fait</span>':'')+'</div>';
     var body='<div class="fa-d" style="margin:4px 0;white-space:pre-wrap;font-size:14px">'+esc(e.texte||'')+'</div>';
@@ -3996,7 +4012,7 @@ button.big:active{transform:translateY(1px)}
     var from=byId('sup-from')?byId('sup-from').value:'', to=byId('sup-to')?byId('sup-to').value:'';
     var entries=(typeof saEntries==='function')?saEntries(from,to):[];
     var S=ssLoad(), now=Date.now();
-    var data=entries.map(function(e){ var r=(S[e.mid]&&S[e.mid][e.key])||{}; var ct=e.mdate?(new Date(e.mdate+'T00:00:00').getTime()+e.abs*60000):null; var lateMin=(ct!=null&&!r.done)?((now-ct)/60000):null; return {e:e,r:r,ct:ct,lateMin:lateMin}; });
+    var data=entries.map(function(e){ var r=(S[e.mid]&&S[e.mid][e.key])||{}; var ct=e.mdate?frMs(e.mdate,e.abs):null; var lateMin=(ct!=null&&!r.done)?((now-ct)/60000):null; return {e:e,r:r,ct:ct,lateMin:lateMin}; });
     var miss=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; });
     var affAg={}; miss.forEach(function(m){ if(m.agentId){var a=faById(m.agentId); if(a)affAg[a.id]=a;} });
     function tenueOf(a){ var c=(typeof agentCtrl==='function')?agentCtrl(a.nom):null; if(!c)return {none:true}; var dd=(typeof ctrlDays==='function')?ctrlDays(c['Date contrôle']):null; return {none:false,days:dd,statut:c['Statut tenue']||'',noMens:!(c.Pointure||c['T. pantalon']||c['T. haut'])}; }
@@ -4264,7 +4280,7 @@ button.big:active{transform:translateY(1px)}
         if(e.key==='prise'&&done&&r.agRetard)out.push({cat:'prise_retard',key:e.mid,title:'🕓 Agent en retard à la prise',body:(e.agent||'Agent')+' — '+(e.site||'')+(r.agRetardMin?' · '+r.agRetardMin+' min':''),go:'suiviappels'});
         if(done)return;
         if(e.key!=='prise'&&e.key!=='fin')return; // notifs UNIQUEMENT pour la prise et la fin de service (plus de pré-prise / appels de contrôle)
-        var ct=new Date(e.mdate+'T00:00:00').getTime()+(e.abs||0)*60000; if(!ct||ct<gl)return;
+        var ct=frMs(e.mdate,e.abs||0); if(!ct||ct<gl)return;
         var dmin=(now-ct)/60000, loc=(e.label||(e.key==='prise'?'Prise de service':'Fin de service'))+' — '+(e.site||'');
         if(dmin>=10)out.push({cat:'appel_danger',key:e.mid+'|'+e.key,title:'⛔ '+(e.key==='prise'?'Prise':'Fin')+' de service NON pointée',body:loc+' · prévu '+e.heure+' (+'+Math.floor(dmin)+' min)',go:'suiviappels'});
         else if(dmin>=4.5)out.push({cat:'appel_retard',key:e.mid+'|'+e.key,title:'🔴 '+(e.key==='prise'?'Prise':'Fin')+' de service en retard',body:loc+' · prévu '+e.heure,go:'suiviappels'});
@@ -4589,7 +4605,7 @@ button.big:active{transform:translateY(1px)}
     var saved=null; try{saved=sessionStorage.getItem('fkh_pass');}catch(e){}
     if(saved){ CLOUD.pass=saved;
       fetch(CLOUD.base+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:saved})})
-        .then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ CLOUD.role=j.role||'full'; CLOUD.sections=(j.sections&&j.sections.length)?j.sections:null; cloudStart(); } else {if(lo)lo.style.display='flex';} })
+        .then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ CLOUD.role=j.role||'full'; CLOUD.user=j.user||''; CLOUD.sections=(j.sections&&j.sections.length)?j.sections:null; cloudStart(); } else {if(lo)lo.style.display='flex';} })
         .catch(function(){ if(lo)lo.style.display='flex'; });
     } else { if(lo)lo.style.display='flex'; }
   })();
