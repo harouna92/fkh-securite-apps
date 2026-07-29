@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b47</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b48</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -677,18 +677,6 @@ button.big:active{transform:translateY(1px)}
       <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><span class="sub" style="margin:0;align-self:center">Tranche :</span><button type="button" class="sa-slice on" data-sl="all">Toutes</button><button type="button" class="sa-slice" data-sl="jour">☀️ Jour 8h→20h</button><button type="button" class="sa-slice" data-sl="nuit">🌙 Nuit 20h→8h</button></div>
       <button type="button" class="big" id="sa-reset" style="margin-top:8px;background:var(--panel2);color:var(--ink);border:1px solid var(--line)">↺ Revenir au défaut (aujourd'hui · tous · chronologique)</button>
     </div>
-    <div class="card">
-      <button type="button" id="csg-toggle" class="big" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">📋 Ajouter une consigne / tâche à l'opérateur</button>
-      <div id="csg-form" class="hidden" style="margin-top:8px">
-        <p class="sub" style="margin:0 0 6px">La consigne apparaît dans l'agenda ci-dessous et remonte en pop-up ~5 min avant son heure, comme un appel.</p>
-        <label class="f"><div class="lab">La consigne / tâche (ce que l'opérateur doit faire)</div><textarea id="csg-texte" placeholder="Ex. Appeler le client SPIG pour confirmer l'effectif de nuit…"></textarea></label>
-        <div class="grid2" style="margin-top:6px"><label class="f"><div class="lab">Date</div><input type="date" id="csg-date"></label><label class="f"><div class="lab">Heure (créneau où ça remonte)</div><input type="time" id="csg-heure"></label></div>
-        <label class="f" style="margin-top:6px"><div class="lab">Rattacher à une vacation (optionnel — reprend son heure/client si tu laisses vide)</div><select id="csg-mid"><option value="">— aucune (consigne libre sur le créneau) —</option></select></label>
-        <label class="f" style="margin-top:6px"><div class="lab">Client / repère (optionnel)</div><input id="csg-client" placeholder="Ex. SPIG SECURITE" autocomplete="off"></label>
-        <button type="button" class="big ok" id="csg-add" style="margin-top:8px">➕ Ajouter la consigne</button>
-        <div id="csg-list" style="margin-top:10px"></div>
-      </div>
-    </div>
     <div id="sa-alert" style="position:fixed;right:8px;bottom:10px;z-index:59;max-width:190px;max-height:42vh;overflow:auto;background:var(--panel);border:1.5px solid var(--bad);border-radius:9px;padding:5px 7px;font-size:11px;box-shadow:0 4px 16px rgba(0,0,0,.4);display:none"></div>
     <div id="sa-body"></div>
     <div style="display:none">
@@ -846,6 +834,18 @@ button.big:active{transform:translateY(1px)}
   <section id="sec-supervision" class="hidden">
     <div><h1>📊 Supervision</h1><p class="sub">Les chiffres du suivi (appels, retards, injoignables, tenues) + le fil des anomalies. Choisis la période.</p></div>
     <div class="card"><div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="sup-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="sup-to"></label></div><div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><button type="button" class="sup-preset" data-d="1">Aujourd'hui</button><button type="button" class="sup-preset" data-d="7">7 j</button><button type="button" class="sup-preset" data-d="30">30 j</button><button type="button" class="sup-preset" data-d="all">Tout</button></div></div>
+    <div class="card">
+      <button type="button" id="csg-toggle" class="big" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">📋 Consignes / tâches aux opérateurs (créer / gérer)</button>
+      <div id="csg-form" class="hidden" style="margin-top:8px">
+        <p class="sub" style="margin:0 0 6px">La consigne apparaît dans le <b>Suivi des appels</b> de l'opérateur et remonte en pop-up ~5 min avant son heure, comme un appel. Seul le superviseur crée / supprime ici.</p>
+        <label class="f"><div class="lab">La consigne / tâche (ce que l'opérateur doit faire)</div><textarea id="csg-texte" placeholder="Ex. Appeler le client SPIG pour confirmer l'effectif de nuit…"></textarea></label>
+        <div class="grid2" style="margin-top:6px"><label class="f"><div class="lab">Date</div><input type="date" id="csg-date"></label><label class="f"><div class="lab">Heure (créneau où ça remonte)</div><input type="time" id="csg-heure"></label></div>
+        <label class="f" style="margin-top:6px"><div class="lab">Rattacher à une vacation (optionnel — reprend son heure/client si tu laisses vide)</div><select id="csg-mid"><option value="">— aucune (consigne libre sur le créneau) —</option></select></label>
+        <label class="f" style="margin-top:6px"><div class="lab">Client / repère (optionnel)</div><input id="csg-client" placeholder="Ex. SPIG SECURITE" autocomplete="off"></label>
+        <button type="button" class="big ok" id="csg-add" style="margin-top:8px">➕ Ajouter la consigne</button>
+        <div id="csg-list" style="margin-top:10px"></div>
+      </div>
+    </div>
     <div class="subtabs" id="supTabs"><button type="button" data-t="oper" class="on">⚡ Opérationnel</button><button type="button" data-t="board">📈 Tableau de bord</button><button type="button" data-t="anom">🚨 Anomalies</button></div>
     <div id="sup-body"></div>
   </section>
@@ -3734,7 +3734,8 @@ button.big:active{transform:translateY(1px)}
       var extra=done?(' <span style="color:var(--ok)">✓ '+esc(r.hm||'')+'</span>'+(r.retard>0?' <span style="color:var(--bad)">saisie +'+r.retard+' min</span>':'')):'';
       if(done&&(e.key==='prise'||e.key==='fin')&&!r.avise)extra+=' <span style="color:var(--bad);font-weight:700">⚠ CLIENT NON AVISÉ</span>';
       var ct=e.mdate?(new Date(e.mdate+'T00:00:00').getTime()+e.abs*60000):'';
-      var fait='<label class="chk" style="margin:0"><input type="checkbox" class="sa-done" '+d0+' data-h="'+esc(e.heure)+'"'+(done?' checked':'')+'><span>Fait</span></label>';
+      var _tooEarly=(ct&&Date.now()<ct-5*60000); var _lock=done||_tooEarly;
+      var fait='<label class="chk" style="margin:0'+(_lock?';opacity:'+(_tooEarly?'.4':'.9')+';cursor:not-allowed':'')+'"'+(_tooEarly?' title="Grisé — cochable à partir de 5 min avant l\'heure ('+esc(e.heure)+')"':(done?' title="Fait — verrouillé. Seul le superviseur peut le ré-ouvrir (Supervision / Suivi site)."':''))+'><input type="checkbox" class="sa-done" '+d0+' data-h="'+esc(e.heure)+'"'+(done?' checked':'')+(_lock?' disabled':'')+'><span>Fait</span></label>';
       var note='<input class="sa-f" data-f="note" '+d0+' placeholder="commentaire…" value="'+esc(r.note||'')+'" style="flex:1;min-width:120px">';
       var statut='<select class="sa-f" data-f="statut" '+d0+'>'+STATUTS.map(function(s){return '<option value="'+esc(s)+'"'+(r.statut===s?' selected':'')+'>'+(s||'— statut —')+'</option>';}).join('')+'</select>';
       var photoSel='<select class="sa-f" data-f="photo" '+d0+'>'+['','Photo horodatée','Photo non horodatée','Pas de photo'].map(function(p){return '<option value="'+esc(p)+'"'+(r.photo===p?' selected':'')+'>'+(p||'📷 photo ?')+'</option>';}).join('')+'</select>';
@@ -3810,11 +3811,11 @@ button.big:active{transform:translateY(1px)}
         renderSuiviAppels(); return; }
       var mid=t.getAttribute('data-mid'), key=t.getAttribute('data-key'); if(!mid)return;
       if(t.classList.contains('sa-done')){ if(t.checked){ var now=ssNowHM(),rt=toMin(now)-toMin(t.getAttribute('data-h'));
-          // Blocage : cochable seulement à partir de 5 min avant l'heure prévue
+          // Sécurité : la case est grisée tant qu'on est à plus de 5 min avant l'heure. Si jamais un clic passe → on refuse.
           var card=t.closest('.sacard'), ct=card?+card.getAttribute('data-ct'):0, tooEarly=false;
           if(ct){ tooEarly=Date.now()<ct-5*60000; }
           else if(rt!=null){ var rtn=rt; if(rtn>720)rtn-=1440; if(rtn<-720)rtn+=1440; tooEarly=rtn<-5; }
-          if(tooEarly){ t.checked=false; alert('⏳ Trop tôt — cette case ne peut être cochée qu\'à partir de 5 minutes avant l\'heure prévue ('+(t.getAttribute('data-h')||'')+').'); return; }
+          if(tooEarly){ t.checked=false; return; }
           saSet(mid,key,{done:true,hm:now,at:Date.now(),doneTs:Date.now(),retard:(rt==null?null:rt)}); } else { saSet(mid,key,{done:false}); } renderSuiviAppels(); }
       else if(t.classList.contains('sa-f')){ var f=t.getAttribute('data-f'),v=(t.type==='checkbox')?t.checked:t.value,p={}; p[f]=v; saSet(mid,key,p); if(f==='avise'||f==='agRetard')renderSuiviAppels(); }
     });
@@ -3847,8 +3848,8 @@ button.big:active{transform:translateY(1px)}
     var sos=(e._valid&&!done)?('<div style="background:'+_vbg+';border:1.5px solid '+_vc+';border-radius:10px;padding:7px 10px;margin:4px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-weight:800;color:'+_vc+'">🆘 URGENT — Appeler le client — '+(_vVal?'✅ VALIDATION / ACCEPTATION MISSION':'❌ ANNULATION MISSION')+'</span><span class="val-sos" data-deadline="'+e._valid.deadline+'" style="font-weight:800;font-size:18px;color:'+_vc+'"></span></div>'):'';
     var fait='<label class="chk" style="margin:0"><input type="checkbox" class="csg-done" '+d0+(done?' checked':'')+'><span>Fait</span></label>';
     var note='<input class="csg-note" '+d0+' placeholder="commentaire / résultat…" value="'+esc(e.note||'')+'" style="flex:1;min-width:140px">';
-    var del='<button class="csg-del" '+d0+' title="Supprimer" style="width:30px;height:30px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);cursor:pointer">🗑️</button>';
-    return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" style="padding:8px;border-left:4px solid '+(e._valid&&!done?_vc:'#7b61ff')+(done?';opacity:.6':'')+'">'+head+sos+body+'<div class="acts" style="gap:8px;margin-top:4px;flex-wrap:wrap;align-items:center">'+fait+note+del+'</div></div>';
+    // Pas de bouton « retirer » dans Suivi des appels (cockpit opérateur, accès limité) — seul le superviseur supprime, depuis la gestion des consignes / Supervision.
+    return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" style="padding:8px;border-left:4px solid '+(e._valid&&!done?_vc:'#7b61ff')+(done?';opacity:.6':'')+'">'+head+sos+body+'<div class="acts" style="gap:8px;margin-top:4px;flex-wrap:wrap;align-items:center">'+fait+note+'</div></div>';
   }
   function csgFillMid(){ var sel=byId('csg-mid'); if(!sel)return; var d=byId('csg-date')?byId('csg-date').value:''; var ms=SUIVI.filter(function(x){return x.statut==='validee'&&(!d||x.mdate===d);}); var cur=sel.value; sel.innerHTML='<option value="">— aucune (consigne libre sur le créneau) —</option>'+ms.map(function(m){ var s=m.siteAgent||m.titre||'—'; return '<option value="'+esc(m.id)+'">'+esc(s)+(m.mheure?' · '+esc(m.mheure):'')+(m.mdate?' ('+esc(m.mdate)+')':'')+'</option>'; }).join(''); if(cur)sel.value=cur; }
   function csgRenderList(){ var box=byId('csg-list'); if(!box)return; var a=csgLoad().slice().sort(function(x,y){ var dx=(x.mdate||'')+' '+(x.heure||''),dy=(y.mdate||'')+' '+(y.heure||''); return dx<dy?1:dx>dy?-1:0; }); if(!a.length){ box.innerHTML='<div class="sub" style="margin:0">Aucune consigne enregistrée.</div>'; return; } box.innerHTML='<div class="lab" style="margin:0 0 4px">'+a.length+' consigne'+(a.length>1?'s':'')+'</div><div class="list">'+a.map(function(c){ var m=c.mid?csgMissById(c.mid):null, site=m?(m.siteAgent||m.titre||''):''; return '<div class="it"><div style="flex:1"><div class="fa-n">'+(c.done?'✅':'📋')+' <span style="color:var(--muted);font-weight:400">'+esc(c.mdate||'')+(c.heure?' '+esc(c.heure):'')+'</span> '+esc((c.client||site)?('· '+(c.client||site)):'')+'</div><div class="fa-d">'+esc(c.texte||'')+'</div></div><button class="no csg-dellist" data-cid="'+esc(c.id)+'" title="Supprimer" style="width:30px;height:30px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);cursor:pointer">🗑️</button></div>'; }).join('')+'</div>'; box.querySelectorAll('.csg-dellist').forEach(function(b){ b.onclick=function(){ if(!confirm('Supprimer cette consigne ?'))return; csgDel(b.getAttribute('data-cid')); csgRenderList(); if(typeof renderSuiviAppels==='function')renderSuiviAppels(); }; }); }
