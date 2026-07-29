@@ -927,7 +927,17 @@ button.big:active{transform:translateY(1px)}
     }
     function svcQueryHtml(q){ var r=svcQuery(q); var title='🤖 '+(r.wantUnassigned?'Sites planifiés NON affectés':'Missions planifiées')+' · '+r.win+(r.cli?' · '+esc(r.cli):'');
       if(!r.miss.length)return '<div class="lab" style="margin:8px 10px 2px;color:#6ea8fe">'+title+'</div><div class="sub" style="padding:6px 12px">Aucun résultat.</div>';
-      var rows=r.miss.slice(0,25).map(function(m){ var ag=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?faById(m.agentId).nom:''; var site=m.site||m.siteAgent||m.titre||'—'; return '<div style="padding:7px 12px;border-top:1px solid var(--line)"><b>'+esc(site)+'</b>'+(m.client?' <span class="sub">'+esc(m.client)+'</span>':'')+'<div class="sub">📅 '+esc((m.mdate||'').split('-').reverse().join('/'))+(m.mheure?' '+esc(m.mheure):'')+' · '+(m.agentId?('👤 '+esc(ag||'affecté')):'<span style="color:var(--bad);font-weight:700">⚠️ non affecté</span>')+'</div></div>'; }).join('');
+      var rows=r.miss.slice(0,25).map(function(m){
+        var site=m.site||m.siteAgent||m.titre||'—';
+        var ag=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?faById(m.agentId):null;
+        var agN=ag?(ag.nom||'affecté'):'';
+        var atel=ag?((ag.tels&&ag.tels[0])||ag.tel||''):'';
+        var when='📅 '+esc((m.mdate||'').split('-').reverse().join('/'))+(m.mheure?' '+esc(m.mheure):'');
+        var agentPart=m.agentId
+          ? ('<span class="gs-row" data-t="agent" data-v="'+esc(agN)+'" style="cursor:pointer;color:var(--brand,#6ea8fe);font-weight:700;text-decoration:underline">👤 '+esc(agN)+'</span>'+(atel?(' <a class="gs-call call" href="tel:'+esc(String(atel).replace(/\s/g,''))+'" title="Appeler '+esc(atel)+'" style="text-decoration:none;font-weight:700;white-space:nowrap">📞 '+esc(atel)+'</a>'):' <span class="sub">(pas de n°)</span>'))
+          : '<span style="color:var(--bad);font-weight:700">⚠️ non affecté</span>';
+        return '<div style="padding:8px 12px;border-top:1px solid var(--line)"><b>'+esc(site)+'</b>'+(m.client?' <span class="sub">'+esc(m.client)+'</span>':'')+'<div class="sub" style="margin-top:2px">'+when+' · '+agentPart+'</div></div>';
+      }).join('');
       return '<div class="lab" style="margin:8px 10px 2px;color:#6ea8fe">'+title+' ('+r.miss.length+')</div>'+rows+(r.miss.length>25?'<div class="sub" style="padding:4px 12px">+ '+(r.miss.length-25)+' autres</div>':'');
     }
     function render(q){ var nq=norm(q).trim(); if(nq.length<2){ hide(); return; }
