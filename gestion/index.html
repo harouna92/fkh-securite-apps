@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b32</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b33</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -1322,7 +1322,12 @@ button.big:active{transform:translateY(1px)}
   function msgTplLoad(){ var s=null; try{s=JSON.parse(localStorage.getItem('fkh_msg_tpl')||'null');}catch(e){} return (s&&typeof s==='string'&&s.trim())?s:DEF_MSG_TPL; }
   // Choix PERMANENT des variables à inclure dans le message (cases à cocher).
   function msgVarsLoad(){ var d={client:true,site:false,ville:true,quand:true}, s=null; try{s=JSON.parse(localStorage.getItem('fkh_msg_vars')||'null');}catch(e){} if(s&&typeof s==='object'&&!Array.isArray(s)){ MSG_VARS.forEach(function(v){ if(typeof s[v.k]==='boolean')d[v.k]=s[v.k]; }); } return d; }
-  function nearGroupMsg(it){ var vac=(typeof svExtractVacations==='function')?svExtractVacations(it):[], v0=vac[0]||null, when=''; if(v0&&v0.mdate){ when=v0.mdate.split('-').reverse().join('/')+(v0.mheure?' '+v0.mheure:'')+(v0.mfin?'→'+v0.mfin:''); }
+  function nearGroupMsg(it){ var when='';
+    var v0=(typeof svExtractRaw==='function')?((svExtractRaw(it)||[])[0]||null):null;
+    if(v0&&v0.mdate){ when=v0.mdate.split('-').reverse().join('/')+(v0.mheure?' '+v0.mheure:'')+(v0.mfin?'→'+v0.mfin:''); }
+    else if(v0&&(v0.mheure||v0.horLabel)){ when=(v0.mheure||'')+(v0.mfin?'→'+v0.mfin:'')||v0.horLabel; }
+    else if(it.mdate){ when=it.mdate.split('-').reverse().join('/')+(it.mheure?' '+it.mheure:'')+(it.mfin?'→'+it.mfin:''); }
+    else if(it.mheure){ when=it.mheure+(it.mfin?'→'+it.mfin:''); }
     var cfg=msgVarsLoad(), site=(it.site||it.siteAgent||'');
     var det=[]; if(cfg.client&&it.client)det.push(it.client); if(cfg.site&&site)det.push(site); if(cfg.ville&&it.ville)det.push(it.ville); if(cfg.quand&&when)det.push(when);
     var detStr=det.join(' · '), t=msgTplLoad();
@@ -1372,7 +1377,7 @@ button.big:active{transform:translateY(1px)}
       +(selN?('<div class="hint" style="margin:4px 0 3px">Variables à inclure <b>(permanent)</b> : '+MSG_VARS.map(function(v){ return '<label style="display:inline-flex;align-items:center;gap:3px;margin:0 10px 3px 0;font-size:12px;cursor:pointer"><input type="checkbox" data-msgvar="'+v.k+'" data-id="'+it.id+'"'+(msgVarsLoad()[v.k]?' checked':'')+' style="width:15px;height:15px;padding:0;margin:0">'+v.lbl+'</label>'; }).join('')+'</div>'
           +'<textarea data-nmsg="'+it.id+'" rows="3" style="width:100%;margin:2px 0 6px;font-size:13px;border-radius:8px">'+esc(gmsg)+'</textarea>'
           +'<div class="hint" style="margin:0 0 6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">✍️ Ce texte ne vaut que pour <b>cet envoi</b>. <button data-act="tpledit" data-id="'+it.id+'" style="font-size:11px;padding:3px 8px">✏️ Modifier le modèle permanent</button></div>'
-          +(it._tpledit?('<div class="pickp" style="border:1.5px solid #6ea8fe;margin:0 0 8px"><div class="lab" style="color:#6ea8fe;margin:0 0 3px">✏️ Modèle permanent — s\'applique à TOUS les prochains envois</div><textarea data-tpl="'+it.id+'" rows="3" style="width:100%;font-size:13px;border-radius:8px">'+esc(msgTplLoad())+'</textarea><div class="hint" style="margin:3px 0">Variables remplacées automatiquement : <b>{client}</b> · <b>{ville}</b> · <b>{quand}</b>.</div><div class="acts"><button class="ok" data-act="tplsave" data-id="'+it.id+'">💾 Enregistrer le modèle</button><button data-act="tplreset" data-id="'+it.id+'">↺ Défaut</button><button data-act="tplcancel" data-id="'+it.id+'">Annuler</button></div></div>'):'')
+          +(it._tpledit?('<div class="pickp" style="border:1.5px solid #6ea8fe;margin:0 0 8px"><div class="lab" style="color:#6ea8fe;margin:0 0 3px">✏️ Modèle permanent — s\'applique à TOUS les prochains envois</div><textarea data-tpl="'+it.id+'" rows="3" style="width:100%;font-size:13px;border-radius:8px">'+esc(msgTplLoad())+'</textarea><div class="hint" style="margin:3px 0">Écris ton texte fixe et place <b>{details}</b> là où tu veux la liste des variables cochées (Client · Site · Ville · Date/heure). Ces cases se gèrent juste au-dessus.</div><div class="acts"><button class="ok" data-act="tplsave" data-id="'+it.id+'">💾 Enregistrer le modèle</button><button data-act="tplreset" data-id="'+it.id+'">↺ Défaut</button><button data-act="tplcancel" data-id="'+it.id+'">Annuler</button></div></div>'):'')
           +'<div class="hint" style="margin:0 0 4px">🟢 <b>WhatsApp</b> — clique <b>chaque bouton vert</b> : WhatsApp s\'ouvre avec le message déjà écrit, tu valides l\'envoi (WhatsApp n\'autorise pas l\'envoi à plusieurs en 1 clic) :</div><div style="display:flex;flex-wrap:wrap;gap:6px">'+waBtns+'</div>'
           +'<div style="margin-top:8px"><button data-act="nsms" data-id="'+it.id+'" class="ok">💬 Envoyer le SMS à tous les '+selN+' (1 clic)</button></div>')
         :'<div class="hint" style="margin:6px 0 0">Coche des agents ci-dessus, puis contacte-les tous en un geste.</div>')
