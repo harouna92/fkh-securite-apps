@@ -281,11 +281,13 @@ export default {
       if (!pw) return null;
       if (typeof env.APP_PASSWORD === "string" && env.APP_PASSWORD.length > 0 && pw === env.APP_PASSWORD)
         return { role: "full", sections: null };
-      // 4 rôles métier : reconnus mais ACCÈS COMPLET pour l'instant (sections:null = aucun filtre de vue). Le filtrage par rôle sera ajouté ensuite, défini avec Zeus.
-      const ROLE_ENVS = { APP_PASSWORD_OPERATEUR: "operateur", APP_PASSWORD_SUPERVISEUR: "superviseur", APP_PASSWORD_ADMIN: "admin", APP_PASSWORD_SUPERADMIN: "superadmin" };
-      for (const k in ROLE_ENVS) {
-        if (typeof env[k] === "string" && env[k].length > 0 && pw === env[k])
-          return { role: ROLE_ENVS[k], sections: null };
+      // Rôles métier, PLUSIEURS comptes par rôle via pattern : APP_PASSWORD_OPERATEUR, _OPERATEUR2, _OPERATEUR3… (idem SUPERVISEUR/ADMIN/SUPERADMIN).
+      // Accès complet (sections:null) pour l'instant ; `user` = identité pour l'attribution des anomalies. Ajouter une personne = créer un nouveau secret, SANS redéploiement.
+      const ROLE_MAP = { OPERATEUR: "operateur", SUPERVISEUR: "superviseur", ADMIN: "admin", SUPERADMIN: "superadmin" };
+      for (const k of Object.keys(env)) {
+        const mm = /^APP_PASSWORD_(SUPERADMIN|SUPERVISEUR|OPERATEUR|ADMIN)(\d*)$/.exec(k);
+        if (mm && typeof env[k] === "string" && env[k].length > 0 && pw === env[k])
+          return { role: ROLE_MAP[mm[1]], user: mm[1].toLowerCase() + "-" + (mm[2] || "1"), sections: null };
       }
       for (const v of ["APP_PASSWORD_R1", "APP_PASSWORD_R2"]) {
         if (typeof env[v] === "string" && env[v].length > 0 && pw === env[v])
@@ -300,7 +302,7 @@ export default {
       try { body = await request.json(); } catch (_) {}
       const r = roleFor(body.password || "");
       if (!r) return json({ ok: false });
-      return json({ ok: true, role: r.role, sections: r.sections });
+      return json({ ok: true, role: r.role, user: r.user || null, sections: r.sections });
     }
 
     // --- PUBLIC (à token) : dépôt d'une photo par un agent via un lien (pas de mot de passe appli) ---
