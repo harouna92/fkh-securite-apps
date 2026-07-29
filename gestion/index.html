@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION</div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b31</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -964,7 +964,7 @@ button.big:active{transform:translateY(1px)}
     function bindExtra(){
       box.querySelectorAll('.gs-print').forEach(function(bp){ bp.onclick=function(ev){ if(ev){ev.preventDefault();ev.stopPropagation();} svcQueryPrint(bp.getAttribute('data-q')); }; });
       box.querySelectorAll('.gs-ai').forEach(function(bai){ bai.onclick=function(ev){ if(ev){ev.preventDefault();ev.stopPropagation();} var qq=bai.getAttribute('data-q'); hide(); inp.value=''; if(typeof window._askAI==='function')window._askAI(qq); }; });
-      box.querySelectorAll('.gs-save').forEach(function(bs){ bs.onclick=function(ev){ if(ev){ev.preventDefault();ev.stopPropagation();} var qq=bs.getAttribute('data-q')||''; var nm=prompt('Nom de cette vue (pour la retrouver) :', qq.slice(0,40)); if(nm&&nm.trim()){ var arr=savedViewsLoad(); arr.push({id:'v'+Date.now()+'_'+Math.round(Math.random()*9999),name:nm.trim(),q:qq,at:Date.now()}); savedViewsSave(arr); bs.textContent='✅ Vue enregistrée'; bs.disabled=true; } }; });
+      box.querySelectorAll('.gs-save').forEach(function(bs){ bs.onclick=function(ev){ if(ev){ev.preventDefault();ev.stopPropagation();} var qq=bs.getAttribute('data-q')||''; var nm=prompt('Nom de cette vue (pour la retrouver) :', qq.slice(0,40)); if(nm&&nm.trim()){ var arr=savedViewsLoad(); arr.push({id:'v'+Date.now()+'_'+Math.round(Math.random()*9999),name:nm.trim(),q:qq,at:Date.now(),by:(typeof opNow==='function'?opNow():'')}); savedViewsSave(arr); bs.textContent='✅ Vue enregistrée'; bs.disabled=true; } }; });
       box.querySelectorAll('.gs-view').forEach(function(bv){ bv.onclick=function(ev){ if(ev){ev.preventDefault();ev.stopPropagation();} var qq=bv.getAttribute('data-q'); inp.value=qq; render(qq); }; });
       box.querySelectorAll('.gs-delview').forEach(function(bd){ bd.onclick=function(ev){ if(ev){ev.preventDefault();ev.stopPropagation();} var did=bd.getAttribute('data-id'); savedViewsSave(savedViewsLoad().filter(function(x){return x.id!==did;})); render(inp.value); }; });
     }
@@ -2249,7 +2249,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_saved_views'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   function applySectionAccess(){ var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=(!allowed)||allowed.indexOf(s)>=0; b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
