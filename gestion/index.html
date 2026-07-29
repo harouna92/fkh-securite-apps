@@ -136,12 +136,13 @@ button.big:active{transform:translateY(1px)}
 #notif-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:none}
 #notif-badge.nb-g{background:#1a9e5c}
 #notif-badge.nb-o{background:#e08600}
-#notif-badge.nb-r{background:#e5322d;animation:nbblink 1s steps(1,end) infinite}
+#notif-badge.nb-r{background:#e5322d}
 @keyframes nbblink{50%{opacity:.2}}
 #rech-bar{position:fixed;left:9px;bottom:9px;z-index:88;display:none;align-items:center;gap:7px;padding:8px 13px;border-radius:22px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.32);border:none}
 #rech-bar.rb-g{background:#1a9e5c}
 #rech-bar.rb-o{background:#e08600}
-#rech-bar.rb-r{background:#e5322d;animation:nbblink 1s steps(1,end) infinite}
+#rech-bar.rb-r{background:#e5322d}
+#notif-badge.nb-r.blk,#rech-bar.rb-r.blk{animation:nbblink 1s steps(1,end) infinite}
 .notif-ov{display:none;position:fixed;inset:0;z-index:130;background:rgba(0,0,0,.55);align-items:flex-start;justify-content:center;padding:36px 14px;overflow:auto}
 .notif-ov.show{display:flex}
 .notif-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:440px;width:100%;padding:16px;box-shadow:0 14px 44px rgba(0,0,0,.45)}
@@ -3992,6 +3993,8 @@ button.big:active{transform:translateY(1px)}
     byId('notif-sound').addEventListener('change',function(){ NOTIF.cfg.sound=this.checked; notifSaveCfg(); if(this.checked)notifBeep(); });
     notifScan();               // 1er passage = amorçage silencieux (pas de rafale à l'ouverture)
     setInterval(notifScan,20000);
+    // Clignotement par salves : ~8 s de clignotement, puis ~90 s calme, en boucle (rouge uniquement)
+    (function(){ var BLINK=8000, QUIET=90000, on=true, t=0; setInterval(function(){ t+=1000; if(t>=(on?BLINK:QUIET)){ on=!on; t=0; } document.querySelectorAll('.nb-r,.rb-r').forEach(function(el){ el.classList.toggle('blk',on); }); },1000); })();
   })();
 
   (function gexpBar(){
