@@ -143,6 +143,17 @@ button.big:active{transform:translateY(1px)}
 #rech-bar.rb-o{background:#e08600}
 #rech-bar.rb-r{background:#e5322d}
 #notif-badge.nb-r.blk,#rech-bar.rb-r.blk{animation:nbblink 1s steps(1,end) infinite}
+#ask-fab{position:fixed;right:12px;bottom:12px;z-index:120;width:52px;height:52px;border-radius:50%;border:none;background:var(--brand,#3b6ef5);color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.ask-ov{display:none;position:fixed;inset:0;z-index:140;background:rgba(0,0,0,.5);align-items:flex-end;justify-content:flex-end;padding:14px}
+.ask-ov.show{display:flex}
+.ask-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:100%;max-width:400px;padding:14px;box-shadow:0 14px 44px rgba(0,0,0,.5);max-height:88vh;overflow:auto}
+.ask-hd{display:flex;justify-content:space-between;align-items:center;font-size:16px;margin-bottom:8px}
+.ask-hd button{background:none;border:none;color:var(--muted);font-size:19px;cursor:pointer}
+.ask-tabs{display:flex;gap:6px;margin-bottom:8px}
+.ask-tabs button{flex:1;padding:7px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--ink);font-size:12.5px;cursor:pointer}
+.ask-tabs button.on{background:var(--brand,#3b6ef5);color:#fff;border-color:var(--brand,#3b6ef5)}
+#ask-nom,#ask-txt{width:100%;box-sizing:border-box;padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--ink);margin-bottom:8px;font-size:14px}
+#ask-txt{min-height:80px;resize:vertical}
 .notif-ov{display:none;position:fixed;inset:0;z-index:130;background:rgba(0,0,0,.55);align-items:flex-start;justify-content:center;padding:36px 14px;overflow:auto}
 .notif-ov.show{display:flex}
 .notif-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:440px;width:100%;padding:16px;box-shadow:0 14px 44px rgba(0,0,0,.45)}
@@ -207,6 +218,20 @@ button.big:active{transform:translateY(1px)}
 <button type="button" id="logout-fab" title="Se déconnecter" aria-label="Se déconnecter">🔓 Déconnexion</button>
 <button type="button" id="notif-bell" title="Notifications" aria-label="Notifications">🔔<span id="notif-badge"></span></button>
 <button type="button" id="rech-bar" title="Missions en recherche d'agent — cliquer pour les traiter"></button>
+<button type="button" id="ask-fab" title="Poser une question (métier ou sur l'appli)" aria-label="Poser une question">💬</button>
+<div class="ask-ov" id="ask-ov">
+  <div class="ask-box">
+    <div class="ask-hd"><span>💬 Poser une question</span><button type="button" id="ask-x" aria-label="Fermer">✕</button></div>
+    <p class="sub" style="margin:0 0 8px">Question métier ou sur l'utilisation de l'appli — Claude répond ici.</p>
+    <div class="ask-tabs"><button type="button" data-c="analyse" class="on">🔎 Question / analyse</button><button type="button" data-c="retour">🗣️ Besoin / observation</button></div>
+    <input id="ask-nom" placeholder="Ton nom" autocomplete="off">
+    <textarea id="ask-txt" placeholder="Écris ta question ici…"></textarea>
+    <button class="big" id="ask-send">Envoyer à Claude</button>
+    <div class="sub" id="ask-status" style="margin-top:6px"></div>
+    <div id="ask-reply" style="margin-top:8px"></div>
+    <div class="sub" style="margin-top:8px"><a href="#" id="ask-full" style="color:var(--brand,#3b6ef5)">Ouvrir l'Assistant complet (historique) →</a></div>
+  </div>
+</div>
 <div class="notif-ov" id="notif-ov">
   <div class="notif-box">
     <div class="notif-hd"><span>🔔 Notifications</span><button type="button" id="notif-close" aria-label="Fermer">✕</button></div>
@@ -2296,6 +2321,23 @@ button.big:active{transform:translateY(1px)}
     var sb=byId('asg-send'); if(sb)sb.addEventListener('click',asgSend);
     document.querySelectorAll('#asg-tabs button').forEach(function(b){ b.addEventListener('click',function(){ asgSetCanal(b.getAttribute('data-c')); }); });
     asgAvail();
+  })();
+  /* ===== Bulle flottante « Poser une question » — accessible partout, tous rôles ===== */
+  (function initAskFab(){
+    var fab=byId('ask-fab'); if(!fab)return;
+    var canal='analyse', pollT=null;
+    function setCanal(c){ canal=(c==='retour')?'retour':'analyse'; document.querySelectorAll('#ask-ov .ask-tabs button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-c')===canal); }); byId('ask-txt').placeholder=canal==='retour'?'Ex. il faudrait pouvoir exporter le suivi des appels en PDF…':'Écris ta question ici (métier ou sur l\'appli)…'; }
+    function open(){ var sv=null; try{sv=localStorage.getItem('fkh_asg_nom');}catch(e){} if(sv&&!byId('ask-nom').value)byId('ask-nom').value=sv; byId('ask-status').textContent=(typeof CLOUD!=='undefined'&&CLOUD.on)?'':'🔌 Connecte-toi d\'abord (mot de passe commun).'; byId('ask-ov').classList.add('show'); setTimeout(function(){ try{byId('ask-txt').focus();}catch(e){} },60); }
+    function close(){ byId('ask-ov').classList.remove('show'); clearTimeout(pollT); }
+    function showLatest(){ var arr=Object.keys(ASG.msgs).map(function(k){return ASG.msgs[k];}).sort(function(a,b){return b.id-a.id;}); var m=arr[0], box=byId('ask-reply'); if(!m){box.innerHTML='';return;} if(m.reponse){ box.innerHTML='<div style="padding:9px;border-radius:9px;background:var(--panel2);border-left:3px solid var(--brand,#3b6ef5)"><b>Claude :</b> '+esc(m.reponse)+'</div>'; clearTimeout(pollT); } else { box.innerHTML='<div class="sub">⏳ Claude rédige la réponse…</div>'; } }
+    function poll(){ clearTimeout(pollT); pollT=setTimeout(function(){ if(typeof asgPull==='function')asgPull().then(function(){ showLatest(); poll(); }); },4000); }
+    function send(){ if(typeof CLOUD==='undefined'||!CLOUD.on){ byId('ask-status').textContent='🔌 Connecte-toi d\'abord.'; return; } var t=(byId('ask-txt').value||'').trim(); if(!t){ byId('ask-status').textContent='Écris ta question d\'abord.'; return; } var a=(byId('ask-nom').value||'').trim(); try{localStorage.setItem('fkh_asg_nom',a);}catch(e){} var b=byId('ask-send'); b.disabled=true; b.textContent='Envoi…'; fetch(CLOUD.base+'/msg',{method:'POST',headers:asgHdr(),body:JSON.stringify({canal:canal,auteur:a,texte:t})}).then(function(r){return r.json();}).then(function(j){ b.disabled=false; b.textContent='Envoyer à Claude'; if(j&&j.ok){ byId('ask-txt').value=''; byId('ask-status').textContent='✅ Envoyé — la réponse s\'affiche ci-dessous.'; if(typeof asgPull==='function')asgPull().then(function(){ showLatest(); poll(); }); } else { byId('ask-status').textContent='Échec de l\'envoi.'; } }).catch(function(){ b.disabled=false; b.textContent='Envoyer à Claude'; byId('ask-status').textContent='Serveur injoignable.'; }); }
+    fab.addEventListener('click',open);
+    byId('ask-x').addEventListener('click',close);
+    byId('ask-ov').addEventListener('click',function(e){ if(e.target===this)close(); });
+    byId('ask-send').addEventListener('click',send);
+    document.querySelectorAll('#ask-ov .ask-tabs button').forEach(function(b){ b.addEventListener('click',function(){ setCanal(b.getAttribute('data-c')); }); });
+    byId('ask-full').addEventListener('click',function(e){ e.preventDefault(); close(); var btn=document.querySelector('#tabs button[data-s="assistant"]'); if(btn)btn.click(); });
   })();
 
   var TEN_DRILL={};
