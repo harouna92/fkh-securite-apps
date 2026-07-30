@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b65</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b65·L3</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -208,6 +208,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="appels">📞 Appels</button>
     <button data-s="suivisite">🏢 Suivi site</button>
     <button data-s="supervision">📊 Supervision</button>
+    <button data-s="streste">💶 Reste ST</button>
     <button data-s="tickets">🎫 Tickets</button>
   </div>
 </div>
@@ -850,6 +851,10 @@ button.big:active{transform:translateY(1px)}
     <div class="subtabs" id="supTabs"><button type="button" data-t="oper" class="on">⚡ Opérationnel</button><button type="button" data-t="board">📈 Tableau de bord</button><button type="button" data-t="anom">🚨 Anomalies</button></div>
     <div id="sup-body"></div>
   </section>
+  <section id="sec-streste" class="hidden">
+    <div id="streste-body" style="max-width:1000px;margin:0 auto"></div>
+  </section>
+
   <section id="sec-tickets" class="hidden">
     <div><h1>🎫 Tickets</h1><p class="sub">Confie une tâche à traiter. La personne fait le travail <b>directement depuis le ticket</b> (champ à renseigner + lien vers la fiche), et le <b>suivi se met à jour tout seul</b> (ex. 3/11 renseignées).</p></div>
     <div id="tk-body"></div>
@@ -897,8 +902,8 @@ button.big:active{transform:translateY(1px)}
   }
   // Branche un bouton .gtime sur la grille : clic -> grille -> data-v + callback
   function bindTimeBtn(el,onPick){ if(!el)return; el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); openTimeGrid(el, tbGet(el), function(v){ tbSet(el,v); if(onPick)onPick(v); }); }); }
-  var secs=['demandes','noterapide','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
+  var secs=['demandes','noterapide','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','streste'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
   // ===== Réorganiser les SECTIONS (onglets) par glisser-déposer — appui long, mémorisé par appareil =====
   (function tabReorder(){
     var bar=byId('tabs'); if(!bar)return; var LS='fkh_tabs_order';
@@ -1529,6 +1534,9 @@ button.big:active{transform:translateY(1px)}
   // Cherche dans le stock un article correspondant à la pièce (+ taille si fournie). Renvoie {found,qty,records}.
   function stockLookup(piece,size){ var st=(typeof TSTOCK!=='undefined'&&TSTOCK)?TSTOCK:[]; var pl=String(piece||'').toLowerCase().trim(); if(!pl)return {found:false,qty:0,records:[]}; var sz=String(size||'').toLowerCase().trim(); var recs=st.filter(function(s){ var sp=String(s['Pièce']||'').toLowerCase().trim(); if(!sp)return false; if(sp.indexOf(pl)<0&&pl.indexOf(sp)<0)return false; if(sz){ var ts=String(s.Taille||'').toLowerCase().trim(); if(ts&&ts!==sz)return false; } return true; }); var qty=recs.reduce(function(a,s){var q=parseInt(s['Qté en stock'],10);return a+(isNaN(q)?0:q);},0); return {found:recs.length>0,qty:qty,records:recs}; }
   function stockBadge(piece,size){ if(typeof DPIECES_NOSIZE!=='undefined'&&DPIECES_NOSIZE[piece]&&!size)size=''; var l=stockLookup(piece,size); if(l.found&&l.qty>0)return '<span style="font-size:10.5px;color:var(--ok)">📦 en stock ('+l.qty+(size?' · '+esc(size):'')+')</span>'; if(l.found)return '<span style="font-size:10.5px;color:var(--warn)">📦 stock 0'+(size?' · '+esc(size):'')+'</span>'; return '<span style="font-size:10.5px;color:var(--bad)">❌ pas en stock'+(size?' · '+esc(size):'')+'</span>'; }
+  function stockSave(){ try{ save('fkh_tenues_stock',TSTOCK); }catch(e){} }
+  // Parseur d'inventaire collé (Excel/CSV/liste tapée) : 1 ligne = Pièce [; Taille [; Couleur]] ; Qté (séparateur tab, ; , ou 2+ espaces). La dernière valeur numérique = quantité.
+  function stockParse(txt){ var out=[]; String(txt||'').split(/\r?\n/).forEach(function(ln){ ln=ln.trim(); if(!ln)return; if(/pi[èe]ce|qt[ée]|taille|couleur|stock/i.test(ln)&&!/\d/.test(ln))return; var parts=ln.split(/\t|;|,|\s{2,}/).map(function(s){return s.trim();}).filter(function(s){return s!=='';}); if(parts.length<2)return; var qty=''; for(var k=parts.length-1;k>=0;k--){ if(/^\d+([.,]\d+)?$/.test(parts[k])){ qty=parts[k].replace(',','.'); parts.splice(k,1); break; } } var piece=parts[0]||''; if(!piece)return; out.push({'Pièce':piece,'Taille':parts[1]||'','Couleur':parts[2]||'','Qté en stock':qty||'0'}); }); return out; }
   // ---- Commandes / réappro : seuil de stock configurable + suivi des commandes passées ----
   function tenSeuil(){ var s=parseInt(load('fkh_tenues_seuil'),10); return (isNaN(s)||s<0)?3:s; }
   function tenCmdLoad(){ var o=load('fkh_tenues_cmd'); return (o&&typeof o==='object'&&!Array.isArray(o))?o:{}; }
@@ -2368,10 +2376,61 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   function applySectionAccess(){ var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=(!allowed)||allowed.indexOf(s)>=0; b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
+
+  /* ===== Cockpit « Reste à payer sous-traitant » (N4 Super-Admin) — lit la clé synchronisée fkh_st_reste ===== */
+  function renderStReste(){
+    var box=byId('streste-body'); if(!box)return;
+    var DEF={maj:'2026-07-30',st:'GARIS',vigicore:8100,lignes:[
+      {m:'Nov 2025',n:'GS-2025-085',f:46716.01,p:null},
+      {m:'Déc 2025',n:'GS-2025-086',f:75997.94,p:null},
+      {m:'Jan 2026',n:'GS-2026-091',f:64676.45,p:13075.80},
+      {m:'Fév 2026',n:'GS-2026-095',f:33975.70,p:79720.20},
+      {m:'Mars 2026',n:'GS-2026-099',f:50304.74,p:80125.20},
+      {m:'Avr 2026',n:'GS-2026-108',f:56571.70,p:27972.00},
+      {m:'Mai 2026',n:'— (à éditer)',f:71587.92,p:69144.30,todo:true}
+    ]};
+    var d=null; try{d=JSON.parse(localStorage.getItem('fkh_st_reste')||'null');}catch(e){}
+    if(!d||!d.lignes)d=DEF;
+    var eur=function(x){return x==null?'—':Math.round(x).toLocaleString('fr-FR')+' €';};
+    var cf=0,cp=0,facE=0,aFac=0,rows='';
+    d.lignes.forEach(function(r){
+      cf+=r.f; if(r.p)cp+=r.p; var pos=cp-cf;
+      if(r.todo)aFac+=r.f; else if(String(r.m).indexOf('2026')>=0)facE+=r.f;
+      var td='padding:8px 10px;border-bottom:1px solid #e6e9ee';
+      rows+='<tr>'
+        +'<td style="text-align:left;'+td+'">'+r.m+(r.todo?' <span style="font-size:10px;color:#b7791f;border:1px solid #d9a441;border-radius:20px;padding:0 6px">non facturé</span>':'')+'</td>'
+        +'<td style="text-align:left;color:#7a8794;'+td+'">'+r.n+'</td>'
+        +'<td style="text-align:right;'+td+'">'+eur(r.f)+'</td>'
+        +'<td style="text-align:right;'+td+'">'+eur(r.p)+'</td>'
+        +'<td style="text-align:right;color:#7a8794;'+td+'">'+eur(cf)+'</td>'
+        +'<td style="text-align:right;color:#7a8794;'+td+'">'+eur(cp)+'</td>'
+        +'<td style="text-align:right;font-weight:600;color:'+(pos>=0?'#2f855a':'#c53030')+';'+td+'">'+(pos>=0?'+':'')+eur(pos)+'</td>'
+        +'</tr>';
+    });
+    var reste=facE+aFac-cp;
+    var kpi=function(l,v,n,c){return '<div style="flex:1;min-width:150px;background:#fff;border:1px solid #e6e9ee;border-radius:10px;padding:12px 14px"><div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:#7a8794">'+l+'</div><div style="font-size:20px;font-weight:700;margin-top:3px;color:'+(c||'#1a2733')+'">'+v+'</div><div style="font-size:10.5px;color:#7a8794;margin-top:2px">'+n+'</div></div>';};
+    var thh='text-align:right;padding:8px 10px;background:#f2f5f8;color:#7a8794;font-size:11px';
+    box.innerHTML='<h2 style="font-size:18px;margin:6px 0 2px">💶 Reste à payer sous-traitant — GARIS</h2>'
+      +'<div style="font-size:12px;color:#7a8794;margin-bottom:14px">FKH ↔ son sous-traitant GARIS (tous sites) · 2026 · <span style="color:#2f855a">payé vérifié Qonto</span></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">'
+        +kpi('Facturé émis (Jan→Avr)',eur(facE),'TTC · 4 factures')
+        +kpi('Payé (Qonto vérifié)',eur(cp),'21 virements','#2f855a')
+        +kpi('À facturer (Mai)',eur(aFac),'cascade · non éditée')
+        +kpi('Reste à payer prévis.','≈ '+eur(reste),'mai incluse · dû GARIS','#c53030')
+        +kpi('VIGICORE',eur(d.vigicore||0),'payé · 0 facture','#b7791f')
+      +'</div>'
+      +'<table style="width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid #e6e9ee;border-radius:10px;overflow:hidden">'
+      +'<thead><tr><th style="text-align:left;padding:8px 10px;background:#f2f5f8;color:#7a8794;font-size:11px">Mois</th>'
+      +'<th style="text-align:left;padding:8px 10px;background:#f2f5f8;color:#7a8794;font-size:11px">N° facture</th>'
+      +'<th style="'+thh+'">Facturé</th><th style="'+thh+'">Payé</th><th style="'+thh+'">Cumul fact.</th><th style="'+thh+'">Cumul payé</th><th style="'+thh+'">Position</th></tr></thead>'
+      +'<tbody>'+rows+'</tbody></table>'
+      +'<div style="margin-top:12px;background:#fff;border:1px solid #d9a441;border-left:4px solid #d9a441;border-radius:10px;padding:12px 14px;font-size:12.5px"><b style="color:#b7791f">⚠️ Anomalie VIGICORE</b><br>~'+eur(d.vigicore||0)+' versés mais <b>0 facture</b> — VIGICORE bloqué (identité légale manquante). À régulariser.</div>'
+      +'<div style="margin-top:14px;font-size:11.5px;color:#7a8794;border-top:1px solid #e6e9ee;padding-top:10px">Facturé = suivi GARIS · Payé = rapprochement Qonto 2026 (5 relevés, exact au centime). Reste ≈ '+eur(reste)+' dû à GARIS une fois mai facturée (suppose solde 2025 nul). MAJ '+(d.maj||'')+'.</div>';
+  }
   function cloudHdr(){ return {'Content-Type':'application/json','X-App-Password':CLOUD.pass}; }
   // ===== Photos R2 (via le Worker) =====
   function photoReady(){ return !!(CLOUD.on && CLOUD.base && CLOUD.pass); }
@@ -2637,11 +2696,31 @@ button.big:active{transform:translateY(1px)}
   var _tenRT=null;
   // Es-tu en train de SAISIR (input/select/textarea focus) dans cette section ? → sert à ne pas reconstruire le DOM sous les doigts de l'utilisateur (fix panneaux qui se referment).
   function _editingIn(secId){ var sec=byId(secId); if(!sec||sec.classList.contains('hidden'))return false; var ae=document.activeElement; return !!(ae&&sec.contains(ae)&&/^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName)); }
+  function stockCardHtml(){
+    var st=(TSTOCK||[]); function low(s){var x=String(s['Statut stock']||'').toLowerCase();return x.indexOf('proche')>=0||x.indexOf('rupture')>=0||x.indexOf('manqu')>=0;}
+    var nlow=st.filter(low).length, B='';
+    B+='<div class="acts" style="margin:0 0 8px;justify-content:flex-end"><button type="button" id="stock-imp-btn" style="font-size:11px">📥 Importer / Remplacer</button></div>';
+    B+='<div id="stock-imp-pan" class="hidden" style="background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px;margin:0 0 8px"><div class="sub" style="margin:0 0 4px">Colle ton inventaire — <b>1 ligne = Pièce ; Taille ; Qté</b> (séparateur tabulation, ; ou ,). Ça <b>REMPLACE</b> tout le stock.</div><textarea id="stock-imp-txt" rows="5" style="width:100%;font-size:12px" placeholder="Polo ; M ; 12&#10;Pantalon ; L ; 8&#10;Gilet ; XL ; 5"></textarea><div class="acts" style="margin-top:6px"><button class="ok" id="stock-imp-apply">📥 Remplacer le stock</button><button id="stock-imp-cancel" style="font-size:12px">annuler</button></div></div>';
+    B+='<div class="list">';
+    B+= st.map(function(s,i){var w=low(s);return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(String(s['Pièce']||'—'))+' <span style="color:var(--muted);font-weight:400">'+esc([s.Couleur,s.Taille].filter(function(x){return x!=null&&x!=='';}).join(' '))+'</span></div>'+(s['Statut stock']?'<div class="fa-d" style="color:'+(w?'var(--bad)':'var(--muted)')+'">'+esc(String(s['Statut stock']))+'</div>':'')+'</div><div class="fa-a" style="gap:6px;align-items:center"><span class="sub" style="margin:0">Qté</span><input type="number" min="0" class="stock-qty" data-i="'+i+'" value="'+esc(String(s['Qté en stock']!=null?s['Qté en stock']:''))+'" style="width:62px;padding:4px 6px"><button type="button" class="no stock-del" data-i="'+i+'" title="Supprimer la référence" style="font-size:12px">🗑️</button></div></div>';}).join('');
+    B+='<div class="it" style="gap:6px;flex-wrap:wrap;border-top:2px solid var(--line);padding-top:8px"><input class="stock-add-piece" placeholder="Pièce" style="flex:1;min-width:100px"><input class="stock-add-taille" placeholder="Taille" style="width:70px"><input class="stock-add-couleur" placeholder="Couleur" style="width:90px"><input type="number" min="0" class="stock-add-qte" placeholder="Qté" style="width:62px"><button type="button" class="ok stock-add-btn" style="font-size:12px">➕ Ajouter</button></div>';
+    B+='</div>';
+    return '<div class="card"><button type="button" id="stock-open" class="big" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">📦 Stock ('+st.length+' réf.'+(nlow?' · '+nlow+' à surveiller':'')+')</button><div id="stock-body" class="hidden" style="margin-top:8px">'+B+'</div></div>';
+  }
+  function wireStock(wrap){ if(!wrap)return;
+    if(byId('stock-open'))byId('stock-open').onclick=function(){ var b=byId('stock-body'); if(b)b.classList.toggle('hidden'); };
+    wrap.querySelectorAll('.stock-qty').forEach(function(inp){ inp.onchange=function(){ var i=+inp.getAttribute('data-i'); if(TSTOCK[i]){ TSTOCK[i]['Qté en stock']=inp.value; stockSave(); } }; });
+    wrap.querySelectorAll('.stock-del').forEach(function(b){ b.onclick=function(){ var i=+b.getAttribute('data-i'); if(!TSTOCK[i]||!confirm('Supprimer « '+(TSTOCK[i]['Pièce']||'')+' '+(TSTOCK[i].Taille||'')+' » du stock ?'))return; TSTOCK.splice(i,1); stockSave(); renderTenues(); }; });
+    (function(){ var ab=wrap.querySelector('.stock-add-btn'); if(ab)ab.onclick=function(){ var gp=function(c){var el=wrap.querySelector(c);return el?(el.value||'').trim():'';}; var p=gp('.stock-add-piece'); if(!p){alert('Indique au moins la pièce.');return;} TSTOCK.push({'Pièce':p,'Taille':gp('.stock-add-taille'),'Couleur':gp('.stock-add-couleur'),'Qté en stock':gp('.stock-add-qte')||'0'}); stockSave(); renderTenues(); }; })();
+    if(byId('stock-imp-btn'))byId('stock-imp-btn').onclick=function(){ var p=byId('stock-imp-pan'); if(p)p.classList.toggle('hidden'); };
+    if(byId('stock-imp-cancel'))byId('stock-imp-cancel').onclick=function(){ var p=byId('stock-imp-pan'); if(p)p.classList.add('hidden'); };
+    if(byId('stock-imp-apply'))byId('stock-imp-apply').onclick=function(){ var txt=(byId('stock-imp-txt')&&byId('stock-imp-txt').value)||''; var parsed=stockParse(txt); if(!parsed.length){ alert('Rien de lisible. Une ligne = Pièce ; Taille ; Qté (séparés par tabulation, ; ou ,).'); return; } if(!confirm('⚠️ Ça REMPLACE tout le stock actuel ('+(TSTOCK?TSTOCK.length:0)+' réf.) par '+parsed.length+' réf. Confirmer ?'))return; TSTOCK=parsed; stockSave(); renderTenues(); };
+  }
   function renderTenues(){
     var wrap=byId('ten-body'); if(!wrap)return;
     if(_editingIn('sec-tenues')){ clearTimeout(_tenRT); _tenRT=setTimeout(renderTenues,1500); return; } // ne pas reconstruire Tenues tant que l'utilisateur saisit (bloc distribution matricule/adresse) — reprend 1,5 s après la fin de saisie
     if(!TCTRL)TCTRL=load('fkh_tenues_ctrl'); if(!TSTOCK)TSTOCK=load('fkh_tenues_stock');
-    if(!(TCTRL&&TCTRL.length)){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune donnée tenue chargée. Connecte-toi avec le mot de passe commun pour les recevoir depuis le classeur partagé.</div></div>'; return; }
+    if(!(TCTRL&&TCTRL.length)){ wrap.innerHTML='<div class="card"><div class="sub" style="margin:0">Aucune donnée de contrôle tenue sur cet appareil (connecte-toi pour charger les contrôles agents). Le stock reste gérable ci-dessous.</div></div>'+stockCardHtml(); wireStock(wrap); return; }
     var byA={}; TCTRL.forEach(function(c){var n=tnorm(c.Agent);if(!n)return;var d=String(c['Date contrôle']||'');if(!byA[n]||d>byA[n]._d)byA[n]={rec:c,_d:d};});
     var agents=Object.keys(byA).map(function(k){return byA[k].rec;}).sort(function(a,b){return String(b['Date contrôle']).localeCompare(String(a['Date contrôle']));});
     // ===== FILTRE des vues (client + jour/nuit + période) — défaut : 7 jours à venir. Base = missions planifiées. =====
@@ -2738,12 +2817,10 @@ button.big:active{transform:translateY(1px)}
       var manq=c.Manquants?('<div class="fa-d" style="color:var(--bad)">Manque : '+esc(String(c.Manquants))+'</div>'):'';
       return '<div class="it"><div style="flex:1"><div class="fa-n">'+(inc?'🟠':'🟢')+' '+esc(c.Agent||'—')+(c.Site?' <span style="color:var(--muted);font-weight:400">· '+esc(String(c.Site))+'</span>':'')+'</div><div class="fa-d">'+esc(String(c['Date contrôle']||'').slice(0,10))+(d!=null?' · il y a '+d+' j':'')+(d!=null&&d>14?' <span style="color:var(--bad)">⚠ à recontrôler</span>':'')+(mens?' · '+esc(mens):'')+'</div>'+manq+'</div><div class="fa-a"><button class="tc-edit" data-i="'+TCTRL.indexOf(c)+'" title="Éditer ce contrôle">✏️</button></div></div>';
     }).join('')+'</div></div>';
-    var st=(TSTOCK||[]); function low(s){var x=String(s['Statut stock']||'').toLowerCase();return x.indexOf('proche')>=0||x.indexOf('rupture')>=0||x.indexOf('manqu')>=0;}
-    var nlow=st.filter(low).length;
-    H+='<div class="card"><div class="lab" style="margin:0 0 6px">📦 Stock ('+st.length+' réf.'+(nlow?' · '+nlow+' à surveiller':'')+')</div><div class="list">';
-    H+= st.map(function(s){var w=low(s);return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(String(s['Pièce']||'—'))+' <span style="color:var(--muted);font-weight:400">'+esc([s.Couleur,s.Taille].filter(function(x){return x!=null&&x!=='';}).join(' '))+'</span></div><div class="fa-d">Qté : '+esc(String(s['Qté en stock']!=null?s['Qté en stock']:'?'))+(s['Statut stock']?' · <span style="color:'+(w?'var(--bad)':'var(--muted)')+'">'+esc(String(s['Statut stock']))+'</span>':'')+'</div></div></div>';}).join('')+'</div></div>';
+    H+=stockCardHtml();
     wrap.innerHTML=H;
     wrap.querySelectorAll('.tc-edit').forEach(function(b){b.onclick=function(){var i=+b.getAttribute('data-i'); if(TCTRL[i]&&typeof tcFill==='function')tcFill(TCTRL[i],i);};});
+    wireStock(wrap);
   }
   // Panneau de correction EN LIGNE selon l'anomalie de la vue : adresse dédiée pour « sans adresse », sinon le bloc distribution (matricule + pièces + envoi).
   function tenFixPanel(key,nom){ var a=(typeof faByNom==='function'?faByNom(nom):null)||{};
