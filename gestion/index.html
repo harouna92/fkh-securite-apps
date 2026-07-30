@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b61</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b62</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -2855,8 +2855,10 @@ button.big:active{transform:translateY(1px)}
       if(agentId){ var an=faById(agentId); lines.push('Agent : '+((an&&an.nom)||m.agentNom||'')+(m.agentTel?' — '+m.agentTel:'')); }
       // #2 (Jules) : ne PAS recréer un doublon. Si une mission existe déjà pour le même site + date + agent + tranche (jour/nuit), on la MET À JOUR (elle garde son ID → donc son état « fait » + photos ; l'import ne redemande plus les actions déjà faites).
       var _siteN=siteNorm(m.bdc||siteAgent||''), _tr=_trf(m.mheure), _exist=null;
-      for(var _xi=0;_xi<SUIVI.length;_xi++){ var _xm=SUIVI[_xi]; if(_xm.statut!=='validee')continue; if(siteNorm(_xm.siteBDC||_xm.siteAgent||_xm.titre||'')!==_siteN)continue; if((_xm.mdate||'')!==(m.mdate||''))continue; if(_tr&&_trf(_xm.mheure)&&_trf(_xm.mheure)!==_tr)continue; if(agentId&&_xm.agentId&&_xm.agentId!==agentId)continue; _exist=_xm; break; }
-      if(_exist){ if(m.mheure)_exist.mheure=m.mheure; if(finTxt)_exist.mfin=finTxt; _exist.texte=lines.join('\n'); if(m.client)_exist.client=m.client; if(m.ville)_exist.ville=m.ville; if(agentId&&!_exist.agentId)_exist.agentId=agentId; _exist.src='import'; updated++; if(siteAgent&&siteNoms.indexOf(siteAgent)<0)siteNoms.push(siteAgent); if(m.agentNom&&agentNoms.indexOf(m.agentNom)<0)agentNoms.push(m.agentNom); return; }
+      // Dédup par RÉFÉRENCE Sekur d'abord : identifiant unique du service. Même réf = même service -> MISE À JOUR en place (garde l'ID, donc les pointages/photos), quel que soit le nom de site ou l'agent. C'est ce qui tue les doublons au ré-import.
+      if(m.ref){ for(var _ri=0;_ri<SUIVI.length;_ri++){ if(SUIVI[_ri]&&SUIVI[_ri].ref&&SUIVI[_ri].ref===m.ref){ _exist=SUIVI[_ri]; break; } } }
+      if(!_exist)for(var _xi=0;_xi<SUIVI.length;_xi++){ var _xm=SUIVI[_xi]; if(_xm.statut!=='validee')continue; if(siteNorm(_xm.siteBDC||_xm.siteAgent||_xm.titre||'')!==_siteN)continue; if((_xm.mdate||'')!==(m.mdate||''))continue; if(_tr&&_trf(_xm.mheure)&&_trf(_xm.mheure)!==_tr)continue; if(agentId&&_xm.agentId&&_xm.agentId!==agentId)continue; _exist=_xm; break; }
+      if(_exist){ if(m.mheure)_exist.mheure=m.mheure; if(finTxt)_exist.mfin=finTxt; _exist.texte=lines.join('\n'); if(m.client)_exist.client=m.client; if(m.ville)_exist.ville=m.ville; if(agentId&&!_exist.agentId)_exist.agentId=agentId; if(m.ref)_exist.ref=m.ref; if(m.bdc)_exist.siteBDC=m.bdc; _exist.src='import'; updated++; if(siteAgent&&siteNoms.indexOf(siteAgent)<0)siteNoms.push(siteAgent); if(m.agentNom&&agentNoms.indexOf(m.agentNom)<0)agentNoms.push(m.agentNom); return; }
       var it={id:'imp'+base+'_'+i,texte:lines.join('\n'),titre:siteAgent+(m.ville?' — '+m.ville:''),statut:'validee',motif:'',pris:base,valide:base,ville:m.ville||'',la:null,lo:null,assoc:[],mdate:m.mdate,mheure:m.mheure,mfin:finTxt,client:m.client||'',siteAgent:siteAgent,siteBDC:m.bdc||'',poste:m.poste||'',ref:m.ref||'',src:'import'};
       if(agentId)it.agentId=agentId;
       SUIVI.push(it);
