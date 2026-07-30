@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b62</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b63</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -1347,6 +1347,27 @@ button.big:active{transform:translateY(1px)}
     if(out.length<=1){ var txt=String(it.texte||''), re=/d[ée]but\s+(\d{1,2})\/(\d{1,2})\/(\d{2,4})[\s\S]{0,50}?de\s+(\d{1,2}:\d{2})\s+[àa]\s+(\d{1,2}:\d{2})/gi, mm, parsed=[]; while((mm=re.exec(txt))){ var yy=mm[3].length===2?('20'+mm[3]):mm[3]; parsed.push({mdate:yy+'-'+('0'+mm[2]).slice(-2)+'-'+('0'+mm[1]).slice(-2), mheure:mm[4], mfin:mm[5]}); } if(parsed.length>out.length)out=parsed; }
     return out;
   }
+  // Parseur robuste de TOUTES les vacations d'une demande — gère les blocs « Vacation N : » multi-lignes ET « dès que possible / fin HH:MM » (que svExtractRaw/msgAllDates rataient).
+  function msgVacations(it){
+    var out=[];
+    var raw=(typeof svExtractRaw==='function')?(svExtractRaw(it)||[]):[];
+    raw.forEach(function(v){ if(v.mdate||v.mheure||v.mfin||v.dateLabel)out.push({mdate:v.mdate||'',mheure:v.mheure||'',mfin:v.mfin||'',dateLabel:v.dateLabel||'',asap:(!v.mdate&&/possible/i.test(v.dateLabel||''))}); });
+    var txt=String((it&&it.texte)||'');
+    if(/vacation\s*\d*\s*:/i.test(txt)){
+      var blocks=txt.split(/\n(?=[ \t]*Vacation\s*\d*\s*:)/i), parsed=[];
+      blocks.forEach(function(b){ if(!/vacation\s*\d*\s*:/i.test(b))return;
+        var asap=/possible/i.test(b);
+        var dm=b.match(/d[ée]but\s+(\d{1,2})\/(\d{1,2})\/(\d{2,4})/i), mdate='';
+        if(dm){ var yy=dm[3].length===2?('20'+dm[3]):dm[3]; mdate=yy+'-'+('0'+dm[2]).slice(-2)+'-'+('0'+dm[1]).slice(-2); }
+        var mheure='',mfin='', hm=b.match(/de\s+(\d{1,2}:\d{2})\s+[àa]\s+(\d{1,2}:\d{2})/i);
+        if(hm){ mheure=hm[1]; mfin=hm[2]; }
+        else { var fm=b.match(/fin\s+(\d{1,2}:\d{2})/i); if(fm)mfin=fm[1]; var sm=b.match(/(?:d[ée]but|[àa]\s+partir\s+de)\s+(\d{1,2}:\d{2})/i); if(sm)mheure=sm[1]; }
+        if(mdate||mheure||mfin||asap)parsed.push({mdate:mdate,mheure:mheure,mfin:mfin,dateLabel:asap?'dès que possible':'',asap:(asap&&!mdate)});
+      });
+      if(parsed.length>out.length)out=parsed;
+    }
+    return out;
+  }
   function nearGroupMsg(it){
     var v0=(typeof svExtractRaw==='function')?((svExtractRaw(it)||[])[0]||null):null;
     var mdate=(v0&&v0.mdate)||it.mdate||'', mheure=(v0&&v0.mheure)||it.mheure||'', mfin=(v0&&v0.mfin)||it.mfin||'';
@@ -1364,10 +1385,13 @@ button.big:active{transform:translateY(1px)}
     var lieu=[]; if(cfg.site&&site)lieu.push(site); if(cfg.ville&&ville)lieu.push(ville+(cp?(' ('+cp+')'):''));
     bodyLines.push('On a une mission'+((cfg.client&&client)?(' pour '+client):'')+(lieu.length?(' à '+lieu.join(', ')):'')+' :');
     if(cfg.date){
-      var _dates=msgAllDates(it); if(!_dates.length&&(mdate||mheure))_dates=[{mdate:mdate,mheure:mheure,mfin:mfin}];
+      var _dates=msgVacations(it); if(!_dates.length&&(mdate||mheure||mfin))_dates=[{mdate:mdate,mheure:mheure,mfin:mfin,dateLabel:'',asap:false}];
       function _hf(t){ return String(t||'').replace(':','h'); }
       function _cap(s){ return s?(s.charAt(0).toUpperCase()+s.slice(1)):s; }
-      _dates.forEach(function(dd){ var dp=''; if(dd.mdate){ var qn=_cap(msgDayName(dd.mdate,cfg._dayfmt)); dp=(qn?qn+' ':'')+msgDateTxt(dd.mdate); } var hb=cfg.hdebut?dd.mheure:'', he=cfg.hfin?dd.mfin:''; var hp=(hb&&he)?('de '+_hf(hb)+' à '+_hf(he)):(hb?('à partir de '+_hf(hb)):(he?('jusqu\'à '+_hf(he)):'')); var ln=[dp,hp].filter(Boolean).join(' — '); if(ln)bodyLines.push(ln); });
+      function _hor(dd){ var hb=cfg.hdebut?dd.mheure:'', he=cfg.hfin?dd.mfin:''; return (hb&&he)?('de '+_hf(hb)+' à '+_hf(he)):(hb?('à partir de '+_hf(hb)):(he?('jusqu\'à '+_hf(he)):'')); }
+      var _grp=[], _gm={};
+      _dates.forEach(function(dd){ var k=dd.mdate||(dd.asap?'ASAP':('L:'+(dd.dateLabel||''))); if(!_gm[k]){_gm[k]={dd:dd,h:[]};_grp.push(_gm[k]);} var hh=_hor(dd); if(hh)_gm[k].h.push(hh); });
+      _grp.forEach(function(g,gi){ if(gi>0)bodyLines.push(''); var dd=g.dd, head=''; if(dd.mdate){ var qn=_cap(msgDayName(dd.mdate,cfg._dayfmt)); head=(qn?qn+' ':'')+msgDateTxt(dd.mdate); } else if(dd.asap||/possible/i.test(dd.dateLabel||'')){ head='Aujourd\'hui, dès que possible'; } else if(dd.dateLabel){ head=dd.dateLabel; } if(g.h.length<=1){ var ln=[head,g.h[0]||''].filter(Boolean).join(' — '); if(ln)bodyLines.push(ln); } else { if(head)bodyLines.push(head+' :'); g.h.forEach(function(x){ bodyLines.push(x); }); } }); if(_grp.length)bodyLines.push('');
     }
     var detStr=bodyLines.join('\n');
     var t=msgTplLoad();
@@ -1749,6 +1773,26 @@ button.big:active{transform:translateY(1px)}
     var c=demDupeCands(x); if(!c.length)return '';
     var crit=[_dnorm(x.client)?'client':'',_dnorm(x.site||x.siteAgent||x.titre)?'site':''].filter(Boolean).join(' / ');
     return '<div class="meta" style="background:rgba(123,97,255,.12);border:1.5px solid #7b61ff;border-radius:10px;padding:6px 10px;margin-top:4px"><span style="color:#7b61ff;font-weight:700">🔗 Doublon probable avec '+c.length+' autre'+(c.length>1?'s':'')+'</span> <span class="sub">(même '+crit+')</span> <button class="ok" data-act="dupmerge" data-id="'+x.id+'" style="font-size:11px;padding:2px 8px">Fusionner → compter 1</button></div>';
+  }
+  // ===== « Faire valider (client) » enrichi : choisir QUAND appeler + quelles vacations on prend (✅/❌ + raccourcis) =====
+  function valVacList(x){ return (typeof msgVacations==='function')?msgVacations(x):[]; }
+  function valVacIsToday(v){ return !!(v.asap || (v.mdate && v.mdate===impTodayISO())); }
+  function valVacLabel(v){
+    var day = v.mdate ? (function(){ var qn=(typeof msgDayName==='function')?msgDayName(v.mdate,'long'):''; return (qn?(qn.charAt(0).toUpperCase()+qn.slice(1)+' '):'')+((typeof msgDateTxt==='function')?msgDateTxt(v.mdate):v.mdate); })() : (v.asap?'Aujourd\'hui (dès que possible)':(v.dateLabel||'créneau'));
+    function _h(t){return String(t||'').replace(':','h');}
+    var hor=(v.mheure&&v.mfin)?('de '+_h(v.mheure)+' à '+_h(v.mfin)):(v.mheure?('à partir de '+_h(v.mheure)):(v.mfin?('jusqu\'à '+_h(v.mfin)):''));
+    return [day,hor].filter(Boolean).join(' — ');
+  }
+  function valPanelHtml(x){
+    var vs=valVacList(x), id=esc(x.id);
+    var vacHtml = vs.length ? vs.map(function(v,i){ return '<label class="chk" style="display:flex;margin:2px 0"><input type="checkbox" class="valvac" data-i="'+i+'" checked><span>'+esc(valVacLabel(v))+'</span></label>'; }).join('') : '<div class="sub" style="margin:0">Pas de vacation détaillée — on valide la demande entière.</div>';
+    return '<div class="card" style="margin-top:4px;border:1.5px solid var(--brand,#3b6ef5)"><div class="lab" style="margin:0 0 6px;font-weight:700">📞 Faire valider — préparer le ticket</div>'
+      +'<div class="lab" style="margin:0 0 3px">Quand l\'opérateur doit appeler ?</div>'
+      +'<div class="acts" style="gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 10px"><label class="chk" style="margin:0"><input type="radio" name="valwhen-'+id+'" class="valwhen" value="now" checked><span>Maintenant</span></label><label class="chk" style="margin:0"><input type="radio" name="valwhen-'+id+'" class="valwhen" value="tomorrow"><span>Demain</span></label><label class="chk" style="margin:0"><input type="radio" name="valwhen-'+id+'" class="valwhen" value="date"><span>Le</span></label><input type="date" class="valwhen-d" style="width:auto;padding:4px 6px"><input type="time" class="valwhen-h" value="09:00" style="width:auto;padding:4px 6px"></div>'
+      +'<div class="lab" style="margin:0 0 3px">On prend quelles vacations ? <span class="sub" style="font-weight:400">(coché = ✅ on valide)</span></div>'
+      +'<div class="acts" style="gap:6px;flex-wrap:wrap;margin:0 0 5px"><button type="button" data-valpreset="all" data-id="'+id+'" style="font-size:11px">✅ Tout</button><button type="button" data-valpreset="notoday" data-id="'+id+'" style="font-size:11px">🚫 Tout sauf aujourd\'hui</button><button type="button" data-valpreset="none" data-id="'+id+'" style="font-size:11px">❌ Rien</button></div>'
+      +vacHtml
+      +'<div class="acts" style="margin-top:8px;gap:6px"><button class="ok" data-act="valmake" data-id="'+id+'">📞 Créer le ticket</button><button data-act="valclose" data-id="'+id+'" style="font-size:12px">annuler</button></div></div>';
   }
   function renderSuivi(){
     ['recherche','validee','annulee','nongeree'].forEach(function(b){var el=byId('cnt-'+b);if(el)el.textContent=SUIVI.filter(function(x){return x.statut===b&&(b!=='recherche'||!x.dupOf);}).length;});
