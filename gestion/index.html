@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b67</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b68</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1323,10 +1323,12 @@ button.big:active{transform:translateY(1px)}
     var demDep=String(it.depCode||it.dep||(it.cp?String(it.cp).replace(/\s/g,'').slice(0,2):'')||'').trim();
     function add(a,d,cov){ if(seen[a.id])return; seen[a.id]=1; list.push({a:a,d:d,cover:cov||''}); }
     FA.forEach(function(a){
-      if(it._nads&&!a.ads)return; if(it._nvoit&&!a.voiture)return;
       var hasco=(a.la!=null&&a.lo!=null), d=hasco?km(it.la,it.lo,a.la,a.lo):null;
+      // Responsables secteur (national / département) : TOUJOURS candidats, même s'ils ne sont PAS ADS/véhicule (ils encadrent / peuvent couvrir) — passent AVANT les filtres.
       if(a.secteurPartout){ add(a,(d==null?9999:d),'🌍 France'); return; }
       if(demDep && Array.isArray(a.secteurDeps) && a.secteurDeps.some(function(x){return String(x).trim()===demDep;})){ add(a,(d==null?9998:d),'🗺️ dép. '+demDep); return; }
+      // Agents de proximité : soumis aux filtres ADS / véhicule.
+      if(it._nads&&!a.ads)return; if(it._nvoit&&!a.voiture)return;
       if(hasco && d<=rad)add(a,d,'');
     });
     list.sort(function(x,y){return x.d-y.d;}); return list;
