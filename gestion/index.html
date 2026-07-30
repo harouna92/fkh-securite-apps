@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b60</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b61</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -3823,7 +3823,7 @@ button.big:active{transform:translateY(1px)}
     // Une carte cochée reste visible jusqu'à 2 min après l'heure prévue (ou 2 min après le cochage si coché en retard)
     var hideAt=function(e){ if(e.consigne)return 0; var r=(S[e.mid]&&S[e.mid][e.key])||{}; if(!r.done)return 0; var ct=e.mdate?frMs(e.mdate,e.abs||0):0; return Math.max(ct||0,(r.doneTs||r.at||0))+120000; };
     var nowT=Date.now();
-    var todoL=entries.filter(function(e){ return !isDone(e) || (!e.consigne && hideAt(e)>nowT); }), doneL=entries.filter(function(e){ return isDone(e) && (e.consigne || hideAt(e)<=nowT); });
+    var todoL=entries.filter(function(e){ return !isDone(e); }), doneL=entries.filter(function(e){ return isDone(e); }); // une case cochée disparaît TOUT DE SUITE de la file (avant : restait ~2 min)
     var sosL=todoL.filter(function(e){ return e.consigne && e._valid; }); todoL=todoL.filter(function(e){ return !(e.consigne && e._valid); });
     var sosAnn=sosL.filter(function(e){return e._valid&&e._valid.type==='annuler';});
     var sosVal=sosL.filter(function(e){return e._valid&&e._valid.type!=='annuler';});
