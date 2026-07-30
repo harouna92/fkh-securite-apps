@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b63</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b64</span></div>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
     <button data-s="demandes">🛡️ Gardiennage</button>
@@ -1391,10 +1391,10 @@ button.big:active{transform:translateY(1px)}
       function _hor(dd){ var hb=cfg.hdebut?dd.mheure:'', he=cfg.hfin?dd.mfin:''; return (hb&&he)?('de '+_hf(hb)+' à '+_hf(he)):(hb?('à partir de '+_hf(hb)):(he?('jusqu\'à '+_hf(he)):'')); }
       var _grp=[], _gm={};
       _dates.forEach(function(dd){ var k=dd.mdate||(dd.asap?'ASAP':('L:'+(dd.dateLabel||''))); if(!_gm[k]){_gm[k]={dd:dd,h:[]};_grp.push(_gm[k]);} var hh=_hor(dd); if(hh)_gm[k].h.push(hh); });
-      _grp.forEach(function(g,gi){ if(gi>0)bodyLines.push(''); var dd=g.dd, head=''; if(dd.mdate){ var qn=_cap(msgDayName(dd.mdate,cfg._dayfmt)); head=(qn?qn+' ':'')+msgDateTxt(dd.mdate); } else if(dd.asap||/possible/i.test(dd.dateLabel||'')){ head='Aujourd\'hui, dès que possible'; } else if(dd.dateLabel){ head=dd.dateLabel; } if(g.h.length<=1){ var ln=[head,g.h[0]||''].filter(Boolean).join(' — '); if(ln)bodyLines.push(ln); } else { if(head)bodyLines.push(head+' :'); g.h.forEach(function(x){ bodyLines.push(x); }); } }); if(_grp.length)bodyLines.push('');
+      _grp.forEach(function(g,gi){ bodyLines.push(''); var dd=g.dd, head=''; if(dd.mdate){ var qn=_cap(msgDayName(dd.mdate,cfg._dayfmt)); head=(qn?qn+' ':'')+msgDateTxt(dd.mdate); } else if(dd.asap||/possible/i.test(dd.dateLabel||'')){ head='Aujourd\'hui, dès que possible'; } else if(dd.dateLabel){ head=dd.dateLabel; } if(g.h.length<=1){ var ln=[head,g.h[0]||''].filter(Boolean).join(' — '); if(ln)bodyLines.push(ln); } else { if(head)bodyLines.push(head+' :'); g.h.forEach(function(x){ bodyLines.push(x); }); } }); if(_grp.length)bodyLines.push('');
     }
     var detStr=bodyLines.join('\n');
-    var t=msgTplLoad();
+    var t=DEF_MSG_TPL; // format standard GRAVÉ (Zeus 2026-07-30) : on ignore tout modèle enregistré, qui écrasait le corps groupé
     // Les variables cochées vont TOUJOURS dans le message : repère {details} s'il existe, sinon en tête.
     if(/\{details\}/.test(t)){ t=t.replace(/\{details\}/g,detStr); }
     else { t=t.replace(/\{client\}|\{site\}|\{ville\}|\{quand\}|\{date\}/g,'').replace(/[ \t]{2,}/g,' ').trim(); if(detStr)t=detStr+(t?'\n'+t:''); }
@@ -1453,8 +1453,7 @@ button.big:active{transform:translateY(1px)}
       +'<div class="hm" style="justify-content:space-between;flex-wrap:wrap;gap:6px"><b style="font-size:13px">📤 Envoi groupé — '+selN+' sélectionné'+(selN>1?'s':'')+'</b><span><button data-act="nselall" data-id="'+it.id+'">Tout cocher</button> <button data-act="nselnone" data-id="'+it.id+'">Aucun</button></span></div>'
       +(selN?('<div class="hint" style="margin:4px 0 3px">Variables à inclure <b>(permanent)</b> : '+MSG_VARS.map(function(v){ return '<label style="display:inline-flex;align-items:center;gap:3px;margin:0 10px 3px 0;font-size:12px;cursor:pointer"><input type="checkbox" data-msgvar="'+v.k+'" data-id="'+it.id+'"'+(msgVarsLoad()[v.k]?' checked':'')+' style="width:15px;height:15px;padding:0;margin:0">'+v.lbl+'</label>'; }).join('')+' &nbsp;·&nbsp; Jour : <select data-dayfmt="1" data-id="'+it.id+'" style="width:auto;padding:2px 5px;font-size:12px">'+[['court','LUN'],['long','lundi'],['none','(aucun)']].map(function(o){return '<option value="'+o[0]+'"'+(msgVarsLoad()._dayfmt===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></div>'
           +'<textarea data-nmsg="'+it.id+'" rows="3" style="width:100%;margin:2px 0 6px;font-size:13px;border-radius:8px">'+esc(gmsg)+'</textarea>'
-          +'<div class="hint" style="margin:0 0 6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">✍️ Ce texte ne vaut que pour <b>cet envoi</b>. <button data-act="tpledit" data-id="'+it.id+'" style="font-size:11px;padding:3px 8px">✏️ Modifier le modèle permanent</button></div>'
-          +(it._tpledit?('<div class="pickp" style="border:1.5px solid #6ea8fe;margin:0 0 8px"><div class="lab" style="color:#6ea8fe;margin:0 0 3px">✏️ Modèle permanent — s\'applique à TOUS les prochains envois</div><textarea data-tpl="'+it.id+'" rows="3" style="width:100%;font-size:13px;border-radius:8px">'+esc(msgTplLoad())+'</textarea><div class="hint" style="margin:3px 0">Écris ton texte fixe et place <b>{details}</b> là où tu veux la liste des variables cochées (Client · Site · Ville · Date/heure). Ces cases se gèrent juste au-dessus.</div><div class="acts"><button class="ok" data-act="tplsave" data-id="'+it.id+'">💾 Enregistrer le modèle</button><button data-act="tplreset" data-id="'+it.id+'">↺ Défaut</button><button data-act="tplcancel" data-id="'+it.id+'">Annuler</button></div></div>'):'')
+          +'<div class="hint" style="margin:0 0 6px">✍️ Ce texte ne vaut que pour <b>cet envoi</b> — le format du message est standardisé (coche/décoche les variables juste au-dessus pour changer le contenu).</div>'
           +'<div class="hint" style="margin:0 0 4px">🟢 <b>WhatsApp</b> — clique <b>chaque bouton vert</b> : WhatsApp s\'ouvre avec le message déjà écrit, tu valides l\'envoi (WhatsApp n\'autorise pas l\'envoi à plusieurs en 1 clic) :</div><div style="display:flex;flex-wrap:wrap;gap:6px">'+waBtns+'</div>'
           +'<div style="margin-top:8px"><button data-act="nsms" data-id="'+it.id+'" class="ok">💬 Envoyer le SMS à tous les '+selN+' (1 clic)</button></div>')
         :'<div class="hint" style="margin:6px 0 0">Coche des agents ci-dessus, puis contacte-les tous en un geste.</div>')
