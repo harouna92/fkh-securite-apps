@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b96</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b97</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -195,6 +195,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="prise">Prise de service</button>
     <button data-s="fin">Fin de service</button>
     <button data-s="suivi">Suivi demandes</button>
+    <button data-s="planning">📅 Planning</button>
     <button data-s="fiche">Fiche agent</button>
     <button data-s="zone">Zone à couvrir</button>
     <button data-s="thiam">Thiam</button>
@@ -891,6 +892,10 @@ button.big:active{transform:translateY(1px)}
     <div id="terrain-write"></div>
     <div id="terrain-inbox"></div>
   </section>
+  <section id="sec-planning" class="hidden">
+    <div><h1>📅 Planning</h1><p class="sub">Les <b>mêmes missions</b> que « Suivi demandes » (validées), présentées en grille sites × jours. Clique une case pour voir/affecter. Ajoute une vacation directement. Tout est lié : une modif ici se reflète partout.</p></div>
+    <div id="planning-body"></div>
+  </section>
 </div>
 
 <script>
@@ -934,8 +939,8 @@ button.big:active{transform:translateY(1px)}
   }
   // Branche un bouton .gtime sur la grille : clic -> grille -> data-v + callback
   function bindTimeBtn(el,onPick){ if(!el)return; el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); openTimeGrid(el, tbGet(el), function(v){ tbSet(el,v); if(onPick)onPick(v); }); }); }
-  var secs=['demandes','noterapide','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','numeros','terrain','streste','cockpitfkh','depots'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='terrain'&&typeof renderTerrain==='function')renderTerrain();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
+  var secs=['demandes','noterapide','prise','fin','suivi','planning','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','numeros','terrain','streste','cockpitfkh','depots'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='terrain'&&typeof renderTerrain==='function')renderTerrain();if(s==='planning'&&typeof renderPlanning==='function')renderPlanning();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
   // ===== Réorganiser les SECTIONS (onglets) par glisser-déposer — appui long, mémorisé par appareil =====
   (function tabReorder(){
     var bar=byId('tabs'); if(!bar)return; var LS='fkh_tabs_order';
@@ -3422,6 +3427,31 @@ button.big:active{transform:translateY(1px)}
     inbox.querySelectorAll('[data-terrainack]').forEach(function(b){ b.onclick=function(){ terrainAck(b.getAttribute('data-terrainack')); }; });
     inbox.querySelectorAll('[data-terraindel]').forEach(function(b){ b.onclick=function(){ terrainDel(b.getAttribute('data-terraindel')); }; });
     inbox.querySelectorAll('.terrain-replybtn').forEach(function(b){ b.onclick=function(){ terrainReply(b.getAttribute('data-id')); }; });
+  }
+  // ===== 📅 Planning (style Sekur) : MÊMES missions validées (fkh_suivi) présentées en grille sites × jours. Le pont : modifier ici = modifier partout. =====
+  var plWeek=null;
+  function _plMonday(iso){ try{ var d=new Date(iso+'T00:00:00'); var wd=(d.getDay()+6)%7; return svcAddDays(iso,-wd); }catch(e){ return iso; } }
+  function planningGo(mid){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===mid){m=SUIVI[i];break;} if(!m)return; if(typeof suiviBucket!=='undefined')suiviBucket=(m.statut==='validee'?'validee':(m.statut||'recherche')); var tb=document.querySelector('#tabs button[data-s="suivi"]'); if(tb)tb.click(); if(typeof renderSuivi==='function')renderSuivi(); }
+  function planningAddVac(day,site){ var s=prompt('Nouvelle vacation — Site :', site&&site!=='—'?site:''); if(s===null)return; s=s.trim(); if(!s)return; var h=(prompt('Heure de début (ex. 20:00) :','')||'').trim(); var now=Date.now(); SUIVI.unshift({id:'pl'+now+'_'+Math.round(Math.random()*9999),titre:s,siteAgent:s,client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day,mheure:h,mfin:'',src:'planning'}); if(typeof saveSuivi==='function')saveSuivi(); renderPlanning(); }
+  function renderPlanning(){
+    var box=byId('planning-body'); if(!box)return;
+    if(!plWeek)plWeek=_plMonday(impTodayISO());
+    var days=[],i; for(i=0;i<7;i++)days.push(svcAddDays(plWeek,i));
+    var dn=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'], today=impTodayISO();
+    var miss=(typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){ return m.statut==='validee'&&m.mdate&&days.indexOf(m.mdate)>=0; });
+    var siteMap={}, order=[];
+    miss.forEach(function(m){ var s=(m.siteAgent||m.titre||'—'); if(!siteMap[s]){siteMap[s]=[];order.push(s);} siteMap[s].push(m); });
+    order.sort(function(a,b){return String(a).localeCompare(String(b));});
+    var wl=plWeek.split('-').reverse().join('/'), we=days[6].split('-').reverse().join('/');
+    var toolbar='<div class="acts" style="gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><button type="button" id="pl-prev">◀ Semaine</button><b style="min-width:150px;text-align:center">'+wl+' → '+we+'</b><button type="button" id="pl-next">Semaine ▶</button><button type="button" id="pl-today" style="font-size:12px">Aujourd\'hui</button><span class="sub" style="margin-left:auto">'+miss.length+' vacation'+(miss.length>1?'s':'')+' · '+order.length+' site'+(order.length>1?'s':'')+'</span></div>';
+    var th='<th style="position:sticky;left:0;z-index:2;background:var(--panel2);min-width:150px;text-align:left;padding:6px 8px;border:1px solid var(--line)">Site</th>'+days.map(function(d,j){ var td2=(d===today); var dd=d.split('-')[2]; return '<th style="min-width:96px;padding:4px;border:1px solid var(--line);'+(td2?'color:var(--bad);font-weight:800':'')+'">'+dn[j]+'<br><span style="font-size:11px">'+dd+'</span></th>'; }).join('');
+    var bodyR=order.length?order.map(function(s){ var cells=days.map(function(d){ var here=siteMap[s].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var col=aff?'#1a9e5c':'#e0a13b'; return '<div class="pl-chip" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter'))+'" style="background:'+col+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.mheure?esc(m.mheure)+' ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+'</div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc(s)+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join(''); return '<tr><td style="position:sticky;left:0;background:var(--panel2);font-weight:600;padding:6px 8px;border:1px solid var(--line);font-size:12px">'+esc(s)+'</td>'+cells+'</tr>'; }).join(''):'<tr><td colspan="8" style="padding:20px;text-align:center;border:1px solid var(--line)"><span class="sub">Aucune mission validée cette semaine. Clique une case pour ajouter une vacation.</span></td></tr>';
+    box.innerHTML=toolbar+'<div style="overflow:auto"><table style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr>'+th+'</tr></thead><tbody>'+bodyR+'</tbody></table></div><div class="sub" style="margin-top:8px">🟢 agent affecté · 🟠 à affecter · clique une vacation → va à la mission (Suivi demandes) · clique une case vide → ajoute une vacation.</div>';
+    if(byId('pl-prev'))byId('pl-prev').onclick=function(){ plWeek=svcAddDays(plWeek,-7); renderPlanning(); };
+    if(byId('pl-next'))byId('pl-next').onclick=function(){ plWeek=svcAddDays(plWeek,7); renderPlanning(); };
+    if(byId('pl-today'))byId('pl-today').onclick=function(){ plWeek=_plMonday(impTodayISO()); renderPlanning(); };
+    box.querySelectorAll('.pl-chip').forEach(function(c){ c.onclick=function(e){ e.stopPropagation(); planningGo(c.getAttribute('data-mid')); }; });
+    box.querySelectorAll('.pl-cell').forEach(function(t3){ t3.onclick=function(e){ if(e.target.closest('.pl-chip'))return; planningAddVac(t3.getAttribute('data-day'),t3.getAttribute('data-site')); }; });
   }
   function renderTickets(){
     var wrap=byId('tk-body'); if(!wrap)return; var T=tkLoad();
