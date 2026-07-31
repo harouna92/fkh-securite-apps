@@ -1979,11 +1979,18 @@ button.big:active{transform:translateY(1px)}
       var _fv=(typeof svExtractRaw==='function')?(svExtractRaw(it)[0]||null):null;
       var _hasDate=!!it.mdate||!!(_fv&&_fv.mdate);
       var _isOpen=!!it.h24||/\bh\s*24\b|jusqu'?[àa]\s*nouvel\s*ordre|permanent|en\s*continu/i.test((it.texte||'')+' '+(it.titre||''));
-      var _site=(it.site||it.siteAgent||'').trim(), _manque=[];
-      if(!(it.client&&it.client.trim()))_manque.push('le nom du client');
+      // Récupère client/site LÀ OÙ l'IA (Aquila) les met : champ structuré, sinon le texte détecté (« Client : … » / « Site : … »), sinon le titre. Évite de bloquer une demande dont l'info est déjà visible dans la carte.
+      function _txtField(re){ var _m=re.exec(it.texte||''); return _m?_m[1].trim():''; }
+      var _client=((it.client&&it.client.trim())||_txtField(/^\s*Client\s*:\s*(.+)$/mi)||'').trim();
+      var _site=((it.site||it.siteAgent||'').trim()||_txtField(/^\s*Site\s*:\s*(.+)$/mi)||(it.titre||'').trim());
+      var _manque=[];
+      if(!_client)_manque.push('le nom du client');
       if(!_site)_manque.push('le nom du site');
       if(!_hasDate&&!_isOpen)_manque.push('la date de début');
       if(_manque.length){ alert('⛔ Validation impossible — il manque : '+_manque.join(', ')+'.\n\nJ\'ouvre l\'édition pour compléter (champs marqués *).'); delete it._pick;delete it._pick2;delete it._near; it._edit=true; saveSuivi(); renderSuivi(); return; }
+      // Backfill des champs structurés (pour « le pont » Planning, les tickets et l'affichage) à partir de l'info retrouvée.
+      if(!(it.client&&it.client.trim()))it.client=_client;
+      if(!(it.site||it.siteAgent))it.siteAgent=_site;
       it.statut='validee'; it.valide=Date.now(); it.motif=''; delete it._pending; delete it.aiPending; if(_fv&&!it.mdate){ if(_fv.mdate)it.mdate=_fv.mdate; if(_fv.mheure)it.mheure=_fv.mheure; if(_fv.mfin)it.mfin=_fv.mfin; } }
     else if(act==='dovalidate'){ var _rule=b.getAttribute('data-rule'), _rm; if(_rule==='custom'){ var _inp=b.closest('.sv')?b.closest('.sv').querySelector('.splitcustom'):null; var _h=_inp?parseFloat(_inp.value):0; _rm=(_h>0)?Math.round(_h*60):0; } else _rm=parseInt(_rule,10)||0; delete it._splitpick; svValidateSplit(it,_rm); saveSuivi(); renderSuivi(); return; }
     else if(act==='splitcancel'){ delete it._splitpick; renderSuivi(); return; }
