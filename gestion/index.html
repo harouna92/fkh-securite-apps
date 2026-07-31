@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v31-07·b105</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v31-07·b106</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3500,6 +3500,13 @@ button.big:active{transform:translateY(1px)}
     +'#planning-body button:hover{background:#f0f3f4}'
     +'#planning-body #pl-today{background:#21ba45!important;color:#fff!important;border:none!important;border-radius:28px!important;padding:0 16px!important}'
     +'#planning-body #pl-freset{background:#fff}'
+    +'#planning-body tr.pl-sitehead td{background:#37475a!important;border:1px solid #2f3d4b!important;padding:0}'
+    +'#planning-body .pl-sh-lbl{color:#fff!important;padding:6px 8px;min-width:150px}'
+    +'#planning-body .pl-sh-lbl b{color:#fff!important;font-size:12px}'
+    +'#planning-body .pl-siteadd,#planning-body .pl-sitecopy{color:#fff;opacity:.9}'
+    +'#planning-body td.pl-sitefill{background:#37475a!important}'
+    +'#planning-body .pl-hlabel{background:#f5f7f8!important;color:#3f4b52!important;padding:4px 8px;min-width:150px}'
+    +'#planning-body .pl-hlabel b{color:#3f4b52!important;font-size:11.5px}'
     +'/* modale d\'affectation : look Sekur clair */'
     +'#pl-modal-card{font-family:Roboto,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;background:#fff!important;color:#3f4b52!important;border:1px solid #e4e8ea!important}'
     +'#pl-modal-card .sub{color:#7a858b}'
@@ -3509,6 +3516,11 @@ button.big:active{transform:translateY(1px)}
     +'#pl-modal-card button.ok{background:#21ba45;color:#fff;border:none}'
     +'#pl-modal-card button.no{background:#fff;color:#c10015;border:1px solid #f0b6bb}';
     (document.head||document.documentElement).appendChild(st); }
+  function _plDurTxt(h1,h2){ var s=toMin(h1),e=toMin(h2); if(s==null||e==null)return ''; var d=e-s; if(d<=0)d+=1440; var hh=Math.floor(d/60),mm=d%60; return hh+'h'+(mm?('0'+mm).slice(-2):''); }
+  // Ajouter une vacation sur un site+horaire+jour (clic case vide d'une ligne d'horaire) puis ouvrir la modale (affecter).
+  function planningAddVacH(day,site,h1,h2){ var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day,mheure:h1||'',mfin:h2||'',src:'planning'}); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
+  // Copier un site : duplique toutes ses vacations de la semaine affichée vers la semaine SUIVANTE (mêmes horaires, agents à réaffecter).
+  function planningCopySite(site){ var wk=[],i; for(i=0;i<7;i++)wk.push(svcAddDays(plWeek,i)); var src=SUIVI.filter(function(m){ return m.statut==='validee'&&(m.siteAgent||m.titre||'—')===site&&m.mdate&&wk.indexOf(m.mdate)>=0; }); if(!src.length){ alert('Aucune vacation à copier pour ce site cette semaine.'); return; } if(!confirm('Copier les '+src.length+' vacation(s) de « '+site+' » vers la semaine suivante ?\n(Mêmes horaires, agents à réaffecter.)'))return; var now=Date.now(),n=0; src.forEach(function(m,k){ var c={}; for(var key in m){ if(key.charAt(0)!=='_')c[key]=m[key]; } c.id='pl'+now+'_'+k+'_'+Math.round(Math.random()*9999); c.mdate=svcAddDays(m.mdate,7); delete c.agentId; delete c.vacStatus; c.valide=now; c.pris=now; SUIVI.unshift(c); n++; }); if(typeof saveSuivi==='function')saveSuivi(); plWeek=svcAddDays(plWeek,7); renderPlanning(); alert('✅ '+n+' vacation(s) copiée(s) sur la semaine suivante (à affecter).'); }
   function _plMatch(m){ var F=PL_F;
     if(F.client&&(m.client||'')!==F.client)return false;
     if(F.agent){ if(F.agent==='none'){ if(m.agentId)return false; } else if((m.agentId||'')!==F.agent)return false; }
@@ -3534,7 +3546,17 @@ button.big:active{transform:translateY(1px)}
     var _agOpts='<option value="">Tous agents</option><option value="none"'+(PL_F.agent==='none'?' selected':'')+'>À affecter (sans agent)</option>'+((typeof FA!=='undefined'&&FA)?FA.slice().sort(function(a,b){return String(a.nom||'').localeCompare(String(b.nom||''));}).map(function(a){return '<option value="'+esc(a.id)+'"'+(PL_F.agent===a.id?' selected':'')+'>'+esc(a.nom||'—')+'</option>';}).join(''):'');
     var filterBar='<div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><input id="pl-q" placeholder="🔎 site · client · agent · ville" value="'+esc(PL_F.q)+'" style="flex:1;min-width:150px"><select id="pl-fstatut">'+_stOpts+'</select><select id="pl-fclient">'+_clOpts+'</select><select id="pl-fagent">'+_agOpts+'</select>'+((PL_F.q||PL_F.statut!==''||PL_F.client||PL_F.agent)?'<button id="pl-freset" style="font-size:12px">↺ Réinit.</button>':'')+'</div>';
     var th='<th style="position:sticky;left:0;z-index:2;background:var(--panel2);min-width:150px;text-align:left;padding:6px 8px;border:1px solid var(--line)">Site</th>'+days.map(function(d,j){ var td2=(d===today); var dd=d.split('-')[2]; return '<th style="min-width:96px;padding:4px;border:1px solid var(--line);'+(td2?'color:var(--bad);font-weight:800':'')+'">'+dn[j]+'<br><span style="font-size:11px">'+dd+'</span></th>'; }).join('');
-    var bodyR=order.length?order.map(function(s){ var cells=days.map(function(d){ var here=siteMap[s].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); var col=st.c; return '<div class="pl-chip" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l)+'" style="background:'+col+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.25">'+(m.mheure?esc(m.mheure)+' ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div></div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc(s)+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join(''); return '<tr><td style="position:sticky;left:0;background:var(--panel2);font-weight:600;padding:6px 8px;border:1px solid var(--line);font-size:12px">'+esc(s)+((siteInfo[s]&&siteInfo[s].ville)?' <span class="sub" style="font-weight:400">('+esc(siteInfo[s].ville)+')</span>':'')+((siteInfo[s]&&siteInfo[s].client)?'<div class="sub" style="font-weight:400;font-size:10.5px">'+esc(siteInfo[s].client)+'</div>':'')+'</td>'+cells+'</tr>'; }).join(''):'<tr><td colspan="8" style="padding:20px;text-align:center;border:1px solid var(--line)"><span class="sub">Aucune mission validée cette semaine. Clique une case pour ajouter une vacation.</span></td></tr>';
+    var bodyR='';
+    if(!order.length){ bodyR='<tr><td colspan="8" style="padding:20px;text-align:center;border:1px solid var(--line)"><span class="sub">Aucune vacation validée cette semaine. Clique ＋ sur un site (ou une case) pour ajouter une vacation.</span></td></tr>'; }
+    else { order.forEach(function(s){ var info=siteInfo[s]||{};
+      bodyR+='<tr class="pl-sitehead"><td class="pl-sh-lbl" style="position:sticky;left:0;z-index:2"><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;min-width:0;overflow:hidden"><b>'+esc(s)+'</b>'+(info.ville?' <span style="opacity:.85;font-weight:400">('+esc(info.ville)+')</span>':'')+(info.client?'<div style="font-size:10.5px;opacity:.85">'+esc(info.client)+'</div>':'')+'</div><span class="pl-siteadd" data-site="'+esc(s)+'" title="Ajouter une vacation" style="cursor:pointer;font-size:16px">＋</span><span class="pl-sitecopy" data-site="'+esc(s)+'" title="Copier le site → semaine suivante" style="cursor:pointer;font-size:14px">⧉</span></div></td>'+days.map(function(){return '<td class="pl-sitefill"></td>';}).join('')+'</tr>';
+      var byH={},hOrder=[]; siteMap[s].forEach(function(m){ var hk=(m.mheure||'')+'-'+(m.mfin||''); if(!byH[hk]){byH[hk]=[];hOrder.push(hk);} byH[hk].push(m); });
+      hOrder.sort();
+      hOrder.forEach(function(hk){ var sample=byH[hk][0]; var durt=_plDurTxt(sample.mheure,sample.mfin); var lbl=(sample.mheure||'—')+(sample.mfin?('-'+sample.mfin):'')+(durt?(' ('+durt+')'):''); var qual=sample.qual||sample.specialite||'';
+        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); return '<div class="pl-chip" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l)+'" style="background:'+st.c+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div></div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc(s)+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
+        bodyR+='<tr><td class="pl-hlabel" style="position:sticky;left:0;z-index:1"><b>'+esc(lbl)+'</b>'+(qual?'<div style="font-size:10px;opacity:.8">'+esc(qual)+'</div>':'')+'</td>'+cells+'</tr>';
+      });
+    }); }
     box.innerHTML=toolbar+filterBar+'<div style="overflow:auto"><table style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr>'+th+'</tr></thead><tbody>'+bodyR+'</tbody></table></div><div class="sub" style="margin-top:8px">Statuts : <b style="color:#8a8f98">En attente</b> · <b style="color:#2563eb">En cours</b> · <b style="color:#1a9e5c">Terminé</b> · <b style="color:#e0a13b">à affecter</b> · <b style="color:#c02626">en retard / non couvert</b> — clique une vacation → <b>affecter / changer le statut</b> · clique une case vide → ajouter une vacation.</div>';
     if(byId('pl-prev'))byId('pl-prev').onclick=function(){ plWeek=svcAddDays(plWeek,-7); renderPlanning(); };
     if(byId('pl-next'))byId('pl-next').onclick=function(){ plWeek=svcAddDays(plWeek,7); renderPlanning(); };
@@ -3546,7 +3568,9 @@ button.big:active{transform:translateY(1px)}
     if(byId('pl-freset'))byId('pl-freset').onclick=function(){ PL_F={q:'',statut:'',client:'',agent:''}; renderPlanning(); };
     if(_plFocusQ){ var _qi=byId('pl-q'); if(_qi){ _qi.focus(); var _v=_qi.value; _qi.value=''; _qi.value=_v; } _plFocusQ=false; }
     box.querySelectorAll('.pl-chip').forEach(function(c){ c.onclick=function(e){ e.stopPropagation(); planningAffect(c.getAttribute('data-mid')); }; });
-    box.querySelectorAll('.pl-cell').forEach(function(t3){ t3.onclick=function(e){ if(e.target.closest('.pl-chip'))return; planningAddVac(t3.getAttribute('data-day'),t3.getAttribute('data-site')); }; });
+    box.querySelectorAll('.pl-cell').forEach(function(t3){ t3.onclick=function(e){ if(e.target.closest('.pl-chip'))return; planningAddVacH(t3.getAttribute('data-day'),t3.getAttribute('data-site'),t3.getAttribute('data-h1'),t3.getAttribute('data-h2')); }; });
+    box.querySelectorAll('.pl-siteadd').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); planningAddVac(plWeek,b.getAttribute('data-site')); }; });
+    box.querySelectorAll('.pl-sitecopy').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); planningCopySite(b.getAttribute('data-site')); }; });
   }
   function renderTickets(){
     var wrap=byId('tk-body'); if(!wrap)return; var T=tkLoad();
