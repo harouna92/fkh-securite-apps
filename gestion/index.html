@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b74</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b75</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2805,14 +2805,14 @@ button.big:active{transform:translateY(1px)}
   function remoSave(o){ save('fkh_remontees',o); }
   function remoSet(id,patch){ var o=remoLoad(); o[id]=Object.assign({},o[id]||{},patch); remoSave(o); }
   var REMO_CLASSE=[['','— classer —'],['question','❓ Question'],['bug','🐛 Bug'],['amelioration','💡 Amélioration'],['fonction','🆕 Fonction']];
-  var REMO_STATUT=[['','🔵 À traiter'],['trancher','🟠 À TRANCHER (toi)'],['cours','🟡 En cours'],['fait','✅ Fait']];
+  var REMO_STATUT=[['','🔵 À traiter'],['cours','🟡 En cours'],['local','🧪 Testable en local (attend ta validation)'],['trancher','🟠 À TRANCHER (toi)'],['ligne','🟢 En ligne']];
   function renderRemoCockpit(){
     var box=byId('asg-cockpit'); if(!box)return;
     if(!isSuperAdmin()){ box.classList.add('hidden'); return; }
     box.classList.remove('hidden');
     var meta=remoLoad(), arr=Object.keys(ASG.msgs).map(function(k){return ASG.msgs[k];}).sort(function(a,b){return b.id-a.id;});
-    var nT=0,nF=0,nO=0; arr.forEach(function(m){ var st=(meta[m.id]&&meta[m.id].statut)||''; if(st==='trancher')nT++; else if(st==='fait')nF++; else nO++; });
-    var head='<div class="lab" style="margin:0 0 4px;color:#7b61ff">🎛️ Cockpit Remontées <span class="sub" style="font-weight:400">— tu tranches ici (super-admin)</span></div><div class="sub" style="margin:0 0 8px">'+arr.length+' remontée'+(arr.length>1?'s':'')+' · 🟠 '+nT+' à trancher · 🔵🟡 '+nO+' ouverte'+(nO>1?'s':'')+' · ✅ '+nF+' faite'+(nF>1?'s':'')+'</div>';
+    var nT=0,nL=0,nLg=0,nO=0; arr.forEach(function(m){ var st=(meta[m.id]&&meta[m.id].statut)||''; if(st==='trancher')nT++; else if(st==='local')nL++; else if(st==='ligne')nLg++; else nO++; });
+    var head='<div class="lab" style="margin:0 0 4px;color:#7b61ff;display:flex;align-items:center;gap:8px;flex-wrap:wrap">🎛️ Cockpit Remontées <span class="sub" style="font-weight:400">— tu tranches ici (super-admin)</span><button type="button" id="remo-run" class="ok" style="margin-left:auto;font-size:12px">🚀 Traiter les remontées</button></div><div class="sub" style="margin:0 0 4px">'+arr.length+' remontée'+(arr.length>1?'s':'')+' · 🔵🟡 '+nO+' à traiter/en cours · 🧪 '+nL+' à valider · 🟠 '+nT+' à trancher · 🟢 '+nLg+' en ligne</div><div class="sub" style="margin:0 0 8px;font-size:11px;color:var(--muted)">Flux : petite demande → Claude code + 🧪 testable en local → tu valides → 🟢 en ligne · Question → réponse directe · Gros → 🟠 à trancher.</div>';
     if(!arr.length){ box.innerHTML=head+'<div class="sub" style="margin:0">Aucune remontée pour l\'instant.</div>'; return; }
     box.innerHTML=head+arr.map(function(m){
       var mt=meta[m.id]||{}, d=new Date(m.created_at), when=(''+d.getDate()).padStart(2,'0')+'/'+(''+(d.getMonth()+1)).padStart(2,'0');
@@ -2823,6 +2823,7 @@ button.big:active{transform:translateY(1px)}
     }).join('');
     box.querySelectorAll('.remo-classe').forEach(function(s){ s.onchange=function(){ remoSet(s.getAttribute('data-id'),{classe:s.value}); renderRemoCockpit(); }; });
     box.querySelectorAll('.remo-statut').forEach(function(s){ s.onchange=function(){ remoSet(s.getAttribute('data-id'),{statut:s.value}); renderRemoCockpit(); }; });
+    if(byId('remo-run'))byId('remo-run').onclick=function(){ var m2=remoLoad(), n=0; arr.forEach(function(mm){ var st=(m2[mm.id]&&m2[mm.id].statut)||''; if(!st){ m2[mm.id]=Object.assign({},m2[mm.id]||{},{statut:'cours',runAt:new Date().toISOString()}); n++; } }); remoSave(m2); renderRemoCockpit(); alert('🚀 '+n+' remontée(s) passée(s) en 🟡 En cours.\n\nEn session Claude, écris « remontées » → je les lis et je traite : petite demande = je code + 🧪 testable en local ; question = réponse ; gros = 🟠 à trancher. Rien ne part en ligne sans ton « pousse ».'); };
   }
   function asgRender(){
     if(typeof renderRemoCockpit==='function')renderRemoCockpit();
