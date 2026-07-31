@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b83</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b84</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -212,6 +212,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="streste">💶 Reste ST</button>
     <button data-s="cockpitfkh">📈 Cockpit FKH</button>
     <button data-s="tickets">🎫 Tickets</button>
+    <button data-s="numeros">📇 Numéros utiles</button>
   </div>
 </div>
 <div id="gsearch-wrap" style="position:relative;max-width:1100px;margin:8px auto 0;padding:0 10px">
@@ -876,6 +877,12 @@ button.big:active{transform:translateY(1px)}
     <div><h1>🎫 Tickets</h1><p class="sub">Confie une tâche à traiter. La personne fait le travail <b>directement depuis le ticket</b> (champ à renseigner + lien vers la fiche), et le <b>suivi se met à jour tout seul</b> (ex. 3/11 renseignées).</p></div>
     <div id="tk-body"></div>
   </section>
+  <section id="sec-numeros" class="hidden">
+    <div><h1>📇 Numéros utiles</h1><p class="sub">Carnet partagé (clients, fournisseurs, services…). Clique un numéro pour appeler. Lecture pour tous · <b>modification réservée superviseur / admin / super‑admin</b>.</p></div>
+    <input id="num-search" placeholder="🔎 Rechercher (nom, numéro, catégorie)…" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--ink);margin-bottom:10px">
+    <div id="num-add"></div>
+    <div id="num-list"></div>
+  </section>
 </div>
 
 <script>
@@ -919,8 +926,8 @@ button.big:active{transform:translateY(1px)}
   }
   // Branche un bouton .gtime sur la grille : clic -> grille -> data-v + callback
   function bindTimeBtn(el,onPick){ if(!el)return; el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); openTimeGrid(el, tbGet(el), function(v){ tbSet(el,v); if(onPick)onPick(v); }); }); }
-  var secs=['demandes','noterapide','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','streste','cockpitfkh','depots'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
+  var secs=['demandes','noterapide','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','numeros','streste','cockpitfkh','depots'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
   // ===== Réorganiser les SECTIONS (onglets) par glisser-déposer — appui long, mémorisé par appareil =====
   (function tabReorder(){
     var bar=byId('tabs'); if(!bar)return; var LS='fkh_tabs_order';
@@ -2411,10 +2418,12 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_data'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_data'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
-  function applySectionAccess(){ var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=(!allowed)||allowed.indexOf(s)>=0; b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
+  var SUPERADMIN_SECTIONS=['numeros','tickets','cockpitfkh','streste','depots']; // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)
+  function _secSuperOnly(s){ return SUPERADMIN_SECTIONS.indexOf(s)>=0; }
+  function applySectionAccess(){ var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=((!allowed)||allowed.indexOf(s)>=0) && !(_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin()); b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
 
   /* ===== Cockpit « Reste à payer sous-traitant » (N4 Super-Admin) — lit la clé synchronisée fkh_st_reste ===== */
   function renderStReste(){
@@ -2761,6 +2770,7 @@ button.big:active{transform:translateY(1px)}
       else if(k==='fkh_zones_diff'){ try{ZDIFF=JSON.parse(localStorage.getItem('fkh_zones_diff')||'{}')||{};}catch(e){ZDIFF={};} if(typeof renderZone==='function' && byId('sec-zone') && !byId('sec-zone').classList.contains('hidden'))renderZone(); }
       else if(k==='fkh_tenues_ctrl'){ TCTRL=load('fkh_tenues_ctrl'); if(typeof renderTenues==='function')renderTenues(); if(typeof renderFA==='function')renderFA(); if(typeof renderSuivi==='function')renderSuivi(); }
       else if(k==='fkh_tenues_stock'){ TSTOCK=load('fkh_tenues_stock'); if(typeof renderTenues==='function')renderTenues(); }
+      else if(k==='fkh_numeros_utiles'){ if(byId('sec-numeros')&&!byId('sec-numeros').classList.contains('hidden')&&typeof numListRender==='function')numListRender(); }
       else if(k==='fkh_services'){ if(typeof renderServices==='function')renderServices(); }
       else { var fns=COMBO_REFRESH[k]; if(fns)fns.forEach(function(f){try{f();}catch(e){}}); } // clés « combos » (clients, agents…) : listes rafraîchies en direct
     }catch(e){}
@@ -3287,6 +3297,42 @@ button.big:active{transform:translateY(1px)}
   function tkLoad(){ var a=load('fkh_tickets'); return Array.isArray(a)?a:[]; }
   function tkSave(a){ save('fkh_tickets',a); }
   function tkProgress(t){ var ty=TK_TYPES[t.type]; if(!ty)return {done:0,total:0}; var ids=t.targetIds||[],done=0; ids.forEach(function(id){ var a=faById(id); if(a&&!ty.missing(a))done++; }); return {done:done,total:ids.length}; }
+  // ===== 📇 Numéros utiles : carnet partagé (lecture+appel pour tous, modif superviseur+) =====
+  var NUM_CATS=[['client','🏢 Client'],['fournisseur','🚚 Fournisseur'],['service','🛠️ Service / interne'],['autre','📌 Autre']];
+  function numCatLabel(c){ for(var i=0;i<NUM_CATS.length;i++)if(NUM_CATS[i][0]===c)return NUM_CATS[i][1]; return '📌 Autre'; }
+  function numLoad(){ var a=load('fkh_numeros_utiles'); return Array.isArray(a)?a:[]; }
+  function numSave(a){ save('fkh_numeros_utiles',a); }
+  function numCanEdit(){ return !(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); }
+  function numNewId(){ return 'n'+Date.now()+'_'+Math.round(Math.random()*1e5); }
+  function renderNumeros(){
+    var add=byId('num-add'); if(!add)return;
+    if(byId('num-search'))byId('num-search').oninput=function(){ numListRender(); };
+    if(numCanEdit()){
+      add.innerHTML='<div class="card" style="margin-bottom:10px"><div class="lab" style="margin:0 0 6px">➕ Ajouter un numéro</div><div class="acts" style="gap:6px;flex-wrap:wrap"><input id="num-n-nom" placeholder="Nom / société" style="flex:1;min-width:130px"><select id="num-n-cat">'+NUM_CATS.map(function(c){return '<option value="'+c[0]+'">'+c[1]+'</option>';}).join('')+'</select><input id="num-n-num" placeholder="Numéro" style="width:130px"><input id="num-n-note" placeholder="Note (facultatif)" style="flex:1;min-width:120px"><button type="button" class="ok" id="num-n-add" style="font-size:12px">➕ Ajouter</button><button type="button" id="num-imp-cli" style="font-size:12px" title="Importer les numéros clients déjà enregistrés">📥 Importer les clients</button></div></div>';
+      byId('num-n-add').onclick=function(){ var nom=(byId('num-n-nom').value||'').trim(), num=(byId('num-n-num').value||'').trim(); if(!nom&&!num){alert('Indique au moins un nom ou un numéro.');return;} var a=numLoad(); a.push({id:numNewId(),nom:nom,cat:byId('num-n-cat').value||'autre',num:num,note:(byId('num-n-note').value||'').trim()}); numSave(a); byId('num-n-nom').value='';byId('num-n-num').value='';byId('num-n-note').value=''; numListRender(); };
+      byId('num-imp-cli').onclick=function(){ var TEL={}; try{TEL=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(e){} var a=numLoad(),added=0; Object.keys(TEL).forEach(function(cli){ var n=TEL[cli]; if(!n)return; var k=String(n).replace(/\D/g,'').slice(-9); if(k&&a.some(function(x){return String(x.num||'').replace(/\D/g,'').slice(-9)===k;}))return; a.push({id:numNewId(),nom:cli,cat:'client',num:String(n),note:''}); added++; }); numSave(a); alert(added+' client(s) importé(s) dans le carnet.'); numListRender(); };
+    } else { add.innerHTML=''; }
+    numListRender();
+  }
+  function numListRender(){
+    var box=byId('num-list'); if(!box)return; var q=((byId('num-search')&&byId('num-search').value)||'').toLowerCase().trim();
+    var a=numLoad().slice().sort(function(x,y){ return String(x.nom||'').localeCompare(String(y.nom||'')); });
+    if(q)a=a.filter(function(x){ return (String(x.nom||'')+' '+String(x.num||'')+' '+numCatLabel(x.cat)+' '+String(x.note||'')).toLowerCase().indexOf(q)>=0; });
+    if(!a.length){ box.innerHTML='<div class="card"><div class="sub" style="margin:0">'+(q?'Aucun numéro pour « '+esc(q)+' ».':'Aucun numéro pour l\'instant — clique « Importer les clients » ou ajoute-en un.')+'</div></div>'; return; }
+    var ed=numCanEdit();
+    box.innerHTML='<div class="list">'+a.map(function(x){
+      var tel=String(x.num||'').replace(/\s/g,'');
+      if(ed){
+        return '<div class="it" style="flex-wrap:wrap;gap:6px"><div style="flex:1;min-width:150px"><input class="num-f" data-id="'+esc(x.id)+'" data-k="nom" value="'+esc(x.nom||'')+'" placeholder="Nom" style="width:100%;font-weight:600;padding:4px 6px"><input class="num-f" data-id="'+esc(x.id)+'" data-k="note" value="'+esc(x.note||'')+'" placeholder="Note (facultatif)" style="width:100%;margin-top:3px;padding:4px 6px;font-size:12px"></div><div class="fa-a" style="gap:6px;align-items:center;flex-wrap:wrap"><select class="num-f" data-id="'+esc(x.id)+'" data-k="cat">'+NUM_CATS.map(function(c){return '<option value="'+c[0]+'"'+(x.cat===c[0]?' selected':'')+'>'+c[1]+'</option>';}).join('')+'</select><input class="num-f" data-id="'+esc(x.id)+'" data-k="num" value="'+esc(x.num||'')+'" placeholder="Numéro" style="width:120px;padding:4px 6px">'+(x.num?'<a class="call" href="tel:'+esc(tel)+'" title="Appeler" style="align-self:center">📞</a>':'')+'<button type="button" class="no num-del" data-id="'+esc(x.id)+'" title="Supprimer" style="font-size:12px">🗑️</button></div></div>';
+      }
+      var numHtml=x.num?('<a class="call" href="tel:'+esc(tel)+'">'+esc(x.num)+'</a>'):'<span class="sub">—</span>';
+      return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(x.nom||'—')+' <span class="badge" style="background:var(--panel2);font-weight:400;font-size:11px">'+numCatLabel(x.cat)+'</span></div>'+(x.note?'<div class="fa-d">'+esc(x.note)+'</div>':'')+'</div><div class="fa-a">'+numHtml+'</div></div>';
+    }).join('')+'</div>';
+    if(ed){
+      box.querySelectorAll('.num-f').forEach(function(inp){ inp.onchange=function(){ var id=inp.getAttribute('data-id'),k=inp.getAttribute('data-k'),a=numLoad(),i; for(i=0;i<a.length;i++){ if(a[i].id===id){ a[i][k]=(inp.value||'').trim(); break; } } numSave(a); }; });
+      box.querySelectorAll('.num-del').forEach(function(b){ b.onclick=function(){ var id=b.getAttribute('data-id'),a=numLoad(); var it=a.filter(function(z){return z.id===id;})[0]; if(!confirm('Supprimer « '+((it&&it.nom)||'ce numéro')+' » du carnet ?'))return; numSave(a.filter(function(z){return z.id!==id;})); numListRender(); }; });
+    }
+  }
   function renderTickets(){
     var wrap=byId('tk-body'); if(!wrap)return; var T=tkLoad();
     var typeOpts=Object.keys(TK_TYPES).map(function(k){ var n=(typeof FA!=='undefined'?FA:[]).filter(function(a){return TK_TYPES[k].missing(a);}).length; return '<option value="'+k+'">'+TK_TYPES[k].lbl+' ('+n+' agents concernés)</option>'; }).join('');
