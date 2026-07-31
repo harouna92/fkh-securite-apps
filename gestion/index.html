@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v31-07·b113</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v31-07·b114</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3500,40 +3500,22 @@ button.big:active{transform:translateY(1px)}
   }
   // Look « Sekur » (calque) appliqué au seul onglet Planning — voir releve-sekur/calque-planning.md
   function _plEnsureCss(){ if(byId('pl-sekur-css'))return; var st=document.createElement('style'); st.id='pl-sekur-css'; st.textContent=
-    '#planning-body{font-family:Roboto,-apple-system,"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;background:#e7eaeb;color:#627078;padding:10px;border-radius:8px}'
-    +'#planning-body b{color:#3f4b52}'
-    +'#planning-body .sub{color:#7a858b}'
-    +'#planning-body table{background:#fff!important;border:1px solid #e4e8ea}'
-    +'#planning-body thead th{background:#f5f7f8!important;color:#3f4b52!important;text-transform:uppercase;font-size:11.5px!important;font-weight:600!important;letter-spacing:.3px;border:1px solid #e4e8ea!important}'
-    +'#planning-body tbody td{border:1px solid #e4e8ea!important;background:#fff!important;color:#3f4b52}'
-    +'#planning-body tbody tr:hover td{background:#f8fafb!important}'
-    +'#planning-body td[style*="sticky"]{background:#fff!important;color:#3f4b52!important}'
-    +'#planning-body input,#planning-body select{height:34px;min-height:34px;padding:0 10px!important;box-sizing:border-box;border:1px solid #cfd6da!important;border-radius:4px!important;background:#fff!important;color:#3f4b52!important;font-family:inherit;font-size:13px;line-height:normal;vertical-align:middle}'
+    /* Visuel = thème natif GESTION (retour demandé par Zeus). On ne garde que le structurel des nouveaux éléments + le fix des listes rognées. */
+    '#planning-body select,#planning-body input{padding:6px 10px;box-sizing:border-box;line-height:normal;vertical-align:middle}'
     +'#planning-body select{appearance:auto;-webkit-appearance:menulist}'
     +'#planning-body .acts{align-items:center}'
-    +'#planning-body button{border-radius:4px;border:1px solid #cfd6da;background:#fff;color:#3f4b52;text-transform:uppercase;font-size:12px;font-weight:500;min-height:32px;padding:0 12px;box-shadow:none}'
-    +'#planning-body button:hover{background:#f0f3f4}'
-    +'#planning-body #pl-today{background:#21ba45!important;color:#fff!important;border:none!important;border-radius:28px!important;padding:0 16px!important}'
-    +'#planning-body #pl-freset{background:#fff}'
     +'#planning-body tr.pl-sitehead td{background:#37475a!important;border:1px solid #2f3d4b!important;padding:0}'
     +'#planning-body .pl-sh-lbl{color:#fff!important;padding:6px 8px;min-width:150px}'
     +'#planning-body .pl-sh-lbl b{color:#fff!important;font-size:12px}'
     +'#planning-body .pl-siteadd,#planning-body .pl-sitecopy{color:#fff;opacity:.9}'
     +'#planning-body td.pl-sitefill{background:#37475a!important}'
-    +'#planning-body .pl-hlabel{background:#f5f7f8!important;color:#3f4b52!important;padding:4px 8px;min-width:150px}'
+    +'#planning-body .pl-hlabel{background:var(--panel2)!important;color:var(--ink)!important;padding:4px 8px;min-width:150px}'
+    +'#planning-body .pl-hlabel b{color:var(--ink)!important;font-size:11.5px}'
     +'#planning-body tr.pl-ivhead td{background:#8e44ad!important;border:1px solid #7d3c98!important;padding:0}'
     +'#planning-body tr.pl-ivhead .pl-sh-lbl{color:#fff!important;padding:6px 8px}'
     +'#planning-body tr.pl-ivhead b{color:#fff!important;font-size:12px}'
     +'#planning-body td.pl-ivfill{background:#8e44ad!important}'
-    +'#planning-body .pl-hlabel b{color:#3f4b52!important;font-size:11.5px}'
-    +'/* modale d\'affectation : look Sekur clair */'
-    +'#pl-modal-card{font-family:Roboto,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;background:#fff!important;color:#3f4b52!important;border:1px solid #e4e8ea!important}'
-    +'#pl-modal-card .sub{color:#7a858b}'
-    +'#pl-modal-card input,#pl-modal-card select{height:34px;min-height:34px;padding:0 10px!important;box-sizing:border-box;border:1px solid #cfd6da!important;border-radius:4px!important;background:#fff!important;color:#3f4b52!important;font-size:13px;line-height:normal}'
-    +'#pl-modal-card .fa{border-bottom:1px solid #eef1f2;padding:6px 2px}'
-    +'#pl-modal-card button{border-radius:4px;border:1px solid #cfd6da;background:#fff;color:#3f4b52;text-transform:uppercase;font-size:12px;font-weight:500;min-height:32px;padding:0 12px}'
-    +'#pl-modal-card button.ok{background:#21ba45;color:#fff;border:none}'
-    +'#pl-modal-card button.no{background:#fff;color:#c10015;border:1px solid #f0b6bb}';
+    +'#pl-modal-card input,#pl-modal-card select{padding:6px 10px;box-sizing:border-box;line-height:normal}';
     (document.head||document.documentElement).appendChild(st); }
   function _plDurTxt(h1,h2){ var s=toMin(h1),e=toMin(h2); if(s==null||e==null)return ''; var d=e-s; if(d<=0)d+=1440; var hh=Math.floor(d/60),mm=d%60; return hh+'h'+(mm?('0'+mm).slice(-2):''); }
   // Ajouter une vacation sur un site+horaire+jour (clic case vide d'une ligne d'horaire) puis ouvrir la modale (affecter).
