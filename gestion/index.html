@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v31-07·b111</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v31-07·b112</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3538,6 +3538,24 @@ button.big:active{transform:translateY(1px)}
   function planningAddVacH(day,site,h1,h2){ var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day,mheure:h1||'',mfin:h2||'',src:'planning'}); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
   // Copier un site : duplique toutes ses vacations de la semaine affichée vers la semaine SUIVANTE (mêmes horaires, agents à réaffecter).
   function planningCopySite(site){ var wk=[],i; for(i=0;i<7;i++)wk.push(svcAddDays(plWeek,i)); var src=SUIVI.filter(function(m){ return m.statut==='validee'&&(m.siteAgent||m.titre||'—')===site&&m.mdate&&wk.indexOf(m.mdate)>=0; }); if(!src.length){ alert('Aucune vacation à copier pour ce site cette semaine.'); return; } if(!confirm('Copier les '+src.length+' vacation(s) de « '+site+' » vers la semaine suivante ?\n(Mêmes horaires, agents à réaffecter.)'))return; var now=Date.now(),n=0; src.forEach(function(m,k){ var c={}; for(var key in m){ if(key.charAt(0)!=='_')c[key]=m[key]; } c.id='pl'+now+'_'+k+'_'+Math.round(Math.random()*9999); c.mdate=svcAddDays(m.mdate,7); delete c.agentId; delete c.vacStatus; c.valide=now; c.pris=now; SUIVI.unshift(c); n++; }); if(typeof saveSuivi==='function')saveSuivi(); plWeek=svcAddDays(plWeek,7); renderPlanning(); alert('✅ '+n+' vacation(s) copiée(s) sur la semaine suivante (à affecter).'); }
+  // ===== Tableau des heures (calque Sekur) : Hj/Hn/Hjf/Hnf, colonnes Semaine/Dimanche — nuit 21h→06h, fériés FR calculés, découpage à la minute =====
+  function _plEaster(y){ var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,mm=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*mm+114)/31),da=((h+l-7*mm+114)%31)+1; return new Date(y,mo-1,da); }
+  function _plFerie(iso){ var p=iso.split('-'),y=+p[0],mmdd=p[1]+'-'+p[2]; if(['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'].indexOf(mmdd)>=0)return true; var E=_plEaster(y); function off(n){ var d=new Date(E.getFullYear(),E.getMonth(),E.getDate()+n); return ('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); } return mmdd===off(1)||mmdd===off(39)||mmdd===off(50); }
+  function _plHeures(days){ var K={jS:0,jD:0,nS:0,nD:0,fjS:0,fjD:0,fnS:0,fnD:0}, nSvc=0;
+    (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.statut!=='validee'||!m.mdate||days.indexOf(m.mdate)<0)return; var s=toMin(m.mheure); if(s==null)return; var e=(typeof missEndMin==='function')?missEndMin(m):null; if(e==null)e=s+720; if(e<=s)e+=1440; nSvc++;
+      var brks=(Array.isArray(m.breaks)?m.breaks:[]).filter(function(b){return b.notWork;}).map(function(b){ var b1=toMin(b.h1),b2=toMin(b.h2); if(b1==null||b2==null)return null; if(b2<=b1)b2+=1440; if(b1<s){b1+=1440;b2+=1440;} return [b1,b2]; }).filter(Boolean);
+      for(var t=s;t<e;t++){ var inBrk=brks.some(function(b){return t>=b[0]&&t<b[1];}); if(inBrk)continue; var dayOff=Math.floor(t/1440), mod=t%1440; var dISO=dayOff?svcAddDays(m.mdate,dayOff):m.mdate; var pp=dISO.split('-'); var wd=new Date(+pp[0],+pp[1]-1,+pp[2]).getDay(); var night=(mod>=1260||mod<360); var fer=_plFerie(dISO); var col=(wd===0)?'D':'S'; var key=(fer?(night?'fn':'fj'):(night?'n':'j'))+col; K[key]+=1; } });
+    var out={}; Object.keys(K).forEach(function(k){ out[k]=Math.round(K[k]/60*100)/100; }); out.nSvc=nSvc; out.total=Math.round((K.jS+K.jD+K.nS+K.nD+K.fjS+K.fjD+K.fnS+K.fnD)/60*100)/100; return out; }
+  function planningHeuresOpen(){ _plAffId=null; _plModal().style.display='flex'; var card=byId('pl-modal-card'); if(!card)return; var days=_plDays(); var H=_plHeures(days);
+    function row(l,a,b){ return '<tr><td style="padding:5px 8px;border:1px solid #e4e8ea">'+l+'</td><td style="padding:5px 8px;border:1px solid #e4e8ea;text-align:right">'+a+'</td><td style="padding:5px 8px;border:1px solid #e4e8ea;text-align:right">'+b+'</td></tr>'; }
+    card.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><b style="font-size:15px;flex:1">▾ Tableau des heures — '+days[0].split('-').reverse().join('/')+' → '+days[days.length-1].split('-').reverse().join('/')+'</b><button class="pl-close" style="font-size:18px;background:none;border:none;color:var(--muted);cursor:pointer">✕</button></div>'
+      +'<div class="sub" style="margin:0 0 8px">Catégories de facturation (nuit 21h→6h · fériés FR · pauses « non travaillées » déduites).</div>'
+      +'<table style="border-collapse:collapse;width:100%;font-size:13px"><thead><tr><th style="padding:5px 8px;border:1px solid #e4e8ea;text-align:left"></th><th style="padding:5px 8px;border:1px solid #e4e8ea">Semaine</th><th style="padding:5px 8px;border:1px solid #e4e8ea">Dimanche</th></tr></thead><tbody>'
+      +row('De jour',H.jS,H.jD)+row('De nuit',H.nS,H.nD)+row('Férié de jour',H.fjS,H.fjD)+row('Férié de nuit',H.fnS,H.fnD)
+      +row('<b>Nombre de services</b>','<b>'+H.nSvc+'</b>','')+row('<b>Total d\'heures</b>','<b>'+H.total+' h</b>','')
+      +'</tbody></table>';
+    card.querySelectorAll('.pl-close').forEach(function(b){b.onclick=planningAffectClose;});
+  }
   // ===== Indisponibilités (calque Sekur listIndispo) : agent en congé → signalé et NON proposé à l'affectation =====
   function indispoLoad(){ var a=load('fkh_indispo'); return Array.isArray(a)?a:[]; }
   function indispoSave(a){ save('fkh_indispo',a); }
@@ -3574,7 +3592,7 @@ button.big:active{transform:translateY(1px)}
     order.sort(function(a,b){return String(a).localeCompare(String(b));});
     var wl=days[0].split('-').reverse().join('/'), we=days[days.length-1].split('-').reverse().join('/');
     var _granOpts=['Jour','Semaine','Mois'].map(function(g){return '<option'+(PL_GRAN===g?' selected':'')+'>'+g+'</option>';}).join('');
-    var toolbar='<div class="acts" style="gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><button type="button" id="pl-prev">◀</button><b style="min-width:150px;text-align:center">'+(days.length===1?wl:(wl+' → '+we))+'</b><button type="button" id="pl-next">▶</button><button type="button" id="pl-today" style="font-size:12px">Aujourd\'hui</button><select id="pl-gran" style="width:auto">'+_granOpts+'</select><button type="button" id="pl-indispo" style="font-size:12px">⏱ Indispos</button><span class="sub" style="margin-left:auto">'+miss.length+' vacation'+(miss.length>1?'s':'')+' · '+order.length+' site'+(order.length>1?'s':'')+'</span></div>';
+    var toolbar='<div class="acts" style="gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><button type="button" id="pl-prev">◀</button><b style="min-width:150px;text-align:center">'+(days.length===1?wl:(wl+' → '+we))+'</b><button type="button" id="pl-next">▶</button><button type="button" id="pl-today" style="font-size:12px">Aujourd\'hui</button><select id="pl-gran" style="width:auto">'+_granOpts+'</select><button type="button" id="pl-indispo" style="font-size:12px">⏱ Indispos</button><button type="button" id="pl-heures" style="font-size:12px">▾ Heures</button><span class="sub" style="margin-left:auto">'+miss.length+' vacation'+(miss.length>1?'s':'')+' · '+order.length+' site'+(order.length>1?'s':'')+'</span></div>';
     var _plSM=_plStatusMap();
     var _stOpts='<option value="">Tous statuts</option><option value="0"'+(String(PL_F.statut)==='0'?' selected':'')+'>🟠 À affecter / non couvert</option>'+Object.keys(_plSM).map(function(c){return '<option value="'+c+'"'+(String(PL_F.statut)===c?' selected':'')+'>'+esc(_plSM[c].l)+'</option>';}).join('');
     var _clOpts='<option value="">Tous clients</option>'+Object.keys(_plClients).sort().map(function(c){return '<option'+(PL_F.client===c?' selected':'')+'>'+esc(c)+'</option>';}).join('');
@@ -3603,6 +3621,7 @@ button.big:active{transform:translateY(1px)}
     if(byId('pl-today'))byId('pl-today').onclick=function(){ plWeek=(PL_GRAN==='Jour')?impTodayISO():(PL_GRAN==='Mois'?(impTodayISO().slice(0,7)+'-01'):_plMonday(impTodayISO())); renderPlanning(); };
     if(byId('pl-gran'))byId('pl-gran').onchange=function(){ PL_GRAN=this.value; plWeek=(PL_GRAN==='Jour')?impTodayISO():(PL_GRAN==='Mois'?(impTodayISO().slice(0,7)+'-01'):_plMonday(impTodayISO())); renderPlanning(); };
     if(byId('pl-indispo'))byId('pl-indispo').onclick=function(){ planningIndispoOpen(); };
+    if(byId('pl-heures'))byId('pl-heures').onclick=function(){ planningHeuresOpen(); };
     if(byId('pl-q'))byId('pl-q').oninput=function(){ PL_F.q=this.value; _plFocusQ=true; renderPlanning(); };
     if(byId('pl-fstatut'))byId('pl-fstatut').onchange=function(){ PL_F.statut=this.value; renderPlanning(); };
     if(byId('pl-fclient'))byId('pl-fclient').onchange=function(){ PL_F.client=this.value; renderPlanning(); };
