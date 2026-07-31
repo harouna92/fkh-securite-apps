@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b80</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b81</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -669,6 +669,7 @@ button.big:active{transform:translateY(1px)}
   <section id="sec-suiviappels" class="hidden">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><h1 style="margin:0">📞 Suivi des appels</h1><div id="sa-clock" style="position:fixed;right:12px;top:10px;z-index:60;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;padding:6px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);box-shadow:0 4px 16px rgba(0,0,0,.35)">--:--:--</div></div>
     <p class="sub">Agenda chronologique des appels à faire (issus des missions validées). Pour chaque ligne : coche « Fait » (heure réelle enregistrée), choisis le statut, ajoute un commentaire. Heures 🇫🇷 + 🇲🇱.</p>
+    <div id="sa-superzone">
     <div class="card" style="border:2px solid var(--brand,#6ea8fe)">
       <label class="f"><div class="lab">👤 Opérateur de service (qui gère les appels aujourd'hui)</div>
         <select id="sa-operateur"><option value="">— Choisir l'opérateur —</option><option>Thiam</option><option>Traoré</option><option>Daniel</option><option>Jules</option></select></label>
@@ -682,6 +683,7 @@ button.big:active{transform:translateY(1px)}
       <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><span class="sub" style="margin:0;align-self:center">Tranche :</span><button type="button" class="sa-slice on" data-sl="all">Toutes</button><button type="button" class="sa-slice" data-sl="jour">☀️ Jour 8h→20h</button><button type="button" class="sa-slice" data-sl="nuit">🌙 Nuit 20h→8h</button></div>
       <button type="button" class="big" id="sa-reset" style="margin-top:8px;background:var(--panel2);color:var(--ink);border:1px solid var(--line)">↺ Revenir au défaut (aujourd'hui · tous · chronologique)</button>
     </div>
+    </div><!-- /sa-superzone (masqué aux opérateurs) -->
     <div id="sa-alert" style="position:fixed;right:8px;bottom:10px;z-index:59;max-width:190px;max-height:42vh;overflow:auto;background:var(--panel);border:1.5px solid var(--bad);border-radius:9px;padding:5px 7px;font-size:11px;box-shadow:0 4px 16px rgba(0,0,0,.4);display:none"></div>
     <div id="sa-body"></div>
     <div style="display:none">
@@ -2768,7 +2770,7 @@ button.big:active{transform:translateY(1px)}
     if(!CLOUD.on) return Promise.resolve();
     return fetch(CLOUD.base+'/state?since='+CLOUD.last,{headers:cloudHdr()})
       .then(function(r){ if(r.status===401){cloudLogout('Mot de passe refusé.');throw new Error('401');} return r.json(); })
-      .then(function(j){ if(!j)return; if(j.changed)Object.keys(j.changed).forEach(function(k){cloudApply(k,j.changed[k].v);}); if(j.now)CLOUD.last=j.now; })
+      .then(function(j){ if(!j)return; if(typeof _activeBusy==='function'&&_activeBusy())return; /* anti-fermeture : on n'applique pas la synchro tant qu'un panneau est ouvert ; CLOUD.last non avancé → ré-appliqué au prochain poll */ if(j.changed)Object.keys(j.changed).forEach(function(k){cloudApply(k,j.changed[k].v);}); if(j.now)CLOUD.last=j.now; })
       .catch(function(){});
   }
   function cloudPoll(){ clearTimeout(CLOUD.pollT); CLOUD.pollT=setTimeout(function(){ cloudPull().then(cloudPoll); },4000); }
@@ -2917,6 +2919,8 @@ button.big:active{transform:translateY(1px)}
   // Anti-fermeture GÉNÉRAL : un rafraîchissement automatique ne doit JAMAIS refermer ce que l'utilisateur a ouvert.
   // → true si, dans cette section, un panneau <details> est ouvert OU un champ est en cours de saisie. Les rendus AUTO sautent alors (les rendus manuels passent).
   function _uiOpen(secId){ var sec=byId(secId); if(!sec||sec.classList.contains('hidden'))return false; if(_editingIn(secId))return true; if(sec.querySelector('details[open]'))return true; if(sec.querySelector('.oper-panel:not(.hidden)'))return true; return false; }
+  // Anti-fermeture GLOBAL : true si la section actuellement visible a un panneau ouvert / une saisie en cours. Utilisé pour DIFFÉRER la synchro cloud (rien n'est perdu, ré-appliqué au cycle suivant).
+  function _activeBusy(){ try{ var secs=document.querySelectorAll('section[id^="sec-"]'); for(var i=0;i<secs.length;i++){ var s=secs[i]; if(!s.classList.contains('hidden')&&_uiOpen(s.id))return true; } }catch(e){} return false; }
   function renderStockHolder(){ var sh=byId('stock-holder'); if(sh){ sh.innerHTML=stockCardHtml(); wireStock(sh); } }
   function stockCardHtml(){
     var st=(TSTOCK||[]); function low(s){var x=String(s['Statut stock']||'').toLowerCase();return x.indexOf('proche')>=0||x.indexOf('rupture')>=0||x.indexOf('manqu')>=0;}
@@ -4124,6 +4128,7 @@ button.big:active{transform:translateY(1px)}
   }
   function renderSuiviAppels(){
     var wrap=byId('sa-body'); if(!wrap)return;
+    var _sz=byId('sa-superzone'); if(_sz)_sz.style.display=((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur')?'none':''); // opérateur : vue simplifiée = seulement les tickets d'appels
     var from=byId('sa-from')?byId('sa-from').value:'', to=byId('sa-to')?byId('sa-to').value:'';
     var lbl=(from||to)?('du '+(from?from.split('-').reverse().join('/'):'…')+' au '+(to?to.split('-').reverse().join('/'):'…')):'toute la période';
     var entries=saEntries(from,to,true).filter(function(e){return saTypeMatch(e.key)&&saSliceMatch(e);});
@@ -4534,7 +4539,7 @@ button.big:active{transform:translateY(1px)}
   setInterval(function(){ var sec=byId('sec-supervision'); if(!sec||sec.classList.contains('hidden')||supTab!=='oper')return; operTick(); },1000);
   setInterval(function(){ var sec=byId('sec-supervision'); if(!sec||sec.classList.contains('hidden')||supTab!=='oper')return; if(typeof _uiOpen==='function'&&_uiOpen('sec-supervision'))return; if(typeof renderSupervision==='function')renderSupervision(); },30000);
   // L'appli va chercher les demandes détectées par l'IA en PERMANENCE (toutes les 60 s), quel que soit l'onglet affiché, pour qu'elles basculent toutes seules dans Suivi demandes.
-  setInterval(function(){ if(typeof CLOUD!=='undefined'&&CLOUD.on&&typeof aiLoadDemandes==='function')aiLoadDemandes(); },60000);
+  setInterval(function(){ if(typeof _activeBusy==='function'&&_activeBusy())return; if(typeof CLOUD!=='undefined'&&CLOUD.on&&typeof aiLoadDemandes==='function')aiLoadDemandes(); },60000);
   // Et une première fois ~4 s après le chargement (rattrapage immédiat à l'ouverture).
   setTimeout(function(){ if(typeof CLOUD!=='undefined'&&CLOUD.on&&typeof aiLoadDemandes==='function')aiLoadDemandes(); },4000);
 
