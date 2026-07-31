@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b75</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b76</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2543,7 +2543,7 @@ button.big:active{transform:translateY(1px)}
   function cfkhEur(x){ return (x==null)?'—':Math.round(x).toLocaleString('fr-FR')+' €'; }
   function renderCockpitFKH(){
     var nav=byId('cfkh-nav'), box=byId('cfkh-body'); if(!nav||!box)return; var D=cfkhData();
-    var vues=[['ensemble','Vue d’ensemble'],['clients','Clients / mois'],['cascade','Cascade ST'],['paie','Paie']];
+    var vues=[['ensemble','Vue d’ensemble'],['etat','État (annuel)'],['clients','Clients / mois'],['cascade','Cascade ST'],['paie','Paie']];
     nav.innerHTML='<h2 style="font-size:18px;margin:6px 0 2px">📈 Cockpit FKH</h2>'
       +'<div style="font-size:12px;color:#7a8794;margin-bottom:10px">Reproduit l’artefact FKH · lit le carnet <code>fkh_data</code> (ex-DATA_FKH.json) · MAJ '+(D.maj||'')+'</div>'
       +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">'+vues.map(function(v){return '<button data-v="'+v[0]+'" style="padding:6px 12px;border-radius:20px;border:1px solid '+(cfkhView===v[0]?'#1a2733':'#cdd6e0')+';background:'+(cfkhView===v[0]?'#1a2733':'#fff')+';color:'+(cfkhView===v[0]?'#fff':'#42505e')+';font-size:12.5px;cursor:pointer">'+v[1]+'</button>';}).join('')+'</div>';
@@ -2568,6 +2568,18 @@ button.big:active{transform:translateY(1px)}
       h+='<table style="width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid #e6e9ee;border-radius:10px;overflow:hidden"><thead><tr><th style="'+thh+';text-align:left">Mois</th><th style="'+thr+'">CA ST théorique HT</th><th style="'+thr+'">Interne FKH</th><th style="'+thr+'">CA ST net TTC</th><th style="'+thh+';text-align:right">ST affecté</th></tr></thead><tbody>';
       D.cascade.forEach(function(x){ h+='<tr><td style="'+td+'">'+x.m+'</td><td style="'+tdr+'">'+cfkhEur(x.theoht)+'</td><td style="'+tdr+'">'+cfkhEur(x.interne)+'</td><td style="'+tdr+';font-weight:600">'+cfkhEur(x.netttc)+'</td><td style="'+tdr+'">'+x.st+'</td></tr>'; });
       h+='</tbody></table><div style="font-size:11.5px;color:#7a8794;margin-top:8px">Sous-traité = NET client − interne FKH. Tout affecté à GARIS (unique ST actif).</div>';
+    } else if(cfkhView==='etat'){
+      var moisc=D.ca_client.map(function(x){return x.m.replace(/ 20\d\d/,'');});
+      function cfkhRow(lbl,vals,fmt){ var cells=vals.map(function(v){return '<td style="'+tdr+'">'+fmt(v)+'</td>';}).join(''); var tot=vals.reduce(function(a,b){return a+b;},0); return '<tr><td style="'+td+';font-weight:600">'+lbl+'</td>'+cells+'<td style="'+tdr+';font-weight:700;background:#f7f9fb">'+fmt(tot)+'</td></tr>'; }
+      var eF=function(v){return cfkhEur(v);}, hF=function(v){return (Math.round(v*100)/100)+' h';};
+      h+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border:1px solid #e6e9ee;border-radius:10px;overflow:hidden"><thead><tr><th style="'+thh+';text-align:left">Ligne</th>'+moisc.map(function(m){return '<th style="'+thr+'">'+m+'</th>';}).join('')+'<th style="'+thr+'">Total</th></tr></thead><tbody>';
+      h+=cfkhRow('CA client (net TTC)',D.ca_client.map(function(x){return x.netttc;}),eF);
+      h+=cfkhRow('CA sous-traité (TTC)',D.cascade.map(function(x){return x.netttc;}),eF);
+      h+=cfkhRow('Masse salariale (brute)',D.paie.map(function(x){return x.brute;}),eF);
+      h+=cfkhRow('Heures internes',D.paie.map(function(x){return x.h;}),hF);
+      h+='<tr><td style="'+td+';font-weight:600">Agents payés</td>'+D.paie.map(function(x){return '<td style="'+tdr+'">'+x.ag+'</td>';}).join('')+'<td style="'+tdr+';color:#7a8794">—</td></tr>';
+      h+='</tbody></table></div>';
+      h+='<div style="font-size:11.5px;color:#7a8794;margin-top:8px">Matrice annuelle lue du carnet <code>fkh_data</code> (Jan→Mai 2026). Les lignes conformité / justificatifs / courriers arriveront avec l’enrichissement du carnet.</div>';
     } else if(cfkhView==='paie'){
       h+='<table style="width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid #e6e9ee;border-radius:10px;overflow:hidden"><thead><tr><th style="'+thh+';text-align:left">Mois</th><th style="'+thr+'">Masse brute</th><th style="'+thr+'">Masse nette</th><th style="'+thr+'">Heures internes</th><th style="'+thr+'">Agents</th></tr></thead><tbody>';
       D.paie.forEach(function(x){ h+='<tr><td style="'+td+'">'+x.m+'</td><td style="'+tdr+'">'+cfkhEur(x.brute)+'</td><td style="'+tdr+'">'+cfkhEur(x.nette)+'</td><td style="'+tdr+'">'+x.h+' h</td><td style="'+tdr+'">'+x.ag+'</td></tr>'; });
@@ -2806,6 +2818,21 @@ button.big:active{transform:translateY(1px)}
   function remoSet(id,patch){ var o=remoLoad(); o[id]=Object.assign({},o[id]||{},patch); remoSave(o); }
   var REMO_CLASSE=[['','— classer —'],['question','❓ Question'],['bug','🐛 Bug'],['amelioration','💡 Amélioration'],['fonction','🆕 Fonction']];
   var REMO_STATUT=[['','🔵 À traiter'],['cours','🟡 En cours'],['local','🧪 Testable en local (attend ta validation)'],['trancher','🟠 À TRANCHER (toi)'],['ligne','🟢 En ligne']];
+  // Pré-tri GRATUIT par mots-clés (0 coût, instantané) : propose une classe, Claude affine ensuite pendant « remontées ».
+  function _noAcc(s){ try{return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}catch(e){return String(s||'').toLowerCase();} }
+  function remoAutoClasse(txt){
+    var t=_noAcc(txt); if(!t)return '';
+    function any(arr){ for(var i=0;i<arr.length;i++){ if(t.indexOf(arr[i])>=0)return true; } return false; }
+    var BUG=['bug','bogue','erreur','marche pas','marche plus','fonctionne pas','ne fonctionne','plante','plantee','plante ','crash','probleme','souci','impossible de','n arrive pas','narrive pas','ne charge','charge pas','fige','figee','ne s affiche','affiche pas','disparait','coince','ne repond','repond pas','anomalie','defaut','defaillance','ne s ouvre','ouvre pas','enregistre pas','ne s enregistre','ca beugue','beug'];
+    var FONC=['ajouter','ajoute ','rajouter','rajoute','nouvelle fonction','nouvelle option','nouveau bouton','creer','pouvoir faire','possibilite de','possibilite d','avoir un bouton','avoir une option','mettre un bouton','integrer','ajout d','ajout de','rajout'];
+    var AMEL=['ameliorer','amelioration','mieux','plus rapide','trop lent','trop long','simplifier','au lieu de','plutot','deplacer','optimiser','pas pratique','plus clair','plus simple','reorganiser','ce serait mieux','ce serait plus'];
+    var QUES=['comment','pourquoi','est-ce que','est ce que','c est quoi','ca veut dire','quelle ','quel est','quels ','ou est','ou se trouve','peut on savoir','savoir si','je comprends pas','je ne comprends','je capte pas'];
+    if(any(BUG))return 'bug';
+    if(any(FONC))return 'fonction';
+    if(any(AMEL))return 'amelioration';
+    if(any(QUES))return 'question';
+    return '';
+  }
   function renderRemoCockpit(){
     var box=byId('asg-cockpit'); if(!box)return;
     if(!isSuperAdmin()){ box.classList.add('hidden'); return; }
