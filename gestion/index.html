@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b78</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b79</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -701,7 +701,8 @@ button.big:active{transform:translateY(1px)}
         <button type="button" data-c="retour">🗣️ Observation / besoin</button>
       </div>
       <div class="card">
-        <label class="f"><div class="lab">Ton nom</div><input id="asg-auteur" placeholder="Qui écrit ?" autocomplete="off"></label>
+        <div class="f" id="asg-ident" style="font-size:13px;color:var(--muted);margin-bottom:8px">✍️ Tu écris en tant que : <b id="asg-ident-who" style="color:var(--ink)">—</b></div>
+        <label class="f" id="asg-nom-wrap" style="display:none"><div class="lab">Ton nom</div><input id="asg-auteur" placeholder="Qui écrit ?" autocomplete="off"></label>
         <label class="f" style="margin-top:8px"><div class="lab" id="asg-lab">Ta question, un besoin, un problème rencontré…</div><textarea id="asg-texte" placeholder="Écris ici ce que tu veux — question, souci, idée d'amélioration. Claude s'en occupe."></textarea></label>
         <button class="big" id="asg-send">Envoyer à Claude</button>
         <div class="sub" id="asg-status" style="margin-top:6px"></div>
@@ -2432,7 +2433,7 @@ button.big:active{transform:translateY(1px)}
     d.lignes.forEach(function(r){
       cf+=r.f; if(r.p)cp+=r.p; var pos=cp-cf;
       if(r.todo)aFac+=r.f; else if(String(r.m).indexOf('2026')>=0)facE+=r.f;
-      var td='padding:8px 10px;border-bottom:1px solid #e6e9ee';
+      var td='padding:8px 10px;border-bottom:1px solid #e6e9ee;color:#1a2733';
       rows+='<tr>'
         +'<td style="text-align:left;'+td+'">'+r.m+(r.todo?' <span style="font-size:10px;color:#b7791f;border:1px solid #d9a441;border-radius:20px;padding:0 6px">non facturé</span>':'')+'</td>'
         +'<td style="text-align:left;color:#7a8794;'+td+'">'+r.n+'</td>'
@@ -2556,7 +2557,7 @@ button.big:active{transform:translateY(1px)}
       +'<div style="font-size:12px;color:#7a8794;margin-bottom:10px">Reproduit l’artefact FKH · lit le carnet <code>fkh_data</code> (ex-DATA_FKH.json) · MAJ '+(D.maj||'')+'</div>'
       +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">'+vues.map(function(v){return '<button data-v="'+v[0]+'" style="padding:6px 12px;border-radius:20px;border:1px solid '+(cfkhView===v[0]?'#1a2733':'#cdd6e0')+';background:'+(cfkhView===v[0]?'#1a2733':'#fff')+';color:'+(cfkhView===v[0]?'#fff':'#42505e')+';font-size:12.5px;cursor:pointer">'+v[1]+'</button>';}).join('')+'</div>';
     Array.prototype.forEach.call(nav.querySelectorAll('button[data-v]'),function(b){ b.onclick=function(){ cfkhView=b.getAttribute('data-v'); renderCockpitFKH(); }; });
-    var td='padding:8px 10px;border-bottom:1px solid #e6e9ee', tdr=td+';text-align:right', thh='background:#f2f5f8;color:#7a8794;font-size:11px;padding:8px 10px', thr=thh+';text-align:right';
+    var td='padding:8px 10px;border-bottom:1px solid #e6e9ee;color:#1a2733', tdr=td+';text-align:right', thh='background:#f2f5f8;color:#5c6b7a;font-size:11px;padding:8px 10px', thr=thh+';text-align:right';
     var h='';
     if(cfkhView==='ensemble'){
       var caT=0,stT=0,mbT=0; D.ca_client.forEach(function(x){caT+=x.netttc;}); D.cascade.forEach(function(x){stT+=x.netttc;}); D.paie.forEach(function(x){mbT+=x.brute;});
@@ -2797,13 +2798,17 @@ button.big:active{transform:translateY(1px)}
   function asgHdr(){ return {'Content-Type':'application/json','X-App-Password':CLOUD.pass}; }
   function asgVisible(){ var s=byId('sec-assistant'); return s && !s.classList.contains('hidden'); }
   function asgAvail(){ var on=CLOUD.on; var off=byId('asg-offline'),wr=byId('asg-wrap'); if(off)off.style.display=on?'none':''; if(wr)wr.style.display=on?'':'none'; }
-  function asgOnOpen(){ asgAvail(); if(CLOUD.on){ asgPull(); } asgRender(); }
-  function asgOnConnect(){ asgAvail(); asgPull().then(asgPoll); }
+  function asgOnOpen(){ asgAvail(); asgSetIdent(); if(CLOUD.on){ asgPull(); } asgRender(); }
+  function asgOnConnect(){ asgAvail(); asgSetIdent(); asgPull().then(asgPoll); }
+  // Auto-identité : la personne est déjà identifiée par son mot de passe (1 compte = 1 personne) → plus besoin de taper son nom.
+  function _asgRoleLabel(r){ return ({operateur:'opérateur',superviseur:'superviseur',admin:'admin',superadmin:'super-admin',full:'super-admin'})[r||'']||''; }
+  function asgAuthor(){ if(typeof CLOUD!=='undefined'&&CLOUD.user){ var n=(typeof operNom==='function'?operNom(CLOUD.user):'')||CLOUD.user; var r=_asgRoleLabel(CLOUD.role); return r?(n+' ('+r+')'):n; } return (byId('asg-auteur')&&byId('asg-auteur').value||'').trim(); }
+  function asgSetIdent(){ var who=byId('asg-ident-who'), line=byId('asg-ident'), wrap=byId('asg-nom-wrap'); var known=!!(typeof CLOUD!=='undefined'&&CLOUD.on&&CLOUD.user); if(who)who.textContent=known?asgAuthor():'—'; if(line)line.style.display=known?'':'none'; if(wrap)wrap.style.display=known?'none':''; }
   function asgSetCanal(c){ ASG.canal=(c==='retour')?'retour':'analyse'; document.querySelectorAll('#asg-tabs button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-c')===ASG.canal);}); byId('asg-lab').textContent=ASG.canal==='retour'?'Ton observation ou ton besoin sur l\'appli':'Ta question ou ce que tu veux faire analyser'; byId('asg-texte').placeholder=ASG.canal==='retour'?'Ex. il faudrait pouvoir exporter le suivi des appels en PDF…':'Écris ta question ici…'; }
   function asgSend(){
     if(!CLOUD.on)return;
     var t=(byId('asg-texte').value||'').trim(); if(!t){byId('asg-status').textContent='Écris un message d\'abord.';return;}
-    var a=(byId('asg-auteur').value||'').trim(); try{localStorage.setItem('fkh_asg_nom',a);}catch(e){}
+    var a=asgAuthor(); if(!a){byId('asg-status').textContent='Reconnecte-toi (identité inconnue).';return;}
     var btn=byId('asg-send'); btn.disabled=true; btn.textContent='Envoi…'; byId('asg-status').textContent='';
     fetch(CLOUD.base+'/msg',{method:'POST',headers:asgHdr(),body:JSON.stringify({canal:ASG.canal,auteur:a,texte:t})})
       .then(function(r){return r.json();}).then(function(j){ btn.disabled=false; btn.textContent='Envoyer à Claude';
@@ -2879,7 +2884,7 @@ button.big:active{transform:translateY(1px)}
     var sv=null; try{sv=localStorage.getItem('fkh_asg_nom');}catch(e){} if(sv&&byId('asg-auteur'))byId('asg-auteur').value=sv;
     var sb=byId('asg-send'); if(sb)sb.addEventListener('click',asgSend);
     document.querySelectorAll('#asg-tabs button').forEach(function(b){ b.addEventListener('click',function(){ asgSetCanal(b.getAttribute('data-c')); }); });
-    asgAvail();
+    asgAvail(); asgSetIdent();
   })();
   /* ===== Bulle flottante « Poser une question » — accessible partout, tous rôles ===== */
   (function initAskFab(){
