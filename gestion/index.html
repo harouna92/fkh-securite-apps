@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v31-07·b106</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v31-07·b107</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3471,6 +3471,7 @@ button.big:active{transform:translateY(1px)}
       +'<div class="lab" style="margin:8px 0 3px">✏️ Détails de la vacation</div>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><input class="pl-e-site" placeholder="Site" value="'+esc(m.siteAgent||m.titre||'')+'"><input class="pl-e-client" placeholder="Client" value="'+esc(m.client||'')+'"></div>'
       +'<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:6px;margin-top:6px"><input type="date" class="pl-e-date" value="'+esc(m.mdate||'')+'"><input class="pl-e-h1" placeholder="Début 20:00" value="'+esc(m.mheure||'')+'"><input class="pl-e-h2" placeholder="Fin 08:00" value="'+esc(m.mfin||'')+'"></div>'
+      +'<input class="pl-e-qual" list="pl-qual-dl" placeholder="Qualification (ex. Agent de sécurité confirmé)" value="'+esc(m.qual||'')+'" style="width:100%;margin-top:6px"><datalist id="pl-qual-dl"><option value="Agent de sécurité confirmé"></option><option value="Agent rondier contrôleur"></option><option value="ADS"></option><option value="SSIAP 1"></option><option value="SSIAP 2"></option><option value="Agent cynophile"></option></datalist>'
       +'<div class="lab" style="margin:2px 0 3px">Affecter un agent (nom · n° · ville)</div><input class="pl-afsearch" placeholder="Tape un nom, un numéro, une ville…" autocomplete="off" value="'+esc(_plAffQ)+'" style="width:100%"><div class="pl-afres" style="margin-top:6px">'+_plAgentResults(m)+'</div>'
       +'<div class="lab" style="margin:10px 0 3px">🔪 Découper en vacations</div><div class="acts" style="gap:6px;flex-wrap:wrap"><button class="pl-split" data-rule="720">12h</button><button class="pl-split" data-rule="480">8h</button><button class="pl-split" data-rule="360">6h</button><button class="pl-split" data-rule="0">Garder tel quel</button></div>'
       +'<div class="acts" style="margin-top:10px;flex-wrap:wrap"><button class="pl-jump">↗ Ouvrir dans Suivi demandes</button><button class="no pl-del">🗑️ Supprimer la vacation</button><button class="pl-close">Fermer</button></div>';
@@ -3480,7 +3481,7 @@ button.big:active{transform:translateY(1px)}
     var rm=card.querySelector('.pl-affrm'); if(rm)rm.onclick=function(){ if(!confirm('Retirer l\'agent de cette mission ? Elle repassera « à affecter ».'))return; delete m.agentId; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); };
     var jp=card.querySelector('.pl-jump'); if(jp)jp.onclick=function(){ var id=_plAffId; planningAffectClose(); planningGo(id); };
     function _bindE(sel,field,isHM){ var el=card.querySelector(sel); if(!el)return; el.onchange=function(){ var v=el.value; if(isHM)v=_plNormHM(v); m[field]=v; if(field==='siteAgent'&&!m.titre)m.titre=v; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; }
-    _bindE('.pl-e-site','siteAgent',false); _bindE('.pl-e-client','client',false); _bindE('.pl-e-date','mdate',false); _bindE('.pl-e-h1','mheure',true); _bindE('.pl-e-h2','mfin',true);
+    _bindE('.pl-e-site','siteAgent',false); _bindE('.pl-e-client','client',false); _bindE('.pl-e-date','mdate',false); _bindE('.pl-e-h1','mheure',true); _bindE('.pl-e-h2','mfin',true); _bindE('.pl-e-qual','qual',false);
     var del=card.querySelector('.pl-del'); if(del)del.onclick=function(){ if(!confirm('Supprimer définitivement cette vacation ?'))return; var id=_plAffId; SUIVI=SUIVI.filter(function(x){return x.id!==id;}); if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); };
     card.querySelectorAll('.pl-split').forEach(function(b){ b.onclick=function(){ var rm=parseInt(b.getAttribute('data-rule'),10)||0; var n=(typeof svValidateSplit==='function')?svValidateSplit(m,rm):1; if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); alert(n>=2?('🔪 Découpé en '+n+' vacations.'):'1 seule vacation (rien à découper sur ce créneau).'); }; });
     _plWirePicks(card,m);
