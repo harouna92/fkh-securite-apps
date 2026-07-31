@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v31-07·b107</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v31-07·b108</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3436,7 +3436,9 @@ button.big:active{transform:translateY(1px)}
     inbox.querySelectorAll('.terrain-replybtn').forEach(function(b){ b.onclick=function(){ terrainReply(b.getAttribute('data-id')); }; });
   }
   // ===== 📅 Planning (style Sekur) : MÊMES missions validées (fkh_suivi) présentées en grille sites × jours. Le pont : modifier ici = modifier partout. =====
-  var plWeek=null, PL_F={q:'',statut:'',client:'',agent:''}, _plFocusQ=false;
+  var plWeek=null, PL_F={q:'',statut:'',client:'',agent:''}, _plFocusQ=false, PL_GRAN='Semaine'; // granularité : Jour · Semaine · Mois (calque Sekur)
+  function _plDays(){ var out=[],i; if(PL_GRAN==='Jour'){ out.push(plWeek); } else if(PL_GRAN==='Mois'){ var first=plWeek.slice(0,7)+'-01'; var y=+plWeek.slice(0,4), mo=+plWeek.slice(5,7); var nb=new Date(y,mo,0).getDate(); for(i=0;i<nb;i++)out.push(svcAddDays(first,i)); } else { for(i=0;i<7;i++)out.push(svcAddDays(plWeek,i)); } return out; }
+  function _plShift(dir){ if(PL_GRAN==='Jour')plWeek=svcAddDays(plWeek,dir); else if(PL_GRAN==='Mois'){ var y=+plWeek.slice(0,4), mo=+plWeek.slice(5,7)-1+dir; var d=new Date(y,mo,1); plWeek=d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-01'; } else plWeek=svcAddDays(plWeek,7*dir); }
   function _plMonday(iso){ try{ var d=new Date(iso+'T00:00:00'); var wd=(d.getDay()+6)%7; return svcAddDays(iso,-wd); }catch(e){ return iso; } }
   function planningGo(mid){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===mid){m=SUIVI[i];break;} if(!m)return; if(typeof suiviBucket!=='undefined')suiviBucket=(m.statut==='validee'?'validee':(m.statut||'recherche')); var tb=document.querySelector('#tabs button[data-s="suivi"]'); if(tb)tb.click(); if(typeof renderSuivi==='function')renderSuivi(); }
   function _plNormHM(v){ v=String(v||'').trim(); if(!v)return ''; var m=v.match(/^(\d{1,2})\s*[:hH]?\s*(\d{0,2})$/); if(!m)return v; return ('0'+m[1]).slice(-2)+':'+(m[2]?('0'+m[2]).slice(-2):'00'); }
@@ -3531,7 +3533,7 @@ button.big:active{transform:translateY(1px)}
   function renderPlanning(){
     var box=byId('planning-body'); if(!box)return; _plEnsureCss();
     if(!plWeek)plWeek=_plMonday(impTodayISO());
-    var days=[],i; for(i=0;i<7;i++)days.push(svcAddDays(plWeek,i));
+    var days=_plDays(), i;
     var dn=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'], today=impTodayISO();
     var missAll=(typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){ return m.statut==='validee'&&m.mdate&&days.indexOf(m.mdate)>=0; });
     var _plClients={}; missAll.forEach(function(m){ if(m.client)_plClients[m.client]=1; });
@@ -3539,16 +3541,17 @@ button.big:active{transform:translateY(1px)}
     var siteMap={}, order=[], siteInfo={};
     miss.forEach(function(m){ var s=(m.siteAgent||m.titre||'—'); if(!siteMap[s]){siteMap[s]=[];order.push(s);siteInfo[s]={ville:m.ville||'',client:m.client||''};} siteMap[s].push(m); });
     order.sort(function(a,b){return String(a).localeCompare(String(b));});
-    var wl=plWeek.split('-').reverse().join('/'), we=days[6].split('-').reverse().join('/');
-    var toolbar='<div class="acts" style="gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><button type="button" id="pl-prev">◀ Semaine</button><b style="min-width:150px;text-align:center">'+wl+' → '+we+'</b><button type="button" id="pl-next">Semaine ▶</button><button type="button" id="pl-today" style="font-size:12px">Aujourd\'hui</button><span class="sub" style="margin-left:auto">'+miss.length+' vacation'+(miss.length>1?'s':'')+' · '+order.length+' site'+(order.length>1?'s':'')+'</span></div>';
+    var wl=days[0].split('-').reverse().join('/'), we=days[days.length-1].split('-').reverse().join('/');
+    var _granOpts=['Jour','Semaine','Mois'].map(function(g){return '<option'+(PL_GRAN===g?' selected':'')+'>'+g+'</option>';}).join('');
+    var toolbar='<div class="acts" style="gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><button type="button" id="pl-prev">◀</button><b style="min-width:150px;text-align:center">'+(days.length===1?wl:(wl+' → '+we))+'</b><button type="button" id="pl-next">▶</button><button type="button" id="pl-today" style="font-size:12px">Aujourd\'hui</button><select id="pl-gran" style="width:auto">'+_granOpts+'</select><span class="sub" style="margin-left:auto">'+miss.length+' vacation'+(miss.length>1?'s':'')+' · '+order.length+' site'+(order.length>1?'s':'')+'</span></div>';
     var _plSM=_plStatusMap();
     var _stOpts='<option value="">Tous statuts</option><option value="0"'+(String(PL_F.statut)==='0'?' selected':'')+'>🟠 À affecter / non couvert</option>'+Object.keys(_plSM).map(function(c){return '<option value="'+c+'"'+(String(PL_F.statut)===c?' selected':'')+'>'+esc(_plSM[c].l)+'</option>';}).join('');
     var _clOpts='<option value="">Tous clients</option>'+Object.keys(_plClients).sort().map(function(c){return '<option'+(PL_F.client===c?' selected':'')+'>'+esc(c)+'</option>';}).join('');
     var _agOpts='<option value="">Tous agents</option><option value="none"'+(PL_F.agent==='none'?' selected':'')+'>À affecter (sans agent)</option>'+((typeof FA!=='undefined'&&FA)?FA.slice().sort(function(a,b){return String(a.nom||'').localeCompare(String(b.nom||''));}).map(function(a){return '<option value="'+esc(a.id)+'"'+(PL_F.agent===a.id?' selected':'')+'>'+esc(a.nom||'—')+'</option>';}).join(''):'');
     var filterBar='<div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><input id="pl-q" placeholder="🔎 site · client · agent · ville" value="'+esc(PL_F.q)+'" style="flex:1;min-width:150px"><select id="pl-fstatut">'+_stOpts+'</select><select id="pl-fclient">'+_clOpts+'</select><select id="pl-fagent">'+_agOpts+'</select>'+((PL_F.q||PL_F.statut!==''||PL_F.client||PL_F.agent)?'<button id="pl-freset" style="font-size:12px">↺ Réinit.</button>':'')+'</div>';
-    var th='<th style="position:sticky;left:0;z-index:2;background:var(--panel2);min-width:150px;text-align:left;padding:6px 8px;border:1px solid var(--line)">Site</th>'+days.map(function(d,j){ var td2=(d===today); var dd=d.split('-')[2]; return '<th style="min-width:96px;padding:4px;border:1px solid var(--line);'+(td2?'color:var(--bad);font-weight:800':'')+'">'+dn[j]+'<br><span style="font-size:11px">'+dd+'</span></th>'; }).join('');
+    var th='<th style="position:sticky;left:0;z-index:2;background:var(--panel2);min-width:150px;text-align:left;padding:6px 8px;border:1px solid var(--line)">Site</th>'+days.map(function(d){ var td2=(d===today); var dd=d.split('-')[2]; var _p=d.split('-'); var _wd=(new Date(+_p[0],+_p[1]-1,+_p[2]).getDay()+6)%7; var _we=(_wd>=5); return '<th style="min-width:'+(PL_GRAN==='Mois'?'44px':'96px')+';padding:4px;border:1px solid var(--line);'+(td2?'color:var(--bad);font-weight:800':(_we?'background:#eef1f2;':''))+'">'+dn[_wd]+'<br><span style="font-size:11px">'+dd+'</span></th>'; }).join('');
     var bodyR='';
-    if(!order.length){ bodyR='<tr><td colspan="8" style="padding:20px;text-align:center;border:1px solid var(--line)"><span class="sub">Aucune vacation validée cette semaine. Clique ＋ sur un site (ou une case) pour ajouter une vacation.</span></td></tr>'; }
+    if(!order.length){ bodyR='<tr><td colspan="99" style="padding:20px;text-align:center;border:1px solid var(--line)"><span class="sub">Aucune vacation validée cette semaine. Clique ＋ sur un site (ou une case) pour ajouter une vacation.</span></td></tr>'; }
     else { order.forEach(function(s){ var info=siteInfo[s]||{};
       bodyR+='<tr class="pl-sitehead"><td class="pl-sh-lbl" style="position:sticky;left:0;z-index:2"><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;min-width:0;overflow:hidden"><b>'+esc(s)+'</b>'+(info.ville?' <span style="opacity:.85;font-weight:400">('+esc(info.ville)+')</span>':'')+(info.client?'<div style="font-size:10.5px;opacity:.85">'+esc(info.client)+'</div>':'')+'</div><span class="pl-siteadd" data-site="'+esc(s)+'" title="Ajouter une vacation" style="cursor:pointer;font-size:16px">＋</span><span class="pl-sitecopy" data-site="'+esc(s)+'" title="Copier le site → semaine suivante" style="cursor:pointer;font-size:14px">⧉</span></div></td>'+days.map(function(){return '<td class="pl-sitefill"></td>';}).join('')+'</tr>';
       var byH={},hOrder=[]; siteMap[s].forEach(function(m){ var hk=(m.mheure||'')+'-'+(m.mfin||''); if(!byH[hk]){byH[hk]=[];hOrder.push(hk);} byH[hk].push(m); });
@@ -3559,9 +3562,10 @@ button.big:active{transform:translateY(1px)}
       });
     }); }
     box.innerHTML=toolbar+filterBar+'<div style="overflow:auto"><table style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr>'+th+'</tr></thead><tbody>'+bodyR+'</tbody></table></div><div class="sub" style="margin-top:8px">Statuts : <b style="color:#8a8f98">En attente</b> · <b style="color:#2563eb">En cours</b> · <b style="color:#1a9e5c">Terminé</b> · <b style="color:#e0a13b">à affecter</b> · <b style="color:#c02626">en retard / non couvert</b> — clique une vacation → <b>affecter / changer le statut</b> · clique une case vide → ajouter une vacation.</div>';
-    if(byId('pl-prev'))byId('pl-prev').onclick=function(){ plWeek=svcAddDays(plWeek,-7); renderPlanning(); };
-    if(byId('pl-next'))byId('pl-next').onclick=function(){ plWeek=svcAddDays(plWeek,7); renderPlanning(); };
-    if(byId('pl-today'))byId('pl-today').onclick=function(){ plWeek=_plMonday(impTodayISO()); renderPlanning(); };
+    if(byId('pl-prev'))byId('pl-prev').onclick=function(){ _plShift(-1); renderPlanning(); };
+    if(byId('pl-next'))byId('pl-next').onclick=function(){ _plShift(1); renderPlanning(); };
+    if(byId('pl-today'))byId('pl-today').onclick=function(){ plWeek=(PL_GRAN==='Jour')?impTodayISO():(PL_GRAN==='Mois'?(impTodayISO().slice(0,7)+'-01'):_plMonday(impTodayISO())); renderPlanning(); };
+    if(byId('pl-gran'))byId('pl-gran').onchange=function(){ PL_GRAN=this.value; plWeek=(PL_GRAN==='Jour')?impTodayISO():(PL_GRAN==='Mois'?(impTodayISO().slice(0,7)+'-01'):_plMonday(impTodayISO())); renderPlanning(); };
     if(byId('pl-q'))byId('pl-q').oninput=function(){ PL_F.q=this.value; _plFocusQ=true; renderPlanning(); };
     if(byId('pl-fstatut'))byId('pl-fstatut').onchange=function(){ PL_F.statut=this.value; renderPlanning(); };
     if(byId('pl-fclient'))byId('pl-fclient').onchange=function(){ PL_F.client=this.value; renderPlanning(); };
