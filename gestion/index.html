@@ -1972,7 +1972,9 @@ button.big:active{transform:translateY(1px)}
     if(act==='trouve'){
       // #11 garde-fou : formalisme minimum avant de passer en « validée »
       var _fv=(typeof svExtractRaw==='function')?(svExtractRaw(it)[0]||null):null;
-      var _hasDate=!!it.mdate||!!(_fv&&_fv.mdate);
+      // Dates relatives (Aquila écrit souvent « demain » / « après-demain » / « aujourd'hui ») — résolues par rapport au JOUR DE L'APPEL (it.pris). Cas sûrs uniquement (pas les jours de semaine).
+      var _relDate=(function(){ try{ var refISO=it.pris?new Date(it.pris).toISOString().slice(0,10):impTodayISO(); var s=(((it.vacations&&it.vacations.map(function(v){return v.date||'';}).join(' '))||'')+' '+(it.texte||'')).toLowerCase(); if(/apr[eè]s[\s-]?demain/.test(s))return svcAddDays(refISO,2); if(/\bdemain\b/.test(s))return svcAddDays(refISO,1); if(/aujourd'?hui|ce soir|cette nuit|ce matin|cet apr[eè]s[\s-]?midi/.test(s))return refISO; }catch(e){} return ''; })();
+      var _hasDate=!!it.mdate||!!(_fv&&_fv.mdate)||!!_relDate;
       var _isOpen=!!it.h24||/\bh\s*24\b|jusqu'?[àa]\s*nouvel\s*ordre|permanent|en\s*continu/i.test((it.texte||'')+' '+(it.titre||''));
       // Récupère client/site LÀ OÙ l'IA (Aquila) les met : champ structuré, sinon le texte détecté (« Client : … » / « Site : … »), sinon le titre. Évite de bloquer une demande dont l'info est déjà visible dans la carte.
       function _txtField(re){ var _m=re.exec(it.texte||''); return _m?_m[1].trim():''; }
@@ -1986,7 +1988,7 @@ button.big:active{transform:translateY(1px)}
       // Backfill des champs structurés (pour « le pont » Planning, les tickets et l'affichage) à partir de l'info retrouvée.
       if(!(it.client&&it.client.trim()))it.client=_client;
       if(!(it.site||it.siteAgent))it.siteAgent=_site;
-      it.statut='validee'; it.valide=Date.now(); it.motif=''; delete it._pending; delete it.aiPending; if(_fv&&!it.mdate){ if(_fv.mdate)it.mdate=_fv.mdate; if(_fv.mheure)it.mheure=_fv.mheure; if(_fv.mfin)it.mfin=_fv.mfin; } }
+      it.statut='validee'; it.valide=Date.now(); it.motif=''; delete it._pending; delete it.aiPending; if(!it.mdate){ if(_fv&&_fv.mdate)it.mdate=_fv.mdate; else if(_relDate)it.mdate=_relDate; if(_fv&&_fv.mheure)it.mheure=_fv.mheure; if(_fv&&_fv.mfin)it.mfin=_fv.mfin; } }
     else if(act==='dovalidate'){ var _rule=b.getAttribute('data-rule'), _rm; if(_rule==='custom'){ var _inp=b.closest('.sv')?b.closest('.sv').querySelector('.splitcustom'):null; var _h=_inp?parseFloat(_inp.value):0; _rm=(_h>0)?Math.round(_h*60):0; } else _rm=parseInt(_rule,10)||0; delete it._splitpick; svValidateSplit(it,_rm); saveSuivi(); renderSuivi(); return; }
     else if(act==='splitcancel'){ delete it._splitpick; renderSuivi(); return; }
     else if(act==='resplit'){ var _grp=it.vacGroup; if(!_grp){ return; } var _mem=SUIVI.filter(function(m){return m.vacGroup===_grp;}); var _aff=_mem.filter(function(m){return m.agentId;}).length; if(!confirm('Réassembler cette mission ('+_mem.length+' vacation'+(_mem.length>1?'s':'')+') et redéfinir le découpage ?'+(_aff?'\n\n⚠️ '+_aff+' vacation(s) déjà affectée(s) à un agent — elles seront à réaffecter.':'')))return; var _ref=_mem[0]; SUIVI=SUIVI.filter(function(m){return m.vacGroup!==_grp;}); var _now2=Date.now(); var _src={id:'grp'+_now2+'_'+Math.round(Math.random()*9999),titre:(_ref.vacSrcTitre||_ref.titre||'Demande'),statut:'validee',motif:'',pris:(_ref.pris||_now2),valide:_now2,ville:_ref.ville,cp:_ref.cp,client:_ref.client,la:_ref.la,lo:_ref.lo,assoc:[],vacations:(_ref.vacSource||[]),texte:(_ref.vacSrcTexte||_ref.texte||'')}; SUIVI.unshift(_src); saveSuivi(); if(typeof suiviBucket!=='undefined')suiviBucket='validee'; renderSuivi(); return; }
