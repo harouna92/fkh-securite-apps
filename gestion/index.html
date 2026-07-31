@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b92</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b93</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -213,6 +213,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="cockpitfkh">📈 Cockpit FKH</button>
     <button data-s="tickets">🎫 Tickets</button>
     <button data-s="numeros">📇 Numéros utiles</button>
+    <button data-s="terrain">📨 Remontées terrain <span class="cnt" id="terrain-cnt" style="display:none"></span></button>
   </div>
 </div>
 <div id="gsearch-wrap" style="position:relative;max-width:1100px;margin:8px auto 0;padding:0 10px">
@@ -884,6 +885,11 @@ button.big:active{transform:translateY(1px)}
     <div id="num-add"></div>
     <div id="num-list"></div>
   </section>
+  <section id="sec-terrain" class="hidden">
+    <div><h1>📨 Remontées terrain</h1><p class="sub">Une info reçue par téléphone à faire remonter (prolongation, modif, incident…). Écris + Envoyer. En cas d'urgence, clique 🆘. Les responsables sont alertés (cloche + badge) et accusent réception.</p></div>
+    <div id="terrain-write"></div>
+    <div id="terrain-inbox"></div>
+  </section>
 </div>
 
 <script>
@@ -927,8 +933,8 @@ button.big:active{transform:translateY(1px)}
   }
   // Branche un bouton .gtime sur la grille : clic -> grille -> data-v + callback
   function bindTimeBtn(el,onPick){ if(!el)return; el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); openTimeGrid(el, tbGet(el), function(v){ tbSet(el,v); if(onPick)onPick(v); }); }); }
-  var secs=['demandes','noterapide','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','numeros','streste','cockpitfkh','depots'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
+  var secs=['demandes','noterapide','prise','fin','suivi','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','numeros','terrain','streste','cockpitfkh','depots'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='terrain'&&typeof renderTerrain==='function')renderTerrain();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
   // ===== Réorganiser les SECTIONS (onglets) par glisser-déposer — appui long, mémorisé par appareil =====
   (function tabReorder(){
     var bar=byId('tabs'); if(!bar)return; var LS='fkh_tabs_order';
@@ -2426,7 +2432,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_data'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_data'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   var SUPERADMIN_SECTIONS=['tickets','cockpitfkh','streste','depots']; // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)
@@ -2781,6 +2787,7 @@ button.big:active{transform:translateY(1px)}
       else if(k==='fkh_tenues_ctrl'){ TCTRL=load('fkh_tenues_ctrl'); if(typeof renderTenues==='function')renderTenues(); if(typeof renderFA==='function')renderFA(); if(typeof renderSuivi==='function')renderSuivi(); }
       else if(k==='fkh_tenues_stock'){ TSTOCK=load('fkh_tenues_stock'); if(typeof renderTenues==='function')renderTenues(); }
       else if(k==='fkh_numeros_utiles'){ if(byId('sec-numeros')&&!byId('sec-numeros').classList.contains('hidden')&&typeof numListRender==='function')numListRender(); }
+      else if(k==='fkh_terrain'){ if(typeof terrainNotify==='function')terrainNotify(); if(byId('sec-terrain')&&!byId('sec-terrain').classList.contains('hidden')&&typeof renderTerrain==='function')renderTerrain(); }
       else if(k==='fkh_services'){ if(typeof renderServices==='function')renderServices(); }
       else { var fns=COMBO_REFRESH[k]; if(fns)fns.forEach(function(f){try{f();}catch(e){}}); } // clés « combos » (clients, agents…) : listes rafraîchies en direct
     }catch(e){}
@@ -2796,7 +2803,7 @@ button.big:active{transform:translateY(1px)}
   function cloudPoll(){ clearTimeout(CLOUD.pollT); CLOUD.pollT=setTimeout(function(){ cloudPull().then(cloudPoll); },4000); }
   function cloudBar(txt,online){ var b=byId('cloudbar'); if(!b)return; b.style.display='flex'; b.querySelector('.cb-txt').textContent=txt; b.className='cloudbar '+(online?'cb-on':'cb-off'); }
   function cloudLogout(msg){ CLOUD.on=false; CLOUD.pass=''; try{sessionStorage.removeItem('fkh_pass');}catch(e){} clearTimeout(CLOUD.pollT); var lo=byId('loginOverlay'); if(lo)lo.style.display='flex'; if(msg)byId('login-err').textContent=msg; var _lf=byId('logout-fab'); if(_lf)_lf.style.display='none'; }
-  function cloudStart(){ CLOUD.on=true; try{sessionStorage.setItem('fkh_pass',CLOUD.pass);}catch(e){} var lo=byId('loginOverlay'); if(lo)lo.style.display='none'; var _lf=byId('logout-fab'); if(_lf)_lf.style.display='block'; if(typeof applySectionAccess==='function')applySectionAccess(); if(typeof applyRoleLayout==='function')applyRoleLayout(); cloudBar('☁︎ Connecté'+(CLOUD.user?(' — '+operNom(CLOUD.user)):(CLOUD.sections?' — accès restreint':' — données partagées')),true); cloudToggleImport(); cloudPull().then(function(){ cloudPoll(); }); if(typeof asgOnConnect==='function')asgOnConnect(); }
+  function cloudStart(){ CLOUD.on=true; try{sessionStorage.setItem('fkh_pass',CLOUD.pass);}catch(e){} var lo=byId('loginOverlay'); if(lo)lo.style.display='none'; var _lf=byId('logout-fab'); if(_lf)_lf.style.display='block'; if(typeof applySectionAccess==='function')applySectionAccess(); if(typeof applyRoleLayout==='function')applyRoleLayout(); cloudBar('☁︎ Connecté'+(CLOUD.user?(' — '+operNom(CLOUD.user)):(CLOUD.sections?' — accès restreint':' — données partagées')),true); cloudToggleImport(); cloudPull().then(function(){ cloudPoll(); if(typeof terrainNotify==='function')terrainNotify(); }); if(typeof asgOnConnect==='function')asgOnConnect(); }
   // Y a-t-il des données locales pas encore dans le classeur commun ? (sert à n'afficher le bouton que quand c'est utile)
   function cloudHasLocalData(){ for(var i=0;i<SYNC_KEYS.length;i++){ var v=localStorage.getItem(SYNC_KEYS[i]); if(v&&v.length>2&&v!=='[]'&&v!=='{}')return true; } return false; }
   function cloudToggleImport(){ var ib=byId('cloud-import'); if(ib)ib.style.display=(CLOUD.on&&cloudHasLocalData())?'':'none'; }
@@ -3354,6 +3361,37 @@ button.big:active{transform:translateY(1px)}
       box.querySelectorAll('.num-f').forEach(function(inp){ inp.onchange=function(){ var id=inp.getAttribute('data-id'),k=inp.getAttribute('data-k'),a=numLoad(),i; for(i=0;i<a.length;i++){ if(a[i].id===id){ a[i][k]=(inp.value||'').trim(); break; } } numSave(a); }; });
       box.querySelectorAll('.num-del').forEach(function(b){ b.onclick=function(){ var id=b.getAttribute('data-id'),a=numLoad(); var it=a.filter(function(z){return z.id===id;})[0]; if(!confirm('Supprimer « '+((it&&it.nom)||'ce numéro')+' » du carnet ?'))return; numSave(a.filter(function(z){return z.id!==id;})); numListRender(); }; });
     }
+  }
+  // ===== 📨 Remontées terrain : l'opérateur fait remonter une info (tel) ; superviseur+ voient + « pris en compte » + ALERTE (badge onglet + notif). + 🆘 SOS =====
+  function terrainLoad(){ var a=load('fkh_terrain'); return Array.isArray(a)?a:[]; }
+  function terrainSave(a){ save('fkh_terrain',a); }
+  function terrainWho(){ return (typeof asgAuthor==='function'&&asgAuthor())||'—'; }
+  function terrainCanManage(){ return !(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); }
+  function terrainNewId(){ return 'tr'+Date.now()+'_'+Math.round(Math.random()*1e5); }
+  function terrainPending(){ return terrainLoad().filter(function(x){return !x.pris;}); }
+  function _terrainWhen(iso){ try{var d=new Date(iso);return (''+d.getDate()).padStart(2,'0')+'/'+(''+(d.getMonth()+1)).padStart(2,'0')+' '+(''+d.getHours()).padStart(2,'0')+':'+(''+d.getMinutes()).padStart(2,'0');}catch(e){return '';} }
+  // Badge compteur sur l'onglet (superviseur+ seulement) : nb en attente, ROUGE si au moins un 🆘 SOS.
+  function terrainBadge(){ var el=byId('terrain-cnt'); if(!el)return; if(!terrainCanManage()){ el.style.display='none'; return; } var p=terrainPending(), sos=p.filter(function(x){return x.sos;}).length; if(!p.length){ el.style.display='none'; el.textContent=''; return; } el.style.display=''; el.textContent=p.length; el.style.background=sos?'#c02626':''; el.style.color=sos?'#fff':''; }
+  // Notification (cloche + son) dès qu'une nouvelle remontée arrive (superviseur+). 🆘 = urgent.
+  var TERRAIN_SEEN=null;
+  function terrainNotify(){ if(!terrainCanManage()){ terrainBadge(); return; } var p=terrainPending(); if(TERRAIN_SEEN===null){ TERRAIN_SEEN={}; p.forEach(function(x){TERRAIN_SEEN[x.id]=1;}); terrainBadge(); return; } p.forEach(function(x){ if(!TERRAIN_SEEN[x.id]){ TERRAIN_SEEN[x.id]=1; if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on&&(typeof notifCanFire!=='function'||notifCanFire())){ notifFire({cat:'nouvelle_demande',key:'terrain'+x.id,title:(x.sos?'🆘 URGENT — un opérateur demande un rappel':'📨 Nouvelle remontée terrain'),body:(x.auteur||'')+(x.texte?' : '+String(x.texte).slice(0,70):''),go:'terrain'}); } else if(typeof notifBeep==='function'){ try{notifBeep();}catch(e){} } } }); terrainBadge(); }
+  function terrainAdd(sos){ var ta=byId('terrain-txt'), t=(ta&&ta.value||'').trim(); if(!sos&&!t){ if(byId('terrain-status'))byId('terrain-status').textContent='Écris ton info d\'abord.'; return; } var a=terrainLoad(); a.unshift({id:terrainNewId(),auteur:terrainWho(),texte:t,sos:!!sos,created:new Date().toISOString(),pris:'',prisAt:''}); terrainSave(a); if(ta)ta.value=''; if(byId('terrain-status'))byId('terrain-status').textContent=sos?'🆘 Alerte envoyée aux responsables — on te rappelle.':'✅ Transmis aux responsables.'; renderTerrain(); }
+  function terrainAck(id){ var a=terrainLoad(),i; for(i=0;i<a.length;i++){ if(a[i].id===id){ a[i].pris=terrainWho(); a[i].prisAt=new Date().toISOString(); break; } } terrainSave(a); renderTerrain(); }
+  function terrainDel(id){ if(!confirm('Retirer cette remontée ?'))return; terrainSave(terrainLoad().filter(function(x){return x.id!==id;})); renderTerrain(); }
+  function renderTerrain(){
+    terrainBadge();
+    var w=byId('terrain-write'); if(!w)return;
+    w.innerHTML='<div class="card"><div class="lab" style="margin:0 0 6px">✍️ Une info à faire remonter</div><textarea id="terrain-txt" placeholder="Ex. le client X a appelé pour prolonger la mission jusqu\'à vendredi…" style="width:100%;min-height:70px"></textarea><div class="acts" style="margin-top:8px;gap:8px;flex-wrap:wrap"><button class="ok" id="terrain-send">📨 Envoyer</button><button id="terrain-sos" style="background:#c02626;border-color:#c02626;color:#fff;font-weight:700">🆘 URGENT — me rappeler</button></div><div class="sub" id="terrain-status" style="margin-top:6px"></div></div>';
+    if(byId('terrain-send'))byId('terrain-send').onclick=function(){ terrainAdd(false); };
+    if(byId('terrain-sos'))byId('terrain-sos').onclick=function(){ if(!confirm('Envoyer une alerte URGENTE aux responsables pour qu\'ils te rappellent ?'))return; terrainAdd(true); };
+    var inbox=byId('terrain-inbox'); if(!inbox)return;
+    if(!terrainCanManage()){ inbox.innerHTML='<div class="sub" style="margin:8px 0 0;line-height:1.6">✅ Tes remontées sont transmises aux responsables (superviseur / admin / super‑admin). Ils te recontactent si besoin.</div>'; return; }
+    var a=terrainLoad(), pending=a.filter(function(x){return !x.pris;}), done=a.filter(function(x){return x.pris;}), nSos=pending.filter(function(x){return x.sos;}).length;
+    function card(x){ return '<div class="card" style="padding:8px;margin-bottom:6px;border-left:4px solid '+(x.sos?'#c02626':'var(--brand,#6ea8fe)')+(x.pris?';opacity:.6':'')+'"><div style="font-size:11px;color:var(--muted)">'+esc(x.auteur||'—')+' · '+_terrainWhen(x.created)+(x.sos?' · <b style="color:#c02626">🆘 URGENT</b>':'')+'</div><div style="margin:3px 0">'+esc(x.texte||(x.sos?'(demande de rappel urgent)':''))+'</div>'+(x.pris?('<div class="sub" style="margin:0;color:var(--ok)">✅ Pris en compte par '+esc(x.pris)+' · '+_terrainWhen(x.prisAt)+'</div>'):('<div class="acts" style="gap:6px;margin-top:2px"><button class="ok" data-terrainack="'+esc(x.id)+'" style="font-size:12px">✅ Pris en compte</button><button data-terraindel="'+esc(x.id)+'" style="font-size:12px">🗑️</button></div>'))+'</div>'; }
+    var sosBar=nSos?('<div class="card" style="border:2px solid #c02626;background:rgba(200,0,0,.10);padding:8px;margin-bottom:8px"><b style="color:#c02626">🆘 '+nSos+' demande'+(nSos>1?'s':'')+' de rappel URGENT'+(nSos>1?'es':'')+' — traite en priorité.</b></div>'):'';
+    inbox.innerHTML=sosBar+'<div class="lab" style="margin:10px 0 4px">📥 Remontées reçues <span class="sub" style="font-weight:400">— '+pending.length+' à traiter'+(nSos?' · 🆘 '+nSos+' URGENT':'')+'</span></div>'+(pending.length?pending.map(card).join(''):'<div class="sub" style="margin:0">Aucune remontée en attente.</div>')+(done.length?'<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--muted);font-weight:700">✅ '+done.length+' déjà pris en compte</summary><div style="margin-top:6px">'+done.map(card).join('')+'</div></details>':'');
+    inbox.querySelectorAll('[data-terrainack]').forEach(function(b){ b.onclick=function(){ terrainAck(b.getAttribute('data-terrainack')); }; });
+    inbox.querySelectorAll('[data-terraindel]').forEach(function(b){ b.onclick=function(){ terrainDel(b.getAttribute('data-terraindel')); }; });
   }
   function renderTickets(){
     var wrap=byId('tk-body'); if(!wrap)return; var T=tkLoad();
