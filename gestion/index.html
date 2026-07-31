@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v31-07·b103</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v31-07·b104</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3478,6 +3478,30 @@ button.big:active{transform:translateY(1px)}
     card.querySelectorAll('.pl-split').forEach(function(b){ b.onclick=function(){ var rm=parseInt(b.getAttribute('data-rule'),10)||0; var n=(typeof svValidateSplit==='function')?svValidateSplit(m,rm):1; if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); alert(n>=2?('🔪 Découpé en '+n+' vacations.'):'1 seule vacation (rien à découper sur ce créneau).'); }; });
     _plWirePicks(card,m);
   }
+  // Look « Sekur » (calque) appliqué au seul onglet Planning — voir releve-sekur/calque-planning.md
+  function _plEnsureCss(){ if(byId('pl-sekur-css'))return; var st=document.createElement('style'); st.id='pl-sekur-css'; st.textContent=
+    '#planning-body{font-family:Roboto,-apple-system,"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;background:#e7eaeb;color:#627078;padding:10px;border-radius:8px}'
+    +'#planning-body b{color:#3f4b52}'
+    +'#planning-body .sub{color:#7a858b}'
+    +'#planning-body table{background:#fff!important;border:1px solid #e4e8ea}'
+    +'#planning-body thead th{background:#f5f7f8!important;color:#3f4b52!important;text-transform:uppercase;font-size:11.5px!important;font-weight:600!important;letter-spacing:.3px;border:1px solid #e4e8ea!important}'
+    +'#planning-body tbody td{border:1px solid #e4e8ea!important;background:#fff!important;color:#3f4b52}'
+    +'#planning-body tbody tr:hover td{background:#f8fafb!important}'
+    +'#planning-body td[style*="sticky"]{background:#fff!important;color:#3f4b52!important}'
+    +'#planning-body input,#planning-body select{height:34px;border:1px solid #cfd6da!important;border-radius:4px!important;background:#fff!important;color:#3f4b52!important;font-family:inherit;font-size:13px}'
+    +'#planning-body button{border-radius:4px;border:1px solid #cfd6da;background:#fff;color:#3f4b52;text-transform:uppercase;font-size:12px;font-weight:500;min-height:32px;padding:0 12px;box-shadow:none}'
+    +'#planning-body button:hover{background:#f0f3f4}'
+    +'#planning-body #pl-today{background:#21ba45!important;color:#fff!important;border:none!important;border-radius:28px!important;padding:0 16px!important}'
+    +'#planning-body #pl-freset{background:#fff}'
+    +'/* modale d\'affectation : look Sekur clair */'
+    +'#pl-modal-card{font-family:Roboto,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;background:#fff!important;color:#3f4b52!important;border:1px solid #e4e8ea!important}'
+    +'#pl-modal-card .sub{color:#7a858b}'
+    +'#pl-modal-card input,#pl-modal-card select{height:34px;border:1px solid #cfd6da!important;border-radius:4px!important;background:#fff!important;color:#3f4b52!important;font-size:13px}'
+    +'#pl-modal-card .fa{border-bottom:1px solid #eef1f2;padding:6px 2px}'
+    +'#pl-modal-card button{border-radius:4px;border:1px solid #cfd6da;background:#fff;color:#3f4b52;text-transform:uppercase;font-size:12px;font-weight:500;min-height:32px;padding:0 12px}'
+    +'#pl-modal-card button.ok{background:#21ba45;color:#fff;border:none}'
+    +'#pl-modal-card button.no{background:#fff;color:#c10015;border:1px solid #f0b6bb}';
+    (document.head||document.documentElement).appendChild(st); }
   function _plMatch(m){ var F=PL_F;
     if(F.client&&(m.client||'')!==F.client)return false;
     if(F.agent){ if(F.agent==='none'){ if(m.agentId)return false; } else if((m.agentId||'')!==F.agent)return false; }
@@ -3485,7 +3509,7 @@ button.big:active{transform:translateY(1px)}
     if(F.q){ var ag=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):''; var hay=((m.siteAgent||'')+' '+(m.titre||'')+' '+(m.client||'')+' '+(m.ville||'')+' '+ag).toLowerCase(); if(hay.indexOf(F.q.toLowerCase())<0)return false; }
     return true; }
   function renderPlanning(){
-    var box=byId('planning-body'); if(!box)return;
+    var box=byId('planning-body'); if(!box)return; _plEnsureCss();
     if(!plWeek)plWeek=_plMonday(impTodayISO());
     var days=[],i; for(i=0;i<7;i++)days.push(svcAddDays(plWeek,i));
     var dn=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'], today=impTodayISO();
