@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b87</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b88</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -536,6 +536,7 @@ button.big:active{transform:translateY(1px)}
       <button data-b="validee">✅ Validées <span class="cnt" id="cnt-validee">0</span></button>
       <button data-b="annulee">✖️ Annulées <span class="cnt" id="cnt-annulee">0</span></button>
       <button data-b="nongeree">⚠️ Non gérées <span class="cnt" id="cnt-nongeree">0</span></button>
+      <button data-b="traitee">✅ Traitées <span class="cnt" id="cnt-traitee">0</span></button>
     </div>
     <input id="suivi-q" placeholder="🔎 Filtrer (site, ville, client, agent…)" autocomplete="off" style="width:100%;margin:8px 0 4px">
     <div id="val-controls" class="hidden">
@@ -1500,7 +1501,7 @@ button.big:active{transform:translateY(1px)}
     return '<div class="pickp">'+head+cnt+body+groupBar+'<div class="acts" style="margin-top:8px"><button data-act="nearclose" data-id="'+it.id+'">Fermer</button></div></div>';
   }
   function badge(st,motif){
-    var map={validee:['okbg','ok','✅ Validée'],annulee:['badbg','bad','✖️ Annulée client'],nongeree:['warnbg','warn','⚠️ Non gérée']}, m=map[st];
+    var map={validee:['okbg','ok','✅ Validée'],annulee:['badbg','bad','✖️ Annulée client'],nongeree:['warnbg','warn','⚠️ Non gérée'],traitee:['okbg','ok','✅ Traité (sans recherche)']}, m=map[st];
     return m?'<span class="badge" style="background:var(--'+m[0]+');color:var(--'+m[1]+')">'+m[2]+(motif?' — '+esc(motif):'')+'</span>':'';
   }
   // ===== Étape 1 — Affectation d'agent à une mission validée =====
@@ -1844,7 +1845,7 @@ button.big:active{transform:translateY(1px)}
       +'<div class="acts" style="margin-top:8px;gap:6px"><button class="ok" data-act="valmake" data-id="'+id+'">📞 Créer le ticket</button><button data-act="valclose" data-id="'+id+'" style="font-size:12px">annuler</button></div></div>';
   }
   function renderSuivi(){
-    ['recherche','validee','annulee','nongeree'].forEach(function(b){var el=byId('cnt-'+b);if(el)el.textContent=SUIVI.filter(function(x){return x.statut===b&&(b!=='recherche'||!x.dupOf);}).length;});
+    ['recherche','validee','annulee','nongeree','traitee'].forEach(function(b){var el=byId('cnt-'+b);if(el)el.textContent=SUIVI.filter(function(x){return x.statut===b&&(b!=='recherche'||!x.dupOf);}).length;});
     document.querySelectorAll('#suiviTabs button').forEach(function(bt){bt.classList.toggle('on',bt.getAttribute('data-b')===suiviBucket);});
     if(byId('val-controls'))byId('val-controls').classList.toggle('hidden',suiviBucket!=='validee');
     var q=((byId('suivi-q')&&byId('suivi-q').value)||'').toLowerCase().trim(), wrap=byId('suiviList');
@@ -1870,7 +1871,8 @@ button.big:active{transform:translateY(1px)}
       var callSrcLine=(x.aiNumber||x.aiDir)?(function(){ var _cn=(typeof svCallerName==='function')?svCallerName(x.aiNumber):''; var _who=_cn?esc(_cn):(x.aiNumber?('n° '+esc(x.aiNumber)):'correspondant inconnu'); return '<div class="meta" style="background:rgba(46,160,67,.12);border:1.5px solid #2ea043;border-radius:10px;padding:6px 10px;margin-top:4px"><span style="color:#2ea043;font-weight:700">📞 '+(x.aiDir==='out'?('Issu d\'un appel sortant vers '):('Reçu par appel entrant de '))+_who+'</span>'+(_cn&&x.aiNumber?' <span style="color:var(--muted);font-size:11.5px">('+esc(x.aiNumber)+')</span>':'')+'</div>'; })():'';
       var valCsg=(typeof csgLoad==='function')?csgLoad().filter(function(c){return c._valid&&String(c._valid.demandeId)===String(x.id)&&!c.done;})[0]:null;
       var valSection=(x.statut!=='recherche')?'':(valCsg?('<div class="meta" style="margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-weight:700;color:var(--bad)">📞 Envoyé en Suivi des appels — client à '+(valCsg._valid.type==='valider'?'appeler pour VALIDER':'appeler pour ANNULER')+' 🆘</span><button data-act="valcancel" data-cid="'+esc(valCsg.id)+'" style="font-size:11px">✖ annuler l\'envoi</button></div>'):('<div class="acts" style="margin-top:2px;gap:6px;flex-wrap:wrap"><button data-act="valopen" data-id="'+x.id+'" title="Préparer le ticket : QUAND appeler + quelles vacations on valide">📞 Faire valider (client)</button><button class="wn" data-act="anncall" data-id="'+x.id+'" title="Envoyer en Suivi des appels : appeler le client pour ANNULER la demande">📵 Faire annuler (client)</button></div>'));
-      var pickBtn='<div class="acts" style="margin-top:2px"><button data-act="pick" data-id="'+x.id+'">📤 Infos agent</button><button data-act="pick2" data-id="'+x.id+'">✅ Mission validée</button><button data-act="near" data-id="'+x.id+'">🔍 Agents proches</button><button data-act="edit" data-id="'+x.id+'">✏️ Modifier</button><button data-act="zonediff" data-id="'+x.id+'"'+(zdActive?' class="no"':'')+'>🔺 Zone difficile'+(zdActive?' ✓':'')+'</button></div>'+valSection;
+      var srchTag=(x.statut==='recherche')?('<div class="acts" style="margin-top:4px;gap:6px;flex-wrap:wrap;align-items:center"><span class="sub" style="margin:0">Type :</span><select class="sv-srchsel" data-id="'+x.id+'" style="padding:5px 8px;font-weight:700;color:'+(x.noSearch?'#c02626':'var(--ok)')+';border:1.5px solid '+(x.noSearch?'#c02626':'var(--ok)')+';border-radius:8px"><option value="search"'+(x.noSearch?'':' selected')+'>🔍 On cherche un agent</option><option value="nosearch"'+(x.noSearch?' selected':'')+'>📝 Sans recherche (info / modif / prolongation)</option></select></div>'):'';
+      var pickBtn=x.noSearch?('<div class="acts" style="margin-top:2px"><button class="ok" data-act="traite" data-id="'+x.id+'">✅ Marquer traité</button><button data-act="edit" data-id="'+x.id+'">✏️ Modifier</button></div>'):('<div class="acts" style="margin-top:2px"><button data-act="pick" data-id="'+x.id+'">📤 Infos agent</button><button data-act="pick2" data-id="'+x.id+'">✅ Mission validée</button><button data-act="near" data-id="'+x.id+'">🔍 Agents proches</button><button data-act="edit" data-id="'+x.id+'">✏️ Modifier</button><button data-act="zonediff" data-id="'+x.id+'"'+(zdActive?' class="no"':'')+'>🔺 Zone difficile'+(zdActive?' ✓':'')+'</button></div>'+valSection);
       var editPanel = x._edit ? ('<div class="pickp"><div class="lab" style="margin:0 0 4px">✏️ Modifier la demande</div><label class="f"><div class="lab">Titre</div><input class="ed-titre" data-id="'+x.id+'" value="'+esc(x.titre||'')+'" style="width:100%"></label>'
         +'<div class="grid2" style="margin-top:6px"><label class="f"><div class="lab">Client <span style="color:var(--bad)">*</span></div><input class="ed-client" data-id="'+x.id+'" value="'+esc(x.client||'')+'" placeholder="Nom du client (obligatoire)"></label><label class="f"><div class="lab">Ville</div><input class="ed-ville" data-id="'+x.id+'" value="'+esc(x.ville||'')+'"></label></div>'
         +'<div class="grid2" style="margin-top:6px"><label class="f"><div class="lab">Site <span style="color:var(--bad)">*</span></div><input class="ed-site" data-id="'+x.id+'" value="'+esc(x.site||x.siteAgent||x.titre||'')+'" placeholder="Nom du site (obligatoire)"></label><label class="f"><div class="lab">Type de site <span style="color:var(--muted)">(facultatif)</span></div><input class="ed-sitetype" data-id="'+x.id+'" value="'+esc(x.sitetype||'')+'" placeholder="ex. magasin, commerce…"></label></div>'
@@ -1887,7 +1889,7 @@ button.big:active{transform:translateY(1px)}
         var ptitre=x._pick2?'Mission validée — décoche ce que tu ne veux pas':'Infos pour l\'agent — décoche ce que tu ne veux pas';
         pickPanel='<div class="pickp"><div class="lab" style="margin:0 0 2px">'+ptitre+'</div>'+lines.map(function(ln,li){return '<label class="plrow"><input type="checkbox" class="pl" data-li="'+li+'" checked><span>'+(esc(ln)||' ')+'</span></label>';}).join('')+'<div class="lab" style="margin:9px 0 3px">📋 Aperçu — texte à copier</div><div class="outbox pl-out" data-id="'+x.id+'">'+esc(lines.join('\n'))+'</div><div class="acts" style="margin-top:8px"><button class="ok" data-act="pickcopy" data-id="'+x.id+'">📋 Copier la sélection</button><button data-act="pickclose" data-id="'+x.id+'">Fermer</button></div></div>';
       }
-      var nearPanel=x._near?renderNear(x):'';
+      var nearPanel=(x._near&&!x.noSearch)?renderNear(x):'';
       var assocLine='';
       if(x.assoc&&x.assoc.length){ var nm=x.assoc.map(function(id){var a=faById(id);return a?(a.nom||'?'):null;}).filter(Boolean); if(nm.length)assocLine='<div class="meta" style="color:var(--ok);font-weight:600"><span>👥 Associé'+(nm.length>1?'s':'')+' : '+esc(nm.join(', '))+'</span></div>'; }
       var zdLine=(x.depCode&&ZDIFF[x.depCode])?'<div class="meta" style="color:var(--bad);font-weight:600"><span>🔺 Zone difficile'+(x.depNom?' : '+esc(x.depNom)+' ('+esc(x.depCode)+')':'')+'</span></div>':'';
@@ -1899,7 +1901,7 @@ button.big:active{transform:translateY(1px)}
       if(x.statut==='validee'&&!x.vacIdx&&!x._splitpick){ var _rawv=(typeof svExtractRaw==='function')?svExtractRaw(x):[]; var _hasLong=_rawv.some(function(v){ var S=(v.mheure)?toMin(v.mheure):null,E=(v.mfin)?toMin(v.mfin):null; if(S==null||E==null)return false; if(E<=S)E+=1440; return (E-S)>720; }); var _multi=_rawv.length>=2; if(_hasLong||_multi){ over12line='<div class="meta" style="background:rgba(224,74,74,.14);border:1.5px solid var(--bad);border-radius:10px;padding:7px 10px;margin-top:4px"><span style="color:var(--bad);font-weight:700">'+(_hasLong?'⚠️ Créneau > 12h — une vacation ne doit pas dépasser 12h.':'🔪 Plusieurs vacations dans cette mission.')+' À découper ↓</span></div>'; vacSplitBtn='<div class="acts" style="margin-top:2px"><button class="ok" data-act="splitvac" data-id="'+x.id+'" title="Découper en vacations (choix de la règle)">🔪 Découper en vacations</button></div>'; } }
       var splitPickPanel=(x._splitpick)?('<div class="pickp" style="border:1.5px solid #6ea8fe"><div class="lab" style="margin:0 0 5px;color:#6ea8fe">🔪 Découpage en vacations — choisis la règle</div><div class="acts" style="flex-wrap:wrap;gap:6px;align-items:center"><button class="ok" data-act="dovalidate" data-rule="720" data-id="'+x.id+'">12h (défaut)</button><button data-act="dovalidate" data-rule="480" data-id="'+x.id+'">8h</button><button data-act="dovalidate" data-rule="360" data-id="'+x.id+'">6h</button><span style="display:inline-flex;align-items:center;gap:4px">Perso <input class="splitcustom" type="number" min="1" max="24" step="1" placeholder="h" style="width:56px;padding:5px"> h <button data-act="dovalidate" data-rule="custom" data-id="'+x.id+'">Appliquer</button></span><button data-act="dovalidate" data-rule="0" data-id="'+x.id+'" title="Valider sans découper">Garder tel quel</button><button data-act="splitcancel" data-id="'+x.id+'">Annuler</button></div></div>'):'';
       var svBrd=x.aiPending?'#7b61ff':(svNoDate(x)?'var(--bad)':'');
-      return '<div class="sv"'+(svBrd?' style="border:1.5px solid '+svBrd+'"':'')+'><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+demExpiredLine(x)+dupLine(x)+demPrioLine(x)+srcLine+callSrcLine+vacTag+priseShiftLine+over12line+aiPendLine+noDateLine+cdLine+bigCitiesLine(x)+assocLine+zdLine+izLine+'<div class="svm">'+esc(x.texte)+'</div>'+vacSplitBtn+body+splitPickPanel+pickBtn+editPanel+pickPanel+nearPanel+(x._valopen&&typeof valPanelHtml==='function'?valPanelHtml(x):'')+renderAffect(x)+'</div>';
+      return '<div class="sv"'+(svBrd?' style="border:1.5px solid '+svBrd+'"':'')+'><div class="svt">'+esc(x.titre)+'</div><div class="meta">'+meta+'</div>'+demExpiredLine(x)+dupLine(x)+demPrioLine(x)+srcLine+callSrcLine+vacTag+priseShiftLine+over12line+aiPendLine+noDateLine+cdLine+bigCitiesLine(x)+assocLine+zdLine+izLine+'<div class="svm">'+esc(x.texte)+'</div>'+vacSplitBtn+body+srchTag+splitPickPanel+pickBtn+editPanel+pickPanel+nearPanel+(x._valopen&&typeof valPanelHtml==='function'?valPanelHtml(x):'')+renderAffect(x)+'</div>';
     }
     if(suiviBucket==='validee'){
       var byD=function(a,b){var da=a.mdate||'9999-99-99',db=b.mdate||'9999-99-99';return da>db?1:(da<db?-1:0);};
@@ -1951,6 +1953,7 @@ button.big:active{transform:translateY(1px)}
   setInterval(function(){ var sec=byId('sec-suivi'); if(!sec||sec.classList.contains('hidden')||suiviBucket!=='recherche')return; svTick(); },1000);
   // Aperçu live du texte à copier (Infos agent / Mission validée) : recalculé à chaque case cochée/décochée
   function plPreview(card){ if(!card)return; var out=card.querySelector('.pl-out'); if(!out)return; var id=out.getAttribute('data-id'),it=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;} if(!it)return; var lines=it.texte.split('\n'),arr=[]; card.querySelectorAll('input.pl').forEach(function(c){if(c.checked)arr.push(lines[+c.getAttribute('data-li')]);}); out.textContent=arr.join('\n')||'(rien de sélectionné)'; }
+  byId('suiviList').addEventListener('change',function(e){ var s=e.target; if(s&&s.classList&&s.classList.contains('sv-srchsel')){ var sid=s.getAttribute('data-id'),it2=null,j; for(j=0;j<SUIVI.length;j++)if(SUIVI[j].id===sid){it2=SUIVI[j];break;} if(!it2)return; it2.noSearch=(s.value==='nosearch'); delete it2._near; delete it2._pick; delete it2._pick2; if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); } });
   byId('suiviList').addEventListener('click',function(e){
     var b=e.target.closest('button'); if(!b)return;
     var id=b.getAttribute('data-id'), act=b.getAttribute('data-act'), it=null,i;
@@ -1978,6 +1981,8 @@ button.big:active{transform:translateY(1px)}
     else if(act==='cancel'){delete it._pending;}
     else if(act==='confirm'){var s=byId('suiviList').querySelector('select[data-sel="'+id+'"]');it.statut=it._pending;it.motif=s?s.value:'';it.valide=Date.now();delete it._pending;}
     else if(act==='reopen'){it.statut='recherche';it.valide=null;it.motif='';delete it._pending;}
+    else if(act==='togsearch'){ it.noSearch=!it.noSearch; delete it._near; delete it._pick; delete it._pick2; if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); return; }
+    else if(act==='traite'){ it.statut='traitee'; it.valide=Date.now(); it.motif='Traité (sans recherche)'; delete it._pending; delete it._near; delete it._pick; delete it._pick2; if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); return; }
     else if(act==='del'){ if(!confirm('Supprimer définitivement cette demande ?'))return; SUIVI=SUIVI.filter(function(x){return x.id!==id;});}
     else if(act==='pick'){var o=it._pick;delete it._pick2;it._pick=!o;}
     else if(act==='pick2'){var o2=it._pick2;delete it._pick;it._pick2=!o2;}
