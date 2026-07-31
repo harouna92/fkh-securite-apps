@@ -575,8 +575,8 @@ export default {
       const id = rs.meta && rs.meta.last_row_id;
       // Réponse IA automatique (les 2 canaux) — en arrière-plan pour répondre vite au POST.
       if (id) ctx.waitUntil(replyToMsg(env, id, canal, auteur, texte));
-      // Canal « analyse » : notifie l'équipe (Zeus) pour qu'il puisse vérifier / corriger la réponse.
-      if (id && canal === "analyse") ctx.waitUntil((async () => { try { await pushAll(env, { title: "💬 Question Assistant" + (auteur ? " — " + auteur : ""), body: texte.slice(0, 140), url: "/fkh-securite-apps/gestion/", tag: "fkh-asg-" + id }); } catch (e) {} })());
+      // (A, 2026-07-31) Notification « Question Assistant » DÉSACTIVÉE à la demande de Zeus : plus AUCUN push à chaque écriture dans l'Assistant. Le message est enregistré et le super-admin le voit dans le cockpit Remontées.
+      // if (id && canal === "analyse") ctx.waitUntil((async () => { try { await pushAll(env, { title: "💬 Question Assistant" + (auteur ? " — " + auteur : ""), body: texte.slice(0, 140), url: "/fkh-securite-apps/gestion/", tag: "fkh-asg-" + id }); } catch (e) {} })());
       return json({ ok: true, id, now });
     }
 
