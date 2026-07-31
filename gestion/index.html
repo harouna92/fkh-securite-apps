@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b77</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v29-07·b78</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2831,7 +2831,7 @@ button.big:active{transform:translateY(1px)}
   function remoAutoClasse(txt){
     var t=_noAcc(txt); if(!t)return '';
     function any(arr){ for(var i=0;i<arr.length;i++){ if(t.indexOf(arr[i])>=0)return true; } return false; }
-    var BUG=['bug','bogue','erreur','marche pas','marche plus','fonctionne pas','ne fonctionne','plante','plantee','plante ','crash','probleme','souci','impossible de','n arrive pas','narrive pas','ne charge','charge pas','fige','figee','ne s affiche','affiche pas','disparait','coince','ne repond','repond pas','anomalie','defaut','defaillance','ne s ouvre','ouvre pas','enregistre pas','ne s enregistre','ca beugue','beug'];
+    var BUG=['bug','bogue','erreur','marche pas','marche plus','fonctionne pas','ne fonctionne','plante','plantee','plante ','crash','probleme','souci','impossible de','n arrive pas','narrive pas','ne charge','charge pas','fige','figee','ne s affiche','affiche pas','disparait','coince','ne repond','repond pas','anomalie','defaut','defaillance','ne s ouvre','ouvre pas','enregistre pas','ne s enregistre','met pas a jour','se met pas','ne se met','maj pas','se lance pas','se ferme pas','sauvegarde pas','se fait pas','ca beugue','beug'];
     var FONC=['ajouter','ajoute ','rajouter','rajoute','nouvelle fonction','nouvelle option','nouveau bouton','creer','pouvoir faire','possibilite de','possibilite d','avoir un bouton','avoir une option','mettre un bouton','integrer','ajout d','ajout de','rajout'];
     var AMEL=['ameliorer','amelioration','mieux','plus rapide','trop lent','trop long','simplifier','au lieu de','plutot','deplacer','optimiser','pas pratique','plus clair','plus simple','reorganiser','ce serait mieux','ce serait plus'];
     var QUES=['comment','pourquoi','est-ce que','est ce que','c est quoi','ca veut dire','quelle ','quel est','quels ','ou est','ou se trouve','peut on savoir','savoir si','je comprends pas','je ne comprends','je capte pas'];
@@ -2851,10 +2851,13 @@ button.big:active{transform:translateY(1px)}
     if(!arr.length){ box.innerHTML=head+'<div class="sub" style="margin:0">Aucune remontée pour l\'instant.</div>'; return; }
     box.innerHTML=head+arr.map(function(m){
       var mt=meta[m.id]||{}, d=new Date(m.created_at), when=(''+d.getDate()).padStart(2,'0')+'/'+(''+(d.getMonth()+1)).padStart(2,'0');
-      var cls='<select class="remo-classe" data-id="'+esc(m.id)+'" style="font-size:11px;padding:2px 4px;width:auto">'+REMO_CLASSE.map(function(o){return '<option value="'+o[0]+'"'+((mt.classe||'')===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
+      var auto=(typeof remoAutoClasse==='function')?remoAutoClasse(m.texte):'';
+      var curCls=mt.classe||'', effCls=curCls||auto;
+      var cls='<select class="remo-classe" data-id="'+esc(m.id)+'" style="font-size:11px;padding:2px 4px;width:auto">'+REMO_CLASSE.map(function(o){return '<option value="'+o[0]+'"'+(effCls===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
+      var autoBadge=(!curCls&&auto)?(' <span class="sub" title="Proposition automatique par mots-cles — choisis une valeur pour confirmer ou corriger" style="font-size:10px;color:#7b61ff;white-space:nowrap">🤖 auto</span>'):'';
       var stt='<select class="remo-statut" data-id="'+esc(m.id)+'" style="font-size:11px;padding:2px 4px;width:auto">'+REMO_STATUT.map(function(o){return '<option value="'+o[0]+'"'+((mt.statut||'')===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
       var rep=m.reponse?('<div class="sub" style="margin:4px 0 0"><b>Claude :</b> '+esc(m.reponse)+'</div>'):'';
-      return '<div style="border:1px solid var(--line);border-radius:9px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="font-size:11px;color:var(--muted)">'+esc(m.auteur||'—')+' · '+when+'</div><div style="margin:2px 0">'+esc(m.texte)+'</div><div class="acts" style="gap:6px;flex-wrap:wrap;margin-top:4px">'+cls+stt+'</div>'+rep+'</div>';
+      return '<div style="border:1px solid var(--line);border-radius:9px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="font-size:11px;color:var(--muted)">'+esc(m.auteur||'—')+' · '+when+'</div><div style="margin:2px 0">'+esc(m.texte)+'</div><div class="acts" style="gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center">'+cls+autoBadge+stt+'</div>'+rep+'</div>';
     }).join('');
     box.querySelectorAll('.remo-classe').forEach(function(s){ s.onchange=function(){ remoSet(s.getAttribute('data-id'),{classe:s.value}); renderRemoCockpit(); }; });
     box.querySelectorAll('.remo-statut').forEach(function(s){ s.onchange=function(){ remoSet(s.getAttribute('data-id'),{statut:s.value}); renderRemoCockpit(); }; });
