@@ -136,6 +136,16 @@ button.big:active{transform:translateY(1px)}
 #notif-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:none}
 #notif-badge.nb-g{background:#1a9e5c}
 #notif-badge.nb-o{background:#e08600}
+/* b149 : pastilles «non pointé opérateur» + «client non avisé» (même famille que la cloche) */
+.pp-btn{position:fixed;top:7px;z-index:90;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:17px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#pp-op{right:53px}
+#pp-cli{right:97px}
+.pp-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:none}
+#pp-ovl{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:120;display:none;align-items:flex-start;justify-content:center;padding:56px 10px 10px}
+#pp-ovl.on{display:flex}
+#pp-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;max-height:82vh;overflow:auto;padding:12px}
+.pp-tile{flex:1;border:1px solid var(--line);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;background:var(--panel2)}
+.pp-tile b{font-size:26px;display:block}
 #notif-badge.nb-r{background:#e5322d}
 @keyframes nbblink{50%{opacity:.2}}
 #rech-bar{position:fixed;left:9px;bottom:9px;z-index:88;display:none;align-items:center;gap:7px;padding:8px 13px;border-radius:22px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.32);border:none}
@@ -187,7 +197,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b148</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b149</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -226,6 +236,9 @@ button.big:active{transform:translateY(1px)}
 
 <button type="button" id="logout-fab" title="Se déconnecter" aria-label="Se déconnecter">🔓 Déconnexion</button>
 <button type="button" id="notif-bell" title="Notifications" aria-label="Notifications">🔔<span id="notif-badge"></span></button>
+<button type="button" id="pp-op" class="pp-btn" title="Prises / fins de service NON POINTÉES (opérateur)" aria-label="Non pointé">⏰<span class="pp-badge" id="pp-op-n"></span></button>
+<button type="button" id="pp-cli" class="pp-btn" title="Prises / fins de service — CLIENT NON AVISÉ" aria-label="Client non avisé">🏢<span class="pp-badge" id="pp-cli-n"></span></button>
+<div id="pp-ovl"><div id="pp-box"></div></div>
 <button type="button" id="rech-bar" title="Missions en recherche d'agent — cliquer pour les traiter"></button>
 <button type="button" id="ask-fab" title="Poser une question (métier ou sur l'appli)" aria-label="Poser une question">💬</button>
 <div class="ask-ov" id="ask-ov">
@@ -4334,7 +4347,7 @@ button.big:active{transform:translateY(1px)}
   (function(){ var t=impTodayISO(); if(byId('ss-from')&&!byId('ss-from').value)byId('ss-from').value=t; if(byId('ss-to')&&!byId('ss-to').value)byId('ss-to').value=t; })();
 
   // ===== Suivi des appels : agenda chronologique des appels à faire (issus des missions) =====
-  function saSet(mid,key,patch){ var S=ssLoad(); if(!S[mid])S[mid]={}; var r=S[mid][key]||{}; for(var k in patch)r[k]=patch[k]; r.at=Date.now(); S[mid][key]=r; ssSave(S);
+  function saSet(mid,key,patch){ var S=ssLoad(); if(!S[mid])S[mid]={}; var r=S[mid][key]||{}; for(var k in patch)r[k]=patch[k]; r.at=Date.now(); S[mid][key]=r; ssSave(S); if(typeof ppRefresh==='function')setTimeout(function(){try{ppRefresh();}catch(_e){}},80);
     // Contrôle tenue « Fait / photo prise » → enregistre un contrôle DATÉ DU JOUR (sinon l'agent est re-sollicité chaque jour car agentCtrl ne voit aucun contrôle récent).
     if(key==='tenue'){ var tc=String(r.tenueCtrl||''); var refusOrWait=tc.indexOf('REFUS')>=0||tc.indexOf('attente')>=0; if(!refusOrWait&&(tc.indexOf('Fait')>=0||r.tenuePhoto||r.photoKey||r.done))saTenueRegister(mid,r); }
   }
@@ -4764,6 +4777,56 @@ button.big:active{transform:translateY(1px)}
   }
   function phCheckAI(i,btn){ var m=phMatches&&phMatches[i]; if(!m)return; if(typeof CLOUD==='undefined'||!CLOUD.on){ alert('Connecte-toi (en ligne).'); return; } if(btn){btn.disabled=true;btn.textContent='⏳ IA…';} fetch(CLOUD.base+'/ai/check-photo',{method:'POST',headers:cloudHdr(),body:JSON.stringify({key:m.ph.key})}).then(function(r){return r.json();}).then(function(j){ if(btn){btn.disabled=false;btn.textContent='🔍 Vérifier (IA)';} if(j&&j.ok){ m.aiCheck=j; phRender(); } else { alert('Vérif IA : '+((j&&j.error)||'erreur')); } }).catch(function(){ if(btn){btn.disabled=false;btn.textContent='🔍 Vérifier (IA)';} alert('Serveur injoignable.'); }); }
   function phAttach(i,mid,stepKey){ var m=phMatches&&phMatches[i]; if(!m)return; var sk=stepKey||PH_TYPE_STEP[m.ph.type]||'tenue'; var S=ssLoad(); S[mid]=S[mid]||{}; S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:m.ph.key,done:true,at:m.ph.ts||Date.now()}); ssSave(S); alert('📎 Photo rattachée (étape « '+(PH_STEP_LBL[sk]||sk)+' »).'); phRender(); }
+  // ===== b149 : pastilles ⏰ non pointé (opérateur) + 🏢 client non avisé — échéance dépassée d’1 min, en continu depuis le 01/08 08:00 =====
+  var PP_START=null; try{PP_START=frMs('2026-08-01',480);}catch(_e){}
+  var PP_VIEW={mode:null,sub:null};
+  function ppSince(ms){ var m=Math.floor(ms/60000); if(m<1)m=1; if(m<60)return m+' min'; var h=Math.floor(m/60); if(h<24)return h+' h'+((m%60)?(' '+(m%60)+' min'):''); var j=Math.floor(h/24); return j+' j '+(h%24)+' h'; }
+  function ppScan(){ var now=Date.now(), S=ssLoad(), op=[], cli=[];
+    if(typeof saEntries!=='function'||PP_START==null)return {op:op,cli:cli};
+    saEntries('','').forEach(function(e){ if(e.key!=='prise'&&e.key!=='fin')return; if(!e.mdate)return;
+      var due=frMs(e.mdate,e.abs); if(due==null||due<PP_START)return; if(now<due+60000)return;
+      var r=(S[e.mid]&&S[e.mid][e.key])||{};
+      var it={key:e.key,site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:due,since:now-due};
+      if(!r.done)op.push(it);
+      if(!r.avise)cli.push(it);
+    });
+    op.sort(function(x,y){return x.due-y.due;}); cli.sort(function(x,y){return x.due-y.due;});
+    return {op:op,cli:cli};
+  }
+  function ppRefresh(){ var n1=byId('pp-op-n'),n2=byId('pp-cli-n'); if(!n1||!n2)return; var sc=ppScan();
+    n1.textContent=sc.op.length; n1.style.display=sc.op.length?'block':'none';
+    n2.textContent=sc.cli.length; n2.style.display=sc.cli.length?'block':'none';
+    if(PP_VIEW.mode)ppRender(sc);
+  }
+  function ppRender(sc){ var box=byId('pp-box'); if(!box||!PP_VIEW.mode)return; sc=sc||ppScan();
+    var L=(PP_VIEW.mode==='op')?sc.op:sc.cli;
+    var ttl=(PP_VIEW.mode==='op')?'⏰ Prises / fins NON POINTÉES (opérateur)':'🏢 Prises / fins — CLIENT NON AVISÉ';
+    var verbe=(PP_VIEW.mode==='op')?'non pointée(s)':'client non avisé';
+    var pr=L.filter(function(x){return x.key==='prise';}), fi=L.filter(function(x){return x.key==='fin';});
+    var h='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><b style="flex:1;font-size:15px">'+ttl+'</b><button type="button" id="pp-close">✕</button></div>';
+    if(!PP_VIEW.sub){
+      h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="prise"><b>'+pr.length+'</b>🟢 Prises de service<br><span class="sub" style="margin:0;font-size:11.5px">'+verbe+'</span></div><div class="pp-tile" data-sub="fin"><b>'+fi.length+'</b>🔚 Fins de service<br><span class="sub" style="margin:0;font-size:11.5px">'+verbe+'</span></div></div>';
+      h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">Depuis le 01/08 08:00, en continu · une échéance entre ici 1 min après son heure prévue. Clique sur une tuile pour le détail par vacation (durée écoulée).</p>';
+    } else {
+      var LL=(PP_VIEW.sub==='prise')?pr:fi;
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+LL.length+' '+(PP_VIEW.sub==='prise'?'prise(s)':'fin(s)')+' · '+verbe+'</span></div>';
+      h+=LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
+        return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+' · ':'')+'prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b></div></div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>';
+    }
+    box.innerHTML=h;
+    var cl=byId('pp-close'); if(cl)cl.onclick=ppClose;
+    var bk=byId('pp-back'); if(bk)bk.onclick=function(){PP_VIEW.sub=null;ppRender();};
+    box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){PP_VIEW.sub=t.getAttribute('data-sub');ppRender();}; });
+  }
+  function ppOpen(mode){ PP_VIEW={mode:mode,sub:null}; var o=byId('pp-ovl'); if(o)o.classList.add('on'); ppRender(); }
+  function ppClose(){ PP_VIEW={mode:null,sub:null}; var o=byId('pp-ovl'); if(o)o.classList.remove('on'); }
+  (function(){ var b1=byId('pp-op'),b2=byId('pp-cli'),o=byId('pp-ovl');
+    if(b1)b1.onclick=function(){ppOpen('op');};
+    if(b2)b2.onclick=function(){ppOpen('cli');};
+    if(o)o.addEventListener('click',function(ev){ if(ev.target===o)ppClose(); });
+    setInterval(function(){ try{ppRefresh();}catch(_e){} },30000);
+    setTimeout(function(){ try{ppRefresh();}catch(_e){} },900);
+  })();
   function renderSupervision(){
     var wrap=byId('sup-body'); if(!wrap)return;
     document.querySelectorAll('#supTabs button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===supTab);});
