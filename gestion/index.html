@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b122</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b123</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2937,12 +2937,16 @@ button.big:active{transform:translateY(1px)}
     var canal='analyse', pollT=null;
     function setCanal(c){ canal=(c==='retour')?'retour':'analyse'; document.querySelectorAll('#ask-ov .ask-tabs button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-c')===canal); }); byId('ask-txt').placeholder=canal==='retour'?'Ex. il faudrait pouvoir exporter le suivi des appels en PDF…':'Écris ici… ou clique 🎙️ et parle.'; }
     // 🎙️ Dictée vocale (remontée bulle 💬) : Web Speech API fr-FR — dispo Chrome/Edge/Android ; bouton masqué si non supporté (iPhone Safari : utiliser le micro du clavier).
-    window._wireDictation=function(btnId,taId){ var btn=byId(btnId), ta=byId(taId); if(!btn||!ta)return; var SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR){ btn.style.display='none'; return; } var rec=null,on=false;
-      btn.onclick=function(){ if(on){ try{rec.stop();}catch(e){} return; } rec=new SR(); rec.lang='fr-FR'; rec.continuous=true; rec.interimResults=false;
-        rec.onresult=function(ev){ var t=''; for(var i=ev.resultIndex;i<ev.results.length;i++){ if(ev.results[i].isFinal)t+=ev.results[i][0].transcript; } if(t){ ta.value=(ta.value?ta.value+' ':'')+t.trim(); ta.dispatchEvent(new Event('input',{bubbles:true})); } };
-        rec.onend=function(){ on=false; btn.textContent='🎙️ Dicter'; btn.style.background=''; btn.style.color=''; };
-        rec.onerror=function(){ on=false; btn.textContent='🎙️ Dicter'; btn.style.background=''; btn.style.color=''; };
-        try{ rec.start(); on=true; btn.textContent='⏹ Stop'; btn.style.background='#c02626'; btn.style.color='#fff'; }catch(e){} }; };
+    window._wireDictation=function(btnId,taId){ var btn=byId(btnId), ta=byId(taId); if(!btn||!ta)return; var SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR){ btn.style.display='none'; return; } var rec=null,wantOn=false;
+      // Dictée CONTINUE (demande Zeus 01-08) : la reconnaissance coupe toute seule au silence → on la RELANCE automatiquement tant que l'utilisateur n'a pas cliqué ⏹ Stop.
+      function uiOff(){ btn.textContent='🎙️ Dicter'; btn.style.background=''; btn.style.color=''; }
+      function mkRec(){ var r=new SR(); r.lang='fr-FR'; r.continuous=true; r.interimResults=false;
+        r.onresult=function(ev){ var t=''; for(var i=ev.resultIndex;i<ev.results.length;i++){ if(ev.results[i].isFinal)t+=ev.results[i][0].transcript; } if(t){ ta.value=(ta.value?ta.value+' ':'')+t.trim(); ta.dispatchEvent(new Event('input',{bubbles:true})); } };
+        r.onend=function(){ if(wantOn){ setTimeout(function(){ if(!wantOn)return; try{ rec=mkRec(); rec.start(); }catch(e){ wantOn=false; uiOff(); } },150); } else uiOff(); };
+        r.onerror=function(ev){ var fatal=(ev&&(ev.error==='not-allowed'||ev.error==='service-not-allowed')); if(fatal){ wantOn=false; uiOff(); alert('Micro refusé — autorise le micro dans le navigateur.'); } };
+        return r; }
+      btn.onclick=function(){ if(wantOn){ wantOn=false; try{rec.stop();}catch(e){} uiOff(); return; }
+        try{ rec=mkRec(); rec.start(); wantOn=true; btn.textContent='⏹ Stop'; btn.style.background='#c02626'; btn.style.color='#fff'; }catch(e){} }; };
     _wireDictation('ask-mic','ask-txt');
     _wireDictation('asg-mic','asg-texte');
     function open(){ var sv=null; try{sv=localStorage.getItem('fkh_asg_nom');}catch(e){} if(sv&&!byId('ask-nom').value)byId('ask-nom').value=sv; byId('ask-status').textContent=(typeof CLOUD!=='undefined'&&CLOUD.on)?'':'🔌 Connecte-toi d\'abord (mot de passe commun).'; byId('ask-ov').classList.add('show'); setTimeout(function(){ try{byId('ask-txt').focus();}catch(e){} },60); }
