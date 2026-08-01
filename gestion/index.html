@@ -204,7 +204,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b191</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b192</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -5161,7 +5161,7 @@ button.big:active{transform:translateY(1px)}
       var due=frMs(e.mdate,e.abs); if(due==null)return;
       if(!isTe){ if(now<due+60000)return; var start=isC2?0:PP_START; if(start==null||due<start)return; } // b166 : photos controle = tout l'historique ; b167 : la tenue gere sa propre fenetre
       var r=(S[e.mid]&&S[e.mid][e.key])||{};
-      var it={mid:e.mid,key:e.key,label:e.label,site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:due,since:now-due};
+      var it={tel:e.agentTel||'',mid:e.mid,key:e.key,label:e.label,site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:due,since:now-due};
       if(isPF){ if(!r.done)sc.op.push(it); if(!r.avise)sc.cli.push(it); if(!(r.photoKey||r.photo))sc.ph.push(it); }
       else if(isTe){ // b167 : entre dans la liste 12 h AVANT la prise, y RESTE tant que la PHOTO de controle n'est pas deposee
         if(r.photoKey||r.tenuePhoto)return;
@@ -5235,7 +5235,7 @@ button.big:active{transform:translateY(1px)}
       return '';
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
-      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+' · ':'')+(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>')))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>')))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
     if(D.roGrp&&!PP_VIEW.sub){ // b190 : 2 groupes AUCUN appel / DECALAGE
       var rA=L.filter(function(x){return (x.grp||(x.callT?'ecart':'aucun'))==='aucun';}),rE=L.filter(function(x){return (x.grp||(x.callT?'ecart':'aucun'))==='ecart';});
       h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="aucun"><b>'+rA.length+'</b>📵 AUCUN appel<br><span class="sub" style="margin:0;font-size:11.5px">pas d’appel du numéro aujourd’hui</span></div><div class="pp-tile" data-sub="ecart"><b>'+rE.length+'</b>↔ DÉCALAGE<br><span class="sub" style="margin:0;font-size:11.5px">appel trouvé mais écart > 10 min</span></div></div>';
@@ -5326,7 +5326,7 @@ button.big:active{transform:translateY(1px)}
         var pAt=r.doneTs||r.at; if(!pAt)return; // pas d'heure de pointage exploitable
         var ct=frMs(e.mdate,e.abs); if(ct==null||(PP_START!=null&&ct<PP_START))return;
         if(r.viaPhoto||r.photoKey)return; // réglé par preuve photo : pas d’appel attendu
-        function chk(num,who){ var b2=nearest(num,pAt); if(b2&&b2.d<=FEN)return; out.push({mid:e.mid,key:e.key,label:(e.label||'')+' — '+who,grp:(b2?'ecart':'aucun'),ro:1,pAt:pAt,callT:(b2?b2.t:null),deltaMin:(b2?Math.round(b2.d/60000):null),site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:ct,since:now-pAt}); }
+        function chk(num,who){ var b2=nearest(num,pAt); if(b2&&b2.d<=FEN)return; out.push({tel:num||'',mid:e.mid,key:e.key,label:(e.label||'')+' — '+who,grp:(b2?'ecart':'aucun'),ro:1,pAt:pAt,callT:(b2?b2.t:null),deltaMin:(b2?Math.round(b2.d/60000):null),site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:ct,since:now-pAt}); }
         if(e.agentTel)chk(e.agentTel,'appel AGENT');
         if((e.key==='prise'||e.key==='fin')&&r.avise&&e.client&&ctm[e.client])chk(ctm[e.client],'appel CLIENT');
       });
