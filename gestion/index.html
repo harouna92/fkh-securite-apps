@@ -203,7 +203,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b153</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b154</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3824,7 +3824,7 @@ button.big:active{transform:translateY(1px)}
       var byH={},hOrder=[]; siteMap[s].forEach(function(m){ var hk=(m.mheure||'')+'-'+(m.mfin||''); if(!byH[hk]){byH[hk]=[];hOrder.push(hk);} byH[hk].push(m); });
       hOrder.sort();
       hOrder.forEach(function(hk){ var sample=byH[hk][0]; var durt=_plDurTxt(sample.mheure,sample.mfin); var lbl=(sample.mheure||'—')+(sample.mfin?('-'+sample.mfin):'')+(durt?(' ('+durt+')'):''); var qual=sample.qual||sample.specialite||'';
-        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); var hach=(aff&&!m.planifie); var bgS=hach?('background:repeating-linear-gradient(45deg,'+st.c+' 0 6px,rgba(0,0,0,.32) 6px 10px)'):('background:'+st.c); return '<div class="pl-chip" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l+(aff?(m.planifie?' · planifié':' · NON planifié (hachuré)'):''))+'" style="'+bgS+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.isCircuit?'🚐 ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div></div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc(s)+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
+        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); var hach=(aff&&!m.planifie); var bgS=hach?('background:repeating-linear-gradient(45deg,'+st.c+' 0 6px,rgba(0,0,0,.32) 6px 10px)'):('background:'+st.c); if(m.mailPending){ bgS='background:repeating-linear-gradient(45deg,#7b61ff 0 7px,#3d2f99 7px 12px);outline:2px dashed #fff;outline-offset:-2px'; } return '<div class="pl-chip" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l+(aff?(m.planifie?' · planifié':' · NON planifié (hachuré)'):''))+'" style="'+bgS+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.isCircuit?'🚐 ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+(m.mailPending?'<div style="font-size:9px;font-weight:800">📧 À VALIDER</div>':'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div>')+'</div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc(s)+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
         bodyR+='<tr><td class="pl-hlabel" style="position:sticky;left:0;z-index:1"><b>'+esc(lbl)+'</b>'+(qual?'<div style="font-size:10px;opacity:.8">'+esc(qual)+'</div>':'')+'</td>'+cells+'</tr>';
       });
     }); }
@@ -4701,7 +4701,7 @@ button.big:active{transform:translateY(1px)}
   function saEntries(from,to,inclExcl){
     // #13 On inclut aussi les missions démarrant la VEILLE de `from` : leurs appels d'après-minuit tombent dans la période demandée (continuité de nuit à travers minuit).
     var fromV=from?svcAddDays(from,-1):'';
-    var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if((from||to)&&!d)return false; if(from&&d&&d<fromV)return false; if(to&&d&&d>to)return false; return true; });
+    var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; if(x.mailPending)return false; /* b154 : vacation creee depuis un mail, en attente de validation -> pas encore de tickets */ var d=x.mdate||''; if((from||to)&&!d)return false; if(from&&d&&d<fromV)return false; if(to&&d&&d>to)return false; return true; });
     if(typeof apDeconflict==='function')apDeconflict(missions,10);
     var out=[];
     missions.forEach(function(m){ var start=toMin(m.mheure); var _ag=(m.agentId&&faById(m.agentId))?faById(m.agentId):null; var _tel=(_ag&&_ag.tels&&_ag.tels[0])?_ag.tels[0]:''; ssSteps(m).forEach(function(s){ if(!s.heure)return; var mn=toMin(s.heure),abs=(mn==null?0:mn); if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn!=null&&mn<start)abs=mn+1440;
@@ -5166,11 +5166,23 @@ button.big:active{transform:translateY(1px)}
     mailsFetch(function(items){ _mailsRender(items); });
   }
   function _mailsRender(items){ var box=byId('mails-body'); if(!box)return;
+    // b154 : chaque BDC (kind=demande) avec site+date SANS mission en face -> creation AUTO d'une vacation "📧 A VALIDER" (violet hachure au Planning, tickets generes seulement apres validation)
+    (function(){ var _ref=[]; try{_ref=JSON.parse(localStorage.getItem('fkh_mail_refuse')||'[]')||[];}catch(e){}
+      var _crea=false;
+      (items||[]).forEach(function(it){ if(it.dismissed)return; var pp=mailsParse(it);
+        if(pp.kind!=='demande'||!pp.site||!pp.mdate)return;
+        if(_ref.indexOf(it.cdr_id)>=0)return;
+        if((SUIVI||[]).some(function(m){return m.mailSrc===it.cdr_id;}))return;
+        if(mailsMatchMission(pp))return;
+        SUIVI.unshift({id:'mv'+Date.now()+'_'+Math.round(Math.random()*99999),statut:'validee',mailPending:true,mailSrc:it.cdr_id,client:pp.client||'',siteAgent:pp.site,ville:pp.ville||'',mdate:pp.mdate,mheure:pp.heure||'',mfin:'',titre:(pp.subject||'').slice(0,80),texte:'📧 Cree automatiquement depuis un mail'+(pp.ref?' (ref '+pp.ref+')':'')});
+        _crea=true; });
+      if(_crea){ save('fkh_suivi',SUIVI); if(typeof cloudPush==='function'){try{cloudPush('fkh_suivi');}catch(e){}} }
+    })();
     var KL={annulation:['🔴','ANNULATION'],modification:['🟠','MODIF'],demande:['📥','DEMANDE'],proposition:['🟡','PROPOSITION'],consigne:['📎','CONSIGNE'],autre:['✉️','MAIL']};
     var rows=(items||[]).map(function(it){ var pp=mailsParse(it); var mt=mailsMatchMission(pp); var st;
       if(pp.kind==='annulation'){ st=(mt&&mt.m.statut==='validee')?['🔴 ANNULATION reçue — mission ENCORE planifiée !','var(--bad)',1]:['✔ annulation — rien de planifié en face','var(--muted)',0]; }
       else if(pp.kind==='consigne'||pp.kind==='autre'){ st=['','var(--muted)',0]; }
-      else { st=mt?((mt.m.statut==='validee')?['✅ planifié — '+(mt.m.siteAgent||mt.m.titre||''),'var(--ok)',0]:['🕵 en recherche dans Suivi demandes','#e0a13b',0]):['❌ PAS planifié (aucune mission en face)','var(--bad)',1]; }
+      else { st=mt?((mt.m.mailPending)?['💜 Vacation créée automatiquement depuis ce mail — À VALIDER','#7b61ff',1]:((mt.m.statut==='validee')?['✅ planifié — '+(mt.m.siteAgent||mt.m.titre||''),'var(--ok)',0]:['🕵 en recherche dans Suivi demandes','#e0a13b',0])):['❌ PAS planifié (aucune mission en face)','var(--bad)',1]; }
       return {it:it,pp:pp,mt:mt,st:st};
     });
     var nRisk=rows.filter(function(r){return r.st[2]===1&&!r.it.dismissed;}).length;
@@ -5187,12 +5199,24 @@ button.big:active{transform:translateY(1px)}
         +(info?'<div class="fa-d" style="margin-top:3px">'+info+'</div>':'')
         +'<div class="fa-d" style="margin-top:2px;color:var(--muted)">de '+esc(pp.from)+(it.is_demande?' · 🤖 demande détectée'+(it.created?' → créée dans Suivi demandes':''):'')+'</div>'
         +(r.st[0]?'<div style="margin-top:5px;font-weight:700;color:'+r.st[1]+'">'+esc(r.st[0])+'</div>':'')
-        +'<div class="acts" style="margin-top:6px;gap:6px">'+(it.dismissed?'<span class="sub" style="margin:0">traité</span>':'<button type="button" class="mails-done" data-id="'+esc(it.cdr_id)+'" style="font-size:12px">✔ Marquer traité</button>')+'</div>'
+        +'<div class="acts" style="margin-top:6px;gap:6px">'+((r.mt&&r.mt.m.mailPending)?('<button type="button" class="mails-val ok" data-mid="'+esc(r.mt.m.id)+'" style="font-size:12px">✅ Valider la vacation</button><button type="button" class="mails-ref" data-mid="'+esc(r.mt.m.id)+'" data-id="'+esc(it.cdr_id)+'" style="font-size:12px;color:var(--bad)">🗑 Refuser</button>'):'')+(it.dismissed?'<span class="sub" style="margin:0">traité</span>':'<button type="button" class="mails-done" data-id="'+esc(it.cdr_id)+'" style="font-size:12px">✔ Marquer traité</button>')+'</div>'
         +'</div>';
     });
     box.innerHTML=h;
     box.querySelectorAll('.mails-flt').forEach(function(b){ b.onclick=function(){ mailsFilter=b.getAttribute('data-f'); _mailsRender(items); }; });
     var rf=byId('mails-refresh'); if(rf)rf.onclick=renderMails;
+    box.querySelectorAll('.mails-val').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid');
+      for(var i=0;i<SUIVI.length;i++){ if(SUIVI[i].id===mid){ delete SUIVI[i].mailPending; break; } }
+      save('fkh_suivi',SUIVI); if(typeof cloudPush==='function'){try{cloudPush('fkh_suivi');}catch(e){}}
+      if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
+      _mailsRender(items); }; });
+    box.querySelectorAll('.mails-ref').forEach(function(b){ b.onclick=function(){ if(!confirm('Refuser cette vacation ? Elle sera retirée du Planning (le mail reste dans la liste).'))return;
+      var mid=b.getAttribute('data-mid'), cid=b.getAttribute('data-id');
+      for(var i=0;i<SUIVI.length;i++){ if(SUIVI[i].id===mid){ SUIVI.splice(i,1); break; } }
+      save('fkh_suivi',SUIVI); if(typeof cloudPush==='function'){try{cloudPush('fkh_suivi');}catch(e){}}
+      var _rf=[]; try{_rf=JSON.parse(localStorage.getItem('fkh_mail_refuse')||'[]')||[];}catch(e){} if(_rf.indexOf(cid)<0)_rf.push(cid); try{localStorage.setItem('fkh_mail_refuse',JSON.stringify(_rf));}catch(e){}
+      if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
+      _mailsRender(items); }; });
     box.querySelectorAll('.mails-done').forEach(function(b){ b.onclick=function(){ var id=b.getAttribute('data-id');
       items.forEach(function(x){ if(x.cdr_id===id)x.dismissed=1; });
       try{localStorage.setItem(MAILS_CACHE_KEY,JSON.stringify(items));}catch(e){}
