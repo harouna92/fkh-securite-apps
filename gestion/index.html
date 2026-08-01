@@ -197,7 +197,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b149</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b150</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -4793,7 +4793,11 @@ button.big:active{transform:translateY(1px)}
     op.sort(function(x,y){return x.due-y.due;}); cli.sort(function(x,y){return x.due-y.due;});
     return {op:op,cli:cli};
   }
-  function ppRefresh(){ var n1=byId('pp-op-n'),n2=byId('pp-cli-n'); if(!n1||!n2)return; var sc=ppScan();
+  function ppRefresh(){ var n1=byId('pp-op-n'),n2=byId('pp-cli-n'); if(!n1||!n2)return;
+    var _b1=byId('pp-op'),_b2=byId('pp-cli'),_hide=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); // b150 : pastilles réservées superviseur/admin/super-admin — cachées à l'opérateur
+    if(_b1)_b1.style.display=_hide?'none':''; if(_b2)_b2.style.display=_hide?'none':'';
+    if(_hide){ if(PP_VIEW.mode)ppClose(); return; }
+    var sc=ppScan();
     n1.textContent=sc.op.length; n1.style.display=sc.op.length?'block':'none';
     n2.textContent=sc.cli.length; n2.style.display=sc.cli.length?'block':'none';
     if(PP_VIEW.mode)ppRender(sc);
