@@ -202,7 +202,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b181+b116</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b182+b116</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -4889,7 +4889,7 @@ button.big:active{transform:translateY(1px)}
     cli:{title:'🏢 Prises / fins — CLIENT NON AVISÉ',verb:'client non avisé',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     ph:{title:'📷 Photos de PRISE / FIN manquantes',verb:'sans photo',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     te:{title:'🦺 Agents planifiés SANS photo de contrôle tenue',verb:'photo de contrôle manquante',tiles:3,depuis:'Visés dès 12 h AVANT la prise de service, tant que la photo n’est pas déposée'},
-    c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,depuis:'Depuis le DÉBUT des sites planifiés (tout l’historique)'},
+    c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,phaseSite:1,depuis:'Tout l’historique · classées Terminées / En cours puis PAR SITE · dépôt de la photo sur chaque créneau'},
     af:{title:'🧍 Vacations NON AFFECTÉES (à partir d’aujourd’hui)',verb:'sans agent',tiles:0,bySite:1,depuis:'D’aujourd’hui vers le futur · classées par site'},
     ro:{title:'🔌 Pointages SANS appel réel à ± 10 min (Ringover)',verb:'aucun appel à ± 10 min du pointage',tiles:0,depuis:'Aujourd’hui · un pointage est validé si un appel du bon numéro existe à ± 10 min de l’HEURE DU POINTAGE (journal Ringover réel)'}
   };
@@ -4911,7 +4911,7 @@ button.big:active{transform:translateY(1px)}
         if(now<due-43200000)return;
         var _fd=_finMap[e.mid]; it.phase=(now<due)?'avant':((_fd&&now>_fd)?'apres':'pendant'); it.since=now-(due-43200000);
         sc.te.push(it); }
-      else { if(!(r.photoKey||r.photo))sc.c2.push(it); }
+      else { if(!(r.photoKey||r.photo)){ var _fd2=_finMap[e.mid]; it.phase=(_fd2&&now>_fd2)?'passee':'encours'; sc.c2.push(it); } }
     });
     ['op','cli','ph','te','c2'].forEach(function(k){ sc[k].sort(function(x,y){return x.due-y.due;}); });
     // b175 (remontee #40) : des qu'une vacation COMMENCE, un creneau photo est attendu toutes les 2 h ;
@@ -4930,7 +4930,7 @@ button.big:active{transform:translateY(1px)}
           if(_pts.some(function(pt){ return Math.abs(pt-_t)<=4200000; }))continue;
           var _k2=String(m.id)+'|'+_t; if(_seen2[_k2])continue; _seen2[_k2]=1;
           var _d2=new Date(_t), _h2=('0'+_d2.getHours()).slice(-2)+':'+('0'+_d2.getMinutes()).slice(-2);
-          sc.c2.push({mid:m.id,key:'c2syn',label:'🌙 Photo des 2 h — créneau '+_h2,site:(m.siteAgent||m.titre||'—'),client:m.client||'',ville:m.ville||'',agent:_ag,mdate:m.mdate,heure:_h2,due:_t,since:now-_t});
+          sc.c2.push({phase:((_en&&now>_en)?'passee':'encours'),mid:m.id,key:'c2syn',label:'🌙 Photo des 2 h — créneau '+_h2,site:(m.siteAgent||m.titre||'—'),client:m.client||'',ville:m.ville||'',agent:_ag,mdate:m.mdate,heure:_h2,due:_t,since:now-_t});
         }
       });
       sc.c2.sort(function(x,y){return x.due-y.due;});
@@ -4968,7 +4968,20 @@ button.big:active{transform:translateY(1px)}
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
       return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+' · ':'')+(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>')))+'</div>'+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
-    if(D.bySite&&!PP_VIEW.sub){ // b177 : classification par SITE
+    if(D.phaseSite&&!PP_VIEW.sub){ // b182 : niveau 1 = Terminees / En cours
+      var cP=L.filter(function(x){return x.phase==='passee';}),cE=L.filter(function(x){return x.phase!=='passee';});
+      h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="passee"><b>'+cP.length+'</b>⏳ Vacations TERMINÉES<br><span class="sub" style="margin:0;font-size:11.5px">photos manquantes</span></div><div class="pp-tile" data-sub="encours"><b>'+cE.length+'</b>🟢 Vacations EN COURS<br><span class="sub" style="margin:0;font-size:11.5px">photos manquantes</span></div></div>';
+      h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
+    } else if(D.phaseSite&&PP_VIEW.sub&&PP_VIEW.sub2==null){ // b182 : niveau 2 = par SITE
+      var Lp=L.filter(function(x){return (PP_VIEW.sub==='passee')?(x.phase==='passee'):(x.phase!=='passee');});
+      var _g2={}; Lp.forEach(function(x){ (_g2[x.site]=_g2[x.site]||[]).push(x); });
+      var _s2=Object.keys(_g2).sort(function(u,v2){return _g2[u][0].due-_g2[v2][0].due;});
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(PP_VIEW.sub==='passee'?'⏳ Terminées':'🟢 En cours')+'</b><span class="sub" style="margin:0">'+Lp.length+' créneau(x) sans photo</span></div>';
+      h+=_s2.length?_s2.map(function(st3){ var n3=_g2[st3].length,f3=_g2[st3][0]; return '<div class="pp-tile" data-sub2="'+esc(st3)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+n3+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st3)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f3.client?'🏢 '+esc(f3.client)+' · ':'')+'1er créneau : '+((f3.mdate||'').split('-').reverse().join('/'))+' '+esc(f3.heure||'')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Rien 🎉</div>';
+    } else if(D.phaseSite&&PP_VIEW.sub&&PP_VIEW.sub2!=null){ // b182 : niveau 3 = creneaux du site + depot photo
+      var Ls=L.filter(function(x){ return ((PP_VIEW.sub==='passee')?(x.phase==='passee'):(x.phase!=='passee'))&&x.site===PP_VIEW.sub2; });
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+esc(PP_VIEW.sub2)+'</b><span class="sub" style="margin:0">'+Ls.length+' créneau(x) · dépose la photo sur la ligne</span></div>'+rowsOf(Ls);
+    } else if(D.bySite&&!PP_VIEW.sub){ // b177 : classification par SITE
       var _g={}; L.forEach(function(x){ (_g[x.site]=_g[x.site]||[]).push(x); });
       var _ss=Object.keys(_g).sort(function(u,v){return _g[u][0].due-_g[v][0].due;});
       h+=_ss.length?_ss.map(function(st2){ var n2=_g[st2].length,f2=_g[st2][0]; return '<div class="pp-tile" data-sub="'+esc(st2)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+n2+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st2)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f2.client?'🏢 '+esc(f2.client)+' · ':'')+'prochaine : '+((f2.mdate||'').split('-').reverse().join('/'))+(f2.heure?' '+esc(f2.heure):'')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Rien à affecter 🎉</div>';
@@ -4994,8 +5007,8 @@ button.big:active{transform:translateY(1px)}
     }
     box.innerHTML=h;
     var cl=byId('pp-close'); if(cl)cl.onclick=ppClose;
-    var bk=byId('pp-back'); if(bk)bk.onclick=function(){PP_VIEW.sub=null;ppRender();};
-    box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){PP_VIEW.sub=t.getAttribute('data-sub');ppRender();}; });
+    var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };
+    box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else {PP_VIEW.sub=t.getAttribute('data-sub');} ppRender(); }; });
     box.querySelectorAll('.pp-act-aff').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); ppClose(); if(typeof planningAffect==='function')planningAffect(mid); }; });
     box.querySelectorAll('.pp-act-fait').forEach(function(b){ b.onclick=function(){ saSet(b.getAttribute('data-mid'),b.getAttribute('data-key'),{done:true}); if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
     box.querySelectorAll('.pp-act-avise').forEach(function(b){ b.onclick=function(){ saSet(b.getAttribute('data-mid'),b.getAttribute('data-key'),{avise:true}); if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
@@ -5026,8 +5039,8 @@ button.big:active{transform:translateY(1px)}
   }
   setInterval(function(){ try{ppRoScan();}catch(_e){} },300000);
   setTimeout(function(){ try{ppRoScan();}catch(_e){} },3000);
-  function ppOpen(mode){ PP_VIEW={mode:mode,sub:null}; var o=byId('pp-ovl'); if(o)o.classList.add('on'); ppRender(); }
-  function ppClose(){ PP_VIEW={mode:null,sub:null}; var o=byId('pp-ovl'); if(o)o.classList.remove('on'); }
+  function ppOpen(mode){ PP_VIEW={mode:mode,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.add('on'); ppRender(); }
+  function ppClose(){ PP_VIEW={mode:null,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.remove('on'); }
   (function(){ ['op','cli','ph','te','c2','ro','af'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
     var o=byId('pp-ovl'); if(o)o.addEventListener('click',function(ev){ if(ev.target===o)ppClose(); });
     setInterval(function(){ try{ppRefresh();}catch(_e){} },30000);
