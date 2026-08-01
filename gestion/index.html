@@ -146,6 +146,7 @@ button.big:active{transform:translateY(1px)}
 #pp-te{right:185px}
 #pp-c2{right:229px}
 #pp-ro{right:273px}
+#pp-af{right:317px}
 .pp-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:none}
 #pp-ovl{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:120;display:none;align-items:flex-start;justify-content:center;padding:56px 10px 10px}
 #pp-ovl.on{display:flex}
@@ -203,7 +204,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b176</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b177</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -251,6 +252,7 @@ button.big:active{transform:translateY(1px)}
 <button type="button" id="pp-te" class="pp-btn" title="Contrôles tenue (photo) NON FAITS depuis lundi" aria-label="Tenues non contrôlées">🦺<span class="pp-badge" id="pp-te-n"></span></button>
 <button type="button" id="pp-c2" class="pp-btn" title="Photos de contrôle (toutes les 2 h) manquantes" aria-label="Photos contrôles manquantes">🌙<span class="pp-badge" id="pp-c2-n"></span></button>
 <button type="button" id="pp-ro" class="pp-btn" title="Pointages SANS trace d’appel réel (Ringover)" aria-label="Pointages sans appel réel">🔌<span class="pp-badge" id="pp-ro-n"></span></button>
+<button type="button" id="pp-af" class="pp-btn" title="Vacations SANS AGENT à partir d’aujourd’hui — classées par site" aria-label="Vacations non affectées">🧍<span class="pp-badge" id="pp-af-n"></span></button>
 <div id="pp-ovl"><div id="pp-box"></div></div>
 <button type="button" id="rech-bar" title="Missions en recherche d'agent — cliquer pour les traiter"></button>
 <button type="button" id="ask-fab" title="Poser une question (métier ou sur l'appli)" aria-label="Poser une question">💬</button>
@@ -5064,6 +5066,7 @@ button.big:active{transform:translateY(1px)}
     ph:{title:'📷 Photos de PRISE / FIN manquantes',verb:'sans photo',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     te:{title:'🦺 Agents planifiés SANS photo de contrôle tenue',verb:'photo de contrôle manquante',tiles:3,depuis:'Visés dès 12 h AVANT la prise de service, tant que la photo n’est pas déposée'},
     c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,depuis:'Depuis le DÉBUT des sites planifiés (tout l’historique)'},
+    af:{title:'🧍 Vacations NON AFFECTÉES (à partir d’aujourd’hui)',verb:'sans agent',tiles:0,bySite:1,depuis:'D’aujourd’hui vers le futur · classées par site'},
     ro:{title:'🔌 Pointages SANS appel réel à ± 10 min (Ringover)',verb:'aucun appel à ± 10 min du pointage',tiles:0,depuis:'Aujourd’hui · un pointage est validé si un appel du bon numéro existe à ± 10 min de l’HEURE DU POINTAGE (journal Ringover réel)'}
   };
   function ppSince(ms){ var m=Math.floor(ms/60000); if(m<1)m=1; if(m<60)return m+' min'; var h=Math.floor(m/60); if(h<24)return h+' h'+((m%60)?(' '+(m%60)+' min'):''); var j=Math.floor(h/24); return j+' j '+(h%24)+' h'; }
@@ -5108,12 +5111,20 @@ button.big:active{transform:translateY(1px)}
       });
       sc.c2.sort(function(x,y){return x.due-y.due;});
     }catch(_e){}
+    // b177 : vacations validees SANS agent, d'aujourd'hui vers le futur (classees par site au rendu)
+    sc.af=[];
+    try{ var _tdA=(typeof impTodayISO==='function')?impTodayISO():'';
+      (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.statut!=='validee'||m.mailPending||m.retiree||m.aDecouper)return; if(!m.mdate||m.mdate<_tdA)return; if(m.agentId)return;
+        var _du=frMs(m.mdate,toMin(m.mheure||'')||0)||now;
+        sc.af.push({mid:m.id,key:'af',af:1,site:(m.siteAgent||m.titre||'—'),client:m.client||'',ville:m.ville||'',agent:'',mdate:m.mdate,heure:m.mheure||'',due:_du,since:0}); });
+      sc.af.sort(function(x,y){return x.due-y.due;});
+    }catch(_e){}
     sc.ro=(PP_RO&&PP_RO.items)||[]; // b153 : rempli par ppRoScan (asynchrone, en ligne) ou par le cache
     return sc;
   }
   function ppRefresh(){ var hide=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); // b150 : réservé superviseur/admin/super-admin
     var sc=hide?null:ppScan(), any=false;
-    ['op','cli','ph','te','c2','ro'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
+    ['op','cli','ph','te','c2','ro','af'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
       b.style.display=hide?'none':'';
       if(!hide){ var L=sc[k]; n.textContent=L.length; n.style.display=L.length?'block':'none'; } });
     if(!any)return;
@@ -5125,14 +5136,23 @@ button.big:active{transform:translateY(1px)}
     var pr=L.filter(function(x){return x.key==='prise';}), fi=L.filter(function(x){return x.key!=='prise';});
     var h='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><b style="flex:1;font-size:15px">'+D.title+'</b><button type="button" id="pp-close">✕</button></div>';
     function rowAct(x){ var md=PP_VIEW.mode; // b160 : corriger l'info manquante DIRECTEMENT depuis la ligne
+      if(md==='af')return '<button type="button" class="pp-act-aff" data-mid="'+esc(x.mid||'')+'" style="font-size:12px;border-color:#e0a13b;color:#e0a13b;font-weight:700">👤 Affecter un agent</button>';
       if(md==='op')return '<button type="button" class="pp-act-fait" data-mid="'+esc(x.mid||'')+'" data-key="'+esc(x.key)+'" style="font-size:12px">✔ Marquer fait</button>';
       if(md==='cli')return '<button type="button" class="pp-act-avise" data-mid="'+esc(x.mid||'')+'" data-key="'+esc(x.key)+'" style="font-size:12px">📞 Client avisé ✔</button>';
       if(md==='ph'||md==='c2'||md==='te')return (typeof photoReady==='function'&&photoReady()&&typeof photoBtn==='function')?photoBtn('ppph-'+String(x.mid||'').replace(/[^a-zA-Z0-9]/g,'')+'-'+x.key,'📷 Ajouter la photo'):'<span class="sub" style="font-size:11px;margin:0">📷 connexion en ligne requise pour envoyer la photo</span>';
       return '';
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
-      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+' · ':'')+(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))+'</div>'+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
-    if(D.tiles===3&&!PP_VIEW.sub){ // b167 : 3 parties avant / pendant / apres service
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+' · ':'')+(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>')))+'</div>'+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
+    if(D.bySite&&!PP_VIEW.sub){ // b177 : classification par SITE
+      var _g={}; L.forEach(function(x){ (_g[x.site]=_g[x.site]||[]).push(x); });
+      var _ss=Object.keys(_g).sort(function(u,v){return _g[u][0].due-_g[v][0].due;});
+      h+=_ss.length?_ss.map(function(st2){ var n2=_g[st2].length,f2=_g[st2][0]; return '<div class="pp-tile" data-sub="'+esc(st2)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+n2+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st2)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f2.client?'🏢 '+esc(f2.client)+' · ':'')+'prochaine : '+((f2.mdate||'').split('-').reverse().join('/'))+(f2.heure?' '+esc(f2.heure):'')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Rien à affecter 🎉</div>';
+      h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+' · clique un site pour ses vacations, puis « Affecter un agent » ouvre directement la fiche vacation.</p>';
+    } else if(D.bySite&&PP_VIEW.sub){
+      var LLs=L.filter(function(x){return x.site===PP_VIEW.sub;});
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+esc(PP_VIEW.sub)+'</b><span class="sub" style="margin:0">'+LLs.length+' vacation(s) sans agent</span></div>'+rowsOf(LLs);
+    } else if(D.tiles===3&&!PP_VIEW.sub){ // b167 : 3 parties avant / pendant / apres service
       var tAv=L.filter(function(x){return x.phase==='avant';}),tPe=L.filter(function(x){return x.phase==='pendant';}),tAp=L.filter(function(x){return x.phase==='apres';});
       h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="avant"><b>'+tAv.length+'</b>⏳ AVANT la prise<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div><div class="pp-tile" data-sub="pendant"><b>'+tPe.length+'</b>🟢 PENDANT le service<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div><div class="pp-tile" data-sub="apres"><b>'+tAp.length+'</b>🔚 APRÈS le service<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div></div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+' · la photo déposée (ici même, bouton 📷 sur la ligne) retire l’agent de la liste.</p>';
@@ -5152,6 +5172,7 @@ button.big:active{transform:translateY(1px)}
     var cl=byId('pp-close'); if(cl)cl.onclick=ppClose;
     var bk=byId('pp-back'); if(bk)bk.onclick=function(){PP_VIEW.sub=null;ppRender();};
     box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){PP_VIEW.sub=t.getAttribute('data-sub');ppRender();}; });
+    box.querySelectorAll('.pp-act-aff').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); ppClose(); if(typeof planningAffect==='function')planningAffect(mid); }; });
     box.querySelectorAll('.pp-act-fait').forEach(function(b){ b.onclick=function(){ saSet(b.getAttribute('data-mid'),b.getAttribute('data-key'),{done:true}); if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
     box.querySelectorAll('.pp-act-avise').forEach(function(b){ b.onclick=function(){ saSet(b.getAttribute('data-mid'),b.getAttribute('data-key'),{avise:true}); if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
     if(PP_VIEW.mode==='ph'||PP_VIEW.mode==='c2'||PP_VIEW.mode==='te'){ L.forEach(function(x){ var uid='ppph-'+String(x.mid||'').replace(/[^a-zA-Z0-9]/g,'')+'-'+x.key; if(typeof photoWire==='function')photoWire(uid,function(f){ var ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg'; return 'appel/'+x.mid+'/'+x.key+'/'+Date.now()+'.'+ext; },function(key){ if(x.key==='tenue')saSet(x.mid,x.key,{done:true,tenuePhoto:true,photoKey:key}); else saSet(x.mid,x.key,{photo:'Photo horodatée',photoKey:key}); if(typeof photoArchiveAdd==='function')photoArchiveAdd({key:key,mid:x.mid,step:x.key,site:x.site,agent:x.agent,mdate:x.mdate||'',sk:String(x.mid)+'|'+x.key+'|'+key}); /* b175 : la photo couvre le creneau des 2 h */ if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }); }); }
@@ -5183,7 +5204,7 @@ button.big:active{transform:translateY(1px)}
   setTimeout(function(){ try{ppRoScan();}catch(_e){} },3000);
   function ppOpen(mode){ PP_VIEW={mode:mode,sub:null}; var o=byId('pp-ovl'); if(o)o.classList.add('on'); ppRender(); }
   function ppClose(){ PP_VIEW={mode:null,sub:null}; var o=byId('pp-ovl'); if(o)o.classList.remove('on'); }
-  (function(){ ['op','cli','ph','te','c2','ro'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
+  (function(){ ['op','cli','ph','te','c2','ro','af'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
     var o=byId('pp-ovl'); if(o)o.addEventListener('click',function(ev){ if(ev.target===o)ppClose(); });
     setInterval(function(){ try{ppRefresh();}catch(_e){} },30000);
     setTimeout(function(){ try{ppRefresh();}catch(_e){} },900);
