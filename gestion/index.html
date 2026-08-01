@@ -204,7 +204,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b179</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b180</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3660,6 +3660,49 @@ button.big:active{transform:translateY(1px)}
   // ===== Modale d'affectation depuis une case (le pont : écrit m.agentId / m.vacStatus dans fkh_suivi) =====
   var _plAffId=null, _plAffQ='';
   function _plModal(){ var w=byId('pl-modal'); if(!w){ w=document.createElement('div'); w.id='pl-modal'; w.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.5);display:none;align-items:flex-start;justify-content:center;padding:36px 12px;overflow:auto'; w.innerHTML='<div id="pl-modal-card" style="background:var(--panel);border:1px solid var(--line);border-radius:14px;max-width:460px;width:100%;padding:16px;box-shadow:0 10px 40px rgba(0,0,0,.5)"></div>'; document.body.appendChild(w); w.onclick=function(e){ if(e.target===w)planningAffectClose(); }; } return w; }
+  // b180 : bouton AJOUTER du Planning — hierarchie Client -> Site -> Service/Vacation (demande Zeus #42)
+  function _plKnownClients(){ var o={}; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.client)o[m.client]=1; }); try{ var ct=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{}; Object.keys(ct).forEach(function(k){o[k]=1;}); }catch(e){} delete o['']; return Object.keys(o).sort(); }
+  function _plKnownSites(cli){ var o={}; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.statut!=='validee')return; if(cli&&(m.client||'')!==cli)return; var s2=m.siteAgent||m.titre; if(s2)o[s2]=1; }); try{ (load('fkh_site_noms')||[]).forEach(function(n){ var nm=(typeof n==='string')?n:(n&&n.nom||''); if(nm)o[nm]=1; }); }catch(e){} delete o['']; return Object.keys(o).sort(); }
+  function _plAddMenu(){ var w=_plModal(); w.style.display='flex'; var cc=byId('pl-modal-card');
+    function head(t){ return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><button type="button" class="pa-back" style="font-size:12px">\u2190</button><b style="flex:1">'+t+'</b><button type="button" class="pl-close">\u2715</button></div>'; }
+    function foot(lbl){ return '<div class="acts" style="margin-top:10px"><button type="button" class="ok pa-go">'+lbl+'</button></div>'; }
+    function wire(){ var c2=cc.querySelector('.pl-close'); if(c2)c2.onclick=planningAffectClose; var bk=cc.querySelector('.pa-back'); if(bk)bk.onclick=step0; }
+    function dlClients(id){ return '<datalist id="'+id+'">'+_plKnownClients().map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist>'; }
+    function step0(){ cc.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><b style="flex:1">\u2795 Ajouter au Planning</b><button type="button" class="pl-close">\u2715</button></div>'
+      +'<p class="sub" style="margin:0 0 8px;font-size:11.5px">Hi\u00e9rarchie respect\u00e9e : \U0001F3E2 Client \u2192 \U0001F4CD Site \u2192 \U0001F550 Service / vacation.</p>'
+      +'<div style="display:grid;gap:8px"><button type="button" class="pl-add-c">\U0001F3E2 Cr\u00e9er un CLIENT</button><button type="button" class="pl-add-s">\U0001F4CD Cr\u00e9er un SITE (rattach\u00e9 \u00e0 un client)</button><button type="button" class="ok pl-add-v">\U0001F550 Cr\u00e9er un SERVICE / une VACATION</button></div>';
+      var c2=cc.querySelector('.pl-close'); if(c2)c2.onclick=planningAffectClose;
+      cc.querySelector('.pl-add-c').onclick=stepClient; cc.querySelector('.pl-add-s').onclick=stepSite; cc.querySelector('.pl-add-v').onclick=stepVac; }
+    function stepClient(){ cc.innerHTML=head('\U0001F3E2 Nouveau client')
+      +'<input class="pa-cnom" placeholder="Nom du client (ex. SECURITAS)" style="width:100%">'
+      +'<input class="pa-ctel" placeholder="T\u00e9l\u00e9phone du client (optionnel)" style="width:100%;margin-top:6px">'+foot('Cr\u00e9er le client'); wire();
+      cc.querySelector('.pa-go').onclick=function(){ var n=(cc.querySelector('.pa-cnom').value||'').trim(); if(!n){alert('Nom du client obligatoire.');return;} var t=(cc.querySelector('.pa-ctel').value||'').trim();
+        try{ var ct=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{}; if(!(n in ct)||t)ct[n]=t||ct[n]||''; localStorage.setItem('fkh_client_tel',JSON.stringify(ct)); if(typeof cloudPush==='function')cloudPush('fkh_client_tel'); }catch(e){}
+        alert('\u2705 Client \u00ab '+n+' \u00bb enregistr\u00e9 \u2014 disponible dans toutes les listes.'); step0(); }; }
+    function stepSite(){ cc.innerHTML=head('\U0001F4CD Nouveau site')
+      +'<label class="f"><div class="lab">\U0001F3E2 Client (obligatoire \u2014 hi\u00e9rarchie)</div><input class="pa-scli" list="pa-dlc" placeholder="Client du site\u2026" autocomplete="off">'+dlClients('pa-dlc')+'</label>'
+      +'<input class="pa-snom" placeholder="Nom du site (ex. BASIC FIT Dijon)" style="width:100%;margin-top:6px">'
+      +'<input class="pa-svil" placeholder="Ville" style="width:100%;margin-top:6px">'+foot('Cr\u00e9er le site'); wire();
+      cc.querySelector('.pa-go').onclick=function(){ var cli=(cc.querySelector('.pa-scli').value||'').trim(), n=(cc.querySelector('.pa-snom').value||'').trim(), vi=(cc.querySelector('.pa-svil').value||'').trim();
+        if(!cli){alert('Choisis d\u2019abord le CLIENT (hi\u00e9rarchie Client \u2192 Site).');return;} if(!n){alert('Nom du site obligatoire.');return;}
+        if(typeof siteMetaSet==='function')try{siteMetaSet(n,{client:cli,ville:vi});}catch(e){}
+        try{ var sn=load('fkh_site_noms')||[]; if(sn.indexOf(n)<0){ sn.push(n); save('fkh_site_noms',sn); } }catch(e){}
+        alert('\u2705 Site \u00ab '+n+' \u00bb cr\u00e9\u00e9 (client '+cli+').'); step0(); }; }
+    function stepVac(){ cc.innerHTML=head('\U0001F550 Nouveau service / vacation')
+      +'<label class="f"><div class="lab">\U0001F3E2 Client</div><input class="pa-vcli" list="pa-dlc2" placeholder="Client\u2026" autocomplete="off">'+dlClients('pa-dlc2')+'</label>'
+      +'<label class="f" style="margin-top:6px"><div class="lab">\U0001F4CD Site</div><input class="pa-vsite" list="pa-dls" placeholder="Site\u2026" autocomplete="off"><datalist id="pa-dls"></datalist></label>'
+      +'<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:6px;margin-top:6px"><input type="date" class="pa-vdate" value="'+esc((typeof impTodayISO==='function')?impTodayISO():'')+'"><input type="time" class="pa-vh1" title="Heure d\u00e9but"><input type="time" class="pa-vh2" title="Heure fin"></div>'+foot('Cr\u00e9er la vacation'); wire();
+      var siteInp=cc.querySelector('.pa-vsite'), cliInp=cc.querySelector('.pa-vcli');
+      function fillSites(){ var dl=cc.querySelector('#pa-dls'); if(dl)dl.innerHTML=_plKnownSites((cliInp.value||'').trim()).map(function(x){return '<option value="'+esc(x)+'">';}).join(''); }
+      cliInp.oninput=fillSites; fillSites();
+      cc.querySelector('.pa-go').onclick=function(){ var cli=(cliInp.value||'').trim(), st2=(siteInp.value||'').trim(), d=(cc.querySelector('.pa-vdate').value||'').trim(), h1=(cc.querySelector('.pa-vh1').value||'').trim(), h2=(cc.querySelector('.pa-vh2').value||'').trim();
+        if(!cli){alert('Client obligatoire (hi\u00e9rarchie).');return;} if(!st2){alert('Site obligatoire (hi\u00e9rarchie).');return;} if(!d||!h1){alert('Date et heure de d\u00e9but obligatoires.');return;}
+        var vi=''; try{ vi=(typeof siteMetaGet==='function')?(siteMetaGet(st2).ville||''):''; }catch(e){}
+        var now=Date.now(), id='pl'+now+'_'+Math.round(Math.random()*9999);
+        SUIVI.unshift({id:id,titre:st2,siteAgent:st2,client:cli,ville:vi,statut:'validee',motif:'',pris:now,valide:now,assoc:[],mdate:d,mheure:h1,mfin:h2,src:'planning'});
+        if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning();
+        planningAffect(id); }; }
+    step0(); }
   function planningAffectClose(){ var w=byId('pl-modal'); if(w)w.style.display='none'; _plAffId=null; }
   function planningAffect(mid){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===mid){m=SUIVI[i];break;} if(!m)return; _plAffId=mid; _plAffQ=''; _plModal().style.display='flex'; _plRenderModal(); }
   function _plMissById(id){ for(var i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id)return SUIVI[i]; return null; }
@@ -3837,7 +3880,7 @@ button.big:active{transform:translateY(1px)}
     var wl=days[0].split('-').reverse().join('/'), we=days[days.length-1].split('-').reverse().join('/');
     var _granOpts=['Jour','Semaine','Mois'].map(function(g){return '<option'+(PL_GRAN===g?' selected':'')+'>'+g+'</option>';}).join('');
     _plDaysCur=days.slice();
-    var toolbar='<div class="acts" style="gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><button type="button" id="pl-prev">◀</button><b style="min-width:150px;text-align:center">'+(days.length===1?wl:(wl+' → '+we))+'</b><button type="button" id="pl-next">▶</button><button type="button" id="pl-today" style="font-size:12px">Aujourd\'hui</button><select id="pl-gran" style="width:auto">'+_granOpts+'</select><button type="button" id="pl-indispo" style="font-size:12px">⏱ Indispos</button><button type="button" id="pl-heures" style="font-size:12px">▾ Heures</button>'+((typeof isSuperAdmin==='function'&&isSuperAdmin())?'<button type="button" id="pl-fact" style="font-size:12px" title="Facture proforma : client filtré × période affichée (tarifs de la fiche client)">💶 Facture</button>':'')+''+(_nDec?'<button type="button" id="pl-godec" style="font-size:12px;border-color:#7b61ff;color:#a99bff" title="Validées en attente de découpage — elles n’apparaissent pas encore ici">🔪 '+_nDec+' à découper</button>':'')+(_nRet?'<button type="button" id="pl-goret" style="font-size:12px;border-color:#e0a13b;color:#e0a13b" title="Vacations retirées (réversible) — clique pour les voir / les rétablir">🗑 '+_nRet+' retirée(s)</button>':'')+'<span class="sub" style="margin-left:auto">'+miss.length+' vacation'+(miss.length>1?'s':'')+' · '+order.length+' site'+(order.length>1?'s':'')+'</span></div>';
+    var toolbar='<div class="acts" style="gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><button type="button" id="pl-prev">◀</button><b style="min-width:150px;text-align:center">'+(days.length===1?wl:(wl+' → '+we))+'</b><button type="button" id="pl-next">▶</button><button type="button" id="pl-today" style="font-size:12px">Aujourd\'hui</button><select id="pl-gran" style="width:auto">'+_granOpts+'</select><button type="button" id="pl-indispo" style="font-size:12px">⏱ Indispos</button><button type="button" id="pl-heures" style="font-size:12px">▾ Heures</button><button type="button" id="pl-add" class="ok" style="font-size:12px" title="Créer un client, un site ou une vacation (hiérarchie Client → Site → Service)">➕ Ajouter</button>'+((typeof isSuperAdmin==='function'&&isSuperAdmin())?'<button type="button" id="pl-fact" style="font-size:12px" title="Facture proforma : client filtré × période affichée (tarifs de la fiche client)">💶 Facture</button>':'')+''+(_nDec?'<button type="button" id="pl-godec" style="font-size:12px;border-color:#7b61ff;color:#a99bff" title="Validées en attente de découpage — elles n’apparaissent pas encore ici">🔪 '+_nDec+' à découper</button>':'')+(_nRet?'<button type="button" id="pl-goret" style="font-size:12px;border-color:#e0a13b;color:#e0a13b" title="Vacations retirées (réversible) — clique pour les voir / les rétablir">🗑 '+_nRet+' retirée(s)</button>':'')+'<span class="sub" style="margin-left:auto">'+miss.length+' vacation'+(miss.length>1?'s':'')+' · '+order.length+' site'+(order.length>1?'s':'')+'</span></div>';
     var _plSM=_plStatusMap();
     var _stOpts='<option value="">Tous statuts</option><option value="0"'+(String(PL_F.statut)==='0'?' selected':'')+'>🟠 À affecter / non couvert</option>'+Object.keys(_plSM).map(function(c){return '<option value="'+c+'"'+(String(PL_F.statut)===c?' selected':'')+'>'+esc(_plSM[c].l)+'</option>';}).join('');
     var _clOpts='<option value="">Tous clients</option>'+Object.keys(_plClients).sort().map(function(c){return '<option'+(PL_F.client===c?' selected':'')+'>'+esc(c)+'</option>';}).join('');
@@ -3865,6 +3908,7 @@ button.big:active{transform:translateY(1px)}
     if(byId('pl-prev'))byId('pl-prev').onclick=function(){ _plShift(-1); renderPlanning(); };
     if(byId('pl-next'))byId('pl-next').onclick=function(){ _plShift(1); renderPlanning(); };
     if(byId('pl-fact'))byId('pl-fact').onclick=function(){ planningFacture(); };
+    if(byId('pl-add'))byId('pl-add').onclick=function(){ if(typeof _plAddMenu==='function')_plAddMenu(); };
     if(byId('pl-goret'))byId('pl-goret').onclick=function(){ // b156 : liste des vacations retirees + Retablir
       var rets=SUIVI.filter(function(m){return m.statut==='validee'&&m.retiree;});
       var card=_plModal(); card.style.display='flex'; var cc=byId('pl-modal-card');
