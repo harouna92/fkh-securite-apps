@@ -24,6 +24,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1
 .tabs button{flex:1 1 auto;font-family:inherit;font-size:12px;font-weight:600;padding:8px 8px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);cursor:pointer;white-space:nowrap}
 .tabs button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
 .wrap{max-width:44rem;margin:0 auto;padding:16px 16px 48px;display:flex;flex-direction:column;gap:13px}
+@media(min-width:1100px){.wrap{max-width:none;margin:0 28px}.brand{max-width:none;margin:0 28px 8px}.tabs{max-width:none;margin:0 28px}.cloudbar{max-width:none;padding-left:28px;padding-right:28px}}
 h1{font-size:1.25rem;font-weight:700;margin:0}.sub{font-size:12.5px;color:var(--muted);margin:0}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
 .lab{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:5px}
@@ -202,7 +203,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b202+b116</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b204+b116</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
