@@ -202,7 +202,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b190+b116</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b191+b116</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -4914,6 +4914,7 @@ button.big:active{transform:translateY(1px)}
     if(typeof saEntries!=='function'||PP_START==null)return sc;
     var _ents=saEntries('','');
     var _finMap={}; _ents.forEach(function(e){ if(e.key==='fin'&&e.mdate){ var fd=frMs(e.mdate,e.abs); if(fd!=null)_finMap[e.mid]=fd; } }); // b167 : fin de service par mission (phase avant/pendant/apres)
+    var _ctlMap={}; // b191 : pointages d'appel controle par mission (fait / injoignable)
     _ents.forEach(function(e){ if(!e.mdate)return;
       var isPF=(e.key==='prise'||e.key==='fin'), isTe=(e.key==='tenue'), isC2=(e.key.indexOf('ctrl')===0);
       if(!isPF&&!isTe&&!isC2)return;
@@ -4927,7 +4928,11 @@ button.big:active{transform:translateY(1px)}
         if(now<due-43200000)return;
         var _fd=_finMap[e.mid]; if(_fd==null)_fd=due+86400000; /* b185 : sans fin connue = terminee 24h apres la prise */ it.phase=(now<due)?'avant':((now>_fd)?'apres':'pendant'); it.since=now-(due-43200000);
         sc.te.push(it); }
-      else { if(!(r.photoKey||r.photo)){ var _fd2=_finMap[e.mid]; if(_fd2==null)_fd2=due+86400000; it.phase=(now>_fd2)?'passee':'encours'; sc.c2.push(it); } }
+      else { var _inj=!!(r.statut&&String(r.statut).indexOf('Injoignable')>=0);
+        (_ctlMap[e.mid]=_ctlMap[e.mid]||[]).push({t:due,done:!!r.done,inj:_inj,hm:r.hm||''});
+        if(!(r.photoKey||r.photo)){ var _fd2=_finMap[e.mid]; if(_fd2==null)_fd2=due+86400000; it.phase=(now>_fd2)?'passee':'encours';
+          it.c2info=_inj?'📵 Agent INJOIGNABLE — l’opérateur a tenté de joindre':(r.done?('☎ Appel contrôle ✅ FAIT'+(r.hm?(' à '+r.hm):'')+' — mais pas de photo'):'☎ Appel contrôle ❌ NON pointé par l’opérateur');
+          sc.c2.push(it); } }
     });
     ['op','cli','ph','te','c2'].forEach(function(k){ sc[k].sort(function(x,y){return x.due-y.due;}); });
     // b175 (remontee #40) : des qu'une vacation COMMENCE, un creneau photo est attendu toutes les 2 h ;
@@ -4947,7 +4952,9 @@ button.big:active{transform:translateY(1px)}
           if(_pts.some(function(pt){ return Math.abs(pt-_t)<=4200000; }))continue;
           var _k2=String(m.id)+'|'+_t; if(_seen2[_k2])continue; _seen2[_k2]=1;
           var _d2=new Date(_t), _h2=('0'+_d2.getHours()).slice(-2)+':'+('0'+_d2.getMinutes()).slice(-2);
-          sc.c2.push({phase:((now>_enX)?'passee':'encours'),mid:m.id,key:'c2syn',label:'🌙 Photo des 2 h — créneau '+_h2,site:(m.siteAgent||m.titre||'—'),client:m.client||'',ville:m.ville||'',agent:_ag,mdate:m.mdate,heure:_h2,due:_t,since:now-_t});
+          var _cr=null; (_ctlMap[m.id]||[]).forEach(function(c9){ var d9=Math.abs(c9.t-_t); if(d9<=4200000&&(!_cr||d9<Math.abs(_cr.t-_t)))_cr=c9; });
+          var _ci=_cr?(_cr.inj?'📵 Agent INJOIGNABLE — l’opérateur a tenté de joindre':(_cr.done?('☎ Appel contrôle ✅ FAIT'+(_cr.hm?(' à '+_cr.hm):'')+' — mais pas de photo'):'☎ Appel contrôle ❌ NON pointé')):'☎ Aucun appel contrôle pointé sur ce créneau';
+          sc.c2.push({c2info:_ci,phase:((now>_enX)?'passee':'encours'),mid:m.id,key:'c2syn',label:'🌙 Photo des 2 h — créneau '+_h2,site:(m.siteAgent||m.titre||'—'),client:m.client||'',ville:m.ville||'',agent:_ag,mdate:m.mdate,heure:_h2,due:_t,since:now-_t});
         }
       });
       sc.c2.sort(function(x,y){return x.due-y.due;});
@@ -4988,7 +4995,7 @@ button.big:active{transform:translateY(1px)}
       return '';
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
-      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+' · ':'')+(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>')))+'</div>'+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+' · ':'')+(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>')))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
     if(D.roGrp&&!PP_VIEW.sub){ // b190 : 2 groupes AUCUN appel / DECALAGE
       var rA=L.filter(function(x){return (x.grp||(x.callT?'ecart':'aucun'))==='aucun';}),rE=L.filter(function(x){return (x.grp||(x.callT?'ecart':'aucun'))==='ecart';});
       h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="aucun"><b>'+rA.length+'</b>📵 AUCUN appel<br><span class="sub" style="margin:0;font-size:11.5px">pas d’appel du numéro aujourd’hui</span></div><div class="pp-tile" data-sub="ecart"><b>'+rE.length+'</b>↔ DÉCALAGE<br><span class="sub" style="margin:0;font-size:11.5px">appel trouvé mais écart > 10 min</span></div></div>';
