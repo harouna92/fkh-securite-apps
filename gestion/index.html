@@ -146,6 +146,7 @@ button.big:active{transform:translateY(1px)}
 #pp-te{right:185px}
 #pp-c2{right:229px}
 #pp-ro{right:273px}
+#pp-hr{right:317px;width:auto;min-width:74px;padding:0 10px;font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums}
 .pp-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:none}
 #pp-ovl{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:120;display:none;align-items:flex-start;justify-content:center;padding:56px 10px 10px}
 #pp-ovl.on{display:flex}
@@ -203,7 +204,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b157</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b158</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -251,6 +252,7 @@ button.big:active{transform:translateY(1px)}
 <button type="button" id="pp-te" class="pp-btn" title="Contrôles tenue (photo) NON FAITS depuis lundi" aria-label="Tenues non contrôlées">🦺<span class="pp-badge" id="pp-te-n"></span></button>
 <button type="button" id="pp-c2" class="pp-btn" title="Photos de contrôle (toutes les 2 h) manquantes" aria-label="Photos contrôles manquantes">🌙<span class="pp-badge" id="pp-c2-n"></span></button>
 <button type="button" id="pp-ro" class="pp-btn" title="Pointages SANS trace d’appel réel (Ringover)" aria-label="Pointages sans appel réel">🔌<span class="pp-badge" id="pp-ro-n"></span></button>
+<button type="button" id="pp-hr" class="pp-btn" title="Heure France en direct — clique pour le détail (France + Mali)">--:--:--</button>
 <div id="pp-ovl"><div id="pp-box"></div></div>
 <button type="button" id="rech-bar" title="Missions en recherche d'agent — cliquer pour les traiter"></button>
 <button type="button" id="ask-fab" title="Poser une question (métier ou sur l'appli)" aria-label="Poser une question">💬</button>
@@ -5132,6 +5134,19 @@ button.big:active{transform:translateY(1px)}
     var o=byId('pp-ovl'); if(o)o.addEventListener('click',function(ev){ if(ev.target===o)ppClose(); });
     setInterval(function(){ try{ppRefresh();}catch(_e){} },30000);
     setTimeout(function(){ try{ppRefresh();}catch(_e){} },900);
+  })();
+  // b158 : pastille horloge — heure France qui tourne (visible par TOUS les rôles, opérateurs compris)
+  (function(){ var b=byId('pp-hr'); if(!b)return;
+    function fr(){ return new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date()); }
+    function tick(){ try{b.textContent=fr();}catch(e){} }
+    setInterval(tick,1000); tick();
+    b.onclick=function(){ var o=byId('pp-ovl'),box=byId('pp-box'); if(!o||!box)return; PP_VIEW={mode:null,sub:null}; o.classList.add('on');
+      function rend(){ var hfr=fr(); var d=new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',weekday:'long',day:'2-digit',month:'long',year:'numeric'}).format(new Date()); var hml=new Intl.DateTimeFormat('fr-FR',{timeZone:'Africa/Bamako',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date());
+        box.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><b style="flex:1;font-size:15px">🕐 Heure en direct</b><button type="button" id="pp-close">✕</button></div><div style="text-align:center;padding:8px 0"><div style="font-size:34px;font-weight:800;font-variant-numeric:tabular-nums">'+hfr+'</div><div class="sub" style="margin:4px 0 10px">'+d+' · 🇫🇷 France</div><div style="font-size:22px;font-weight:700;font-variant-numeric:tabular-nums">🇲🇱 '+hml+'</div><div class="sub" style="margin:2px 0 0">Mali (Bamako)</div></div>';
+        var cl=byId('pp-close'); if(cl)cl.onclick=function(){ o.classList.remove('on'); };
+      }
+      rend(); var t2=setInterval(function(){ if(!o.classList.contains('on')){clearInterval(t2);return;} rend(); },1000);
+    };
   })();
   // ===== b151 : 📧 Mails missions (super-admin) — remontée des mails BDC + comparaison entrants ↔ planifié =====
   var MAILS_CACHE_KEY='fkh_mails_cache'; var mailsFilter='tous';
