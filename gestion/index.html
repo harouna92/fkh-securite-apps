@@ -189,7 +189,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b136</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b137</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -284,6 +284,7 @@ button.big:active{transform:translateY(1px)}
     <div id="gexp-bar">
       <div class="gexp-row"><input id="gexp-in" placeholder="📝 Note codée : c AQUILA s Carrefour 83000 1930 2200 x2 !" autocomplete="off" style="flex:1"></div>
       <div class="gexp-row" style="margin-top:6px"><button type="button" id="gexp-do" title="Transcrire" style="flex:1">✨ Transcrire</button><button type="button" id="gexp-help" title="Aide codes">❔</button></div>
+      <div style="margin-top:6px"><button type="button" id="nrnear-open" style="font-size:12.5px;border:1px solid #6ea8fe;color:#6ea8fe;background:var(--panel2);border-radius:8px;padding:6px 12px">🧭 Agents proches (ville / CP de la note)</button><div id="nrnear-box"></div></div>
       <div class="gexp-grp">🏢 Client &amp; lieu</div>
       <div class="gexp-row" style="margin-top:2px;flex-wrap:wrap"><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-clientbtn">🏢 Client ▾</button><div id="gexp-clientdd" class="sugg hidden" style="left:0;right:auto;min-width:200px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-sitebtn">🏬 Type de site ▾</button><div id="gexp-sitedd" class="sugg hidden" style="left:0;right:auto;min-width:190px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-villebtn">📍 Ville ▾</button><div id="gexp-villedd" class="sugg hidden" style="left:0;right:auto;min-width:210px"></div></span><span style="position:relative;display:inline-block"><button type="button" class="gexp-day" id="gexp-cpbtn">🔢 Code postal ▾</button><div id="gexp-cpdd" class="sugg hidden" style="left:0;right:auto;min-width:210px"></div></span><button type="button" class="gexp-day" id="gexp-prochesbtn" title="Grandes villes proches + distance + temps de trajet">📍 Villes proches</button></div>
       <div id="gexp-prochespanel" class="hidden" style="margin-top:6px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)">
@@ -337,7 +338,7 @@ button.big:active{transform:translateY(1px)}
       </div>
       <div id="gexp-prev" class="hidden" style="margin-top:8px"></div>
     </div>
-  <div class="card"><button type="button" class="big" id="nrnear-open" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">🧭 Agents proches (selon la note : ville / CP)</button><div id="nrnear-box"></div></div>
+  
   </section>
   <section id="sec-demandes" class="hidden">
     <div><h1>🛡️ Gardiennage</h1><p class="sub">Choisis ou écris · la ville remplit le code postal · les heures donnent la plage.</p></div>
