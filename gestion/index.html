@@ -204,7 +204,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b158</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b160</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -5067,7 +5067,7 @@ button.big:active{transform:translateY(1px)}
       var due=frMs(e.mdate,e.abs); if(due==null)return; if(now<due+60000)return;
       var start=isTe?PP_WEEK:PP_START; if(start==null||due<start)return;
       var r=(S[e.mid]&&S[e.mid][e.key])||{};
-      var it={key:e.key,label:e.label,site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:due,since:now-due};
+      var it={mid:e.mid,key:e.key,label:e.label,site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:due,since:now-due};
       if(isPF){ if(!r.done)sc.op.push(it); if(!r.avise)sc.cli.push(it); if(!(r.photoKey||r.photo))sc.ph.push(it); }
       else if(isTe){ if(!r.done)sc.te.push(it); }
       else { if(!(r.photoKey||r.photo))sc.c2.push(it); }
@@ -5089,8 +5089,14 @@ button.big:active{transform:translateY(1px)}
     var D=PP_DEF[PP_VIEW.mode]||PP_DEF.op; var L=sc[PP_VIEW.mode]||[];
     var pr=L.filter(function(x){return x.key==='prise';}), fi=L.filter(function(x){return x.key!=='prise';});
     var h='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><b style="flex:1;font-size:15px">'+D.title+'</b><button type="button" id="pp-close">✕</button></div>';
+    function rowAct(x){ var md=PP_VIEW.mode; // b160 : corriger l'info manquante DIRECTEMENT depuis la ligne
+      if(md==='op')return '<button type="button" class="pp-act-fait" data-mid="'+esc(x.mid||'')+'" data-key="'+esc(x.key)+'" style="font-size:12px">✔ Marquer fait</button>';
+      if(md==='cli')return '<button type="button" class="pp-act-avise" data-mid="'+esc(x.mid||'')+'" data-key="'+esc(x.key)+'" style="font-size:12px">📞 Client avisé ✔</button>';
+      if(md==='ph'||md==='c2'||md==='te')return (typeof photoReady==='function'&&photoReady()&&typeof photoBtn==='function')?photoBtn('ppph-'+String(x.mid||'').replace(/[^a-zA-Z0-9]/g,'')+'-'+x.key,'📷 Ajouter la photo'):'<span class="sub" style="font-size:11px;margin:0">📷 connexion en ligne requise pour envoyer la photo</span>';
+      return '';
+    }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
-      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+' · ':'')+'prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b></div></div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+' · ':'')+'prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b></div>'+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
     if(D.tiles&&!PP_VIEW.sub){
       h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="prise"><b>'+pr.length+'</b>🟢 Prises de service<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div><div class="pp-tile" data-sub="fin"><b>'+fi.length+'</b>🔚 Fins de service<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div></div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+' · une échéance entre ici 1 min après son heure prévue. Clique sur une tuile pour le détail par vacation (durée écoulée).</p>';
@@ -5104,6 +5110,9 @@ button.big:active{transform:translateY(1px)}
     var cl=byId('pp-close'); if(cl)cl.onclick=ppClose;
     var bk=byId('pp-back'); if(bk)bk.onclick=function(){PP_VIEW.sub=null;ppRender();};
     box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){PP_VIEW.sub=t.getAttribute('data-sub');ppRender();}; });
+    box.querySelectorAll('.pp-act-fait').forEach(function(b){ b.onclick=function(){ saSet(b.getAttribute('data-mid'),b.getAttribute('data-key'),{done:true}); if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
+    box.querySelectorAll('.pp-act-avise').forEach(function(b){ b.onclick=function(){ saSet(b.getAttribute('data-mid'),b.getAttribute('data-key'),{avise:true}); if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
+    if(PP_VIEW.mode==='ph'||PP_VIEW.mode==='c2'||PP_VIEW.mode==='te'){ L.forEach(function(x){ var uid='ppph-'+String(x.mid||'').replace(/[^a-zA-Z0-9]/g,'')+'-'+x.key; if(typeof photoWire==='function')photoWire(uid,function(f){ var ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg'; return 'appel/'+x.mid+'/'+x.key+'/'+Date.now()+'.'+ext; },function(key){ if(x.key==='tenue')saSet(x.mid,x.key,{done:true,tenuePhoto:true,photoKey:key}); else saSet(x.mid,x.key,{photo:'Photo horodatée',photoKey:key}); if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }); }); }
   }
   // b153 : croisement pointages cochés ↔ appels réels Ringover (en ligne ; cache local pour consultation hors-ligne)
   var PP_RO=null; try{ PP_RO=JSON.parse(localStorage.getItem('fkh_ppro_cache')||'null'); }catch(_e){}
@@ -5117,8 +5126,8 @@ button.big:active{transform:translateY(1px)}
       saEntries(today,today).forEach(function(e){ var r=(S[e.mid]&&S[e.mid][e.key])||{}; if(!r.done)return;
         var ct=frMs(e.mdate,e.abs); if(ct==null||(PP_START!=null&&ct<PP_START))return;
         if(r.viaPhoto||r.photoKey)return; // réglé par preuve photo : pas d’appel attendu
-        if(e.agentTel&&!trace(e.agentTel,ct))out.push({key:e.key,label:(e.label||'')+' — appel AGENT',site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:ct,since:now-ct});
-        if((e.key==='prise'||e.key==='fin')&&r.avise&&e.client&&ctm[e.client]&&!trace(ctm[e.client],ct))out.push({key:e.key,label:(e.label||'')+' — appel CLIENT',site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:ct,since:now-ct});
+        if(e.agentTel&&!trace(e.agentTel,ct))out.push({key:e.key,label:(e.label||'')+' — appel AGENT'+((r.doneTs||r.at)?' · 🖊 pointé à '+fmtDT(r.doneTs||r.at):''),site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:ct,since:now-ct});
+        if((e.key==='prise'||e.key==='fin')&&r.avise&&e.client&&ctm[e.client]&&!trace(ctm[e.client],ct))out.push({key:e.key,label:(e.label||'')+' — appel CLIENT'+((r.doneTs||r.at)?' · 🖊 pointé à '+fmtDT(r.doneTs||r.at):''),site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:ct,since:now-ct});
       });
       out.sort(function(x,y){return x.due-y.due;});
       PP_RO={at:Date.now(),items:out};
