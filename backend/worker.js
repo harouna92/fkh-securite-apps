@@ -316,7 +316,7 @@ export default {
       const expected = env.AGENT_PHOTO_TOKEN || "fkh-photo-link-2026";
       if (tok !== expected) return json({ error: "bad_token" }, 403);
       const key = url.searchParams.get("key") || "";
-      if (!key || !/^(agent|tenue|appel|u)\//.test(key) || key.indexOf("..") >= 0) return json({ error: "bad_key" }, 400); // u/ = lien photo UNIQUE (sans identité agent)
+      if (!key || !/^(agent|tenue|appel)\//.test(key) || key.indexOf("..") >= 0) return json({ error: "bad_key" }, 400);
       const ct = request.headers.get("Content-Type") || "image/jpeg";
       await env.PHOTOS.put(key, request.body, { httpMetadata: { contentType: ct } });
       return json({ ok: true, key: key });
