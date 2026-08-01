@@ -189,7 +189,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b128</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b129</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2794,6 +2794,14 @@ button.big:active{transform:translateY(1px)}
       if(byId('sec-suivisite')&&!byId('sec-suivisite').classList.contains('hidden')&&typeof renderSuiviSite==='function')renderSuiviSite();
       return;
     }
+    if(k==='fkh_consignes'){ // #8 : fusion par ticket (mtime) au lieu d'écraser — une coche « fait » ou une suppression faite ailleurs ne REVIENT plus
+      var remK=[]; try{remK=JSON.parse(v)||[];}catch(_){remK=[];} if(!Array.isArray(remK))remK=[];
+      var mrgK=csgMergeArr(csgLoadRaw(),remK), mvK=JSON.stringify(mrgK);
+      try{ localStorage.setItem('fkh_consignes',mvK); }catch(e){}
+      if(mvK!==v && typeof cloudPush==='function')cloudPush('fkh_consignes'); // le local avait plus récent -> renvoie la fusion
+      if(byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')&&typeof renderSuiviAppels==='function')renderSuiviAppels();
+      return;
+    }
     if(k==='fkh_tenues_ctrl'){ // fusion au lieu d'écraser — protège les contrôles de tenue enregistrés sur un autre appareil
       var remC=[]; try{remC=JSON.parse(v)||[];}catch(_){remC=[];} if(!Array.isArray(remC))remC=[];
       var mrgC=tcMerge(load('fkh_tenues_ctrl'),remC), mvC=JSON.stringify(mrgC);
@@ -4707,10 +4715,15 @@ button.big:active{transform:translateY(1px)}
   (function(){ var t=impTodayISO(); if(byId('sa-from')&&!byId('sa-from').value)byId('sa-from').value=t; if(byId('sa-to')&&!byId('sa-to').value)byId('sa-to').value=t; })();
   (function(){ function tick(){ var el=byId('sa-clock'); if(!el)return; var d=new Date(); el.textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2); } tick(); setInterval(tick,1000); })();
   // ===== Consignes / tâches libres greffées dans l'agenda des appels =====
-  function csgLoad(){ var a=load('fkh_consignes'); return Array.isArray(a)?a:[]; }
-  function csgSave(a){ save('fkh_consignes',a); }
-  function csgSet(cid,patch){ var a=csgLoad(); for(var i=0;i<a.length;i++){ if(String(a[i].id)===String(cid)){ for(var k in patch)a[i][k]=patch[k]; break; } } csgSave(a); }
-  function csgDel(cid){ csgSave(csgLoad().filter(function(c){return String(c.id)!==String(cid);})); }
+  // ===== Consignes : anti-réapparition (#8). Fusion par ticket à la synchro (comme #11 pour les coches) + suppression par TOMBSTONE (un ticket supprimé ne revient plus via un appareil périmé). =====
+  function csgLoadRaw(){ var a=load('fkh_consignes'); return Array.isArray(a)?a:[]; }
+  function csgLoad(){ return csgLoadRaw().filter(function(c){return !c.deleted;}); }
+  function csgMtime(c){ return Math.max(+c.mtime||0,+c.at||0,+c.doneAt||0,+c.delAt||0,(c._valid&&+c._valid.createdAt)||0); }
+  function csgSave(a){ var raw=csgLoadRaw(), have={},i; for(i=0;i<a.length;i++)have[String(a[i].id)]=1; var keep=raw.filter(function(c){return c.deleted&&!have[String(c.id)];}); var out=a.concat(keep); var cut=Date.now()-30*864e5; out=out.filter(function(c){return !(c.deleted&&(+c.delAt||0)<cut);}); save('fkh_consignes',out); }
+  function csgSet(cid,patch){ var a=csgLoadRaw(); for(var i=0;i<a.length;i++){ if(String(a[i].id)===String(cid)){ for(var k in patch)a[i][k]=patch[k]; a[i].mtime=Date.now(); break; } } save('fkh_consignes',a); }
+  function csgDel(cid){ csgSet(cid,{deleted:true,delAt:Date.now()}); }
+  // Fusion des consignes de 2 appareils : union par id, le plus récent (mtime) gagne — on ne perd ni une coche « fait », ni une suppression.
+  function csgMergeArr(loc,rem){ var out={},order=[]; function addAll(arr){ (Array.isArray(arr)?arr:[]).forEach(function(c){ if(!c||c.id==null)return; var k=String(c.id); if(!out[k]){ out[k]=c; order.push(k); } else if(csgMtime(c)>csgMtime(out[k]))out[k]=c; }); } addAll(loc); addAll(rem); return order.map(function(k){return out[k];}); }
   function csgNewId(){ return 'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
   function csgMissById(id){ for(var i=0;i<SUIVI.length;i++)if(String(SUIVI[i].id)===String(id))return SUIVI[i]; return null; }
   function consigneCard(e){
