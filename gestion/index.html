@@ -3649,7 +3649,9 @@ button.big:active{transform:translateY(1px)}
   // Look « Sekur » (calque) appliqué au seul onglet Planning — voir releve-sekur/calque-planning.md
   function _plEnsureCss(){ if(byId('pl-sekur-css'))return; var st=document.createElement('style'); st.id='pl-sekur-css'; st.textContent=
     /* Visuel = thème natif GESTION (retour demandé par Zeus). On ne garde que le structurel des nouveaux éléments + le fix des listes rognées. */
-    '#planning-body select,#planning-body input{padding:6px 10px;box-sizing:border-box;line-height:normal;vertical-align:middle}'
+    '#planning-body thead th{position:sticky;top:0;z-index:5;background:var(--panel2)}'
+    +'#planning-body thead th:first-child{z-index:7}'
+    +'#planning-body select,#planning-body input{padding:6px 10px;box-sizing:border-box;line-height:normal;vertical-align:middle}'
     +'#planning-body select{appearance:auto;-webkit-appearance:menulist}'
     +'#planning-body .acts{align-items:center}'
     +'#planning-body tr.pl-sitehead td{background:#37475a!important;border:1px solid #2f3d4b!important;padding:0}'
@@ -3748,7 +3750,7 @@ button.big:active{transform:translateY(1px)}
         bodyR+='<tr><td class="pl-hlabel" style="position:sticky;left:0;z-index:1"><b>'+esc(lbl)+'</b>'+(qual?'<div style="font-size:10px;opacity:.8">'+esc(qual)+'</div>':'')+'</td>'+cells+'</tr>';
       });
     }); }
-    box.innerHTML=toolbar+filterBar+'<div style="overflow:auto"><table style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr>'+th+'</tr></thead><tbody>'+bodyR+'</tbody></table></div><div class="sub" style="margin-top:8px">Statuts : <b style="color:#8a8f98">En attente</b> · <b style="color:#2563eb">En cours</b> · <b style="color:#1a9e5c">Terminé</b> · <b style="color:#e0a13b">à affecter</b> · <b style="color:#c02626">en retard / non couvert</b> — clique une vacation → <b>affecter / changer le statut</b> · clique une case vide → ajouter une vacation.</div>';
+    box.innerHTML=toolbar+filterBar+'<div style="overflow:auto;max-height:76vh"><table style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr>'+th+'</tr></thead><tbody>'+bodyR+'</tbody></table></div><div class="sub" style="margin-top:8px">Statuts : <b style="color:#8a8f98">En attente</b> · <b style="color:#2563eb">En cours</b> · <b style="color:#1a9e5c">Terminé</b> · <b style="color:#e0a13b">à affecter</b> · <b style="color:#c02626">en retard / non couvert</b> — clique une vacation → <b>affecter / changer le statut</b> · clique une case vide → ajouter une vacation.</div>';
     if(byId('pl-add'))byId('pl-add').onclick=function(){ if(typeof _plAddMenu==='function')_plAddMenu(); };
     if(byId('pl-goret'))byId('pl-goret').onclick=function(){ // b156 : liste des vacations retirees + Retablir
       var rets=SUIVI.filter(function(m){return m.statut==='validee'&&m.retiree;});
