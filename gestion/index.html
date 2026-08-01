@@ -204,7 +204,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b201</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b202</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -4885,7 +4885,7 @@ button.big:active{transform:translateY(1px)}
       var tenueSel='<select class="sa-f" data-f="tenueCtrl" '+d0+'>'+['','✅ Fait — photo prise','📩 Demandé — en attente','🚫 Agent a REFUSÉ'].map(function(s){return '<option value="'+esc(s)+'"'+(r.tenueCtrl===s?' selected':'')+'>'+(s||'— contrôle tenue demandé ? —')+'</option>';}).join('')+'</select>';
       var upId='saph-'+String(e.mid).replace(/[^a-zA-Z0-9]/g,'')+'-'+e.key;
       var pv=r.photoKey?' <a href="#" class="sa-photo-view" data-k="'+esc(r.photoKey)+'" style="font-size:12px;color:#6ea8fe;align-self:center">🖼️ voir la photo</a>':(function(){ var _ar=(typeof photoArchiveFind==='function')?photoArchiveFind(saStableKey(e)):null; return _ar?(' <a href="#" class="sa-photo-view" data-k="'+esc(_ar.key)+'" title="Photo de contrôle archivée (conservée malgré la mise à jour du planning)" style="font-size:12px;color:#e0a13b;align-self:center">🖼️ photo archivée</a>'):''; })();
-      var photoUp=(photoReady()?photoBtn(upId,'📤 photo'):'<span class="sub" style="font-size:11px;align-self:center">📷 (connexion en ligne pour envoyer)</span>')+pv; var photoSug=(photoReady()?('<button type="button" class="sa-phsug" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'" data-when="'+esc(String(frMs(e.edate||e.mdate,e.abs)||''))+'" data-city="'+esc(slugForPhoto(e.ville||''))+'" data-lbl="'+esc(e.label||'')+'" style="font-size:11px">🖼️ Photos proposées</button>'):''); /* b200 */
+      var photoUp=(photoReady()?photoBtn(upId,'📤 photo'):'<span class="sub" style="font-size:11px;align-self:center">📷 (connexion en ligne pour envoyer)</span>')+pv; var photoSug=(photoReady()?('<button type="button" class="sa-phsug" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'" data-when="'+esc(String(frMs(e.edate||e.mdate,e.abs)||''))+'" data-city="'+esc(slugForPhoto(e.ville||''))+'" data-cp="'+esc(((typeof siteMetaGet==='function')?(siteMetaGet(e.site||'').cp||''):'')||e.cp||'')+'" data-rue="'+esc((typeof siteMetaGet==='function')?(siteMetaGet(e.site||'').adresse||''):'')+'" data-lbl="'+esc(e.label||'')+'" style="font-size:11px">🖼️ Photos proposées</button>'):''); /* b200 */
       // ☎ compteur de tentatives d'appel + 🆘 alerte responsables (remontée SOS clignotante) — remontée Zeus #18
       var _tries=+r.tries||0;
       var tryBtn='<button type="button" class="sa-try" '+d0+' title="J\'ai appelé sans réponse — compte une tentative" style="font-size:12px'+(_tries?';border-color:#e0a13b;color:#e0a13b;font-weight:700':'')+'">☎ +1'+(_tries?' ×'+_tries:'')+'</button>';
@@ -4918,7 +4918,7 @@ button.big:active{transform:translateY(1px)}
     entries.forEach(function(e){ var hasPhoto=(e.key==='prise'||e.key==='fin'||e.key==='tenue'||e.key.indexOf('ctrl')===0); if(!hasPhoto||typeof photoWire!=='function')return; var upId='saph-'+String(e.mid).replace(/[^a-zA-Z0-9]/g,'')+'-'+e.key; photoWire(upId,function(f){ var ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg'; return 'appel/'+e.mid+'/'+e.key+'/'+Date.now()+'.'+ext; },function(key){ if(e.key==='tenue')saSet(e.mid,e.key,{tenuePhoto:true,photoKey:key}); else saSet(e.mid,e.key,{photo:'Photo horodatée',photoKey:key}); if(typeof photoArchiveAdd==='function')photoArchiveAdd({key:key,mid:e.mid,step:e.label,site:e.site,agent:e.agent,mdate:e.mdate||e.edate,sk:saStableKey(e)}); renderSuiviAppels(); }); });
     document.querySelectorAll('#sa-body .sa-photo-view').forEach(function(a){ a.onclick=function(ev){ ev.preventDefault(); if(typeof photoOpen==='function')photoOpen(a.getAttribute('data-k')); }; });
     document.querySelectorAll('#sa-body .csg-del').forEach(function(b){ b.onclick=function(){ if(!confirm('Retirer ce ticket de Suivi des appels ?'))return; csgDel(b.getAttribute('data-cid')); renderSuiviAppels(); if(typeof csgRenderList==='function')csgRenderList(); if(typeof renderSuivi==='function')renderSuivi(); }; });
-    document.querySelectorAll('#sa-body .sa-phsug').forEach(function(b){ b.onclick=function(){ phSugOpen(b.getAttribute('data-mid'),b.getAttribute('data-key'),b.getAttribute('data-when'),b.getAttribute('data-city'),b.getAttribute('data-lbl')); }; }); /* b200 */
+    document.querySelectorAll('#sa-body .sa-phsug').forEach(function(b){ b.onclick=function(){ phSugOpen(b.getAttribute('data-mid'),b.getAttribute('data-key'),b.getAttribute('data-when'),b.getAttribute('data-city'),b.getAttribute('data-lbl'),b.getAttribute('data-cp'),b.getAttribute('data-rue')); }; }); /* b200 */
     document.querySelectorAll('#sa-body .sa-affect').forEach(function(b){ b.onclick=function(){ if(typeof planningAffect==='function')planningAffect(b.getAttribute('data-mid')); }; }); // b157 : affectation directe depuis le ticket (admin+)
     document.querySelectorAll('#sa-body .sa-excl').forEach(function(b){ b.onclick=function(){ var k=b.getAttribute('data-exk'),ex=saExclLoad(); if(ex[k]){ delete ex[k]; } else { if(!confirm('Retirer cet appel de l\'agenda (prise / fin / contrôle) ? Il sera masqué, mais restaurable à tout moment.'))return; ex[k]=Date.now(); } saExclSave(ex); renderSuiviAppels(); }; });
     document.querySelectorAll('#sa-body .sa-excl-toggle').forEach(function(b){ b.onclick=function(){ saShowExcl=b.checked; renderSuiviAppels(); }; });
@@ -5532,7 +5532,8 @@ button.big:active{transform:translateY(1px)}
   }
   // ===== b200 : PHOTOS PROPOSEES pour un ticket — score geo (ville, bientot CP/rue) + temps (+-1h30 max) =====
   var PHSUG_MAX=5400000; /* 1 h 30 : au-dela, la photo n'est plus proposee (etape consideree non faite) */
-  function phSugOpen(mid,key,whenMs,citySlug,label){
+  function phSugOpen(mid,key,whenMs,citySlug,label,cpSite,rueSite){
+    var _rueToks=String(rueSite||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').split(' ').filter(function(t){return t.length>3&&!/^(rue|avenue|boulevard|place|route|chemin|allee|impasse|quai)$/.test(t);});
     var ov=byId('pp-ovl'), box=byId('pp-box'); if(!ov||!box)return;
     if(typeof PP_VIEW!=='undefined')PP_VIEW={mode:null,sub:null,sub2:null};
     ov.classList.add('on');
@@ -5544,7 +5545,7 @@ button.big:active{transform:translateY(1px)}
       if(!list.length){ h+='<div class="sub">Aucune photo compatible (même ville, ± 1 h 30 de l’heure prévue). → étape considérée NON FAITE.</div>'; }
       else { h+='<p class="sub" style="margin:0 0 8px;font-size:11.5px">Classées par proximité 📍 lieu puis ⏱ écart de temps. Clique « Associer » pour régler le ticket avec cette photo.</p>'
         +list.map(function(x,i){ var mn=Math.round(x.d/60000); var col=(mn<=30)?'var(--ok)':((mn<=60)?'#e0a13b':'var(--bad)');
-          return '<div style="display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="flex:0 0 auto">'+((typeof photoThumbTag==='function')?photoThumbTag(x.key):'')+'</div><div style="flex:1;min-width:0"><div style="font-size:12.5px"><b>🕐 '+esc(x.hm)+'</b> · <span style="color:'+col+';font-weight:700">⏱ '+(mn===0?'à l’heure':((x.t>when?'+':'−')+mn+' min'))+'</span></div><div class="sub" style="margin:0;font-size:11.5px">'+(x.city?('📍 '+esc(String(x.city).replace(/_/g,' '))+(x.same?' — même ville ✅':' — ville différente')):'📍 lieu inconnu')+'</div></div><button type="button" class="ok phsug-go" data-key="'+esc(x.key)+'" data-hm="'+esc(x.hm)+'" style="font-size:12px">📎 Associer</button></div>'; }).join(''); }
+          return '<div style="display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="flex:0 0 auto">'+((typeof photoThumbTag==='function')?photoThumbTag(x.key):'')+'</div><div style="flex:1;min-width:0"><div style="font-size:12.5px"><b>🕐 '+esc(x.hm)+'</b> · <span style="color:'+col+';font-weight:700">⏱ '+(mn===0?'à l’heure':((x.t>when?'+':'−')+mn+' min'))+'</span></div><div class="sub" style="margin:0;font-size:11.5px">'+(x.city?('📍 '+esc(String(x.city).replace(/_/g,' '))+(x.rueOk?' — 🎯 même RUE':(x.cpOk?' — 📮 même CODE POSTAL':(x.same?' — même ville ✅':' — ville différente')))):'📍 lieu inconnu')+'</div></div><button type="button" class="ok phsug-go" data-key="'+esc(x.key)+'" data-hm="'+esc(x.hm)+'" style="font-size:12px">📎 Associer</button></div>'; }).join(''); }
       box.innerHTML=h;
       var c2=byId('pp-close'); if(c2)c2.onclick=function(){ ov.classList.remove('on'); };
       box.querySelectorAll('.phsug-go').forEach(function(b){ b.onclick=function(){ var k=b.getAttribute('data-key'), hm=b.getAttribute('data-hm');
@@ -5561,9 +5562,13 @@ button.big:active{transform:translateY(1px)}
         var same=!!(citySlug&&city&&city===citySlug);
         if(citySlug&&city&&!same)return; /* photo d'une autre ville : jamais proposée */
         var dt=new Date(ts); var hm=('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2);
-        out.push({key:k,t:ts,d:d,hm:hm,city:city,same:same});
+        var kl=String(k).toLowerCase();
+        var cpOk=!!(cpSite&&kl.indexOf(String(cpSite))>=0);
+        var rueOk=false; if(_rueToks.length){ var hit=0; _rueToks.forEach(function(t){ if(kl.indexOf(t)>=0)hit++; }); rueOk=(hit>=Math.max(1,Math.ceil(_rueToks.length/2))); }
+        var geo=(rueOk?3:0)+(cpOk?2:0)+(same?1:0); /* b202 : rue > CP > ville */
+        out.push({key:k,t:ts,d:d,hm:hm,city:city,same:same,cpOk:cpOk,rueOk:rueOk,geo:geo});
       });
-      out.sort(function(a,b){ return (b.same-a.same)||(a.d-b.d); });
+      out.sort(function(a,b){ return (b.geo-a.geo)||(a.d-b.d); }); /* b202 : proximite geo la plus fine d'abord */
       render(out.slice(0,8));
     }); }); });
   }
