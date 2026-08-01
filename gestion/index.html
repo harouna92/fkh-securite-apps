@@ -189,7 +189,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b138</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b139</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2011,7 +2011,7 @@ button.big:active{transform:translateY(1px)}
       var _isOpen=!!it.h24||/\bh\s*24\b|jusqu'?[àa]\s*nouvel\s*ordre|permanent|en\s*continu/i.test((it.texte||'')+' '+(it.titre||''));
       // Récupère client/site LÀ OÙ l'IA (Aquila) les met : champ structuré, sinon le texte détecté (« Client : … » / « Site : … »), sinon le titre. Évite de bloquer une demande dont l'info est déjà visible dans la carte.
       function _txtField(re){ var _m=re.exec(it.texte||''); return _m?_m[1].trim():''; }
-      var _client=((it.client&&it.client.trim())||_txtField(/^\s*Client\s*:\s*(.+)$/mi)||'').trim();
+      var _client=((it.client&&it.client.trim())||_txtField(/^\s*Client\s*:\s*(.+)$/mi)||'').trim(); _client=notFKH(_client);
       var _site=((it.site||it.siteAgent||'').trim()||_txtField(/^\s*Site\s*:\s*(.+)$/mi)||(it.titre||'').trim());
       var _manque=[];
       if(!_client)_manque.push('le nom du client');
@@ -4552,7 +4552,7 @@ button.big:active{transform:translateY(1px)}
         }
         // --- GARDIENNAGE → Suivi demandes (comportement existant) ---
         if(SUIVI.some(function(m){return String(m.id)===id;}))return; var now=Date.now();
-        var it={id:id,texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:((typeof svCallerName==='function'&&svCallerName(call.number))||d.client||''),la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiNature:nat,aiCdr:call.cdr_id,aiNumber:call.number||'',aiDir:call.direction||''}; if(call._sim)it.sim=true; SUIVI.unshift(it); changed=true; if(!firstNew)firstNew=it; aiRouteNear(it,bd); /* consigne « nouvelle demande gardiennage » retirée (l'opérateur prend les appels, il est déjà au courant) */
+        var it={id:id,texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:((typeof svCallerName==='function'&&svCallerName(call.number))||notFKH(d.client)||''),la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiNature:nat,aiCdr:call.cdr_id,aiNumber:call.number||'',aiDir:call.direction||''}; if(call._sim)it.sim=true; SUIVI.unshift(it); changed=true; if(!firstNew)firstNew=it; aiRouteNear(it,bd); /* consigne « nouvelle demande gardiennage » retirée (l'opérateur prend les appels, il est déjà au courant) */
       });
       // --- ARRÊT du gardiennage (initiative CLIENT) → consigne « Informer l'agent » dans Suivi des appels ---
       arrets.forEach(function(ar,aidx){ var acid='arret_'+call.cdr_id+'_'+aidx; if(call._sim||typeof csgLoad!=='function')return; try{ var _cc=csgLoad(); if(_cc.some(function(x){return x.srcId===acid;}))return; var lieu=[ar.site,ar.ville].filter(Boolean).join(' — '); _cc.push({id:csgNewId(),srcId:acid,texte:'🛑 ARRÊT DU GARDIENNAGE — INITIATIVE CLIENT.\n👉 INFORMER L\'AGENT que la prestation s\'arrête.'+(ar.client?'\n🏢 Client : '+ar.client:'')+(lieu?'\n📍 '+lieu:'')+(ar.motif?'\n📝 Motif : '+ar.motif:''),client:(ar.client||''),site:(ar.site||''),ville:(ar.ville||''),cp:'',mdate:impTodayISO(),heure:ssNowHM(),done:false,note:'',aiGen:true,arret:true}); csgSave(_cc); changed=true; arretN++; if(!firstArret)firstArret={client:(ar.client||''),lieu:lieu}; }catch(_e){} });
@@ -4565,10 +4565,12 @@ button.big:active{transform:translateY(1px)}
   // Durée d'un créneau en minutes (gère le passage minuit) et son format « 12h » / « 8h30 ».
   function vacDurMin(hor){ if(!hor)return 0; var ph=(typeof parseHoraires==='function')?parseHoraires(hor):null; if(ph&&ph.mheure&&ph.mfin){ var a=toMin(ph.mheure),b=toMin(ph.mfin); if(a==null||b==null)return 0; var dur=b-a; if(dur<=0)dur+=1440; return dur; } return 0; }
   function fmtDurMin(min){ if(!min)return ''; var h=Math.floor(min/60),m=min%60; return h+'h'+(m?('0'+m).slice(-2):''); }
+  // Règle Zeus 01-08 : FKH n'est JAMAIS le client (c'est nous). Toute détection « client=FKH » est ignorée.
+  function notFKH(c){ return /^\s*fkh/i.test(String(c||''))?'':String(c||'').trim(); }
   function aiBuildDemande(call,d){ var sel=(d.ville&&typeof commSearch==='function')?(commSearch(d.ville,1)||[])[0]:null; if(!sel&&d.cp&&typeof commByCP==='function')sel=(commByCP(d.cp,1)||[])[0];
     var cp=d.cp||(sel&&sel.codesPostaux?sel.codesPostaux[0]:''), vn=sel?sel.nom:(d.ville||''); var la=(sel&&sel.centre)?sel.centre.coordinates[1]:null, lo=(sel&&sel.centre)?sel.centre.coordinates[0]:null;
     var near=(la!=null&&typeof BIG!=='undefined')?BIG.map(function(b){return {n:b[0],la:b[1],lo:b[2],d:Math.round(km(la,lo,b[1],b[2]))};}).filter(function(x){return x.d>1&&x.n!==vn;}).sort(function(a,b){return a.d-b.d;}).slice(0,2):[];
-    var L=['Prestation : Gardiennage','Type d\'agent : ADS']; if(d.client)L.push('Client : '+d.client); if(d.type_site)L.push('Type de site : '+d.type_site); if(d.site)L.push('Site : '+d.site); if(vn||cp)L.push('Ville : '+vn+(cp?' ('+cp+')':'')); near.forEach(function(x){ L.push('↦ '+x.n+' à '+x.d+' km'); });
+    var L=['Prestation : Gardiennage','Type d\'agent : ADS']; var _dc=notFKH(d.client); if(_dc)L.push('Client : '+_dc); if(d.type_site)L.push('Type de site : '+d.type_site); if(d.site)L.push('Site : '+d.site); if(vn||cp)L.push('Ville : '+vn+(cp?' ('+cp+')':'')); near.forEach(function(x){ L.push('↦ '+x.n+' à '+x.d+' km'); });
     var vacs=d.vacations||[], totMin=0;
     vacs.forEach(function(v,i){ L.push(vacs.length>1?('Vacation '+(i+1)+'/'+vacs.length+' :'):'Vacation :'); if(v.date)L.push('   📅 Date : '+v.date); if(v.horaires)L.push('   🕐 Créneau : '+v.horaires); var mn=vacDurMin(v.horaires); if(mn){ L.push('   ⏱ Plage : '+fmtDurMin(mn)); totMin+=mn; } });
     if(d.nb_agents)L.push('Agents : '+d.nb_agents); if(d.urgent)L.push('🔴 URGENT'); if(call.resume)L.push('Notes : '+call.resume);
@@ -4590,7 +4592,7 @@ button.big:active{transform:translateY(1px)}
         return;
       }
       // --- GARDIENNAGE collé → Suivi demandes ---
-      var it={id:'mail'+now+'_'+idx+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:d.client||'',la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiNature:nat,source:(origin==='img'?'capture':'mail')}; SUIVI.unshift(it); if(typeof aiRouteNear==='function')aiRouteNear(it,bd); n++; /* consigne « nouvelle demande gardiennage » retirée */ });
+      var it={id:'mail'+now+'_'+idx+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:notFKH(d.client),la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiNature:nat,source:(origin==='img'?'capture':'mail')}; SUIVI.unshift(it); if(typeof aiRouteNear==='function')aiRouteNear(it,bd); n++; /* consigne « nouvelle demande gardiennage » retirée */ });
     arrets.forEach(function(ar){ if(typeof csgLoad!=='function')return; try{ var _cc=csgLoad(); var lieu=[ar.site,ar.ville].filter(Boolean).join(' — '); _cc.push({id:csgNewId(),texte:'🛑 ARRÊT DU GARDIENNAGE — INITIATIVE CLIENT ('+(origin==='img'?'capture':'texte')+').\n👉 INFORMER L\'AGENT que la prestation s\'arrête.'+(ar.client?'\n🏢 Client : '+ar.client:'')+(lieu?'\n📍 '+lieu:'')+(ar.motif?'\n📝 Motif : '+ar.motif:''),client:(ar.client||''),site:(ar.site||''),ville:(ar.ville||''),cp:'',mdate:impTodayISO(),heure:ssNowHM(),done:false,note:'',aiGen:true,arret:true}); csgSave(_cc); arretN++; }catch(_e){} });
     if(typeof saveSuivi==='function')saveSuivi();
     if(ivN&&typeof window._ivRender==='function')window._ivRender();
