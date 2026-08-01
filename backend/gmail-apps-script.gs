@@ -26,7 +26,7 @@ var TOKEN      = 'fkh-mail-ingest-2026'; // = secret MAIL_INGEST_TOKEN côté Wo
 // Périmètre (décision Zeus 01/08/2026, révisée) : le script envoie TOUS les mails REÇUS.
 // C'est le Worker (IA + critères mission) qui ne GARDE que ce qui concerne les missions —
 // le reste est marqué « hors-mission » (jamais ré-analysé) et servira à d'autres sections plus tard.
-var ADRESSES_A_NOUS = ['fkhsecurite', 'hacamara2']; // nos propres adresses : jamais renvoyées
+var ADRESSES_A_NOUS = ['fkhsecurite', 'hacamara2', 'bahalphaba95']; // nos propres adresses : jamais renvoyées
 var LABEL_TRAITE   = 'FKH-Traite'; // posé sur les fils envoyés (repère visuel ; l'anti-doublon réel est côté Worker)
 var FENETRE        = '1d';         // fenêtre de recherche à chaque passage (le Worker dédoublonne)
 var MAX_MESSAGES   = 30;           // sécurité : nb max de messages envoyés par exécution
