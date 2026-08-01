@@ -189,7 +189,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b135</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b136</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -337,6 +337,7 @@ button.big:active{transform:translateY(1px)}
       </div>
       <div id="gexp-prev" class="hidden" style="margin-top:8px"></div>
     </div>
+  <div class="card"><button type="button" class="big" id="nrnear-open" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">🧭 Agents proches (selon la note : ville / CP)</button><div id="nrnear-box"></div></div>
   </section>
   <section id="sec-demandes" class="hidden">
     <div><h1>🛡️ Gardiennage</h1><p class="sub">Choisis ou écris · la ville remplit le code postal · les heures donnent la plage.</p></div>
@@ -453,6 +454,7 @@ button.big:active{transform:translateY(1px)}
       </div>
       <button class="big" id="toSuivi" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">📥 Envoyer vers « Suivi demandes »</button>
     </div>
+  <div class="card"><button type="button" class="big" id="gdnear-open" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">🧭 Agents proches (selon Ville / CP du formulaire)</button><div id="gdnear-box"></div></div>
   </section>
 
   <section id="sec-prise" class="hidden">
@@ -3488,6 +3490,25 @@ button.big:active{transform:translateY(1px)}
     inbox.querySelectorAll('[data-terraindel]').forEach(function(b){ b.onclick=function(){ terrainDel(b.getAttribute('data-terraindel')); }; });
     inbox.querySelectorAll('.terrain-replybtn').forEach(function(b){ b.onclick=function(){ terrainReply(b.getAttribute('data-id')); }; });
   }
+  // ===== 🧭 Agents proches DANS Prise de note rapide + Gardiennage (remontée Zeus 01-08). Message composé UNIQUEMENT avec les infos disponibles. =====
+  function npNearMsg(info){ var lieu=info.ville?(info.ville+(info.cp?' ('+info.cp+')':'')):(info.cp?('secteur '+info.cp):''); return 'Bonjour, on a une mission'+(info.client?(' pour '+info.client):'')+(lieu?(' à '+lieu):'')+'. Es-tu disponible ? Réponds-nous vite s’il te plaît. FKH SÉCURITÉ'; }
+  function npNearRender(boxId,info){ var box=byId(boxId); if(!box)return;
+    if(!info||(!info.ville&&!info.cp)){ box.innerHTML='<div class="sub" style="margin:6px 0 0">Renseigne d’abord une ville ou un code postal'+(boxId==='nrnear-box'?' puis ✨ Transcrire':'')+'.</div>'; return; }
+    var la=info.la,lo=info.lo;
+    if(la==null&&typeof commSearch==='function'&&info.ville){ var sel=(commSearch(info.ville,1)||[])[0]; if(sel&&sel.centre){ la=sel.centre.coordinates[1]; lo=sel.centre.coordinates[0]; if(!info.cp&&sel.codesPostaux)info.cp=sel.codesPostaux[0]; } }
+    if(la==null&&typeof commByCP==='function'&&info.cp){ var sel2=(commByCP(info.cp,1)||[])[0]; if(sel2&&sel2.centre){ la=sel2.centre.coordinates[1]; lo=sel2.centre.coordinates[0]; if(!info.ville)info.ville=sel2.nom; } }
+    if(la==null){ box.innerHTML='<div class="sub" style="margin:6px 0 0">Ville « '+esc(info.ville||info.cp||'')+' » non géolocalisée — précise le code postal.</div>'; return; }
+    var rad=+(box.getAttribute('data-rad')||50);
+    var arr=((typeof FA!=='undefined'&&FA)?FA:[]).filter(function(x){return x.la!=null&&x.lo!=null;}).map(function(x){ return {a:x,d:Math.round(km(la,lo,x.la,x.lo))}; }).filter(function(o){return o.d<=rad;}).sort(function(x,y){return x.d-y.d;}).slice(0,15);
+    var msg=box.getAttribute('data-msg')||npNearMsg(info);
+    var rows=arr.length?arr.map(function(o){ var t=(o.a.tels&&o.a.tels[0])||o.a.tel||''; var n=(typeof waNum==='function')?waNum(t):''; return '<div class="fa"><div><div class="fa-n">'+esc(o.a.nom||'—')+' <span class="sub" style="font-weight:400">· '+o.d+' km'+(o.a.ville?' · '+esc(o.a.ville):'')+'</span></div><div class="fa-d">'+esc(t||'—')+'</div></div><div class="fa-a">'+(t?'<a class="call" href="tel:'+esc(String(t).replace(/\s/g,''))+'">📞</a>':'')+(n?'<button type="button" class="npn-wa" data-n="'+esc(n)+'" style="background:#25d366;border-color:#25d366;color:#062e16;font-weight:600">🟢 WhatsApp</button>':'')+'</div></div>'; }).join(''):'<div class="sub" style="margin:0">Aucun agent géolocalisé à ≤ '+rad+' km.</div>';
+    box.innerHTML='<div style="margin-top:8px"><div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap"><span class="sub" style="margin:0">📍 '+esc(info.ville||'')+(info.cp?' ('+esc(info.cp)+')':'')+' · rayon</span><select class="npn-rad">'+[25,50,80,120,200].map(function(r){return '<option'+(r===rad?' selected':'')+'>'+r+'</option>';}).join('')+'</select><span class="sub" style="margin:0">km · '+arr.length+' agent'+(arr.length>1?'s':'')+'</span></div><div class="lab" style="margin:8px 0 3px">✉️ Message (composé avec les infos disponibles — modifiable)</div><textarea class="npn-msg" style="width:100%;min-height:56px">'+esc(msg)+'</textarea><div class="list" style="margin-top:6px">'+rows+'</div></div>';
+    box.querySelector('.npn-rad').onchange=function(){ box.setAttribute('data-rad',this.value); npNearRender(boxId,info); };
+    box.querySelector('.npn-msg').oninput=function(){ box.setAttribute('data-msg',this.value); };
+    box.querySelectorAll('.npn-wa').forEach(function(bt){ bt.onclick=function(){ var m=box.querySelector('.npn-msg').value; window.open('https://wa.me/'+bt.getAttribute('data-n')+'?text='+encodeURIComponent(m),'_blank'); }; });
+  }
+  if(byId('nrnear-open'))byId('nrnear-open').onclick=function(){ npNearRender('nrnear-box', window._gexpLastInfo||null); };
+  if(byId('gdnear-open'))byId('gdnear-open').onclick=function(){ npNearRender('gdnear-box', {client:(byId('genr-client')&&byId('genr-client').value||'').trim(), ville:(byId('genr-ville')&&byId('genr-ville').value||'').trim(), cp:(byId('genr-cp')&&byId('genr-cp').value||'').trim()}); };
   // ===== 🏢 Fiches CLIENTS (#20-A) : coordonnées + contacts + TARIFS horaires (base de la facturation C). Store fkh_clients_meta {clé=nom normalisé}. =====
   var CLF_OPEN={};
   function clfLoad(){ var o=load('fkh_clients_meta'); return (o&&typeof o==='object'&&!Array.isArray(o))?o:{}; }
@@ -5382,7 +5403,7 @@ button.big:active{transform:translateY(1px)}
     function gexpHasCur(){ return !!(inp.value.trim()||gexpDate||gexpH1||gexpH2||gexpH24||gexpAsap||gexpDepart||gexpClient||gexpSite||gexpVille||gexpCP||gexpAgence||gexpSurv||gexpVacs.length); }
     function gexpPayload(){ var now=Date.now(), vn=lastSel?lastSel.nom:(lastR.ville||''), cp=lastR.cp||(lastSel&&lastSel.codesPostaux?lastSel.codesPostaux[0]:''), co=lastSel&&lastSel.centre?lastSel.centre.coordinates:null, v0=gexpVacs[0]||null, dIso=(v0&&v0.date)||lastDateIso||'', dFin=(v0&&v0.dateFin)||'', H1=(v0&&v0.h1)||gexpH1||lastR.hours[0]||'', H2=(v0&&v0.h2)||gexpH2||lastR.hours[1]||'', hh=gexpH24?'':H1, mfin=(!gexpH24&&H2)?(((dFin||dIso)?((dFin||dIso).split('-').reverse().join('/')+' '):'')+H2):'';
       return {id:'gx'+now+'_'+Math.round(Math.random()*9999),texte:lastTxt,titre:(lastR.site||lastR.client||vn||'Demande gardiennage').slice(0,60),statut:'recherche',motif:'',pris:now,valide:null,ville:vn,cp:cp,la:co?co[1]:null,lo:co?co[0]:null,assoc:[],mdate:dIso,mheure:hh,mfin:mfin,h24:gexpH24,urgent:!!lastR.urgent,_express:true}; }
-    function doTranscribe(){ var p=byId('gexp-prev'); var hasCur=gexpHasCur(); if(!hasCur&&!gexpAdded.length){ p.classList.add('hidden'); return; } var R=parse(inp.value); if(gexpClient)R.client=gexpClient; if(gexpSite)R.site=gexpSite; if(gexpVille){R.ville=gexpVille; R.cp=gexpCP||'';} else if(gexpCP){R.cp=gexpCP;} var sel=gexpVilleSel||resolveVille(R); if(typeof gexpSyncNear==='function')gexpSyncNear(sel); var dateIso=R.date||gexpDate, txt=toText(R,sel,dateIso,gexpH24,gexpAsap,gexpDepart); lastR=R; lastSel=sel; lastTxt=txt; lastDateIso=dateIso;
+    function doTranscribe(){ var p=byId('gexp-prev'); var hasCur=gexpHasCur(); if(!hasCur&&!gexpAdded.length){ p.classList.add('hidden'); return; } var R=parse(inp.value); if(gexpClient)R.client=gexpClient; if(gexpSite)R.site=gexpSite; if(gexpVille){R.ville=gexpVille; R.cp=gexpCP||'';} else if(gexpCP){R.cp=gexpCP;} var sel=gexpVilleSel||resolveVille(R); if(typeof gexpSyncNear==='function')gexpSyncNear(sel); var dateIso=R.date||gexpDate, txt=toText(R,sel,dateIso,gexpH24,gexpAsap,gexpDepart); lastR=R; lastSel=sel; lastTxt=txt; lastDateIso=dateIso; try{window._gexpLastInfo={client:R.client||gexpClient||'',ville:(sel&&sel.nom)||R.ville||'',cp:R.cp||gexpCP||'',la:(sel&&sel.centre)?sel.centre.coordinates[1]:null,lo:(sel&&sel.centre)?sel.centre.coordinates[0]:null};}catch(e){}
       var nTot=gexpAdded.length+(hasCur?1:0);
       var addedHtml=gexpAdded.length?('<div class="fa-d" style="margin:0 0 6px">📦 '+gexpAdded.length+' demande'+(gexpAdded.length>1?'s':'')+' préparée'+(gexpAdded.length>1?'s':'')+' :'+gexpAdded.map(function(o,i){return '<div style="display:flex;align-items:center;gap:6px;margin-top:3px"><span style="flex:1">• '+esc(o.titre)+(o.mdate?' ('+o.mdate.split('-').reverse().join('/')+')':'')+'</span><button type="button" data-gxrm="'+i+'" style="width:26px;height:26px;padding:0">✕</button></div>';}).join('')+'</div>'):'';
       p.innerHTML=addedHtml+(hasCur?'<div class="outbox" style="white-space:pre-wrap">'+esc(txt)+'</div>':'')+'<div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap">'+(hasCur?'<button type="button" id="gexp-add" style="min-width:150px">➕ Ajouter cette demande, en saisir une autre</button>':'')+'<button type="button" class="big ok" id="gexp-send" style="flex:1;min-width:180px">📤 Envoyer en recherche'+(nTot>1?' ('+nTot+')':'')+'</button><button type="button" id="gexp-clear">Effacer</button></div>'; p.classList.remove('hidden');
