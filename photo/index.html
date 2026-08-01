@@ -68,7 +68,7 @@
     // tampon horodaté en bas
     var d=new Date(); var stamp=pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
     var line2=uni?'':(aid?(agent||''):((agent?agent+' · ':'')+(TYPES[type]||type||'').replace(/^[^ ]+ /,'')));
-    var line3=gpsCity?('📍 '+(gpsStreet?gpsStreet+', ':'')+gpsCity):'';
+    var line3=(gpsCity||gpsCoord)?('📍 '+(gpsStreet?gpsStreet+', ':'')+(gpsCity||'')+(gpsCoord?((gpsCity?' · ':'')+'GPS '+gpsCoord):'')):''; // b173 : coordonnees GPS imprimees sur le tampon
     var fs=Math.max(16,Math.round(W/32)); x.font='bold '+fs+'px system-ui,sans-serif'; x.textBaseline='bottom';
     var nl=1+(line2?1:0)+(line3?1:0), bh=fs*(nl*1.25+0.5); x.fillStyle='rgba(0,0,0,.55)'; x.fillRect(0,H-bh,W,bh);
     x.fillStyle='#fff'; var yy=H-6; if(line3){ x.fillText(line3, 12, yy); yy-=fs*1.25; } if(line2){ x.fillText(line2, 12, yy); yy-=fs*1.25; } x.fillText('🕐 '+stamp, 12, yy);
