@@ -187,7 +187,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b120</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b121</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3684,10 +3684,12 @@ button.big:active{transform:translateY(1px)}
     var create='<div class="card"><div class="lab" style="margin:0 0 6px">➕ Nouveau ticket <span class="sub" style="font-weight:400">— la cible est détectée automatiquement</span></div>'
       +'<div class="grid2"><label class="f"><div class="lab">Tâche</div><select id="tk-type">'+typeOpts+'</select></label><label class="f"><div class="lab">Destinataire</div><input id="tk-assignee" placeholder="Ex. Traoré, ou « opérateurs »" autocomplete="off"></label></div>'
       +'<label class="f" style="margin-top:6px"><div class="lab">Consigne (facultatif)</div><input id="tk-consigne" placeholder="Ex. Appeler chaque agent pour récupérer son adresse postale"></label>'
+      +'<div class="grid2" style="margin-top:6px"><label class="f"><div class="lab">⏰ À faire avant <span class="sub" style="font-weight:400">(sinon escalade admin)</span></div><input type="datetime-local" id="tk-due"></label><label class="f"><div class="lab">🔔 Notifier le destinataire le <span class="sub" style="font-weight:400">(vide = tout de suite)</span></div><input type="datetime-local" id="tk-notifat"></label></div>'
       +'<button class="big" id="tk-create" style="margin-top:8px">🎫 Créer le ticket</button></div>';
     var list=T.length?T.slice().reverse().map(function(t){
       var ty=TK_TYPES[t.type], p=tkProgress(t), pct=p.total?Math.round(p.done/p.total*100):100, open=!!TK_OPEN[t.id];
-      var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px"><div><b>'+esc(t.titre||(ty?ty.lbl:'Ticket'))+'</b>'+(t.assignee?' <span class="sub">→ '+esc(t.assignee)+'</span>':'')+'</div><div><button data-tkopen="'+esc(t.id)+'" style="font-size:12px">'+(open?'▾ Réduire':'▸ Ouvrir')+'</button> <button class="no" data-tkdel="'+esc(t.id)+'" style="font-size:12px">🗑️</button></div></div>'
+      var _cplt=(p.total&&p.done>=p.total), _over=(t.due&&Date.now()>t.due&&!_cplt);
+      var h='<div class="card"'+(_over?' style="border:1.5px solid #c02626"':'')+'><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px"><div><b>'+esc(t.titre||(ty?ty.lbl:'Ticket'))+'</b>'+(t.assignee?' <span class="sub">→ '+esc(t.assignee)+'</span>':'')+(t.due?' <span style="font-size:11px;color:'+(_over?'#c02626':'var(--muted)')+';font-weight:'+(_over?'800':'400')+'">'+(_over?'🔴 EN RETARD — était à faire avant ':'⏰ avant ')+new Date(t.due).toLocaleString('fr-FR').slice(0,17)+'</span>':'')+(t.notifyAt&&!t.notified?' <span style="font-size:11px;color:var(--muted)">🔔 notif le '+new Date(t.notifyAt).toLocaleString('fr-FR').slice(0,17)+'</span>':'')+'</div><div><button data-tkopen="'+esc(t.id)+'" style="font-size:12px">'+(open?'▾ Réduire':'▸ Ouvrir')+'</button> <button class="no" data-tkdel="'+esc(t.id)+'" style="font-size:12px">🗑️</button></div></div>'
         +(t.consigne?'<div class="sub" style="margin:3px 0 0">'+esc(t.consigne)+'</div>':'')
         +'<div style="margin:7px 0 0"><div style="height:9px;background:var(--panel2);border-radius:6px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+(p.total&&p.done>=p.total?'#1a9e5c':'#3b6ef5')+';transition:width .3s"></div></div><div class="sub" style="margin:3px 0 0"><b>'+p.done+'/'+p.total+'</b> renseignés'+(p.total&&p.done>=p.total?' · ✅ terminé':'')+'</div></div>';
       if(open&&ty){
@@ -3699,12 +3701,25 @@ button.big:active{transform:translateY(1px)}
       return h+'</div>';
     }).join(''):'<div class="card"><div class="sub" style="margin:0">Aucun ticket pour l\'instant. Crée-en un ci-dessus.</div></div>';
     wrap.innerHTML=create+list;
-    if(byId('tk-create'))byId('tk-create').onclick=function(){ var type=byId('tk-type').value, ty=TK_TYPES[type]; if(!ty)return; var ids=(typeof FA!=='undefined'?FA:[]).filter(function(a){return ty.missing(a);}).map(function(a){return a.id;}); if(!ids.length){ alert('Aucun agent concerné — rien à faire pour cette tâche.'); return; } var arr=tkLoad(); arr.push({id:'tk'+Date.now()+'_'+Math.round(Math.random()*9999),type:type,titre:ty.lbl,consigne:(byId('tk-consigne').value||'').trim(),assignee:(byId('tk-assignee').value||'').trim(),targetIds:ids,by:(typeof opNow==='function'?opNow():''),at:Date.now()}); tkSave(arr); TK_OPEN[arr[arr.length-1].id]=true; renderTickets(); };
+    if(byId('tk-create'))byId('tk-create').onclick=function(){ var type=byId('tk-type').value, ty=TK_TYPES[type]; if(!ty)return; var ids=(typeof FA!=='undefined'?FA:[]).filter(function(a){return ty.missing(a);}).map(function(a){return a.id;}); if(!ids.length){ alert('Aucun agent concerné — rien à faire pour cette tâche.'); return; }
+      // Remontée #22 : dimensions échéance (escalade si dépassée) + notification programmée.
+      var _dueV=byId('tk-due')?byId('tk-due').value:'', _nfV=byId('tk-notifat')?byId('tk-notifat').value:'';
+      var _due=_dueV?new Date(_dueV).getTime():null, _nf=_nfV?new Date(_nfV).getTime():null; var _now=Date.now();
+      var t={id:'tk'+_now+'_'+Math.round(Math.random()*9999),type:type,titre:ty.lbl,consigne:(byId('tk-consigne').value||'').trim(),assignee:(byId('tk-assignee').value||'').trim(),targetIds:ids,by:(typeof opNow==='function'?opNow():''),at:_now,due:_due,notifyAt:_nf,notified:false,escalated:false};
+      if(!_nf||_nf<=_now){ t.notified=true; if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:t.id,title:'🎫 Nouveau ticket'+(t.assignee?' pour '+t.assignee:''),body:(t.titre||'')+(t.due?' — avant '+new Date(t.due).toLocaleString('fr-FR').slice(0,17):''),go:'tickets'}); }
+      var arr=tkLoad(); arr.push(t); tkSave(arr); TK_OPEN[t.id]=true; renderTickets(); };
+
     wrap.querySelectorAll('[data-tkopen]').forEach(function(b){ b.onclick=function(){ var id=b.getAttribute('data-tkopen'); TK_OPEN[id]=!TK_OPEN[id]; renderTickets(); }; });
     wrap.querySelectorAll('[data-tkdel]').forEach(function(b){ b.onclick=function(){ var id=b.getAttribute('data-tkdel'); if(!confirm('Supprimer ce ticket ?'))return; tkSave(tkLoad().filter(function(x){return x.id!==id;})); renderTickets(); }; });
     wrap.querySelectorAll('.tk-field').forEach(function(inp){ inp.addEventListener('change',function(){ var tid=inp.getAttribute('data-tkid'), aid=inp.getAttribute('data-aid'), t=tkLoad().filter(function(x){return x.id===tid;})[0]; if(!t)return; var ty=TK_TYPES[t.type], a=faById(aid); if(a&&ty){ ty.set(a,inp.value); renderTickets(); } }); });
     wrap.querySelectorAll('[data-tkfiche]').forEach(function(b){ b.onclick=function(){ var nom=b.getAttribute('data-tkfiche'), tb=document.querySelector('#tabs button[data-s="fiche"]'); if(tb)tb.click(); var fs=byId('fa-search'); if(fs){ fs.value=nom; fs.dispatchEvent(new Event('input',{bubbles:true})); if(fs.scrollIntoView)fs.scrollIntoView({behavior:'smooth',block:'center'}); } }; });
   }
+  // Tick tickets (remontée #22) : notification PROGRAMMÉE à l'heure choisie + ESCALADE (notif rouge) si l'échéance passe sans que tout soit renseigné.
+  function tkTick(){ try{ var arr=tkLoad(), chg=false, now=Date.now(); arr.forEach(function(t){
+    if(t.notifyAt&&!t.notified&&now>=t.notifyAt){ t.notified=true; chg=true; if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'tknf'+t.id,title:'🎫 Ticket'+(t.assignee?' pour '+t.assignee:''),body:(t.titre||'')+(t.due?' — avant '+new Date(t.due).toLocaleString('fr-FR').slice(0,17):''),go:'tickets'}); }
+    if(t.due&&now>t.due&&!t.escalated){ var p=tkProgress(t); if(!(p.total&&p.done>=p.total)){ t.escalated=true; chg=true; if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'tkesc'+t.id,title:'🔴 Ticket EN RETARD — non fait dans le délai',body:(t.titre||'')+(t.assignee?' → '+t.assignee:'')+' ('+p.done+'/'+p.total+')',go:'tickets'}); } } });
+    if(chg){ tkSave(arr); var sec=byId('sec-tickets'); if(sec&&!sec.classList.contains('hidden')&&typeof renderTickets==='function')renderTickets(); } }catch(e){} }
+  setInterval(tkTick,60000);
   function svcSynthCard(m){
     var S=ssLoad(), st=S[m.id]||{}, steps=ssSteps(m);
     var _anomAll=svcAnomaliesAll(m), _anom=_anomAll[0]||(svcState(m)==='complet'?{c:'#1a9e5c',t:'🟢 Complet'}:null);
