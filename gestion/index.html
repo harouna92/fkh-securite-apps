@@ -203,7 +203,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b170</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b171</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2772,7 +2772,14 @@ button.big:active{transform:translateY(1px)}
   if(byId('plink-copy'))byId('plink-copy').onclick=function(){ var u=photoLinkBuild(); if(u&&navigator.clipboard)navigator.clipboard.writeText(u); if(u)flash(this,'Copié ✓'); };
   if(byId('plink-uni-wa'))byId('plink-uni-wa').onclick=function(){ var u='https://photo-de-service.pages.dev/?u=1'; window.open('https://wa.me/?text='+encodeURIComponent('Bonjour, merci de prendre vos photos de service (prise, contrôle, fin) via ce lien : '+u),'_blank'); };
   if(byId('plink-uni-sms'))byId('plink-uni-sms').onclick=function(){ var u='https://photo-de-service.pages.dev/?u=1'; window.open('sms:?body='+encodeURIComponent('Bonjour, merci de prendre vos photos de service via ce lien : '+u),'_self'); };
-  if(byId('plink-uni-copy'))byId('plink-uni-copy').onclick=function(){ var u='https://photo-de-service.pages.dev/?u=1'; if(navigator.clipboard)navigator.clipboard.writeText(u); var o=byId('plink-out'); if(o){o.style.display='block';o.textContent=u;} flash(this,'Copié ✓'); };
+  function copyLien(u,btn){ // b171 : copie robuste (clipboard -> execCommand -> affichage manuel)
+    function done(ok){ if(btn){ var o=btn.textContent; btn.textContent=ok?'✅ Copié !':'⚠️ Copie bloquée — lien affiché dessous'; setTimeout(function(){btn.textContent=o;},2500); }
+      var out=byId('plink-out'); if(out){ out.style.display='block'; out.innerHTML=(ok?'✅ Lien copié : ':'📋 Sélectionne et copie ce lien : ')+'<b style="user-select:all">'+esc(u)+'</b>'; } }
+    function legacy(){ try{ var t=document.createElement('textarea'); t.value=u; t.style.cssText='position:fixed;opacity:0;left:-999px'; document.body.appendChild(t); t.focus(); t.select(); var ok=false; try{ok=document.execCommand('copy');}catch(e){} document.body.removeChild(t); done(!!ok); }catch(e){ done(false); } }
+    try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(u).then(function(){done(true);},function(){legacy();}); return; } }catch(e){}
+    legacy();
+  }
+  if(byId('plink-uni-copy'))byId('plink-uni-copy').onclick=function(){ copyLien('https://photo-de-service.pages.dev/?u=1',this); };
   if(byId('plink-wa'))byId('plink-wa').onclick=function(){ var a=(byId('plink-agent').value||'').trim(), u=photoLinkBuild(); if(!u)return; window.open('https://wa.me/?text='+encodeURIComponent(photoLinkMsg(a,u)),'_blank'); };
   if(byId('plink-sms'))byId('plink-sms').onclick=function(){ var a=(byId('plink-agent').value||'').trim(), u=photoLinkBuild(); if(!u)return; window.open('sms:?&body='+encodeURIComponent(photoLinkMsg(a,u)),'_blank'); };
   // ===== Affecter des tenues aux agents en mission (filtré jour/nuit + client) =====
