@@ -189,7 +189,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b125</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b126</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -4605,7 +4605,7 @@ button.big:active{transform:translateY(1px)}
       // ☎ compteur de tentatives d'appel + 🆘 alerte responsables (remontée SOS clignotante) — remontée Zeus #18
       var _tries=+r.tries||0;
       var tryBtn='<button type="button" class="sa-try" '+d0+' title="J\'ai appelé sans réponse — compte une tentative" style="font-size:12px'+(_tries?';border-color:#e0a13b;color:#e0a13b;font-weight:700':'')+'">☎ +1'+(_tries?' ×'+_tries:'')+'</button>';
-      var alertBtn='<button type="button" class="sa-alert" '+d0+' data-ctx="'+esc((e.client?e.client+' · ':'')+(e.site||'')+' · '+(sl(e.key)||e.key)+' '+(e.heure||'')+(e.agent?' · agent '+e.agent:''))+'" title="Alerte urgente aux superviseur/admin/super-admin (clignote chez eux)" style="font-size:12px;background:#c02626;border-color:#c02626;color:#fff;font-weight:700">🆘 Alerter</button>';
+      var alertBtn='<button type="button" class="sa-alert" '+d0+' data-ctx="'+esc((e.client?e.client+' · ':'')+(e.site||'')+' · '+(e.key==='prise'?'Prise de service':e.key==='fin'?'Fin de service':e.key==='tenue'?'Contrôle tenue':e.key==='route'?'Route':e.key==='j15'?'Pré-prise':'Contrôle')+' '+(e.heure||'')+(e.agent?' · agent '+e.agent:''))+'" title="Alerte urgente aux superviseur/admin/super-admin (clignote chez eux)" style="font-size:12px;background:#c02626;border-color:#c02626;color:#fff;font-weight:700">🆘 Alerter</button>';
       // 📵 Injoignable (remontée #22) : envoie le cas au SUPERVISEUR (section 🧭 Terrain, 10 min avant escalade admin) — ne coche PAS « fait ».
       var unreachBtn='<button type="button" class="sa-unreach" '+d0+' data-ctx="'+esc((e.client?e.client+' · ':'')+(e.site||''))+'" title="L\'agent ne répond pas — envoyer au superviseur (10 min avant escalade)" style="font-size:12px;border-color:#e0a13b;color:#e0a13b;font-weight:700">📵 Injoignable</button>';
       var fields=(e.key==='prise')?(fait+agret+photoSel+photoUp+avise+tryBtn+unreachBtn+alertBtn+note):(e.key==='fin')?(fait+photoSel+photoUp+avise+tryBtn+unreachBtn+alertBtn+note):(e.key==='route')?(fait+prisRoute+tryBtn+alertBtn+note):(e.key==='j15')?(fait+ponctuel+tryBtn+alertBtn+note):(e.key==='tenue')?(fait+tenueSel+tenuePh+photoUp+tryBtn+alertBtn+note):(fait+statut+photoSel+photoUp+tryBtn+alertBtn+note);
