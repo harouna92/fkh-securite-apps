@@ -203,7 +203,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b161</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b162</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -5054,7 +5054,7 @@ button.big:active{transform:translateY(1px)}
     ph:{title:'📷 Photos de PRISE / FIN manquantes',verb:'sans photo',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     te:{title:'🦺 Contrôles tenue (photo) NON FAITS',verb:'non faits',tiles:0,depuis:'Depuis lundi (début de semaine)'},
     c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,depuis:'Depuis le 01/08 08:00, en continu'},
-    ro:{title:'🔌 Pointages SANS trace d’appel réel (Ringover)',verb:'aucun appel trouvé',tiles:0,depuis:'Aujourd’hui · croisement avec le journal d’appels réel (fenêtre ± réglage Supervision)'}
+    ro:{title:'🔌 Pointages SANS appel réel à ± 5 min (Ringover)',verb:'aucun appel à ± 5 min du pointage',tiles:0,depuis:'Aujourd’hui · un pointage est validé si un appel du bon numéro existe à ± 5 min de l’HEURE DU POINTAGE (journal Ringover réel)'}
   };
   function ppSince(ms){ var m=Math.floor(ms/60000); if(m<1)m=1; if(m<60)return m+' min'; var h=Math.floor(m/60); if(h<24)return h+' h'+((m%60)?(' '+(m%60)+' min'):''); var j=Math.floor(h/24); return j+' j '+(h%24)+' h'; }
   function ppScan(){ var now=Date.now(),S=ssLoad(),sc={op:[],cli:[],ph:[],te:[],c2:[]};
@@ -5118,14 +5118,16 @@ button.big:active{transform:translateY(1px)}
     var today=(typeof impTodayISO==='function')?impTodayISO():'';
     if(!today)return;
     fetch(CLOUD.base+'/ringover/calls?from='+encodeURIComponent(today)+'&to='+encodeURIComponent(today),{headers:cloudHdr()}).then(function(r){return r.json();}).then(function(j){
-      if(!(j&&j.ok))return; var calls=j.calls||[], win=roWin()*60000;
-      function trace(num,ct){ var k=roKey(num); if(!k)return null; var best=null; calls.forEach(function(c){ if(roKey(c.number)!==k)return; if(ct){ var t=new Date(c.start).getTime(); if(isNaN(t)||Math.abs(t-ct)>win)return; } if(!best||(c.answered&&!best.answered))best=c; }); return best; }
+      if(!(j&&j.ok))return; var calls=j.calls||[]; var FEN=300000; // b162 : fourchette FIXE 5 min autour de l'HEURE DU POINTAGE
+      function nearest(num,pAt){ var k=roKey(num); if(!k)return null; var best=null; calls.forEach(function(c){ if(roKey(c.number)!==k)return; var t=new Date(c.start).getTime(); if(isNaN(t))return; var d=Math.abs(t-pAt); if(!best||d<best.d)best={t:t,d:d}; }); return best; }
       var S=ssLoad(), now=Date.now(), out=[], ctm={}; try{ctm=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(_e){}
       saEntries(today,today).forEach(function(e){ var r=(S[e.mid]&&S[e.mid][e.key])||{}; if(!r.done)return;
+        var pAt=r.doneTs||r.at; if(!pAt)return; // pas d'heure de pointage exploitable
         var ct=frMs(e.mdate,e.abs); if(ct==null||(PP_START!=null&&ct<PP_START))return;
         if(r.viaPhoto||r.photoKey)return; // réglé par preuve photo : pas d’appel attendu
-        if(e.agentTel&&!trace(e.agentTel,ct))out.push({key:e.key,label:(e.label||'')+' — appel AGENT'+((r.doneTs||r.at)?' · 🖊 pointé à '+fmtDT(r.doneTs||r.at):''),site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:ct,since:now-ct});
-        if((e.key==='prise'||e.key==='fin')&&r.avise&&e.client&&ctm[e.client]&&!trace(ctm[e.client],ct))out.push({key:e.key,label:(e.label||'')+' — appel CLIENT'+((r.doneTs||r.at)?' · 🖊 pointé à '+fmtDT(r.doneTs||r.at):''),site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:ct,since:now-ct});
+        function chk(num,who){ var b2=nearest(num,pAt); if(b2&&b2.d<=FEN)return; out.push({mid:e.mid,key:e.key,label:(e.label||'')+' — '+who+' · 🖊 pointé à '+fmtDT(pAt)+(b2?(' · appel le plus proche à '+fmtDT(b2.t)+' (écart '+Math.round(b2.d/60000)+' min)'):' · AUCUN appel de ce numéro aujourd’hui'),site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:ct,since:now-pAt}); }
+        if(e.agentTel)chk(e.agentTel,'appel AGENT');
+        if((e.key==='prise'||e.key==='fin')&&r.avise&&e.client&&ctm[e.client])chk(ctm[e.client],'appel CLIENT');
       });
       out.sort(function(x,y){return x.due-y.due;});
       PP_RO={at:Date.now(),items:out};
