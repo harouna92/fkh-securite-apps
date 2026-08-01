@@ -440,6 +440,14 @@ export default {
       const items = (rs.results || []).map((row) => Object.assign({ cdr_id: row.cdr_id, at: row.at }, safeParse(row.data)));
       return json({ ok: true, items });
     }
+    // --- b151 : liste des mails ingérés (section 📧 Mails missions — super-admin uniquement) ---
+    if (path === "/mails/list" && request.method === "GET") {
+      const rr = roleFor(pass);
+      if (!rr || (rr.role !== "superadmin" && rr.role !== "full")) return json({ error: "forbidden" }, 403);
+      const rs = await env.DB.prepare("SELECT cdr_id, at, is_demande, dismissed, created, data FROM ai_calls WHERE cdr_id LIKE 'mail_%' ORDER BY at DESC LIMIT 200").all();
+      const items = (rs.results || []).map((row) => Object.assign({ cdr_id: row.cdr_id, at: row.at, is_demande: row.is_demande, dismissed: row.dismissed, created: row.created }, safeParse(row.data)));
+      return json({ ok: true, items });
+    }
     if ((path === "/ai/dismiss" || path === "/ai/created") && request.method === "POST") {
       let b = {}; try { b = await request.json(); } catch (_) {}
       if (b.cdr_id) {
