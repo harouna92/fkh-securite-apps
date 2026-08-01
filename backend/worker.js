@@ -338,6 +338,16 @@ export default {
       let data = {}, isDem = 0;
       try { const an = await aiAnalyze(env, text); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [], transcript: text.slice(0, 2000), number: String(b.from || "mail"), direction: "in", source: "mail", start: new Date().toISOString() }; isDem = (data.demandes.length || data.arrets.length) ? 1 : 0; }
       catch (e) { data = { error: String((e && e.message) || e) }; }
+      // b155 : le script envoie TOUS les mails reçus — on ne GARDE que ce qui concerne les missions
+      // (demande détectée par l'IA, OU donneur d'ordre connu, OU vocabulaire mission). Le reste = marqueur `skip`
+      // (dédoublonnage : le mail ne sera pas ré-analysé) ; ses infos restent en base pour d'autres sections plus tard.
+      const fromStr = String(b.from || "");
+      const knownSender = /(securitas|reseau-aquila|ranc-developpement|banzai-communication)/i.test(fromStr);
+      const missionWords = /(gardien|prestation|surveillance|annulation|bon de commande|vacation|agent de s[eé]curit|rondier|intervention|ronde)/i.test(text);
+      if (!isDem && !knownSender && !missionWords) {
+        await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, 0, 1, 0, ?)").bind(cdr, Date.now(), JSON.stringify({ skip: 1, transcript: text.slice(0, 300), number: fromStr, source: "mail" })).run();
+        return json({ ok: true, skipped: "hors-mission" });
+      }
       await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(cdr, Date.now(), isDem, JSON.stringify(data)).run();
       if (isDem) { try { await pushAll(env, aiDemandeNotif({ cdr_id: cdr, direction: "in" }, data.demandes)); } catch (e) {} }
       return json({ ok: true, detected: isDem ? data.demandes.length : 0 });

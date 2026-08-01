@@ -23,25 +23,18 @@
 var WORKER_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
 var TOKEN      = 'fkh-mail-ingest-2026'; // = secret MAIL_INGEST_TOKEN côté Worker (défaut OK)
 
-// Périmètre : expéditeurs connus + mots-clés dans l'OBJET (modifiable ici)
-var EXPEDITEURS = [
-  'securitas.fr',              // SECURITAS (reponse.nantes@…)
-  'reseau-aquila.fr',          // AQUILA (permanence@…)
-  'ranc-developpement.fr',     // RANC DEVELOPPEMENT (pc.securite@…)
-  'banzai-communication.fr'    // BANZAI (prod@…)
-];
-var MOTS_CLES_OBJET = ['gardiennage', 'prestation', 'surveillance', 'annulation', '"bon de commande"'];
-
+// Périmètre (décision Zeus 01/08/2026, révisée) : le script envoie TOUS les mails REÇUS.
+// C'est le Worker (IA + critères mission) qui ne GARDE que ce qui concerne les missions —
+// le reste est marqué « hors-mission » (jamais ré-analysé) et servira à d'autres sections plus tard.
+var ADRESSES_A_NOUS = ['fkhsecurite', 'hacamara2']; // nos propres adresses : jamais renvoyées
 var LABEL_TRAITE   = 'FKH-Traite'; // posé sur les fils envoyés (repère visuel ; l'anti-doublon réel est côté Worker)
-var FENETRE        = '3d';         // on regarde les mails des 3 derniers jours à chaque passage
+var FENETRE        = '1d';         // fenêtre de recherche à chaque passage (le Worker dédoublonne)
 var MAX_MESSAGES   = 30;           // sécurité : nb max de messages envoyés par exécution
 
-/** Boucle principale : cherche les mails missions et les envoie au Worker. */
+/** Boucle principale : envoie tous les mails reçus récents au Worker (qui trie). */
 function traiterMailsFKH() {
   var traite = getOrCreateLabel(LABEL_TRAITE);
-  var qFrom = EXPEDITEURS.map(function (d) { return 'from:' + d; }).join(' OR ');
-  var qSubj = MOTS_CLES_OBJET.map(function (k) { return 'subject:' + k; }).join(' OR ');
-  var query = '({' + qFrom + '} OR {' + qSubj + '}) newer_than:' + FENETRE + ' -in:sent -in:trash -in:spam';
+  var query = 'newer_than:' + FENETRE + ' -in:sent -in:chats -in:trash -in:spam';
   var threads = GmailApp.search(query, 0, 40);
   var envoyes = 0, deja = 0;
   for (var i = 0; i < threads.length && envoyes < MAX_MESSAGES; i++) {
@@ -49,9 +42,11 @@ function traiterMailsFKH() {
     var touche = false;
     for (var j = 0; j < msgs.length && envoyes < MAX_MESSAGES; j++) {
       var m = msgs[j];
-      // On ne renvoie pas nos propres réponses
+      // On ne renvoie pas nos propres messages
       var from = m.getFrom() || '';
-      if (from.indexOf('fkhsecurite') >= 0) continue;
+      var aNous = false;
+      for (var k = 0; k < ADRESSES_A_NOUS.length; k++) { if (from.indexOf(ADRESSES_A_NOUS[k]) >= 0) { aNous = true; break; } }
+      if (aNous) continue;
       try {
         var payload = {
           msgId:   m.getId(),
