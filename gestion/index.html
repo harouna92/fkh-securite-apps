@@ -189,7 +189,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b126</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b127</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3501,7 +3501,7 @@ button.big:active{transform:translateY(1px)}
     box.querySelectorAll('.st2-photo').forEach(function(a3){ a3.onclick=function(ev){ ev.preventDefault(); if(typeof photoOpen==='function')photoOpen(a3.getAttribute('data-k')); }; });
   }
   // ===== 📅 Planning (style Sekur) : MÊMES missions validées (fkh_suivi) présentées en grille sites × jours. Le pont : modifier ici = modifier partout. =====
-  var plWeek=null, PL_F={q:'',statut:'',client:'',agent:''}, _plFocusQ=false, PL_GRAN='Semaine'; // granularité : Jour · Semaine · Mois (calque Sekur)
+  var plWeek=null, PL_F={q:'',statut:'',client:'',agent:'',tranche:''}, _plFocusQ=false, PL_GRAN='Semaine'; // granularité : Jour · Semaine · Mois (calque Sekur)
   function _plDays(){ var out=[],i; if(PL_GRAN==='Jour'){ out.push(plWeek); } else if(PL_GRAN==='Mois'){ var first=plWeek.slice(0,7)+'-01'; var y=+plWeek.slice(0,4), mo=+plWeek.slice(5,7); var nb=new Date(y,mo,0).getDate(); for(i=0;i<nb;i++)out.push(svcAddDays(first,i)); } else { for(i=0;i<7;i++)out.push(svcAddDays(plWeek,i)); } return out; }
   function _plShift(dir){ if(PL_GRAN==='Jour')plWeek=svcAddDays(plWeek,dir); else if(PL_GRAN==='Mois'){ var y=+plWeek.slice(0,4), mo=+plWeek.slice(5,7)-1+dir; var d=new Date(y,mo,1); plWeek=d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-01'; } else plWeek=svcAddDays(plWeek,7*dir); }
   function _plMonday(iso){ try{ var d=new Date(iso+'T00:00:00'); var wd=(d.getDay()+6)%7; return svcAddDays(iso,-wd); }catch(e){ return iso; } }
@@ -3632,6 +3632,8 @@ button.big:active{transform:translateY(1px)}
     card.querySelectorAll('.pl-inddel').forEach(function(b){ b.onclick=function(){ var L2=indispoLoad(); L2.splice(+b.getAttribute('data-i'),1); indispoSave(L2); _plRenderIndispo(); if(typeof renderPlanning==='function')renderPlanning(); }; });
   }
   function _plMatch(m){ var F=PL_F;
+    // Tranche (remontée Zeus 01-08) : service de JOUR = départ 07:00→18:59 · service de NUIT = départ 19:00→06:59.
+    if(F.tranche){ var _t=toMin(m.mheure); if(_t==null)return false; var _jour=(_t>=420&&_t<1140); if(F.tranche==='jour'&&!_jour)return false; if(F.tranche==='nuit'&&_jour)return false; }
     if(F.client&&(m.client||'')!==F.client)return false;
     if(F.agent){ if(F.agent==='none'){ if(m.agentId)return false; } else if((m.agentId||'')!==F.agent)return false; }
     if(F.statut!==''&&F.statut!=null){ if(String(_plVacState(m).code)!==String(F.statut))return false; }
@@ -3655,7 +3657,7 @@ button.big:active{transform:translateY(1px)}
     var _stOpts='<option value="">Tous statuts</option><option value="0"'+(String(PL_F.statut)==='0'?' selected':'')+'>🟠 À affecter / non couvert</option>'+Object.keys(_plSM).map(function(c){return '<option value="'+c+'"'+(String(PL_F.statut)===c?' selected':'')+'>'+esc(_plSM[c].l)+'</option>';}).join('');
     var _clOpts='<option value="">Tous clients</option>'+Object.keys(_plClients).sort().map(function(c){return '<option'+(PL_F.client===c?' selected':'')+'>'+esc(c)+'</option>';}).join('');
     var _agOpts='<option value="">Tous agents</option><option value="none"'+(PL_F.agent==='none'?' selected':'')+'>À affecter (sans agent)</option>'+((typeof FA!=='undefined'&&FA)?FA.slice().sort(function(a,b){return String(a.nom||'').localeCompare(String(b.nom||''));}).map(function(a){return '<option value="'+esc(a.id)+'"'+(PL_F.agent===a.id?' selected':'')+'>'+esc(a.nom||'—')+'</option>';}).join(''):'');
-    var filterBar='<div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><input id="pl-q" placeholder="🔎 site · client · agent · ville" value="'+esc(PL_F.q)+'" style="flex:1;min-width:150px"><select id="pl-fstatut">'+_stOpts+'</select><select id="pl-fclient">'+_clOpts+'</select><select id="pl-fagent">'+_agOpts+'</select>'+((PL_F.q||PL_F.statut!==''||PL_F.client||PL_F.agent)?'<button id="pl-freset" style="font-size:12px">↺ Réinit.</button>':'')+'</div>';
+    var filterBar='<div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><input id="pl-q" placeholder="🔎 site · client · agent · ville" value="'+esc(PL_F.q)+'" style="flex:1;min-width:150px"><select id="pl-fstatut">'+_stOpts+'</select><select id="pl-fclient">'+_clOpts+'</select><select id="pl-fagent">'+_agOpts+'</select><select id="pl-ftranche"><option value="">Jour + nuit</option><option value="jour"'+(PL_F.tranche==='jour'?' selected':'')+'>☀️ Jour (départ 07h→19h)</option><option value="nuit"'+(PL_F.tranche==='nuit'?' selected':'')+'>🌙 Nuit (départ 19h→07h)</option></select>'+((PL_F.q||PL_F.statut!==''||PL_F.client||PL_F.agent||PL_F.tranche)?'<button id="pl-freset" style="font-size:12px">↺ Réinit.</button>':'')+'</div>';
     var th='<th style="position:sticky;left:0;z-index:2;background:var(--panel2);min-width:150px;text-align:left;padding:6px 8px;border:1px solid var(--line)">Site</th>'+days.map(function(d){ var td2=(d===today); var dd=d.split('-')[2]; var _p=d.split('-'); var _wd=(new Date(+_p[0],+_p[1]-1,+_p[2]).getDay()+6)%7; var _we=(_wd>=5); return '<th style="min-width:'+(PL_GRAN==='Mois'?'44px':'96px')+';padding:4px;border:1px solid var(--line);'+(td2?'color:var(--bad);font-weight:800':(_we?'background:#eef1f2;':''))+'">'+dn[_wd]+'<br><span style="font-size:11px">'+dd+'</span></th>'; }).join('');
     var bodyR='';
     // Groupe « 🚨 Intervention » en tête (calque du vrai Sekur) — interventions/rondes de fkh_interv_dem sur la période
@@ -3685,7 +3687,8 @@ button.big:active{transform:translateY(1px)}
     if(byId('pl-fstatut'))byId('pl-fstatut').onchange=function(){ PL_F.statut=this.value; renderPlanning(); };
     if(byId('pl-fclient'))byId('pl-fclient').onchange=function(){ PL_F.client=this.value; renderPlanning(); };
     if(byId('pl-fagent'))byId('pl-fagent').onchange=function(){ PL_F.agent=this.value; renderPlanning(); };
-    if(byId('pl-freset'))byId('pl-freset').onclick=function(){ PL_F={q:'',statut:'',client:'',agent:''}; renderPlanning(); };
+    if(byId('pl-ftranche'))byId('pl-ftranche').onchange=function(){ PL_F.tranche=this.value; renderPlanning(); };
+    if(byId('pl-freset'))byId('pl-freset').onclick=function(){ PL_F={q:'',statut:'',client:'',agent:'',tranche:''}; renderPlanning(); };
     if(_plFocusQ){ var _qi=byId('pl-q'); if(_qi){ _qi.focus(); var _v=_qi.value; _qi.value=''; _qi.value=_v; } _plFocusQ=false; }
     box.querySelectorAll('.pl-chip').forEach(function(c){ c.onclick=function(e){ e.stopPropagation(); planningAffect(c.getAttribute('data-mid')); }; });
     box.querySelectorAll('.pl-cell').forEach(function(t3){ t3.onclick=function(e){ if(e.target.closest('.pl-chip'))return; planningAddVacH(t3.getAttribute('data-day'),t3.getAttribute('data-site'),t3.getAttribute('data-h1'),t3.getAttribute('data-h2')); }; });
