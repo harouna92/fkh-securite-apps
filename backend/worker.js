@@ -172,6 +172,20 @@ async function aiAnalyze(env, transcript, direction) {
   if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
   return aiParseJson(await r.json());
 }
+// b203 : lecture des PIECES JOINTES PDF (bons de commande) par l'IA -> adresse exacte du site, refs, horaires
+async function aiReadPdf(env, pdfs) {
+  const docs = (pdfs || []).slice(0, 2).map((p) => ({ type: "document", source: { type: "base64", media_type: "application/pdf", data: p.b64 } }));
+  if (!docs.length) return null;
+  const q = { type: "text", text: "Ce sont des bons de commande / demandes de prestation de gardiennage adresses a FKH SECURITE (sous-traitant). Extrais UNIQUEMENT ce qui est ecrit, en JSON strict, sans commentaire : {\"site\":\"nom du site a garder\",\"adresse\":\"numero et rue\",\"cp\":\"code postal\",\"ville\":\"ville\",\"client\":\"donneur d'ordre\",\"ref\":\"reference de la commande\",\"date\":\"AAAA-MM-JJ\",\"debut\":\"HH:MM\",\"fin\":\"HH:MM\",\"consignes\":\"consignes en une phrase\"}. Mets une chaine vide pour tout champ absent. FKH SECURITE n'est JAMAIS le client." };
+  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 700, messages: [{ role: "user", content: docs.concat([q]) }] }) });
+  if (!r.ok) return null;
+  const j = await r.json();
+  const txt = (j && j.content && j.content[0] && j.content[0].text) || "";
+  const m = txt.match(/\{[\s\S]*\}/);
+  if (!m) return null;
+  try { return JSON.parse(m[0]); } catch (e) { return null; }
+}
+
 async function aiAnalyzeImage(env, b64, media) {
   const content = [ { type: "text", text: AI_PROMPT_BASE + "\n\nAnalyse cette capture d'ecran (demande recue) :" }, { type: "image", source: { type: "base64", media_type: media || "image/png", data: b64 } } ];
   const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 600, messages: [{ role: "user", content: content }] }) });
@@ -336,8 +350,11 @@ export default {
       const exist = await env.DB.prepare("SELECT cdr_id FROM ai_calls WHERE cdr_id = ?").bind(cdr).first();
       if (exist) return json({ ok: true, skipped: "already" });
       let data = {}, isDem = 0;
+      let pdfInfo = null;
+      try { if (Array.isArray(b.pdfs) && b.pdfs.length && env.ANTHROPIC_API_KEY) pdfInfo = await aiReadPdf(env, b.pdfs); } catch (e) {}
       try { const an = await aiAnalyze(env, text); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [], transcript: text.slice(0, 2000), number: String(b.from || "mail"), direction: "in", source: "mail", start: new Date().toISOString() }; isDem = (data.demandes.length || data.arrets.length) ? 1 : 0; }
       catch (e) { data = { error: String((e && e.message) || e) }; }
+      if (pdfInfo) { data.pdf = pdfInfo; if (pdfInfo.adresse || pdfInfo.cp) isDem = isDem || 1; } // b203 : adresse exacte issue du bon de commande
       // b155 : le script envoie TOUS les mails reçus — on ne GARDE que ce qui concerne les missions
       // (demande détectée par l'IA, OU donneur d'ordre connu, OU vocabulaire mission). Le reste = marqueur `skip`
       // (dédoublonnage : le mail ne sera pas ré-analysé) ; ses infos restent en base pour d'autres sections plus tard.

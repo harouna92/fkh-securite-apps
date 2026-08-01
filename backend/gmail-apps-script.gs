@@ -48,11 +48,23 @@ function traiterMailsFKH() {
       for (var k = 0; k < ADRESSES_A_NOUS.length; k++) { if (from.indexOf(ADRESSES_A_NOUS[k]) >= 0) { aNous = true; break; } }
       if (aNous) continue;
       try {
+        // b203 : on joint les PDF (bons de commande) en base64 -> le Worker les fait lire par l'IA (adresse exacte du site)
+        var pdfs = [];
+        try {
+          var atts = m.getAttachments({ includeInlineImages: false, includeAttachments: true }) || [];
+          for (var z = 0; z < atts.length && pdfs.length < 2; z++) {
+            var at = atts[z];
+            if (String(at.getContentType()).indexOf('pdf') < 0) continue;
+            if (at.getSize() > 3500000) continue; // 3,5 Mo max par PDF
+            pdfs.push({ name: at.getName(), b64: Utilities.base64Encode(at.getBytes()) });
+          }
+        } catch (ePdf) { Logger.log('PDF ignore : ' + ePdf); }
         var payload = {
           msgId:   m.getId(),
           subject: m.getSubject() || '',
           body:    m.getPlainBody() ? m.getPlainBody().slice(0, 8000) : '',
-          from:    from
+          from:    from,
+          pdfs:    pdfs
         };
         var res = UrlFetchApp.fetch(WORKER_URL + '/mail/ingest?k=' + encodeURIComponent(TOKEN), {
           method: 'post',
