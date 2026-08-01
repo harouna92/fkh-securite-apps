@@ -201,7 +201,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b155+b116</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b168+b116</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2232,7 +2232,7 @@ button.big:active{transform:translateY(1px)}
       var d=(tags?tags+'· ':'')+parts.filter(Boolean).map(esc).join(' · ')+(agentMissing(a).length?' <span style="color:var(--warn)">⚠ '+agentMissing(a).map(esc).join(' · ')+'</span>':'')+tenueBadge(a)+((a.interv&&a.interv.length)?'<br><span style="color:#e0784b">🚨 Intervention : '+a.interv.map(esc).join(', ')+'</span>':'')+(a.respSecteur?'<br><span style="color:#6ea8fe;font-weight:600">🧭 Responsable secteur — '+(a.secteurPartout?'🌍 intervient partout':((a.secteurDeps&&a.secteurDeps.length)?'Dép. '+a.secteurDeps.map(esc).join(', '):'secteur à préciser'))+'</span>':'')+anBlock;
       var call=tels.map(function(t){return '<a class="call" href="tel:'+esc(t.replace(/\s/g,''))+'" title="Appeler '+esc(t)+'">📞</a>';}).join('');
       var vbadge=a.verifie?'<span style="color:var(--ok);font-size:12px;font-weight:600"> 🟢 vérifiée</span>':'<span style="color:var(--warn);font-size:12px;font-weight:600"> 🟠 à vérifier</span>';
-      var plurl='https://harouna92.github.io/fkh-securite-apps/photo/?aid='+encodeURIComponent(a.id)+'&name='+encodeURIComponent(a.nom||'');
+      var plurl='https://fkh-photo.pages.dev/?aid='+encodeURIComponent(a.id)+'&name='+encodeURIComponent(a.nom||'');
       var flpanel='<div class="falink" id="falink-'+a.id+'" style="display:none;margin-top:6px;padding:7px 9px;border:1px dashed var(--brand,#3b6ef5);border-radius:9px;background:var(--panel2)"><div class="lab" style="font-size:11px;margin:0 0 4px">🔗 Lien photo permanent — le même à vie pour cet agent</div><div class="sub" style="word-break:break-all;font-size:11.5px;margin:0 0 6px">'+esc(plurl)+'</div><div class="acts" style="gap:6px;flex-wrap:wrap"><button class="ok falink-copy" data-u="'+esc(plurl)+'" style="font-size:12px;padding:4px 10px">📋 Copier</button><button class="falink-wa" data-u="'+esc(plurl)+'" data-n="'+esc(a.nom||'')+'" style="font-size:12px;padding:4px 10px">🟢 WhatsApp</button><button class="falink-sms" data-u="'+esc(plurl)+'" data-n="'+esc(a.nom||'')+'" style="font-size:12px;padding:4px 10px">💬 SMS</button></div></div>';
       return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+vbadge+'</div><div class="fa-d">'+(d||'—')+'</div>'+agentStatLine(a.nom)+acLine(a.nom)+distBlock(a.nom)+faPhotoBlock(a.nom)+faProBlock(a)+flpanel+'</div><div class="fa-a">'+call+'<button class="falink-btn" data-falink="'+a.id+'" title="Lien photo de l\'agent">🔗</button><button data-fav="'+a.id+'" title="'+(a.verifie?'Repasser à « à vérifier »':'Marquer vérifiée')+'">'+(a.verifie?'↩':'✅')+'</button><button data-fae="'+a.id+'" title="Modifier">✏️</button><button class="no" data-fad="'+a.id+'" title="Supprimer">🗑️</button></div></div>';
     }).join('');
@@ -2736,12 +2736,12 @@ button.big:active{transform:translateY(1px)}
     });
   }
   if(byId('rep-open'))byId('rep-open').onclick=function(){ var b=byId('rep-body'); if(!b)return; if(b.classList.contains('hidden')){ b.classList.remove('hidden'); renderRepertoire(); } else { b.classList.add('hidden'); } };
-  function photoLinkBuild(){ var out=byId('plink-out'); var nm=(byId('plink-agent')&&byId('plink-agent').value||'').trim(); if(!nm){ if(out){out.style.display='block';out.textContent='Écris d\'abord le nom de l\'agent.';} return ''; } var ag=(FA||[]).filter(function(x){return tnorm(x.nom||'')===tnorm(nm);})[0]||(FA||[]).filter(function(x){return (x.nom||'').toLowerCase().indexOf(nm.toLowerCase())>=0;})[0]; if(!ag){ if(out){out.style.display='block';out.textContent='Agent introuvable en Fiche agent — ajoute-le d\'abord (le lien a besoin de son identifiant).';} return ''; } var url='https://harouna92.github.io/fkh-securite-apps/photo/?aid='+encodeURIComponent(ag.id)+'&name='+encodeURIComponent(ag.nom||nm); if(out){ out.style.display='block'; out.textContent=url; } return url; }
+  function photoLinkBuild(){ var out=byId('plink-out'); var nm=(byId('plink-agent')&&byId('plink-agent').value||'').trim(); if(!nm){ if(out){out.style.display='block';out.textContent='Écris d\'abord le nom de l\'agent.';} return ''; } var ag=(FA||[]).filter(function(x){return tnorm(x.nom||'')===tnorm(nm);})[0]||(FA||[]).filter(function(x){return (x.nom||'').toLowerCase().indexOf(nm.toLowerCase())>=0;})[0]; if(!ag){ if(out){out.style.display='block';out.textContent='Agent introuvable en Fiche agent — ajoute-le d\'abord (le lien a besoin de son identifiant).';} return ''; } var url='https://fkh-photo.pages.dev/?aid='+encodeURIComponent(ag.id)+'&name='+encodeURIComponent(ag.nom||nm); if(out){ out.style.display='block'; out.textContent=url; } return url; }
   function photoLinkFillList(){ var dl=byId('plink-agents'); if(!dl)return; dl.innerHTML=(FA||[]).map(function(x){return '<option value="'+esc(x.nom||'')+'">';}).join(''); }
   function photoLinkMsg(a,url){ return 'Bonjour'+(a?' '+a:'')+', merci de prendre la photo demandée via ce lien (elle est horodatée automatiquement) : '+url; }
   if(byId('plink-open'))byId('plink-open').onclick=function(){ var b=byId('plink-body'); if(b)b.classList.toggle('hidden'); if(b&&!b.classList.contains('hidden')&&typeof photoLinkFillList==='function')photoLinkFillList(); };
   if(byId('plink-copy'))byId('plink-copy').onclick=function(){ var u=photoLinkBuild(); if(u&&navigator.clipboard)navigator.clipboard.writeText(u); if(u)flash(this,'Copié ✓'); };
-  if(byId('plink-uni-copy'))byId('plink-uni-copy').onclick=function(){ var u='https://harouna92.github.io/fkh-securite-apps/photo/?u=1'; if(navigator.clipboard)navigator.clipboard.writeText(u); var o=byId('plink-out'); if(o){o.style.display='block';o.textContent=u;} flash(this,'Copié ✓'); };
+  if(byId('plink-uni-copy'))byId('plink-uni-copy').onclick=function(){ var u='https://fkh-photo.pages.dev/?u=1'; if(navigator.clipboard)navigator.clipboard.writeText(u); var o=byId('plink-out'); if(o){o.style.display='block';o.textContent=u;} flash(this,'Copié ✓'); };
   if(byId('plink-wa'))byId('plink-wa').onclick=function(){ var a=(byId('plink-agent').value||'').trim(), u=photoLinkBuild(); if(!u)return; window.open('https://wa.me/?text='+encodeURIComponent(photoLinkMsg(a,u)),'_blank'); };
   if(byId('plink-sms'))byId('plink-sms').onclick=function(){ var a=(byId('plink-agent').value||'').trim(), u=photoLinkBuild(); if(!u)return; window.open('sms:?&body='+encodeURIComponent(photoLinkMsg(a,u)),'_blank'); };
   // ===== Affecter des tenues aux agents en mission (filtré jour/nuit + client) =====
@@ -4812,7 +4812,7 @@ button.big:active{transform:translateY(1px)}
     cli:{title:'🏢 Prises / fins — CLIENT NON AVISÉ',verb:'client non avisé',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     ph:{title:'📷 Photos de PRISE / FIN manquantes',verb:'sans photo',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     te:{title:'🦺 Contrôles tenue (photo) NON FAITS',verb:'non faits',tiles:0,depuis:'Depuis lundi (début de semaine)'},
-    c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,depuis:'Depuis le 01/08 08:00, en continu'},
+    c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,depuis:'Depuis le DÉBUT des sites planifiés (tout l’historique)'},
     ro:{title:'🔌 Pointages SANS appel réel à ± 10 min (Ringover)',verb:'aucun appel à ± 10 min du pointage',tiles:0,depuis:'Aujourd’hui · un pointage est validé si un appel du bon numéro existe à ± 10 min de l’HEURE DU POINTAGE (journal Ringover réel)'}
   };
   function ppSince(ms){ var m=Math.floor(ms/60000); if(m<1)m=1; if(m<60)return m+' min'; var h=Math.floor(m/60); if(h<24)return h+' h'+((m%60)?(' '+(m%60)+' min'):''); var j=Math.floor(h/24); return j+' j '+(h%24)+' h'; }
@@ -4822,7 +4822,7 @@ button.big:active{transform:translateY(1px)}
       var isPF=(e.key==='prise'||e.key==='fin'), isTe=(e.key==='tenue'), isC2=(e.key.indexOf('ctrl')===0);
       if(!isPF&&!isTe&&!isC2)return;
       var due=frMs(e.mdate,e.abs); if(due==null)return; if(now<due+60000)return;
-      var start=isTe?PP_WEEK:PP_START; if(start==null||due<start)return;
+      var start=isTe?PP_WEEK:(isC2?0:PP_START); if(start==null||due<start)return; // b166 : les photos de controle (2h) remontent TOUT l'historique des sites planifies
       var r=(S[e.mid]&&S[e.mid][e.key])||{};
       var it={mid:e.mid,key:e.key,label:e.label,site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:due,since:now-due};
       if(isPF){ if(!r.done)sc.op.push(it); if(!r.avise)sc.cli.push(it); if(!(r.photoKey||r.photo))sc.ph.push(it); }
@@ -4853,7 +4853,7 @@ button.big:active{transform:translateY(1px)}
       return '';
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
-      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+' · ':'')+'prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b></div>'+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+' · ':'')+(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))+'</div>'+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
     if(D.tiles&&!PP_VIEW.sub){
       h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="prise"><b>'+pr.length+'</b>🟢 Prises de service<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div><div class="pp-tile" data-sub="fin"><b>'+fi.length+'</b>🔚 Fins de service<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div></div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+' · une échéance entre ici 1 min après son heure prévue. Clique sur une tuile pour le détail par vacation (durée écoulée).</p>';
@@ -4884,7 +4884,7 @@ button.big:active{transform:translateY(1px)}
         var pAt=r.doneTs||r.at; if(!pAt)return; // pas d'heure de pointage exploitable
         var ct=frMs(e.mdate,e.abs); if(ct==null||(PP_START!=null&&ct<PP_START))return;
         if(r.viaPhoto||r.photoKey)return; // réglé par preuve photo : pas d’appel attendu
-        function chk(num,who){ var b2=nearest(num,pAt); if(b2&&b2.d<=FEN)return; out.push({mid:e.mid,key:e.key,label:(e.label||'')+' — '+who+' · 🖊 pointé à '+fmtDT(pAt)+(b2?(' · appel le plus proche à '+fmtDT(b2.t)+' (écart '+Math.round(b2.d/60000)+' min)'):' · AUCUN appel de ce numéro aujourd’hui'),site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:ct,since:now-pAt}); }
+        function chk(num,who){ var b2=nearest(num,pAt); if(b2&&b2.d<=FEN)return; out.push({mid:e.mid,key:e.key,label:(e.label||'')+' — '+who,ro:1,pAt:pAt,callT:(b2?b2.t:null),deltaMin:(b2?Math.round(b2.d/60000):null),site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:ct,since:now-pAt}); }
         if(e.agentTel)chk(e.agentTel,'appel AGENT');
         if((e.key==='prise'||e.key==='fin')&&r.avise&&e.client&&ctm[e.client])chk(ctm[e.client],'appel CLIENT');
       });
