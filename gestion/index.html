@@ -202,7 +202,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b182+b116</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b185+b116</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -4909,9 +4909,9 @@ button.big:active{transform:translateY(1px)}
       else if(isTe){ // b167 : entre dans la liste 12 h AVANT la prise, y RESTE tant que la PHOTO de controle n'est pas deposee
         if(r.photoKey||r.tenuePhoto)return;
         if(now<due-43200000)return;
-        var _fd=_finMap[e.mid]; it.phase=(now<due)?'avant':((_fd&&now>_fd)?'apres':'pendant'); it.since=now-(due-43200000);
+        var _fd=_finMap[e.mid]; if(_fd==null)_fd=due+86400000; /* b185 : sans fin connue = terminee 24h apres la prise */ it.phase=(now<due)?'avant':((now>_fd)?'apres':'pendant'); it.since=now-(due-43200000);
         sc.te.push(it); }
-      else { if(!(r.photoKey||r.photo)){ var _fd2=_finMap[e.mid]; it.phase=(_fd2&&now>_fd2)?'passee':'encours'; sc.c2.push(it); } }
+      else { if(!(r.photoKey||r.photo)){ var _fd2=_finMap[e.mid]; if(_fd2==null)_fd2=due+86400000; it.phase=(now>_fd2)?'passee':'encours'; sc.c2.push(it); } }
     });
     ['op','cli','ph','te','c2'].forEach(function(k){ sc[k].sort(function(x,y){return x.due-y.due;}); });
     // b175 (remontee #40) : des qu'une vacation COMMENCE, un creneau photo est attendu toutes les 2 h ;
@@ -4923,14 +4923,15 @@ button.big:active{transform:translateY(1px)}
         var _st=frMs(m.mdate,toMin(m.mheure)); if(_st==null||now<_st)return;
         var _sm=toMin(m.mheure), _em=missEndMin(m);
         var _en=(_em!=null)?frMs(m.mdate,(_em<=_sm?_em+1440:_em)):null;
-        var _stop=Math.min(now,(_en||now));
+        var _enX=_en||(_st+86400000); /* b185 */
+        var _stop=Math.min(now,_enX);
         var _pts=_PA.filter(function(ph){return String(ph.mid)===String(m.id);}).map(function(ph){ var mm2=/(\d{10,})/.exec(String(ph.key||'')); return mm2?+mm2[1]:null; }).filter(Boolean);
         var _ag=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):'';
         for(var _t=_st+7200000;_t<=_stop;_t+=7200000){
           if(_pts.some(function(pt){ return Math.abs(pt-_t)<=4200000; }))continue;
           var _k2=String(m.id)+'|'+_t; if(_seen2[_k2])continue; _seen2[_k2]=1;
           var _d2=new Date(_t), _h2=('0'+_d2.getHours()).slice(-2)+':'+('0'+_d2.getMinutes()).slice(-2);
-          sc.c2.push({phase:((_en&&now>_en)?'passee':'encours'),mid:m.id,key:'c2syn',label:'🌙 Photo des 2 h — créneau '+_h2,site:(m.siteAgent||m.titre||'—'),client:m.client||'',ville:m.ville||'',agent:_ag,mdate:m.mdate,heure:_h2,due:_t,since:now-_t});
+          sc.c2.push({phase:((now>_enX)?'passee':'encours'),mid:m.id,key:'c2syn',label:'🌙 Photo des 2 h — créneau '+_h2,site:(m.siteAgent||m.titre||'—'),client:m.client||'',ville:m.ville||'',agent:_ag,mdate:m.mdate,heure:_h2,due:_t,since:now-_t});
         }
       });
       sc.c2.sort(function(x,y){return x.due-y.due;});
@@ -4988,7 +4989,14 @@ button.big:active{transform:translateY(1px)}
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+' · clique un site pour ses vacations, puis « Affecter un agent » ouvre directement la fiche vacation.</p>';
     } else if(D.bySite&&PP_VIEW.sub){
       var LLs=L.filter(function(x){return x.site===PP_VIEW.sub;});
-      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+esc(PP_VIEW.sub)+'</b><span class="sub" style="margin:0">'+LLs.length+' vacation(s) sans agent</span></div>'+rowsOf(LLs);
+      var _hs=[]; LLs.forEach(function(x){ if(x.heure&&_hs.indexOf(x.heure)<0)_hs.push(x.heure); }); _hs.sort();
+      var _dmin='',_dmax=''; LLs.forEach(function(x){ var d3=x.mdate||''; if(!d3)return; if(!_dmin||d3<_dmin)_dmin=d3; if(!_dmax||d3>_dmax)_dmax=d3; });
+      var mass='<div class="meta" style="border:1.5px solid #e0a13b;border-radius:10px;padding:8px;margin:0 0 8px"><div class="lab" style="margin:0 0 4px">⚡ Affectation en série — même agent sur plusieurs vacations</div>'
+        +'<input class="pp-mass-ag" list="pp-mass-dl" placeholder="Agent (nom)…" autocomplete="off" style="width:100%"><datalist id="pp-mass-dl">'+((typeof FA!=='undefined'&&FA)?FA.map(function(a2){return '<option value="'+esc(a2.nom||'')+'">';}).join(''):'')+'</datalist>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px"><input type="date" class="pp-mass-d1" value="'+esc(_dmin)+'" title="Du"><input type="date" class="pp-mass-d2" value="'+esc(_dmax)+'" title="Au"><select class="pp-mass-h"><option value="">Toutes heures</option>'+_hs.map(function(x2){return '<option>'+esc(x2)+'</option>';}).join('')+'</select></div>'
+        +'<div class="acts" style="margin-top:6px"><button type="button" class="ok pp-mass-go" style="font-size:12px">⚡ Affecter à toute la série</button></div>'
+        +'<p class="sub" style="margin:4px 0 0;font-size:11px">Ex. Duc : choisis l’agent + période + heure (08:00 = poste jour) → tout le mois est affecté d’un coup. Refais pareil pour le poste de nuit.</p></div>';
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+esc(PP_VIEW.sub)+'</b><span class="sub" style="margin:0">'+LLs.length+' vacation(s) sans agent</span></div>'+mass+rowsOf(LLs);
     } else if(D.tiles===3&&!PP_VIEW.sub){ // b167 : 3 parties avant / pendant / apres service
       var tAv=L.filter(function(x){return x.phase==='avant';}),tPe=L.filter(function(x){return x.phase==='pendant';}),tAp=L.filter(function(x){return x.phase==='apres';});
       h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="avant"><b>'+tAv.length+'</b>⏳ AVANT la prise<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div><div class="pp-tile" data-sub="pendant"><b>'+tPe.length+'</b>🟢 PENDANT le service<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div><div class="pp-tile" data-sub="apres"><b>'+tAp.length+'</b>🔚 APRÈS le service<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div></div>';
@@ -5010,6 +5018,19 @@ button.big:active{transform:translateY(1px)}
     var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };
     box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else {PP_VIEW.sub=t.getAttribute('data-sub');} ppRender(); }; });
     box.querySelectorAll('.pp-act-aff').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); ppClose(); if(typeof planningAffect==='function')planningAffect(mid); }; });
+    var _mg=box.querySelector('.pp-mass-go'); if(_mg)_mg.onclick=function(){ /* b184 : affectation en serie */
+      var nm=(box.querySelector('.pp-mass-ag').value||'').trim(); if(!nm){alert('Choisis un agent.');return;}
+      var ag=null; (typeof FA!=='undefined'&&FA?FA:[]).forEach(function(a3){ if(!ag&&typeof tnorm==='function'&&tnorm(a3.nom||'')===tnorm(nm))ag=a3; });
+      if(!ag)(typeof FA!=='undefined'&&FA?FA:[]).forEach(function(a3){ if(!ag&&typeof tnorm==='function'&&tnorm(a3.nom||'').indexOf(tnorm(nm))>=0)ag=a3; });
+      if(!ag){alert('Agent introuvable dans les fiches agents.');return;}
+      var d1=box.querySelector('.pp-mass-d1').value||'', d2=box.querySelector('.pp-mass-d2').value||'', hh=box.querySelector('.pp-mass-h').value||'';
+      var cibles=[]; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.statut!=='validee'||m.agentId||m.mailPending||m.retiree||m.aDecouper)return; if((m.siteAgent||m.titre||'—')!==PP_VIEW.sub)return; var d4=m.mdate||''; if(!d4)return; if(d1&&d4<d1)return; if(d2&&d4>d2)return; if(hh&&(m.mheure||'')!==hh)return; cibles.push(m); });
+      if(!cibles.length){alert('Aucune vacation ne correspond aux critères.');return;}
+      if(!confirm('Affecter '+(ag.nom||'')+' à '+cibles.length+' vacation(s) de « '+PP_VIEW.sub+' »'+(hh?(' à '+hh):'')+' ?'))return;
+      cibles.forEach(function(m){ m.agentId=ag.id; });
+      if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
+      ppRender(); alert('✅ '+cibles.length+' vacation(s) affectée(s) à '+(ag.nom||'')+'.');
+    };
     box.querySelectorAll('.pp-act-fait').forEach(function(b){ b.onclick=function(){ saSet(b.getAttribute('data-mid'),b.getAttribute('data-key'),{done:true}); if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
     box.querySelectorAll('.pp-act-avise').forEach(function(b){ b.onclick=function(){ saSet(b.getAttribute('data-mid'),b.getAttribute('data-key'),{avise:true}); if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
     if(PP_VIEW.mode==='ph'||PP_VIEW.mode==='c2'||PP_VIEW.mode==='te'){ L.forEach(function(x){ var uid='ppph-'+String(x.mid||'').replace(/[^a-zA-Z0-9]/g,'')+'-'+x.key; if(typeof photoWire==='function')photoWire(uid,function(f){ var ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg'; return 'appel/'+x.mid+'/'+x.key+'/'+Date.now()+'.'+ext; },function(key){ if(x.key==='tenue')saSet(x.mid,x.key,{done:true,tenuePhoto:true,photoKey:key}); else saSet(x.mid,x.key,{photo:'Photo horodatée',photoKey:key}); if(typeof photoArchiveAdd==='function')photoArchiveAdd({key:key,mid:x.mid,step:x.key,site:x.site,agent:x.agent,mdate:x.mdate||'',sk:String(x.mid)+'|'+x.key+'|'+key}); /* b175 : la photo couvre le creneau des 2 h */ if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }); }); }
