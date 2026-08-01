@@ -201,7 +201,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b163+b116</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b164+b116</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2984,7 +2984,7 @@ button.big:active{transform:translateY(1px)}
         try{ rec=mkRec(); rec.start(); wantOn=true; btn.textContent='⏹ Stop'; btn.style.background='#c02626'; btn.style.color='#fff'; }catch(e){} }; };
     _wireDictation('ask-mic','ask-txt');
     _wireDictation('asg-mic','asg-texte');
-    function open(){ var sv=null; try{sv=localStorage.getItem('fkh_asg_nom');}catch(e){} if(sv&&!byId('ask-nom').value)byId('ask-nom').value=sv; byId('ask-status').textContent=(typeof CLOUD!=='undefined'&&CLOUD.on)?'':'🔌 Connecte-toi d\'abord (mot de passe commun).'; byId('ask-ov').classList.add('show'); setTimeout(function(){ try{byId('ask-txt').focus();}catch(e){} },60); }
+    function open(){ var sv=null; try{sv=localStorage.getItem('fkh_asg_nom');}catch(e){} if(sv&&!byId('ask-nom').value)byId('ask-nom').value=sv; byId('ask-status').textContent=(typeof CLOUD!=='undefined'&&CLOUD.on)?'':'🔌 Connecte-toi d\'abord (mot de passe commun).'; byId('ask-ov').classList.add('show'); if(typeof CLOUD!=='undefined'&&CLOUD.on&&typeof asgPull==='function'){ asgPull().then(function(){ showLatest(); }); } /* b164 : la bulle affiche la derniere reponse (dont les MAJ equipe dev) des l'ouverture */ setTimeout(function(){ try{byId('ask-txt').focus();}catch(e){} },60); }
     function close(){ byId('ask-ov').classList.remove('show'); clearTimeout(pollT); }
     function showLatest(){ var arr=Object.keys(ASG.msgs).map(function(k){return ASG.msgs[k];}).sort(function(a,b){return b.id-a.id;}); var m=arr[0], box=byId('ask-reply'); if(!m){box.innerHTML='';return;} if(m.reponse){ box.innerHTML='<div style="padding:9px;border-radius:9px;background:var(--panel2);border-left:3px solid var(--brand,#3b6ef5)"><b>Claude :</b> '+esc(m.reponse)+'</div>'; clearTimeout(pollT); } else { box.innerHTML='<div class="sub">⏳ Claude rédige la réponse…</div>'; } }
     function poll(){ clearTimeout(pollT); pollT=setTimeout(function(){ if(typeof asgPull==='function')asgPull().then(function(){ showLatest(); poll(); }); },4000); }
