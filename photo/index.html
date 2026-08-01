@@ -47,11 +47,13 @@
   var q=new URLSearchParams(location.search);
   // Lien permanent par agent : aid = identifiant fiche agent ; name = son nom. Pas de type (l'agence déduit l'étape via l'horodatage).
   var aid=(q.get('aid')||'').trim();
-  var agent=(q.get('name')||q.get('a')||'').trim(), type=(q.get('t')||(aid?'':'prise')).trim(), mid=(q.get('m')||'').trim(), site=(q.get('s')||'').trim();
+  // Lien UNIQUE pour tous les agents (u=1) : pas d'identité dans le lien ni sur le tampon — l'agence rapproche la photo d'une vacation via l'heure + la ville (GPS).
+  var uni=(q.get('u')||'').trim();
+  var agent=(q.get('name')||q.get('a')||'').trim(), type=(q.get('t')||((aid||uni)?'':'prise')).trim(), mid=(q.get('m')||'').trim(), site=(q.get('s')||'').trim();
   var TYPES={prise:'🟢 Prise de service',fin:'🔚 Fin de service',tenue:'🦺 Contrôle tenue',controle:'🎛️ Contrôle pendant service'};
   var v=document.getElementById('v'), c=document.getElementById('c'), snap=document.getElementById('snap'), send=document.getElementById('send'), retry=document.getElementById('retry'), msg=document.getElementById('msg'), prev=document.getElementById('preview');
   document.getElementById('ctx').innerHTML=(type?'<span class="badge">'+(TYPES[type]||type)+'</span>':'')+(agent?'<span class="badge">👤 '+esc(agent)+'</span>':'')+(site?'<span class="badge">📍 '+esc(site)+'</span>':'');
-  if(aid)msg.innerHTML='<span style="color:#8aa">Photo horodatée automatiquement (date, heure, position). Prends-la au moment du service.</span>';
+  if(aid||uni)msg.innerHTML='<span style="color:#8aa">Photo horodatée automatiquement (date, heure, position). Prends-la au moment du service.</span>';
   if(type==='tenue')msg.innerHTML='<span style="color:#e0a13b">🦺 Cadre bien l\'AGENT en tenue (pas le bâtiment).</span>';
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});}
   function pad(n){return (n<10?'0':'')+n;}
@@ -65,11 +67,11 @@
     var W=v.videoWidth, H=v.videoHeight; c.width=W; c.height=H; var x=c.getContext('2d'); x.drawImage(v,0,0,W,H);
     // tampon horodaté en bas
     var d=new Date(); var stamp=pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
-    var line2=aid?(agent||''):((agent?agent+' · ':'')+(TYPES[type]||type||'').replace(/^[^ ]+ /,''));
+    var line2=uni?'':(aid?(agent||''):((agent?agent+' · ':'')+(TYPES[type]||type||'').replace(/^[^ ]+ /,'')));
     var line3=gpsCity?('📍 '+(gpsStreet?gpsStreet+', ':'')+gpsCity):'';
     var fs=Math.max(16,Math.round(W/32)); x.font='bold '+fs+'px system-ui,sans-serif'; x.textBaseline='bottom';
-    var nl=line3?3:2, bh=fs*(nl*1.25+0.5); x.fillStyle='rgba(0,0,0,.55)'; x.fillRect(0,H-bh,W,bh);
-    x.fillStyle='#fff'; var yy=H-6; if(line3){ x.fillText(line3, 12, yy); yy-=fs*1.25; } x.fillText(line2, 12, yy); yy-=fs*1.25; x.fillText('🕐 '+stamp, 12, yy);
+    var nl=1+(line2?1:0)+(line3?1:0), bh=fs*(nl*1.25+0.5); x.fillStyle='rgba(0,0,0,.55)'; x.fillRect(0,H-bh,W,bh);
+    x.fillStyle='#fff'; var yy=H-6; if(line3){ x.fillText(line3, 12, yy); yy-=fs*1.25; } if(line2){ x.fillText(line2, 12, yy); yy-=fs*1.25; } x.fillText('🕐 '+stamp, 12, yy);
     c.toBlob(function(b){ blob=b; prev.innerHTML='<img src="'+URL.createObjectURL(b)+'">'; prev.style.display='block'; v.style.display='none'; snap.style.display='none'; send.style.display='block'; retry.style.display='block'; msg.textContent=''; },'image/jpeg',0.85);
   };
   retry.onclick=function(){ blob=null; prev.style.display='none'; v.style.display='block'; snap.style.display='block'; send.style.display='none'; retry.style.display='none'; msg.textContent=''; };
@@ -78,7 +80,7 @@
     send.disabled=true; send.textContent='⏳ Envoi…'; msg.className=''; msg.textContent='';
     var safe=(agent||'agent').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'').toLowerCase()||'agent';
     var citySlug=(gpsCity||'').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'').toLowerCase()||'ville_inconnue';
-    var base = mid ? ('appel/'+mid+'/'+(type==='controle'?'ctrl':type)) : (aid ? ('agent/'+aid+'/'+citySlug) : ('agent/'+type+'/'+safe+'/'+citySlug));
+    var base = mid ? ('appel/'+mid+'/'+(type==='controle'?'ctrl':type)) : (uni ? ('u/'+citySlug) : (aid ? ('agent/'+aid+'/'+citySlug) : ('agent/'+type+'/'+safe+'/'+citySlug)));
     var key = base+'/'+Date.now()+'.jpg';
     fetch(API+'/agent-photo?k='+encodeURIComponent(TOKEN)+'&key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'image/jpeg'},body:blob}).then(function(r){return r.json();}).then(function(j){
       if(j&&j.ok){ if(stream)stream.getTracks().forEach(function(t){t.stop();}); v.style.display='none'; prev.style.display='none'; document.getElementById('cam-actions').style.display='none'; document.getElementById('ctx').style.display='none'; document.getElementById('done').style.display='block'; setTimeout(function(){ try{ window.close(); }catch(e){} },1200); }
