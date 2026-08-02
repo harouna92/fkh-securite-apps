@@ -205,7 +205,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b212</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b213</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -5280,7 +5280,7 @@ button.big:active{transform:translateY(1px)}
         var _em9=missEndMin(m), _en9=null;
         if(_em9!=null){ _en9=frMs((m.mdateFin&&m.mdateFin>m.mdate)?m.mdateFin:m.mdate,(_em9<=_sm9&&!(m.mdateFin&&m.mdateFin>m.mdate))?_em9+1440:_em9); }
         if(_en9==null)_en9=_du+86400000;
-        var _ph9=(now<_du)?'avenir':((now>_en9)?'passee':'encours');
+        var _ph9=(now<_du)?((_du-now<=86400000)?'j1':'avenir'):((now>_en9)?'passee':'encours'); /* b213 : sous-famille 24 h */
         sc.af.push({mid:m.id,key:'af',af:1,phase:_ph9,site:(m.siteAgent||m.titre||'—'),client:m.client||'',ville:m.ville||'',agent:'',mdate:m.mdate,heure:m.mheure||'',due:_du,since:0}); });
       sc.af.sort(function(x,y){return x.due-y.due;});
     }catch(_e){}
@@ -5340,14 +5340,14 @@ button.big:active{transform:translateY(1px)}
       var Ls=L.filter(function(x){ return ((PP_VIEW.sub==='passee')?(x.phase==='passee'):(x.phase!=='passee'))&&x.site===PP_VIEW.sub2; });
       h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+esc(PP_VIEW.sub2)+'</b><span class="sub" style="margin:0">'+Ls.length+' créneau(x) · dépose la photo sur la ligne</span></div>'+rowsOf(Ls);
     } else if(D.af3&&!PP_VIEW.sub){ // b189 : niveau 1 = A venir / En cours / Passees
-      var aAv=L.filter(function(x){return x.phase==='avenir';}),aEn=L.filter(function(x){return x.phase==='encours';}),aPa=L.filter(function(x){return x.phase==='passee';});
-      h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="avenir"><b>'+aAv.length+'</b>⏳ À VENIR<br><span class="sub" style="margin:0;font-size:11.5px">sans agent</span></div><div class="pp-tile" data-sub="encours"><b>'+aEn.length+'</b>🟢 EN COURS<br><span class="sub" style="margin:0;font-size:11.5px">sans agent</span></div><div class="pp-tile" data-sub="passee"><b>'+aPa.length+'</b>🕓 PASSÉES<br><span class="sub" style="margin:0;font-size:11.5px">jamais affectées</span></div></div>';
+      var aJ1=L.filter(function(x){return x.phase==='j1';}),aAv=L.filter(function(x){return x.phase==='avenir';}),aEn=L.filter(function(x){return x.phase==='encours';}),aPa=L.filter(function(x){return x.phase==='passee';});
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap"><div class="pp-tile" data-sub="j1" style="border-color:#e0a13b"><b>'+aJ1.length+'</b>🚨 DANS LES 24 H<br><span class="sub" style="margin:0;font-size:11.5px">sans agent — urgent</span></div><div class="pp-tile" data-sub="avenir"><b>'+aAv.length+'</b>⏳ À VENIR (au-delà)<br><span class="sub" style="margin:0;font-size:11.5px">sans agent</span></div><div class="pp-tile" data-sub="encours"><b>'+aEn.length+'</b>🟢 EN COURS<br><span class="sub" style="margin:0;font-size:11.5px">sans agent</span></div><div class="pp-tile" data-sub="passee"><b>'+aPa.length+'</b>🕓 PASSÉES<br><span class="sub" style="margin:0;font-size:11.5px">jamais affectées</span></div></div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
     } else if(D.af3&&PP_VIEW.sub&&PP_VIEW.sub2==null){ // b189 : niveau 2 = par SITE
       var Lp9=L.filter(function(x){return x.phase===PP_VIEW.sub;});
       var _g9={}; Lp9.forEach(function(x){ (_g9[x.site]=_g9[x.site]||[]).push(x); });
       var _s9=Object.keys(_g9).sort(function(u,v9){return _g9[u][0].due-_g9[v9][0].due;});
-      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(PP_VIEW.sub==='avenir'?'⏳ À venir':PP_VIEW.sub==='encours'?'🟢 En cours':'🕓 Passées')+'</b><span class="sub" style="margin:0">'+Lp9.length+' vacation(s) sans agent</span></div>';
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(PP_VIEW.sub==='j1'?'🚨 Dans les 24 h':PP_VIEW.sub==='avenir'?'⏳ À venir':PP_VIEW.sub==='encours'?'🟢 En cours':'🕓 Passées')+'</b><span class="sub" style="margin:0">'+Lp9.length+' vacation(s) sans agent</span></div>';
       h+=_s9.length?_s9.map(function(st9b){ var n9=_g9[st9b].length,f9=_g9[st9b][0]; return '<div class="pp-tile" data-sub2="'+esc(st9b)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+n9+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st9b)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f9.client?'🏢 '+esc(f9.client)+' · ':'')+'1re échéance : '+((f9.mdate||'').split('-').reverse().join('/'))+(f9.heure?' '+esc(f9.heure):'')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Rien 🎉</div>';
     } else if(D.af3&&PP_VIEW.sub&&PP_VIEW.sub2!=null){ // b189 : niveau 3 = vacations du site + affectation en serie (b184)
       var LLs=L.filter(function(x){return x.phase===PP_VIEW.sub&&x.site===PP_VIEW.sub2;});
