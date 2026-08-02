@@ -204,7 +204,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b205</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b206</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3768,6 +3768,7 @@ button.big:active{transform:translateY(1px)}
         +'<div class="acts" style="gap:10px;margin-top:4px;align-items:center;flex-wrap:wrap;font-size:12px"><label style="display:flex;gap:4px;align-items:center;text-transform:none"><input type="checkbox" class="pl-brk-nw" style="height:auto;min-height:0;width:auto">non travaillée</label><label style="display:flex;gap:4px;align-items:center;text-transform:none"><input type="checkbox" class="pl-brk-nc" style="height:auto;min-height:0;width:auto">non facturée</label><button class="ok pl-brk-add" style="margin-left:auto">➕ Pause</button></div>'; })()
       +'<div class="lab" style="margin:2px 0 3px">Affecter un agent (nom · n° · ville)</div><input class="pl-afsearch" placeholder="Tape un nom, un numéro, une ville…" autocomplete="off" value="'+esc(_plAffQ)+'" style="width:100%"><div class="pl-afres" style="margin-top:6px">'+_plAgentResults(m)+'</div>'
       +'<label style="display:flex;gap:6px;align-items:center;margin-top:8px;font-size:12px;text-transform:none"><input type="checkbox" class="pl-e-circuit" style="height:auto;min-height:0;width:auto"'+(m.isCircuit?' checked':'')+'>🚐 Tournée (circuit — passages sur plusieurs sites)</label>'
+      +'<label style="display:flex;gap:6px;align-items:center;margin-top:4px;font-size:12px;text-transform:none"><input type="checkbox" class="pl-e-h24" style="height:auto;min-height:0;width:auto"'+(m.h24?' checked':'')+'>🔁 Site H24 / vacation CONTINUE (peut durer plusieurs jours) <span class="sub" style="font-size:11px">— pas d\'appel Route ni de Pré-prise, photos de contrôle toutes les 2 h du début à la fin</span></label>'
       +'<div class="lab" style="margin:10px 0 3px">🔪 Découper en vacations</div><div class="acts" style="gap:6px;flex-wrap:wrap"><button class="pl-split" data-rule="720">12h</button><button class="pl-split" data-rule="480">8h</button><button class="pl-split" data-rule="360">6h</button><button class="pl-split" data-rule="0">Garder tel quel</button></div>'
       
       +(m.mailPending?'<div class="meta" style="background:rgba(123,97,255,.15);border:1.5px solid #7b61ff;border-radius:10px;padding:7px 10px;margin-top:6px"><span style="color:#a99bff;font-weight:700">📧 Vacation issue d’un mail — À VALIDER</span><div class="acts" style="margin-top:6px"><button type="button" class="ok pl-mail-ok" style="font-size:12px">✅ Valider cette vacation</button><button type="button" class="no pl-mail-ref" style="font-size:12px">🗑 Refuser (supprimer)</button></div></div>':'')+'<div class="acts" style="margin-top:10px;flex-wrap:wrap"><button class="pl-tenue" title="Créer un ticket contrôle tenue pour cette vacation (remontée #27)">🦺 Contrôle tenue</button><button class="pl-jump">↗ Ouvrir dans Suivi demandes</button><button class="pl-saoff" style="border-color:#e0a13b;color:#e0a13b">'+(m.saOff?'🔔 Réactiver dans Suivi des appels':'🔕 Retirer du Suivi des appels')+'</button><button class="no pl-del" title="Suppression DÉFINITIVE : disparaît du Planning et de Suivi des appels. Pour la remettre : en recréer une.">🗑️ Supprimer la vacation (définitif)</button><button class="pl-close">Fermer</button></div>';
@@ -3797,6 +3798,7 @@ button.big:active{transform:translateY(1px)}
     var tn=card.querySelector('.pl-tenue'); if(tn)tn.onclick=function(){ var agNom=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):''; if(!agNom&&!confirm('Aucun agent affecté sur cette vacation — créer quand même le ticket contrôle tenue ?'))return; var ok=(typeof tenueCtrlDemand==='function')&&tenueCtrlDemand(agNom,m.id,(m.siteAgent||m.titre||''),m.mdate||'',m.mheure||'','demande manuelle (Planning)'); alert(ok?'🦺 Ticket contrôle tenue créé dans Suivi des appels.':'Un contrôle tenue est déjà en attente pour cet agent à cette date.'); };
     var badd=card.querySelector('.pl-brk-add'); if(badd)badd.onclick=function(){ var h1=_plNormHM(card.querySelector('.pl-brk-h1').value), h2=_plNormHM(card.querySelector('.pl-brk-h2').value); if(!h1||!h2){ alert('Heures de début et fin de pause obligatoires.'); return; } if(!Array.isArray(m.breaks))m.breaks=[]; m.breaks.push({h1:h1,h2:h2,type:(card.querySelector('.pl-brk-type').value||'').trim(),notWork:card.querySelector('.pl-brk-nw').checked,notCharge:card.querySelector('.pl-brk-nc').checked}); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); };
     card.querySelectorAll('.pl-brkdel').forEach(function(b){ b.onclick=function(){ if(!Array.isArray(m.breaks))return; m.breaks.splice(+b.getAttribute('data-i'),1); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); }; });
+    var h24=card.querySelector('.pl-e-h24'); if(h24)h24.onchange=function(){ if(h24.checked)m.h24=true; else delete m.h24; if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; /* b206 */
     var cir=card.querySelector('.pl-e-circuit'); if(cir)cir.onchange=function(){ if(cir.checked)m.isCircuit=true; else delete m.isCircuit; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); };
     card.querySelectorAll('.pl-split').forEach(function(b){ b.onclick=function(){ var rm=parseInt(b.getAttribute('data-rule'),10)||0; var n=(typeof svValidateSplit==='function')?svValidateSplit(m,rm):1; if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); alert(n>=2?('🔪 Découpé en '+n+' vacations.'):'1 seule vacation (rien à découper sur ce créneau).'); }; });
     _plWirePicks(card,m);
@@ -4591,8 +4593,8 @@ button.big:active{transform:translateY(1px)}
   function ssMissions(from,to){ return SUIVI.filter(function(x){ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; }).sort(function(a,b){var da=(a.mdate||'')+' '+(a.mheure||''),db=(b.mdate||'')+' '+(b.mheure||'');return da<db?-1:da>db?1:0;}); }
   function ssSteps(m){
     var P=ssParams(), steps=[], prise=m.mheure||'';
-    if(prise)steps.push({key:'route',label:'☎ Route (renseignements)',heure:(m.routeH||shiftTime(prise,-P.route)),type:'route'});
-    if(prise)steps.push({key:'j15',label:'☎ Pré-prise (J‑'+P.before+')',heure:(m.j15H||shiftTime(prise,-P.before)),type:'j15'});
+    if(prise&&!m.h24)steps.push({key:'route',label:'☎ Route (renseignements)',heure:(m.routeH||shiftTime(prise,-P.route)),type:'route'}); /* b206 : H24 = pas d'appel route */
+    if(prise&&!m.h24)steps.push({key:'j15',label:'☎ Pré-prise (J‑'+P.before+')',heure:(m.j15H||shiftTime(prise,-P.before)),type:'j15'}); /* b206 */
     steps.push({key:'prise',label:'🟢 Prise de service',heure:prise,type:'prise'});
     if(m.agentId&&prise){ var _an=faById(m.agentId); if(_an&&typeof agentCtrl==='function'){ var _c=agentCtrl(_an.nom||''),_dd=(_c&&typeof ctrlDays==='function')?ctrlDays(_c['Date contrôle']):null, _need=!_c||(_dd!=null&&_dd>14); if(_need)steps.push({key:'tenue',label:'🦺 Contrôle tenue + PHOTO',heure:prise,type:'tenue'}); } }
     apControls(m).forEach(function(c,i){ steps.push({key:'ctrl'+i,label:'🌙 Contrôle '+(i+1),heure:c,type:'call'}); });
@@ -5222,8 +5224,9 @@ button.big:active{transform:translateY(1px)}
       (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.statut!=='validee'||m.mailPending||m.retiree)return; if(!m.mdate||!m.mheure)return;
         var _st=frMs(m.mdate,toMin(m.mheure)); if(_st==null||now<_st)return;
         var _sm=toMin(m.mheure), _em=missEndMin(m);
-        var _en=(_em!=null)?frMs(m.mdate,(_em<=_sm?_em+1440:_em)):null;
-        var _enX=_en||(_st+86400000); /* b185 */
+        var _df6=(m.mdateFin&&m.mdateFin>m.mdate)?m.mdateFin:null; /* b206 : vacation sur plusieurs jours */
+        var _en=_df6?frMs(_df6,(_em!=null?_em:0)):((_em!=null)?frMs(m.mdate,(_em<=_sm?_em+1440:_em)):null);
+        var _enX=_en||(m.h24?now:(_st+86400000)); /* b185 + b206 : H24 sans date de fin = toujours en cours */
         var _stop=Math.min(now,_enX);
         var _pts=_PA.filter(function(ph){return String(ph.mid)===String(m.id);}).map(function(ph){ var mm2=/(\d{10,})/.exec(String(ph.key||'')); return mm2?+mm2[1]:null; }).filter(Boolean);
         var _ag=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):'';
