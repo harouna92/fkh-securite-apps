@@ -205,7 +205,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b216</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b217</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -255,7 +255,7 @@ button.big:active{transform:translateY(1px)}
 <button type="button" id="pp-c2" class="pp-btn" title="Photos de contrôle (toutes les 2 h) manquantes" aria-label="Photos contrôles manquantes">🌙<span class="pp-badge" id="pp-c2-n"></span></button>
 <button type="button" id="pp-ro" class="pp-btn" title="Pointages SANS trace d’appel réel (Ringover)" aria-label="Pointages sans appel réel">🔌<span class="pp-badge" id="pp-ro-n"></span></button>
 <button type="button" id="pp-af" class="pp-btn" title="Vacations SANS AGENT à partir d’aujourd’hui — classées par site" aria-label="Vacations non affectées">🧍<span class="pp-badge" id="pp-af-n"></span></button>
-<button type="button" id="pp-rt" class="pp-btn" title="Agents EN RETARD à la prise de service" aria-label="Retards de prise">⏰️<span class="pp-badge" id="pp-rt-n"></span></button>
+<button type="button" id="pp-rt" class="pp-btn" title="Agents EN RETARD à la prise de service" aria-label="Retards de prise">🐢<span class="pp-badge" id="pp-rt-n"></span></button>
 <div id="pp-ovl"><div id="pp-box"></div></div>
 <button type="button" id="rech-bar" title="Missions en recherche d'agent — cliquer pour les traiter"></button>
 <button type="button" id="ask-fab" title="Poser une question (métier ou sur l'appli)" aria-label="Poser une question">💬</button>
@@ -5205,7 +5205,7 @@ button.big:active{transform:translateY(1px)}
     ph:{title:'📷 Photos de PRISE / FIN manquantes',verb:'sans photo',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     te:{title:'🦺 Agents planifiés SANS photo de contrôle tenue',verb:'photo de contrôle manquante',tiles:3,depuis:'Visés dès 12 h AVANT la prise de service, tant que la photo n’est pas déposée'},
     c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,phaseSite:1,depuis:'Tout l’historique · classées Terminées / En cours puis PAR SITE · dépôt de la photo sur chaque créneau'},
-    rt:{title:'⏰️ Agents EN RETARD à la prise de service',verb:'retard signalé',tiles:0,bySite2:1,depuis:'Depuis le 01/08 · classés par site · retard saisi par l’opérateur sur le ticket de prise'},
+    rt:{title:'🐢 Agents EN RETARD à la prise de service',verb:'retard signalé',tiles:0,bySite2:1,depuis:'Depuis le 01/08 · classés par site · retard saisi par l’opérateur sur le ticket de prise'},
     af:{title:'🧍 Vacations NON AFFECTÉES',verb:'sans agent',tiles:0,af3:1,depuis:'Tout l’historique · À venir / En cours / Passées, puis par site · ⚡ affectation en série'},
     ro:{title:'🔌 Pointages SANS appel réel à ± 10 min (Ringover)',verb:'aucun appel à ± 10 min du pointage',tiles:0,roGrp:1,depuis:'Aujourd’hui · un pointage est validé si un appel du bon numéro existe à ± 10 min de l’HEURE DU POINTAGE (journal Ringover réel)'}
   };
