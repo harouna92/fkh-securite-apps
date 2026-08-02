@@ -336,6 +336,23 @@ export default {
       return json({ ok: true, key: key });
     }
 
+    // --- b223 TEMOIN DE VIE : le script Gmail signale CHAQUE passage, meme quand il n'y a aucun mail.
+    // Sans ca, "aucun mail en base" est ambigu : script mort ou boite vide ? Le heartbeat leve l'ambiguite.
+    if (path === "/mail/ping" && request.method === "POST") {
+      const tok = url.searchParams.get("k") || "";
+      if (tok !== (env.MAIL_INGEST_TOKEN || "fkh-mail-ingest-2026")) return json({ error: "bad_token" }, 403);
+      let b = {}; try { b = await request.json(); } catch (_) {}
+      let hb = {}; try { const r0 = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_mail_hb'").first(); hb = r0 && r0.v ? JSON.parse(r0.v) : {}; } catch (_) {}
+      const now = Date.now();
+      hb = { at: now, vus: +b.vus || 0, envoyes: +b.envoyes || 0, erreur: String(b.erreur || "").slice(0, 300),
+             runs: (+hb.runs || 0) + 1, lastMail: (+b.envoyes > 0 ? now : (+hb.lastMail || 0)) };
+      await env.DB.prepare("INSERT OR REPLACE INTO store (k, v, updated_at) VALUES ('fkh_mail_hb', ?, ?)").bind(JSON.stringify(hb), now).run();
+      return json({ ok: true });
+    }
+    if (path === "/mails/hb" && request.method === "GET") {
+      let hb = {}; try { const r0 = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_mail_hb'").first(); hb = r0 && r0.v ? JSON.parse(r0.v) : {}; } catch (_) {}
+      return json({ ok: true, hb: hb, now: Date.now() });
+    }
     // --- PUBLIC (à token) : ingestion d'un mail (BDC) transféré par le Gmail Apps Script → pipeline IA existant ---
     if (path === "/mail/ingest" && request.method === "POST") {
       const tok = url.searchParams.get("k") || "";
@@ -499,7 +516,8 @@ export default {
       if (!rr || (rr.role !== "superadmin" && rr.role !== "full")) return json({ error: "forbidden" }, 403);
       const rs = await env.DB.prepare("SELECT cdr_id, at, is_demande, dismissed, created, data FROM ai_calls WHERE cdr_id LIKE 'mail_%' ORDER BY at DESC LIMIT 200").all();
       const items = (rs.results || []).map((row) => Object.assign({ cdr_id: row.cdr_id, at: row.at, is_demande: row.is_demande, dismissed: row.dismissed, created: row.created }, safeParse(row.data)));
-      return json({ ok: true, items });
+      let hb = {}; try { const r0 = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_mail_hb'").first(); hb = r0 && r0.v ? JSON.parse(r0.v) : {}; } catch (_) {}
+      return json({ ok: true, items, hb, now: Date.now() });
     }
     if ((path === "/ai/dismiss" || path === "/ai/created") && request.method === "POST") {
       let b = {}; try { b = await request.json(); } catch (_) {}
