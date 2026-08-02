@@ -370,6 +370,32 @@ export default {
       return json({ ok: true, detected: isDem ? data.demandes.length : 0 });
     }
 
+    // b214 : AUDIT des photos recues (metadonnees seulement : cles, tailles, dates ; jamais les images).
+    // Protege par le jeton des liens agents -> permet de verifier ce que les liens uniques ont remonte.
+    if (path === "/photos-audit" && request.method === "GET") {
+      const tok = url.searchParams.get("k") || "";
+      if (tok !== (env.AGENT_PHOTO_TOKEN || "fkh-photo-link-2026")) return json({ error: "bad_token" }, 403);
+      if (!env.PHOTOS) return json({ error: "no_bucket" }, 500);
+      const pfx = url.searchParams.get("prefix") || "";
+      const nb = Math.min(parseInt(url.searchParams.get("n") || "40", 10) || 40, 300);
+      const out = { total: 0, parPrefixe: {}, dernieres: [] };
+      let cursor = undefined;
+      for (let i = 0; i < 10; i++) {
+        const l = await env.PHOTOS.list({ limit: 1000, cursor, prefix: pfx || undefined });
+        for (const o of (l.objects || [])) {
+          out.total++;
+          const pre = String(o.key).split("/")[0] || "?";
+          out.parPrefixe[pre] = (out.parPrefixe[pre] || 0) + 1;
+          out.dernieres.push({ key: o.key, ko: Math.round((o.size || 0) / 1024), le: o.uploaded });
+        }
+        if (!l.truncated) break;
+        cursor = l.cursor;
+      }
+      out.dernieres.sort((a, b) => String(b.le).localeCompare(String(a.le)));
+      out.dernieres = out.dernieres.slice(0, nb);
+      return json(out);
+    }
+
     // --- Toutes les autres routes exigent un mot de passe valide (complet OU restreint) ---
     const pass = request.headers.get("X-App-Password") || "";
     if (!roleFor(pass)) {
@@ -564,30 +590,6 @@ export default {
     }
 
     // --- Liste des photos (repertoire), ?prefix=tenue/ ---
-    // b214 : AUDIT des photos recues (metadonnees seulement : cles, tailles, dates ; jamais les images).
-    // Protege par le jeton des liens agents -> permet de verifier ce que les liens uniques ont remonte.
-    if (path === "/photos-audit" && request.method === "GET") {
-      const tok = url.searchParams.get("k") || "";
-      if (tok !== (env.AGENT_PHOTO_TOKEN || "fkh-photo-link-2026")) return json({ error: "bad_token" }, 403);
-      if (!env.PHOTOS) return json({ error: "no_bucket" }, 500);
-      const out = { total: 0, parPrefixe: {}, dernieres: [] };
-      let cursor = undefined;
-      for (let i = 0; i < 10; i++) {
-        const l = await env.PHOTOS.list({ limit: 1000, cursor });
-        for (const o of (l.objects || [])) {
-          out.total++;
-          const pre = String(o.key).split("/")[0] || "?";
-          out.parPrefixe[pre] = (out.parPrefixe[pre] || 0) + 1;
-          out.dernieres.push({ key: o.key, ko: Math.round((o.size || 0) / 1024), le: o.uploaded });
-        }
-        if (!l.truncated) break;
-        cursor = l.cursor;
-      }
-      out.dernieres.sort((a, b) => String(b.le).localeCompare(String(a.le)));
-      out.dernieres = out.dernieres.slice(0, 40);
-      return json(out);
-    }
-
     if (path === "/photos" && request.method === "GET") {
       if (!env.PHOTOS) return json({ error: "no bucket" }, 500);
       const prefix = url.searchParams.get("prefix") || "";

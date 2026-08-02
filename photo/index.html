@@ -28,7 +28,7 @@
 <div class="wrap">
   <h1>📸 FKH Sécurité</h1>
   <p class="sub">Prends la photo demandée. Elle est horodatée automatiquement et envoyée à l'agence.</p>
-  <div id="ctx"></div>
+  <div id="geowarn" style="display:none;background:rgba(200,0,0,.14);border:1.5px solid #c02626;color:#ff8f8f;border-radius:10px;padding:9px 10px;margin:0 0 8px;font-size:13px;line-height:1.45"><b>📍 Localisation non détectée</b><br>Active-la pour que ta photo compte comme preuve de présence sur le site.<div style="margin-top:6px"><button type="button" id="geo-retry" style="font-size:12px;padding:6px 10px">🔄 Réessayer la position</button></div></div><div id="ctx"></div>
   <video id="v" autoplay playsinline muted></video>
   <canvas id="c" style="display:none"></canvas>
   <div id="preview" style="display:none"></div>
@@ -60,7 +60,10 @@
   var stream=null;
   navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:2560},height:{ideal:1440}},audio:false}).then(function(s){ stream=s; v.srcObject=s; }).catch(function(){ msg.className='err'; msg.textContent='Impossible d\'accéder à la caméra. Autorise l\'accès et recharge la page.'; snap.style.display='none'; });
   var gpsCity='', gpsStreet='', gpsCoord='', gpsCp=''; // b209 : code postal
-  if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(function(p){ gpsCoord=p.coords.latitude.toFixed(5)+','+p.coords.longitude.toFixed(5); fetch('https://api-adresse.data.gouv.fr/reverse/?lon='+p.coords.longitude+'&lat='+p.coords.latitude).then(function(r){return r.json();}).then(function(j){ var f=j&&j.features&&j.features[0]; if(f){ gpsCity=f.properties.city||f.properties.municipality||''; gpsStreet=f.properties.name||f.properties.street||''; gpsCp=f.properties.postcode||''; /* b209 */ var el=document.getElementById('ctx'); if(el&&gpsCity)el.innerHTML+='<span class="badge">📍 '+esc((gpsStreet?gpsStreet+', ':'')+(gpsCp?gpsCp+' ':'')+gpsCity)+'</span>'; } }).catch(function(){}); }, function(){}, {enableHighAccuracy:true,timeout:8000,maximumAge:60000}); }
+  function geoWarn(on){ var w=document.getElementById('geowarn'); if(w)w.style.display=on?'block':'none'; }
+  function geoAsk(){ if(!navigator.geolocation){ geoWarn(true); return; } navigator.geolocation.getCurrentPosition(function(p){ gpsCoord=p.coords.latitude.toFixed(5)+','+p.coords.longitude.toFixed(5); fetch('https://api-adresse.data.gouv.fr/reverse/?lon='+p.coords.longitude+'&lat='+p.coords.latitude).then(function(r){return r.json();}).then(function(j){ var f=j&&j.features&&j.features[0]; if(f){ gpsCity=f.properties.city||f.properties.municipality||''; gpsStreet=f.properties.name||f.properties.street||''; gpsCp=f.properties.postcode||''; /* b209 */ var el=document.getElementById('ctx'); if(el&&gpsCity)el.innerHTML+='<span class="badge">📍 '+esc((gpsStreet?gpsStreet+', ':'')+(gpsCp?gpsCp+' ':'')+gpsCity)+'</span>'; } }).catch(function(){}); geoWarn(false); }, function(){ geoWarn(true); }, {enableHighAccuracy:true,timeout:8000,maximumAge:60000}); }
+  geoWarn(true); geoAsk(); /* b215 : bandeau tant que la position n'est pas obtenue */
+  (function(){ var b=document.getElementById('geo-retry'); if(b)b.onclick=function(){ b.textContent='⏳ Recherche…'; geoAsk(); setTimeout(function(){ b.textContent='🔄 Réessayer la position'; },2500); }; })();
   var blob=null;
   snap.onclick=function(){
     if(!v.videoWidth){ msg.textContent='Caméra pas prête, réessaie.'; return; }
