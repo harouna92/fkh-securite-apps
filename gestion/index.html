@@ -147,6 +147,7 @@ button.big:active{transform:translateY(1px)}
 #pp-ro{right:273px}
 #pp-af{right:317px}
 #pp-rt{right:361px}
+#pp-gp{right:405px}
 .pp-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:none}
 #pp-ovl{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:120;display:none;align-items:flex-start;justify-content:center;padding:56px 10px 10px}
 #pp-ovl.on{display:flex}
@@ -204,7 +205,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b218+b116</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b220+b116</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -253,6 +254,7 @@ button.big:active{transform:translateY(1px)}
 <button type="button" id="pp-ro" class="pp-btn" title="Pointages SANS trace d’appel réel (Ringover)" aria-label="Pointages sans appel réel">🔌<span class="pp-badge" id="pp-ro-n"></span></button>
 <button type="button" id="pp-af" class="pp-btn" title="Vacations SANS AGENT à partir d’aujourd’hui — classées par site" aria-label="Vacations non affectées">🧍<span class="pp-badge" id="pp-af-n"></span></button>
 <button type="button" id="pp-rt" class="pp-btn" title="Agents EN RETARD à la prise de service" aria-label="Retards de prise">🐢<span class="pp-badge" id="pp-rt-n"></span></button>
+<button type="button" id="pp-gp" class="pp-btn" title="Agents ayant envoyé des photos SANS géolocalisation" aria-label="Photos sans position par agent">📵<span class="pp-badge" id="pp-gp-n"></span></button>
 <div id="pp-ovl"><div id="pp-box"></div></div>
 <button type="button" id="rech-bar" title="Missions en recherche d'agent — cliquer pour les traiter"></button>
 <button type="button" id="ask-fab" title="Poser une question (métier ou sur l'appli)" aria-label="Poser une question">💬</button>
@@ -3816,7 +3818,7 @@ button.big:active{transform:translateY(1px)}
       var byH={},hOrder=[]; siteMap[s].forEach(function(m){ var hk=(m.mheure||'')+'-'+(m.mfin||''); if(!byH[hk]){byH[hk]=[];hOrder.push(hk);} byH[hk].push(m); });
       hOrder.sort();
       hOrder.forEach(function(hk){ var sample=byH[hk][0]; var durt=_plDurTxt(sample.mheure,sample.mfin); var lbl=(sample.mheure||'—')+(sample.mfin?('-'+sample.mfin):'')+(durt?(' ('+durt+')'):''); var qual=sample.qual||sample.specialite||'';
-        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); return '<div class="pl-chip" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l+(m.saOff?' · SANS TICKETS (retiree du Suivi des appels)':''))+'" style="'+(m.mailPending?'background:repeating-linear-gradient(45deg,#7b61ff 0 7px,#3d2f99 7px 12px);outline:2px dashed #fff;outline-offset:-2px':('background:'+st.c))+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.saOff?'<span title="Cette vacation n’envoie AUCUN ticket dans Suivi des appels" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#e0a13b;margin-right:3px;vertical-align:middle"></span>🔕 ':'')+(m.isCircuit?'🚐 ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+(m.mailPending?'<div style="font-size:9px;font-weight:800">📧 À VALIDER</div>':'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div>')+'</div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc(s)+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
+        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); return '<div class="pl-chip" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l+(m.saOff?' · SANS TICKETS (retiree du Suivi des appels)':''))+'" style="'+(m.mailPending?'background:repeating-linear-gradient(45deg,#7b61ff 0 7px,#3d2f99 7px 12px);outline:2px dashed #fff;outline-offset:-2px':('background:'+st.c))+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.saOff?'🔕 ':'')+(m.isCircuit?'🚐 ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+(m.mailPending?'<div style="font-size:9px;font-weight:800">📧 À VALIDER</div>':'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div>')+'</div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc(s)+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
         bodyR+='<tr><td class="pl-hlabel" style="position:sticky;left:0;z-index:1"><b>'+esc(lbl)+'</b>'+(qual?'<div style="font-size:10px;opacity:.8">'+esc(qual)+'</div>':'')+'</td>'+cells+'</tr>';
       });
     }); }
@@ -4962,6 +4964,7 @@ button.big:active{transform:translateY(1px)}
     ph:{title:'📷 Photos de PRISE / FIN manquantes',verb:'sans photo',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     te:{title:'🦺 Agents planifiés SANS photo de contrôle tenue',verb:'photo de contrôle manquante',tiles:3,depuis:'Visés dès 12 h AVANT la prise de service, tant que la photo n’est pas déposée'},
     c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,phaseSite:1,depuis:'Tout l’historique · classées Terminées / En cours puis PAR SITE · dépôt de la photo sur chaque créneau'},
+    gp:{title:'📵 Photos envoyées SANS géolocalisation',verb:'photo(s) sans position',tiles:0,byAgent:1,depuis:'Par agent · à rappeler pour les sensibiliser (une photo sans position ne prouve pas la présence sur site)'},
     rt:{title:'🐢 Agents EN RETARD à la prise de service',verb:'retard signalé',tiles:0,bySite2:1,depuis:'Depuis le 01/08 · classés par site · retard saisi par l’opérateur sur le ticket de prise'},
     af:{title:'🧍 Vacations NON AFFECTÉES',verb:'sans agent',tiles:0,af3:1,depuis:'Tout l’historique · À venir / En cours / Passées, puis par site · ⚡ affectation en série'},
     ro:{title:'🔌 Pointages SANS appel réel à ± 10 min (Ringover)',verb:'aucun appel à ± 10 min du pointage',tiles:0,roGrp:1,depuis:'Aujourd’hui · un pointage est validé si un appel du bon numéro existe à ± 10 min de l’HEURE DU POINTAGE (journal Ringover réel)'}
@@ -5019,6 +5022,23 @@ button.big:active{transform:translateY(1px)}
     }catch(_e){}
     // b177 : vacations validees SANS agent, d'aujourd'hui vers le futur (classees par site au rendu)
     // b210 : retards de prise signales par l'operateur (case Agent en retard du ticket)
+    // b219 : agents ayant envoye des photos SANS position (cle u/ville_inconnue) - via l'archive de rattachement
+    sc.gp=[];
+    try{ var _ar=[]; try{_ar=JSON.parse(localStorage.getItem('fkh_photo_archive')||'[]')||[];}catch(_e){}
+      var _byAg={};
+      _ar.forEach(function(x){ if(String(x.key||'').indexOf('u/ville_inconnue/')!==0)return;
+        var ag=(x.agent||'').trim()||'(agent non identifié)';
+        var m0=null; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(String(m.id)===String(x.mid))m0=m; });
+        var tel=''; try{ if(m0&&m0.agentId&&typeof faById==='function'){ var a0=faById(m0.agentId); if(a0&&a0.tels&&a0.tels[0])tel=a0.tels[0]; } }catch(_e){}
+        if(!tel&&typeof FA!=='undefined'&&FA)FA.forEach(function(a1){ if(!tel&&typeof tnorm==='function'&&tnorm(a1.nom||'')===tnorm(ag)&&a1.tels&&a1.tels[0])tel=a1.tels[0]; });
+        var ts=0; var mm=/(\d{10,})/.exec(String(x.key||'')); if(mm)ts=+mm[1];
+        (_byAg[ag]=_byAg[ag]||{agent:ag,tel:tel,items:[]}).items.push({site:(x.site||(m0&&(m0.siteAgent||m0.titre))||'—'),mdate:(x.mdate||(m0&&m0.mdate)||''),step:(x.step||''),ts:ts});
+        if(tel&&!_byAg[ag].tel)_byAg[ag].tel=tel;
+      });
+      Object.keys(_byAg).forEach(function(k){ var g=_byAg[k]; g.items.sort(function(u,v){return v.ts-u.ts;});
+        sc.gp.push({gp:1,agent:g.agent,tel:g.tel,nb:g.items.length,items:g.items,site:(g.items[0]&&g.items[0].site)||'',mdate:(g.items[0]&&g.items[0].mdate)||'',heure:'',due:(g.items[0]&&g.items[0].ts)||now,since:0}); });
+      sc.gp.sort(function(x,y){return y.nb-x.nb;});
+    }catch(_e){}
     sc.rt=[];
     try{ var _S=ssLoad();
       saEntries('','').forEach(function(e){ if(e.key!=='prise'||!e.mdate)return;
@@ -5046,7 +5066,7 @@ button.big:active{transform:translateY(1px)}
   }
   function ppRefresh(){ var hide=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); // b150 : réservé superviseur/admin/super-admin
     var sc=hide?null:ppScan(), any=false;
-    ['op','cli','ph','te','c2','ro','af','rt'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
+    ['op','cli','ph','te','c2','ro','af','rt','gp'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
       b.style.display=hide?'none':'';
       if(!hide){ var L=sc[k]; n.textContent=L.length; n.style.display=L.length?'block':'none'; } });
     if(!any)return;
@@ -5066,7 +5086,16 @@ button.big:active{transform:translateY(1px)}
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
       return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
-    if(D.bySite2&&!PP_VIEW.sub){ /* b210 : retards par SITE */
+    if(D.byAgent&&!PP_VIEW.sub){ /* b219 : par AGENT */
+      h+=L.length?L.map(function(g){ return '<div class="pp-tile" data-sub="'+esc(g.agent)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+g.nb+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">\U0001F464 '+esc(g.agent)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(g.tel?('\U0001F4DE '+esc(g.tel)):'<span style="color:var(--bad)">numéro inconnu</span>')+' · '+g.nb+' photo(s) sans position</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Aucun agent concerné \U0001F389</div>';
+      h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
+    } else if(D.byAgent&&PP_VIEW.sub){
+      var g2=L.filter(function(x){return x.agent===PP_VIEW.sub;})[0]||{items:[]};
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">\U0001F464 '+esc(PP_VIEW.sub)+'</b>'+(g2.tel?('<a class="call" href="tel:'+esc(String(g2.tel).replace(/\s+/g,''))+'" style="font-size:13px">\U0001F4DE '+esc(g2.tel)+'</a>'):'')+'<span class="sub" style="margin:0">'+(g2.items||[]).length+' photo(s)</span></div>';
+      h+=(g2.items||[]).map(function(it2){ var d5=(it2.mdate||'').split('-').reverse().join('/'); var hh=''; try{ var dd=new Date(it2.ts); hh=('0'+dd.getHours()).slice(-2)+':'+('0'+dd.getMinutes()).slice(-2); }catch(e){}
+        return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><b>\U0001F4CD '+esc(it2.site||'—')+'</b><div class="fa-d" style="margin-top:2px">'+(d5?('le '+d5+' '):'')+(hh?('à '+hh):'')+(it2.step?(' · '+esc(it2.step)):'')+' · <b style="color:var(--bad)">photo sans position</b></div></div>'; }).join('');
+      h+='<p class="sub" style="margin:8px 0 0;font-size:11.5px">Appelle l’agent et rappelle-lui d’accepter la demande de position : sans elle, sa photo ne prouve pas sa présence sur le site.</p>';
+    } else if(D.bySite2&&!PP_VIEW.sub){ /* b210 : retards par SITE */
       var _gr={}; L.forEach(function(x){ (_gr[x.site]=_gr[x.site]||[]).push(x); });
       var _sr=Object.keys(_gr).sort(function(u,v){return _gr[v].length-_gr[u].length;});
       h+=_sr.length?_sr.map(function(st4){ var n4=_gr[st4].length,f4=_gr[st4][0];
@@ -5180,7 +5209,7 @@ button.big:active{transform:translateY(1px)}
   setTimeout(function(){ try{ppRoScan();}catch(_e){} },3000);
   function ppOpen(mode){ PP_VIEW={mode:mode,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.add('on'); ppRender(); }
   function ppClose(){ PP_VIEW={mode:null,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.remove('on'); }
-  (function(){ ['op','cli','ph','te','c2','ro','af','rt'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
+  (function(){ ['op','cli','ph','te','c2','ro','af','rt','gp'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
     var o=byId('pp-ovl'); if(o)o.addEventListener('click',function(ev){ if(ev.target===o)ppClose(); });
     setInterval(function(){ try{ppRefresh();}catch(_e){} },30000);
     setTimeout(function(){ try{ppRefresh();}catch(_e){} },900);
