@@ -59,8 +59,8 @@
   function pad(n){return (n<10?'0':'')+n;}
   var stream=null;
   navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:2560},height:{ideal:1440}},audio:false}).then(function(s){ stream=s; v.srcObject=s; }).catch(function(){ msg.className='err'; msg.textContent='Impossible d\'accéder à la caméra. Autorise l\'accès et recharge la page.'; snap.style.display='none'; });
-  var gpsCity='', gpsStreet='', gpsCoord='';
-  if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(function(p){ gpsCoord=p.coords.latitude.toFixed(5)+','+p.coords.longitude.toFixed(5); fetch('https://api-adresse.data.gouv.fr/reverse/?lon='+p.coords.longitude+'&lat='+p.coords.latitude).then(function(r){return r.json();}).then(function(j){ var f=j&&j.features&&j.features[0]; if(f){ gpsCity=f.properties.city||f.properties.municipality||''; gpsStreet=f.properties.name||f.properties.street||''; var el=document.getElementById('ctx'); if(el&&gpsCity)el.innerHTML+='<span class="badge">📍 '+esc((gpsStreet?gpsStreet+', ':'')+gpsCity)+'</span>'; } }).catch(function(){}); }, function(){}, {enableHighAccuracy:true,timeout:8000,maximumAge:60000}); }
+  var gpsCity='', gpsStreet='', gpsCoord='', gpsCp=''; // b209 : code postal
+  if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(function(p){ gpsCoord=p.coords.latitude.toFixed(5)+','+p.coords.longitude.toFixed(5); fetch('https://api-adresse.data.gouv.fr/reverse/?lon='+p.coords.longitude+'&lat='+p.coords.latitude).then(function(r){return r.json();}).then(function(j){ var f=j&&j.features&&j.features[0]; if(f){ gpsCity=f.properties.city||f.properties.municipality||''; gpsStreet=f.properties.name||f.properties.street||''; gpsCp=f.properties.postcode||''; /* b209 */ var el=document.getElementById('ctx'); if(el&&gpsCity)el.innerHTML+='<span class="badge">📍 '+esc((gpsStreet?gpsStreet+', ':'')+(gpsCp?gpsCp+' ':'')+gpsCity)+'</span>'; } }).catch(function(){}); }, function(){}, {enableHighAccuracy:true,timeout:8000,maximumAge:60000}); }
   var blob=null;
   snap.onclick=function(){
     if(!v.videoWidth){ msg.textContent='Caméra pas prête, réessaie.'; return; }
@@ -68,7 +68,7 @@
     // tampon horodaté en bas
     var d=new Date(); var stamp=pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
     var line2=uni?'':(aid?(agent||''):((agent?agent+' · ':'')+(TYPES[type]||type||'').replace(/^[^ ]+ /,'')));
-    var line3=(gpsCity||gpsCoord)?('📍 '+(gpsStreet?gpsStreet+', ':'')+(gpsCity||'')+(gpsCoord?((gpsCity?' · ':'')+'GPS '+gpsCoord):'')):''; // b173 : coordonnees GPS imprimees sur le tampon
+    var line3=(gpsCity||gpsCoord)?('📍 '+(gpsStreet?gpsStreet+', ':'')+(gpsCp?gpsCp+' ':'')+(gpsCity||'')+(gpsCoord?((gpsCity?' · ':'')+'GPS '+gpsCoord):'')):''; // b173 : coordonnees GPS imprimees sur le tampon
     var fs=Math.max(16,Math.round(W/32)); x.font='bold '+fs+'px system-ui,sans-serif'; x.textBaseline='bottom';
     var nl=1+(line2?1:0)+(line3?1:0), bh=fs*(nl*1.25+0.5); x.fillStyle='rgba(0,0,0,.55)'; x.fillRect(0,H-bh,W,bh);
     x.fillStyle='#fff'; var yy=H-6; if(line3){ x.fillText(line3, 12, yy); yy-=fs*1.25; } if(line2){ x.fillText(line2, 12, yy); yy-=fs*1.25; } x.fillText('🕐 '+stamp, 12, yy);
