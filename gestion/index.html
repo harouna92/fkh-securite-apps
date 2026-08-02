@@ -205,7 +205,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b221+b116</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b223+b116</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -5057,7 +5057,9 @@ button.big:active{transform:translateY(1px)}
         var _em9=missEndMin(m), _en9=null;
         if(_em9!=null){ _en9=frMs((m.mdateFin&&m.mdateFin>m.mdate)?m.mdateFin:m.mdate,(_em9<=_sm9&&!(m.mdateFin&&m.mdateFin>m.mdate))?_em9+1440:_em9); }
         if(_en9==null)_en9=_du+86400000;
-        var _ph9=(now<_du)?((_du-now<=86400000)?'j1':'avenir'):((now>_en9)?'passee':'encours'); /* b213 */
+        /* b222 : 24 h -> 7 jours -> le reste, sans chevauchement (chaque vacation comptee une seule fois). */
+        var _dl9=_du-now;
+        var _ph9=(now<_du)?((_dl9<=86400000)?'j1':(_dl9<=604800000?'j7':'avenir')):((now>_en9)?'passee':'encours');
         sc.af.push({mid:m.id,key:'af',af:1,phase:_ph9,site:(m.siteAgent||m.titre||'—'),client:m.client||'',ville:m.ville||'',agent:'',mdate:m.mdate,heure:m.mheure||'',due:_du,since:0}); });
       sc.af.sort(function(x,y){return x.due-y.due;});
     }catch(_e){}
@@ -5126,14 +5128,14 @@ button.big:active{transform:translateY(1px)}
       var Ls=L.filter(function(x){ return ((PP_VIEW.sub==='passee')?(x.phase==='passee'):(x.phase!=='passee'))&&x.site===PP_VIEW.sub2; });
       h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+esc(PP_VIEW.sub2)+'</b><span class="sub" style="margin:0">'+Ls.length+' créneau(x) · dépose la photo sur la ligne</span></div>'+rowsOf(Ls);
     } else if(D.af3&&!PP_VIEW.sub){ // b189 : niveau 1 = A venir / En cours / Passees
-      var aJ1=L.filter(function(x){return x.phase==='j1';}),aAv=L.filter(function(x){return x.phase==='avenir';}),aEn=L.filter(function(x){return x.phase==='encours';}),aPa=L.filter(function(x){return x.phase==='passee';});
-      h+='<div style="display:flex;gap:10px;flex-wrap:wrap"><div class="pp-tile" data-sub="j1" style="border-color:#e0a13b"><b>'+aJ1.length+'</b>🚨 DANS LES 24 H<br><span class="sub" style="margin:0;font-size:11.5px">sans agent — urgent</span></div><div class="pp-tile" data-sub="avenir"><b>'+aAv.length+'</b>⏳ À VENIR (au-delà)<br><span class="sub" style="margin:0;font-size:11.5px">sans agent</span></div><div class="pp-tile" data-sub="encours"><b>'+aEn.length+'</b>🟢 EN COURS<br><span class="sub" style="margin:0;font-size:11.5px">sans agent</span></div><div class="pp-tile" data-sub="passee"><b>'+aPa.length+'</b>🕓 PASSÉES<br><span class="sub" style="margin:0;font-size:11.5px">jamais affectées</span></div></div>';
+      var aJ7=L.filter(function(x){return x.phase==='j7';});var aJ1=L.filter(function(x){return x.phase==='j1';}),aAv=L.filter(function(x){return x.phase==='avenir';}),aEn=L.filter(function(x){return x.phase==='encours';}),aPa=L.filter(function(x){return x.phase==='passee';});
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap"><div class="pp-tile" data-sub="j1" style="border-color:#e0a13b"><b>'+aJ1.length+'</b>🚨 DANS LES 24 H<br><span class="sub" style="margin:0;font-size:11.5px">sans agent — urgent</span></div><div class="pp-tile" data-sub="j7" style="border-color:#c9a227"><b>'+aJ7.length+'</b>📅 DANS LES 7 JOURS<br><span class="sub" style="margin:0;font-size:11.5px">après les 24 h — sans agent</span></div><div class="pp-tile" data-sub="avenir"><b>'+aAv.length+'</b>⏳ LE RESTE À VENIR<br><span class="sub" style="margin:0;font-size:11.5px">au-delà de 7 jours — sans agent</span></div><div class="pp-tile" data-sub="encours"><b>'+aEn.length+'</b>🟢 EN COURS<br><span class="sub" style="margin:0;font-size:11.5px">sans agent</span></div><div class="pp-tile" data-sub="passee"><b>'+aPa.length+'</b>🕓 PASSÉES<br><span class="sub" style="margin:0;font-size:11.5px">jamais affectées</span></div></div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
     } else if(D.af3&&PP_VIEW.sub&&PP_VIEW.sub2==null){ // b189 : niveau 2 = par SITE
       var Lp9=L.filter(function(x){return x.phase===PP_VIEW.sub;});
       var _g9={}; Lp9.forEach(function(x){ (_g9[x.site]=_g9[x.site]||[]).push(x); });
       var _s9=Object.keys(_g9).sort(function(u,v9){return _g9[u][0].due-_g9[v9][0].due;});
-      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(PP_VIEW.sub==='j1'?'🚨 Dans les 24 h':PP_VIEW.sub==='avenir'?'⏳ À venir':PP_VIEW.sub==='encours'?'🟢 En cours':'🕓 Passées')+'</b><span class="sub" style="margin:0">'+Lp9.length+' vacation(s) sans agent</span></div>';
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(PP_VIEW.sub==='j1'?'🚨 Dans les 24 h':PP_VIEW.sub==='j7'?'📅 Dans les 7 jours':PP_VIEW.sub==='avenir'?'⏳ Le reste à venir':PP_VIEW.sub==='encours'?'🟢 En cours':'🕓 Passées')+'</b><span class="sub" style="margin:0">'+Lp9.length+' vacation(s) sans agent</span></div>';
       h+=_s9.length?_s9.map(function(st9b){ var n9=_g9[st9b].length,f9=_g9[st9b][0]; return '<div class="pp-tile" data-sub2="'+esc(st9b)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+n9+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st9b)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f9.client?'🏢 '+esc(f9.client)+' · ':'')+'1re échéance : '+((f9.mdate||'').split('-').reverse().join('/'))+(f9.heure?' '+esc(f9.heure):'')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Rien 🎉</div>';
     } else if(D.af3&&PP_VIEW.sub&&PP_VIEW.sub2!=null){ // b189 : niveau 3 = vacations du site + affectation en serie (b184)
       var LLs=L.filter(function(x){return x.phase===PP_VIEW.sub&&x.site===PP_VIEW.sub2;});
@@ -5282,9 +5284,40 @@ button.big:active{transform:translateY(1px)}
     });
     return best;
   }
+  /* ===== b223 TEMOIN DE VIE de la collecte des mails =====
+     POURQUOI : sans signal, « aucun mail » est ambigu (script mort, ou boite vide ?). Le 02/08 le
+     declencheur Gmail n'a pas tourne pendant 16 h et rien ne l'a signale.
+     COMMENT : le script signale CHAQUE passage, meme a vide. +15 min de silence = collecte A L'ARRET,
+     annonce ici et dans la cloche (donc aussi en notification telephone). */
+  var MAIL_HB=null;
+  var MAIL_HB_SEUIL=15*60000;
+  function mailHb(){ if(MAIL_HB)return MAIL_HB; try{ var o=JSON.parse(localStorage.getItem('fkh_mail_hb')||'null'); if(o&&o.hb)return o.hb; }catch(e){} return null; }
+  function mailHbEtat(){
+    var hb=mailHb(); if(!hb||!hb.at)return {ko:1,jamais:1,txt:'jamais signale'};
+    var d=Date.now()-hb.at;
+    return {ko:(d>MAIL_HB_SEUIL)?1:0, depuis:d, at:hb.at, erreur:hb.erreur||'', runs:hb.runs||0, lastMail:hb.lastMail||0,
+            txt:(typeof ppSince==='function')?ppSince(d):(Math.round(d/60000)+' min')};
+  }
+  function mailHbBanner(){
+    var e=mailHbEtat(), h='';
+    var hhmm=e.at?(new Date(e.at)).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+    if(e.jamais){
+      h='<div class="card" style="border:1.5px solid #c02626;background:rgba(192,38,38,.10)"><b style="color:#e5322d">⚠️ LA COLLECTE N’A JAMAIS DONNÉ SIGNE DE VIE</b>'
+       +'<div class="sub" style="margin:4px 0 0">Le script Gmail n’a envoyé aucun témoin. Dans l’éditeur Apps Script : lance <b>installerDeclencheur</b> une fois, puis vérifie ⏰ <b>Déclencheurs</b> — la ligne « traiterMailsFKH · Toutes les 5 minutes » doit y apparaître.</div></div>';
+    } else if(e.ko){
+      h='<div class="card" style="border:1.5px solid #c02626;background:rgba(192,38,38,.10)"><b style="color:#e5322d">⚠️ LA COLLECTE EST À L’ARRÊT depuis '+esc(e.txt)+'</b>'
+       +'<div class="sub" style="margin:4px 0 0">Dernier signal : '+esc(hhmm)+'. Les bons de commande reçus depuis ne sont <b>pas</b> descendus dans le Planning.'
+       +(e.erreur?('<br>Dernière erreur remontée : <b>'+esc(e.erreur)+'</b>'):'')
+       +'<br>À faire : ouvrir Apps Script → ⏰ Déclencheurs (la ligne a pu être désactivée par Google après des échecs), puis relancer <b>installerDeclencheur</b>.</div></div>';
+    } else {
+      h='<div class="card" style="border:1px solid #1a9e5c;background:rgba(26,158,92,.08);padding:8px 10px"><b style="color:#1a9e5c">✅ Collecte active</b> <span class="sub" style="margin:0">— dernier passage il y a '+esc(e.txt)+' ('+esc(hhmm)+')'
+       +(e.lastMail?(' · dernier mail reçu : '+esc((new Date(e.lastMail)).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}))):' · aucun mail depuis')+'</span></div>';
+    }
+    return h;
+  }
   function mailsFetch(cb){ if(typeof CLOUD==='undefined'||!CLOUD||!CLOUD.on){ if(cb)cb(mailsCache()); return; }
     fetch(CLOUD.base+'/mails/list',{headers:cloudHdr()}).then(function(r){return r.json();}).then(function(j){
-      if(j&&j.ok){ try{localStorage.setItem(MAILS_CACHE_KEY,JSON.stringify(j.items||[]));}catch(e){} if(cb)cb(j.items||[]); }
+      if(j&&j.ok){ try{localStorage.setItem(MAILS_CACHE_KEY,JSON.stringify(j.items||[]));}catch(e){} MAIL_HB=j.hb||null; try{localStorage.setItem('fkh_mail_hb',JSON.stringify({hb:MAIL_HB,lu:Date.now()}));}catch(e){} if(cb)cb(j.items||[]); }
       else if(cb)cb(mailsCache());
     }).catch(function(){ if(cb)cb(mailsCache()); });
   }
@@ -5293,6 +5326,7 @@ button.big:active{transform:translateY(1px)}
     mailsFetch(function(items){ _mailsRender(items); });
   }
   function _mailsRender(items){ var box=byId('mails-body'); if(!box)return;
+    var _hbH=mailHbBanner();
     items=(items||[]).filter(function(it){return !it.skip;}); // b155 : le Worker analyse TOUS les mails mais marque skip ceux qui ne concernent pas les missions
     // b154 : chaque BDC (kind=demande) avec site+date SANS mission en face -> creation AUTO d'une vacation "📧 A VALIDER" (violet hachure au Planning, tickets generes seulement apres validation)
     (function(){ var _ref=[]; try{_ref=JSON.parse(localStorage.getItem('fkh_mail_refuse')||'[]')||[];}catch(e){}
@@ -5330,7 +5364,7 @@ button.big:active{transform:translateY(1px)}
         +'<div class="acts" style="margin-top:6px;gap:6px">'+((r.mt&&r.mt.m.mailPending)?('<button type="button" class="mails-val ok" data-mid="'+esc(r.mt.m.id)+'" style="font-size:12px">✅ Valider la vacation</button><button type="button" class="mails-ref" data-mid="'+esc(r.mt.m.id)+'" data-id="'+esc(it.cdr_id)+'" style="font-size:12px;color:var(--bad)">🗑 Refuser</button>'):'')+(it.dismissed?'<span class="sub" style="margin:0">traité</span>':'<button type="button" class="mails-done" data-id="'+esc(it.cdr_id)+'" style="font-size:12px">✔ Marquer traité</button>')+'</div>'
         +'</div>';
     });
-    box.innerHTML=h;
+    box.innerHTML=_hbH+h;
     box.querySelectorAll('.mails-flt').forEach(function(b){ b.onclick=function(){ mailsFilter=b.getAttribute('data-f'); _mailsRender(items); }; });
     var rf=byId('mails-refresh'); if(rf)rf.onclick=renderMails;
     box.querySelectorAll('.mails-val').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid');
@@ -5726,7 +5760,7 @@ button.big:active{transform:translateY(1px)}
     {k:'appel_danger',   ic:'⛔', lbl:'Prise/fin de service non pointée (+10 min)'},
     {k:'nouvelle_demande',ic:'🆕', lbl:'Nouvelle demande reçue (en recherche)'},
     {k:'demande_1h',     ic:'🕵️', lbl:'Demande en recherche depuis + d\'1 h'},
-    {k:'prise_retard',   ic:'🕓', lbl:'Agent en retard à la prise de service'}
+    {k:'mail_arret',    ic:'📧', lbl:'Collecte des mails à l’arrêt (+15 min)'},{k:'prise_retard',   ic:'🕓', lbl:'Agent en retard à la prise de service'}
   ];
   function notifLoadCfg(){ var c=null; try{c=JSON.parse(localStorage.getItem('fkh_notif_cfg')||'null');}catch(e){} if(!c||typeof c!=='object')c={}; if(typeof c.on!=='boolean')c.on=false; if(typeof c.sound!=='boolean')c.sound=true; if(!c.cats||typeof c.cats!=='object')c.cats={}; NOTIF_CATS.forEach(function(t){ if(typeof c.cats[t.k]!=='boolean')c.cats[t.k]=true; }); NOTIF.cfg=c; }
   function notifSaveCfg(){ try{localStorage.setItem('fkh_notif_cfg',JSON.stringify(NOTIF.cfg));}catch(e){} }
@@ -5736,6 +5770,12 @@ button.big:active{transform:translateY(1px)}
   function notifFire(a){ try{ var n=new Notification(a.title,{body:a.body,tag:a.cat+':'+a.key}); n.onclick=function(){ try{window.focus();}catch(e){} var btn=document.querySelector('#tabs button[data-s="'+a.go+'"]'); if(btn)btn.click(); try{n.close();}catch(e){} }; }catch(e){} notifBeep(); }
   function notifThresholdAlerts(){
     var now=Date.now(), out=[];
+    /* b223 : la collecte des mails a l'arret est une alerte a part entiere — c'est ce qui a manque le 02/08. */
+    try{ var _hbE=mailHbEtat(); if(_hbE.ko&&(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)){
+      out.push({cat:'mail_arret',key:'hb'+(typeof impTodayISO==='function'?impTodayISO():''),
+        title:'⚠️ Collecte des mails à l’arrêt',
+        body:(_hbE.jamais?'Le script Gmail n’a jamais donné signe de vie.':'Aucun signal depuis '+_hbE.txt+'. Les bons de commande ne descendent plus dans le Planning.'),
+        when:(typeof impTodayISO==='function'?impTodayISO():'')}); } }catch(_e){}
     try{ var S=(typeof ssLoad==='function')?ssLoad():{}, gl=(typeof saGolive==='function')?saGolive():0;
       if(typeof saEntries==='function')saEntries('','').forEach(function(e){
         if(e.consigne||!e.mdate)return;
@@ -6077,7 +6117,7 @@ button.big:active{transform:translateY(1px)}
       fetch(CLOUD.base+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:saved})})
         .then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ CLOUD.role=j.role||'full'; CLOUD.user=j.user||''; CLOUD.sections=(j.sections&&j.sections.length)?j.sections:null; cloudStart(); } else {if(lo)lo.style.display='flex';} })
         .catch(function(){ if(lo)lo.style.display='flex'; });
-    } else { if(lo)lo.style.display='flex'; }
+    } else { if(lo&&!_SBX)lo.style.display='flex'; }   /* b223 : en SANDBOX le volet ne doit jamais revenir */
   })();
 })();
 </script>
