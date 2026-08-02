@@ -146,6 +146,7 @@ button.big:active{transform:translateY(1px)}
 #pp-c2{right:229px}
 #pp-ro{right:273px}
 #pp-af{right:317px}
+#pp-rt{right:361px}
 .pp-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:none}
 #pp-ovl{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:120;display:none;align-items:flex-start;justify-content:center;padding:56px 10px 10px}
 #pp-ovl.on{display:flex}
@@ -203,7 +204,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b208+b116</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b210+b116</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -251,6 +252,7 @@ button.big:active{transform:translateY(1px)}
 <button type="button" id="pp-c2" class="pp-btn" title="Photos de contrôle (toutes les 2 h) manquantes" aria-label="Photos contrôles manquantes">🌙<span class="pp-badge" id="pp-c2-n"></span></button>
 <button type="button" id="pp-ro" class="pp-btn" title="Pointages SANS trace d’appel réel (Ringover)" aria-label="Pointages sans appel réel">🔌<span class="pp-badge" id="pp-ro-n"></span></button>
 <button type="button" id="pp-af" class="pp-btn" title="Vacations SANS AGENT à partir d’aujourd’hui — classées par site" aria-label="Vacations non affectées">🧍<span class="pp-badge" id="pp-af-n"></span></button>
+<button type="button" id="pp-rt" class="pp-btn" title="Agents EN RETARD à la prise de service" aria-label="Retards de prise">⏰️<span class="pp-badge" id="pp-rt-n"></span></button>
 <div id="pp-ovl"><div id="pp-box"></div></div>
 <button type="button" id="rech-bar" title="Missions en recherche d'agent — cliquer pour les traiter"></button>
 <button type="button" id="ask-fab" title="Poser une question (métier ou sur l'appli)" aria-label="Poser une question">💬</button>
@@ -4943,6 +4945,7 @@ button.big:active{transform:translateY(1px)}
     ph:{title:'📷 Photos de PRISE / FIN manquantes',verb:'sans photo',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     te:{title:'🦺 Agents planifiés SANS photo de contrôle tenue',verb:'photo de contrôle manquante',tiles:3,depuis:'Visés dès 12 h AVANT la prise de service, tant que la photo n’est pas déposée'},
     c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,phaseSite:1,depuis:'Tout l’historique · classées Terminées / En cours puis PAR SITE · dépôt de la photo sur chaque créneau'},
+    rt:{title:'⏰️ Agents EN RETARD à la prise de service',verb:'retard signalé',tiles:0,bySite2:1,depuis:'Depuis le 01/08 · classés par site · retard saisi par l’opérateur sur le ticket de prise'},
     af:{title:'🧍 Vacations NON AFFECTÉES',verb:'sans agent',tiles:0,af3:1,depuis:'Tout l’historique · À venir / En cours / Passées, puis par site · ⚡ affectation en série'},
     ro:{title:'🔌 Pointages SANS appel réel à ± 10 min (Ringover)',verb:'aucun appel à ± 10 min du pointage',tiles:0,roGrp:1,depuis:'Aujourd’hui · un pointage est validé si un appel du bon numéro existe à ± 10 min de l’HEURE DU POINTAGE (journal Ringover réel)'}
   };
@@ -4998,6 +5001,18 @@ button.big:active{transform:translateY(1px)}
       sc.c2.sort(function(x,y){return x.due-y.due;});
     }catch(_e){}
     // b177 : vacations validees SANS agent, d'aujourd'hui vers le futur (classees par site au rendu)
+    // b210 : retards de prise signales par l'operateur (case Agent en retard du ticket)
+    sc.rt=[];
+    try{ var _S=ssLoad();
+      saEntries('','').forEach(function(e){ if(e.key!=='prise'||!e.mdate)return;
+        var r=(_S[e.mid]&&_S[e.mid].prise)||{}; if(!r.done||!r.agRetard)return;
+        var due=frMs(e.mdate,e.abs); if(due==null||(PP_START!=null&&due<PP_START))return;
+        var mn=0; try{ mn=(+r.agRetardH||0)*60+(+r.agRetardMin||0); }catch(_e){}
+        if(!mn&&r.hm&&e.heure){ var a1=toMin(r.hm),a2=toMin(e.heure); if(a1!=null&&a2!=null)mn=Math.max(0,a1-a2); }
+        sc.rt.push({mid:e.mid,key:'prise',rt:1,retardMin:mn,arrivee:(r.hm||''),tel:e.agentTel||'',site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:due,since:0});
+      });
+      sc.rt.sort(function(x,y){return y.due-x.due;});
+    }catch(_e){}
     sc.af=[];
     try{ var _tdA=(typeof impTodayISO==='function')?impTodayISO():'';
       (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.statut!=='validee'||m.mailPending||m.retiree||m.aDecouper)return; if(!m.mdate)return; if(m.agentId)return; /* b189 : tout l'historique */
@@ -5014,7 +5029,7 @@ button.big:active{transform:translateY(1px)}
   }
   function ppRefresh(){ var hide=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); // b150 : réservé superviseur/admin/super-admin
     var sc=hide?null:ppScan(), any=false;
-    ['op','cli','ph','te','c2','ro','af'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
+    ['op','cli','ph','te','c2','ro','af','rt'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
       b.style.display=hide?'none':'';
       if(!hide){ var L=sc[k]; n.textContent=L.length; n.style.display=L.length?'block':'none'; } });
     if(!any)return;
@@ -5033,8 +5048,18 @@ button.big:active{transform:translateY(1px)}
       return '';
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
-      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>')))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
-    if(D.roGrp&&!PP_VIEW.sub){ // b190 : 2 groupes AUCUN appel / DECALAGE
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 '+esc(x.agent)+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
+    if(D.bySite2&&!PP_VIEW.sub){ /* b210 : retards par SITE */
+      var _gr={}; L.forEach(function(x){ (_gr[x.site]=_gr[x.site]||[]).push(x); });
+      var _sr=Object.keys(_gr).sort(function(u,v){return _gr[v].length-_gr[u].length;});
+      h+=_sr.length?_sr.map(function(st4){ var n4=_gr[st4].length,f4=_gr[st4][0];
+        var moy=Math.round(_gr[st4].reduce(function(a2,x){return a2+(x.retardMin||0);},0)/n4);
+        return '<div class="pp-tile" data-sub="'+esc(st4)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+n4+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st4)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f4.client?'🏢 '+esc(f4.client)+' · ':'')+(moy?('retard moyen '+moy+' min'):'retard signalé')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Aucun retard signalé 🎉</div>';
+      h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
+    } else if(D.bySite2&&PP_VIEW.sub){
+      var Lr2=L.filter(function(x){return x.site===PP_VIEW.sub;});
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+esc(PP_VIEW.sub)+'</b><span class="sub" style="margin:0">'+Lr2.length+' retard(s)</span></div>'+rowsOf(Lr2);
+    } else if(D.roGrp&&!PP_VIEW.sub){ // b190 : 2 groupes AUCUN appel / DECALAGE
       var rA=L.filter(function(x){return (x.grp||(x.callT?'ecart':'aucun'))==='aucun';}),rE=L.filter(function(x){return (x.grp||(x.callT?'ecart':'aucun'))==='ecart';});
       h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="aucun"><b>'+rA.length+'</b>📵 AUCUN appel<br><span class="sub" style="margin:0;font-size:11.5px">pas d’appel du numéro aujourd’hui</span></div><div class="pp-tile" data-sub="ecart"><b>'+rE.length+'</b>↔ DÉCALAGE<br><span class="sub" style="margin:0;font-size:11.5px">appel trouvé mais écart > 10 min</span></div></div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
@@ -5138,7 +5163,7 @@ button.big:active{transform:translateY(1px)}
   setTimeout(function(){ try{ppRoScan();}catch(_e){} },3000);
   function ppOpen(mode){ PP_VIEW={mode:mode,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.add('on'); ppRender(); }
   function ppClose(){ PP_VIEW={mode:null,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.remove('on'); }
-  (function(){ ['op','cli','ph','te','c2','ro','af'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
+  (function(){ ['op','cli','ph','te','c2','ro','af','rt'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
     var o=byId('pp-ovl'); if(o)o.addEventListener('click',function(ev){ if(ev.target===o)ppClose(); });
     setInterval(function(){ try{ppRefresh();}catch(_e){} },30000);
     setTimeout(function(){ try{ppRefresh();}catch(_e){} },900);
