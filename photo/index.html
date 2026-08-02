@@ -58,16 +58,14 @@
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});}
   function pad(n){return (n<10?'0':'')+n;}
   var stream=null;
-  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:2560},height:{ideal:1440}},audio:false}).then(function(s){ stream=s; v.srcObject=s; }).catch(function(){ msg.className='err'; msg.textContent='Impossible d\'accéder à la caméra. Autorise l\'accès et recharge la page.'; snap.style.display='none'; });
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:2560},height:{ideal:1440}},audio:false}).then(function(s){ stream=s; v.srcObject=s; }).catch(function(err){ /* b216 : diagnostic precis + solution de secours */ var n=(err&&err.name)||'', t=''; if(n==='NotAllowedError'||n==='SecurityError'){ t='🚫 Accès caméra REFUSÉ.<br>Touche le cadenas 🔒 en haut de l’écran → Autorisations → Caméra → Autoriser, puis recharge la page.'; } else if(n==='NotReadableError'||n==='AbortError'||n==='TrackStartError'){ t='📵 La caméra est OCCUPÉE par autre chose — le plus souvent un <b>appel téléphonique en cours</b> ou une autre application.<br>Termine l’appel (ou ferme l’autre appli), puis recharge la page.'; } else if(n==='NotFoundError'){ t='⚠️ Aucune caméra détectée sur cet appareil.'; } else { t='⚠️ Caméra indisponible ('+(n||'erreur')+').'; } msg.className='err'; msg.innerHTML=t+'<div style="margin-top:12px"><label class="btn" style="cursor:pointer;display:inline-block;padding:12px 16px;font-size:16px;background:#1a9e5c;color:#fff;border-radius:10px">📷 Prendre la photo avec l’appareil photo<input type="file" accept="image/*" capture="environment" id="cam-fb" style="display:none"></label><div style="font-size:12px;margin-top:6px;opacity:.85">Solution de secours : la photo sera tamponnée de la même façon.</div></div>'; snap.style.display='none'; var fb=document.getElementById('cam-fb'); if(fb)fb.onchange=function(){ var f=fb.files&&fb.files[0]; if(!f)return;   var im=new Image();   im.onload=function(){ try{ var W=im.naturalWidth,H=im.naturalHeight; c.width=W; c.height=H; var x=c.getContext('2d'); x.drawImage(im,0,0,W,H); stampCanvas(); }catch(e){} };   im.src=URL.createObjectURL(f); }; });
   var gpsCity='', gpsStreet='', gpsCoord='', gpsCp=''; // b209 : code postal
   function geoWarn(on){ var w=document.getElementById('geowarn'); if(w)w.style.display=on?'block':'none'; }
   function geoAsk(){ if(!navigator.geolocation){ geoWarn(true); return; } navigator.geolocation.getCurrentPosition(function(p){ gpsCoord=p.coords.latitude.toFixed(5)+','+p.coords.longitude.toFixed(5); fetch('https://api-adresse.data.gouv.fr/reverse/?lon='+p.coords.longitude+'&lat='+p.coords.latitude).then(function(r){return r.json();}).then(function(j){ var f=j&&j.features&&j.features[0]; if(f){ gpsCity=f.properties.city||f.properties.municipality||''; gpsStreet=f.properties.name||f.properties.street||''; gpsCp=f.properties.postcode||''; /* b209 */ var el=document.getElementById('ctx'); if(el&&gpsCity)el.innerHTML+='<span class="badge">📍 '+esc((gpsStreet?gpsStreet+', ':'')+(gpsCp?gpsCp+' ':'')+gpsCity)+'</span>'; } }).catch(function(){}); geoWarn(false); }, function(){ geoWarn(true); }, {enableHighAccuracy:true,timeout:8000,maximumAge:60000}); }
   geoWarn(true); geoAsk(); /* b215 : bandeau tant que la position n'est pas obtenue */
   (function(){ var b=document.getElementById('geo-retry'); if(b)b.onclick=function(){ b.textContent='⏳ Recherche…'; geoAsk(); setTimeout(function(){ b.textContent='🔄 Réessayer la position'; },2500); }; })();
   var blob=null;
-  snap.onclick=function(){
-    if(!v.videoWidth){ msg.textContent='Caméra pas prête, réessaie.'; return; }
-    var W=v.videoWidth, H=v.videoHeight; c.width=W; c.height=H; var x=c.getContext('2d'); x.drawImage(v,0,0,W,H);
+  function stampCanvas(){ var x=c.getContext('2d'); var W=c.width, H=c.height;
     // tampon horodaté en bas
     var d=new Date(); var stamp=pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
     var line2=uni?'':(aid?(agent||''):((agent?agent+' · ':'')+(TYPES[type]||type||'').replace(/^[^ ]+ /,'')));
@@ -76,7 +74,8 @@
     var nl=1+(line2?1:0)+(line3?1:0), bh=fs*(nl*1.25+0.5); x.fillStyle='rgba(0,0,0,.55)'; x.fillRect(0,H-bh,W,bh);
     x.fillStyle='#fff'; var yy=H-6; if(line3){ x.fillText(line3, 12, yy); yy-=fs*1.25; } if(line2){ x.fillText(line2, 12, yy); yy-=fs*1.25; } x.fillText('🕐 '+stamp, 12, yy);
     c.toBlob(function(b){ blob=b; prev.innerHTML='<img src="'+URL.createObjectURL(b)+'">'; prev.style.display='block'; v.style.display='none'; snap.style.display='none'; send.style.display='block'; retry.style.display='block'; msg.textContent=''; },'image/jpeg',0.88);
-  };
+  }
+  snap.onclick=function(){ var W=v.videoWidth, H=v.videoHeight; c.width=W; c.height=H; var x=c.getContext('2d'); x.drawImage(v,0,0,W,H); stampCanvas(); };
   retry.onclick=function(){ blob=null; prev.style.display='none'; v.style.display='block'; snap.style.display='block'; send.style.display='none'; retry.style.display='none'; msg.textContent=''; };
   send.onclick=function(){
     if(!blob){ return; }
