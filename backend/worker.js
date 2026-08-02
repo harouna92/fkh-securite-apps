@@ -161,7 +161,7 @@ async function aiTranscribe(env, audioUrl) {
   const j = await r.json();
   return j.text || "";
 }
-const AI_PROMPT_BASE = "Tu analyses un message (appel transcrit, mail, SMS ou capture d'ecran) d'une societe de securite privee. Determine s'il contient une (ou plusieurs) demande(s) operationnelle(s), de trois NATURES possibles :\n- GARDIENNAGE : un agent est POSTE pour SURVEILLER un site sur une vacation / une duree (nuit, week-end, chantier, magasin...). Surveillance statique, l'agent reste sur place.\n- INTERVENTION : un DEPLACEMENT PONCTUEL declenche par une ALARME / une levee de doute / une alerte (l'agent se rend sur place, verifie, repart). Ponctuel, dure typiquement 1 h.\n- RONDE : un ou plusieurs PASSAGES de verification / pointage / tournee sur un ou plusieurs sites.\nEn cas de DOUTE entre gardiennage et intervention/ronde, choisis GARDIENNAGE.\nReponds UNIQUEMENT en JSON strict, sans aucun texte autour :\n{\"is_demande\": true|false, \"resume\": \"\", \"demandes\": [{\"nature\":\"gardiennage|intervention|ronde\",\"client\":\"\",\"ville\":\"\",\"cp\":\"\",\"site\":\"\",\"type_site\":\"\",\"nb_agents\":\"\",\"urgent\":true,\"vacations\":[{\"date\":\"\",\"horaires\":\"\"}]}],\"arrets\":[{\"client\":\"\",\"site\":\"\",\"ville\":\"\",\"motif\":\"\"}]}\nREGLES ABSOLUES :\n- 'nature' est OBLIGATOIRE pour CHAQUE demande : exactement 'gardiennage', 'intervention' ou 'ronde'.\n- Le champ 'client' est PRIORITAIRE : cherche ACTIVEMENT le donneur d'ordre et reprends-le exactement comme il est dit (Securitas, Sotel, etc.). Regarde partout : societe qui appelle/mande, nom cite, en-tete ou signature du mail, expediteur, en-tete de SMS. C'est souvent une societe de securite qui nous sous-traite. Ne laisse 'client' vide QUE si vraiment AUCUN nom de donneur d'ordre n'apparait nulle part.\n- UNE demande = UN SEUL SITE. Si le message concerne PLUSIEURS SITES differents (villes ou lieux differents), cree PLUSIEURS entrees distinctes dans 'demandes', une par site. NE JAMAIS regrouper plusieurs sites dans une seule demande.\n- Pour un MEME site (gardiennage) demande sur PLUSIEURS DATES : c'est UNE SEULE demande, mais mets UNE entree PAR DATE dans 'vacations', chaque entree = {date, horaires (creneau de cette date)}. NE PAS regrouper toutes les dates ensemble. Pour une intervention ou une ronde ponctuelle, 'vacations' peut rester vide (ou contenir la date/heure prevue si elle est precisee).\n- ARRET / ANNULATION a l'initiative du CLIENT : si le message est un client qui ARRETE, ANNULE ou met FIN a une prestation de gardiennage EN COURS (ex. « on arrete la surveillance du site X », « plus besoin d'agent a partir de demain », « on suspend la mission »), NE le mets PAS dans 'demandes' → mets une entree dans 'arrets' {client, site, ville, motif}. C'est le client qui prend l'initiative de l'arret.\n- is_demande=false, demandes=[] et arrets=[] si ce n'est NI du gardiennage, NI une intervention, NI une ronde, NI un arret (facture, RH, commercial, conversation, autre).\n- Laisse \"\" si une info est absente. resume = 1 phrase courte resumant le message.";
+const AI_PROMPT_BASE = "Tu analyses un message (appel transcrit, mail, SMS ou capture d'ecran) d'une societe de securite privee. Determine s'il contient une (ou plusieurs) demande(s) operationnelle(s), de trois NATURES possibles :\n- GARDIENNAGE : un agent est POSTE pour SURVEILLER un site sur une vacation / une duree (nuit, week-end, chantier, magasin...). Surveillance statique, l'agent reste sur place.\n- INTERVENTION : un DEPLACEMENT PONCTUEL declenche par une ALARME / une levee de doute / une alerte (l'agent se rend sur place, verifie, repart). Ponctuel, dure typiquement 1 h.\n- RONDE : un ou plusieurs PASSAGES de verification / pointage / tournee sur un ou plusieurs sites.\nEn cas de DOUTE entre gardiennage et intervention/ronde, choisis GARDIENNAGE.\nReponds UNIQUEMENT en JSON strict, sans aucun texte autour :\n{\"is_demande\": true|false, \"resume\": \"\", \"demandes\": [{\"nature\":\"gardiennage|intervention|ronde\",\"client\":\"\",\"ville\":\"\",\"cp\":\"\",\"site\":\"\",\"type_site\":\"\",\"nb_agents\":\"\",\"urgent\":true,\"vacations\":[{\"date\":\"\",\"horaires\":\"\"}]}],\"arrets\":[{\"client\":\"\",\"site\":\"\",\"ville\":\"\",\"motif\":\"\"}]}\nREGLES ABSOLUES :\n- FKH (FKH SECURITE) n'est JAMAIS le champ 'client' : FKH c'est NOUS, le destinataire des demandes. Le client est l'AUTRE societe (donneur d'ordre). Si le seul nom present est FKH, laisse 'client' vide.\n- 'nature' est OBLIGATOIRE pour CHAQUE demande : exactement 'gardiennage', 'intervention' ou 'ronde'.\n- Le champ 'client' est PRIORITAIRE : cherche ACTIVEMENT le donneur d'ordre et reprends-le exactement comme il est dit (Securitas, Sotel, etc.). Regarde partout : societe qui appelle/mande, nom cite, en-tete ou signature du mail, expediteur, en-tete de SMS. C'est souvent une societe de securite qui nous sous-traite. Ne laisse 'client' vide QUE si vraiment AUCUN nom de donneur d'ordre n'apparait nulle part.\n- UNE demande = UN SEUL SITE. Si le message concerne PLUSIEURS SITES differents (villes ou lieux differents), cree PLUSIEURS entrees distinctes dans 'demandes', une par site. NE JAMAIS regrouper plusieurs sites dans une seule demande.\n- Pour un MEME site (gardiennage) demande sur PLUSIEURS DATES : c'est UNE SEULE demande, mais mets UNE entree PAR DATE dans 'vacations', chaque entree = {date, horaires (creneau de cette date)}. NE PAS regrouper toutes les dates ensemble. Pour une intervention ou une ronde ponctuelle, 'vacations' peut rester vide (ou contenir la date/heure prevue si elle est precisee).\n- ARRET / ANNULATION a l'initiative du CLIENT : si le message est un client qui ARRETE, ANNULE ou met FIN a une prestation de gardiennage EN COURS (ex. « on arrete la surveillance du site X », « plus besoin d'agent a partir de demain », « on suspend la mission »), NE le mets PAS dans 'demandes' → mets une entree dans 'arrets' {client, site, ville, motif}. C'est le client qui prend l'initiative de l'arret.\n- is_demande=false, demandes=[] et arrets=[] si ce n'est NI du gardiennage, NI une intervention, NI une ronde, NI un arret (facture, RH, commercial, conversation, autre).\n- Laisse \"\" si une info est absente. resume = 1 phrase courte resumant le message.";
 function aiParseJson(j) { const txt = (j.content && j.content[0] && j.content[0].text) || "{}"; const m = txt.match(/\{[\s\S]*\}/); try { return JSON.parse(m ? m[0] : txt); } catch (e) { return { is_demande: false, resume: "analyse illisible" }; } }
 async function aiAnalyze(env, transcript, direction) {
   const dirLine = direction === "in" ? "\n\nContexte : appel ENTRANT (le correspondant nous appelle)."
@@ -172,6 +172,20 @@ async function aiAnalyze(env, transcript, direction) {
   if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
   return aiParseJson(await r.json());
 }
+// b203 : lecture des PIECES JOINTES PDF (bons de commande) par l'IA -> adresse exacte du site, refs, horaires
+async function aiReadPdf(env, pdfs) {
+  const docs = (pdfs || []).slice(0, 2).map((p) => ({ type: "document", source: { type: "base64", media_type: "application/pdf", data: p.b64 } }));
+  if (!docs.length) return null;
+  const q = { type: "text", text: "Ce sont des bons de commande / demandes de prestation de gardiennage adresses a FKH SECURITE (sous-traitant). Extrais UNIQUEMENT ce qui est ecrit, en JSON strict, sans commentaire : {\"site\":\"nom du site a garder\",\"adresse\":\"numero et rue\",\"cp\":\"code postal\",\"ville\":\"ville\",\"client\":\"donneur d'ordre\",\"ref\":\"reference de la commande\",\"date\":\"AAAA-MM-JJ\",\"debut\":\"HH:MM\",\"fin\":\"HH:MM\",\"consignes\":\"consignes en une phrase\"}. Mets une chaine vide pour tout champ absent. FKH SECURITE n'est JAMAIS le client." };
+  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 700, messages: [{ role: "user", content: docs.concat([q]) }] }) });
+  if (!r.ok) return null;
+  const j = await r.json();
+  const txt = (j && j.content && j.content[0] && j.content[0].text) || "";
+  const m = txt.match(/\{[\s\S]*\}/);
+  if (!m) return null;
+  try { return JSON.parse(m[0]); } catch (e) { return null; }
+}
+
 async function aiAnalyzeImage(env, b64, media) {
   const content = [ { type: "text", text: AI_PROMPT_BASE + "\n\nAnalyse cette capture d'ecran (demande recue) :" }, { type: "image", source: { type: "base64", media_type: media || "image/png", data: b64 } } ];
   const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 600, messages: [{ role: "user", content: content }] }) });
@@ -336,8 +350,21 @@ export default {
       const exist = await env.DB.prepare("SELECT cdr_id FROM ai_calls WHERE cdr_id = ?").bind(cdr).first();
       if (exist) return json({ ok: true, skipped: "already" });
       let data = {}, isDem = 0;
+      let pdfInfo = null;
+      try { if (Array.isArray(b.pdfs) && b.pdfs.length && env.ANTHROPIC_API_KEY) pdfInfo = await aiReadPdf(env, b.pdfs); } catch (e) {}
       try { const an = await aiAnalyze(env, text); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [], transcript: text.slice(0, 2000), number: String(b.from || "mail"), direction: "in", source: "mail", start: new Date().toISOString() }; isDem = (data.demandes.length || data.arrets.length) ? 1 : 0; }
       catch (e) { data = { error: String((e && e.message) || e) }; }
+      if (pdfInfo) { data.pdf = pdfInfo; if (pdfInfo.adresse || pdfInfo.cp) isDem = isDem || 1; } // b203 : adresse exacte issue du bon de commande
+      // b155 : le script envoie TOUS les mails reçus — on ne GARDE que ce qui concerne les missions
+      // (demande détectée par l'IA, OU donneur d'ordre connu, OU vocabulaire mission). Le reste = marqueur `skip`
+      // (dédoublonnage : le mail ne sera pas ré-analysé) ; ses infos restent en base pour d'autres sections plus tard.
+      const fromStr = String(b.from || "");
+      const knownSender = /(securitas|reseau-aquila|ranc-developpement|banzai-communication)/i.test(fromStr);
+      const missionWords = /(gardien|prestation|surveillance|annulation|bon de commande|vacation|agent de s[eé]curit|rondier|intervention|ronde)/i.test(text);
+      if (!isDem && !knownSender && !missionWords) {
+        await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, 0, 1, 0, ?)").bind(cdr, Date.now(), JSON.stringify({ skip: 1, transcript: text.slice(0, 300), number: fromStr, source: "mail" })).run();
+        return json({ ok: true, skipped: "hors-mission" });
+      }
       await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(cdr, Date.now(), isDem, JSON.stringify(data)).run();
       if (isDem) { try { await pushAll(env, aiDemandeNotif({ cdr_id: cdr, direction: "in" }, data.demandes)); } catch (e) {} }
       return json({ ok: true, detected: isDem ? data.demandes.length : 0 });
@@ -438,6 +465,14 @@ export default {
     if (path === "/ai/demandes" && request.method === "GET") {
       const rs = await env.DB.prepare("SELECT cdr_id, at, data FROM ai_calls WHERE is_demande = 1 AND dismissed = 0 AND created = 0 ORDER BY at DESC LIMIT 50").all();
       const items = (rs.results || []).map((row) => Object.assign({ cdr_id: row.cdr_id, at: row.at }, safeParse(row.data)));
+      return json({ ok: true, items });
+    }
+    // --- b151 : liste des mails ingérés (section 📧 Mails missions — super-admin uniquement) ---
+    if (path === "/mails/list" && request.method === "GET") {
+      const rr = roleFor(pass);
+      if (!rr || (rr.role !== "superadmin" && rr.role !== "full")) return json({ error: "forbidden" }, 403);
+      const rs = await env.DB.prepare("SELECT cdr_id, at, is_demande, dismissed, created, data FROM ai_calls WHERE cdr_id LIKE 'mail_%' ORDER BY at DESC LIMIT 200").all();
+      const items = (rs.results || []).map((row) => Object.assign({ cdr_id: row.cdr_id, at: row.at, is_demande: row.is_demande, dismissed: row.dismissed, created: row.created }, safeParse(row.data)));
       return json({ ok: true, items });
     }
     if ((path === "/ai/dismiss" || path === "/ai/created") && request.method === "POST") {

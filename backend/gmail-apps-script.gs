@@ -1,76 +1,94 @@
 /************************************************************************
- * FKH SÉCURITÉ — Pipeline mails automatique (#5)
+ * FKH SÉCURITÉ — Pipeline mails automatique (#5, mis à niveau 01/08/2026)
  * ---------------------------------------------------------------------
- * Ce script tourne dans TON compte Gmail (script.google.com) et transfère
- * les mails de bon de commande / demande (BDC) au Worker Cloudflare, qui
- * les passe dans l'IA. Les demandes détectées apparaissent ensuite toutes
- * seules dans l'appli GESTION → Suivi demandes → « en recherche » avec la
- * mention « 🤖 à vérifier » (et, si c'est une intervention/ronde, dans la
- * section Interventions grâce à l'aiguillage #1).
+ * Ce script tourne dans le compte Gmail QUI REÇOIT les mails missions
+ * (script.google.com) et transfère les mails des donneurs d'ordre au
+ * Worker Cloudflare. L'IA les analyse : les demandes détectées arrivent
+ * toutes seules dans GESTION → Suivi demandes → « en recherche », et TOUS
+ * les mails remontés apparaissent dans la section 📧 Mails missions
+ * (super-admin) avec la comparaison mails ↔ Planning.
  *
- * ─── INSTALLATION (à faire une seule fois, côté Zeus) ───
- * 1. Va sur https://script.google.com → « Nouveau projet ».
- * 2. Colle TOUT ce fichier (remplace le code par défaut).
- * 3. Dans Gmail, crée un libellé « FKH-BDC » et un filtre qui l'applique
- *    aux mails de demande (ex. expéditeurs Securitas/Sotel…, ou mot-clé
- *    « bon de commande »). Tu peux aussi poser le libellé à la main.
- * 4. (Optionnel mais recommandé) pose le secret côté Worker pour durcir
- *    le token :  npx.cmd wrangler secret put MAIL_INGEST_TOKEN
- *    puis mets la MÊME valeur dans TOKEN ci-dessous. Sinon, laisse la
- *    valeur par défaut (elle marche déjà).
- * 5. Menu « Exécuter » → choisis la fonction  installerDeclencheur  une
- *    fois (autorise l'accès Gmail quand Google le demande). Ça crée un
- *    déclencheur qui lance le traitement toutes les 5 minutes.
- * 6. Pour tester tout de suite : « Exécuter » →  traiterMailsFKH .
+ * ⚠️ AUCUN filtre/libellé à créer : le script cherche tout seul les mails
+ * des 4 expéditeurs connus + mots-clés (décision Zeus 01/08/2026).
+ *
+ * ─── INSTALLATION (une seule fois, côté Zeus) ───
+ * 1. Connecte-toi au compte Gmail qui reçoit les mails missions.
+ * 2. https://script.google.com → « Nouveau projet » → colle TOUT ce fichier.
+ * 3. Menu « Exécuter » → fonction  installerDeclencheur  (autorise l'accès
+ *    Gmail quand Google le demande) → traitement toutes les 5 minutes.
+ * 4. Pour tester tout de suite : « Exécuter » →  traiterMailsFKH .
  ************************************************************************/
 
-// ⚙️ CONFIG — à ajuster
+// ⚙️ CONFIG
 var WORKER_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-var TOKEN      = 'fkh-mail-ingest-2026'; // doit être identique au secret MAIL_INGEST_TOKEN (ou laisser tel quel)
-var LABEL_A_TRAITER = 'FKH-BDC';         // libellé des mails à analyser
-var LABEL_TRAITE    = 'FKH-Traite';      // libellé posé une fois envoyé (anti-doublon)
-var MAX_PAR_PASSAGE = 15;                // sécurité : nb max de mails traités par exécution
+var TOKEN      = 'fkh-mail-ingest-2026'; // = secret MAIL_INGEST_TOKEN côté Worker (défaut OK)
 
-/** Boucle principale : cherche les mails à traiter et les envoie au Worker. */
+// Périmètre (décision Zeus 01/08/2026, révisée) : le script envoie TOUS les mails REÇUS.
+// C'est le Worker (IA + critères mission) qui ne GARDE que ce qui concerne les missions —
+// le reste est marqué « hors-mission » (jamais ré-analysé) et servira à d'autres sections plus tard.
+var ADRESSES_A_NOUS = ['fkhsecurite', 'hacamara2', 'bahalphaba95']; // nos propres adresses : jamais renvoyées
+var LABEL_TRAITE   = 'FKH-Traite'; // posé sur les fils envoyés (repère visuel ; l'anti-doublon réel est côté Worker)
+var FENETRE        = '1d';         // fenêtre de recherche à chaque passage (le Worker dédoublonne)
+var MAX_MESSAGES   = 30;           // sécurité : nb max de messages envoyés par exécution
+
+/** Boucle principale : envoie tous les mails reçus récents au Worker (qui trie). */
 function traiterMailsFKH() {
   var traite = getOrCreateLabel(LABEL_TRAITE);
-  var query = 'label:' + LABEL_A_TRAITER + ' -label:' + LABEL_TRAITE;
-  var threads = GmailApp.search(query, 0, MAX_PAR_PASSAGE);
-  var envoyes = 0;
-  for (var i = 0; i < threads.length; i++) {
+  var query = 'newer_than:' + FENETRE + ' -in:sent -in:chats -in:trash -in:spam';
+  var threads = GmailApp.search(query, 0, 40);
+  var envoyes = 0, deja = 0;
+  for (var i = 0; i < threads.length && envoyes < MAX_MESSAGES; i++) {
     var msgs = threads[i].getMessages();
-    var m = msgs[msgs.length - 1]; // le dernier message du fil
-    try {
-      var payload = {
-        msgId:   m.getId(),
-        subject: m.getSubject() || '',
-        body:    m.getPlainBody() ? m.getPlainBody().slice(0, 8000) : '',
-        from:    m.getFrom() || ''
-      };
-      var res = UrlFetchApp.fetch(WORKER_URL + '/mail/ingest?k=' + encodeURIComponent(TOKEN), {
-        method: 'post',
-        contentType: 'application/json',
-        payload: JSON.stringify(payload),
-        muteHttpExceptions: true
-      });
-      var code = res.getResponseCode();
-      if (code >= 200 && code < 300) {
-        threads[i].addLabel(traite); // marqué traité → jamais renvoyé
-        envoyes++;
-      } else {
-        Logger.log('Echec (' + code + ') pour « ' + payload.subject + ' » : ' + res.getContentText());
-      }
-    } catch (e) {
-      Logger.log('Erreur sur un mail : ' + e);
+    var touche = false;
+    for (var j = 0; j < msgs.length && envoyes < MAX_MESSAGES; j++) {
+      var m = msgs[j];
+      // On ne renvoie pas nos propres messages
+      var from = m.getFrom() || '';
+      var aNous = false;
+      for (var k = 0; k < ADRESSES_A_NOUS.length; k++) { if (from.indexOf(ADRESSES_A_NOUS[k]) >= 0) { aNous = true; break; } }
+      if (aNous) continue;
+      try {
+        // b203 : on joint les PDF (bons de commande) en base64 -> le Worker les fait lire par l'IA (adresse exacte du site)
+        var pdfs = [];
+        try {
+          var atts = m.getAttachments({ includeInlineImages: false, includeAttachments: true }) || [];
+          for (var z = 0; z < atts.length && pdfs.length < 2; z++) {
+            var at = atts[z];
+            if (String(at.getContentType()).indexOf('pdf') < 0) continue;
+            if (at.getSize() > 3500000) continue; // 3,5 Mo max par PDF
+            pdfs.push({ name: at.getName(), b64: Utilities.base64Encode(at.getBytes()) });
+          }
+        } catch (ePdf) { Logger.log('PDF ignore : ' + ePdf); }
+        var payload = {
+          msgId:   m.getId(),
+          subject: m.getSubject() || '',
+          body:    m.getPlainBody() ? m.getPlainBody().slice(0, 8000) : '',
+          from:    from,
+          pdfs:    pdfs
+        };
+        var res = UrlFetchApp.fetch(WORKER_URL + '/mail/ingest?k=' + encodeURIComponent(TOKEN), {
+          method: 'post',
+          contentType: 'application/json',
+          payload: JSON.stringify(payload),
+          muteHttpExceptions: true
+        });
+        var code = res.getResponseCode();
+        if (code >= 200 && code < 300) {
+          touche = true;
+          if (res.getContentText().indexOf('already') >= 0) deja++; else envoyes++;
+        } else {
+          Logger.log('Echec (' + code + ') pour « ' + payload.subject + ' » : ' + res.getContentText());
+        }
+      } catch (e) { Logger.log('Erreur sur un mail : ' + e); }
     }
+    if (touche) threads[i].addLabel(traite);
   }
-  Logger.log(envoyes + ' mail(s) envoyé(s) au Worker.');
+  Logger.log(envoyes + ' nouveau(x) mail(s) envoyé(s), ' + deja + ' déjà connus (dédoublonnés par le Worker).');
   return envoyes;
 }
 
 /** Crée le déclencheur automatique (toutes les 5 min). À lancer UNE fois. */
 function installerDeclencheur() {
-  // Évite les doublons de déclencheur
   var triggers = ScriptApp.getProjectTriggers();
   for (var i = 0; i < triggers.length; i++) {
     if (triggers[i].getHandlerFunction() === 'traiterMailsFKH') ScriptApp.deleteTrigger(triggers[i]);
