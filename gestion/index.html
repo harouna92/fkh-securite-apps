@@ -204,7 +204,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b204</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b205</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1347,6 +1347,17 @@ button.big:active{transform:translateY(1px)}
   // -> la date part dans mdateFin, l'heure seule reste dans mfin ; le Planning n'affiche plus que les heures.
   function suiviCleanFins(){ try{ var ch=false; (SUIVI||[]).forEach(function(m){ var f=String(m.mfin||''); if(f&&!/^\s*\d{1,2}[:hH]\d{2}\s*$/.test(f)){ var dm=/(\d{2})\/(\d{2})\/(\d{4})/.exec(f); var hm=/(\d{1,2})[:hH](\d{2})/.exec(f.replace(/\d{2}\/\d{2}\/\d{4}/,'')); if(dm)m.mdateFin=dm[3]+'-'+dm[2]+'-'+dm[1]; m.mfin=hm?(('0'+(+hm[1])).slice(-2)+':'+hm[2]):''; ch=true; } }); if(ch)save('fkh_suivi',SUIVI); }catch(e){} }
   suiviCleanFins();
+  // b205 : HERITAGE SITE -> VACATION. Le referentiel Sites & Clients (adresses Sekur/PDF) complete
+  // les vacations dont la ville / le CP / le client sont vides -> rapprochements photo et mails plus fins.
+  function suiviHeriteSite(){ try{ var sm={}; try{sm=JSON.parse(localStorage.getItem('fkh_sites_meta')||'{}')||{};}catch(e){}
+    if(!sm||!Object.keys(sm).length)return; var ch=0;
+    (SUIVI||[]).forEach(function(m){ if(m.statut!=='validee')return; var st=m.siteAgent||m.titre||''; var me=sm[st]; if(!me)return;
+      if(!(m.ville||'').trim() && me.ville){ m.ville=me.ville; ch++; }
+      if(!(m.cp||'').trim() && me.cp){ m.cp=me.cp; ch++; }
+      if(!(m.client||'').trim() && me.client){ m.client=me.client; ch++; }
+    });
+    if(ch)save('fkh_suivi',SUIVI); }catch(e){} }
+  suiviHeriteSite();
   // b195 (JULES #43-49) : l'ancien flag retiree (b156) devient saOff = retrait REVERSIBLE du Suivi des appels (la vacation reste au Planning)
   function saOffMigrate(){ try{ var ch=false; (SUIVI||[]).forEach(function(m){ if(m.retiree){ delete m.retiree; delete m.retireeAt; m.saOff=true; ch=true; } }); if(ch)save('fkh_suivi',SUIVI); }catch(e){} }
   saOffMigrate();
@@ -2895,7 +2906,7 @@ button.big:active{transform:translateY(1px)}
     }
     try{ localStorage.setItem(k,v); }catch(e){}
     try{
-      if(k==='fkh_suivi'){ var _sims=SUIVI.filter(function(x){return x.sim;}); SUIVI=load('fkh_suivi'); if(_sims.length)SUIVI=_sims.concat(SUIVI); SUIVI.forEach(function(x){delete x._pending;delete x._pick;delete x._pick2;}); if(typeof suiviCleanFins==='function')suiviCleanFins(); if(typeof saOffMigrate==='function')saOffMigrate(); if(typeof renderSuivi==='function')renderSuivi(); }
+      if(k==='fkh_suivi'){ var _sims=SUIVI.filter(function(x){return x.sim;}); SUIVI=load('fkh_suivi'); if(_sims.length)SUIVI=_sims.concat(SUIVI); SUIVI.forEach(function(x){delete x._pending;delete x._pick;delete x._pick2;}); if(typeof suiviCleanFins==='function')suiviCleanFins(); if(typeof suiviHeriteSite==='function')suiviHeriteSite(); if(typeof saOffMigrate==='function')saOffMigrate(); if(typeof renderSuivi==='function')renderSuivi(); }
       else if(k==='fkh_fa'){ FA=load('fkh_fa'); FA.forEach(function(a){if(a.tel&&!a.tels){a.tels=[a.tel];delete a.tel;}}); if(typeof renderFA==='function')renderFA(); }
       else if(k==='fkh_thiam'){ TH=load('fkh_thiam'); if(typeof thRenderBoard==='function')thRenderBoard(); if(typeof thRenderOut==='function')thRenderOut(); if(typeof thRenderAuto==='function')thRenderAuto(); }
       else if(k==='fkh_zones_diff'){ try{ZDIFF=JSON.parse(localStorage.getItem('fkh_zones_diff')||'{}')||{};}catch(e){ZDIFF={};} if(typeof renderZone==='function' && byId('sec-zone') && !byId('sec-zone').classList.contains('hidden'))renderZone(); }
@@ -5520,6 +5531,7 @@ button.big:active{transform:translateY(1px)}
     var ss=box.querySelector('.ref-s-save'); if(ss)ss.onclick=function(){ var host=ss.closest('.ref-item'); var oldN=host.getAttribute('data-k');
       var patch={ client:(host.querySelector('.ref-s-client').value||'').trim(), nomClient:(host.querySelector('.ref-s-nomcli').value||'').trim(), adresse:(host.querySelector('.ref-s-adresse').value||'').trim(), cp:(host.querySelector('.ref-s-cp').value||'').trim(), ville:(host.querySelector('.ref-s-ville').value||'').trim() };
       try{ var sm2=_refMetaAll(); sm2[oldN]=Object.assign({},sm2[oldN]||{},patch); localStorage.setItem('fkh_sites_meta',JSON.stringify(sm2)); if(typeof cloudPush==='function')cloudPush('fkh_sites_meta'); }catch(e){}
+      if(typeof suiviHeriteSite==='function')suiviHeriteSite();
       var newN=(host.querySelector('.ref-s-nom').value||'').trim();
       if(newN&&newN!==oldN){ if(confirm('Renommer le site « '+oldN+' » en « '+newN+' » ?\n\nAppliqué à toutes ses vacations.')){ var n2=refRenameSite(oldN,newN); REF_SEL=newN; alert('✅ Renommé ('+n2+' vacation(s) mises à jour).'); } }
       renderRef(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} };
