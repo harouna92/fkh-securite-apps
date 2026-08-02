@@ -56,7 +56,14 @@ function pingTemoinDeVie(vus, envoyes, erreur) {
 
 function _collecterMails() {
   var traite = getOrCreateLabel(LABEL_TRAITE);
-  var query = 'newer_than:' + FENETRE + ' -in:sent -in:chats -in:trash -in:spam';
+  // b224 : recherche INCREMENTALE. A 1 passage par minute, relire FENETRE entiere a chaque fois
+  // consommerait le quota Apps Script (90 min/jour en compte Gmail gratuit). On ne regarde donc que
+  // ce qui est arrive depuis le dernier passage, avec 10 min de recouvrement de securite.
+  var props = PropertiesService.getScriptProperties();
+  var dernier = parseInt(props.getProperty('FKH_DERNIER_PASSAGE') || '0', 10);
+  var depuis = dernier ? Math.floor(dernier / 1000) - 600 : 0;
+  var query = (depuis ? ('after:' + depuis) : ('newer_than:' + FENETRE)) + ' -in:sent -in:chats -in:trash -in:spam';
+  props.setProperty('FKH_DERNIER_PASSAGE', String(Date.now()));
   var threads = GmailApp.search(query, 0, 40);
   var envoyes = 0, deja = 0;
   for (var i = 0; i < threads.length && envoyes < MAX_MESSAGES; i++) {
@@ -109,16 +116,16 @@ function _collecterMails() {
   return { vus: envoyes + deja, envoyes: envoyes };
 }
 
-/** Crée le déclencheur automatique (toutes les 5 min). À lancer UNE fois. */
+/** Crée le déclencheur automatique (toutes les 1 min). À lancer UNE fois. */
 function installerDeclencheur() {
   var triggers = ScriptApp.getProjectTriggers();
   for (var i = 0; i < triggers.length; i++) {
     if (triggers[i].getHandlerFunction() === 'traiterMailsFKH') ScriptApp.deleteTrigger(triggers[i]);
   }
-  ScriptApp.newTrigger('traiterMailsFKH').timeBased().everyMinutes(5).create();
+  ScriptApp.newTrigger('traiterMailsFKH').timeBased().everyMinutes(1).create();
   pingTemoinDeVie(0, 0, '');
   var n = ScriptApp.getProjectTriggers().length;
-  Logger.log('Déclencheur installé : traiterMailsFKH toutes les 5 minutes. Déclencheurs actifs sur le projet : ' + n);
+  Logger.log('Déclencheur installé : traiterMailsFKH toutes les MINUTES. Déclencheurs actifs sur le projet : ' + n);
 }
 
 /** Utilitaire : récupère un libellé, le crée s'il n'existe pas. */
