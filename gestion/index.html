@@ -214,7 +214,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b229</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b232</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -242,6 +242,8 @@ button.big:active{transform:translateY(1px)}
     <button data-s="streste">💶 Reste ST</button>
     <button data-s="cockpitfkh">📈 Cockpit FKH</button>
     <button data-s="tickets">🎫 Tickets</button>
+<button data-s="corbeille">🗑️ Corbeille</button>
+<button data-s="droits">🔐 Droits d’accès</button>
 <button type="button" id="pc-btn" title="Prise / fin de service au PC — pour que tout le monde sache qui tient le poste">🎧 Prise de service PC</button>
     <button data-s="numeros">📇 Numéros utiles</button>
     <button data-s="clientsf">🏢 Clients</button>
@@ -925,6 +927,18 @@ button.big:active{transform:translateY(1px)}
     <div id="cfkh-body" style="max-width:1000px;margin:0 auto"></div>
   </section>
 
+  <section id="sec-droits" class="hidden">
+    <h2>🔐 Droits d’accès</h2>
+    <p class="sub">Coche qui voit quoi. Le super-admin voit toujours tout — c’est volontaire, pour qu’on ne puisse
+    jamais se fermer la porte. Le réglage est <b>partagé</b> : il s’applique à tout le monde dès la prochaine ouverture.</p>
+    <div id="dr-body"></div>
+  </section>
+  <section id="sec-corbeille" class="hidden">
+    <h2>🗑️ Corbeille</h2>
+    <p class="sub">Range ta barre : appui long sur un onglet, puis lâche-le sur 🗑️ Corbeille — il quitte la barre.
+    Rien n’est perdu, tu le retrouves ici et tu peux le remettre quand tu veux. Ce réglage ne concerne que <b>cet appareil</b>.</p>
+    <div id="cb-body"></div>
+  </section>
   <section id="sec-tickets" class="hidden">
     <div><h1>🎫 Tickets</h1><p class="sub">Confie une tâche à traiter. La personne fait le travail <b>directement depuis le ticket</b> (champ à renseigner + lien vers la fiche), et le <b>suivi se met à jour tout seul</b> (ex. 3/11 renseignées).</p></div>
     <div id="tk-body"></div>
@@ -996,8 +1010,8 @@ button.big:active{transform:translateY(1px)}
   }
   // Branche un bouton .gtime sur la grille : clic -> grille -> data-v + callback
   function bindTimeBtn(el,onPick){ if(!el)return; el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); openTimeGrid(el, tbGet(el), function(v){ tbSet(el,v); if(onPick)onPick(v); }); }); }
-  var secs=['demandes','noterapide','prise','fin','suivi','planning','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','numeros','clientsf','terrain','supterrain','streste','cockpitfkh','depots','mails','ref'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;if(s==='ref'){var _r8=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; if(_r8!=='admin'&&_r8!=='superadmin'&&_r8!=='full')return;} /* b198 : Sites & Clients = admin + super-admin */document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});try{document.body.classList.toggle('plfull',s==='planning');}catch(e){} /* b207 */if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='terrain'&&typeof renderTerrain==='function')renderTerrain();if(s==='supterrain'&&typeof renderSupTerrain==='function')renderSupTerrain();if(s==='clientsf'&&typeof renderClientsF==='function')renderClientsF();if(s==='planning'&&typeof renderPlanning==='function')renderPlanning();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if(s==='mails'&&typeof renderMails==='function')renderMails();if(s==='ref'&&typeof renderRef==='function')renderRef();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
+  var secs=['droits','corbeille','demandes','noterapide','prise','fin','suivi','planning','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','numeros','clientsf','terrain','supterrain','streste','cockpitfkh','depots','mails','ref'];
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;if(s==='ref'){var _r8=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; if(_r8!=='admin'&&_r8!=='superadmin'&&_r8!=='full')return;} /* b198 : Sites & Clients = admin + super-admin */document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});try{document.body.classList.toggle('plfull',s==='planning');}catch(e){} /* b207 */if(s==='droits'&&typeof renderDroits==='function')renderDroits();if(s==='corbeille'&&typeof renderCorbeille==='function')renderCorbeille();if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='terrain'&&typeof renderTerrain==='function')renderTerrain();if(s==='supterrain'&&typeof renderSupTerrain==='function')renderSupTerrain();if(s==='clientsf'&&typeof renderClientsF==='function')renderClientsF();if(s==='planning'&&typeof renderPlanning==='function')renderPlanning();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if(s==='mails'&&typeof renderMails==='function')renderMails();if(s==='ref'&&typeof renderRef==='function')renderRef();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
   // ===== Réorganiser les SECTIONS (onglets) par glisser-déposer — appui long, mémorisé par appareil =====
   (function tabReorder(){
     var bar=byId('tabs'); if(!bar)return; var LS='fkh_tabs_order';
@@ -1011,7 +1025,14 @@ button.big:active{transform:translateY(1px)}
     var timer=null, dragging=null, moved=false, sx=0, sy=0;
     bar.addEventListener('pointerdown',function(e){ if(!peutReorganiser())return; var b=e.target.closest?e.target.closest('button[data-s]'):null; if(!b)return; sx=e.clientX; sy=e.clientY; moved=false; timer=setTimeout(function(){ dragging=b; b.classList.add('tab-drag'); if(navigator.vibrate){try{navigator.vibrate(15);}catch(_){}}} ,350); });
     bar.addEventListener('pointermove',function(e){ if(timer&&!dragging&&(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8)){ clearTimeout(timer); timer=null; } if(!dragging)return; e.preventDefault(); moved=true; var u=document.elementFromPoint(e.clientX,e.clientY); var t=u&&u.closest?u.closest('button[data-s]'):null; if(!t||t===dragging||t.parentNode!==bar)return; var r=t.getBoundingClientRect(); bar.insertBefore(dragging, (e.clientX>(r.left+r.width/2))?t.nextSibling:t); });
-    function end(){ if(timer){clearTimeout(timer);timer=null;} if(dragging){ dragging.classList.remove('tab-drag'); dragging=null; save(); } }
+    function end(e){ if(timer){clearTimeout(timer);timer=null;}
+      if(dragging){
+        var cible=null; try{ var el=(e&&e.clientX!=null)?document.elementFromPoint(e.clientX,e.clientY):null; cible=el&&el.closest?el.closest('button[data-s]'):null; }catch(_e){}
+        var k=dragging.getAttribute('data-s');
+        dragging.classList.remove('tab-drag'); dragging=null;
+        if(cible&&cible.getAttribute('data-s')==='corbeille'&&k!=='corbeille'){ if(typeof cbJeter==='function')cbJeter(k); return; }   /* b230 */
+        save();
+      } }
     bar.addEventListener('pointerup',end); bar.addEventListener('pointercancel',end);
     bar.addEventListener('click',function(e){ if(moved){ e.preventDefault(); e.stopPropagation(); moved=false; } },true);
   })();
@@ -2559,10 +2580,10 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_pc_poste','fkh_data'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_pc_poste','fkh_droits','fkh_data'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
-  var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','tickets','cockpitfkh','streste','depots','clientsf']; // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)  /* b228 : 'mails' retire — la section Mails missions (et son temoin de vie) est desormais visible par le superviseur et l'administrateur, pas seulement le super-admin */
+  var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','tickets','cockpitfkh','streste','depots','clientsf','corbeille','droits']; // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)  /* b228 : 'mails' retire — la section Mails missions (et son temoin de vie) est desormais visible par le superviseur et l'administrateur, pas seulement le super-admin */
   function _secSuperOnly(s){ return SUPERADMIN_SECTIONS.indexOf(s)>=0; }
   // Landing + ordre des onglets selon le rôle : opérateur → « Suivi des appels » en 1er + ouvert ; superviseur/admin/super-admin → « Suivi demandes » en 1er + ouvert.
   function applyRoleLayout(){ try{ var tabs=byId('tabs'); if(!tabs)return; var isOp=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); var primary=isOp?'suiviappels':'suivi'; var pb=tabs.querySelector('button[data-s="'+primary+'"]'); if(!pb)return; tabs.insertBefore(pb,tabs.firstChild); if(!isOp){ var sa=tabs.querySelector('button[data-s="suiviappels"]'); if(sa)tabs.insertBefore(sa,pb.nextSibling); } if(getComputedStyle(pb).display!=='none')pb.click(); }catch(e){} }
@@ -2579,7 +2600,182 @@ button.big:active{transform:translateY(1px)}
       ord.slice().reverse().forEach(function(k){ var b=bar.querySelector('button[data-s="'+k+'"]'); if(b)bar.insertBefore(b,bar.firstChild); });
     }catch(e){}
   }
-  function applySectionAccess(){ tabsOrdreRole(); try{pcMaj();}catch(e){} var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=((!allowed)||allowed.indexOf(s)>=0) && !(_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin()); b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
+  /* ===== b230 : CORBEILLE DES SECTIONS =====
+     POURQUOI : pres de 30 onglets dans la barre. Chacun n'en utilise qu'une partie, et le bruit coute
+     du temps a chaque recherche visuelle.
+     COMMENT : appui long sur un onglet, on le lache sur 🗑️ — il quitte la barre sans etre detruit.
+     Il attend dans la Corbeille, restaurable en un clic. La suppression definitive est un second geste,
+     explicite, et reste rattrapable par « Tout remettre ». Reglage PAR APPAREIL : sans effet pour les autres. */
+  function cbHidden(){ try{ var a=JSON.parse(localStorage.getItem('fkh_tabs_hidden')||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+  function cbDeleted(){ try{ var a=JSON.parse(localStorage.getItem('fkh_tabs_deleted')||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+  function cbSave(h,d){ try{ localStorage.setItem('fkh_tabs_hidden',JSON.stringify(h)); localStorage.setItem('fkh_tabs_deleted',JSON.stringify(d)); }catch(e){} }
+  function cbLabel(k){ var b=document.querySelector('#tabs button[data-s="'+k+'"]'); return b?(b.textContent||k).trim():k; }
+  function cbJeter(k){ if(!k||k==='corbeille')return; var h=cbHidden(); if(h.indexOf(k)<0)h.push(k); cbSave(h,cbDeleted()); applySectionAccess(); renderCorbeille(); }
+  function cbRestaurer(k){ cbSave(cbHidden().filter(function(x){return x!==k;}), cbDeleted().filter(function(x){return x!==k;})); applySectionAccess(); renderCorbeille(); }
+  function cbSupprimer(k){ var h=cbHidden().filter(function(x){return x!==k;}), d=cbDeleted(); if(d.indexOf(k)<0)d.push(k); cbSave(h,d); applySectionAccess(); renderCorbeille(); }
+  function renderCorbeille(){
+    var box=byId('cb-body'); if(!box)return;
+    var h=cbHidden(), d=cbDeleted();
+    function ligne(k,def){
+      return '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:6px;background:var(--panel2)">'
+        +'<b style="flex:1;min-width:120px">'+esc(cbLabel(k))+'</b>'
+        +'<button type="button" class="cb-res" data-k="'+esc(k)+'" style="font-size:12px">↩️ Remettre dans la barre</button>'
+        +(def?'':'<button type="button" class="cb-del" data-k="'+esc(k)+'" style="font-size:12px">🗑️ Supprimer définitivement</button>')
+        +'</div>';
+    }
+    var htm='<div class="lab" style="margin:8px 0 4px">Dans la corbeille'+(h.length?(' ('+h.length+')'):'')+'</div>';
+    htm+=h.length?h.map(function(k){return ligne(k,false);}).join(''):'<div class="sub">Rien pour l’instant. Appuie longuement sur un onglet, puis lâche-le sur 🗑️ Corbeille.</div>';
+    if(d.length){
+      htm+='<div class="lab" style="margin:14px 0 4px">Supprimées définitivement ('+d.length+')</div>';
+      htm+='<div class="sub" style="margin:0 0 6px">Elles n’apparaissent plus dans la barre. Tu peux quand même les remettre.</div>';
+      htm+=d.map(function(k){return ligne(k,true);}).join('');
+    }
+    if(h.length||d.length)htm+='<div class="acts" style="margin-top:10px"><button type="button" id="cb-all">↩️ Tout remettre</button></div>';
+    box.innerHTML=htm;
+    box.querySelectorAll('.cb-res').forEach(function(b){ b.onclick=function(){ cbRestaurer(b.getAttribute('data-k')); }; });
+    box.querySelectorAll('.cb-del').forEach(function(b){ b.onclick=function(){ if(confirm('Supprimer définitivement « '+cbLabel(b.getAttribute('data-k'))+' » de ta barre ?\n\nElle disparaîtra aussi de la corbeille. « Tout remettre » permettra de la récupérer.'))cbSupprimer(b.getAttribute('data-k')); }; });
+    var all=byId('cb-all'); if(all)all.onclick=function(){ cbSave([],[]); applySectionAccess(); renderCorbeille(); };
+  }
+  /* b230 : le masquage (Assistant, corbeille) et le bouton PC ne dependent pas de la connexion :
+     on applique des le chargement, sinon la barre reste telle quelle tant qu'on n'a pas de session. */
+  try{ document.addEventListener('DOMContentLoaded',function(){ try{applySectionAccess();}catch(e){} }); setTimeout(function(){ try{applySectionAccess();}catch(e){} },300); }catch(e){}
+  /* ===== b232 : DROITS D'ACCES =====
+     POURQUOI : jusqu'ici, « qui voit quoi » etait ecrit en dur dans le code — chaque ajustement passait
+     par un build. Le super-admin doit pouvoir ouvrir ou fermer un acces lui-meme, quand il decide.
+     COMMENT : une grille sections x roles et pastilles x roles, partagee par le cloud. Tant qu'une case
+     n'a jamais ete touchee, on garde exactement le comportement d'avant (les defauts ci-dessous).
+     GARDE-FOU : le super-admin voit toujours tout, on ne peut pas se verrouiller dehors. */
+  var DR_ROLES=[['operateur','Opérateur'],['superviseur','Superviseur'],['admin','Administrateur']];
+  /* defaut = l'existant : les sections super-admin restent fermees, les autres ouvertes a l'encadrement,
+     l'operateur garde ses 5 sections de travail. */
+  var DR_OPERATEUR_DEF=['suiviappels','interv','suivi','demandes','noterapide'];
+  function drLoad(){ try{ var o=JSON.parse(localStorage.getItem('fkh_droits')||'null'); if(o&&typeof o==='object')return o; }catch(e){} return {sections:{},pastilles:{}}; }
+  function drSave(o){ try{ save('fkh_droits',o); }catch(e){} }
+  function drRole(){ try{ return (typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; }catch(e){ return 'full'; } }
+  function drEstSuper(){ var r=drRole(); return r==='superadmin'||r==='full'; }
+  /* Regle Zeus 03/08 : TOUTE nouveaute — section comme pastille — nait super-admin seul, et c'est lui
+     qui l'ouvre ensuite depuis cette grille. On raisonne donc en liste BLANCHE : ce qui n'est pas
+     explicitement liste ci-dessous est ferme par defaut. Une pastille ajoutee demain sera invisible
+     aux autres tant que Zeus ne l'aura pas cochee — sans qu'il faille y penser dans le code. */
+  var DR_SECTIONS_ENCADREMENT=['noterapide','demandes','suivi','planning','fiche','zone','suiviappels','tenues',
+    'services','interv','cfgiv','appels','suivisite','supervision','numeros','terrain','supterrain','mails'];
+  var DR_PASTILLES_ENCADREMENT=['op','cli','ph','te','c2','ro','af','rt','gp','pc'];
+  function drDefSection(k,role){
+    if(_secSuperOnly(k))return false;
+    if(role==='operateur')return DR_OPERATEUR_DEF.indexOf(k)>=0;
+    if(k==='ref')return (role==='admin');
+    return DR_SECTIONS_ENCADREMENT.indexOf(k)>=0;
+  }
+  function drDefPastille(k,role){
+    if(role==='operateur')return false;
+    return DR_PASTILLES_ENCADREMENT.indexOf(k)>=0;   /* 'an' n'y est pas : annulations = super-admin seul */
+  }
+  function drVoitSection(k){
+    if(drEstSuper())return true;
+    var o=drLoad(), r=drRole(), c=o.sections&&o.sections[k];
+    if(c&&typeof c==='object'&&typeof c[r]==='boolean')return c[r];
+    return drDefSection(k,r);
+  }
+  function drVoitPastille(k){
+    if(drEstSuper())return true;
+    var o=drLoad(), r=drRole(), c=o.pastilles&&o.pastilles[k];
+    if(c&&typeof c==='object'&&typeof c[r]==='boolean')return c[r];
+    return drDefPastille(k,r);
+  }
+  var DR_PASTILLES=[['pc','🎧 Qui est au PC'],['an','🔴 Annulations à confirmer'],['op','⏰ Prises/fins non pointées'],
+    ['cli','🏢 Client non avisé'],['ph','📷 Photos prise/fin'],['te','🦺 Contrôles tenue'],
+    ['c2','🌙 Photos de contrôle 2 h'],['ro','🔌 Pointage sans appel'],['af','🧍 Vacations non affectées'],
+    ['rt','🐢 Retards de prise'],['gp','📵 Photos sans position']];
+  function renderDroits(){
+    var box=byId('dr-body'); if(!box)return;
+    if(!drEstSuper()){ box.innerHTML='<div class="card"><div class="sub" style="margin:0">Réservé au super-administrateur.</div></div>'; return; }
+    var o=drLoad();
+    function grille(titre,liste,type,def){
+      var h='<div class="lab" style="margin:14px 0 6px">'+titre+'</div>';
+      h+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr>'
+       +'<th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)">Élément</th>'
+       +DR_ROLES.map(function(r){return '<th style="padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap">'+r[1]+'</th>';}).join('')
+       +'</tr></thead><tbody>';
+      h+=liste.map(function(it){
+        var k=it[0], lbl=it[1];
+        return '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--line)">'+esc(lbl)+'</td>'
+          +DR_ROLES.map(function(r){
+              var cur=(o[type]&&o[type][k]&&typeof o[type][k][r[0]]==='boolean')?o[type][k][r[0]]:def(k,r[0]);
+              return '<td style="text-align:center;padding:6px 8px;border-bottom:1px solid var(--line)">'
+                +'<input type="checkbox" class="dr-cb" data-t="'+type+'" data-k="'+esc(k)+'" data-r="'+r[0]+'"'+(cur?' checked':'')+' style="width:18px;height:18px">'
+                +'</td>'; }).join('')
+          +'</tr>'; }).join('');
+      return h+'</tbody></table></div>';
+    }
+    var secs2=[]; document.querySelectorAll('#tabs button[data-s]').forEach(function(b){
+      var k=b.getAttribute('data-s'); if(k==='droits')return; secs2.push([k,(b.textContent||k).trim()]); });
+    box.innerHTML=grille('Pastilles',DR_PASTILLES,'pastilles',drDefPastille)
+      + grille('Sections', secs2, 'sections', drDefSection)
+      + '<div class="acts" style="margin-top:12px"><button type="button" id="dr-reset">↩️ Revenir aux réglages d’origine</button></div>';
+    box.querySelectorAll('.dr-cb').forEach(function(cb){
+      cb.onchange=function(){
+        var o2=drLoad(), t=cb.getAttribute('data-t'), k=cb.getAttribute('data-k'), r=cb.getAttribute('data-r');
+        o2[t]=o2[t]||{}; o2[t][k]=o2[t][k]||{}; o2[t][k][r]=cb.checked; drSave(o2);
+        try{ applySectionAccess(); ppRefresh(); }catch(e){}
+      };
+    });
+    var rz=byId('dr-reset'); if(rz)rz.onclick=function(){ if(confirm('Revenir aux réglages d’origine ?'))
+      { drSave({sections:{},pastilles:{}}); renderDroits(); try{ applySectionAccess(); ppRefresh(); }catch(e){} } };
+  }
+  var DEMOS={
+    annulation:{ titre:'🔴 Annulation signalée',
+      quoi:'Une vacation AQUILA demain soir, sur laquelle un mail d’annulation vient d’arriver.',
+      aFaire:'Ouvre la pastille 🔴 en haut à droite : tu dois voir le site, l’heure et l’heure de réception. Essaie « \u274c Fausse alerte » (la vacation reste intacte), puis recharge et essaie « \u2705 Confirmer ».',
+      monter:function(){
+        var d=new Date(Date.now()+18*3600000), iso=d.toISOString().slice(0,10);
+        var m={id:'demo_an1',statut:'validee',client:'AQUILA',siteAgent:'CARREFOUR MARKET Sainte-Savine',ville:'Sainte-Savine',
+               mdate:iso,mheure:'20:00',mfin:'06:00',
+               annul:{src:'mail_demo1',at:Date.now()-1800000,sujet:'ANNULATION prestation du '+iso.split('-').reverse().join('/'),vu:0}};
+        SUIVI.unshift(m); } },
+    pcvide:{ titre:'🎧 Personne au PC',
+      quoi:'Aucun poste ouvert : le PC est vacant.',
+      aFaire:'Regarde la pastille 🎧 : elle doit clignoter en rouge avec un « ! ». Ouvre-la, puis clique « 🎧 Je prends le PC » — elle doit passer au vert et t’afficher au poste.',
+      monter:function(){ try{localStorage.setItem('fkh_pc_poste',JSON.stringify({postes:[]}));}catch(e){} } },
+    pctenu:{ titre:'🎧 Le PC est tenu',
+      quoi:'Un opérateur a ouvert son service il y a 2 h.',
+      aFaire:'La pastille 🎧 affiche « 1 » sans clignoter. Ouvre-la : tu vois qui tient le poste et depuis combien de temps.',
+      monter:function(){ try{localStorage.setItem('fkh_pc_poste',JSON.stringify({postes:[{user:'operateur-1',nom:'Opérateur 1',role:'operateur',debut:Date.now()-7200000,fin:0}]}));}catch(e){} } },
+    collecte:{ titre:'\u26a0\uFE0F Collecte des mails à l’arrêt',
+      quoi:'Le dernier signal du script Gmail date de 2 h.',
+      aFaire:'Ouvre 📧 Mails missions : le bandeau rouge doit annoncer l’arrêt et la marche à suivre.',
+      monter:function(){ try{localStorage.setItem('fkh_mail_hb',JSON.stringify({hb:{at:Date.now()-7200000,vus:12,envoyes:0,runs:41,lastMail:Date.now()-32400000,erreur:''},lu:Date.now()}));}catch(e){} } },
+    corbeille:{ titre:'🗑️ Corbeille des sections',
+      quoi:'Rien à préparer — la corbeille part vide.',
+      aFaire:'Appuie longuement (environ une demi-seconde) sur un onglet dont tu ne te sers pas, garde le doigt et lâche-le sur 🗑️ Corbeille. Ouvre ensuite la Corbeille : remets-le, ou supprime-le définitivement.',
+      monter:function(){} }
+  };
+  function demoMonter(k){
+    var D=DEMOS[k]; if(!D)return;
+    try{ D.monter(); if(typeof save==='function'&&typeof SUIVI!=='undefined')save('fkh_suivi',SUIVI); }catch(e){}
+    setTimeout(function(){ demoBandeau(k); if(typeof ppRefresh==='function')try{ppRefresh();}catch(e){} },400);
+  }
+  function demoNettoyer(){
+    try{ SUIVI=(SUIVI||[]).filter(function(m){ return String(m.id||'').indexOf('demo_')!==0; }); save('fkh_suivi',SUIVI); }catch(e){}
+    try{ localStorage.removeItem('fkh_pc_poste'); localStorage.removeItem('fkh_mail_hb'); }catch(e){}
+    location.href=location.pathname+'?sandbox=1';
+  }
+  function demoBandeau(k){
+    var D=DEMOS[k]; if(!D||byId('demo-bar'))return;
+    var el=document.createElement('div'); el.id='demo-bar';
+    el.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:120;background:#1b1030;border-top:2px solid #7b61ff;padding:10px 14px;font-size:13px;line-height:1.5;box-shadow:0 -4px 18px rgba(0,0,0,.4)';
+    el.innerHTML='<b style="color:#a68bff">🧪 DÉMO — '+esc(D.titre)+'</b> <span class="sub" style="margin:0">'+esc(D.quoi)+'</span>'
+      +'<div style="margin-top:4px"><b>À toi :</b> '+esc(D.aFaire)+'</div>'
+      +'<div style="margin-top:7px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="demo-clean" style="font-size:12px">🧹 Effacer la démo</button>'
+      +'<button type="button" id="demo-hide" style="font-size:12px">Masquer ce bandeau</button></div>';
+    document.body.appendChild(el);
+    byId('demo-clean').onclick=demoNettoyer;
+    byId('demo-hide').onclick=function(){ el.style.display='none'; };
+  }
+  function applySectionAccess(){ tabsOrdreRole(); var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); if(!s)return;   /* b232 : le bouton PC vit dans la barre sans etre un onglet — il ne doit pas etre reaffiche ici */ var ok=((!allowed)||allowed.indexOf(s)>=0) && !(_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin());
+      /* b230 : l'onglet Assistant quitte la barre — la bulle 💬 en bas a droite reste, c'est par elle qu'on ecrit. */
+      if(s==='assistant')ok=false;
+      try{ if(cbHidden().indexOf(s)>=0||cbDeleted().indexOf(s)>=0)ok=false; }catch(_e){}
+      try{ if(ok&&typeof drVoitSection==='function'&&!drVoitSection(s))ok=false; }catch(_e){}   /* b232 : droits regles depuis l'appli */ b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); try{pcMaj();}catch(e){}   /* b232 : apres le balayage des onglets, sinon il serait reaffiche */ if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
 
   /* ===== Cockpit « Reste à payer sous-traitant » (N4 Super-Admin) — lit la clé synchronisée fkh_st_reste ===== */
   function renderStReste(){
@@ -5378,7 +5574,10 @@ button.big:active{transform:translateY(1px)}
     pcSave(o); pcMaj(); if(typeof ppRefresh==='function')ppRefresh();
   }
   function pcMaj(){
-    var b=byId('pc-btn'); if(b){ var ouvert=pcJeSuisOuvert();
+    var b=byId('pc-btn'); if(b){
+      var _op=false; try{ _op=((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'')==='operateur'; }catch(e){}
+      b.style.display=_op?'':'none';   /* b230 : bouton de la barre = operateurs ; l'encadrement prend le poste depuis la pastille 🎧 */
+      var ouvert=pcJeSuisOuvert();
       b.textContent=ouvert?'🎧 Fin de service PC':'🎧 Prise de service PC';
       b.className=ouvert?'on':''; b.onclick=function(){ ouvert?pcQuitter():pcPrendre(); }; }
   }
@@ -5387,6 +5586,7 @@ button.big:active{transform:translateY(1px)}
     var sc=hide?null:ppScan(), any=false;
     ['op','cli','ph','te','c2','ro','af','rt','gp','pc','an'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
       b.style.display=hide?'none':'';
+      if(typeof drVoitPastille==='function'&&!drVoitPastille(k)){ b.style.display='none'; return; }   /* b232 */
       if(k==='an'){ var La=sc.an||[]; b.style.display=(hide||!La.length)?'none':'';
         b.classList.toggle('pc-vide',!!La.length); n.textContent=La.length; n.style.display=La.length?'':'none';
         b.title=La.length?(La.length+' annulation(s) reçue(s) par mail — à confirmer'):''; return; }
@@ -5714,7 +5914,7 @@ box.querySelectorAll('.an-ok').forEach(function(b){ b.onclick=function(){ if(con
   }
   /* La mention n'est visible que par l'encadrement (decision Zeus 03/08) : l'operateur garde ses
      tickets sans mention, il appelle normalement — c'est le superviseur qui tranche. */
-  function annulVisible(){ try{ var r=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; return r!=='operateur'; }catch(e){ return true; } }
+  function annulVisible(){ try{ if(typeof drVoitPastille==='function')return drVoitPastille('an'); }catch(e){} return drEstSuper(); }
   function mailsAutoPlan(items){
     items=(items||[]).filter(function(it){return !it.skip;});
     // b154 : chaque BDC (kind=demande) avec site+date SANS mission en face -> creation AUTO d'une vacation "📧 A VALIDER" (violet hachure au Planning, tickets generes seulement apres validation)
@@ -6529,6 +6729,14 @@ box.querySelectorAll('.an-ok').forEach(function(b){ b.onclick=function(){ if(con
     var lob=byId('cloud-logout'); if(lob)lob.addEventListener('click',function(){ if(confirm('Se déconnecter de l\'application ? Il faudra retaper le mot de passe pour revenir.'))cloudLogout(); });
     // b155 : mode SANDBOX (tests locaux) — ?sandbox=1 dans l'URL = hors-ligne FORCE : on ignore toute session restauree, aucune connexion cloud possible.
     var _SBX=false; try{_SBX=new URLSearchParams(location.search).has('sandbox');}catch(e){}
+    /* ===== b231 : MODE DEMO =====
+       POURQUOI : pour valider une fonction, il faut la CLIQUER — pas la regarder sur une capture. Mais
+       les donnees de mon sandbox ne sont pas celles du navigateur de Zeus : un decor pose de mon cote
+       n'existe pas du sien. Le scenario doit donc s'installer LUI-MEME a l'ouverture du lien.
+       COMMENT : ?sandbox=1&demo=<scenario> monte le decor, affiche un bandeau, et « Effacer la demo »
+       remet tout a zero. Tout est marque `demo_` : rien ne se melange aux vraies donnees, et le mode
+       sandbox garantit qu'aucune ligne ne part au cloud. */
+    try{ if(_SBX){ var _dm=new URLSearchParams(location.search).get('demo'); if(_dm)demoMonter(_dm); } }catch(e){}
     window._FKH_SANDBOX=_SBX;
     if(_SBX){ try{sessionStorage.removeItem('fkh_pass');}catch(e){} if(lo)lo.style.display='none'; cloudBar('🧪 SANDBOX — hors-ligne forcé (aucun cloud)',false); cloudToggleImport(); var _lf9=byId('logout-fab'); if(_lf9)_lf9.style.display='none'; }
     var saved=null; try{saved=_SBX?null:sessionStorage.getItem('fkh_pass');}catch(e){}
