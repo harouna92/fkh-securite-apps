@@ -66,19 +66,19 @@ function tampon(txt){ var m=/v01-08[··]b(\d+)/.exec(txt||''); return m?parseIn
    seul. Le bouton prepare donc la phrase exacte et la COPIE : il ne reste qu'a la coller dans le chat.
    C'est un geste de plus, mais sans ambiguite sur ce qui est demande. */
 function ordre(it, etat){
-  var verbe={attente:'Traite le sujet',decide:'Code le sujet',local:'Mets en ligne'}[etat];
-  var quoi=(etat==='local'&&it.b)?('b'+it.b+' — '+it.titre):it.titre;
+  var verbe={attente:'Traite le sujet',decide:'Code le sujet',code:'Déploie en local et prépare la démo',local:'Mets en ligne'}[etat];
+  var quoi=((etat==='local'||etat==='code')&&it.b)?('b'+it.b+' — '+it.titre):it.titre;
   return verbe+' : '+quoi;
 }
 function carte(it, enLigne, etat){
   var demo='';
-  if(it.demo){
+  if(it.demo&&(etat==='local'||etat==='ligne')){
     var base=enLigne?BASE_DEMO_LIGNE:BASE_DEMO_LOCAL;
     demo='<a class="demo" target="_blank" rel="noopener" href="'+base+'?sandbox=1&demo='+encodeURIComponent(it.demo)+'">▶️ Tester en démo</a>';
   }
   var act='';
   if(etat&&etat!=='ligne'){
-    var lbl={attente:'▶️ Demander à traiter',decide:'💻 Demander à coder',local:'🚀 Demander la mise en ligne'}[etat];
+    var lbl={attente:'▶️ Demander à traiter',decide:'💻 Demander à coder',code:'🧪 Demander le déploiement local',local:'🚀 Demander la mise en ligne'}[etat];
     act='<button type="button" class="ord" data-o="'+esc(ordre(it,etat))+'">'+lbl+'</button>';
   }
   return '<div class="card'+(it.urgent?' urgent':'')+'">'
@@ -99,7 +99,11 @@ function colonne(icone, titre, items, enLigne, vide, explique, etat){
 function rendre(data, bLigne, bLocal){
   var items=(data.items||[]).slice().sort(function(a,b){return b.b-a.b;});
   var enLigne=items.filter(function(i){return i.b<=bLigne;});
-  var enLocal=items.filter(function(i){return i.b>bLigne;});
+  /* b257 (regle Zeus) : « code » n'est pas « pousse en local ». Tant que le build n'a pas ete deploye
+     sur le poste de test et sa demo verifiee, il n'y a rien de jouable — donc pas de bouton de demo.
+     Le marqueur `local:true` n'est mis qu'apres avoir fait tourner la demo pour de vrai. */
+  var enLocal=items.filter(function(i){return i.b>bLigne&&i.local;});
+  var code=items.filter(function(i){return i.b>bLigne&&!i.local;});
   var attente=data.attente||[];
 
   document.getElementById('p-ligne').innerHTML='en ligne : <b>b'+(bLigne||'?')+'</b>';
@@ -109,7 +113,8 @@ function rendre(data, bLigne, bLocal){
   document.getElementById('grille').innerHTML=
      colonne('📥','À traiter',attente,false,'Rien en attente.','Reçu. Rien n’est encore décidé : il faut d’abord cadrer ce qu’on fait.','attente')
    + colonne('📝','Décidé — à coder',decide,false,'Rien en attente de développement.','On sait exactement quoi faire, ce n’est pas encore développé. <b>Pas de démo possible</b> : il n’y a rien à montrer.','decide')
-   + colonne('🟡','Codé — en local',enLocal,false,'Tout est poussé.','Développé et testé, <b>pas encore publié</b>. C’est à partir d’ici que la démo existe — sur ce PC uniquement.','local')
+   + colonne('💻','Codé',code,false,'Rien en attente de déploiement local.','Écrit et vérifié, <b>pas encore déployé sur le poste de test</b>. <b>Pas de démo</b> : rien n’est jouable tant que ce n’est pas poussé en local.','code')
+   + colonne('🟡','Poussé en local',enLocal,false,'Rien en local.','Déployé sur ce poste, démo vérifiée. <b>Jouable ici</b>, pas encore publié pour les autres.','local')
    + colonne('🟢','En ligne',enLigne,true,'Rien encore publié.','Publié : utilisable par tout le monde, et la démo s’ouvre <b>aussi depuis le téléphone</b>.','ligne');
 
   document.querySelectorAll('.ord').forEach(function(b){
@@ -123,8 +128,7 @@ function rendre(data, bLigne, bLocal){
   var d=new Date();
   document.getElementById('pied').textContent=
     'Dernière vérification : '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2)
-    +' · '+attente.length+' à traiter · '+enLocal.length+' en local · '+enLigne.length+' en ligne'
-    +' · '+decide.length+' décidés à coder'
+    +' · '+attente.length+' à traiter · '+decide.length+' à coder · '+code.length+' codés · '+enLocal.length+' en local · '+enLigne.length+' en ligne'
     +' · La démo devient possible à partir de l’état « Codé ».';
 }
 

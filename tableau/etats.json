@@ -1,5 +1,5 @@
 {
-  "_lisezmoi": "Source unique du tableau de bord. 4 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' avec un numero de build = code (en local tant que le tampon publie ne l'a pas atteint, en ligne ensuite). L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie, donc le tableau ne peut pas mentir.",
+  "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
   "maj": "2026-08-03",
   "items": [
     {
@@ -23,31 +23,36 @@
       "titre": "Démos vivantes : visite guidée pas à pas",
       "source": "Zeus",
       "demo": "reponse",
-      "note": "halo + défilement + le geste s'exécute"
+      "note": "halo + défilement + le geste s'exécute",
+      "local": true
     },
     {
       "b": 252,
       "titre": "Croix de retrait seulement en mode réglage",
       "source": "Zeus",
-      "demo": "retirer"
+      "demo": "retirer",
+      "local": true
     },
     {
       "b": 251,
       "titre": "Modes d'emploi joints aux réponses ([[aide:…]])",
       "source": "Zeus",
-      "demo": "reponse"
+      "demo": "reponse",
+      "local": true
     },
     {
       "b": 250,
       "titre": "Croix de retrait fiable (26 px, pointerdown, ruban Annuler)",
       "source": "Zeus",
-      "demo": "retirer"
+      "demo": "retirer",
+      "local": true
     },
     {
       "b": 249,
       "titre": "Retirer une pastille/section depuis la vue",
       "source": "Zeus",
-      "demo": "retirer"
+      "demo": "retirer",
+      "local": true
     },
     {
       "b": 248,
