@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FKH — Tableau de bord des états</title>
+<style>
+  :root{--bg:#0b0f16;--panel:#141c28;--panel2:#1b2534;--line:#26344a;--ink:#e6edf7;--muted:#8fa1b8;--brand:#6ea8fe}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{position:sticky;top:0;z-index:10;background:var(--panel);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  h1{margin:0;font-size:17px;flex:1;min-width:200px}
+  .pill{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel2);color:var(--muted)}
+  .pill b{color:var(--ink)}
+  button{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer}
+  button:hover{border-color:var(--brand)}
+  main{padding:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;align-items:start}
+  .col{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .col h2{margin:0;padding:10px 12px;font-size:13.5px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center}
+  .col h2 span.n{margin-left:auto;font-size:12px;color:var(--muted)}
+  .col .body{padding:10px;display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow:auto}
+  .card{background:var(--panel2);border:1px solid var(--line);border-left-width:3px;border-radius:9px;padding:9px 10px}
+  .card b.t{display:block;font-size:13px;margin-bottom:3px}
+  .meta{font-size:11.5px;color:var(--muted)}
+  .tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);margin-right:5px}
+  .demo{display:inline-block;margin-top:7px;font-size:12px;color:#0b0f16;background:var(--brand);padding:4px 9px;border-radius:7px;text-decoration:none;font-weight:600}
+  .demo:hover{filter:brightness(1.12)}
+  .urgent{border-left-color:#e5322d}
+  .note{margin-top:5px;font-size:11.5px;color:#e0a13b}
+  .pas{margin-top:5px;font-size:11.5px;color:var(--muted);font-style:italic}
+  .vide{color:var(--muted);font-size:12.5px;padding:6px 2px}
+  .expl{padding:8px 12px;font-size:11.5px;color:var(--muted);border-bottom:1px solid var(--line);background:rgba(110,168,254,.05)}
+  .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+  .ord{font-size:12px;padding:4px 9px}
+  #ord-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:50;background:#101a2b;border:2px solid var(--brand);border-radius:12px;padding:12px 14px;max-width:min(620px,94vw);box-shadow:0 8px 30px rgba(0,0,0,.6)}
+  .ord-txt{margin:7px 0;padding:8px 10px;background:var(--panel2);border-radius:8px;font-family:ui-monospace,monospace;font-size:12.5px;user-select:all}
+  footer{padding:10px 16px;color:var(--muted);font-size:11.5px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <h1>📊 Tableau de bord — états des demandes</h1>
+  <span class="pill" id="p-ligne">en ligne : <b>…</b></span>
+  <span class="pill" id="p-local">local : <b>…</b></span>
+  <button id="refresh">🔄 Actualiser</button>
+</header>
+<main id="grille"></main>
+<footer id="pied">Chargement…</footer>
+
+<script>
+/* ===== Tableau de bord des etats (b254) =====
+   POURQUOI : suivre a l'oeil ce qui est demande, code, en local, en ligne — et pouvoir tester en demo
+   des que c'est code, sans demander a personne.
+   COMMENT : une seule source (etats.json) pour les demandes et les numeros de build. L'etat « en ligne »
+   n'y est PAS ecrit : il est CALCULE en lisant le tampon reellement publie sur l'application. Le tableau
+   ne peut donc pas affirmer qu'une chose est en ligne alors qu'elle ne l'est pas. */
+var URL_LIGNE='https://harouna92.github.io/fkh-securite-apps/gestion/';
+var BASE_DEMO_LOCAL='http://localhost:8143/';
+var BASE_DEMO_LIGNE=URL_LIGNE;
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});}
+
+function tampon(txt){ var m=/v01-08[··]b(\d+)/.exec(txt||''); return m?parseInt(m[1],10):0; }
+
+/* b255 : bouton d'ordre par carte.
+   LIMITE ASSUMEE : une page web ne peut pas me reveiller — aucun clic ici ne declenche un travail tout
+   seul. Le bouton prepare donc la phrase exacte et la COPIE : il ne reste qu'a la coller dans le chat.
+   C'est un geste de plus, mais sans ambiguite sur ce qui est demande. */
+function ordre(it, etat){
+  var verbe={attente:'Traite le sujet',decide:'Code le sujet',code:'Déploie en local et prépare la démo',local:'Mets en ligne'}[etat];
+  var quoi=((etat==='local'||etat==='code')&&it.b)?('b'+it.b+' — '+it.titre):it.titre;
+  return verbe+' : '+quoi;
+}
+function carte(it, enLigne, etat){
+  var demo='';
+  if(it.demo&&(etat==='local'||etat==='ligne')){
+    var base=enLigne?BASE_DEMO_LIGNE:BASE_DEMO_LOCAL;
+    demo='<a class="demo" target="_blank" rel="noopener" href="'+base+'?sandbox=1&demo='+encodeURIComponent(it.demo)+'">▶️ Tester en démo</a>';
+  }
+  var act='';
+  if(etat&&etat!=='ligne'){
+    var lbl={attente:'▶️ Demander à traiter',decide:'💻 Demander à coder',code:'🧪 Demander le déploiement local',local:'🚀 Demander la mise en ligne'}[etat];
+    act='<button type="button" class="ord" data-o="'+esc(ordre(it,etat))+'">'+lbl+'</button>';
+  }
+  return '<div class="card'+(it.urgent?' urgent':'')+'" draggable="true" data-id="'+esc(it.b?('b'+it.b):('x'+(it.titre||'').slice(0,24)))+'" data-etat="'+esc(etat||'')+'">'
+    +'<b class="t">'+esc(it.titre)+'</b>'
+    +'<div class="meta">'+(it.b?('<span class="tag">b'+it.b+'</span>'):'')+esc(it.source||'')+'</div>'
+    +(it.note?('<div class="note">⚠️ '+esc(it.note)+'</div>'):'')
+    +((!it.demo&&it.pourquoipas&&(etat==='local'||etat==='ligne'))?('<div class="pas">🎬 Pas de démo — '+esc(it.pourquoipas)+'</div>'):'')
+    +'<div class="acts">'+demo+act+'</div></div>';
+}
+
+function colonne(icone, titre, items, enLigne, vide, explique, etat){
+  return '<section class="col" data-cible="'+esc(etat||'')+'"><h2>'+icone+' '+titre+'<span class="n">'+items.length+'</span></h2>'
+    +(explique?'<div class="expl">'+explique+'</div>':'')
+    +'<div class="body">'
+    +(items.length?items.map(function(i){return carte(i,enLigne,etat);}).join(''):'<div class="vide">'+vide+'</div>')
+    +'</div></section>';
+}
+
+function rendre(data, bLigne, bLocal){
+  var items=(data.items||[]).slice().sort(function(a,b){return b.b-a.b;});
+  var enLigne=items.filter(function(i){return i.b<=bLigne;});
+  /* b257 (regle Zeus) : « code » n'est pas « pousse en local ». Tant que le build n'a pas ete deploye
+     sur le poste de test et sa demo verifiee, il n'y a rien de jouable — donc pas de bouton de demo.
+     Le marqueur `local:true` n'est mis qu'apres avoir fait tourner la demo pour de vrai. */
+  var enLocal=items.filter(function(i){return i.b>bLigne&&i.local;});
+  var code=items.filter(function(i){return i.b>bLigne&&!i.local;});
+  var attente=data.attente||[];
+
+  document.getElementById('p-ligne').innerHTML='en ligne : <b>b'+(bLigne||'?')+'</b>';
+  document.getElementById('p-local').innerHTML='local : <b>b'+(bLocal||'?')+'</b>';
+
+  var decide=data.decide||[];
+  document.getElementById('grille').innerHTML=
+     colonne('📥','À traiter',attente,false,'Rien en attente.','Reçu. Rien n’est encore décidé : il faut d’abord cadrer ce qu’on fait.','attente')
+   + colonne('📝','Décidé — à coder',decide,false,'Rien en attente de développement.','On sait exactement quoi faire, ce n’est pas encore développé. <b>Pas de démo possible</b> : il n’y a rien à montrer.','decide')
+   + colonne('💻','Codé',code,false,'Rien en attente de déploiement local.','Écrit et vérifié, <b>pas encore déployé sur le poste de test</b>. <b>Pas de démo</b> : rien n’est jouable tant que ce n’est pas poussé en local.','code')
+   + colonne('🟡','Poussé en local',enLocal,false,'Rien en local.','Déployé sur ce poste, démo vérifiée. <b>Jouable ici</b>, pas encore publié pour les autres.','local')
+   + colonne('🟢','En ligne',enLigne,true,'Rien encore publié.','Publié : utilisable par tout le monde, et la démo s’ouvre <b>aussi depuis le téléphone</b>.','ligne');
+
+  brancherGlisser();
+  document.querySelectorAll('.ord').forEach(function(b){
+    b.onclick=function(){
+      var txt=b.getAttribute('data-o');
+      function ok(){ montrer(txt,b); }
+      try{ navigator.clipboard.writeText(txt).then(ok,ok); }catch(e){ ok(); }
+    };
+  });
+
+  var d=new Date();
+  document.getElementById('pied').textContent=
+    'Dernière vérification : '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2)
+    +' · '+attente.length+' à traiter · '+decide.length+' à coder · '+code.length+' codés · '+enLocal.length+' en local · '+enLigne.length+' en ligne'
+    +' · La démo devient possible à partir de l’état « Codé ».';
+}
+
+/* b261 : glisser-deposer d'un etat a l'autre, reellement enregistre.
+   La page seule ne peut rien ecrire ; c'est le serveur du tableau (tableau/serveur.py) qui accepte
+   POST /tableau/etats.json. Sans lui — si le tableau est ouvert via un simple http.server — le
+   deplacement est refuse et on le dit franchement, plutot que de laisser croire qu'il a ete pris. */
+var DATA=null;
+function trouver(id){
+  var d=DATA; if(!d)return null;
+  function ch(arr,src){ for(var i=0;i<(arr||[]).length;i++){ var it=arr[i];
+    var k=it.b?('b'+it.b):('x'+(it.titre||'').slice(0,24)); if(k===id)return {it:it,src:src,i:i}; } return null; }
+  return ch(d.items,'items')||ch(d.decide,'decide')||ch(d.attente,'attente');
+}
+function deplacer(id,cible){
+  var f=trouver(id); if(!f||!DATA)return;
+  var it=f.it;
+  DATA[f.src].splice(f.i,1);
+  if(cible==='attente'){ delete it.b; delete it.local; delete it.demo; DATA.attente.unshift(it); }
+  else if(cible==='decide'){ delete it.b; delete it.local; delete it.demo; DATA.decide.unshift(it); }
+  else if(cible==='code'){ delete it.local; if(!it.b)it.b=0; DATA.items.unshift(it); }
+  else if(cible==='local'){ it.local=true; if(!it.b)it.b=0; DATA.items.unshift(it); }
+  else { DATA[f.src].splice(f.i,0,it); return; }   /* on ne fait pas passer en ligne par un glisser : ca se pousse */
+  enregistrer();
+}
+function enregistrer(){
+  fetch('etats.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(DATA)})
+    .then(function(r){return r.json();})
+    .then(function(j){ if(j&&j.ok)charger(); else alerteEcriture(); })
+    .catch(alerteEcriture);
+}
+function alerteEcriture(){
+  var p=document.getElementById('pied');
+  p.textContent='⚠️ Déplacement NON enregistré : le tableau doit être ouvert par son serveur (tableau/serveur.py), pas par un simple serveur de fichiers.';
+  p.style.color='#e5322d';
+}
+function brancherGlisser(){
+  document.querySelectorAll('.card[draggable]').forEach(function(c){
+    c.addEventListener('dragstart',function(e){ e.dataTransfer.setData('text/plain',c.getAttribute('data-id')); c.style.opacity='.5'; });
+    c.addEventListener('dragend',function(){ c.style.opacity=''; });
+  });
+  document.querySelectorAll('.col[data-cible]').forEach(function(col){
+    col.addEventListener('dragover',function(e){ if(col.getAttribute('data-cible')==='ligne')return; e.preventDefault(); col.style.outline='2px dashed var(--brand)'; });
+    col.addEventListener('dragleave',function(){ col.style.outline=''; });
+    col.addEventListener('drop',function(e){ col.style.outline=''; var cible=col.getAttribute('data-cible');
+      if(cible==='ligne'){ alert('La mise en ligne ne se fait pas en glissant : demande-la avec le bouton 🚀, elle passe par une poussée réelle.'); return; }
+      e.preventDefault(); deplacer(e.dataTransfer.getData('text/plain'),cible); });
+  });
+}
+function montrer(txt,btn){
+  /* b260 (retour Zeus) : la fenetre etait du bruit — on copie, on le signale sur le bouton, c'est tout. */
+  if(!btn)return;
+  var avant=btn.textContent;
+  btn.textContent='✅ Copié — colle dans le chat';
+  btn.style.borderColor='#1a9e5c'; btn.style.color='#1a9e5c';
+  setTimeout(function(){ btn.textContent=avant; btn.style.borderColor=''; btn.style.color=''; },2600);
+}
+function charger(){
+  document.getElementById('pied').textContent='Vérification en cours…';
+  var p1=fetch('etats.json?v='+Date.now()).then(function(r){return r.json();});
+  var p2=fetch(URL_LIGNE+'?v='+Date.now()).then(function(r){return r.text();}).catch(function(){return '';});
+  Promise.all([p1,p2]).then(function(r){
+    var data=r[0]; DATA=data; var bLigne=tampon(r[1]);
+    var bLocal=(data.items||[]).reduce(function(m,i){return Math.max(m,i.b||0);},0);
+    rendre(data,bLigne,bLocal);
+  }).catch(function(e){
+    document.getElementById('pied').textContent='Impossible de charger : '+e;
+  });
+}
+
+document.getElementById('refresh').onclick=charger;
+charger();
+setInterval(charger,60000);   /* se remet a jour tout seul : un build pousse passe de « local » a « en ligne » sans rien faire */
+</script>
+</body>
+</html>

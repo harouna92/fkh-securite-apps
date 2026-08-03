@@ -153,6 +153,13 @@ button.big:active{transform:translateY(1px)}
 #pp-pc{right:449px}
 #pp-an{right:493px}
 #pp-td{right:537px}
+.rv-x{position:absolute;top:-8px;left:-8px;width:26px;height:26px;border-radius:50%;background:#e5322d;color:#fff;font-size:15px;font-weight:800;line-height:26px;text-align:center;cursor:pointer;z-index:99;box-shadow:0 1px 5px rgba(0,0,0,.6);touch-action:manipulation;user-select:none}
+.rv-x:active{transform:scale(.88)}
+.gd-halo{outline:3px solid #6ea8fe !important;outline-offset:3px;border-radius:10px;animation:gdpulse 1.4s ease-in-out infinite;position:relative;z-index:150}
+@keyframes gdpulse{0%,100%{box-shadow:0 0 0 0 rgba(110,168,254,.6)}50%{box-shadow:0 0 0 10px rgba(110,168,254,0)}}
+#gd-carte{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:240;width:min(520px,92vw);background:#101a2b;border:2px solid #6ea8fe;border-radius:14px;padding:14px;font-size:13.5px;box-shadow:0 10px 34px rgba(0,0,0,.6)}
+#rv-undo{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:220;background:#1a2233;border:1px solid #6ea8fe;border-radius:10px;padding:10px 14px;font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+#tabs button{position:relative}
 #pp-an.pc-vide{border-color:#e5322d;background:rgba(229,50,45,.18);animation:pcpulse 1.6s ease-in-out infinite}
 .pl-chip.annul{border:1.5px solid #e5322d !important;background:repeating-linear-gradient(45deg,rgba(229,50,45,.18),rgba(229,50,45,.18) 6px,transparent 6px,transparent 12px) !important}
 #pp-pc.pc-vide{border-color:#e5322d;background:rgba(229,50,45,.18);animation:pcpulse 1.6s ease-in-out infinite}
@@ -216,7 +223,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b248+b116</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b259+b116</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2736,6 +2743,53 @@ button.big:active{transform:translateY(1px)}
     var rz=byId('dr-reset'); if(rz)rz.onclick=function(){ if(confirm('Revenir aux réglages d’origine ?'))
       { drSave({sections:{},pastilles:{}}); renderDroits(); try{ applySectionAccess(); ppRefresh(); }catch(e){} } };
   }
+  /* ===== b251 : MODES D'EMPLOI =====
+     POURQUOI : dire a quelqu'un « c'est en ligne » ne lui apprend pas a s'en servir. Sans mode d'emploi
+     joint, la fonctionnalite existe mais personne ne l'utilise — et la demande revient dans un mois.
+     COMMENT : chaque reponse peut porter un marqueur [[aide:cle]]. L'appli le transforme en bouton
+     « Comment ça marche » ; un clic ouvre la fiche, sans quitter l'ecran. Le meme lien fonctionne en
+     adresse directe : ?aide=selfie — donc partageable par message ou par mail. */
+  var AIDES={
+    selfie:{t:'\U0001F933 Photo en selfie',pour:'Se photographier soi-même pour un contrôle de tenue.',
+      pas:['Ouvre le lien photo qu’on t’a envoyé.','Sous le bouton de prise de vue, touche « \U0001F933 Passer en selfie ».','Pour un contrôle de tenue, la caméra avant s’ouvre déjà toute seule.','Cadre-toi en entier, écusson visible, puis prends la photo.'],
+      note:'Tu te vois en miroir pour te cadrer, mais la photo enregistrée ne l’est pas : ton écusson reste lisible.'},
+    pc:{t:'\U0001F3A7 Prise de service au PC',pour:'Faire savoir à tous que quelqu’un tient le poste.',
+      pas:['En arrivant, touche « \U0001F3A7 Prise de service PC » dans la barre du haut.','Le bouton passe au vert : « Fin de service PC ».','En partant, touche-le à nouveau.'],
+      note:'Si tu es le dernier au poste, l’appli te prévient avant de fermer : sans personne au PC, une alerte part à l’encadrement.'},
+    tickets:{t:'\U0001F3AB Demander un point à quelqu’un',pour:'Confier un sujet et savoir ce qu’il en a fait.',
+      pas:['Ouvre la pastille concernée (vacations non affectées, photos manquantes…).','En bas, touche « \U0001F3AB Demander un point à… ».','Choisis à qui, écris ton mot, envoie.','La liste que tu regardes part avec le ticket : le destinataire sait de quoi tu parles.'],
+      note:'Il répond en deux clics (À faire / En cours / Fait / Bloqué + un mot). Tu es prévenu de son retour.'},
+    tenues:{t:'\U0001F4E6 Tenues envoyées non confirmées',pour:'S’assurer qu’un agent a bien reçu sa tenue.',
+      pas:['Ouvre la pastille \U0001F4E6.','Appelle l’agent (son numéro est cliquable).','S’il l’a reçue : « \u2705 Il l’a reçu » — la ligne se ferme.','Sinon : « +2 j », « +4 j » ou « +7 j » — son nom reviendra à cette échéance.'],
+      note:'Le délai de relance se règle en haut de la vue (4 jours par défaut).'},
+    apercu:{t:'\U0001F441\uFE0F Voir l’application comme un autre',pour:'Vérifier ce que voit un collaborateur.',
+      pas:['Dans le bandeau du haut, clique le rôle voulu.','Le bandeau devient ORANGE : tu n’es plus dans ta vue.','Pour retirer un élément de sa vue, clique la petite croix rouge dessus.','Reviens à ta vue en cliquant ton propre rôle.'],
+      note:'On ne peut voir que des vues moins ouvertes que la sienne. Seul le super-admin peut modifier.'},
+    annulation:{t:'\U0001F534 Annulation reçue par mail',pour:'Traiter une annulation sans casser une mission par erreur.',
+      pas:['La pastille \U0001F534 s’allume, la vacation apparaît hachurée rouge au Planning.','Ouvre la pastille : site, date, heure de réception du mail.','Vérifie auprès du client.','« \u2705 Confirmer » retire la vacation et ses appels ; « \u274c Fausse alerte » la laisse intacte.'],
+      note:'Une annulation ne supprime jamais rien toute seule : c’est toujours un humain qui tranche.'}
+  };
+  function aideOuvrir(cle){
+    var A=AIDES[cle]; if(!A){ alert('Mode d’emploi introuvable.'); return; }
+    var old=byId('aide-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='aide-pop';
+    pop.style.cssText='position:fixed;inset:8% 6%;z-index:230;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:16px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+    pop.innerHTML='<div style="display:flex;align-items:center;gap:8px"><b style="flex:1;font-size:16px">'+esc(A.t)+'</b><button type="button" id="aide-x">✕</button></div>'
+      +'<div class="sub" style="margin:6px 0 12px">'+esc(A.pour)+'</div>'
+      +A.pas.map(function(x,i){ return '<div style="display:flex;gap:10px;margin-bottom:8px"><b style="min-width:22px;color:#6ea8fe">'+(i+1)+'.</b><div>'+esc(x)+'</div></div>'; }).join('')
+      +(A.note?('<div class="card" style="margin-top:10px;border-left:3px solid #e0a13b"><div class="sub" style="margin:0">\U0001F4A1 '+esc(A.note)+'</div></div>'):'');
+    document.body.appendChild(pop);
+    byId('aide-x').onclick=function(){ pop.parentNode.removeChild(pop); };
+  }
+  /* Transforme [[aide:cle]] en bouton, partout ou un texte est affiche. */
+  function aideBoutons(html){
+    return String(html||'').replace(/\[\[aide:([a-z]+)\]\]/g, function(m,c){
+      var A=AIDES[c]; if(!A)return '';
+      return '<button type="button" class="aide-b" data-a="'+c+'" style="font-size:12.5px;margin-top:6px">\U0001F4D6 Comment ça marche — '+esc(A.t)+'</button>';
+    });
+  }
+  document.addEventListener('click',function(ev){ var b=ev.target&&ev.target.closest?ev.target.closest('.aide-b'):null; if(b){ ev.preventDefault(); ev.stopPropagation(); aideOuvrir(b.getAttribute('data-a')); } });
+  function aideWire(root){ (root||document).querySelectorAll('.aide-b').forEach(function(b){ b.onclick=function(){ aideOuvrir(b.getAttribute('data-a')); }; }); }
   var DEMOS={
     annulation:{ titre:'🔴 Annulation signalée',
       quoi:'Une vacation AQUILA demain soir, sur laquelle un mail d’annulation vient d’arriver.',
@@ -2766,6 +2820,52 @@ button.big:active{transform:translateY(1px)}
       quoi:'L’application vue par un opérateur.',
       aFaire:'Dans la barre, tu vois « 🎧 Prise de service PC » — il n’existe que pour les opérateurs. Clique dessus : il passe au vert « Fin de service PC ». Repasse en « super-admin » avec le bandeau : le bouton disparaît, mais la pastille 🎧 t’affiche qui tient le poste.',
       monter:function(){ try{localStorage.setItem('fkh_pc_poste',JSON.stringify({postes:[]}));}catch(e){} } },
+    photo:{ titre:'📎 Rattacher une photo sans correspondance',
+      quoi:'Une photo prise à 20 h 12 qu’aucun ticket n’a réclamée, et trois vacations du jour.',
+      aFaire:'Suis les étapes : tu vas ouvrir la liste des tickets, élargir la fenêtre horaire, et rattacher la photo à la main.',
+      monter:function(){ try{
+        var d=new Date(), iso=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+        SUIVI.unshift({id:'demo_ph1',statut:'validee',client:'AQUILA',siteAgent:'CARREFOUR Sainte-Savine',ville:'Sainte-Savine',mdate:iso,mheure:'20:00',mfin:'06:00',ctrls:['22:00','00:00','02:00']});
+        SUIVI.unshift({id:'demo_ph2',statut:'validee',client:'SECURITAS',siteAgent:'GARE DE JARNY',ville:'Jarny',mdate:iso,mheure:'19:30',mfin:'07:30'});
+        SUIVI.unshift({id:'demo_ph3',statut:'validee',client:'AQUILA',siteAgent:'SG TOTAL TROYES',ville:'Troyes',mdate:iso,mheure:'08:00',mfin:'18:00'});
+        save('fkh_suivi',SUIVI);
+        var t=new Date(); t.setHours(20,12,0,0);
+        phMatches=[{ph:{key:'u/ville_inconnue/'+t.getTime()+'.jpg',fmt:'uni',city:'ville_inconnue',ts:t.getTime(),type:'controle'},aiCheck:null}];
+      }catch(e){} } ,
+      guide:function(){ return [
+        {sel:null, txt:'Une photo est arrivée à <b>20 h 12</b> <b>sans position</b> : le rapprochement automatique n’a rien pu faire. Elle existe, elle prouve quelque chose — mais elle n’est rattachée à aucun ticket.', btn:'Ouvrir le choix manuel', fait:function(){ phmOuvrir(0); }, attendre:600},
+        {sel:'#phm-pop', txt:'Voici <b>tous les tickets du jour</b> dans la fenêtre par défaut de <b>± 2 h</b>, triés par écart avec l’heure de la photo. L’écart est vert sous 30 min, orange sous 2 h.', btn:'Élargir à toute la journée', fait:function(){ var b=document.querySelector('.phm-f[data-f="1440"]'); if(b)b.click(); }, attendre:500},
+        {sel:'#phm-pop', txt:'En élargissant, <b>la vacation de jour de Troyes apparaît aussi</b> — utile quand l’heure de la photo est douteuse. Les contrôles des 2 h sont proposés au même titre que la prise et la fin.', btn:'Rattacher le plus proche', fait:function(){ var b=document.querySelector('.phm-go'); if(b)b.click(); }, attendre:600},
+        {sel:null, txt:'C’est fait : le ticket est réglé et <b>cette photo en est la preuve</b>, exactement comme si le rapprochement automatique avait réussi. Clique 🧹 Effacer la démo pour retirer les vacations d’essai.'}
+      ]; } },
+    galerie:{ titre:'🖼️ Choisir une photo déjà remontée',
+      quoi:'Six photos arrivées par le lien envoyé aux agents.',
+      aFaire:'Tu vas ouvrir la galerie du cloud et en choisir une, au lieu de fouiller la pellicule du téléphone.',
+      monter:function(){ try{
+        var n=Date.now(), L=[];
+        [['agent/tenue/DIALLO_Mamadou',2],['agent/prise/TRAORE_Ousmane',5],['u/sainte_savine',9],
+         ['agent/fin/DIALLO_Mamadou',26],['u/jarny',30],['agent/tenue/KEITA_Sekou',50]].forEach(function(x){
+          L.push(x[0]+'/'+(n-x[1]*3600000)+'.jpg');
+        });
+        GAL.items=L; GAL.charge=Date.now();
+      }catch(e){} },
+      guide:function(){ return [
+        {sel:null, txt:'Avant, « Importer la photo » n’ouvrait que <b>la pellicule du téléphone</b>. Or les photos des agents arrivent par le lien qu’on leur envoie : elles sont <b>déjà dans le cloud, horodatées et tamponnées</b>.', btn:'Ouvrir la galerie', fait:function(){ galOuvrir(function(k){ window._galChoix=k; alert('Photo choisie :\n'+k+'\n\nDans l’application, ce clic la rattache à l’étape — sans rien re-téléverser.'); }); }, attendre:600},
+        {sel:'#gal-pop', txt:'La <b>plus récente en tête</b>. Chaque vignette dit <b>qui</b>, <b>quand</b> et de quel type de lien elle vient. Tape un nom dans le filtre pour restreindre.', btn:'Filtrer sur « DIALLO »', fait:function(){ var q=byId('gal-q'); if(q){ q.value='DIALLO'; q.dispatchEvent(new Event('input',{bubbles:true})); } }, attendre:450},
+        {sel:'#gal-liste', txt:'Il ne reste que les siennes. <b>Un clic la désigne comme preuve de l’étape</b> — rien n’est re-téléversé, la photo est déjà là, avec son tampon.', btn:'Choisir la première', fait:function(){ var c=document.querySelector('.gal-c'); if(c)c.click(); }, attendre:600},
+        {sel:null, txt:'C’est tout. Ce bouton est présent <b>partout où l’import existait</b> : contrôles tenue, photos de prise et de fin, contrôles des 2 h.'}
+      ]; } },
+    retirer:{ titre:'✂️ Retirer une pastille ou une section sur place',
+      quoi:'Tu arrives directement dans la vue du SUPERVISEUR, en aperçu.',
+      aFaire:'Le bandeau est ORANGE et affiche « APERÇU » — le repère qui dit que tu n’es pas dans ta vue. Regarde les pastilles en haut à droite et les onglets : chacun porte une petite CROIX ROUGE. Clique celle de 🦺 Tenues (ou de n’importe quelle pastille) : elle quitte la vue du superviseur, tout de suite. Reviens sur « super-admin » : chez toi tout est intact et les croix disparaissent. Pour remettre : 🔐 Droits d’accès, ou « ✏️ Régler cette vue ».',
+      monter:function(){ try{ localStorage.removeItem('fkh_droits'); setTimeout(function(){ demoRole('superviseur'); },900); }catch(e){} },
+      guide:function(){ return [
+        {sel:'#demo-role', txt:'Le bandeau est <b>ORANGE</b> et dit « APERÇU » : tu n’es plus dans ta vue, tu es dans celle du <b>superviseur</b>. Dans ta vraie vue il est vert.', btn:'Suivant →'},
+        {sel:'#rv-open', txt:'Tant que tu n’as rien demandé, <b>aucune croix n’apparaît</b> — tu observes tranquillement. Clique « Régler cette vue » pour passer en mode modification.', btn:'Passer en mode réglage', fait:function(){ var b=byId('rv-open'); if(b)b.click(); }, attendre:600},
+        {sel:'#pp-af', txt:'Les <b>croix rouges</b> sont apparues sur chaque pastille et chaque onglet. Celle-ci est la pastille 🧍 <b>Vacations non affectées</b>. Clique pour la retirer de la vue du superviseur.', btn:'Retirer cette pastille', fait:function(){ var x=document.querySelector('#pp-af .rv-x'); if(x)x.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true})); }, attendre:700},
+        {sel:'#rv-undo', txt:'Elle a disparu de sa vue — et le ruban propose <b>↩️ Annuler</b> pendant 7 secondes. Pas de « Êtes-vous sûr ? » à valider sans lire : l’action est immédiate et rattrapable.', btn:'Annuler le retrait', fait:function(){ var b=byId('rv-undo-b'); if(b)b.click(); }, attendre:600},
+        {sel:'#pp-af', txt:'La pastille est revenue. Termine en cliquant sur <b>super-admin</b> dans le bandeau : le mode réglage se coupe tout seul et tu retrouves ta vue.'}
+      ]; } },
     tenues:{ titre:'📦 Tenues envoyées non confirmées',
       quoi:'Deux agents attendent leur tenue depuis 6 et 11 jours, sans confirmation de réception.',
       aFaire:'Ouvre la pastille 📦. Change le délai (4 → 8 jours) : un des deux sort de la liste. Sur l’autre, clique « +2 j » : il disparaît, et reviendra dans 2 jours. Puis « ✅ Il l’a reçu » : la ligne se ferme pour de bon.',
@@ -2776,18 +2876,36 @@ button.big:active{transform:translateY(1px)}
         D['demo agent beta']={nom:'DEMO Agent BETA',statut:'envoye',pieces:'1 parka + 1 paire de chaussures',dateEnvoi:iso(11),dateRecu:'',urgence:''};
         save('fkh_tenues_dist',D); localStorage.removeItem('fkh_td_delai');
       }catch(e){} } },
-    reponse:{ titre:'✅ Comment l’auteur est prévenu',
-      quoi:'Une réponse à une demande que tu aurais faite, non encore lue.',
-      aFaire:'Regarde la bulle 💬 en bas à droite : elle porte une PASTILLE ROUGE. Ouvre la cloche 🔔 : l’alerte « Ta demande a été traitée » y est aussi — c’est elle qui part en notification sur le téléphone, appli fermée. Clique la bulle pour lire : la pastille s’éteint.',
+    reponse:{ titre:'\u2705 Comment un collaborateur est prévenu',
+      quoi:'Tu te mets à la place de JULES : il avait demandé le mode selfie, on vient de le mettre en ligne.',
+      aFaire:'Quatre choses, dans l’ordre. 1) La bulle \U0001F4AC en bas à droite porte une PASTILLE ROUGE — le premier signal, visible sans rien ouvrir. 2) Ouvre la cloche \U0001F514 : l’alerte « Ta demande a été traitée » y est. 3) Touche « \U0001F514 Voir la notification » dans ce bandeau : ton navigateur affichera EXACTEMENT ce que le collaborateur reçoit sur son téléphone, appli fermée. 4) Clique la bulle : la réponse contient un bouton « \U0001F4D6 Comment ça marche » qui ouvre le mode d’emploi. La pastille ne s’éteint qu’à ce moment-là.',
       monter:function(){ try{
         ASG.msgs=ASG.msgs||{};
         var id=990001;
         ASG.msgs[id]={id:id,canal:'analyse',auteur:(typeof asgAuthor==='function'?asgAuthor():'moi'),
           texte:'Il faudrait pouvoir passer la caméra en selfie pour les contrôles de tenue.',
-          reponse:'C’est en ligne : sur le lien photo, un bouton « 🤳 Passer en selfie ». Un contrôle de tenue s’ouvre même directement en caméra avant. Dis-moi si ça te convient.',
+          reponse:'C’est en ligne. Sur le lien photo, un bouton « \U0001F933 Passer en selfie » — et un contrôle de tenue s’ouvre déjà en caméra avant. Dis-moi si ça te convient.\n[[aide:selfie]]',
           created_at:Date.now()-3600000, replied_at:Date.now()-120000, statut:'repondu'};
         localStorage.removeItem('fkh_asg_lus');
-      }catch(e){} } },
+        setTimeout(function(){ var bar=byId('demo-bar'); if(!bar||byId('demo-notif'))return;
+          var b=document.createElement('button'); b.type='button'; b.id='demo-notif'; b.style.fontSize='12px'; b.textContent='\U0001F514 Voir la notification';
+          b.onclick=function(){
+            function envoyer(){ try{ new Notification('\u2705 Ta demande a été traitée',{body:'Le mode selfie est en ligne — ouvre \U0001F4AC pour lire la réponse et le mode d’emploi.',tag:'demo-fkh'}); }catch(e){ alert('Notification impossible : '+e); } }
+            if(!('Notification' in window))return alert('Ce navigateur ne gère pas les notifications.');
+            if(Notification.permission==='granted')envoyer();
+            else Notification.requestPermission().then(function(pm){ if(pm==='granted')envoyer(); else alert('Tu as refusé les notifications — c’est ce refus qui empêcherait un collaborateur d’être prévenu.'); });
+          };
+          var z=bar.querySelector('div:last-child'); if(z)z.appendChild(b);
+        },700);
+      }catch(e){} },
+      guide:function(){ return [
+        {sel:'#ask-fab', txt:'Voici la bulle 💬 de <b>JULES</b>. Regarde la <b>pastille rouge</b> en haut : il n’a rien ouvert, rien lu — et il sait déjà qu’on lui a répondu. C’est le premier signal.', btn:'Et la cloche ?'},
+        {sel:'#notif-bell', txt:'La même information vit dans la cloche. Clique « Ouvrir la cloche » : l’alerte « <b>Ta demande a été traitée</b> » va s’afficher.', btn:'Ouvrir la cloche', fait:function(){ var b=byId('notif-bell'); if(b)b.click(); }, attendre:500},
+        {sel:'#notif-ov', txt:'C’est cette ligne-là qui part en <b>notification sur son téléphone, appli fermée</b>. Il n’a pas besoin d’ouvrir l’application pour savoir.', btn:'Me montrer la vraie notification', fait:function(){ var b=byId('demo-notif'); if(b)b.click(); }, attendre:700},
+        {sel:'#ask-fab', txt:'Maintenant il ouvre la bulle pour lire. Clique « Ouvrir la réponse ».', btn:'Ouvrir la réponse', fait:function(){ var b=byId('ask-fab'); if(b)b.click(); }, attendre:700},
+        {sel:'#ask-reply, #ask-pop', txt:'La réponse est là — <b>avec un bouton 📖 Comment ça marche</b>. On ne lui dit pas seulement « c’est en ligne » : on lui montre comment s’en servir, en étapes.', btn:'Ouvrir le mode d’emploi', fait:function(){ var b=document.querySelector('.aide-b'); if(b)b.click(); else aideOuvrir('selfie'); }, attendre:600},
+        {sel:'#aide-pop', txt:'Voilà la fiche. Elle s’ouvre aussi par adresse directe <b>?aide=selfie</b> — tu peux donc l’envoyer à un agent par message. Et la pastille de la bulle vient de s’éteindre : elle ne s’éteint qu’<b>après lecture</b>.'}
+      ]; } },
     droits:{ titre:'🔐 Droits d’accès',
       quoi:'La grille « qui voit quoi » telle qu’elle est aujourd’hui.',
       aFaire:'Ouvre 🔐 Droits d’accès. Regarde la ligne 🔴 Annulations : les trois cases sont vides, c’est toi seul. Coche « Superviseur » sur 🔴 — c’est enregistré aussitôt. Puis « ↩️ Revenir aux réglages d’origine » pour tout remettre.',
@@ -2818,7 +2936,8 @@ button.big:active{transform:translateY(1px)}
       if((DR_RANG[r]||9)>(DR_RANG[drRoleReel()]||0))r=drRoleReel();   /* jamais au-dessus de son propre role */
       CLOUD.role=r||'full';
       CLOUD.sections=(r==='operateur')?['suiviappels','interv','suivi','demandes','noterapide']:null;
-      applySectionAccess(); ppRefresh(); demoRoleBandeau();
+      if(r===drRoleReel())RV_MODE=false;   /* b252 : de retour chez soi, on ne regle plus */
+      applySectionAccess(); ppRefresh(); demoRoleBandeau(); setTimeout(rvCroixMaj,150);
     }catch(e){}
   }
   /* ===== b236 : REGLER LA VUE DEPUIS LA VUE =====
@@ -2871,6 +2990,75 @@ button.big:active{transform:translateY(1px)}
     pop.querySelectorAll('.rv-up').forEach(function(b){ b.onclick=function(){ bouge(b.getAttribute('data-t'),+b.getAttribute('data-i'),-1); }; });
     pop.querySelectorAll('.rv-dn').forEach(function(b){ b.onclick=function(){ bouge(b.getAttribute('data-t'),+b.getAttribute('data-i'),1); }; });
   }
+  /* ===== b249 : RETIRER SUR PLACE =====
+     POURQUOI : constater qu'une pastille n'a rien a faire chez le superviseur, puis aller la decocher
+     dans une liste, c'est deux gestes et un changement d'ecran. On retire la ou on voit.
+     COMMENT : en APERCU (et pour le super-admin seul), chaque pastille et chaque onglet porte une petite
+     croix rouge. Un clic : l'element quitte la vue de ce role. C'est le meme reglage que la grille des
+     Droits — donc reversible d'un clic la-bas, ou par « Regler cette vue ». */
+  function rvAstuce(){
+    var old=byId('rv-undo'); if(old)old.parentNode.removeChild(old);
+    var d=document.createElement('div'); d.id='rv-undo';
+    d.innerHTML='✏️ <b>Mode réglage</b> — clique la croix rouge d’une pastille ou d’un onglet pour le retirer de cette vue. &nbsp;<button type="button" id="rv-liste" style="font-size:12.5px">📋 Liste complète</button>';
+    document.body.appendChild(d);
+    byId('rv-liste').onclick=function(){ demoReglerVue(); };
+    setTimeout(function(){ if(d.parentNode&&d.id==='rv-undo'&&d.innerHTML.indexOf('Mode réglage')>=0)d.parentNode.removeChild(d); },6000);
+  }
+  function rvAnnuler(type,cle,role,avant,libelle){
+    var old=byId('rv-undo'); if(old)old.parentNode.removeChild(old);
+    var d=document.createElement('div'); d.id='rv-undo';
+    d.innerHTML='<b>'+esc(libelle)+'</b> retiré de cette vue &nbsp;<button type="button" id="rv-undo-b" style="font-size:12.5px">↩️ Annuler</button>';
+    document.body.appendChild(d);
+    byId('rv-undo-b').onclick=function(){
+      var o=drLoad(); o[type]=o[type]||{}; o[type][cle]=o[type][cle]||{};
+      if(typeof avant==='boolean')o[type][cle][role]=avant; else delete o[type][cle][role];
+      drSave(o); applySectionAccess(); ppRefresh(); setTimeout(rvCroixMaj,120);
+      d.parentNode&&d.parentNode.removeChild(d);
+    };
+    setTimeout(function(){ if(d.parentNode)d.parentNode.removeChild(d); },7000);
+  }
+  /* b252 (retour Zeus) : les croix ne s'affichent plus d'office. Elles etaient la des qu'on entrait
+     dans une vue — donc en permanence pendant qu'on l'observe, avec le risque d'en toucher une sans le
+     vouloir. Elles n'apparaissent maintenant qu'apres un clic sur « Regler cette vue », et disparaissent
+     au clic suivant. Regarder et modifier deviennent deux gestes distincts. */
+  var RV_MODE=false;
+  function rvCroixMaj(){
+    document.querySelectorAll('.rv-x').forEach(function(x){ x.parentNode&&x.parentNode.removeChild(x); });
+    if(!RV_MODE)return;
+    var role=drRole(), reel=drRoleReel();
+    if(role===reel)return;                      /* on ne se retire rien a soi-meme */
+    if(reel!=='full'&&reel!=='superadmin')return;  /* seul le super-admin regle */
+    function croix(el,type,cle,libelle){
+      if(!el||el.style.display==='none')return;
+      var x=document.createElement('span'); x.className='rv-x'; x.textContent='×';
+      x.title='Retirer « '+libelle+' » de la vue de ce rôle';
+      /* b250 : on intercepte des le POINTERDOWN, en capture. Un clic « normal » arrivait apres deux
+         concurrents : l'appui long qui arme le glisser-deposer des pastilles, et le onclick du bouton
+         qui ouvrait le panneau. Sur ecran tactile, ou l'appui dure plus longtemps, le retrait passait
+         a la trappe. Ici, plus personne ne voit passer l'evenement.
+         Et plus de boite de dialogue : l'action est immediate et ANNULABLE — c'est plus rapide et plus sur
+         qu'un « Etes-vous sur ? » qu'on valide sans lire. */
+      function retirer(ev){
+        ev.preventDefault(); ev.stopPropagation();
+        if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
+        var o=drLoad(); o[type]=o[type]||{}; o[type][cle]=o[type][cle]||{};
+        var avant=o[type][cle][role];
+        o[type][cle][role]=false; drSave(o);
+        applySectionAccess(); ppRefresh(); setTimeout(rvCroixMaj,120);
+        rvAnnuler(type,cle,role,avant,libelle);
+      }
+      x.addEventListener('pointerdown',retirer,true);
+      x.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); },true);
+      el.appendChild(x);
+    }
+    (typeof DR_PASTILLES!=='undefined'?DR_PASTILLES:[]).forEach(function(pr){
+      var b=byId('pp-'+pr[0]); if(b)croix(b,'pastilles',pr[0],pr[1]);
+    });
+    document.querySelectorAll('#tabs button[data-s]').forEach(function(b){
+      var k=b.getAttribute('data-s'); if(k==='droits')return;
+      croix(b,'sections',k,(b.textContent||k).trim().replace('×',''));
+    });
+  }
   function demoRoleBandeau(){
     var el=byId('demo-role'); if(!el){ el=document.createElement('div'); el.id='demo-role';
       el.style.cssText='position:fixed;left:0;right:0;top:0;z-index:130;background:#0d2b1f;border-bottom:2px solid #1a9e5c;padding:6px 12px;font-size:12.5px;text-align:center';
@@ -2888,12 +3076,60 @@ button.big:active{transform:translateY(1px)}
        On decale la page de sa hauteur reelle (elle varie selon que le texte tient sur une ou deux lignes). */
     try{ setTimeout(function(){ var h=el.offsetHeight||0; document.body.style.paddingTop=h?(h+'px'):'';
          document.querySelectorAll('.pp-btn,#notif-bell').forEach(function(b){ b.style.top=(7+h)+'px'; }); },60); }catch(e){}
-    var _rv=byId('rv-open'); if(_rv)_rv.onclick=demoReglerVue;
+    var _rv=byId('rv-open'); if(_rv)_rv.onclick=function(){
+      if(drRole()===drRoleReel()){ alert('Bascule d’abord sur un autre rôle : c’est sa vue que l’on règle.'); return; }
+      RV_MODE=!RV_MODE; rvCroixMaj();
+      _rv.textContent=RV_MODE?'✅ Terminer le réglage':'✏️ Régler cette vue';
+      _rv.style.background=RV_MODE?'#1a9e5c':''; _rv.style.color=RV_MODE?'#fff':'';
+      if(RV_MODE)rvAstuce();
+    };
+  }
+  /* ===== b253 : VISITE GUIDEE =====
+     POURQUOI (retour Zeus : « je veux que les demos soient vivantes et non figees ») : poser un decor
+     et ecrire « regarde la pastille » ne suffit pas — il faut chercher l'element, deviner le geste, et
+     souvent il ne se passe rien de visible. Une demo doit MONTRER.
+     COMMENT : une suite d'etapes. A chaque etape, l'element concerne est entoure d'un halo qui pulse,
+     la page defile jusqu'a lui, et une bulle explique en une phrase. « Suivant » execute le geste pour
+     de vrai — on voit le resultat se produire. */
+  var GUIDE={pas:[],i:0};
+  function guideStop(){
+    document.querySelectorAll('.gd-halo').forEach(function(e){ e.classList.remove('gd-halo'); });
+    var c=byId('gd-carte'); if(c)c.parentNode.removeChild(c);
+    GUIDE.pas=[]; GUIDE.i=0;
+  }
+  function guideDemarrer(pas){
+    guideStop(); GUIDE.pas=pas||[]; GUIDE.i=0; guideEtape();
+  }
+  function guideEtape(){
+    document.querySelectorAll('.gd-halo').forEach(function(e){ e.classList.remove('gd-halo'); });
+    var P=GUIDE.pas[GUIDE.i];
+    var c=byId('gd-carte');
+    if(!P){ if(c)c.parentNode.removeChild(c); return; }
+    var el=null; try{ el=P.sel?document.querySelector(P.sel):null; }catch(e){}
+    if(el){ el.classList.add('gd-halo'); try{ el.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} }
+    if(!c){ c=document.createElement('div'); c.id='gd-carte'; document.body.appendChild(c); }
+    var dernier=(GUIDE.i>=GUIDE.pas.length-1);
+    c.innerHTML='<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">'
+      +'<b style="flex:1">Étape '+(GUIDE.i+1)+' / '+GUIDE.pas.length+'</b>'
+      +'<button type="button" id="gd-x" style="font-size:12px">✕</button></div>'
+      +'<div style="line-height:1.5">'+P.txt+'</div>'
+      +'<div class="acts" style="margin-top:10px;gap:6px">'
+      +(GUIDE.i?'<button type="button" id="gd-prev" style="font-size:12.5px">← Précédent</button>':'')
+      +'<button type="button" id="gd-next" class="ok" style="font-size:13px">'+(dernier?'✅ Terminer':(P.btn||'Suivant →'))+'</button></div>';
+    byId('gd-x').onclick=guideStop;
+    var pv=byId('gd-prev'); if(pv)pv.onclick=function(){ if(GUIDE.i>0){GUIDE.i--; guideEtape();} };
+    byId('gd-next').onclick=function(){
+      try{ if(P.fait)P.fait(); }catch(e){}
+      GUIDE.i++;
+      setTimeout(guideEtape, P.attendre||260);
+    };
   }
   function demoMonter(k){
     var D=DEMOS[k]; if(!D)return;
     try{ D.monter(); if(typeof save==='function'&&typeof SUIVI!=='undefined')save('fkh_suivi',SUIVI); }catch(e){}
-    setTimeout(function(){ demoBandeau(k); if(typeof ppRefresh==='function')try{ppRefresh();}catch(e){} if(typeof asgBadge==='function')try{asgBadge();}catch(e){} },400);
+    setTimeout(function(){ demoBandeau(k); if(typeof ppRefresh==='function')try{ppRefresh();}catch(e){} if(typeof asgBadge==='function')try{asgBadge();}catch(e){}
+      if(D.guide)setTimeout(function(){ try{ guideDemarrer(D.guide()); }catch(e){} },700);   /* b253 */
+    },400);
   }
   function demoNettoyer(){
     try{ SUIVI=(SUIVI||[]).filter(function(m){ return String(m.id||'').indexOf('demo_')!==0; }); save('fkh_suivi',SUIVI); }catch(e){}
@@ -3137,7 +3373,76 @@ button.big:active{transform:translateY(1px)}
   function photoHydrate(scope){ (scope||document).querySelectorAll('.ph-thumb:not([data-loaded])').forEach(function(img){ img.setAttribute('data-loaded','1'); photoBlobUrl(img.getAttribute('data-k'),function(u){ if(u)img.src=u; else{ img.alt='(photo indisponible)'; img.style.opacity='.5'; } }); }); }
   document.addEventListener('click',function(ev){ var t=ev.target; if(t&&t.classList&&t.classList.contains('ph-thumb')){ if(t.getAttribute('data-big')==='1'){ t.style.width='118px';t.style.height='118px';t.style.cursor='zoom-in';t.removeAttribute('data-big'); } else { t.style.width='min(420px,86vw)';t.style.height='auto';t.style.cursor='zoom-out';t.setAttribute('data-big','1'); } } });
   // Widget réutilisable : bouton d'import photo -> upload R2 -> callback(key). id unique requis.
-  function photoBtn(id,label){ return '<label class="btn" style="cursor:pointer;font-size:12px">'+(label||'📷 Importer la photo')+'<input type="file" accept="image/*" id="'+id+'" style="display:none"></label>'; }
+  /* ===== b258 (remontee #67) : CHOISIR UNE PHOTO DEJA REMONTEE =====
+     POURQUOI : « Importer la photo » n'ouvrait que la pellicule du telephone. Or la plupart des photos
+     arrivent par le LIEN qu'on envoie a l'agent — elles sont deja dans le cloud, horodatees et
+     tamponnees. Aller les rechercher dans sa galerie personnelle etait absurde : la bonne photo etait
+     deja la, et on risquait d'en joindre une non tamponnee.
+     COMMENT : a cote de « Importer », un bouton « Photos remontees » ouvre la galerie des photos du
+     cloud, la plus recente en tete, filtrable par agent ou par ville, avec la date et l'heure de prise.
+     Un clic la rattache — exactement comme un import, mais sans quitter l'appli. */
+  var GAL={items:null,charge:0};
+  function galCharger(cb){
+    if(GAL.items&&(Date.now()-GAL.charge)<120000)return cb(GAL.items);
+    var tok='fkh-photo-link-2026';
+    fetch(CLOUD.base+'/photos-audit?k='+encodeURIComponent(tok)+'&n=300')
+      .then(function(r){return r.json();})
+      .then(function(j){ GAL.items=(j&&j.dernieres)?j.dernieres:[]; GAL.charge=Date.now(); cb(GAL.items); })
+      .catch(function(){ cb([]); });
+  }
+  function galInfos(k){
+    var p2=String(k||'').split('/'), out={qui:'',ou:'',ts:0,type:p2[0]||''};
+    try{
+      if(p2[0]==='u'){ out.ou=(p2[1]||'').replace(/_/g,' '); out.ts=phTs(p2[2]||''); }
+      else if(p2[0]==='agent'){ out.qui=(p2[2]||'').replace(/_/g,' '); out.ts=phTs(p2[3]||p2[2]||''); }
+      else { out.qui=(p2[1]||'').replace(/_/g,' '); out.ts=phTs(p2[p2.length-1]||''); }
+    }catch(e){}
+    return out;
+  }
+  function galOuvrir(onChoix, indice){
+    var old=byId('gal-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='gal-pop';
+    pop.style.cssText='position:fixed;inset:6% 5%;z-index:250;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+    pop.innerHTML='<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">\U0001F5BC\uFE0F Photos remontées par les agents</b><button type="button" id="gal-x">✕</button></div>'
+      +'<input id="gal-q" placeholder="Filtrer : nom d’agent, ville…" style="width:100%;margin:8px 0">'
+      +'<div id="gal-liste" class="sub">Chargement…</div>';
+    document.body.appendChild(pop);
+    byId('gal-x').onclick=function(){ pop.parentNode.removeChild(pop); };
+    function rendre(list,q){
+      var qq=(q||'').toLowerCase().trim();
+      var vus=list.filter(function(k){ if(!qq)return true; return String(k).toLowerCase().indexOf(qq)>=0; }).slice(0,120);
+      byId('gal-liste').innerHTML=vus.length?('<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">'
+        +vus.map(function(k){ var I=galInfos(k);
+          var d=I.ts?new Date(I.ts):null;
+          var quand=d?(('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' à '+('0'+d.getHours()).slice(-2)+'h'+('0'+d.getMinutes()).slice(-2)):'date inconnue';
+          return '<div class="gal-c" data-k="'+esc(k)+'" style="border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--panel2);cursor:pointer">'
+            +'<div style="font-weight:700;font-size:12.5px">'+esc(I.qui||I.ou||'—')+'</div>'
+            +'<div class="sub" style="margin:2px 0 0;font-size:11.5px">'+esc(quand)+'</div>'
+            +'<div class="sub" style="margin:2px 0 0;font-size:11px;opacity:.7">'+esc(I.type)+'</div></div>';
+        }).join('')+'</div>')
+        :'<div class="sub">Aucune photo ne correspond'+(qq?(' à « '+esc(qq)+' »'):'')+'.</div>';
+      byId('gal-liste').querySelectorAll('.gal-c').forEach(function(c){
+        c.onclick=function(){ var k=c.getAttribute('data-k'); pop.parentNode.removeChild(pop); onChoix(k); };
+      });
+    }
+    galCharger(function(list){
+      rendre(list,'');
+      byId('gal-q').oninput=function(){ rendre(list,this.value); };
+      if(indice)byId('gal-q').value='';
+    });
+  }
+  function photoBtn(id,label){
+    return '<label class="btn" style="cursor:pointer;font-size:12px">'+(label||'📷 Importer la photo')+'<input type="file" accept="image/*" id="'+id+'" style="display:none"></label>'
+      +'<button type="button" class="gal-b" data-for="'+id+'" style="font-size:12px;margin-left:4px">🖼️ Photos remontées</button>';
+  }
+  /* b258 : le bouton de galerie du meme bloc partage le circuit de l'import — meme destination, meme
+     rafraichissement. On ne re-televerse rien : la photo est deja dans le cloud, on ne fait que la
+     designer comme preuve de cette etape. */
+  function galWire(id,onChoix){
+    var b=document.querySelector('.gal-b[data-for="'+id+'"]'); if(!b)return;
+    b.onclick=function(){ if(!photoReady()){ alert('Connexion cloud requise (connecte-toi en ligne).'); return; }
+      galOuvrir(function(cle){ onChoix(cle); }); };
+  }
   function photoWire(id,keyFn,onDone){ var inp=byId(id); if(!inp)return; inp.onchange=function(){ var f=inp.files&&inp.files[0]; if(!f)return; if(!photoReady()){ alert('Connexion cloud requise pour envoyer la photo (connecte-toi en ligne).'); return; } var lbl=inp.parentNode; var old=lbl.textContent; lbl.childNodes[0].nodeValue='⏳ envoi…'; var key=keyFn(f); photoUpload(key,f,function(res){ if(res&&res.ok){ lbl.childNodes[0].nodeValue='✅ photo envoyée'; if(onDone)onDone(key,res); } else { lbl.childNodes[0].nodeValue=old; alert('Échec de l\'envoi de la photo'+(res&&res.error?' ('+res.error+')':'')+'.'); } }); }; }
   // Classe une photo dans un bloc métier à partir de sa clé
   function photoBloc(key){ var p=String(key||'').split('/'), cat=p[0]; if(cat==='tenue')return 'tenue'; if(cat==='controle')return 'controle'; if(cat==='agent'){ var s2=p[1]||''; if(s2==='prise')return 'prise'; if(s2==='fin')return 'fin'; if(s2==='tenue')return 'tenue'; if(s2==='controle')return 'controle'; return 'autres'; } if(cat==='appel'){ var st=p[2]||''; if(st==='prise')return 'prise'; if(st==='fin')return 'fin'; if(st==='tenue')return 'tenue'; if(st.indexOf('ctrl')===0)return 'controle'; return 'controle'; } return 'autres'; }
@@ -3441,7 +3746,7 @@ button.big:active{transform:translateY(1px)}
       var cls='<select class="remo-classe" data-id="'+esc(m.id)+'" style="font-size:11px;padding:2px 4px;width:auto">'+REMO_CLASSE.map(function(o){return '<option value="'+o[0]+'"'+(effCls===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
       var autoBadge=(!curCls&&auto)?(' <span class="sub" title="Proposition automatique par mots-cles — choisis une valeur pour confirmer ou corriger" style="font-size:10px;color:#7b61ff;white-space:nowrap">🤖 auto</span>'):'';
       var stt='<select class="remo-statut" data-id="'+esc(m.id)+'" style="font-size:11px;padding:2px 4px;width:auto">'+REMO_STATUT.map(function(o){return '<option value="'+o[0]+'"'+((mt.statut||'')===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
-      var rep=m.reponse?('<div class="sub" style="margin:4px 0 0"><b>Claude :</b> '+esc(m.reponse)+'</div>'):'';
+      var rep=m.reponse?('<div class="sub" style="margin:4px 0 0"><b>Claude :</b> '+aideBoutons(esc(m.reponse))+'</div>'):'';
       return '<div style="border:1px solid var(--line);border-radius:9px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="font-size:11px;color:var(--muted)">'+esc(m.auteur||'—')+' · '+when+'</div><div style="margin:2px 0">'+esc(m.texte)+'</div><div class="acts" style="gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center">'+cls+autoBadge+stt+'</div>'+rep+'</div>';
     }).join('');
     box.querySelectorAll('.remo-classe').forEach(function(s){ s.onchange=function(){ remoSet(s.getAttribute('data-id'),{classe:s.value}); renderRemoCockpit(); }; });
@@ -3459,7 +3764,7 @@ button.big:active{transform:translateY(1px)}
     box.innerHTML=arr.map(function(m){
       var d=new Date(m.created_at), when=(''+d.getDate()).padStart(2,'0')+'/'+(''+(d.getMonth()+1)).padStart(2,'0')+' '+(''+d.getHours()).padStart(2,'0')+':'+(''+d.getMinutes()).padStart(2,'0');
       var badge=m.canal==='retour'?'🗣️ Observation':'🔎 Analyse';
-      var rep=m.reponse?('<div style="margin-top:6px;padding:8px;border-radius:8px;background:var(--panel);border-left:3px solid var(--brand)"><b>Claude :</b> '+esc(m.reponse)+'</div>'):('<div style="margin-top:6px;font-size:12px;color:var(--muted)">⏳ En attente de réponse…</div>');
+      var rep=m.reponse?('<div style="margin-top:6px;padding:8px;border-radius:8px;background:var(--panel);border-left:3px solid var(--brand)"><b>Claude :</b> '+aideBoutons(esc(m.reponse))+'</div>'):('<div style="margin-top:6px;font-size:12px;color:var(--muted)">⏳ En attente de réponse…</div>');
       return '<div style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--panel2)"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">'+badge+' · '+esc(m.auteur||'—')+' · '+when+'</div><div>'+esc(m.texte)+'</div>'+rep+'</div>';
     }).join('');
   }
@@ -5596,7 +5901,7 @@ button.big:active{transform:translateY(1px)}
         if(phIsAttached(it.key)){ body='<div class="fa-d" style="color:var(--ok)">✅ Déjà rattachée</div>'; }
         else if(!a){ body='<div class="fa-d" style="color:var(--warn)">Lien d\'un agent introuvable en Fiche agent (supprimé ?).</div>'; }
         else { var sc=phScoredNew(it);
-          if(!sc.scored.length){ body='<div class="fa-d" style="color:var(--warn)">Aucune mission de '+esc(a.nom)+' le '+esc(sc.dateISO.split('-').reverse().join('/'))+' — planning à vérifier.</div>'; }
+          if(!sc.scored.length){ body='<div class="fa-d" style="color:var(--warn)">Aucune mission de '+esc(a.nom)+' le '+esc(sc.dateISO.split('-').reverse().join('/'))+' — planning à vérifier.</div><div class="acts" style="margin-top:6px"><button type="button" class="phm-open" data-i="'+i+'" style="font-size:12.5px">📎 Choisir un ticket à la main</button></div>'; }
           else { var cands=sc.scored.slice(0,3); body='<div class="fa-d">Recoupé par horaire → '+(cands.length===1?'':'l\'un de ces services :')+'</div><div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:4px">'+cands.map(function(x){ var sk=x.step.k; return '<button class="ok" data-phattach="'+i+'" data-mid="'+esc(x.m.id)+'" data-step="'+esc(sk)+'">📎 '+esc(PH_STEP_LBL[sk]||sk)+' · '+esc(x.m.siteAgent||x.m.titre||x.m.ville||'')+' <span style="opacity:.8">(écart '+x.step.diff+' min)</span></button>'; }).join('')+'</div>'; }
         }
       } else {
@@ -5604,7 +5909,7 @@ button.big:active{transform:translateY(1px)}
         head='<div class="fa-n">'+esc(PH_STEP_LBL[PH_TYPE_STEP[it.type]]||('📷 '+it.type))+' <span style="color:var(--muted);font-weight:400">· '+esc(ag)+(city?' · 📍 '+esc(city):'')+(when?' · 🕐 '+esc(when):'')+'</span></div>';
         var miss=phMissionsForCity(it.city);
         if(phIsAttached(it.key)){ body='<div class="fa-d" style="color:var(--ok)">✅ Déjà rattachée</div>'; }
-        else if(!miss.length){ body='<div class="fa-d" style="color:var(--warn)">Aucune mission en cours à '+esc(city)+'.</div>'; }
+        else if(!miss.length){ body='<div class="fa-d" style="color:var(--warn)">Aucune mission en cours à '+esc(city)+'.</div><div class="acts" style="margin-top:6px"><button type="button" class="phm-open" data-i="'+i+'" style="font-size:12.5px">📎 Choisir un ticket à la main</button></div>'; }
         else { var sk2=PH_TYPE_STEP[it.type]||'tenue'; body='<div class="fa-d">C\'est l\'une de ces missions à '+esc(city)+' :</div><div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:4px">'+miss.slice(0,3).map(function(mm){ var a2=mm.agentId?faById(mm.agentId):null; return '<button data-phattach="'+i+'" data-mid="'+esc(mm.id)+'" data-step="'+esc(sk2)+'">📎 '+esc(mm.siteAgent||mm.titre||mm.ville||'')+(a2?' ('+esc(a2.nom)+')':'')+'</button>'; }).join('')+'</div>'; }
       }
       // #3 Vérif vision (personne en tenue vs bâtiment) — disponible sur toute photo
@@ -5615,7 +5920,72 @@ button.big:active{transform:translateY(1px)}
     box.querySelectorAll('[data-phattach]').forEach(function(b){ b.onclick=function(){ phAttach(+b.getAttribute('data-phattach'),b.getAttribute('data-mid'),b.getAttribute('data-step')); }; });
     box.querySelectorAll('[data-phcheck]').forEach(function(b){ b.onclick=function(){ phCheckAI(+b.getAttribute('data-phcheck'),b); }; });
   }
+    try{ box.querySelectorAll('.phm-open').forEach(function(b){ b.onclick=function(){ phmOuvrir(+b.getAttribute('data-i')); }; }); }catch(e){}   /* b256 */
+
   function phCheckAI(i,btn){ var m=phMatches&&phMatches[i]; if(!m)return; if(typeof CLOUD==='undefined'||!CLOUD.on){ alert('Connecte-toi (en ligne).'); return; } if(btn){btn.disabled=true;btn.textContent='⏳ IA…';} fetch(CLOUD.base+'/ai/check-photo',{method:'POST',headers:cloudHdr(),body:JSON.stringify({key:m.ph.key})}).then(function(r){return r.json();}).then(function(j){ if(btn){btn.disabled=false;btn.textContent='🔍 Vérifier (IA)';} if(j&&j.ok){ m.aiCheck=j; phRender(); } else { alert('Vérif IA : '+((j&&j.error)||'erreur')); } }).catch(function(){ if(btn){btn.disabled=false;btn.textContent='🔍 Vérifier (IA)';} alert('Serveur injoignable.'); }); }
+  /* ===== b256 : RATTACHER UNE PHOTO A LA MAIN =====
+     POURQUOI : le rapprochement automatique croise la geographie et l'heure. Quand l'un des deux manque
+     ou tombe a cote (position non captee, agent en avance, ville mal orthographiee), la photo reste
+     « sans correspondance » — une preuve existe, et elle ne sert a rien.
+     COMMENT : sur ces photos, un bouton ouvre TOUS les tickets du jour, tries par ecart d'heure, avec
+     une fenetre reglable : ±2 h par defaut, elargissable jusqu'a 24 h. On voit l'ecart de chaque ticket
+     et on choisit. Le rattachement manuel est identique a l'automatique — meme preuve, meme ticket regle.
+     Les etapes proposees couvrent prise, fin, controle tenue ET les controles toutes les 2 h. */
+  var PHM_FEN=120;   /* minutes, de part et d'autre */
+  function phmMinutes(ts){ var d=new Date(ts); return d.getHours()*60+d.getMinutes(); }
+  function phmEcart(a,b){ var d=Math.abs(a-b); return Math.min(d,1440-d); }   /* la nuit passe minuit */
+  function phmEtapes(m){
+    var out=[{k:'prise',lbl:'🟢 Prise de service',h:(m.mheure||'')},{k:'fin',lbl:'🔚 Fin de service',h:(m.mfin||'')},{k:'tenue',lbl:'🦺 Contrôle tenue',h:(m.mheure||'')}];
+    try{ var c=(m.ctrls&&m.ctrls.length)?m.ctrls:[]; c.forEach(function(h,i){ out.push({k:'ctrl'+(i+1),lbl:'🌙 Contrôle '+(i+1),h:h}); }); }catch(e){}
+    return out;
+  }
+  function phmOuvrir(i){
+    var m=phMatches&&phMatches[i]; if(!m)return;
+    var it=m.ph, dISO=phDateISO(it.ts), pmin=it.ts?phmMinutes(it.ts):0;
+    function rendre(){
+      var lignes=[];
+      (SUIVI||[]).forEach(function(v){
+        if(v.statut!=='validee'||v.retiree)return;
+        if((v.mdate||'')!==dISO)return;
+        phmEtapes(v).forEach(function(e){
+          if(!e.h)return;
+          var hm=String(e.h).split(':'); if(hm.length<2)return;
+          var em=(+hm[0])*60+(+hm[1]);
+          var ec=phmEcart(pmin,em);
+          if(ec>PHM_FEN)return;
+          var ag=''; try{ if(v.agentId&&typeof faById==='function'){ var a2=faById(v.agentId); ag=(a2&&a2.nom)||''; } }catch(_e){}
+          lignes.push({mid:v.id,step:e.k,lbl:e.lbl,h:e.h,site:(v.siteAgent||v.titre||'—'),agent:ag,ec:ec});
+        });
+      });
+      lignes.sort(function(u,v2){ return u.ec-v2.ec; });
+      var old=byId('phm-pop'); if(old)old.parentNode.removeChild(old);
+      var pop=document.createElement('div'); pop.id='phm-pop';
+      pop.style.cssText='position:fixed;inset:6% 6%;z-index:240;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+      var hphoto=it.ts?(('0'+new Date(it.ts).getHours()).slice(-2)+' h '+('0'+new Date(it.ts).getMinutes()).slice(-2)):'heure inconnue';
+      pop.innerHTML='<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">📎 Rattacher cette photo à un ticket</b><button type="button" id="phm-x">✕</button></div>'
+        +'<div class="sub" style="margin:4px 0 10px">Photo prise le '+esc(dISO.split('-').reverse().join('/'))+' à <b>'+esc(hphoto)+'</b>'+(it.city?(' · 📍 '+esc(String(it.city).replace(/_/g,' '))):'')+'</div>'
+        +'<div class="acts" style="gap:6px;align-items:center;margin-bottom:10px"><span class="sub" style="margin:0">Fenêtre :</span>'
+        +[60,120,240,480,1440].map(function(f){ return '<button type="button" class="phm-f" data-f="'+f+'"'+(PHM_FEN===f?' style="border-color:#6ea8fe;color:#6ea8fe"':'')+'>'+(f<1440?('± '+(f/60)+' h'):'toute la journée')+'</button>'; }).join('')
+        +'</div>'
+        +(lignes.length?lignes.map(function(l){
+            return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)">'
+              +'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b style="flex:1;min-width:150px">'+esc(l.site)+'</b>'
+              +'<span style="color:'+(l.ec<=30?'#1a9e5c':(l.ec<=120?'#e0a13b':'var(--muted)'))+';font-weight:700">écart '+(l.ec<60?(l.ec+' min'):(Math.floor(l.ec/60)+' h '+(l.ec%60)+' min'))+'</span></div>'
+              +'<div class="fa-d" style="margin-top:2px">'+esc(l.lbl)+' prévu à '+esc(l.h)+(l.agent?(' · 👤 '+esc(l.agent)):' · <span style="color:var(--bad)">sans agent</span>')+'</div>'
+              +'<div class="acts" style="margin-top:7px"><button type="button" class="phm-go ok" data-mid="'+esc(l.mid)+'" data-step="'+esc(l.step)+'" style="font-size:12.5px">📎 Rattacher ici</button></div></div>';
+          }).join('')
+          :'<div class="sub">Aucun ticket dans cette fenêtre. Élargis-la — jusqu’à « toute la journée » si l’heure de la photo est douteuse.</div>')
+        +'<p class="sub" style="margin:10px 0 0;font-size:11.5px">Le rattachement manuel vaut le rattachement automatique : le ticket est réglé, la photo devient sa preuve.</p>';
+      document.body.appendChild(pop);
+      byId('phm-x').onclick=function(){ pop.parentNode.removeChild(pop); };
+      pop.querySelectorAll('.phm-f').forEach(function(b){ b.onclick=function(){ PHM_FEN=+b.getAttribute('data-f'); rendre(); }; });
+      pop.querySelectorAll('.phm-go').forEach(function(b){ b.onclick=function(){
+        phAttach(i,b.getAttribute('data-mid'),b.getAttribute('data-step'));
+        var q=byId('phm-pop'); if(q)q.parentNode.removeChild(q);
+      }; });
+    }
+    rendre();
+  }
   function phAttach(i,mid,stepKey){ var m=phMatches&&phMatches[i]; if(!m)return; var sk=stepKey||PH_TYPE_STEP[m.ph.type]||'tenue'; var S=ssLoad(); S[mid]=S[mid]||{}; S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:m.ph.key,done:true,at:m.ph.ts||Date.now()}); ssSave(S); alert('📎 Photo rattachée (étape « '+(PH_STEP_LBL[sk]||sk)+' »).'); phRender(); }
   // ===== 📸 Photos à rattacher (remontées #7/#14/#19) : lien UNIQUE (u/) ou lien agent (agent/) → association à une étape de vacation → le ticket de la file est RÉGLÉ avec preuve photo. =====
   var SA_PH=null;
@@ -7133,6 +7503,7 @@ box.querySelectorAll('.td-ok').forEach(function(b){ b.onclick=function(){ if(con
        COMMENT : ?sandbox=1&demo=<scenario> monte le decor, affiche un bandeau, et « Effacer la demo »
        remet tout a zero. Tout est marque `demo_` : rien ne se melange aux vraies donnees, et le mode
        sandbox garantit qu'aucune ligne ne part au cloud. */
+    try{ var _qa=new URLSearchParams(location.search).get('aide'); if(_qa)setTimeout(function(){ aideOuvrir(_qa); },800); }catch(e){}   /* b251 : ?aide=selfie ouvre la fiche, meme en ligne */
     try{ if(_SBX){ var _q=new URLSearchParams(location.search);
       var _dm=_q.get('demo'); if(_dm)demoMonter(_dm);
       /* b235 : en sandbox le selecteur de role est TOUJOURS la — c'est le moyen le plus rapide de verifier un droit,

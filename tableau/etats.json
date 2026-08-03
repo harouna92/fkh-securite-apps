@@ -1,0 +1,257 @@
+{
+  "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
+  "maj": "2026-08-03",
+  "items": [
+    {
+      "b": 259,
+      "titre": "Démos jouables pour le rattachement photo et la galerie",
+      "source": "Zeus",
+      "local": true,
+      "pourquoipas": "Ce sont les démos elles-mêmes."
+    },
+    {
+      "b": 260,
+      "titre": "Tableau : copie silencieuse (plus de fenêtre)",
+      "source": "Zeus",
+      "local": true,
+      "pourquoipas": "C'est ce tableau de bord."
+    },
+    {
+      "b": 258,
+      "titre": "Choisir une photo déjà remontée par l'agent (galerie du cloud)",
+      "source": "remontée #67",
+      "local": true,
+      "demo": "galerie"
+    },
+    {
+      "b": 254,
+      "titre": "Tableau de bord des états des demandes",
+      "source": "Zeus",
+      "pourquoipas": "C'est ce tableau de bord.",
+      "local": true
+    },
+    {
+      "b": 255,
+      "titre": "Tableau de bord : 4 états + boutons d'ordre",
+      "source": "Zeus",
+      "pourquoipas": "C'est ce tableau de bord.",
+      "local": true
+    },
+    {
+      "b": 256,
+      "titre": "Photos sans correspondance : rattachement manuel, fenêtre horaire réglable",
+      "source": "remontées #53/#54/#57",
+      "note": "±1 h à toute la journée ; prise, fin, tenue et contrôles 2 h",
+      "local": true,
+      "demo": "photo"
+    },
+    {
+      "b": 253,
+      "titre": "Démos vivantes : visite guidée pas à pas",
+      "source": "Zeus",
+      "demo": "reponse",
+      "note": "halo + défilement + le geste s'exécute",
+      "local": true
+    },
+    {
+      "b": 252,
+      "titre": "Croix de retrait seulement en mode réglage",
+      "source": "Zeus",
+      "demo": "retirer",
+      "local": true
+    },
+    {
+      "b": 251,
+      "titre": "Modes d'emploi joints aux réponses ([[aide:…]])",
+      "source": "Zeus",
+      "demo": "reponse",
+      "local": true
+    },
+    {
+      "b": 250,
+      "titre": "Croix de retrait fiable (26 px, pointerdown, ruban Annuler)",
+      "source": "Zeus",
+      "demo": "retirer",
+      "local": true
+    },
+    {
+      "b": 249,
+      "titre": "Retirer une pastille/section depuis la vue",
+      "source": "Zeus",
+      "demo": "retirer",
+      "local": true
+    },
+    {
+      "b": 248,
+      "titre": "Fin des fausses alertes (collecte, PC vacant)",
+      "source": "Zeus",
+      "pourquoipas": "Rien à jouer : ce sont deux alertes qui ne partent PLUS. La preuve, c'est leur absence."
+    },
+    {
+      "b": 247,
+      "titre": "Déconnexion déplacée en bas à gauche",
+      "source": "Zeus",
+      "pourquoipas": "Rien à jouer : la Déconnexion a simplement changé de coin. Ça se constate à l'écran."
+    },
+    {
+      "b": 246,
+      "titre": "Prévenir l'auteur quand sa demande est traitée",
+      "source": "Zeus",
+      "demo": "reponse"
+    },
+    {
+      "b": 245,
+      "titre": "Pastille tenues envoyées non confirmées",
+      "source": "Zeus",
+      "demo": "tenues"
+    },
+    {
+      "b": 244,
+      "titre": "Mode selfie sur le lien photo",
+      "source": "remontée #67",
+      "note": "à valider sur téléphone",
+      "pourquoipas": "Ne peut se tester QUE sur un téléphone : le navigateur du PC n'a pas de caméra."
+    },
+    {
+      "b": 243,
+      "titre": "Suppression du bouton Simuler + nettoyage des 2 lignes",
+      "source": "remontée #62",
+      "pourquoipas": "Rien à jouer : c'est un retrait (le bouton Simuler a disparu) + un nettoyage de 2 lignes en base."
+    },
+    {
+      "b": 242,
+      "titre": "Tickets entre collaborateurs depuis une pastille",
+      "source": "Zeus",
+      "pourquoipas": "Démo à écrire — il faut deux rôles pour la jouer."
+    },
+    {
+      "b": 241,
+      "titre": "Modes d'emploi retirés à l'opérateur",
+      "source": "Zeus",
+      "pourquoipas": "Se voit en basculant en vue opérateur : les textes d'explication ont disparu."
+    },
+    {
+      "b": 240,
+      "titre": "Le bandeau d'aperçu ne recouvre plus les onglets",
+      "source": "Zeus",
+      "pourquoipas": "Rien à jouer : le bandeau ne recouvre plus les onglets. Visible d'un coup d'œil."
+    },
+    {
+      "b": 239,
+      "titre": "Bandeau d'état + bulle réglables",
+      "source": "Zeus",
+      "pourquoipas": "Se voit en basculant en vue opérateur : ni bandeau d'état ni bulle."
+    },
+    {
+      "b": 238,
+      "titre": "Aperçu d'un rôle en ligne (admin + super-admin)",
+      "source": "Zeus",
+      "pourquoipas": "Se joue dans la démo « Ce que voit un superviseur »."
+    },
+    {
+      "b": 237,
+      "titre": "Vue opérateur : cloche et recherche retirées",
+      "source": "Zeus",
+      "pourquoipas": "Se voit en basculant en vue opérateur : ni cloche ni recherche."
+    },
+    {
+      "b": 236,
+      "titre": "Régler la vue d'un rôle depuis la vue",
+      "source": "Zeus",
+      "pourquoipas": "Se joue dans la démo « Retirer sur place » (bouton Régler cette vue)."
+    },
+    {
+      "b": 235,
+      "titre": "Bascule de rôle permanente en sandbox",
+      "source": "Zeus",
+      "pourquoipas": "Rien à jouer : la bascule de rôle est simplement toujours disponible en sandbox."
+    },
+    {
+      "b": 234,
+      "titre": "Endosser un autre rôle",
+      "source": "Zeus",
+      "demo": "mails"
+    },
+    {
+      "b": 232,
+      "titre": "Panneau Droits d'accès (sections × rôles)",
+      "source": "Zeus",
+      "demo": "droits"
+    },
+    {
+      "b": 231,
+      "titre": "Mode démo (?sandbox=1&demo=…)",
+      "source": "Zeus",
+      "pourquoipas": "C'est le moteur des démos lui-même."
+    },
+    {
+      "b": 230,
+      "titre": "Corbeille des sections + bouton PC opérateur",
+      "source": "Zeus",
+      "demo": "corbeille",
+      "note": "Zeus signale que ça ne marche pas — à reproduire"
+    },
+    {
+      "b": 229,
+      "titre": "Annulations signalées sans suppression",
+      "source": "Zeus",
+      "demo": "annulation"
+    },
+    {
+      "b": 227,
+      "titre": "Qui est au PC (prise/fin de service)",
+      "source": "Zeus",
+      "demo": "pcvide"
+    },
+    {
+      "b": 223,
+      "titre": "Témoin de vie de la collecte des mails",
+      "source": "Zeus",
+      "demo": "collecte"
+    },
+    {
+      "b": 222,
+      "titre": "Vacations non affectées : 24 h / 7 j / le reste",
+      "source": "Zeus",
+      "pourquoipas": "Se voit dans la pastille 🧍 : les tuiles 24 h / 7 jours / le reste."
+    }
+  ],
+  "attente": [
+    {
+      "titre": "Sélection multiple de vacations au Planning + modification en lot",
+      "source": "JULES — remontées #65/#66",
+      "urgent": true,
+      "note": "reçu, pas encore cadré : quelles actions en lot exactement ?"
+    },
+    {
+      "titre": "Bloc « flux demande propre » b138–b146 : test guidé par Zeus",
+      "source": "file ancienne",
+      "note": "codé depuis le 01/08, jamais validé"
+    },
+    {
+      "titre": "Backfill des mails SECURITAS / RANC + mails de juin",
+      "source": "chantier mails"
+    },
+    {
+      "titre": "Corbeille (b230) : Zeus signale que ça ne marche pas",
+      "source": "Zeus 03/08",
+      "urgent": true,
+      "note": "en attente du geste exact pour reproduire"
+    }
+  ],
+  "decide": [
+    {
+      "titre": "Import CSV : si la vacation existe sans agent et que le CSV en apporte un, reprendre l'affectation au lieu de créer un doublon",
+      "source": "remontée #64",
+      "note": "règle validée par Zeus, à coder"
+    },
+    {
+      "titre": "Import CSV : détecter les quasi-doublons (même site, même date, horaires différents) et les signaler au lieu de les créer",
+      "source": "remontées #58/#59"
+    },
+    {
+      "titre": "Pastille 🌙 : tenir compte de l'heure du premier contrôle dans « avant / en cours »",
+      "source": "remontée #55"
+    }
+  ]
+}
