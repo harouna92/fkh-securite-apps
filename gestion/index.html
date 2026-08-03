@@ -223,7 +223,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b253</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b256</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -5797,7 +5797,7 @@ button.big:active{transform:translateY(1px)}
         if(phIsAttached(it.key)){ body='<div class="fa-d" style="color:var(--ok)">✅ Déjà rattachée</div>'; }
         else if(!a){ body='<div class="fa-d" style="color:var(--warn)">Lien d\'un agent introuvable en Fiche agent (supprimé ?).</div>'; }
         else { var sc=phScoredNew(it);
-          if(!sc.scored.length){ body='<div class="fa-d" style="color:var(--warn)">Aucune mission de '+esc(a.nom)+' le '+esc(sc.dateISO.split('-').reverse().join('/'))+' — planning à vérifier.</div>'; }
+          if(!sc.scored.length){ body='<div class="fa-d" style="color:var(--warn)">Aucune mission de '+esc(a.nom)+' le '+esc(sc.dateISO.split('-').reverse().join('/'))+' — planning à vérifier.</div><div class="acts" style="margin-top:6px"><button type="button" class="phm-open" data-i="'+i+'" style="font-size:12.5px">📎 Choisir un ticket à la main</button></div>'; }
           else { var cands=sc.scored.slice(0,3); body='<div class="fa-d">Recoupé par horaire → '+(cands.length===1?'':'l\'un de ces services :')+'</div><div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:4px">'+cands.map(function(x){ var sk=x.step.k; return '<button class="ok" data-phattach="'+i+'" data-mid="'+esc(x.m.id)+'" data-step="'+esc(sk)+'">📎 '+esc(PH_STEP_LBL[sk]||sk)+' · '+esc(x.m.siteAgent||x.m.titre||x.m.ville||'')+' <span style="opacity:.8">(écart '+x.step.diff+' min)</span></button>'; }).join('')+'</div>'; }
         }
       } else {
@@ -5805,7 +5805,7 @@ button.big:active{transform:translateY(1px)}
         head='<div class="fa-n">'+esc(PH_STEP_LBL[PH_TYPE_STEP[it.type]]||('📷 '+it.type))+' <span style="color:var(--muted);font-weight:400">· '+esc(ag)+(city?' · 📍 '+esc(city):'')+(when?' · 🕐 '+esc(when):'')+'</span></div>';
         var miss=phMissionsForCity(it.city);
         if(phIsAttached(it.key)){ body='<div class="fa-d" style="color:var(--ok)">✅ Déjà rattachée</div>'; }
-        else if(!miss.length){ body='<div class="fa-d" style="color:var(--warn)">Aucune mission en cours à '+esc(city)+'.</div>'; }
+        else if(!miss.length){ body='<div class="fa-d" style="color:var(--warn)">Aucune mission en cours à '+esc(city)+'.</div><div class="acts" style="margin-top:6px"><button type="button" class="phm-open" data-i="'+i+'" style="font-size:12.5px">📎 Choisir un ticket à la main</button></div>'; }
         else { var sk2=PH_TYPE_STEP[it.type]||'tenue'; body='<div class="fa-d">C\'est l\'une de ces missions à '+esc(city)+' :</div><div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:4px">'+miss.slice(0,3).map(function(mm){ var a2=mm.agentId?faById(mm.agentId):null; return '<button data-phattach="'+i+'" data-mid="'+esc(mm.id)+'" data-step="'+esc(sk2)+'">📎 '+esc(mm.siteAgent||mm.titre||mm.ville||'')+(a2?' ('+esc(a2.nom)+')':'')+'</button>'; }).join('')+'</div>'; }
       }
       // #3 Vérif vision (personne en tenue vs bâtiment) — disponible sur toute photo
@@ -5816,7 +5816,72 @@ button.big:active{transform:translateY(1px)}
     box.querySelectorAll('[data-phattach]').forEach(function(b){ b.onclick=function(){ phAttach(+b.getAttribute('data-phattach'),b.getAttribute('data-mid'),b.getAttribute('data-step')); }; });
     box.querySelectorAll('[data-phcheck]').forEach(function(b){ b.onclick=function(){ phCheckAI(+b.getAttribute('data-phcheck'),b); }; });
   }
+    try{ box.querySelectorAll('.phm-open').forEach(function(b){ b.onclick=function(){ phmOuvrir(+b.getAttribute('data-i')); }; }); }catch(e){}   /* b256 */
+
   function phCheckAI(i,btn){ var m=phMatches&&phMatches[i]; if(!m)return; if(typeof CLOUD==='undefined'||!CLOUD.on){ alert('Connecte-toi (en ligne).'); return; } if(btn){btn.disabled=true;btn.textContent='⏳ IA…';} fetch(CLOUD.base+'/ai/check-photo',{method:'POST',headers:cloudHdr(),body:JSON.stringify({key:m.ph.key})}).then(function(r){return r.json();}).then(function(j){ if(btn){btn.disabled=false;btn.textContent='🔍 Vérifier (IA)';} if(j&&j.ok){ m.aiCheck=j; phRender(); } else { alert('Vérif IA : '+((j&&j.error)||'erreur')); } }).catch(function(){ if(btn){btn.disabled=false;btn.textContent='🔍 Vérifier (IA)';} alert('Serveur injoignable.'); }); }
+  /* ===== b256 : RATTACHER UNE PHOTO A LA MAIN =====
+     POURQUOI : le rapprochement automatique croise la geographie et l'heure. Quand l'un des deux manque
+     ou tombe a cote (position non captee, agent en avance, ville mal orthographiee), la photo reste
+     « sans correspondance » — une preuve existe, et elle ne sert a rien.
+     COMMENT : sur ces photos, un bouton ouvre TOUS les tickets du jour, tries par ecart d'heure, avec
+     une fenetre reglable : ±2 h par defaut, elargissable jusqu'a 24 h. On voit l'ecart de chaque ticket
+     et on choisit. Le rattachement manuel est identique a l'automatique — meme preuve, meme ticket regle.
+     Les etapes proposees couvrent prise, fin, controle tenue ET les controles toutes les 2 h. */
+  var PHM_FEN=120;   /* minutes, de part et d'autre */
+  function phmMinutes(ts){ var d=new Date(ts); return d.getHours()*60+d.getMinutes(); }
+  function phmEcart(a,b){ var d=Math.abs(a-b); return Math.min(d,1440-d); }   /* la nuit passe minuit */
+  function phmEtapes(m){
+    var out=[{k:'prise',lbl:'🟢 Prise de service',h:(m.mheure||'')},{k:'fin',lbl:'🔚 Fin de service',h:(m.mfin||'')},{k:'tenue',lbl:'🦺 Contrôle tenue',h:(m.mheure||'')}];
+    try{ var c=(m.ctrls&&m.ctrls.length)?m.ctrls:[]; c.forEach(function(h,i){ out.push({k:'ctrl'+(i+1),lbl:'🌙 Contrôle '+(i+1),h:h}); }); }catch(e){}
+    return out;
+  }
+  function phmOuvrir(i){
+    var m=phMatches&&phMatches[i]; if(!m)return;
+    var it=m.ph, dISO=phDateISO(it.ts), pmin=it.ts?phmMinutes(it.ts):0;
+    function rendre(){
+      var lignes=[];
+      (SUIVI||[]).forEach(function(v){
+        if(v.statut!=='validee'||v.retiree)return;
+        if((v.mdate||'')!==dISO)return;
+        phmEtapes(v).forEach(function(e){
+          if(!e.h)return;
+          var hm=String(e.h).split(':'); if(hm.length<2)return;
+          var em=(+hm[0])*60+(+hm[1]);
+          var ec=phmEcart(pmin,em);
+          if(ec>PHM_FEN)return;
+          var ag=''; try{ if(v.agentId&&typeof faById==='function'){ var a2=faById(v.agentId); ag=(a2&&a2.nom)||''; } }catch(_e){}
+          lignes.push({mid:v.id,step:e.k,lbl:e.lbl,h:e.h,site:(v.siteAgent||v.titre||'—'),agent:ag,ec:ec});
+        });
+      });
+      lignes.sort(function(u,v2){ return u.ec-v2.ec; });
+      var old=byId('phm-pop'); if(old)old.parentNode.removeChild(old);
+      var pop=document.createElement('div'); pop.id='phm-pop';
+      pop.style.cssText='position:fixed;inset:6% 6%;z-index:240;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+      var hphoto=it.ts?(('0'+new Date(it.ts).getHours()).slice(-2)+' h '+('0'+new Date(it.ts).getMinutes()).slice(-2)):'heure inconnue';
+      pop.innerHTML='<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">📎 Rattacher cette photo à un ticket</b><button type="button" id="phm-x">✕</button></div>'
+        +'<div class="sub" style="margin:4px 0 10px">Photo prise le '+esc(dISO.split('-').reverse().join('/'))+' à <b>'+esc(hphoto)+'</b>'+(it.city?(' · 📍 '+esc(String(it.city).replace(/_/g,' '))):'')+'</div>'
+        +'<div class="acts" style="gap:6px;align-items:center;margin-bottom:10px"><span class="sub" style="margin:0">Fenêtre :</span>'
+        +[60,120,240,480,1440].map(function(f){ return '<button type="button" class="phm-f" data-f="'+f+'"'+(PHM_FEN===f?' style="border-color:#6ea8fe;color:#6ea8fe"':'')+'>'+(f<1440?('± '+(f/60)+' h'):'toute la journée')+'</button>'; }).join('')
+        +'</div>'
+        +(lignes.length?lignes.map(function(l){
+            return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)">'
+              +'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b style="flex:1;min-width:150px">'+esc(l.site)+'</b>'
+              +'<span style="color:'+(l.ec<=30?'#1a9e5c':(l.ec<=120?'#e0a13b':'var(--muted)'))+';font-weight:700">écart '+(l.ec<60?(l.ec+' min'):(Math.floor(l.ec/60)+' h '+(l.ec%60)+' min'))+'</span></div>'
+              +'<div class="fa-d" style="margin-top:2px">'+esc(l.lbl)+' prévu à '+esc(l.h)+(l.agent?(' · 👤 '+esc(l.agent)):' · <span style="color:var(--bad)">sans agent</span>')+'</div>'
+              +'<div class="acts" style="margin-top:7px"><button type="button" class="phm-go ok" data-mid="'+esc(l.mid)+'" data-step="'+esc(l.step)+'" style="font-size:12.5px">📎 Rattacher ici</button></div></div>';
+          }).join('')
+          :'<div class="sub">Aucun ticket dans cette fenêtre. Élargis-la — jusqu’à « toute la journée » si l’heure de la photo est douteuse.</div>')
+        +'<p class="sub" style="margin:10px 0 0;font-size:11.5px">Le rattachement manuel vaut le rattachement automatique : le ticket est réglé, la photo devient sa preuve.</p>';
+      document.body.appendChild(pop);
+      byId('phm-x').onclick=function(){ pop.parentNode.removeChild(pop); };
+      pop.querySelectorAll('.phm-f').forEach(function(b){ b.onclick=function(){ PHM_FEN=+b.getAttribute('data-f'); rendre(); }; });
+      pop.querySelectorAll('.phm-go').forEach(function(b){ b.onclick=function(){
+        phAttach(i,b.getAttribute('data-mid'),b.getAttribute('data-step'));
+        var q=byId('phm-pop'); if(q)q.parentNode.removeChild(q);
+      }; });
+    }
+    rendre();
+  }
   function phAttach(i,mid,stepKey){ var m=phMatches&&phMatches[i]; if(!m)return; var sk=stepKey||PH_TYPE_STEP[m.ph.type]||'tenue'; var S=ssLoad(); S[mid]=S[mid]||{}; S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:m.ph.key,done:true,at:m.ph.ts||Date.now()}); ssSave(S); alert('📎 Photo rattachée (étape « '+(PH_STEP_LBL[sk]||sk)+' »).'); phRender(); }
   // ===== 📸 Photos à rattacher (remontées #7/#14/#19) : lien UNIQUE (u/) ou lien agent (agent/) → association à une étape de vacation → le ticket de la file est RÉGLÉ avec preuve photo. =====
   var SA_PH=null;

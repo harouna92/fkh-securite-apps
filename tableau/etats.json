@@ -3,6 +3,22 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 254,
+      "titre": "Tableau de bord des états des demandes",
+      "source": "Zeus"
+    },
+    {
+      "b": 255,
+      "titre": "Tableau de bord : 4 états + boutons d'ordre",
+      "source": "Zeus"
+    },
+    {
+      "b": 256,
+      "titre": "Photos sans correspondance : rattachement manuel, fenêtre horaire réglable",
+      "source": "remontées #53/#54/#57",
+      "note": "±1 h à toute la journée ; prise, fin, tenue et contrôles 2 h"
+    },
+    {
       "b": 253,
       "titre": "Démos vivantes : visite guidée pas à pas",
       "source": "Zeus",
@@ -178,11 +194,6 @@
     }
   ],
   "decide": [
-    {
-      "titre": "Photos sans correspondance : bouton de rattachement manuel, fenêtre horaire réglable (±2 h par défaut, jusqu'à 24 h)",
-      "source": "remontées #53/#54/#57",
-      "note": "règle arrêtée avec Zeus ; reste à coder"
-    },
     {
       "titre": "Choisir une photo déjà remontée par l'agent, en plus de la pellicule du téléphone",
       "source": "remontée #67 (2e partie)",
