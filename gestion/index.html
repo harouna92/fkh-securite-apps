@@ -214,7 +214,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b232</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b234</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2744,6 +2744,14 @@ button.big:active{transform:translateY(1px)}
       quoi:'Le dernier signal du script Gmail date de 2 h.',
       aFaire:'Ouvre 📧 Mails missions : le bandeau rouge doit annoncer l’arrêt et la marche à suivre.',
       monter:function(){ try{localStorage.setItem('fkh_mail_hb',JSON.stringify({hb:{at:Date.now()-7200000,vus:12,envoyes:0,runs:41,lastMail:Date.now()-32400000,erreur:''},lu:Date.now()}));}catch(e){} } },
+    mails:{ titre:'📧 Mails missions ouvert au superviseur',
+      quoi:'L’application vue par un superviseur.',
+      aFaire:'Le bandeau vert en haut te dit quel rôle tu portes. Cherche 📧 Mails missions dans la barre : elle est là (elle était réservée au super-admin jusqu’à hier). Bascule sur « opérateur » avec le lien du bandeau : elle disparaît, comme la plupart des autres sections.',
+      monter:function(){} },
+    boutonpc:{ titre:'🎧 Le bouton Prise de service PC',
+      quoi:'L’application vue par un opérateur.',
+      aFaire:'Dans la barre, tu vois « 🎧 Prise de service PC » — il n’existe que pour les opérateurs. Clique dessus : il passe au vert « Fin de service PC ». Repasse en « super-admin » avec le bandeau : le bouton disparaît, mais la pastille 🎧 t’affiche qui tient le poste.',
+      monter:function(){ try{localStorage.setItem('fkh_pc_poste',JSON.stringify({postes:[]}));}catch(e){} } },
     droits:{ titre:'🔐 Droits d’accès',
       quoi:'La grille « qui voit quoi » telle qu’elle est aujourd’hui.',
       aFaire:'Ouvre 🔐 Droits d’accès. Regarde la ligne 🔴 Annulations : les trois cases sont vides, c’est toi seul. Coche « Superviseur » sur 🔴 — c’est enregistré aussitôt. Puis « ↩️ Revenir aux réglages d’origine » pour tout remettre.',
@@ -2753,6 +2761,30 @@ button.big:active{transform:translateY(1px)}
       aFaire:'Appuie longuement (environ une demi-seconde) sur un onglet dont tu ne te sers pas, garde le doigt et lâche-le sur 🗑️ Corbeille. Ouvre ensuite la Corbeille : remets-le, ou supprime-le définitivement.',
       monter:function(){} }
   };
+  /* b234 : ENDOSSER UN ROLE (sandbox seulement).
+     POURQUOI : la moitie des reglages qu'on vient de faire — sections ouvertes ou fermees, bouton PC,
+     grille des droits — ne se VOIT que depuis un autre role. Sans ca, Zeus valide a l'aveugle.
+     COMMENT : ?sandbox=1&role=superviseur force le role cote affichage. Aucun effet en ligne : le mode
+     sandbox coupe le cloud, et le vrai controle d'acces reste cote serveur. C'est un miroir, pas une cle. */
+  function demoRole(r){
+    try{
+      if(!window._FKH_SANDBOX)return;
+      CLOUD.role=r||'full';
+      CLOUD.sections=(r==='operateur')?['suiviappels','interv','suivi','demandes','noterapide']:null;
+      applySectionAccess(); ppRefresh(); demoRoleBandeau();
+    }catch(e){}
+  }
+  function demoRoleBandeau(){
+    var el=byId('demo-role'); if(!el){ el=document.createElement('div'); el.id='demo-role';
+      el.style.cssText='position:fixed;left:0;right:0;top:0;z-index:130;background:#0d2b1f;border-bottom:2px solid #1a9e5c;padding:6px 12px;font-size:12.5px;text-align:center';
+      document.body.appendChild(el); }
+    var lbl=({operateur:'Opérateur',superviseur:'Superviseur',admin:'Administrateur'})[CLOUD.role]||'Super-administrateur';
+    el.innerHTML='👁️ Tu vois l’application <b>comme un '+esc(lbl)+'</b> — '
+      +['full','superviseur','admin','operateur'].map(function(r){
+          var n=({full:'super-admin',superviseur:'superviseur',admin:'admin',operateur:'opérateur'})[r];
+          return '<a href="#" class="demo-r" data-r="'+r+'" style="color:#7fe0aa;text-decoration:underline;margin:0 4px">'+n+'</a>'; }).join('·');
+    el.querySelectorAll('.demo-r').forEach(function(a2){ a2.onclick=function(e){ e.preventDefault(); demoRole(a2.getAttribute('data-r')); }; });
+  }
   function demoMonter(k){
     var D=DEMOS[k]; if(!D)return;
     try{ D.monter(); if(typeof save==='function'&&typeof SUIVI!=='undefined')save('fkh_suivi',SUIVI); }catch(e){}
@@ -6740,7 +6772,10 @@ box.querySelectorAll('.an-ok').forEach(function(b){ b.onclick=function(){ if(con
        COMMENT : ?sandbox=1&demo=<scenario> monte le decor, affiche un bandeau, et « Effacer la demo »
        remet tout a zero. Tout est marque `demo_` : rien ne se melange aux vraies donnees, et le mode
        sandbox garantit qu'aucune ligne ne part au cloud. */
-    try{ if(_SBX){ var _dm=new URLSearchParams(location.search).get('demo'); if(_dm)demoMonter(_dm); } }catch(e){}
+    try{ if(_SBX){ var _q=new URLSearchParams(location.search);
+      var _dm=_q.get('demo'); if(_dm)demoMonter(_dm);
+      var _dr=_q.get('role'); if(_dr)setTimeout(function(){ demoRole(_dr==='superadmin'?'full':_dr); },600);   /* b234 */
+    } }catch(e){}
     window._FKH_SANDBOX=_SBX;
     if(_SBX){ try{sessionStorage.removeItem('fkh_pass');}catch(e){} if(lo)lo.style.display='none'; cloudBar('🧪 SANDBOX — hors-ligne forcé (aucun cloud)',false); cloudToggleImport(); var _lf9=byId('logout-fab'); if(_lf9)_lf9.style.display='none'; }
     var saved=null; try{saved=_SBX?null:sessionStorage.getItem('fkh_pass');}catch(e){}
