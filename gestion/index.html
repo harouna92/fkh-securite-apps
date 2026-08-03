@@ -149,6 +149,11 @@ button.big:active{transform:translateY(1px)}
 #pp-af{right:317px}
 #pp-rt{right:361px}
 #pp-gp{right:405px}
+#pp-pc{right:449px}
+#pp-pc.pc-vide{border-color:#e5322d;background:rgba(229,50,45,.18);animation:pcpulse 1.6s ease-in-out infinite}
+@keyframes pcpulse{0%,100%{box-shadow:0 0 0 0 rgba(229,50,45,.55)}50%{box-shadow:0 0 0 7px rgba(229,50,45,0)}}
+#pc-btn{margin:0 0 0 6px;border-radius:999px;font-weight:700;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 12px;cursor:pointer}
+#pc-btn.on{background:#1a9e5c;border-color:#1a9e5c;color:#fff}
 .pp-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:none}
 #pp-ovl{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:120;display:none;align-items:flex-start;justify-content:center;padding:56px 10px 10px}
 #pp-ovl.on{display:flex}
@@ -206,7 +211,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b225</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b227</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -234,6 +239,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="streste">💶 Reste ST</button>
     <button data-s="cockpitfkh">📈 Cockpit FKH</button>
     <button data-s="tickets">🎫 Tickets</button>
+<button type="button" id="pc-btn" title="Prise / fin de service au PC — pour que tout le monde sache qui tient le poste">🎧 Prise de service PC</button>
     <button data-s="numeros">📇 Numéros utiles</button>
     <button data-s="clientsf">🏢 Clients</button>
     <button data-s="terrain">📨 Remontées terrain <span class="cnt" id="terrain-cnt" style="display:none"></span></button>
@@ -258,6 +264,7 @@ button.big:active{transform:translateY(1px)}
 <button type="button" id="pp-af" class="pp-btn" title="Vacations SANS AGENT à partir d’aujourd’hui — classées par site" aria-label="Vacations non affectées">🧍<span class="pp-badge" id="pp-af-n"></span></button>
 <button type="button" id="pp-rt" class="pp-btn" title="Agents EN RETARD à la prise de service" aria-label="Retards de prise">🐢<span class="pp-badge" id="pp-rt-n"></span></button>
 <button type="button" id="pp-gp" class="pp-btn" title="Agents ayant envoyé des photos SANS géolocalisation" aria-label="Photos sans position par agent">📵<span class="pp-badge" id="pp-gp-n"></span></button>
+<button type="button" id="pp-pc" class="pp-btn" title="Qui est au PC (prises de poste des opérateurs)" aria-label="Qui est au PC">🎧<span class="pp-badge" id="pp-pc-n"></span></button>
 <div id="pp-ovl"><div id="pp-box"></div></div>
 <button type="button" id="rech-bar" title="Missions en recherche d'agent — cliquer pour les traiter"></button>
 <button type="button" id="ask-fab" title="Poser une question (métier ou sur l'appli)" aria-label="Poser une question">💬</button>
@@ -990,11 +997,15 @@ button.big:active{transform:translateY(1px)}
   // ===== Réorganiser les SECTIONS (onglets) par glisser-déposer — appui long, mémorisé par appareil =====
   (function tabReorder(){
     var bar=byId('tabs'); if(!bar)return; var LS='fkh_tabs_order';
+    /* b226 : qui range ses onglets ? Super-admin et administrateur : oui, chacun organise son ecran
+       comme il travaille. Superviseur et operateur : non — leur ordre est impose (TABS_ORDRE_ROLE),
+       pour que « c'est dans le 2e onglet » veuille dire la meme chose pour tout le monde. */
+    function peutReorganiser(){ try{ var r=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; return r==='superadmin'||r==='full'||r==='admin'; }catch(e){ return true; } }
     function keyOf(b){ return b&&b.getAttribute?b.getAttribute('data-s'):null; }
     (function apply(){ var o=null; try{o=JSON.parse(localStorage.getItem(LS)||'null');}catch(e){} if(!o||!o.length)return; var map={}; Array.prototype.forEach.call(bar.children,function(b){ var k=keyOf(b); if(k)map[k]=b; }); o.forEach(function(k){ if(map[k])bar.appendChild(map[k]); }); })();
     function save(){ var arr=Array.prototype.map.call(bar.children,keyOf).filter(Boolean); try{localStorage.setItem(LS,JSON.stringify(arr));}catch(e){} }
     var timer=null, dragging=null, moved=false, sx=0, sy=0;
-    bar.addEventListener('pointerdown',function(e){ var b=e.target.closest?e.target.closest('button[data-s]'):null; if(!b)return; sx=e.clientX; sy=e.clientY; moved=false; timer=setTimeout(function(){ dragging=b; b.classList.add('tab-drag'); if(navigator.vibrate){try{navigator.vibrate(15);}catch(_){}}} ,350); });
+    bar.addEventListener('pointerdown',function(e){ if(!peutReorganiser())return; var b=e.target.closest?e.target.closest('button[data-s]'):null; if(!b)return; sx=e.clientX; sy=e.clientY; moved=false; timer=setTimeout(function(){ dragging=b; b.classList.add('tab-drag'); if(navigator.vibrate){try{navigator.vibrate(15);}catch(_){}}} ,350); });
     bar.addEventListener('pointermove',function(e){ if(timer&&!dragging&&(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8)){ clearTimeout(timer); timer=null; } if(!dragging)return; e.preventDefault(); moved=true; var u=document.elementFromPoint(e.clientX,e.clientY); var t=u&&u.closest?u.closest('button[data-s]'):null; if(!t||t===dragging||t.parentNode!==bar)return; var r=t.getBoundingClientRect(); bar.insertBefore(dragging, (e.clientX>(r.left+r.width/2))?t.nextSibling:t); });
     function end(){ if(timer){clearTimeout(timer);timer=null;} if(dragging){ dragging.classList.remove('tab-drag'); dragging=null; save(); } }
     bar.addEventListener('pointerup',end); bar.addEventListener('pointercancel',end);
@@ -2544,14 +2555,27 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_data'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_pc_poste','fkh_data'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','tickets','cockpitfkh','streste','depots','clientsf','mails']; // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)
   function _secSuperOnly(s){ return SUPERADMIN_SECTIONS.indexOf(s)>=0; }
   // Landing + ordre des onglets selon le rôle : opérateur → « Suivi des appels » en 1er + ouvert ; superviseur/admin/super-admin → « Suivi demandes » en 1er + ouvert.
   function applyRoleLayout(){ try{ var tabs=byId('tabs'); if(!tabs)return; var isOp=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); var primary=isOp?'suiviappels':'suivi'; var pb=tabs.querySelector('button[data-s="'+primary+'"]'); if(!pb)return; tabs.insertBefore(pb,tabs.firstChild); if(!isOp){ var sa=tabs.querySelector('button[data-s="suiviappels"]'); if(sa)tabs.insertBefore(sa,pb.nextSibling); } if(getComputedStyle(pb).display!=='none')pb.click(); }catch(e){} }
-  function applySectionAccess(){ var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=((!allowed)||allowed.indexOf(s)>=0) && !(_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin()); b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
+  /* b226 : ordre impose pour les roles qui ne rangent pas leurs onglets eux-memes.
+     Superviseur : il ouvre sa journee sur les demandes en cours, puis sur les appels de controle. */
+  var TABS_ORDRE_ROLE={
+    superviseur:['suivi','suiviappels','demandes','planning','interv','noterapide','fiche','zone','tenues','appels','suivisite','supervision','services','cfgiv','ref','numeros','terrain','supterrain'],
+    operateur:['suiviappels','suivi','demandes','interv','noterapide']
+  };
+  function tabsOrdreRole(){
+    try{
+      var r=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'', ord=TABS_ORDRE_ROLE[r]; if(!ord)return;
+      var bar=byId('tabs'); if(!bar)return;
+      ord.slice().reverse().forEach(function(k){ var b=bar.querySelector('button[data-s="'+k+'"]'); if(b)bar.insertBefore(b,bar.firstChild); });
+    }catch(e){}
+  }
+  function applySectionAccess(){ tabsOrdreRole(); try{pcMaj();}catch(e){} var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); var ok=((!allowed)||allowed.indexOf(s)>=0) && !(_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin()); b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
 
   /* ===== Cockpit « Reste à payer sous-traitant » (N4 Super-Admin) — lit la clé synchronisée fkh_st_reste ===== */
   function renderStReste(){
@@ -5214,6 +5238,7 @@ button.big:active{transform:translateY(1px)}
     ph:{title:'📷 Photos de PRISE / FIN manquantes',verb:'sans photo',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     te:{title:'🦺 Agents planifiés SANS photo de contrôle tenue',verb:'photo de contrôle manquante',tiles:3,depuis:'Visés dès 12 h AVANT la prise de service, tant que la photo n’est pas déposée'},
     c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,phaseSite:1,depuis:'Tout l’historique · classées Terminées / En cours puis PAR SITE · dépôt de la photo sur chaque créneau'},
+    pc:{title:'🎧 Qui est au PC',verb:'personne(s) au poste',tiles:0,pcv:1,depuis:'Le PC ne doit jamais être vacant : tant que personne n’a ouvert son service, les appels et les demandes ne sont tenus par personne'},
     gp:{title:'📵 Photos envoyées SANS géolocalisation',verb:'photo(s) sans position',tiles:0,byAgent:1,depuis:'Par agent · à rappeler pour les sensibiliser (une photo sans position ne prouve pas la présence sur site)'},
     rt:{title:'🐢 Agents EN RETARD à la prise de service',verb:'retard signalé',tiles:0,bySite2:1,depuis:'Depuis le 01/08 · classés par site · retard saisi par l’opérateur sur le ticket de prise'},
     af:{title:'🧍 Vacations NON AFFECTÉES',verb:'sans agent',tiles:0,af3:1,depuis:'Tout l’historique · À venir / En cours / Passées, puis par site · ⚡ affectation en série'},
@@ -5273,6 +5298,7 @@ button.big:active{transform:translateY(1px)}
     // b177 : vacations validees SANS agent, d'aujourd'hui vers le futur (classees par site au rendu)
     // b210 : retards de prise signales par l'operateur (case Agent en retard du ticket)
     // b219 : agents ayant envoye des photos SANS position (cle u/ville_inconnue) - via l'archive de rattachement
+    sc.pc=pcOuverts().map(function(x){ return {pc:1,agent:x.nom,role:x.role,user:x.user,due:x.debut,since:(now-x.debut),site:'PC',mdate:'',heure:''}; });
     sc.gp=[];
     try{ var _ar=[]; try{_ar=JSON.parse(localStorage.getItem('fkh_photo_archive')||'[]')||[];}catch(_e){}
       var _byAg={};
@@ -5316,16 +5342,93 @@ button.big:active{transform:translateY(1px)}
     sc.ro=(PP_RO&&PP_RO.items)||[]; // b153 : rempli par ppRoScan (asynchrone, en ligne) ou par le cache
     return sc;
   }
-  function ppRefresh(){ var hide=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); // b150 : réservé superviseur/admin/super-admin
+  /* ===== b227 : QUI EST AU PC =====
+     POURQUOI : le PC (celui qui prend les appels et traite les demandes) ne doit JAMAIS etre vacant.
+     Sans trace, personne ne sait si l'operateur 1 est parti avant que l'operateur 2 arrive.
+     COMMENT : chaque personne au poste ouvre puis ferme son service. Tant qu'au moins une personne
+     est ouverte, le PC est tenu. Des que la derniere ferme, la pastille passe au ROUGE PULSANT et
+     une alerte part dans la cloche (donc en notification telephone).
+     AGIR SUR PLACE : depuis la pastille, « 🎧 Je prends le PC » ouvre un poste immediatement — un
+     superviseur, un admin ou le super-admin peut donc couvrir le trou sans quitter la vue. */
+  function pcLoad(){ var o=null; try{o=JSON.parse(localStorage.getItem('fkh_pc_poste')||'null');}catch(e){}
+    if(!o||typeof o!=='object')o={postes:[]}; if(!Array.isArray(o.postes))o.postes=[]; return o; }
+  function pcSave(o){ try{ save('fkh_pc_poste',o); }catch(e){ try{localStorage.setItem('fkh_pc_poste',JSON.stringify(o));}catch(_e){} } }
+  function pcMoi(){ try{ return (typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)?CLOUD.user:'local'; }catch(e){ return 'local'; } }
+  function pcMonNom(){ try{ return (typeof opNow==='function'&&opNow())||pcMoi(); }catch(e){ return pcMoi(); } }
+  function pcOuverts(){ return pcLoad().postes.filter(function(x){ return x&&x.debut&&!x.fin; }); }
+  function pcJeSuisOuvert(){ var m=pcMoi(); return pcOuverts().some(function(x){ return x.user===m; }); }
+  function pcPrendre(){
+    var o=pcLoad(); if(pcJeSuisOuvert())return;
+    o.postes.push({user:pcMoi(), nom:pcMonNom(), role:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||''), debut:Date.now(), fin:0});
+    pcSave(o); pcMaj(); if(typeof ppRefresh==='function')ppRefresh();
+  }
+  function pcQuitter(){
+    var o=pcLoad(), m=pcMoi(), t=Date.now(), n=0;
+    o.postes.forEach(function(x){ if(x.user===m&&!x.fin){ x.fin=t; n++; } });
+    if(!n)return;
+    if(!pcOuverts().length&&!confirm('Tu es le dernier au PC.\n\nSi tu fermes maintenant, PLUS PERSONNE ne tient le poste et une alerte va partir.\n\nFermer quand même ?')){
+      o.postes.forEach(function(x){ if(x.user===m&&x.fin===t)x.fin=0; }); return;
+    }
+    pcSave(o); pcMaj(); if(typeof ppRefresh==='function')ppRefresh();
+  }
+  function pcMaj(){
+    var b=byId('pc-btn'); if(b){ var ouvert=pcJeSuisOuvert();
+      b.textContent=ouvert?'🎧 Fin de service PC':'🎧 Prise de service PC';
+      b.className=ouvert?'on':''; b.onclick=function(){ ouvert?pcQuitter():pcPrendre(); }; }
+  }
+  function pcDepuis(x){ try{ return (typeof ppSince==='function')?ppSince(Date.now()-x.debut):(Math.round((Date.now()-x.debut)/60000)+' min'); }catch(e){ return ''; } }
+  function ppRefresh(){ try{setTimeout(ppPlacer,0);}catch(e){} var hide=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); // b150 : réservé superviseur/admin/super-admin
     var sc=hide?null:ppScan(), any=false;
-    ['op','cli','ph','te','c2','ro','af','rt','gp'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
+    ['op','cli','ph','te','c2','ro','af','rt','gp','pc'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
       b.style.display=hide?'none':'';
+      if(k==='pc'){ var Lp=sc.pc||[]; b.style.display=hide?'none':'';
+        b.classList.toggle('pc-vide',!Lp.length);
+        n.textContent=Lp.length?Lp.length:'!'; n.style.display='';
+        b.title=Lp.length?('Au PC : '+Lp.map(function(x){return x.agent;}).join(', ')):'PERSONNE AU PC';
+        return; }
       if(!hide){ var L=sc[k]; n.textContent=L.length; n.style.display=L.length?'block':'none'; } });
     if(!any)return;
     if(hide){ if(PP_VIEW.mode)ppClose(); return; }
     if(PP_VIEW.mode)ppRender(sc);
   }
-  function ppRender(sc){ var box=byId('pp-box'); if(!box||!PP_VIEW.mode)return; sc=sc||ppScan();
+  /* b226 : ranger les PASTILLES. Elles sont posees a des emplacements fixes (right: 53, 97, 141 ... px).
+     Deplacer une pastille = lui donner l'emplacement d'une autre, et decaler les autres. L'ordre est
+     memorise par appareil (fkh_pp_order). Reserve au super-admin et a l'administrateur, comme les onglets. */
+  var PP_ORDRE_DEF=['pp-pc','pp-op','pp-cli','pp-ph','pp-te','pp-c2','pp-ro','pp-af','pp-rt','pp-gp'];
+  function ppPeutRanger(){ try{ var r=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; return r==='superadmin'||r==='full'||r==='admin'; }catch(e){ return false; } }
+  function ppOrdre(){ var o=null; try{o=JSON.parse(localStorage.getItem('fkh_pp_order')||'null');}catch(e){}
+    if(!o||!o.length)return PP_ORDRE_DEF.slice();
+    var out=o.filter(function(k){return PP_ORDRE_DEF.indexOf(k)>=0;});
+    PP_ORDRE_DEF.forEach(function(k){ if(out.indexOf(k)<0)out.push(k); });
+    return out; }
+  function ppOrdreSave(arr){ try{localStorage.setItem('fkh_pp_order',JSON.stringify(arr));}catch(e){} }
+  function ppPlacer(){
+    var visibles=ppOrdre().filter(function(k){ var b=byId(k); return b&&b.style.display!=='none'; });
+    var slots=[]; for(var i=0;i<PP_ORDRE_DEF.length;i++)slots.push(53+44*i);
+    visibles.forEach(function(k,i){ var b=byId(k); if(b)b.style.right=slots[i]+'px'; });
+  }
+  function ppReorderInit(){
+    if(window._PP_REO)return; window._PP_REO=1;
+    var timer=null,drag=null,moved=false,sx=0,sy=0;
+    document.addEventListener('pointerdown',function(e){
+      if(!ppPeutRanger())return;
+      var b=e.target.closest?e.target.closest('button.pp-btn'):null; if(!b)return;
+      sx=e.clientX; sy=e.clientY; moved=false;
+      timer=setTimeout(function(){ drag=b; b.classList.add('tab-drag'); b.style.opacity='.6'; try{b.setPointerCapture(e.pointerId);}catch(_){} },420);
+    });
+    document.addEventListener('pointermove',function(e){
+      if(timer&&!drag&&(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8)){ clearTimeout(timer); timer=null; }
+      if(!drag)return; e.preventDefault(); moved=true;
+      var el=document.elementFromPoint(e.clientX,e.clientY);
+      var t=el&&el.closest?el.closest('button.pp-btn'):null;
+      if(t&&t!==drag){ var ord=ppOrdre(), i=ord.indexOf(drag.id), j=ord.indexOf(t.id);
+        if(i>=0&&j>=0){ ord.splice(i,1); ord.splice(j,0,drag.id); ppOrdreSave(ord); ppPlacer(); } }
+    });
+    function fin(){ if(timer){clearTimeout(timer);timer=null;} if(drag){ drag.classList.remove('tab-drag'); drag.style.opacity=''; drag=null; ppPlacer(); } }
+    document.addEventListener('pointerup',fin); document.addEventListener('pointercancel',fin);
+    document.addEventListener('click',function(e){ if(moved&&e.target.closest&&e.target.closest('button.pp-btn')){ e.preventDefault(); e.stopPropagation(); moved=false; } },true);
+  }
+  function ppRender(sc){ ppReorderInit(); var box=byId('pp-box'); if(!box||!PP_VIEW.mode)return; sc=sc||ppScan();
     var D=PP_DEF[PP_VIEW.mode]||PP_DEF.op; var L=sc[PP_VIEW.mode]||[];
     var pr=L.filter(function(x){return x.key==='prise';}), fi=L.filter(function(x){return x.key!=='prise';});
     var h='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><b style="flex:1;font-size:15px">'+D.title+'</b><button type="button" id="pp-close">✕</button></div>';
@@ -5338,7 +5441,19 @@ button.big:active{transform:translateY(1px)}
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
       return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
-    if(D.byAgent&&!PP_VIEW.sub){ /* b219 : par AGENT */
+    if(D.pcv){
+      var moiOuvert=pcJeSuisOuvert();
+      h+=L.length
+        ? ('<div class="card" style="border:1px solid #1a9e5c;background:rgba(26,158,92,.08);margin-bottom:8px"><b style="color:#1a9e5c">\u2705 Le PC est tenu</b><div class="sub" style="margin:4px 0 0">'+L.length+' personne(s) au poste.</div></div>'
+           + L.map(function(x){ return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)"><b>\U0001F464 '+esc(x.agent)+'</b>'+(x.role?(' <span class="sub" style="margin:0">('+esc(x.role)+')</span>'):'')+'<div class="fa-d" style="margin-top:2px">au poste depuis <b>'+esc(pcDepuis({debut:x.due}))+'</b></div></div>'; }).join(''))
+        : '<div class="card" style="border:1.5px solid #c02626;background:rgba(192,38,38,.12);margin-bottom:8px"><b style="color:#e5322d">\u26a0\uFE0F PERSONNE N\u2019EST AU PC</b><div class="sub" style="margin:4px 0 0">Les appels entrants et les demandes ne sont tenus par personne. Prends le poste, ou appelle quelqu\u2019un pour qu\u2019il le prenne.</div></div>';
+      h+='<div class="acts" style="margin-top:8px"><button type="button" id="pc-act" class="'+(moiOuvert?'':'ok')+'" style="font-size:14px;padding:9px 14px">'+(moiOuvert?'\U0001F3A7 Je quitte le PC':'\U0001F3A7 Je prends le PC')+'</button></div>';
+      var _hist=pcLoad().postes.filter(function(x){ return x.fin&&(Date.now()-x.fin)<86400000; }).sort(function(u,v){return v.fin-u.fin;});
+      if(_hist.length){ h+='<div class="lab" style="margin:12px 0 4px">Rel\u00e8ves des derni\u00e8res 24 h</div>'
+        + _hist.map(function(x){ var f=function(t){ var d=new Date(t); return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); };
+            return '<div class="sub" style="margin:0 0 3px">\U0001F464 '+esc(x.nom||x.user||'')+' \u00b7 '+f(x.debut)+' \u2192 '+f(x.fin)+'</div>'; }).join(''); }
+      h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
+    } else if(D.byAgent&&!PP_VIEW.sub){ /* b219 : par AGENT */
       h+=L.length?L.map(function(g){ return '<div class="pp-tile" data-sub="'+esc(g.agent)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+g.nb+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">\U0001F464 '+esc(g.agent)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(g.tel?('\U0001F4DE '+esc(g.tel)):'<span style="color:var(--bad)">numéro inconnu</span>')+' · '+g.nb+' photo(s) sans position</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Aucun agent concerné \U0001F389</div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
     } else if(D.byAgent&&PP_VIEW.sub){
@@ -5414,7 +5529,8 @@ button.big:active{transform:translateY(1px)}
     }
     box.innerHTML=h;
     var cl=byId('pp-close'); if(cl)cl.onclick=ppClose;
-    var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };
+var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitter():pcPrendre(); ppRender(); };
+        var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };
     box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else {PP_VIEW.sub=t.getAttribute('data-sub');} ppRender(); }; });
     box.querySelectorAll('.pp-act-aff').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); ppClose(); if(typeof planningAffect==='function')planningAffect(mid); }; });
     var _mg=box.querySelector('.pp-mass-go'); if(_mg)_mg.onclick=function(){ /* b184 : affectation en serie */
@@ -5461,7 +5577,7 @@ button.big:active{transform:translateY(1px)}
   setTimeout(function(){ try{ppRoScan();}catch(_e){} },3000);
   function ppOpen(mode){ PP_VIEW={mode:mode,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.add('on'); ppRender(); }
   function ppClose(){ PP_VIEW={mode:null,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.remove('on'); }
-  (function(){ ['op','cli','ph','te','c2','ro','af','rt','gp'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
+  (function(){ ['op','cli','ph','te','c2','ro','af','rt','gp','pc'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
     var o=byId('pp-ovl'); if(o)o.addEventListener('click',function(ev){ if(ev.target===o)ppClose(); });
     setInterval(function(){ try{ppRefresh();}catch(_e){} },30000);
     setTimeout(function(){ try{ppRefresh();}catch(_e){} },900);
@@ -5981,7 +6097,7 @@ button.big:active{transform:translateY(1px)}
     {k:'appel_danger',   ic:'⛔', lbl:'Prise/fin de service non pointée (+10 min)'},
     {k:'nouvelle_demande',ic:'🆕', lbl:'Nouvelle demande reçue (en recherche)'},
     {k:'demande_1h',     ic:'🕵️', lbl:'Demande en recherche depuis + d\'1 h'},
-    {k:'mail_arret', ic:'📧', lbl:'Collecte des mails à l’arrêt (+15 min)'},{k:'prise_retard',   ic:'🕓', lbl:'Agent en retard à la prise de service'}
+    {k:'pc_vacant',     ic:'🎧', lbl:'Personne au PC (poste vacant)'},{k:'mail_arret', ic:'📧', lbl:'Collecte des mails à l’arrêt (+15 min)'},{k:'prise_retard',   ic:'🕓', lbl:'Agent en retard à la prise de service'}
   ];
   function notifLoadCfg(){ var c=null; try{c=JSON.parse(localStorage.getItem('fkh_notif_cfg')||'null');}catch(e){} if(!c||typeof c!=='object')c={}; if(typeof c.on!=='boolean')c.on=false; if(typeof c.sound!=='boolean')c.sound=true; if(!c.cats||typeof c.cats!=='object')c.cats={}; NOTIF_CATS.forEach(function(t){ if(typeof c.cats[t.k]!=='boolean')c.cats[t.k]=true; }); NOTIF.cfg=c; }
   function notifSaveCfg(){ try{localStorage.setItem('fkh_notif_cfg',JSON.stringify(NOTIF.cfg));}catch(e){} }
@@ -5991,6 +6107,12 @@ button.big:active{transform:translateY(1px)}
   function notifFire(a){ try{ var n=new Notification(a.title,{body:a.body,tag:a.cat+':'+a.key}); n.onclick=function(){ try{window.focus();}catch(e){} var btn=document.querySelector('#tabs button[data-s="'+a.go+'"]'); if(btn)btn.click(); try{n.close();}catch(e){} }; }catch(e){} notifBeep(); }
   function notifThresholdAlerts(){
     var now=Date.now(), out=[];
+    /* b227 : PC vacant = alerte immediate. Une cle par heure : l'alerte se rappelle a nous tant que le trou dure. */
+    try{ if(!pcOuverts().length&&(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)){
+      out.push({cat:'pc_vacant',key:'pc'+Math.floor(now/3600000),
+        title:'\u26a0\uFE0F Personne au PC',
+        body:'Aucune prise de service en cours : les appels et les demandes ne sont tenus par personne.',
+        when:(typeof impTodayISO==='function'?impTodayISO():'')}); } }catch(_e){}
     /* b223 : la collecte des mails a l'arret est une alerte a part entiere — c'est ce qui a manque le 02/08.
        Une seule alerte par jour (cle = date) : elle reste visible tant que la collecte n'est pas repartie. */
     try{ var _hbE=mailHbEtat(); if(_hbE.ko&&(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)){
