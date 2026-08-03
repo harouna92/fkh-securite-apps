@@ -513,7 +513,8 @@ export default {
     // --- b151 : liste des mails ingérés (section 📧 Mails missions — super-admin uniquement) ---
     if (path === "/mails/list" && request.method === "GET") {
       const rr = roleFor(pass);
-      if (!rr || (rr.role !== "superadmin" && rr.role !== "full")) return json({ error: "forbidden" }, 403);
+      // b228 : la section Mails missions (et son temoin de vie) est ouverte au superviseur et a l'administrateur.
+      if (!rr || rr.role === "operateur") return json({ error: "forbidden" }, 403);
       const rs = await env.DB.prepare("SELECT cdr_id, at, is_demande, dismissed, created, data FROM ai_calls WHERE cdr_id LIKE 'mail_%' ORDER BY at DESC LIMIT 200").all();
       const items = (rs.results || []).map((row) => Object.assign({ cdr_id: row.cdr_id, at: row.at, is_demande: row.is_demande, dismissed: row.dismissed, created: row.created }, safeParse(row.data)));
       let hb = {}; try { const r0 = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_mail_hb'").first(); hb = r0 && r0.v ? JSON.parse(r0.v) : {}; } catch (_) {}

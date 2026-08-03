@@ -150,6 +150,9 @@ button.big:active{transform:translateY(1px)}
 #pp-rt{right:361px}
 #pp-gp{right:405px}
 #pp-pc{right:449px}
+#pp-an{right:493px}
+#pp-an.pc-vide{border-color:#e5322d;background:rgba(229,50,45,.18);animation:pcpulse 1.6s ease-in-out infinite}
+.pl-chip.annul{border:1.5px solid #e5322d !important;background:repeating-linear-gradient(45deg,rgba(229,50,45,.18),rgba(229,50,45,.18) 6px,transparent 6px,transparent 12px) !important}
 #pp-pc.pc-vide{border-color:#e5322d;background:rgba(229,50,45,.18);animation:pcpulse 1.6s ease-in-out infinite}
 @keyframes pcpulse{0%,100%{box-shadow:0 0 0 0 rgba(229,50,45,.55)}50%{box-shadow:0 0 0 7px rgba(229,50,45,0)}}
 #pc-btn{margin:0 0 0 6px;border-radius:999px;font-weight:700;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 12px;cursor:pointer}
@@ -211,7 +214,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b227</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b229</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -265,6 +268,7 @@ button.big:active{transform:translateY(1px)}
 <button type="button" id="pp-rt" class="pp-btn" title="Agents EN RETARD à la prise de service" aria-label="Retards de prise">🐢<span class="pp-badge" id="pp-rt-n"></span></button>
 <button type="button" id="pp-gp" class="pp-btn" title="Agents ayant envoyé des photos SANS géolocalisation" aria-label="Photos sans position par agent">📵<span class="pp-badge" id="pp-gp-n"></span></button>
 <button type="button" id="pp-pc" class="pp-btn" title="Qui est au PC (prises de poste des opérateurs)" aria-label="Qui est au PC">🎧<span class="pp-badge" id="pp-pc-n"></span></button>
+<button type="button" id="pp-an" class="pp-btn" title="Annulations reçues par mail — à confirmer" aria-label="Annulations à traiter">🔴<span class="pp-badge" id="pp-an-n"></span></button>
 <div id="pp-ovl"><div id="pp-box"></div></div>
 <button type="button" id="rech-bar" title="Missions en recherche d'agent — cliquer pour les traiter"></button>
 <button type="button" id="ask-fab" title="Poser une question (métier ou sur l'appli)" aria-label="Poser une question">💬</button>
@@ -2558,7 +2562,7 @@ button.big:active{transform:translateY(1px)}
   var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_pc_poste','fkh_data'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
-  var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','tickets','cockpitfkh','streste','depots','clientsf','mails']; // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)
+  var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','tickets','cockpitfkh','streste','depots','clientsf']; // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)  /* b228 : 'mails' retire — la section Mails missions (et son temoin de vie) est desormais visible par le superviseur et l'administrateur, pas seulement le super-admin */
   function _secSuperOnly(s){ return SUPERADMIN_SECTIONS.indexOf(s)>=0; }
   // Landing + ordre des onglets selon le rôle : opérateur → « Suivi des appels » en 1er + ouvert ; superviseur/admin/super-admin → « Suivi demandes » en 1er + ouvert.
   function applyRoleLayout(){ try{ var tabs=byId('tabs'); if(!tabs)return; var isOp=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); var primary=isOp?'suiviappels':'suivi'; var pb=tabs.querySelector('button[data-s="'+primary+'"]'); if(!pb)return; tabs.insertBefore(pb,tabs.firstChild); if(!isOp){ var sa=tabs.querySelector('button[data-s="suiviappels"]'); if(sa)tabs.insertBefore(sa,pb.nextSibling); } if(getComputedStyle(pb).display!=='none')pb.click(); }catch(e){} }
@@ -3733,18 +3737,18 @@ button.big:active{transform:translateY(1px)}
     function wire(){ var c2=cc.querySelector('.pl-close'); if(c2)c2.onclick=planningAffectClose; var bk=cc.querySelector('.pa-back'); if(bk)bk.onclick=step0; }
     function dlClients(id){ return '<datalist id="'+id+'">'+_plKnownClients().map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist>'; }
     function step0(){ cc.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><b style="flex:1">\u2795 Ajouter au Planning</b><button type="button" class="pl-close">\u2715</button></div>'
-      +'<p class="sub" style="margin:0 0 8px;font-size:11.5px">Hi\u00e9rarchie respect\u00e9e : \U0001F3E2 Client \u2192 \U0001F4CD Site \u2192 \U0001F550 Service / vacation.</p>'
-      +'<div style="display:grid;gap:8px"><button type="button" class="pl-add-c">\U0001F3E2 Cr\u00e9er un CLIENT</button><button type="button" class="pl-add-s">\U0001F4CD Cr\u00e9er un SITE (rattach\u00e9 \u00e0 un client)</button><button type="button" class="ok pl-add-v">\U0001F550 Cr\u00e9er un SERVICE / une VACATION</button></div>';
+      +'<p class="sub" style="margin:0 0 8px;font-size:11.5px">Hi\u00e9rarchie respect\u00e9e : 🏢 Client \u2192 📍 Site \u2192 🕐 Service / vacation.</p>'
+      +'<div style="display:grid;gap:8px"><button type="button" class="pl-add-c">🏢 Cr\u00e9er un CLIENT</button><button type="button" class="pl-add-s">📍 Cr\u00e9er un SITE (rattach\u00e9 \u00e0 un client)</button><button type="button" class="ok pl-add-v">🕐 Cr\u00e9er un SERVICE / une VACATION</button></div>';
       var c2=cc.querySelector('.pl-close'); if(c2)c2.onclick=planningAffectClose;
       cc.querySelector('.pl-add-c').onclick=stepClient; cc.querySelector('.pl-add-s').onclick=stepSite; cc.querySelector('.pl-add-v').onclick=stepVac; }
-    function stepClient(){ cc.innerHTML=head('\U0001F3E2 Nouveau client')
+    function stepClient(){ cc.innerHTML=head('🏢 Nouveau client')
       +'<input class="pa-cnom" placeholder="Nom du client (ex. SECURITAS)" style="width:100%">'
       +'<input class="pa-ctel" placeholder="T\u00e9l\u00e9phone du client (optionnel)" style="width:100%;margin-top:6px">'+foot('Cr\u00e9er le client'); wire();
       cc.querySelector('.pa-go').onclick=function(){ var n=(cc.querySelector('.pa-cnom').value||'').trim(); if(!n){alert('Nom du client obligatoire.');return;} var t=(cc.querySelector('.pa-ctel').value||'').trim();
         try{ var ct=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{}; if(!(n in ct)||t)ct[n]=t||ct[n]||''; localStorage.setItem('fkh_client_tel',JSON.stringify(ct)); if(typeof cloudPush==='function')cloudPush('fkh_client_tel'); }catch(e){}
         alert('\u2705 Client \u00ab '+n+' \u00bb enregistr\u00e9 \u2014 disponible dans toutes les listes.'); step0(); }; }
-    function stepSite(){ cc.innerHTML=head('\U0001F4CD Nouveau site')
-      +'<label class="f"><div class="lab">\U0001F3E2 Client (obligatoire \u2014 hi\u00e9rarchie)</div><input class="pa-scli" list="pa-dlc" placeholder="Client du site\u2026" autocomplete="off">'+dlClients('pa-dlc')+'</label>'
+    function stepSite(){ cc.innerHTML=head('📍 Nouveau site')
+      +'<label class="f"><div class="lab">🏢 Client (obligatoire \u2014 hi\u00e9rarchie)</div><input class="pa-scli" list="pa-dlc" placeholder="Client du site\u2026" autocomplete="off">'+dlClients('pa-dlc')+'</label>'
       +'<input class="pa-snom" placeholder="Nom du site (ex. BASIC FIT Dijon)" style="width:100%;margin-top:6px">'
       +'<input class="pa-svil" placeholder="Ville" style="width:100%;margin-top:6px">'+foot('Cr\u00e9er le site'); wire();
       cc.querySelector('.pa-go').onclick=function(){ var cli=(cc.querySelector('.pa-scli').value||'').trim(), n=(cc.querySelector('.pa-snom').value||'').trim(), vi=(cc.querySelector('.pa-svil').value||'').trim();
@@ -3752,9 +3756,9 @@ button.big:active{transform:translateY(1px)}
         if(typeof siteMetaSet==='function')try{siteMetaSet(n,{client:cli,ville:vi});}catch(e){}
         try{ var sn=load('fkh_site_noms')||[]; if(sn.indexOf(n)<0){ sn.push(n); save('fkh_site_noms',sn); } }catch(e){}
         alert('\u2705 Site \u00ab '+n+' \u00bb cr\u00e9\u00e9 (client '+cli+').'); step0(); }; }
-    function stepVac(){ cc.innerHTML=head('\U0001F550 Nouveau service / vacation')
-      +'<label class="f"><div class="lab">\U0001F3E2 Client</div><input class="pa-vcli" list="pa-dlc2" placeholder="Client\u2026" autocomplete="off">'+dlClients('pa-dlc2')+'</label>'
-      +'<label class="f" style="margin-top:6px"><div class="lab">\U0001F4CD Site</div><input class="pa-vsite" list="pa-dls" placeholder="Site\u2026" autocomplete="off"><datalist id="pa-dls"></datalist></label>'
+    function stepVac(){ cc.innerHTML=head('🕐 Nouveau service / vacation')
+      +'<label class="f"><div class="lab">🏢 Client</div><input class="pa-vcli" list="pa-dlc2" placeholder="Client\u2026" autocomplete="off">'+dlClients('pa-dlc2')+'</label>'
+      +'<label class="f" style="margin-top:6px"><div class="lab">📍 Site</div><input class="pa-vsite" list="pa-dls" placeholder="Site\u2026" autocomplete="off"><datalist id="pa-dls"></datalist></label>'
       +'<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:6px;margin-top:6px"><input type="date" class="pa-vdate" value="'+esc((typeof impTodayISO==='function')?impTodayISO():'')+'"><input type="time" class="pa-vh1" title="Heure d\u00e9but"><input type="time" class="pa-vh2" title="Heure fin"></div>'+foot('Cr\u00e9er la vacation'); wire();
       var siteInp=cc.querySelector('.pa-vsite'), cliInp=cc.querySelector('.pa-vcli');
       function fillSites(){ var dl=cc.querySelector('#pa-dls'); if(dl)dl.innerHTML=_plKnownSites((cliInp.value||'').trim()).map(function(x){return '<option value="'+esc(x)+'">';}).join(''); }
@@ -3996,7 +4000,7 @@ button.big:active{transform:translateY(1px)}
       var byH={},hOrder=[]; siteMap[s].forEach(function(m){ var hk=(m.mheure||'')+'-'+(m.mfin||''); if(!byH[hk]){byH[hk]=[];hOrder.push(hk);} byH[hk].push(m); });
       hOrder.sort();
       hOrder.forEach(function(hk){ var sample=byH[hk][0]; var durt=_plDurTxt(sample.mheure,sample.mfin); var lbl=(sample.mheure||'—')+(sample.mfin?('-'+sample.mfin):'')+(durt?(' ('+durt+')'):''); var qual=sample.qual||sample.specialite||'';
-        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); var hach=(aff&&!m.planifie); var bgS=hach?('background:repeating-linear-gradient(45deg,'+st.c+' 0 6px,rgba(0,0,0,.32) 6px 10px)'):('background:'+st.c); if(m.mailPending){ bgS='background:repeating-linear-gradient(45deg,#7b61ff 0 7px,#3d2f99 7px 12px);outline:2px dashed #fff;outline-offset:-2px'; } return '<div class="pl-chip" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l+(aff?(m.planifie?' · planifié':' · NON planifié (hachuré)'):'')+(m.saOff?' · SANS TICKETS (retiree du Suivi des appels)':''))+'" style="'+bgS+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.saOff?'🔕 ':'')+(m.isCircuit?'🚐 ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+(m.mailPending?'<div style="font-size:9px;font-weight:800">📧 À VALIDER</div>':'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div>')+'</div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc(s)+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
+        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); var hach=(aff&&!m.planifie); var bgS=hach?('background:repeating-linear-gradient(45deg,'+st.c+' 0 6px,rgba(0,0,0,.32) 6px 10px)'):('background:'+st.c); if(m.mailPending){ bgS='background:repeating-linear-gradient(45deg,#7b61ff 0 7px,#3d2f99 7px 12px);outline:2px dashed #fff;outline-offset:-2px'; } return '<div class="pl-chip'+((m.annul&&annulVisible())?' annul':'')+'" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l+(aff?(m.planifie?' · planifié':' · NON planifié (hachuré)'):'')+(m.saOff?' · SANS TICKETS (retiree du Suivi des appels)':''))+'" style="'+bgS+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.annul&&annulVisible()?'🔴 ':'')+(m.saOff?'🔕 ':'')+(m.isCircuit?'🚐 ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+(m.mailPending?'<div style="font-size:9px;font-weight:800">📧 À VALIDER</div>':'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div>')+'</div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc(s)+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
         bodyR+='<tr><td class="pl-hlabel" style="position:sticky;left:0;z-index:1"><b>'+esc(lbl)+'</b>'+(qual?'<div style="font-size:10px;opacity:.8">'+esc(qual)+'</div>':'')+'</td>'+cells+'</tr>';
       });
     }); }
@@ -5238,6 +5242,7 @@ button.big:active{transform:translateY(1px)}
     ph:{title:'📷 Photos de PRISE / FIN manquantes',verb:'sans photo',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     te:{title:'🦺 Agents planifiés SANS photo de contrôle tenue',verb:'photo de contrôle manquante',tiles:3,depuis:'Visés dès 12 h AVANT la prise de service, tant que la photo n’est pas déposée'},
     c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,phaseSite:1,depuis:'Tout l’historique · classées Terminées / En cours puis PAR SITE · dépôt de la photo sur chaque créneau'},
+    an:{title:'🔴 Annulations à confirmer',verb:'annulation(s) signalée(s)',tiles:0,anv:1,depuis:'Une annulation reçue par mail ne supprime jamais une vacation : elle la signale. Confirme, ou écarte la fausse alerte'},
     pc:{title:'🎧 Qui est au PC',verb:'personne(s) au poste',tiles:0,pcv:1,depuis:'Le PC ne doit jamais être vacant : tant que personne n’a ouvert son service, les appels et les demandes ne sont tenus par personne'},
     gp:{title:'📵 Photos envoyées SANS géolocalisation',verb:'photo(s) sans position',tiles:0,byAgent:1,depuis:'Par agent · à rappeler pour les sensibiliser (une photo sans position ne prouve pas la présence sur site)'},
     rt:{title:'🐢 Agents EN RETARD à la prise de service',verb:'retard signalé',tiles:0,bySite2:1,depuis:'Depuis le 01/08 · classés par site · retard saisi par l’opérateur sur le ticket de prise'},
@@ -5298,6 +5303,7 @@ button.big:active{transform:translateY(1px)}
     // b177 : vacations validees SANS agent, d'aujourd'hui vers le futur (classees par site au rendu)
     // b210 : retards de prise signales par l'operateur (case Agent en retard du ticket)
     // b219 : agents ayant envoye des photos SANS position (cle u/ville_inconnue) - via l'archive de rattachement
+    sc.an=annulVisible()?annulListe():[];
     sc.pc=pcOuverts().map(function(x){ return {pc:1,agent:x.nom,role:x.role,user:x.user,due:x.debut,since:(now-x.debut),site:'PC',mdate:'',heure:''}; });
     sc.gp=[];
     try{ var _ar=[]; try{_ar=JSON.parse(localStorage.getItem('fkh_photo_archive')||'[]')||[];}catch(_e){}
@@ -5379,8 +5385,11 @@ button.big:active{transform:translateY(1px)}
   function pcDepuis(x){ try{ return (typeof ppSince==='function')?ppSince(Date.now()-x.debut):(Math.round((Date.now()-x.debut)/60000)+' min'); }catch(e){ return ''; } }
   function ppRefresh(){ try{setTimeout(ppPlacer,0);}catch(e){} var hide=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); // b150 : réservé superviseur/admin/super-admin
     var sc=hide?null:ppScan(), any=false;
-    ['op','cli','ph','te','c2','ro','af','rt','gp','pc'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
+    ['op','cli','ph','te','c2','ro','af','rt','gp','pc','an'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
       b.style.display=hide?'none':'';
+      if(k==='an'){ var La=sc.an||[]; b.style.display=(hide||!La.length)?'none':'';
+        b.classList.toggle('pc-vide',!!La.length); n.textContent=La.length; n.style.display=La.length?'':'none';
+        b.title=La.length?(La.length+' annulation(s) reçue(s) par mail — à confirmer'):''; return; }
       if(k==='pc'){ var Lp=sc.pc||[]; b.style.display=hide?'none':'';
         b.classList.toggle('pc-vide',!Lp.length);
         n.textContent=Lp.length?Lp.length:'!'; n.style.display='';
@@ -5394,7 +5403,7 @@ button.big:active{transform:translateY(1px)}
   /* b226 : ranger les PASTILLES. Elles sont posees a des emplacements fixes (right: 53, 97, 141 ... px).
      Deplacer une pastille = lui donner l'emplacement d'une autre, et decaler les autres. L'ordre est
      memorise par appareil (fkh_pp_order). Reserve au super-admin et a l'administrateur, comme les onglets. */
-  var PP_ORDRE_DEF=['pp-pc','pp-op','pp-cli','pp-ph','pp-te','pp-c2','pp-ro','pp-af','pp-rt','pp-gp'];
+  var PP_ORDRE_DEF=['pp-an','pp-pc','pp-op','pp-cli','pp-ph','pp-te','pp-c2','pp-ro','pp-af','pp-rt','pp-gp'];
   function ppPeutRanger(){ try{ var r=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; return r==='superadmin'||r==='full'||r==='admin'; }catch(e){ return false; } }
   function ppOrdre(){ var o=null; try{o=JSON.parse(localStorage.getItem('fkh_pp_order')||'null');}catch(e){}
     if(!o||!o.length)return PP_ORDRE_DEF.slice();
@@ -5441,26 +5450,43 @@ button.big:active{transform:translateY(1px)}
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
       return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
-    if(D.pcv){
+    if(D.anv){
+      h+=L.length?L.map(function(x){
+        var d5=(x.mdate||'').split('-').reverse().join('/');
+        var rec=''; try{ var dd=new Date(x.at); rec=('0'+dd.getDate()).slice(-2)+'/'+('0'+(dd.getMonth()+1)).slice(-2)+' à '+('0'+dd.getHours()).slice(-2)+' h '+('0'+dd.getMinutes()).slice(-2); }catch(e){}
+        var urgent=(x.due-Date.now())<86400000&&(x.due>Date.now());
+        return '<div style="border:1.5px solid #e5322d;border-radius:10px;padding:10px;margin-bottom:8px;background:rgba(229,50,45,.08)">'
+          +'<b>📍 '+esc(x.site)+'</b>'+(x.client?(' <span class="sub" style="margin:0">'+esc(x.client)+'</span>'):'')
+          +(urgent?' <b style="color:#e5322d">\u26a0\uFE0F DANS MOINS DE 24 H</b>':'')
+          +'<div class="fa-d" style="margin-top:2px">le '+esc(d5)+(x.heure?(' à '+esc(x.heure)):'')+'</div>'
+          +'<div class="sub" style="margin:4px 0 0">Annulation reçue '+esc(rec)+(x.sujet?(' — « '+esc(x.sujet.slice(0,90))+' »'):'')+'</div>'
+          +(x.agent?('<div class="sub" style="margin:4px 0 0">👤 Agent affecté : <a href="#" class="agf" data-nom="'+esc(x.agent)+'" style="color:var(--brand,#6ea8fe)">'+esc(x.agent)+'</a>'
+             +(x.tel?(' · <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">📞 '+esc(x.tel)+'</a>'):' · <span style="color:var(--bad)">numéro inconnu</span>')
+             +' <i>— à prévenir seulement une fois l’annulation confirmée</i></div>'):'')
+          +'<div class="acts" style="margin-top:8px;gap:6px"><button type="button" class="an-ok ok" data-id="'+esc(x.id)+'" style="font-size:13px">\u2705 Confirmer l’annulation</button>'
+          +'<button type="button" class="an-ko" data-id="'+esc(x.id)+'" style="font-size:13px">\u274c Fausse alerte</button></div></div>';
+      }).join(''):'<div class="sub">Aucune annulation en attente 🎉</div>';
+      h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
+    } else if(D.pcv){
       var moiOuvert=pcJeSuisOuvert();
       h+=L.length
         ? ('<div class="card" style="border:1px solid #1a9e5c;background:rgba(26,158,92,.08);margin-bottom:8px"><b style="color:#1a9e5c">\u2705 Le PC est tenu</b><div class="sub" style="margin:4px 0 0">'+L.length+' personne(s) au poste.</div></div>'
-           + L.map(function(x){ return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)"><b>\U0001F464 '+esc(x.agent)+'</b>'+(x.role?(' <span class="sub" style="margin:0">('+esc(x.role)+')</span>'):'')+'<div class="fa-d" style="margin-top:2px">au poste depuis <b>'+esc(pcDepuis({debut:x.due}))+'</b></div></div>'; }).join(''))
+           + L.map(function(x){ return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)"><b>👤 '+esc(x.agent)+'</b>'+(x.role?(' <span class="sub" style="margin:0">('+esc(x.role)+')</span>'):'')+'<div class="fa-d" style="margin-top:2px">au poste depuis <b>'+esc(pcDepuis({debut:x.due}))+'</b></div></div>'; }).join(''))
         : '<div class="card" style="border:1.5px solid #c02626;background:rgba(192,38,38,.12);margin-bottom:8px"><b style="color:#e5322d">\u26a0\uFE0F PERSONNE N\u2019EST AU PC</b><div class="sub" style="margin:4px 0 0">Les appels entrants et les demandes ne sont tenus par personne. Prends le poste, ou appelle quelqu\u2019un pour qu\u2019il le prenne.</div></div>';
-      h+='<div class="acts" style="margin-top:8px"><button type="button" id="pc-act" class="'+(moiOuvert?'':'ok')+'" style="font-size:14px;padding:9px 14px">'+(moiOuvert?'\U0001F3A7 Je quitte le PC':'\U0001F3A7 Je prends le PC')+'</button></div>';
+      h+='<div class="acts" style="margin-top:8px"><button type="button" id="pc-act" class="'+(moiOuvert?'':'ok')+'" style="font-size:14px;padding:9px 14px">'+(moiOuvert?'🎧 Je quitte le PC':'🎧 Je prends le PC')+'</button></div>';
       var _hist=pcLoad().postes.filter(function(x){ return x.fin&&(Date.now()-x.fin)<86400000; }).sort(function(u,v){return v.fin-u.fin;});
       if(_hist.length){ h+='<div class="lab" style="margin:12px 0 4px">Rel\u00e8ves des derni\u00e8res 24 h</div>'
         + _hist.map(function(x){ var f=function(t){ var d=new Date(t); return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); };
-            return '<div class="sub" style="margin:0 0 3px">\U0001F464 '+esc(x.nom||x.user||'')+' \u00b7 '+f(x.debut)+' \u2192 '+f(x.fin)+'</div>'; }).join(''); }
+            return '<div class="sub" style="margin:0 0 3px">👤 '+esc(x.nom||x.user||'')+' \u00b7 '+f(x.debut)+' \u2192 '+f(x.fin)+'</div>'; }).join(''); }
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
     } else if(D.byAgent&&!PP_VIEW.sub){ /* b219 : par AGENT */
-      h+=L.length?L.map(function(g){ return '<div class="pp-tile" data-sub="'+esc(g.agent)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+g.nb+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">\U0001F464 '+esc(g.agent)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(g.tel?('\U0001F4DE '+esc(g.tel)):'<span style="color:var(--bad)">numéro inconnu</span>')+' · '+g.nb+' photo(s) sans position</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Aucun agent concerné \U0001F389</div>';
+      h+=L.length?L.map(function(g){ return '<div class="pp-tile" data-sub="'+esc(g.agent)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+g.nb+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">👤 '+esc(g.agent)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(g.tel?('📞 '+esc(g.tel)):'<span style="color:var(--bad)">numéro inconnu</span>')+' · '+g.nb+' photo(s) sans position</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Aucun agent concerné 🎉</div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
     } else if(D.byAgent&&PP_VIEW.sub){
       var g2=L.filter(function(x){return x.agent===PP_VIEW.sub;})[0]||{items:[]};
-      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">\U0001F464 '+esc(PP_VIEW.sub)+'</b>'+(g2.tel?('<a class="call" href="tel:'+esc(String(g2.tel).replace(/\s+/g,''))+'" style="font-size:13px">\U0001F4DE '+esc(g2.tel)+'</a>'):'')+'<span class="sub" style="margin:0">'+(g2.items||[]).length+' photo(s)</span></div>';
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">👤 '+esc(PP_VIEW.sub)+'</b>'+(g2.tel?('<a class="call" href="tel:'+esc(String(g2.tel).replace(/\s+/g,''))+'" style="font-size:13px">📞 '+esc(g2.tel)+'</a>'):'')+'<span class="sub" style="margin:0">'+(g2.items||[]).length+' photo(s)</span></div>';
       h+=(g2.items||[]).map(function(it2){ var d5=(it2.mdate||'').split('-').reverse().join('/'); var hh=''; try{ var dd=new Date(it2.ts); hh=('0'+dd.getHours()).slice(-2)+':'+('0'+dd.getMinutes()).slice(-2); }catch(e){}
-        return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><b>\U0001F4CD '+esc(it2.site||'—')+'</b><div class="fa-d" style="margin-top:2px">'+(d5?('le '+d5+' '):'')+(hh?('à '+hh):'')+(it2.step?(' · '+esc(it2.step)):'')+' · <b style="color:var(--bad)">photo sans position</b></div></div>'; }).join('');
+        return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><b>📍 '+esc(it2.site||'—')+'</b><div class="fa-d" style="margin-top:2px">'+(d5?('le '+d5+' '):'')+(hh?('à '+hh):'')+(it2.step?(' · '+esc(it2.step)):'')+' · <b style="color:var(--bad)">photo sans position</b></div></div>'; }).join('');
       h+='<p class="sub" style="margin:8px 0 0;font-size:11.5px">Appelle l’agent et rappelle-lui d’accepter la demande de position : sans elle, sa photo ne prouve pas sa présence sur le site.</p>';
     } else if(D.bySite2&&!PP_VIEW.sub){ /* b210 : retards par SITE */
       var _gr={}; L.forEach(function(x){ (_gr[x.site]=_gr[x.site]||[]).push(x); });
@@ -5529,7 +5555,9 @@ button.big:active{transform:translateY(1px)}
     }
     box.innerHTML=h;
     var cl=byId('pp-close'); if(cl)cl.onclick=ppClose;
-var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitter():pcPrendre(); ppRender(); };
+box.querySelectorAll('.an-ok').forEach(function(b){ b.onclick=function(){ if(confirm('Confirmer l’annulation ?\n\nLa vacation sort du Planning et ses tickets d’appel disparaissent. Pense à prévenir l’agent s’il y en a un.'))annulTrancher(b.getAttribute('data-id'),true); }; });
+    box.querySelectorAll('.an-ko').forEach(function(b){ b.onclick=function(){ annulTrancher(b.getAttribute('data-id'),false); }; });
+    var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitter():pcPrendre(); ppRender(); };
         var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };
     box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else {PP_VIEW.sub=t.getAttribute('data-sub');} ppRender(); }; });
     box.querySelectorAll('.pp-act-aff').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); ppClose(); if(typeof planningAffect==='function')planningAffect(mid); }; });
@@ -5577,7 +5605,7 @@ var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitte
   setTimeout(function(){ try{ppRoScan();}catch(_e){} },3000);
   function ppOpen(mode){ PP_VIEW={mode:mode,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.add('on'); ppRender(); }
   function ppClose(){ PP_VIEW={mode:null,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.remove('on'); }
-  (function(){ ['op','cli','ph','te','c2','ro','af','rt','gp','pc'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
+  (function(){ ['op','cli','ph','te','c2','ro','af','rt','gp','pc','an'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
     var o=byId('pp-ovl'); if(o)o.addEventListener('click',function(ev){ if(ev.target===o)ppClose(); });
     setInterval(function(){ try{ppRefresh();}catch(_e){} },30000);
     setTimeout(function(){ try{ppRefresh();}catch(_e){} },900);
@@ -5646,6 +5674,47 @@ var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitte
   /* b224 : la descente des bons de commande dans le Planning ne doit PAS dependre de l'ouverture
      de la section Mails missions. Cette fonction tourne au chargement de l'appli et a chaque
      rafraichissement des mails : les vacations violettes « A VALIDER » apparaissent toutes seules. */
+  /* ===== b229 : ANNULATIONS =====
+     POURQUOI : un client annule par mail une vacation deja planifiee. Sans signal, l'agent part pour
+     rien et l'operateur appelle un site ferme.
+     COMMENT : on rapproche le mail d'annulation de la vacation par SITE + DATE. On ne supprime RIEN :
+     une lecture de mail n'est pas une decision. La vacation est marquee `annul` — elle reste au
+     Planning, hachuree rouge — et un humain tranche.
+     AGIR SUR PLACE : depuis la pastille 🔴, « Confirmer l'annulation » ou « Fausse alerte ». */
+  function mailsAnnulScan(items){
+    var chg=false;
+    (items||[]).forEach(function(it){
+      if(it.dismissed)return;
+      var pp=mailsParse(it); if(pp.kind!=='annulation'||!pp.site||!pp.mdate)return;
+      var mt=mailsMatchMission(pp); if(!mt||!mt.m)return;
+      var m=mt.m; if(m.annul&&m.annul.src===it.cdr_id)return;
+      if(m.annulKO===it.cdr_id)return;                      /* deja ecarte comme fausse alerte */
+      m.annul={src:it.cdr_id, at:(it.at||Date.now()), sujet:(pp.subject||''), vu:0};
+      chg=true;
+    });
+    if(chg){ save('fkh_suivi',SUIVI); if(typeof cloudPush==='function'){try{cloudPush('fkh_suivi');}catch(e){}} }
+    return chg;
+  }
+  function annulListe(){
+    return (SUIVI||[]).filter(function(m){ return m.annul&&!m.annul.vu&&!m.retiree; }).map(function(m){
+      var ag=null; try{ if(m.agentId&&typeof faById==='function')ag=faById(m.agentId); }catch(e){}
+      var du=0; try{ du=(typeof mDue==='function')?mDue(m):new Date(m.mdate+'T'+(m.mheure||'00:00')).getTime(); }catch(e){}
+      return {an:1,id:m.id,site:(m.siteAgent||m.titre||'—'),client:(m.client||''),mdate:(m.mdate||''),heure:(m.mheure||''),
+              agent:(ag&&ag.nom)||'', tel:(ag&&ag.tels&&ag.tels[0])||'', due:du||Date.now(), since:0, at:m.annul.at, sujet:m.annul.sujet||''};
+    }).sort(function(u,v){ return u.due-v.due; });
+  }
+  function annulTrancher(id,ok){
+    for(var i=0;i<SUIVI.length;i++){ if(SUIVI[i].id!==id)continue; var m=SUIVI[i];
+      if(ok){ m.retiree=true; m.saOff=true; m.annulConfirm=Date.now(); delete m.annul; }
+      else { m.annulKO=(m.annul&&m.annul.src)||''; delete m.annul; }
+      break; }
+    save('fkh_suivi',SUIVI); if(typeof cloudPush==='function'){try{cloudPush('fkh_suivi');}catch(e){}}
+    if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
+    if(typeof ppRefresh==='function')ppRefresh();
+  }
+  /* La mention n'est visible que par l'encadrement (decision Zeus 03/08) : l'operateur garde ses
+     tickets sans mention, il appelle normalement — c'est le superviseur qui tranche. */
+  function annulVisible(){ try{ var r=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; return r!=='operateur'; }catch(e){ return true; } }
   function mailsAutoPlan(items){
     items=(items||[]).filter(function(it){return !it.skip;});
     // b154 : chaque BDC (kind=demande) avec site+date SANS mission en face -> creation AUTO d'une vacation "📧 A VALIDER" (violet hachure au Planning, tickets generes seulement apres validation)
@@ -5659,6 +5728,7 @@ var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitte
         SUIVI.unshift({id:'mv'+Date.now()+'_'+Math.round(Math.random()*99999),statut:'validee',mailPending:true,mailSrc:it.cdr_id,client:pp.client||'',siteAgent:pp.site,ville:pp.ville||'',mdate:pp.mdate,mheure:pp.heure||'',mfin:'',titre:(pp.subject||'').slice(0,80),texte:'📧 Cree automatiquement depuis un mail'+(pp.ref?' (ref '+pp.ref+')':'')});
         _crea=true; });
       if(_crea){ save('fkh_suivi',SUIVI); if(typeof cloudPush==='function'){try{cloudPush('fkh_suivi');}catch(e){}} }
+    if(mailsAnnulScan(items))_crea=true;   /* b229 */
     return _crea;
   }
   function mailsAutoPlanFetch(){ try{ mailsFetch(function(items){ if(mailsAutoPlan(items)){ if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}} } }); }catch(e){} }
@@ -5741,25 +5811,25 @@ var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitte
   function renderRef(){ var box=byId('ref-body'); if(!box)return;
     var isS=(REF_TAB==='sites'); var all=isS?_refSites():_refClients(); var keys=Object.keys(all).sort();
     var q=(REF_Q||'').toLowerCase(); if(q)keys=keys.filter(function(k){ return k.toLowerCase().indexOf(q)>=0; });
-    var h='<div class="card"><div class="lab" style="margin:0 0 6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">\U0001F4DA Référentiel — tout modifier à un seul endroit'
-      +'<span style="margin-left:auto"></span><button type="button" class="ref-tab'+(isS?' ok':'')+'" data-t="sites" style="font-size:12px">\U0001F4CD Sites ('+Object.keys(_refSites()).length+')</button><button type="button" class="ref-tab'+(!isS?' ok':'')+'" data-t="clients" style="font-size:12px">\U0001F3E2 Clients ('+Object.keys(_refClients()).length+')</button></div>'
-      +'<input id="ref-q" placeholder="\U0001F50E Rechercher…" value="'+esc(REF_Q)+'" style="width:100%"></div>';
+    var h='<div class="card"><div class="lab" style="margin:0 0 6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">📚 Référentiel — tout modifier à un seul endroit'
+      +'<span style="margin-left:auto"></span><button type="button" class="ref-tab'+(isS?' ok':'')+'" data-t="sites" style="font-size:12px">📍 Sites ('+Object.keys(_refSites()).length+')</button><button type="button" class="ref-tab'+(!isS?' ok':'')+'" data-t="clients" style="font-size:12px">🏢 Clients ('+Object.keys(_refClients()).length+')</button></div>'
+      +'<input id="ref-q" placeholder="🔎 Rechercher…" value="'+esc(REF_Q)+'" style="width:100%"></div>';
     var sm=_refMetaAll(); var ct={}; try{ct=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(e){}
     h+='<div class="list">'+ (keys.length?keys.map(function(k){
       var sel=(REF_SEL===k);
       var meta=isS?(sm[k]||{}):null;
-      var sub=isS?([ (meta.client?'\U0001F3E2 '+esc(meta.client):'<span style="color:#e0a13b">⚠ client ?</span>'), (meta.adresse?esc(meta.adresse):'<span style="color:#e0a13b">⚠ adresse ?</span>'), esc(((meta.cp||'')+' '+(meta.ville||'')).trim()||'') ].filter(Boolean).join(' · ')) : ((ct[k]?'\U0001F4DE '+esc(ct[k]):'<span style="color:#e0a13b">⚠ tél ?</span>'));
+      var sub=isS?([ (meta.client?'🏢 '+esc(meta.client):'<span style="color:#e0a13b">⚠ client ?</span>'), (meta.adresse?esc(meta.adresse):'<span style="color:#e0a13b">⚠ adresse ?</span>'), esc(((meta.cp||'')+' '+(meta.ville||'')).trim()||'') ].filter(Boolean).join(' · ')) : ((ct[k]?'📞 '+esc(ct[k]):'<span style="color:#e0a13b">⚠ tél ?</span>'));
       var row='<div class="it ref-item" data-k="'+esc(k)+'" style="cursor:pointer;flex-direction:column;align-items:stretch"><div style="display:flex;gap:8px;align-items:baseline"><b style="flex:1;min-width:0">'+esc(k)+'</b><span class="sub" style="margin:0">'+all[k]+' vac.</span></div><div class="fa-d" style="margin-top:2px">'+sub+'</div>';
       if(sel&&isS){ row+='<div class="ref-ed" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px" onclick="event.stopPropagation()">'
         +'<label class="f"><div class="lab">Nom du site (renommer = appliqué à toutes ses vacations)</div><input class="ref-s-nom" value="'+esc(k)+'"></label>'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"><input class="ref-s-client" placeholder="Client" value="'+esc(meta.client||'')+'"><input class="ref-s-nomcli" placeholder="\U0001F3F7️ Nom chez le client" value="'+esc(meta.nomClient||'')+'"></div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"><input class="ref-s-client" placeholder="Client" value="'+esc(meta.client||'')+'"><input class="ref-s-nomcli" placeholder="🏷️ Nom chez le client" value="'+esc(meta.nomClient||'')+'"></div>'
         +'<input class="ref-s-adresse" placeholder="Adresse (rue, n°)" value="'+esc(meta.adresse||'')+'" style="width:100%;margin-top:6px">'
         +'<div style="display:grid;grid-template-columns:120px 1fr;gap:6px;margin-top:6px"><input class="ref-s-cp" placeholder="CP" maxlength="5" value="'+esc(meta.cp||'')+'"><input class="ref-s-ville" placeholder="Ville" value="'+esc(meta.ville||'')+'"></div>'
-        +'<div class="acts" style="margin-top:8px"><button type="button" class="ok ref-s-save">\U0001F4BE Enregistrer</button></div></div>'; }
+        +'<div class="acts" style="margin-top:8px"><button type="button" class="ok ref-s-save">💾 Enregistrer</button></div></div>'; }
       if(sel&&!isS){ row+='<div class="ref-ed" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px" onclick="event.stopPropagation()">'
         +'<label class="f"><div class="lab">Nom du client (renommer = appliqué à toutes ses vacations et à ses sites)</div><input class="ref-c-nom" value="'+esc(k)+'"></label>'
-        +'<input class="ref-c-tel" placeholder="\U0001F4DE Téléphone du client" value="'+esc(ct[k]||'')+'" style="width:100%;margin-top:6px">'
-        +'<div class="acts" style="margin-top:8px"><button type="button" class="ok ref-c-save">\U0001F4BE Enregistrer</button></div></div>'; }
+        +'<input class="ref-c-tel" placeholder="📞 Téléphone du client" value="'+esc(ct[k]||'')+'" style="width:100%;margin-top:6px">'
+        +'<div class="acts" style="margin-top:8px"><button type="button" class="ok ref-c-save">💾 Enregistrer</button></div></div>'; }
       return row+'</div>';
     }).join(''):'<div class="card"><div class="sub" style="margin:0">Rien pour cette recherche.</div></div>')+'</div>';
     box.innerHTML=h;
@@ -6097,7 +6167,7 @@ var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitte
     {k:'appel_danger',   ic:'⛔', lbl:'Prise/fin de service non pointée (+10 min)'},
     {k:'nouvelle_demande',ic:'🆕', lbl:'Nouvelle demande reçue (en recherche)'},
     {k:'demande_1h',     ic:'🕵️', lbl:'Demande en recherche depuis + d\'1 h'},
-    {k:'pc_vacant',     ic:'🎧', lbl:'Personne au PC (poste vacant)'},{k:'mail_arret', ic:'📧', lbl:'Collecte des mails à l’arrêt (+15 min)'},{k:'prise_retard',   ic:'🕓', lbl:'Agent en retard à la prise de service'}
+    {k:'annul_mail',    ic:'🔴', lbl:'Annulation reçue par mail (à confirmer)'},{k:'pc_vacant',     ic:'🎧', lbl:'Personne au PC (poste vacant)'},{k:'mail_arret', ic:'📧', lbl:'Collecte des mails à l’arrêt (+15 min)'},{k:'prise_retard',   ic:'🕓', lbl:'Agent en retard à la prise de service'}
   ];
   function notifLoadCfg(){ var c=null; try{c=JSON.parse(localStorage.getItem('fkh_notif_cfg')||'null');}catch(e){} if(!c||typeof c!=='object')c={}; if(typeof c.on!=='boolean')c.on=false; if(typeof c.sound!=='boolean')c.sound=true; if(!c.cats||typeof c.cats!=='object')c.cats={}; NOTIF_CATS.forEach(function(t){ if(typeof c.cats[t.k]!=='boolean')c.cats[t.k]=true; }); NOTIF.cfg=c; }
   function notifSaveCfg(){ try{localStorage.setItem('fkh_notif_cfg',JSON.stringify(NOTIF.cfg));}catch(e){} }
@@ -6107,6 +6177,11 @@ var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitte
   function notifFire(a){ try{ var n=new Notification(a.title,{body:a.body,tag:a.cat+':'+a.key}); n.onclick=function(){ try{window.focus();}catch(e){} var btn=document.querySelector('#tabs button[data-s="'+a.go+'"]'); if(btn)btn.click(); try{n.close();}catch(e){} }; }catch(e){} notifBeep(); }
   function notifThresholdAlerts(){
     var now=Date.now(), out=[];
+    /* b229 : une annulation non tranchee est une alerte — elle part aussi en notification telephone. */
+    try{ if(annulVisible())annulListe().forEach(function(x){
+      out.push({cat:'annul_mail',key:'an'+x.id, title:'🔴 Annulation signalée — '+x.site,
+        body:'Vacation du '+((x.mdate||'').split('-').reverse().join('/'))+(x.heure?(' à '+x.heure):'')+' : annulation reçue par mail, à confirmer.',
+        when:(typeof impTodayISO==='function'?impTodayISO():'')}); }); }catch(_e){}
     /* b227 : PC vacant = alerte immediate. Une cle par heure : l'alerte se rappelle a nous tant que le trou dure. */
     try{ if(!pcOuverts().length&&(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)){
       out.push({cat:'pc_vacant',key:'pc'+Math.floor(now/3600000),
