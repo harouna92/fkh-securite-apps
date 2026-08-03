@@ -15,6 +15,47 @@
  *  Le MVP mot de passe commun ci-dessous est le socle de cette évolution (pas de reconstruction).
  */
 
+// ===== b269 : creation serveur de la vacation « A VALIDER » a partir d'un bon de commande =====
+function _norm(x) {
+  return String(x || "").toUpperCase().replace(/[^A-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+}
+function lireBonDeCommande(texte) {
+  const sujet = String(texte || "").split("\n")[0].trim();
+  const up = sujet.toUpperCase();
+  if (!/(DEMANDE|MISSION|GARDIENNAGE)/.test(up) || /ANNULATION/.test(up)) return null;
+  // Format AQUILA : « ... AQUILA 5284730 le 03/08/2026 20:00 chez GRAND FRAIS ... (22698801) »
+  const m = sujet.match(/AQUILA\s+\d+\s+le\s+(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2})\s+chez\s+(.+?)\s*(?:\(|$)/i);
+  if (!m) return null;
+  return { mdate: m[3] + "-" + m[2] + "-" + m[1], heure: m[4], site: m[5].trim(),
+           ref: (sujet.match(/AQUILA\s+(\d{6,})/i) || [])[1] || "", client: "AQUILA", sujet };
+}
+async function planifierDepuisMail(env, cdr, texte, data) {
+  const bdc = lireBonDeCommande(texte);
+  if (!bdc) return;
+  const row = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_suivi'").first();
+  if (!row || !row.v) return;
+  let liste = [];
+  try { liste = JSON.parse(row.v) || []; } catch (_) { return; }
+  const sn = _norm(bdc.site);
+  for (const m of liste) {
+    if (m && m.mailSrc === cdr) return;                          // ce mail a deja donne sa vacation
+    if (!m || (m.mdate || "") !== bdc.mdate) continue;           // date differente : ce n'est pas la meme
+    const ms = _norm(m.siteAgent || m.titre || "");
+    if (ms && (ms.indexOf(sn) >= 0 || sn.indexOf(ms) >= 0)) return;   // deja planifie ce jour-la
+  }
+  const pdf = (data && data.pdf) || {};
+  const vac = {
+    id: "mv" + Date.now() + "_" + Math.round(Math.random() * 99999),
+    statut: "validee", mailPending: true, mailSrc: cdr,
+    client: bdc.client, siteAgent: bdc.site, ville: pdf.ville || "", cp: pdf.cp || "",
+    adresse: pdf.adresse || "", mdate: bdc.mdate, mheure: bdc.heure, mfin: "",
+    ref: bdc.ref, titre: bdc.sujet.slice(0, 90), src: "mail",
+  };
+  // json_insert ajoute en fin de tableau sans reecrire tout le document : pas de limite de taille atteinte.
+  await env.DB.prepare("UPDATE store SET v = json_insert(v, '$[#]', json(?)), updated_at = ? WHERE k = 'fkh_suivi'")
+    .bind(JSON.stringify(vac), Date.now()).run();
+}
+
 function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": origin || "*",
@@ -401,11 +442,30 @@ export default {
       const fromStr = String(b.from || "");
       const knownSender = /(securitas|reseau-aquila|ranc-developpement|banzai-communication)/i.test(fromStr);
       const missionWords = /(gardien|prestation|surveillance|annulation|bon de commande|vacation|agent de s[eé]curit|rondier|intervention|ronde)/i.test(text);
+      /* b270 (regle Zeus 03/08) : les mails de FACTURATION ne sont pas des mails de mission. Ils polluaient
+         la section Mails missions et la comparaison avec le Planning. On les ecarte de ce flux, mais on les
+         MARQUE (cat:'facturation') au lieu de les jeter : la section qui les recevra reste a definir, et le
+         jour ou elle existera, l'historique sera deja la. */
+      const factureWords = /(pr[eé]facturation|facturation|facture|avoir|r[eé]glement|paiement|relev[eé] de compte|echeancier|[eé]ch[eé]ancier)/i.test(String(b.subject || "") + " " + text);
+      if (factureWords && !/(bon de commande|gardiennage sur site)/i.test(text)) {
+        await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, 0, 1, 0, ?)")
+          .bind(cdr, Date.now(), JSON.stringify({ skip: 1, cat: "facturation", transcript: text.slice(0, 2000), from: String(b.from || "") })).run();
+        return json({ ok: true, skipped: "facturation" });
+      }
       if (!isDem && !knownSender && !missionWords) {
         await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, 0, 1, 0, ?)").bind(cdr, Date.now(), JSON.stringify({ skip: 1, transcript: text.slice(0, 300), number: fromStr, source: "mail" })).run();
         return json({ ok: true, skipped: "hors-mission" });
       }
       await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(cdr, Date.now(), isDem, JSON.stringify(data)).run();
+      /* ===== b269 : LA VACATION DESCEND AU PLANNING TOUT DE SUITE =====
+         POURQUOI : jusqu'ici la vacation violette « A VALIDER » etait creee par le NAVIGATEUR, en ouvrant
+         l'application. Un bon de commande recu la nuit, ou pendant qu'aucun poste n'est ouvert, restait
+         invisible — c'est ce qui est arrive au bon de commande AQUILA du 03/08 signale par Zeus.
+         Ici, elle est ecrite des la reception du mail, cote serveur : elle existe avant que quiconque
+         ouvre l'application.
+         GARDE-FOU : jamais deux fois le meme mail, et jamais si une vacation existe deja pour ce SITE a
+         cette DATE — un site revient toutes les semaines, seule la date fait foi. */
+      try { await planifierDepuisMail(env, cdr, text, data); } catch (e) {}
       if (isDem) { try { await pushAll(env, aiDemandeNotif({ cdr_id: cdr, direction: "in" }, data.demandes)); } catch (e) {} }
       return json({ ok: true, detected: isDem ? data.demandes.length : 0 });
     }
