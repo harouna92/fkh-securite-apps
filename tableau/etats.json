@@ -3,6 +3,38 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 267,
+      "titre": "« L'agent a refusé d'envoyer la photo » + origine du retard (saisi / déduit)",
+      "source": "Zeus",
+      "theme": "Photos & preuves",
+      "local": true,
+      "pourquoipas": "Se voit dans la pastille 📷 : bouton sur chaque ligne."
+    },
+    {
+      "b": 268,
+      "titre": "Écart entre l'heure prévue et l'heure de la photo (alerte au-delà de 5 min)",
+      "source": "Zeus",
+      "theme": "Photos & preuves",
+      "local": true,
+      "pourquoipas": "Se voit sur une ligne ayant déjà sa photo."
+    },
+    {
+      "b": 269,
+      "titre": "La vacation « À VALIDER » est créée par le SERVEUR à la réception du mail",
+      "source": "Zeus",
+      "theme": "Mails & collecte",
+      "local": true,
+      "pourquoipas": "Vérifié en production avec le sujet réel d'un bon de commande AQUILA."
+    },
+    {
+      "b": 270,
+      "titre": "Les mails de facturation sortent du flux Mails missions (marqués, section à définir)",
+      "source": "Zeus",
+      "theme": "Mails & collecte",
+      "local": true,
+      "pourquoipas": "Se vérifie sur le prochain mail de facturation reçu."
+    },
+    {
       "b": 266,
       "titre": "Bon de commande : va au Planning, plus dans Suivi des demandes (2 causes corrigées)",
       "source": "Zeus — bug signalé",
