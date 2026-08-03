@@ -82,7 +82,7 @@ function carte(it, enLigne, etat){
     var lbl={attente:'▶️ Demander à traiter',decide:'💻 Demander à coder',code:'🧪 Demander le déploiement local',local:'🚀 Demander la mise en ligne'}[etat];
     act='<button type="button" class="ord" data-o="'+esc(ordre(it,etat))+'">'+lbl+'</button>';
   }
-  return '<div class="card'+(it.urgent?' urgent':'')+'">'
+  return '<div class="card'+(it.urgent?' urgent':'')+'" draggable="true" data-id="'+esc(it.b?('b'+it.b):('x'+(it.titre||'').slice(0,24)))+'" data-etat="'+esc(etat||'')+'">'
     +'<b class="t">'+esc(it.titre)+'</b>'
     +'<div class="meta">'+(it.b?('<span class="tag">b'+it.b+'</span>'):'')+esc(it.source||'')+'</div>'
     +(it.note?('<div class="note">⚠️ '+esc(it.note)+'</div>'):'')
@@ -91,7 +91,7 @@ function carte(it, enLigne, etat){
 }
 
 function colonne(icone, titre, items, enLigne, vide, explique, etat){
-  return '<section class="col"><h2>'+icone+' '+titre+'<span class="n">'+items.length+'</span></h2>'
+  return '<section class="col" data-cible="'+esc(etat||'')+'"><h2>'+icone+' '+titre+'<span class="n">'+items.length+'</span></h2>'
     +(explique?'<div class="expl">'+explique+'</div>':'')
     +'<div class="body">'
     +(items.length?items.map(function(i){return carte(i,enLigne,etat);}).join(''):'<div class="vide">'+vide+'</div>')
@@ -119,6 +119,7 @@ function rendre(data, bLigne, bLocal){
    + colonne('🟡','Poussé en local',enLocal,false,'Rien en local.','Déployé sur ce poste, démo vérifiée. <b>Jouable ici</b>, pas encore publié pour les autres.','local')
    + colonne('🟢','En ligne',enLigne,true,'Rien encore publié.','Publié : utilisable par tout le monde, et la démo s’ouvre <b>aussi depuis le téléphone</b>.','ligne');
 
+  brancherGlisser();
   document.querySelectorAll('.ord').forEach(function(b){
     b.onclick=function(){
       var txt=b.getAttribute('data-o');
@@ -134,6 +135,52 @@ function rendre(data, bLigne, bLocal){
     +' · La démo devient possible à partir de l’état « Codé ».';
 }
 
+/* b261 : glisser-deposer d'un etat a l'autre, reellement enregistre.
+   La page seule ne peut rien ecrire ; c'est le serveur du tableau (tableau/serveur.py) qui accepte
+   POST /tableau/etats.json. Sans lui — si le tableau est ouvert via un simple http.server — le
+   deplacement est refuse et on le dit franchement, plutot que de laisser croire qu'il a ete pris. */
+var DATA=null;
+function trouver(id){
+  var d=DATA; if(!d)return null;
+  function ch(arr,src){ for(var i=0;i<(arr||[]).length;i++){ var it=arr[i];
+    var k=it.b?('b'+it.b):('x'+(it.titre||'').slice(0,24)); if(k===id)return {it:it,src:src,i:i}; } return null; }
+  return ch(d.items,'items')||ch(d.decide,'decide')||ch(d.attente,'attente');
+}
+function deplacer(id,cible){
+  var f=trouver(id); if(!f||!DATA)return;
+  var it=f.it;
+  DATA[f.src].splice(f.i,1);
+  if(cible==='attente'){ delete it.b; delete it.local; delete it.demo; DATA.attente.unshift(it); }
+  else if(cible==='decide'){ delete it.b; delete it.local; delete it.demo; DATA.decide.unshift(it); }
+  else if(cible==='code'){ delete it.local; if(!it.b)it.b=0; DATA.items.unshift(it); }
+  else if(cible==='local'){ it.local=true; if(!it.b)it.b=0; DATA.items.unshift(it); }
+  else { DATA[f.src].splice(f.i,0,it); return; }   /* on ne fait pas passer en ligne par un glisser : ca se pousse */
+  enregistrer();
+}
+function enregistrer(){
+  fetch('etats.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(DATA)})
+    .then(function(r){return r.json();})
+    .then(function(j){ if(j&&j.ok)charger(); else alerteEcriture(); })
+    .catch(alerteEcriture);
+}
+function alerteEcriture(){
+  var p=document.getElementById('pied');
+  p.textContent='⚠️ Déplacement NON enregistré : le tableau doit être ouvert par son serveur (tableau/serveur.py), pas par un simple serveur de fichiers.';
+  p.style.color='#e5322d';
+}
+function brancherGlisser(){
+  document.querySelectorAll('.card[draggable]').forEach(function(c){
+    c.addEventListener('dragstart',function(e){ e.dataTransfer.setData('text/plain',c.getAttribute('data-id')); c.style.opacity='.5'; });
+    c.addEventListener('dragend',function(){ c.style.opacity=''; });
+  });
+  document.querySelectorAll('.col[data-cible]').forEach(function(col){
+    col.addEventListener('dragover',function(e){ if(col.getAttribute('data-cible')==='ligne')return; e.preventDefault(); col.style.outline='2px dashed var(--brand)'; });
+    col.addEventListener('dragleave',function(){ col.style.outline=''; });
+    col.addEventListener('drop',function(e){ col.style.outline=''; var cible=col.getAttribute('data-cible');
+      if(cible==='ligne'){ alert('La mise en ligne ne se fait pas en glissant : demande-la avec le bouton 🚀, elle passe par une poussée réelle.'); return; }
+      e.preventDefault(); deplacer(e.dataTransfer.getData('text/plain'),cible); });
+  });
+}
 function montrer(txt,btn){
   /* b260 (retour Zeus) : la fenetre etait du bruit — on copie, on le signale sur le bouton, c'est tout. */
   if(!btn)return;
@@ -147,7 +194,7 @@ function charger(){
   var p1=fetch('etats.json?v='+Date.now()).then(function(r){return r.json();});
   var p2=fetch(URL_LIGNE+'?v='+Date.now()).then(function(r){return r.text();}).catch(function(){return '';});
   Promise.all([p1,p2]).then(function(r){
-    var data=r[0], bLigne=tampon(r[1]);
+    var data=r[0]; DATA=data; var bLigne=tampon(r[1]);
     var bLocal=(data.items||[]).reduce(function(m,i){return Math.max(m,i.b||0);},0);
     rendre(data,bLigne,bLocal);
   }).catch(function(e){
