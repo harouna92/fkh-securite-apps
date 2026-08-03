@@ -223,7 +223,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b274</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b275</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -4778,7 +4778,10 @@ button.big:active{transform:translateY(1px)}
       var d=new Date(t.cree), dt=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' '+('0'+d.getHours()).slice(-2)+'h'+('0'+d.getMinutes()).slice(-2);
       var h='<div class="card" style="border-left:4px solid '+e[1]+'"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
         +'<b style="flex:1;min-width:140px">'+esc(t.objet)+'</b><span style="color:'+e[1]+';font-weight:700">'+e[0]+'</span></div>'
-        +'<div class="sub" style="margin:3px 0 0">'+(mien?('à '+esc(t.pourRole||t.pourUser||'—')):('de '+esc(t.deNom||'—')))+' · '+dt+'</div>'
+        +'<div class="sub" style="margin:3px 0 0">'+(mien?('à '+esc(t.pourRole||t.pourUser||'—')):('de '+esc(t.deNom||'—')))+' · '+dt
+          +(mien?(t.vuAt?(' · <span style="color:#1a9e5c">\u2705 vu le '+(function(){var v=new Date(t.vuAt);return ('0'+v.getDate()).slice(-2)+'/'+('0'+(v.getMonth()+1)).slice(-2)+' à '+('0'+v.getHours()).slice(-2)+' h '+('0'+v.getMinutes()).slice(-2);})()+(t.vuPar?(' par '+esc(t.vuPar)):'')+'</span>')
+                     :' · <span style="color:#e0a13b">\u23F3 pas encore ouvert</span>'):'')
+          +'</div>'
         +(t.message?('<div style="margin-top:6px">'+esc(t.message)+'</div>'):'');
       if(t.contexte&&t.contexte.length){
         h+='<details style="margin-top:6px"><summary class="sub" style="cursor:pointer">'+t.contexte.length+' élément(s) concerné(s)</summary>'
@@ -4798,6 +4801,19 @@ button.big:active{transform:translateY(1px)}
     if(recus.length)out+='<div class="lab" style="margin:10px 0 5px">📥 Ce qu’on me demande ('+recus.length+')</div>'+recus.map(function(t){return carte(t,false);}).join('');
     if(envoyes.length)out+='<div class="lab" style="margin:14px 0 5px">📤 Ce que j’ai demandé ('+envoyes.length+')</div>'+envoyes.map(function(t){return carte(t,true);}).join('');
     return out;
+  }
+  /* ===== b275 : ACCUSE DE RECEPTION =====
+     POURQUOI (Zeus) : envoyer un ticket sans savoir s'il a ete vu, c'est relancer dans le doute — ou ne
+     pas relancer alors qu'il fallait. Celui qui recoit doit savoir qu'il a recu ; celui qui envoie doit
+     savoir que c'est arrive.
+     COMMENT : a l'ouverture de la section Tickets, tout ticket qui m'est adresse est marque VU, une seule
+     fois, avec l'heure et le nom. L'emetteur le lit sur sa carte. C'est un accuse de LECTURE, pas une
+     reponse : « vu » ne veut pas dire « fait », et les deux restent distincts. */
+  function tkxMarquerVus(){
+    var arr=tkxLoad(), ch=false, qui=tkxMonNom();
+    arr.forEach(function(t){ if(t&&t.kind==='echange'&&tkxPourMoi(t)&&!t.vuAt){ t.vuAt=Date.now(); t.vuPar=qui; ch=true; } });
+    if(ch){ tkxSave(arr); if(typeof notifScan==='function')try{notifScan();}catch(e){} }
+    return ch;
   }
   function tkxWire(wrap){
     wrap.querySelectorAll('.tkx-e').forEach(function(b){ b.onclick=function(){ tkxRepondre(b.getAttribute('data-id'),b.getAttribute('data-e'),''); }; });
@@ -4827,6 +4843,7 @@ button.big:active{transform:translateY(1px)}
     }).join(''):'<div class="card"><div class="sub" style="margin:0">Aucun ticket pour l\'instant. Crée-en un ci-dessus.</div></div>';
     wrap.innerHTML=tkxBloc()+create+list;
     tkxWire(wrap);
+    try{ if(tkxMarquerVus())setTimeout(renderTickets,50); }catch(e){}   /* b275 */
     if(byId('tk-create'))byId('tk-create').onclick=function(){ var type=byId('tk-type').value, ty=TK_TYPES[type]; if(!ty)return; var ids=(typeof FA!=='undefined'?FA:[]).filter(function(a){return ty.missing(a);}).map(function(a){return a.id;}); if(!ids.length){ alert('Aucun agent concerné — rien à faire pour cette tâche.'); return; }
       // Remontée #22 : dimensions échéance (escalade si dépassée) + notification programmée.
       var _dueV=byId('tk-due')?byId('tk-due').value:'', _nfV=byId('tk-notifat')?byId('tk-notifat').value:'';

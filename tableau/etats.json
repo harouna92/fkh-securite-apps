@@ -3,6 +3,14 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 275,
+      "titre": "Accusé de réception : « vu le … » sur les tickets envoyés",
+      "source": "Zeus",
+      "theme": "Outils de pilotage",
+      "local": true,
+      "pourquoipas": "Se voit dans 🎫 Tickets : la carte d'un ticket envoyé porte « ⏳ pas encore ouvert » puis « ✅ vu le … »."
+    },
+    {
       "b": 273,
       "titre": "Dépassement de 5 min : échange avec l'agent, client avisé, photo consultable",
       "source": "Zeus",
