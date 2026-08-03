@@ -223,7 +223,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b256</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b258</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3338,7 +3338,76 @@ button.big:active{transform:translateY(1px)}
   function photoHydrate(scope){ (scope||document).querySelectorAll('.ph-thumb:not([data-loaded])').forEach(function(img){ img.setAttribute('data-loaded','1'); photoBlobUrl(img.getAttribute('data-k'),function(u){ if(u)img.src=u; else{ img.alt='(photo indisponible)'; img.style.opacity='.5'; } }); }); }
   document.addEventListener('click',function(ev){ var t=ev.target; if(t&&t.classList&&t.classList.contains('ph-thumb')){ if(t.getAttribute('data-big')==='1'){ t.style.width='118px';t.style.height='118px';t.style.cursor='zoom-in';t.removeAttribute('data-big'); } else { t.style.width='min(420px,86vw)';t.style.height='auto';t.style.cursor='zoom-out';t.setAttribute('data-big','1'); } } });
   // Widget réutilisable : bouton d'import photo -> upload R2 -> callback(key). id unique requis.
-  function photoBtn(id,label){ return '<label class="btn" style="cursor:pointer;font-size:12px">'+(label||'📷 Importer la photo')+'<input type="file" accept="image/*" id="'+id+'" style="display:none"></label>'; }
+  /* ===== b258 (remontee #67) : CHOISIR UNE PHOTO DEJA REMONTEE =====
+     POURQUOI : « Importer la photo » n'ouvrait que la pellicule du telephone. Or la plupart des photos
+     arrivent par le LIEN qu'on envoie a l'agent — elles sont deja dans le cloud, horodatees et
+     tamponnees. Aller les rechercher dans sa galerie personnelle etait absurde : la bonne photo etait
+     deja la, et on risquait d'en joindre une non tamponnee.
+     COMMENT : a cote de « Importer », un bouton « Photos remontees » ouvre la galerie des photos du
+     cloud, la plus recente en tete, filtrable par agent ou par ville, avec la date et l'heure de prise.
+     Un clic la rattache — exactement comme un import, mais sans quitter l'appli. */
+  var GAL={items:null,charge:0};
+  function galCharger(cb){
+    if(GAL.items&&(Date.now()-GAL.charge)<120000)return cb(GAL.items);
+    var tok='fkh-photo-link-2026';
+    fetch(CLOUD.base+'/photos-audit?k='+encodeURIComponent(tok)+'&n=300')
+      .then(function(r){return r.json();})
+      .then(function(j){ GAL.items=(j&&j.dernieres)?j.dernieres:[]; GAL.charge=Date.now(); cb(GAL.items); })
+      .catch(function(){ cb([]); });
+  }
+  function galInfos(k){
+    var p2=String(k||'').split('/'), out={qui:'',ou:'',ts:0,type:p2[0]||''};
+    try{
+      if(p2[0]==='u'){ out.ou=(p2[1]||'').replace(/_/g,' '); out.ts=phTs(p2[2]||''); }
+      else if(p2[0]==='agent'){ out.qui=(p2[2]||'').replace(/_/g,' '); out.ts=phTs(p2[3]||p2[2]||''); }
+      else { out.qui=(p2[1]||'').replace(/_/g,' '); out.ts=phTs(p2[p2.length-1]||''); }
+    }catch(e){}
+    return out;
+  }
+  function galOuvrir(onChoix, indice){
+    var old=byId('gal-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='gal-pop';
+    pop.style.cssText='position:fixed;inset:6% 5%;z-index:250;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+    pop.innerHTML='<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">\U0001F5BC\uFE0F Photos remontées par les agents</b><button type="button" id="gal-x">✕</button></div>'
+      +'<input id="gal-q" placeholder="Filtrer : nom d’agent, ville…" style="width:100%;margin:8px 0">'
+      +'<div id="gal-liste" class="sub">Chargement…</div>';
+    document.body.appendChild(pop);
+    byId('gal-x').onclick=function(){ pop.parentNode.removeChild(pop); };
+    function rendre(list,q){
+      var qq=(q||'').toLowerCase().trim();
+      var vus=list.filter(function(k){ if(!qq)return true; return String(k).toLowerCase().indexOf(qq)>=0; }).slice(0,120);
+      byId('gal-liste').innerHTML=vus.length?('<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">'
+        +vus.map(function(k){ var I=galInfos(k);
+          var d=I.ts?new Date(I.ts):null;
+          var quand=d?(('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' à '+('0'+d.getHours()).slice(-2)+'h'+('0'+d.getMinutes()).slice(-2)):'date inconnue';
+          return '<div class="gal-c" data-k="'+esc(k)+'" style="border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--panel2);cursor:pointer">'
+            +'<div style="font-weight:700;font-size:12.5px">'+esc(I.qui||I.ou||'—')+'</div>'
+            +'<div class="sub" style="margin:2px 0 0;font-size:11.5px">'+esc(quand)+'</div>'
+            +'<div class="sub" style="margin:2px 0 0;font-size:11px;opacity:.7">'+esc(I.type)+'</div></div>';
+        }).join('')+'</div>')
+        :'<div class="sub">Aucune photo ne correspond'+(qq?(' à « '+esc(qq)+' »'):'')+'.</div>';
+      byId('gal-liste').querySelectorAll('.gal-c').forEach(function(c){
+        c.onclick=function(){ var k=c.getAttribute('data-k'); pop.parentNode.removeChild(pop); onChoix(k); };
+      });
+    }
+    galCharger(function(list){
+      rendre(list,'');
+      byId('gal-q').oninput=function(){ rendre(list,this.value); };
+      if(indice)byId('gal-q').value='';
+    });
+  }
+  function photoBtn(id,label){
+    return '<label class="btn" style="cursor:pointer;font-size:12px">'+(label||'📷 Importer la photo')+'<input type="file" accept="image/*" id="'+id+'" style="display:none"></label>'
+      +'<button type="button" class="gal-b" data-for="'+id+'" style="font-size:12px;margin-left:4px">🖼️ Photos remontées</button>';
+  }
+  /* b258 : le bouton de galerie du meme bloc partage le circuit de l'import — meme destination, meme
+     rafraichissement. On ne re-televerse rien : la photo est deja dans le cloud, on ne fait que la
+     designer comme preuve de cette etape. */
+  function galWire(id,onChoix){
+    var b=document.querySelector('.gal-b[data-for="'+id+'"]'); if(!b)return;
+    b.onclick=function(){ if(!photoReady()){ alert('Connexion cloud requise (connecte-toi en ligne).'); return; }
+      galOuvrir(function(cle){ onChoix(cle); }); };
+  }
   function photoWire(id,keyFn,onDone){ var inp=byId(id); if(!inp)return; inp.onchange=function(){ var f=inp.files&&inp.files[0]; if(!f)return; if(!photoReady()){ alert('Connexion cloud requise pour envoyer la photo (connecte-toi en ligne).'); return; } var lbl=inp.parentNode; var old=lbl.textContent; lbl.childNodes[0].nodeValue='⏳ envoi…'; var key=keyFn(f); photoUpload(key,f,function(res){ if(res&&res.ok){ lbl.childNodes[0].nodeValue='✅ photo envoyée'; if(onDone)onDone(key,res); } else { lbl.childNodes[0].nodeValue=old; alert('Échec de l\'envoi de la photo'+(res&&res.error?' ('+res.error+')':'')+'.'); } }); }; }
   // Classe une photo dans un bloc métier à partir de sa clé
   function photoBloc(key){ var p=String(key||'').split('/'), cat=p[0]; if(cat==='tenue')return 'tenue'; if(cat==='controle')return 'controle'; if(cat==='agent'){ var s2=p[1]||''; if(s2==='prise')return 'prise'; if(s2==='fin')return 'fin'; if(s2==='tenue')return 'tenue'; if(s2==='controle')return 'controle'; return 'autres'; } if(cat==='appel'){ var st=p[2]||''; if(st==='prise')return 'prise'; if(st==='fin')return 'fin'; if(st==='tenue')return 'tenue'; if(st.indexOf('ctrl')===0)return 'controle'; return 'controle'; } return 'autres'; }

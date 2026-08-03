@@ -3,6 +3,12 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 258,
+      "titre": "Choisir une photo déjà remontée par l'agent (galerie du cloud)",
+      "source": "remontée #67",
+      "pourquoipas": "Démo à écrire — le déploiement local est la prochaine étape."
+    },
+    {
       "b": 254,
       "titre": "Tableau de bord des états des demandes",
       "source": "Zeus",
@@ -216,11 +222,6 @@
     }
   ],
   "decide": [
-    {
-      "titre": "Choisir une photo déjà remontée par l'agent, en plus de la pellicule du téléphone",
-      "source": "remontée #67 (2e partie)",
-      "note": "décidé le 03/08 ; dépend du rattachement manuel"
-    },
     {
       "titre": "Import CSV : si la vacation existe sans agent et que le CSV en apporte un, reprendre l'affectation au lieu de créer un doublon",
       "source": "remontée #64",
