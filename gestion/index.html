@@ -155,6 +155,9 @@ button.big:active{transform:translateY(1px)}
 #pp-td{right:537px}
 .rv-x{position:absolute;top:-8px;left:-8px;width:26px;height:26px;border-radius:50%;background:#e5322d;color:#fff;font-size:15px;font-weight:800;line-height:26px;text-align:center;cursor:pointer;z-index:99;box-shadow:0 1px 5px rgba(0,0,0,.6);touch-action:manipulation;user-select:none}
 .rv-x:active{transform:scale(.88)}
+.gd-halo{outline:3px solid #6ea8fe !important;outline-offset:3px;border-radius:10px;animation:gdpulse 1.4s ease-in-out infinite;position:relative;z-index:150}
+@keyframes gdpulse{0%,100%{box-shadow:0 0 0 0 rgba(110,168,254,.6)}50%{box-shadow:0 0 0 10px rgba(110,168,254,0)}}
+#gd-carte{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:240;width:min(520px,92vw);background:#101a2b;border:2px solid #6ea8fe;border-radius:14px;padding:14px;font-size:13.5px;box-shadow:0 10px 34px rgba(0,0,0,.6)}
 #rv-undo{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:220;background:#1a2233;border:1px solid #6ea8fe;border-radius:10px;padding:10px 14px;font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
 #tabs button{position:relative}
 #pp-an.pc-vide{border-color:#e5322d;background:rgba(229,50,45,.18);animation:pcpulse 1.6s ease-in-out infinite}
@@ -220,7 +223,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b251</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b253</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2820,7 +2823,14 @@ button.big:active{transform:translateY(1px)}
     retirer:{ titre:'✂️ Retirer une pastille ou une section sur place',
       quoi:'Tu arrives directement dans la vue du SUPERVISEUR, en aperçu.',
       aFaire:'Le bandeau est ORANGE et affiche « APERÇU » — le repère qui dit que tu n’es pas dans ta vue. Regarde les pastilles en haut à droite et les onglets : chacun porte une petite CROIX ROUGE. Clique celle de 🦺 Tenues (ou de n’importe quelle pastille) : elle quitte la vue du superviseur, tout de suite. Reviens sur « super-admin » : chez toi tout est intact et les croix disparaissent. Pour remettre : 🔐 Droits d’accès, ou « ✏️ Régler cette vue ».',
-      monter:function(){ try{ localStorage.removeItem('fkh_droits'); setTimeout(function(){ demoRole('superviseur'); },900); }catch(e){} } },
+      monter:function(){ try{ localStorage.removeItem('fkh_droits'); setTimeout(function(){ demoRole('superviseur'); },900); }catch(e){} },
+      guide:function(){ return [
+        {sel:'#demo-role', txt:'Le bandeau est <b>ORANGE</b> et dit « APERÇU » : tu n’es plus dans ta vue, tu es dans celle du <b>superviseur</b>. Dans ta vraie vue il est vert.', btn:'Suivant →'},
+        {sel:'#rv-open', txt:'Tant que tu n’as rien demandé, <b>aucune croix n’apparaît</b> — tu observes tranquillement. Clique « Régler cette vue » pour passer en mode modification.', btn:'Passer en mode réglage', fait:function(){ var b=byId('rv-open'); if(b)b.click(); }, attendre:600},
+        {sel:'#pp-af', txt:'Les <b>croix rouges</b> sont apparues sur chaque pastille et chaque onglet. Celle-ci est la pastille 🧍 <b>Vacations non affectées</b>. Clique pour la retirer de la vue du superviseur.', btn:'Retirer cette pastille', fait:function(){ var x=document.querySelector('#pp-af .rv-x'); if(x)x.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true})); }, attendre:700},
+        {sel:'#rv-undo', txt:'Elle a disparu de sa vue — et le ruban propose <b>↩️ Annuler</b> pendant 7 secondes. Pas de « Êtes-vous sûr ? » à valider sans lire : l’action est immédiate et rattrapable.', btn:'Annuler le retrait', fait:function(){ var b=byId('rv-undo-b'); if(b)b.click(); }, attendre:600},
+        {sel:'#pp-af', txt:'La pastille est revenue. Termine en cliquant sur <b>super-admin</b> dans le bandeau : le mode réglage se coupe tout seul et tu retrouves ta vue.'}
+      ]; } },
     tenues:{ titre:'📦 Tenues envoyées non confirmées',
       quoi:'Deux agents attendent leur tenue depuis 6 et 11 jours, sans confirmation de réception.',
       aFaire:'Ouvre la pastille 📦. Change le délai (4 → 8 jours) : un des deux sort de la liste. Sur l’autre, clique « +2 j » : il disparaît, et reviendra dans 2 jours. Puis « ✅ Il l’a reçu » : la ligne se ferme pour de bon.',
@@ -2852,7 +2862,15 @@ button.big:active{transform:translateY(1px)}
           };
           var z=bar.querySelector('div:last-child'); if(z)z.appendChild(b);
         },700);
-      }catch(e){} } },
+      }catch(e){} },
+      guide:function(){ return [
+        {sel:'#ask-fab', txt:'Voici la bulle 💬 de <b>JULES</b>. Regarde la <b>pastille rouge</b> en haut : il n’a rien ouvert, rien lu — et il sait déjà qu’on lui a répondu. C’est le premier signal.', btn:'Et la cloche ?'},
+        {sel:'#notif-bell', txt:'La même information vit dans la cloche. Clique « Ouvrir la cloche » : l’alerte « <b>Ta demande a été traitée</b> » va s’afficher.', btn:'Ouvrir la cloche', fait:function(){ var b=byId('notif-bell'); if(b)b.click(); }, attendre:500},
+        {sel:'#notif-ov', txt:'C’est cette ligne-là qui part en <b>notification sur son téléphone, appli fermée</b>. Il n’a pas besoin d’ouvrir l’application pour savoir.', btn:'Me montrer la vraie notification', fait:function(){ var b=byId('demo-notif'); if(b)b.click(); }, attendre:700},
+        {sel:'#ask-fab', txt:'Maintenant il ouvre la bulle pour lire. Clique « Ouvrir la réponse ».', btn:'Ouvrir la réponse', fait:function(){ var b=byId('ask-fab'); if(b)b.click(); }, attendre:700},
+        {sel:'#ask-reply, #ask-pop', txt:'La réponse est là — <b>avec un bouton 📖 Comment ça marche</b>. On ne lui dit pas seulement « c’est en ligne » : on lui montre comment s’en servir, en étapes.', btn:'Ouvrir le mode d’emploi', fait:function(){ var b=document.querySelector('.aide-b'); if(b)b.click(); else aideOuvrir('selfie'); }, attendre:600},
+        {sel:'#aide-pop', txt:'Voilà la fiche. Elle s’ouvre aussi par adresse directe <b>?aide=selfie</b> — tu peux donc l’envoyer à un agent par message. Et la pastille de la bulle vient de s’éteindre : elle ne s’éteint qu’<b>après lecture</b>.'}
+      ]; } },
     droits:{ titre:'🔐 Droits d’accès',
       quoi:'La grille « qui voit quoi » telle qu’elle est aujourd’hui.',
       aFaire:'Ouvre 🔐 Droits d’accès. Regarde la ligne 🔴 Annulations : les trois cases sont vides, c’est toi seul. Coche « Superviseur » sur 🔴 — c’est enregistré aussitôt. Puis « ↩️ Revenir aux réglages d’origine » pour tout remettre.',
@@ -2883,7 +2901,8 @@ button.big:active{transform:translateY(1px)}
       if((DR_RANG[r]||9)>(DR_RANG[drRoleReel()]||0))r=drRoleReel();   /* jamais au-dessus de son propre role */
       CLOUD.role=r||'full';
       CLOUD.sections=(r==='operateur')?['suiviappels','interv','suivi','demandes','noterapide']:null;
-      applySectionAccess(); ppRefresh(); demoRoleBandeau(); setTimeout(rvCroixMaj,150);   /* b249 */
+      if(r===drRoleReel())RV_MODE=false;   /* b252 : de retour chez soi, on ne regle plus */
+      applySectionAccess(); ppRefresh(); demoRoleBandeau(); setTimeout(rvCroixMaj,150);
     }catch(e){}
   }
   /* ===== b236 : REGLER LA VUE DEPUIS LA VUE =====
@@ -2942,6 +2961,14 @@ button.big:active{transform:translateY(1px)}
      COMMENT : en APERCU (et pour le super-admin seul), chaque pastille et chaque onglet porte une petite
      croix rouge. Un clic : l'element quitte la vue de ce role. C'est le meme reglage que la grille des
      Droits — donc reversible d'un clic la-bas, ou par « Regler cette vue ». */
+  function rvAstuce(){
+    var old=byId('rv-undo'); if(old)old.parentNode.removeChild(old);
+    var d=document.createElement('div'); d.id='rv-undo';
+    d.innerHTML='✏️ <b>Mode réglage</b> — clique la croix rouge d’une pastille ou d’un onglet pour le retirer de cette vue. &nbsp;<button type="button" id="rv-liste" style="font-size:12.5px">📋 Liste complète</button>';
+    document.body.appendChild(d);
+    byId('rv-liste').onclick=function(){ demoReglerVue(); };
+    setTimeout(function(){ if(d.parentNode&&d.id==='rv-undo'&&d.innerHTML.indexOf('Mode réglage')>=0)d.parentNode.removeChild(d); },6000);
+  }
   function rvAnnuler(type,cle,role,avant,libelle){
     var old=byId('rv-undo'); if(old)old.parentNode.removeChild(old);
     var d=document.createElement('div'); d.id='rv-undo';
@@ -2955,8 +2982,14 @@ button.big:active{transform:translateY(1px)}
     };
     setTimeout(function(){ if(d.parentNode)d.parentNode.removeChild(d); },7000);
   }
+  /* b252 (retour Zeus) : les croix ne s'affichent plus d'office. Elles etaient la des qu'on entrait
+     dans une vue — donc en permanence pendant qu'on l'observe, avec le risque d'en toucher une sans le
+     vouloir. Elles n'apparaissent maintenant qu'apres un clic sur « Regler cette vue », et disparaissent
+     au clic suivant. Regarder et modifier deviennent deux gestes distincts. */
+  var RV_MODE=false;
   function rvCroixMaj(){
     document.querySelectorAll('.rv-x').forEach(function(x){ x.parentNode&&x.parentNode.removeChild(x); });
+    if(!RV_MODE)return;
     var role=drRole(), reel=drRoleReel();
     if(role===reel)return;                      /* on ne se retire rien a soi-meme */
     if(reel!=='full'&&reel!=='superadmin')return;  /* seul le super-admin regle */
@@ -3008,12 +3041,60 @@ button.big:active{transform:translateY(1px)}
        On decale la page de sa hauteur reelle (elle varie selon que le texte tient sur une ou deux lignes). */
     try{ setTimeout(function(){ var h=el.offsetHeight||0; document.body.style.paddingTop=h?(h+'px'):'';
          document.querySelectorAll('.pp-btn,#notif-bell').forEach(function(b){ b.style.top=(7+h)+'px'; }); },60); }catch(e){}
-    var _rv=byId('rv-open'); if(_rv)_rv.onclick=demoReglerVue;
+    var _rv=byId('rv-open'); if(_rv)_rv.onclick=function(){
+      if(drRole()===drRoleReel()){ alert('Bascule d’abord sur un autre rôle : c’est sa vue que l’on règle.'); return; }
+      RV_MODE=!RV_MODE; rvCroixMaj();
+      _rv.textContent=RV_MODE?'✅ Terminer le réglage':'✏️ Régler cette vue';
+      _rv.style.background=RV_MODE?'#1a9e5c':''; _rv.style.color=RV_MODE?'#fff':'';
+      if(RV_MODE)rvAstuce();
+    };
+  }
+  /* ===== b253 : VISITE GUIDEE =====
+     POURQUOI (retour Zeus : « je veux que les demos soient vivantes et non figees ») : poser un decor
+     et ecrire « regarde la pastille » ne suffit pas — il faut chercher l'element, deviner le geste, et
+     souvent il ne se passe rien de visible. Une demo doit MONTRER.
+     COMMENT : une suite d'etapes. A chaque etape, l'element concerne est entoure d'un halo qui pulse,
+     la page defile jusqu'a lui, et une bulle explique en une phrase. « Suivant » execute le geste pour
+     de vrai — on voit le resultat se produire. */
+  var GUIDE={pas:[],i:0};
+  function guideStop(){
+    document.querySelectorAll('.gd-halo').forEach(function(e){ e.classList.remove('gd-halo'); });
+    var c=byId('gd-carte'); if(c)c.parentNode.removeChild(c);
+    GUIDE.pas=[]; GUIDE.i=0;
+  }
+  function guideDemarrer(pas){
+    guideStop(); GUIDE.pas=pas||[]; GUIDE.i=0; guideEtape();
+  }
+  function guideEtape(){
+    document.querySelectorAll('.gd-halo').forEach(function(e){ e.classList.remove('gd-halo'); });
+    var P=GUIDE.pas[GUIDE.i];
+    var c=byId('gd-carte');
+    if(!P){ if(c)c.parentNode.removeChild(c); return; }
+    var el=null; try{ el=P.sel?document.querySelector(P.sel):null; }catch(e){}
+    if(el){ el.classList.add('gd-halo'); try{ el.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} }
+    if(!c){ c=document.createElement('div'); c.id='gd-carte'; document.body.appendChild(c); }
+    var dernier=(GUIDE.i>=GUIDE.pas.length-1);
+    c.innerHTML='<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">'
+      +'<b style="flex:1">Étape '+(GUIDE.i+1)+' / '+GUIDE.pas.length+'</b>'
+      +'<button type="button" id="gd-x" style="font-size:12px">✕</button></div>'
+      +'<div style="line-height:1.5">'+P.txt+'</div>'
+      +'<div class="acts" style="margin-top:10px;gap:6px">'
+      +(GUIDE.i?'<button type="button" id="gd-prev" style="font-size:12.5px">← Précédent</button>':'')
+      +'<button type="button" id="gd-next" class="ok" style="font-size:13px">'+(dernier?'✅ Terminer':(P.btn||'Suivant →'))+'</button></div>';
+    byId('gd-x').onclick=guideStop;
+    var pv=byId('gd-prev'); if(pv)pv.onclick=function(){ if(GUIDE.i>0){GUIDE.i--; guideEtape();} };
+    byId('gd-next').onclick=function(){
+      try{ if(P.fait)P.fait(); }catch(e){}
+      GUIDE.i++;
+      setTimeout(guideEtape, P.attendre||260);
+    };
   }
   function demoMonter(k){
     var D=DEMOS[k]; if(!D)return;
     try{ D.monter(); if(typeof save==='function'&&typeof SUIVI!=='undefined')save('fkh_suivi',SUIVI); }catch(e){}
-    setTimeout(function(){ demoBandeau(k); if(typeof ppRefresh==='function')try{ppRefresh();}catch(e){} if(typeof asgBadge==='function')try{asgBadge();}catch(e){} },400);
+    setTimeout(function(){ demoBandeau(k); if(typeof ppRefresh==='function')try{ppRefresh();}catch(e){} if(typeof asgBadge==='function')try{asgBadge();}catch(e){}
+      if(D.guide)setTimeout(function(){ try{ guideDemarrer(D.guide()); }catch(e){} },700);   /* b253 */
+    },400);
   }
   function demoNettoyer(){
     try{ SUIVI=(SUIVI||[]).filter(function(m){ return String(m.id||'').indexOf('demo_')!==0; }); save('fkh_suivi',SUIVI); }catch(e){}
