@@ -153,6 +153,8 @@ button.big:active{transform:translateY(1px)}
 #pp-pc{right:449px}
 #pp-an{right:493px}
 #pp-td{right:537px}
+.rv-x{position:absolute;top:-6px;left:-6px;width:19px;height:19px;border-radius:50%;background:#e5322d;color:#fff;font-size:12px;font-weight:800;line-height:19px;text-align:center;cursor:pointer;z-index:95;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+#tabs button{position:relative}
 #pp-an.pc-vide{border-color:#e5322d;background:rgba(229,50,45,.18);animation:pcpulse 1.6s ease-in-out infinite}
 .pl-chip.annul{border:1.5px solid #e5322d !important;background:repeating-linear-gradient(45deg,rgba(229,50,45,.18),rgba(229,50,45,.18) 6px,transparent 6px,transparent 12px) !important}
 #pp-pc.pc-vide{border-color:#e5322d;background:rgba(229,50,45,.18);animation:pcpulse 1.6s ease-in-out infinite}
@@ -216,7 +218,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b248</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b249</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2818,7 +2820,7 @@ button.big:active{transform:translateY(1px)}
       if((DR_RANG[r]||9)>(DR_RANG[drRoleReel()]||0))r=drRoleReel();   /* jamais au-dessus de son propre role */
       CLOUD.role=r||'full';
       CLOUD.sections=(r==='operateur')?['suiviappels','interv','suivi','demandes','noterapide']:null;
-      applySectionAccess(); ppRefresh(); demoRoleBandeau();
+      applySectionAccess(); ppRefresh(); demoRoleBandeau(); setTimeout(rvCroixMaj,150);   /* b249 */
     }catch(e){}
   }
   /* ===== b236 : REGLER LA VUE DEPUIS LA VUE =====
@@ -2870,6 +2872,36 @@ button.big:active{transform:translateY(1px)}
     }
     pop.querySelectorAll('.rv-up').forEach(function(b){ b.onclick=function(){ bouge(b.getAttribute('data-t'),+b.getAttribute('data-i'),-1); }; });
     pop.querySelectorAll('.rv-dn').forEach(function(b){ b.onclick=function(){ bouge(b.getAttribute('data-t'),+b.getAttribute('data-i'),1); }; });
+  }
+  /* ===== b249 : RETIRER SUR PLACE =====
+     POURQUOI : constater qu'une pastille n'a rien a faire chez le superviseur, puis aller la decocher
+     dans une liste, c'est deux gestes et un changement d'ecran. On retire la ou on voit.
+     COMMENT : en APERCU (et pour le super-admin seul), chaque pastille et chaque onglet porte une petite
+     croix rouge. Un clic : l'element quitte la vue de ce role. C'est le meme reglage que la grille des
+     Droits — donc reversible d'un clic la-bas, ou par « Regler cette vue ». */
+  function rvCroixMaj(){
+    document.querySelectorAll('.rv-x').forEach(function(x){ x.parentNode&&x.parentNode.removeChild(x); });
+    var role=drRole(), reel=drRoleReel();
+    if(role===reel)return;                      /* on ne se retire rien a soi-meme */
+    if(reel!=='full'&&reel!=='superadmin')return;  /* seul le super-admin regle */
+    function croix(el,type,cle,libelle){
+      if(!el||el.style.display==='none')return;
+      var x=document.createElement('span'); x.className='rv-x'; x.textContent='×';
+      x.title='Retirer « '+libelle+' » de la vue de ce rôle';
+      x.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation();
+        if(!confirm('Retirer « '+libelle+' » de la vue du rôle affiché ?\n\nTu pourras le remettre dans 🔐 Droits d’accès ou avec « Régler cette vue ».'))return;
+        var o=drLoad(); o[type]=o[type]||{}; o[type][cle]=o[type][cle]||{}; o[type][cle][role]=false; drSave(o);
+        applySectionAccess(); ppRefresh(); setTimeout(rvCroixMaj,120);
+      };
+      el.appendChild(x);
+    }
+    (typeof DR_PASTILLES!=='undefined'?DR_PASTILLES:[]).forEach(function(pr){
+      var b=byId('pp-'+pr[0]); if(b)croix(b,'pastilles',pr[0],pr[1]);
+    });
+    document.querySelectorAll('#tabs button[data-s]').forEach(function(b){
+      var k=b.getAttribute('data-s'); if(k==='droits')return;
+      croix(b,'sections',k,(b.textContent||k).trim().replace('×',''));
+    });
   }
   function demoRoleBandeau(){
     var el=byId('demo-role'); if(!el){ el=document.createElement('div'); el.id='demo-role';
