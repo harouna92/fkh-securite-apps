@@ -34,6 +34,7 @@
   <div id="preview" style="display:none"></div>
   <div id="cam-actions">
     <button class="btn snap" id="snap">📷 Prendre la photo</button>
+    <button class="btn" id="cam-flip" style="margin-top:8px;background:#243447;color:#dbe6f3">🤳 Passer en selfie</button>
     <button class="btn ok" id="send" style="display:none">✅ Envoyer à l'agence</button>
     <button class="btn" id="retry" style="display:none">🔄 Reprendre</button>
     <div id="msg"></div>
@@ -58,7 +59,30 @@
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});}
   function pad(n){return (n<10?'0':'')+n;}
   var stream=null;
-  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:2560},height:{ideal:1440}},audio:false}).then(function(s){ stream=s; v.srcObject=s; }).catch(function(err){ /* b216 : diagnostic precis + solution de secours */ var n=(err&&err.name)||'', t=''; if(n==='NotAllowedError'||n==='SecurityError'){ t='🚫 Accès caméra REFUSÉ.<br>Touche le cadenas 🔒 en haut de l’écran → Autorisations → Caméra → Autoriser, puis recharge la page.'; } else if(n==='NotReadableError'||n==='AbortError'||n==='TrackStartError'){ t='📵 La caméra est OCCUPÉE par autre chose — le plus souvent un <b>appel téléphonique en cours</b> ou une autre application.<br>Termine l’appel (ou ferme l’autre appli), puis recharge la page.'; } else if(n==='NotFoundError'){ t='⚠️ Aucune caméra détectée sur cet appareil.'; } else { t='⚠️ Caméra indisponible ('+(n||'erreur')+').'; } msg.className='err'; msg.innerHTML=t+'<div style="margin-top:12px"><label class="btn" style="cursor:pointer;display:inline-block;padding:12px 16px;font-size:16px;background:#1a9e5c;color:#fff;border-radius:10px">📷 Prendre la photo avec l’appareil photo<input type="file" accept="image/*" capture="environment" id="cam-fb" style="display:none"></label><div style="font-size:12px;margin-top:6px;opacity:.85">Solution de secours : la photo sera tamponnée de la même façon.</div></div>'; snap.style.display='none'; var fb=document.getElementById('cam-fb'); if(fb)fb.onchange=function(){ var f=fb.files&&fb.files[0]; if(!f)return;   var im=new Image();   im.onload=function(){ try{ var W=im.naturalWidth,H=im.naturalHeight; c.width=W; c.height=H; var x=c.getContext('2d'); x.drawImage(im,0,0,W,H); stampCanvas(); }catch(e){} };   im.src=URL.createObjectURL(f); }; });
+  var camErreur=function(err){ /* b216 : diagnostic precis + solution de secours */ var n=(err&&err.name)||'', t=''; if(n==='NotAllowedError'||n==='SecurityError'){ t='🚫 Accès caméra REFUSÉ.<br>Touche le cadenas 🔒 en haut de l’écran → Autorisations → Caméra → Autoriser, puis recharge la page.'; } else if(n==='NotReadableError'||n==='AbortError'||n==='TrackStartError'){ t='📵 La caméra est OCCUPÉE par autre chose — le plus souvent un <b>appel téléphonique en cours</b> ou une autre application.<br>Termine l’appel (ou ferme l’autre appli), puis recharge la page.'; } else if(n==='NotFoundError'){ t='⚠️ Aucune caméra détectée sur cet appareil.'; } else { t='⚠️ Caméra indisponible ('+(n||'erreur')+').'; } msg.className='err'; msg.innerHTML=t+'<div style="margin-top:12px"><label class="btn" style="cursor:pointer;display:inline-block;padding:12px 16px;font-size:16px;background:#1a9e5c;color:#fff;border-radius:10px">📷 Prendre la photo avec l’appareil photo<input type="file" accept="image/*" capture="environment" id="cam-fb" style="display:none"></label><div style="font-size:12px;margin-top:6px;opacity:.85">Solution de secours : la photo sera tamponnée de la même façon.</div></div>'; snap.style.display='none'; var fb=document.getElementById('cam-fb'); if(fb)fb.onchange=function(){ var f=fb.files&&fb.files[0]; if(!f)return;   var im=new Image();   im.onload=function(){ try{ var W=im.naturalWidth,H=im.naturalHeight; c.width=W; c.height=H; var x=c.getContext('2d'); x.drawImage(im,0,0,W,H); stampCanvas(); }catch(e){} };   im.src=URL.createObjectURL(f); }; };
+  /* b244 (remontee #67) : un agent ne peut pas se photographier lui-meme avec la camera arriere.
+     Pour le controle de tenue, la camera avant est le seul moyen — d'ou la bascule. On se souvient du
+     choix : un controle de tenue rouvre directement en selfie. */
+  var camFace=(type==='tenue')?'user':'environment';
+  try{ var _mem=localStorage.getItem('fkh_cam_face_'+(type||'x')); if(_mem)camFace=_mem; }catch(e){}
+  function camDemarrer(){
+    try{ if(stream)stream.getTracks().forEach(function(t){t.stop();}); }catch(e){}
+    navigator.mediaDevices.getUserMedia({video:{facingMode:camFace,width:{ideal:2560},height:{ideal:1440}},audio:false})
+      .then(function(s2){ stream=s2; v.srcObject=s2;
+        /* en selfie on affiche l'image en miroir : sinon l'agent se voit a l'envers et se cadre mal.
+           La photo enregistree, elle, n'est PAS miroir — un ecusson doit rester lisible. */
+        v.style.transform=(camFace==='user')?'scaleX(-1)':'';
+        var fb=document.getElementById('cam-flip');
+        if(fb)fb.textContent=(camFace==='user')?'🏢 Repasser en caméra arrière':'🤳 Passer en selfie';
+      })
+      .catch(function(err){ camErreur(err); });
+  }
+  (function(){ var fb=document.getElementById('cam-flip'); if(!fb)return;
+    fb.onclick=function(){ camFace=(camFace==='user')?'environment':'user';
+      try{ localStorage.setItem('fkh_cam_face_'+(type||'x'),camFace); }catch(e){}
+      camDemarrer(); };
+  })();
+  camDemarrer();
   var gpsCity='', gpsStreet='', gpsCoord='', gpsCp=''; // b209 : code postal
   function geoWarn(on){ var w=document.getElementById('geowarn'); if(w)w.style.display=on?'block':'none'; }
   function geoAsk(){ if(!navigator.geolocation){ geoWarn(true); return; } navigator.geolocation.getCurrentPosition(function(p){ gpsCoord=p.coords.latitude.toFixed(5)+','+p.coords.longitude.toFixed(5); fetch('https://api-adresse.data.gouv.fr/reverse/?lon='+p.coords.longitude+'&lat='+p.coords.latitude).then(function(r){return r.json();}).then(function(j){ var f=j&&j.features&&j.features[0]; if(f){ gpsCity=f.properties.city||f.properties.municipality||''; gpsStreet=f.properties.name||f.properties.street||''; gpsCp=f.properties.postcode||''; /* b209 */ var el=document.getElementById('ctx'); if(el&&gpsCity)el.innerHTML+='<span class="badge">📍 '+esc((gpsStreet?gpsStreet+', ':'')+(gpsCp?gpsCp+' ':'')+gpsCity)+'</span>'; } }).catch(function(){}); geoWarn(false); }, function(){ geoWarn(true); }, {enableHighAccuracy:true,timeout:8000,maximumAge:60000}); }
