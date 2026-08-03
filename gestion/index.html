@@ -214,7 +214,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b239</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b240</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2859,6 +2859,10 @@ button.big:active{transform:translateY(1px)}
           return '<a href="#" class="demo-r" data-r="'+r+'" style="color:#7fe0aa;text-decoration:underline;margin:0 4px">'+n+'</a>'; }).join('·');
     if(drEstSuper()||drRoleReel()==='full'||drRoleReel()==='superadmin')el.innerHTML+=' <button type="button" id="rv-open" style="font-size:11.5px;margin-left:8px;padding:2px 8px">✏️ Régler cette vue</button>';
     el.querySelectorAll('.demo-r').forEach(function(a2){ a2.onclick=function(e){ e.preventDefault(); demoRole(a2.getAttribute('data-r')); }; });
+    /* b240 : le bandeau est en position fixe — sans compensation il recouvre le haut de la barre d'onglets.
+       On decale la page de sa hauteur reelle (elle varie selon que le texte tient sur une ou deux lignes). */
+    try{ setTimeout(function(){ var h=el.offsetHeight||0; document.body.style.paddingTop=h?(h+'px'):'';
+         document.querySelectorAll('.pp-btn,#notif-bell').forEach(function(b){ b.style.top=(7+h)+'px'; }); },60); }catch(e){}
     var _rv=byId('rv-open'); if(_rv)_rv.onclick=demoReglerVue;
   }
   function demoMonter(k){
