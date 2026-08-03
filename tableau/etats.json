@@ -3,6 +3,14 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 266,
+      "titre": "Bon de commande : va au Planning, plus dans Suivi des demandes (2 causes corrigées)",
+      "source": "Zeus — bug signalé",
+      "theme": "Mails & collecte",
+      "local": true,
+      "pourquoipas": "Se vérifiera sur le prochain bon de commande reçu — rien à simuler."
+    },
+    {
       "b": 265,
       "titre": "Corbeille : le lâcher d'un onglet sur 🗑️ est enfin détecté",
       "source": "Zeus — bug signalé",

@@ -223,7 +223,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b265</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b266</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -5519,7 +5519,17 @@ button.big:active{transform:translateY(1px)}
            deja planifie : dans les deux cas le suivi se fait naturellement dans le Planning, ou la
            vacation ressort tant qu'aucun agent n'est affecte. Un mail SANS site ou SANS date, lui,
            reste ici : il n'a aucun autre endroit ou vivre. */
-        if(String(call.cdr_id||'').indexOf('mail_')===0 && (d.site||'') && (d.date||'')) return;
+        /* b266 (bug releve par Zeus : un bon de commande AQUILA avec site ET date etait quand meme parti
+           dans Suivi des demandes). Deux causes, deux garde-fous :
+           1) la date d'une demande ne vit PAS dans d.date mais dans d.vacations[].date — le test ne
+              matchait donc jamais pour un vrai bon de commande ;
+           2) l'ordre d'execution n'est pas garanti entre la creation de la vacation violette et celle
+              de la demande : si une vacation est deja nee de ce mail, on ne double pas. */
+        if(String(call.cdr_id||'').indexOf('mail_')===0){
+          var _dt=(d.date||'')||((d.vacations&&d.vacations[0]&&d.vacations[0].date)||'');
+          if((d.site||'')&&_dt) return;
+          if((SUIVI||[]).some(function(m){ return m.mailSrc===call.cdr_id; })) return;
+        }
         if(SUIVI.some(function(m){return String(m.id)===id;}))return; var now=Date.now();
         var it={id:id,texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:((typeof svCallerName==='function'&&svCallerName(call.number))||notFKH(d.client)||''),la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiNature:nat,aiCdr:call.cdr_id,aiNumber:call.number||'',aiDir:call.direction||''}; if(call._sim)it.sim=true; SUIVI.unshift(it); changed=true; if(!firstNew)firstNew=it; aiRouteNear(it,bd); /* consigne « nouvelle demande gardiennage » retirée (l'opérateur prend les appels, il est déjà au courant) */
       });
@@ -6587,6 +6597,12 @@ box.querySelectorAll('.td-ok').forEach(function(b){ b.onclick=function(){ if(con
         if(ms&&(ms.indexOf(sn)>=0||sn.indexOf(ms)>=0))score+=3;
         else { var aw=sn.split(' ').filter(function(w){return w.length>3;}),hit=0; aw.forEach(function(w){if(ms.indexOf(w)>=0)hit++;}); if(aw.length&&hit>=Math.max(1,Math.ceil(aw.length/2)))score+=1; } }
       if(pp.mdate&&m.mdate===pp.mdate)score+=2;
+      /* b266 (2e cause du bug AQUILA) : le site seul valait 3 points, soit le seuil — un bon de commande
+         pour le 03/08 etait donc declare « deja planifie » parce que le MEME site avait des vacations a
+         d'autres dates (GRAND FRAIS LA ROCHE en avait 7). Un site revient toutes les semaines : il ne
+         prouve rien. Desormais, quand les deux dates sont connues et differentes, seul un numero de
+         reference identique (unique, lui) peut encore conclure a un rapprochement. */
+      if(pp.mdate&&m.mdate&&m.mdate!==pp.mdate&&score<4)return;
       if(score>=3&&(!best||score>best.score))best={m:m,score:score};
     });
     return best;
