@@ -3,6 +3,14 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 264,
+      "titre": "Tableau : la page sait si elle est en ligne ou sur le poste de pilotage",
+      "source": "Zeus",
+      "theme": "Outils de pilotage",
+      "local": true,
+      "pourquoipas": "C'est ce tableau de bord."
+    },
+    {
       "b": 262,
       "titre": "Colonne En ligne regroupée par thèmes + copie au glisser",
       "source": "Zeus",
@@ -283,6 +291,12 @@
     }
   ],
   "decide": [
+    {
+      "titre": "Sélection multiple de vacations au Planning : cocher plusieurs vacations puis, en lot — changer l'agent, décaler les horaires, couper/rétablir les tickets",
+      "source": "JULES — remontées #65/#66",
+      "urgent": true,
+      "note": "cadré par Zeus le 03/08 : les TROIS actions"
+    },
     {
       "titre": "Sélection multiple de vacations au Planning + modification en lot",
       "source": "JULES — remontées #65/#66",

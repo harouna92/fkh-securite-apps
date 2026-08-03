@@ -46,6 +46,7 @@
   <span class="pill" id="p-ligne">en ligne : <b>…</b></span>
   <span class="pill" id="p-local">local : <b>…</b></span>
   <button id="refresh">🔄 Actualiser</button>
+  <span class="pill" id="p-ou"></span>
 </header>
 <main id="grille"></main>
 <footer id="pied">Chargement…</footer>
@@ -59,6 +60,7 @@
    ne peut donc pas affirmer qu'une chose est en ligne alors qu'elle ne l'est pas. */
 var URL_LIGNE='https://harouna92.github.io/fkh-securite-apps/gestion/';
 var API='https://fkh-gestion-api.hacamara2.workers.dev';
+var EN_LIGNE=(location.hostname.indexOf('localhost')<0&&location.hostname.indexOf('127.0.0.1')<0);   /* b264 */
 var JETON='fkh-mail-ingest-2026';
 var BASE_DEMO_LOCAL='http://localhost:8143/';
 var BASE_DEMO_LIGNE=URL_LIGNE;
@@ -127,6 +129,9 @@ function rendre(data, bLigne, bLocal){
 
   document.getElementById('p-ligne').innerHTML='en ligne : <b>b'+(bLigne||'?')+'</b>';
   document.getElementById('p-local').innerHTML='local : <b>b'+(bLocal||'?')+'</b>';
+  var ou=document.getElementById('p-ou');
+  if(ou){ ou.innerHTML=EN_LIGNE?'📖 <b>version en ligne</b> — lecture + envoi d’ordres':'✏️ <b>poste de pilotage</b> — tout est enregistré';
+          ou.style.borderColor=EN_LIGNE?'#e0a13b':'#1a9e5c'; }
 
   var decide=data.decide||[];
   document.getElementById('grille').innerHTML=
@@ -185,13 +190,15 @@ function deplacer(id,cible){
         body:JSON.stringify({texte:phrase,auteur:'tableau de bord'})})
     .then(function(r){return r.json();})
     .then(function(j){ if(p){ p.textContent=(j&&j.ok)
-        ? ((j.deja?'↩️ Déjà dans la file : « ':'✅ Ordre enregistré : « ')+phrase+' » — je le traiterai à la prochaine session. (Copié aussi, si tu veux lancer tout de suite.)')
-        : ('⚠️ Ordre NON enregistré dans la file. Il est copié : colle-le dans le chat.');
+        ? ((j.deja?'↩️ Déjà dans la file : « ':'✅ Ordre envoyé : « ')+phrase+' » — Claude le traitera.'
+           +(EN_LIGNE?' (Version en ligne : l’ordre part bien, mais le déplacement de la carte n’est pas mémorisé ici — il le sera au prochain passage sur le poste.)':''))
+        : ('⚠️ Ordre NON envoyé. Il est copié : colle-le dans le chat.');
       p.style.color=(j&&j.ok)?'#1a9e5c':'#e0a13b'; } })
     .catch(function(){ if(p){ p.textContent='⚠️ File injoignable (hors ligne ?). L’ordre est copié : colle-le dans le chat.'; p.style.color='#e0a13b'; } });
   enregistrer();
 }
 function enregistrer(){
+  if(EN_LIGNE)return;   /* b264 : GitHub Pages ne sait que servir des fichiers — inutile de tenter puis d'afficher une erreur */
   fetch('etats.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(DATA)})
     .then(function(r){return r.json();})
     .then(function(j){ if(j&&j.ok)charger(); else alerteEcriture(); })
