@@ -223,7 +223,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b266</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b266+dom</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -249,7 +249,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="mails">📧 Mails missions</button>
     <button data-s="ref">📚 Sites & Clients</button>
     <button data-s="streste">💶 Reste ST</button>
-    <button data-s="cockpitfkh">📈 Cockpit FKH</button>
+    <button data-s="cockpitfkh">🌐 Domaines</button>
     <button data-s="tickets">🎫 Tickets</button>
 <button data-s="corbeille">🗑️ Corbeille</button>
 <button data-s="droits">🔐 Droits d’accès</button>
@@ -3315,11 +3315,21 @@ button.big:active{transform:translateY(1px)}
       'Mai 2026':[['SECURITAS 10228',42976.39],['AQUILA',13493.55],['SECURITAS 10017',12848.4],['RANC DEVELOPPEMENT',10945.03],['SOTEL',1972.87]]
     }
   };
+    var CFKH_DOMS=[['FKH','\ud83e\udded FKH'],['GARIS','\ud83d\udee1\ufe0f GARIS'],['DAHLIA','\ud83c\udf38 DAHLIA'],['PERSO','\ud83e\uddd1 PERSO']];
+  var CFKH_COL={FKH:'#7c93ff',GARIS:'#f0997b',DAHLIA:'#f0abfc',PERSO:'#34d399'};
+  var CFKH_EMO={FKH:'\ud83e\udded',GARIS:'\ud83d\udee1\ufe0f',DAHLIA:'\ud83c\udf38',PERSO:'\ud83e\uddd1'};
+  var CFKH_TAG={FKH:'Cockpit complet \u00b7 31+ vues live',GARIS:'CA hors FKH \u00b7 alerte Indy',DAHLIA:'RSI \u00b7 reconstruction CA',PERSO:'D\u00e9penses \u00b7 sant\u00e9 \u00b7 juridique'};
+  var CFKH_FILE={FKH:'domaines/APPLI_FKH.html',GARIS:'domaines/APPLI_GARIS.html',DAHLIA:'domaines/APPLI_DAHLIA.html',PERSO:'domaines/APPLI_PERSO.html'};
+  function cfkhDomLabel(){ for(var i=0;i<CFKH_DOMS.length;i++)if(CFKH_DOMS[i][0]===cfkhDom)return CFKH_DOMS[i][1]; return cfkhDom; }
+  var cfkhDom='';
   var cfkhView='ensemble', cfkhMois='Mai 2026';
   function cfkhData(){ try{var d=JSON.parse(localStorage.getItem('fkh_data')||'null'); if(d&&d.ca_client)return d;}catch(e){} return CFKH_DEFAULT; }
   function cfkhEur(x){ return (x==null)?'—':Math.round(x).toLocaleString('fr-FR')+' €'; }
   function renderCockpitFKH(){
     var nav=byId('cfkh-nav'), box=byId('cfkh-body'); if(!nav||!box)return; var D=cfkhData();
+    function wireNav(){ Array.prototype.forEach.call(nav.querySelectorAll('[data-dom]'),function(b){ b.onclick=function(){ cfkhDom=b.getAttribute('data-dom'); renderCockpitFKH(); }; }); Array.prototype.forEach.call(box.querySelectorAll('[data-dom]'),function(b){ b.onclick=function(){ cfkhDom=b.getAttribute('data-dom'); renderCockpitFKH(); }; }); var bh=nav.querySelector('[data-home]'); if(bh)bh.onclick=function(){ cfkhDom=''; renderCockpitFKH(); }; }
+    if(!cfkhDom){ nav.innerHTML='<h2 style="font-size:18px;margin:2px 0">\ud83c\udf10 Domaines</h2><div style="font-size:12px;color:#7a8794;margin-bottom:12px">Choisis un domaine pour ouvrir son cockpit complet.</div>'; box.innerHTML='<div style="background:#0e1116;border-radius:16px;padding:18px"><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">'+CFKH_DOMS.map(function(dd){var dom=dd[0];return '<div data-dom="'+dom+'" style="background:#161b22;border:1px solid #232a33;border-left:4px solid '+CFKH_COL[dom]+';border-radius:14px;padding:18px;cursor:pointer"><div style="font-size:26px">'+CFKH_EMO[dom]+'</div><div style="font-size:17px;font-weight:800;margin-top:6px;color:'+CFKH_COL[dom]+'">'+dom+'</div><div style="font-size:11.5px;color:#8b98a5;margin-top:8px">'+CFKH_TAG[dom]+'</div></div>';}).join('')+'</div></div>'; wireNav(); return; }
+    nav.innerHTML='<span data-home style="font-size:12.5px;color:#2563c9;cursor:pointer;display:inline-block;margin-bottom:6px">\u2190 Domaines</span><h2 style="font-size:18px;margin:2px 0 8px">'+cfkhDomLabel()+'</h2>'; box.innerHTML='<iframe src="'+CFKH_FILE[cfkhDom]+'" style="width:100%;height:80vh;border:1px solid #232a33;border-radius:12px;background:#0e1116"></iframe>'; wireNav(); return;
     var vues=[['ensemble','Vue d’ensemble'],['etat','État (annuel)'],['clients','Clients / mois'],['cascade','Cascade ST'],['paie','Paie']];
     nav.innerHTML='<h2 style="font-size:18px;margin:6px 0 2px">📈 Cockpit FKH</h2>'
       +'<div style="font-size:12px;color:#7a8794;margin-bottom:10px">Reproduit l’artefact FKH · lit le carnet <code>fkh_data</code> (ex-DATA_FKH.json) · MAJ '+(D.maj||'')+'</div>'
