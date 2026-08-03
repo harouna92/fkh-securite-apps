@@ -214,7 +214,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b241</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b243</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2583,7 +2583,7 @@ button.big:active{transform:translateY(1px)}
   var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_pc_poste','fkh_droits','fkh_data'];
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
-  var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','tickets','cockpitfkh','streste','depots','clientsf','corbeille','droits']; // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)  /* b228 : 'mails' retire — la section Mails missions (et son temoin de vie) est desormais visible par le superviseur et l'administrateur, pas seulement le super-admin */
+  var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','cockpitfkh','streste','depots','clientsf','corbeille','droits']; // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)  /* b228 : 'mails' retire — la section Mails missions (et son temoin de vie) est desormais visible par le superviseur et l'administrateur, pas seulement le super-admin */
   function _secSuperOnly(s){ return SUPERADMIN_SECTIONS.indexOf(s)>=0; }
   // Landing + ordre des onglets selon le rôle : opérateur → « Suivi des appels » en 1er + ouvert ; superviseur/admin/super-admin → « Suivi demandes » en 1er + ouvert.
   function applyRoleLayout(){ try{ var tabs=byId('tabs'); if(!tabs)return; var isOp=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); var primary=isOp?'suiviappels':'suivi'; var pb=tabs.querySelector('button[data-s="'+primary+'"]'); if(!pb)return; tabs.insertBefore(pb,tabs.firstChild); if(!isOp){ var sa=tabs.querySelector('button[data-s="suiviappels"]'); if(sa)tabs.insertBefore(sa,pb.nextSibling); } if(getComputedStyle(pb).display!=='none')pb.click(); }catch(e){} }
@@ -2659,7 +2659,7 @@ button.big:active{transform:translateY(1px)}
      explicitement liste ci-dessous est ferme par defaut. Une pastille ajoutee demain sera invisible
      aux autres tant que Zeus ne l'aura pas cochee — sans qu'il faille y penser dans le code. */
   var DR_SECTIONS_ENCADREMENT=['noterapide','demandes','suivi','planning','fiche','zone','suiviappels','tenues',
-    'services','interv','cfgiv','appels','suivisite','supervision','numeros','terrain','supterrain','mails'];
+    'services','interv','cfgiv','appels','suivisite','supervision','numeros','terrain','supterrain','mails','tickets'];
   var DR_PASTILLES_ENCADREMENT=['op','cli','ph','te','c2','ro','af','rt','gp','pc','cloche','recherche','bandeau','bulle','aides'];
   function drDefSection(k,role){
     if(_secSuperOnly(k))return false;
@@ -4368,6 +4368,40 @@ button.big:active{transform:translateY(1px)}
     box.querySelectorAll('.pl-sitecopy').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); planningCopySite(b.getAttribute('data-site')); }; });
     box.querySelectorAll('.pl-ivchip').forEach(function(c){ c.onclick=function(e){ e.stopPropagation(); var tb=document.querySelector('#tabs button[data-s="interv"]'); if(tb)tb.click(); }; });
   }
+  function tkxBloc(){
+    var arr=tkxLoad().filter(function(t){return t&&t.kind==='echange';});
+    var recus=arr.filter(tkxPourMoi), envoyes=arr.filter(tkxDeMoi);
+    if(!recus.length&&!envoyes.length)return '';
+    function carte(t,mien){
+      var e=TK_ETATS[t.etat]||TK_ETATS.a_faire;
+      var d=new Date(t.cree), dt=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' '+('0'+d.getHours()).slice(-2)+'h'+('0'+d.getMinutes()).slice(-2);
+      var h='<div class="card" style="border-left:4px solid '+e[1]+'"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
+        +'<b style="flex:1;min-width:140px">'+esc(t.objet)+'</b><span style="color:'+e[1]+';font-weight:700">'+e[0]+'</span></div>'
+        +'<div class="sub" style="margin:3px 0 0">'+(mien?('à '+esc(t.pourRole||t.pourUser||'—')):('de '+esc(t.deNom||'—')))+' · '+dt+'</div>'
+        +(t.message?('<div style="margin-top:6px">'+esc(t.message)+'</div>'):'');
+      if(t.contexte&&t.contexte.length){
+        h+='<details style="margin-top:6px"><summary class="sub" style="cursor:pointer">'+t.contexte.length+' élément(s) concerné(s)</summary>'
+          +'<div class="sub" style="margin:4px 0 0">'+t.contexte.map(function(l){return '• '+esc(l);}).join('<br>')+'</div></details>';
+      }
+      if(t.fil&&t.fil.length){
+        h+='<div style="margin-top:8px;border-top:1px solid var(--line);padding-top:6px">'
+          +t.fil.map(function(f){ var fd=new Date(f.at); return '<div class="sub" style="margin:0 0 3px"><b>'+esc(f.qui)+'</b> ('+('0'+fd.getHours()).slice(-2)+'h'+('0'+fd.getMinutes()).slice(-2)+') : '+esc(f.txt)+'</div>'; }).join('')
+          +'</div>';
+      }
+      h+='<div class="acts" style="margin-top:8px;gap:6px;flex-wrap:wrap">'
+        +Object.keys(TK_ETATS).map(function(k){ return '<button type="button" class="tkx-e" data-id="'+esc(t.id)+'" data-e="'+k+'" style="font-size:12px'+(t.etat===k?';border-color:'+TK_ETATS[k][1]:'')+'">'+TK_ETATS[k][0]+'</button>'; }).join('')
+        +'<button type="button" class="tkx-r" data-id="'+esc(t.id)+'" style="font-size:12px">💬 Répondre</button></div>';
+      return h+'</div>';
+    }
+    var out='';
+    if(recus.length)out+='<div class="lab" style="margin:10px 0 5px">📥 Ce qu’on me demande ('+recus.length+')</div>'+recus.map(function(t){return carte(t,false);}).join('');
+    if(envoyes.length)out+='<div class="lab" style="margin:14px 0 5px">📤 Ce que j’ai demandé ('+envoyes.length+')</div>'+envoyes.map(function(t){return carte(t,true);}).join('');
+    return out;
+  }
+  function tkxWire(wrap){
+    wrap.querySelectorAll('.tkx-e').forEach(function(b){ b.onclick=function(){ tkxRepondre(b.getAttribute('data-id'),b.getAttribute('data-e'),''); }; });
+    wrap.querySelectorAll('.tkx-r').forEach(function(b){ b.onclick=function(){ var m=prompt('Ta réponse :'); if(m)tkxRepondre(b.getAttribute('data-id'),'',m); }; });
+  }
   function renderTickets(){
     var wrap=byId('tk-body'); if(!wrap)return; var T=tkLoad();
     var typeOpts=Object.keys(TK_TYPES).map(function(k){ var n=(typeof FA!=='undefined'?FA:[]).filter(function(a){return TK_TYPES[k].missing(a);}).length; return '<option value="'+k+'">'+TK_TYPES[k].lbl+' ('+n+' agents concernés)</option>'; }).join('');
@@ -4390,7 +4424,8 @@ button.big:active{transform:translateY(1px)}
       }
       return h+'</div>';
     }).join(''):'<div class="card"><div class="sub" style="margin:0">Aucun ticket pour l\'instant. Crée-en un ci-dessus.</div></div>';
-    wrap.innerHTML=create+list;
+    wrap.innerHTML=tkxBloc()+create+list;
+    tkxWire(wrap);
     if(byId('tk-create'))byId('tk-create').onclick=function(){ var type=byId('tk-type').value, ty=TK_TYPES[type]; if(!ty)return; var ids=(typeof FA!=='undefined'?FA:[]).filter(function(a){return ty.missing(a);}).map(function(a){return a.id;}); if(!ids.length){ alert('Aucun agent concerné — rien à faire pour cette tâche.'); return; }
       // Remontée #22 : dimensions échéance (escalade si dépassée) + notification programmée.
       var _dueV=byId('tk-due')?byId('tk-due').value:'', _nfV=byId('tk-notifat')?byId('tk-notifat').value:'';
@@ -5195,7 +5230,12 @@ button.big:active{transform:translateY(1px)}
   var AIDIR={'both':'entrants + sortants','in':'entrants seulement','out':'sortants seulement'};
   function aiNumAdd(){ var ni=byId('ai-num-in'),nl=byId('ai-num-lbl'),nd=byId('ai-num-dir'); if(!ni)return; var n=(ni.value||'').replace(/[^\d+]/g,''); if(!n){ni.focus();return;} var a=aiNumLoad(); if(!a.some(function(x){return (x.n||'').replace(/\D/g,'').slice(-9)===n.replace(/\D/g,'').slice(-9);})){ a.push({n:n,lbl:(nl.value||'').trim(),dir:nd.value||'both'}); aiNumSave(a); } ni.value='';nl.value=''; renderSupervision(); }
   function aiNumDel(i){ var a=aiNumLoad(); a.splice(i,1); aiNumSave(a); renderSupervision(); }
-  function aiSimulate(){ aiDetected.unshift({cdr_id:'SIM'+Date.now(),at:Date.now(),number:'0383556677',direction:'in',start:new Date().toISOString(),resume:'Aquila demande des agents pour deux sites ; Securitas signale une alarme.',demandes:[{nature:'gardiennage',client:'AQUILA (simulation)',ville:'Houdemont',cp:'54180',site:'Aquila Houdemont',type_site:'Magasin',nb_agents:'1',urgent:true,vacations:[{date:'vendredi 01/08',horaires:'20h00 → 08h00'},{date:'samedi 02/08',horaires:'20h00 → 08h00'}]},{nature:'gardiennage',client:'AQUILA (simulation)',ville:'Nancy',cp:'54000',site:'Aquila Nancy Centre',type_site:'Magasin',nb_agents:'1',urgent:false,vacations:[]},{nature:'intervention',client:'SECURITAS (simulation)',ville:'Dijon',cp:'21000',site:'Alarme entrepôt Dijon',type_site:'Entrepôt',nb_agents:'1',urgent:true,vacations:[]}],_sim:true}); aiAutoCreate(); var tb=document.querySelector('#tabs button[data-s="suivi"]'); if(tb)tb.click(); if(typeof suiviBucket!=='undefined'){suiviBucket='recherche';} if(typeof renderSuivi==='function')renderSuivi(); alert('🤖 Simulation (appel mixte) : l\'IA a AIGUILLÉ 3 demandes selon leur nature.\n\n➡️ GARDIENNAGE → Suivi demandes → En recherche :\n• Aquila Houdemont : 2 vacations datées → mention violette « à vérifier ».\n• Aquila Nancy Centre : AUCUNE date → bandeau ROUGE « à compléter » + Supervision → Opérationnel.\n\n➡️ INTERVENTION sur alarme → section Interventions → En recherche :\n• Securitas / Alarme entrepôt Dijon → carte violette « à vérifier » + cascade d\'appels aux agents de la zone (Côte-d\'Or).\n\nOuvre l\'onglet 🚨 Interventions pour la voir. Clique « Vérifiée, confirmer » pour lever la mention.\n\n🔒 Simulation LOCALE — non synchronisée dans le cloud (disparaît au rechargement).'); }
+  /* b243 : la simulation d'appel est SUPPRIMEE. Elle injectait une fausse demande AQUILA Houdemont
+     qui, une fois validee, devenait une vraie vacation avec de vrais tickets d'appel — donc du bruit
+     dans les pastilles et dans le Planning de production. Le mode demo (?sandbox=1&demo=...) fait
+     le meme travail sans jamais toucher aux donnees reelles. Decision Zeus, 03/08/2026. */
+  function aiSimulate(){ return; }
+
   function aiNumImportClients(){ var tm={}; try{tm=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(e){} var a=aiNumLoad(),added=0; Object.keys(tm).forEach(function(cli){ var n=tm[cli]; if(!n)return; var k=String(n).replace(/\D/g,'').slice(-9); if(!a.some(function(x){return (x.n||'').replace(/\D/g,'').slice(-9)===k;})){ a.push({n:n,lbl:cli,dir:'both'}); added++; } }); aiNumSave(a); alert(added+' client(s) ajouté(s) à la liste des numéros suivis.'); renderSupervision(); }
   function roKey(n){ var d=String(n||'').replace(/\D/g,''); if(d.length>9)d=d.slice(-9); return d; }
   // Fenêtre de rapprochement Ringover (± minutes autour de l'heure prévue) — réglable, défaut 15 min.
@@ -5718,6 +5758,65 @@ button.big:active{transform:translateY(1px)}
       b.className=ouvert?'on':''; b.onclick=function(){ ouvert?pcQuitter():pcPrendre(); }; }
   }
   function pcDepuis(x){ try{ return (typeof ppSince==='function')?ppSince(Date.now()-x.debut):(Math.round((Date.now()-x.debut)/60000)+' min'); }catch(e){ return ''; } }
+  /* ===== b242 : TICKETS ENTRE COLLABORATEURS =====
+     POURQUOI : constater que 3 vacations sont sans agent ne suffit pas — il faut pouvoir demander a
+     quelqu'un de s'en occuper, et savoir ce qu'il en a fait. Sans ca, la relance se perd dans un appel
+     ou un message qui ne laisse aucune trace.
+     COMMENT : depuis n'importe quelle pastille, « Demander un point » cree un ticket qui EMBARQUE le
+     contexte (la liste exacte qu'on regarde). Le destinataire le voit dans 🎫 Tickets, repond en deux
+     clics (Fait / En cours / Bloque + un mot), et l'emetteur est notifie du retour.
+     Stockage : fkh_tickets, deja partage par le cloud. */
+  var TK_ETATS={a_faire:['\u23f3 À faire','#e0a13b'],en_cours:['🔄 En cours','#6ea8fe'],fait:['\u2705 Fait','#1a9e5c'],bloque:['\u26d4 Bloqué','#e5322d']};
+  function tkxLoad(){ var a=load('fkh_tickets'); return Array.isArray(a)?a:[]; }
+  function tkxSave(a){ save('fkh_tickets',a); }
+  function tkxMoi(){ try{ return (typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'moi'; }catch(e){ return 'moi'; } }
+  function tkxMonNom(){ try{ return (typeof opNow==='function'&&opNow())||tkxMoi(); }catch(e){ return tkxMoi(); } }
+  function tkxPourMoi(t){
+    if(!t||t.kind!=='echange')return false;
+    var r=drRole(); if(t.pourUser&&t.pourUser===tkxMoi())return true;
+    if(t.pourRole){ if(t.pourRole===r)return true; if(t.pourRole==='superadmin'&&(r==='full'||r==='superadmin'))return true; }
+    return false;
+  }
+  function tkxDeMoi(t){ return t&&t.kind==='echange'&&t.deUser===tkxMoi(); }
+  function tkxCreer(o){
+    var arr=tkxLoad();
+    arr.push({id:'tx'+Date.now()+'_'+Math.round(Math.random()*9999),kind:'echange',
+      objet:o.objet||'Point à faire', message:o.message||'', contexte:o.contexte||[], source:o.source||'',
+      deUser:tkxMoi(), deNom:tkxMonNom(), pourRole:o.pourRole||'', pourUser:o.pourUser||'',
+      etat:'a_faire', cree:Date.now(), fil:[]});
+    tkxSave(arr);
+    try{ if(typeof notifScan==='function')notifScan(); }catch(e){}
+    return true;
+  }
+  function tkxRepondre(id,etat,mot){
+    var arr=tkxLoad();
+    for(var i=0;i<arr.length;i++){ if(arr[i].id!==id)continue;
+      if(etat)arr[i].etat=etat;
+      if(mot)arr[i].fil.push({qui:tkxMonNom(),at:Date.now(),txt:mot,etat:etat||''});
+      arr[i].maj=Date.now(); arr[i].luPar=''; break; }
+    tkxSave(arr); if(typeof renderTickets==='function')renderTickets(); if(typeof ppRefresh==='function')ppRefresh();
+  }
+  /* Le formulaire de demande, ouvert depuis la pastille : on ne quitte pas la vue. */
+  function tkxDemander(source,titre,lignes){
+    var old=byId('tkx-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='tkx-pop';
+    pop.style.cssText='position:fixed;inset:8% 6%;z-index:210;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+    var ops=[['superviseur','👤 Les superviseurs'],['admin','👤 Les administrateurs'],['operateur','👤 Les opérateurs'],['superadmin','👤 Le super-admin']];
+    pop.innerHTML='<div style="display:flex;align-items:center;gap:8px"><b style="flex:1">🎫 Demander un point</b><button type="button" id="tkx-x">✕</button></div>'
+      +'<label class="f" style="margin-top:8px"><div class="lab">Objet</div><input id="tkx-obj" value="'+esc(titre)+'"></label>'
+      +'<label class="f" style="margin-top:6px"><div class="lab">À qui ?</div><select id="tkx-pour">'+ops.map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></label>'
+      +'<label class="f" style="margin-top:6px"><div class="lab">Ton message</div><input id="tkx-msg" placeholder="Ex. Tu as regardé ces vacations ? Dis-moi où tu en es."></label>'
+      +'<div class="lab" style="margin:10px 0 4px">Ce qui sera joint au ticket ('+lignes.length+')</div>'
+      +'<div class="sub" style="margin:0">'+lignes.map(function(l){return '• '+esc(l);}).join('<br>')+'</div>'
+      +'<div class="acts" style="margin-top:12px"><button type="button" id="tkx-go" class="ok">📤 Envoyer le ticket</button></div>';
+    document.body.appendChild(pop);
+    byId('tkx-x').onclick=function(){ pop.parentNode.removeChild(pop); };
+    byId('tkx-go').onclick=function(){
+      tkxCreer({objet:byId('tkx-obj').value||titre, message:byId('tkx-msg').value||'', contexte:lignes, source:source, pourRole:byId('tkx-pour').value});
+      pop.parentNode.removeChild(pop);
+      alert('Ticket envoyé. Tu verras sa réponse dans 🎫 Tickets, et la cloche te préviendra.');
+    };
+  }
   function ppRefresh(){ try{setTimeout(ppPlacer,0);}catch(e){} var hide=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); // b150 : réservé superviseur/admin/super-admin
     var sc=hide?null:ppScan(), any=false;
     ['op','cli','ph','te','c2','ro','af','rt','gp','pc','an'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
@@ -5893,6 +5992,19 @@ button.big:active{transform:translateY(1px)}
       h+='<div class="acts" style="margin-bottom:8px"><span class="sub" style="margin:0">'+L.length+' en attente · '+D.depuis+'</span></div>'+rowsOf(L);
     }
     box.innerHTML=h;
+    /* b242 : depuis n'importe quelle pastille, demander un point a quelqu'un — le contexte part avec. */
+    try{
+      var _lg=[]; (L||[]).slice(0,25).forEach(function(x){
+        _lg.push([(x.site||x.agent||''),(x.mdate?(' · '+String(x.mdate).split('-').reverse().join('/')):''),(x.heure?(' '+x.heure):'')].join(''));
+      });
+      if(_lg.length&&!byId('pp-ask')){
+        var _ttl=(D.title||'')+' — '+(L||[]).length+' '+(D.verb||'élément(s)');
+        var _bar=document.createElement('div'); _bar.className='acts'; _bar.style.marginTop='10px';
+        _bar.innerHTML='<button type="button" id="pp-ask" style="font-size:13px">🎫 Demander un point à…</button>';
+        box.appendChild(_bar);
+        byId('pp-ask').onclick=function(){ tkxDemander(PP_VIEW.mode,_ttl,_lg); };
+      }
+    }catch(_e){}
     var cl=byId('pp-close'); if(cl)cl.onclick=ppClose;
 box.querySelectorAll('.an-ok').forEach(function(b){ b.onclick=function(){ if(confirm('Confirmer l’annulation ?\n\nLa vacation sort du Planning et ses tickets d’appel disparaissent. Pense à prévenir l’agent s’il y en a un.'))annulTrancher(b.getAttribute('data-id'),true); }; });
     box.querySelectorAll('.an-ko').forEach(function(b){ b.onclick=function(){ annulTrancher(b.getAttribute('data-id'),false); }; });
@@ -6294,7 +6406,7 @@ box.querySelectorAll('.an-ok').forEach(function(b){ b.onclick=function(){ if(con
       var operNamesCard=(typeof isSuperAdmin==='function'&&!isSuperAdmin())?'':'<details class="card"><summary style="cursor:pointer;font-weight:700">👤 Noms des comptes (tous les niveaux — traçabilité)</summary><div style="margin-top:8px"><p class="sub" style="margin:0 0 6px;font-size:11.5px">Donne un nom lisible à chaque compte (opérateur, superviseur, admin, super‑admin). Ce ne sont <b>PAS</b> les mots de passe — juste des étiquettes. <b>Réservé au super‑administrateur.</b></p><div class="list">'+operKnownLabels().map(function(l){ return '<div class="it" style="gap:8px"><span style="min-width:110px;font-weight:600">'+esc(l)+'</span><input class="opernom-in" data-lbl="'+esc(l)+'" value="'+esc(operNamesLoad()[l]||'')+'" placeholder="Nom (ex. Aïcha)" style="flex:1"></div>'; }).join('')+'</div></div></details>';
       var testCallCard='<details class="card"><summary style="cursor:pointer;font-weight:700">🧪 Créer un appel de test</summary><div style="margin-top:8px"><p class="sub" style="margin:0 0 6px;font-size:11.5px">Crée un ticket « APPEL TEST » dans Suivi des appels, avec une prise dans X minutes (heure France). Même logique que les vrais appels (grisé jusqu\'à 5 min avant, décalage horaire pris en compte).</p><div class="acts" style="gap:6px;align-items:center"><span class="sub" style="margin:0">Prise dans</span><input type="number" id="sup-testcall-min" min="1" max="120" value="8" style="width:60px;padding:5px 6px"><span class="sub" style="margin:0">min</span><button type="button" class="ok" id="sup-testcall-btn">➕ Créer l\'appel de test</button></div></div></details>';
       var insertTicketCard='<details class="card"><summary style="cursor:pointer;font-weight:700">🎫 Insérer un ticket (date/heure au choix)</summary><div style="margin-top:8px"><p class="sub" style="margin:0 0 6px;font-size:11.5px">Ajoute un ticket libre dans Suivi des appels à la date et l\'heure que tu veux (rappel, tâche, note). Il apparaît dans le fil du jour choisi (vue « Tous »).</p><div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap"><span class="sub" style="margin:0">Le</span><input type="date" id="sup-ins-date" style="width:auto;padding:5px 8px"><span class="sub" style="margin:0">à</span><input type="time" id="sup-ins-heure" value="09:00" style="width:auto;padding:5px 8px"></div><input id="sup-ins-txt" placeholder="Objet du ticket (ex. Rappeler le client X…)" style="width:100%;margin:6px 0"><div class="acts"><button type="button" class="ok" id="sup-ins-btn">➕ Insérer dans Suivi des appels</button></div></div></details>';
-      var aiBlock=(function(){ var head='<div class="card" style="border:2px solid #7b61ff"><div class="lab" style="margin:0 0 6px;color:#7b61ff;display:flex;align-items:center;gap:8px;flex-wrap:wrap">🤖 Demandes détectées par IA (appels)'+(aiDetected.length?' — '+aiDetected.length:'')+'<button type="button" id="ai-scan-btn" style="margin-left:auto;font-size:11px">🔄 Scanner maintenant</button><button type="button" id="ai-reana-btn" style="font-size:11px" title="Re-analyser les appels récents avec la logique à jour (découpage par site)">🔁 Re-analyser</button><button type="button" id="ai-sim-btn" style="font-size:11px">🧪 Simuler le rendu</button></div>';
+      var aiBlock=(function(){ var head='<div class="card" style="border:2px solid #7b61ff"><div class="lab" style="margin:0 0 6px;color:#7b61ff;display:flex;align-items:center;gap:8px;flex-wrap:wrap">🤖 Demandes détectées par IA (appels)'+(aiDetected.length?' — '+aiDetected.length:'')+'<button type="button" id="ai-scan-btn" style="margin-left:auto;font-size:11px">🔄 Scanner maintenant</button><button type="button" id="ai-reana-btn" style="font-size:11px" title="Re-analyser les appels récents avec la logique à jour (découpage par site)">🔁 Re-analyser</button></div>';
         var nums=aiNumLoad(); var numConfig='<details style="margin:2px 0 8px"'+(nums.length?'':' open')+'><summary style="cursor:pointer;color:#7b61ff;font-size:12px">⚙️ Numéros suivis ('+nums.length+') — l\'IA n\'analyse QUE ceux-là</summary><div style="margin-top:6px">'+(nums.length?('<div class="list">'+nums.map(function(x,i){return '<div class="it" style="font-size:12px"><span style="flex:1">📞 '+esc(x.n)+(x.lbl?' — '+esc(x.lbl):'')+' <span style="color:var(--muted)">('+esc(AIDIR[x.dir||'both'])+')</span></span><button data-ainumdel="'+i+'" style="width:24px;height:24px;padding:0">✕</button></div>';}).join('')+'</div>'):'<div class="sub" style="margin:0;color:var(--warn)">⚠️ Aucun numéro suivi — la détection est inactive. Ajoute des numéros ci-dessous.</div>')+'<div class="acts" style="margin-top:6px;gap:5px;flex-wrap:wrap;align-items:center"><input id="ai-num-in" placeholder="Numéro…" inputmode="tel" style="width:120px"><input id="ai-num-lbl" placeholder="Nom (client…)" style="width:120px"><select id="ai-num-dir" style="width:auto;padding:5px"><option value="both">entrants + sortants</option><option value="in">entrants</option><option value="out">sortants</option></select><button class="ok" id="ai-num-add">➕ Ajouter</button><button id="ai-num-import" style="font-size:11px">📇 Importer mes clients</button></div></div></details>'; head+=numConfig;
         var totDem=0; aiDetected.forEach(function(c){ totDem+=((c.demandes||[]).length); });
         if(!totDem)return head+'<div class="sub" style="margin:0">Aucune demande détectée pour le moment. Le serveur scanne les numéros suivis toutes les 2 min.</div></div>';
@@ -6306,7 +6418,7 @@ box.querySelectorAll('.an-ok').forEach(function(b){ b.onclick=function(){ if(con
       var noDateDems=SUIVI.filter(svNoDate);
       var noDateCard=noDateDems.length?('<div class="card" style="border:2px solid var(--bad)"><div class="lab" style="margin:0 0 6px;color:var(--bad)">⚠️ Demandes en recherche SANS DATE — à compléter ('+noDateDems.length+')</div><div class="list">'+noDateDems.map(function(x){return '<div class="it" style="border-left:3px solid var(--bad);padding-left:8px"><div style="flex:1"><div class="fa-n">'+esc(x.titre||'Demande')+(x.client?' <span style="color:var(--muted);font-weight:400">— '+esc(x.client)+'</span>':'')+'</div><div class="fa-d" style="color:var(--muted)">'+esc([x.ville,x.cp].filter(Boolean).join(' ')||'—')+' · aucune date précisée</div></div><button data-nodate-go="'+esc(x.id)+'" style="font-size:12px">✏️ Compléter</button></div>';}).join('')+'</div></div>'):'';
       function wireNoDate(){ document.querySelectorAll('[data-nodate-go]').forEach(function(b){ b.onclick=function(){ var id=b.getAttribute('data-nodate-go'); var it=SUIVI.filter(function(m){return String(m.id)===String(id);})[0]; if(it)it._edit=true; var tb=document.querySelector('#tabs button[data-s="suivi"]'); if(tb)tb.click(); if(typeof suiviBucket!=='undefined')suiviBucket='recherche'; if(typeof renderSuivi==='function')renderSuivi(); }; }); }
-      function wireRo(){ if(byId('sup-ph-btn'))byId('sup-ph-btn').onclick=phScan; if(phMatches)phRender(); if(byId('sup-ro-date')&&!byId('sup-ro-date').value)byId('sup-ro-date').value=impTodayISO(); if(byId('sup-ro-btn'))byId('sup-ro-btn').onclick=roReportSup; if(byId('sup-ro-diag'))byId('sup-ro-diag').onclick=roProbe; if(byId('sup-testcall-btn'))byId('sup-testcall-btn').onclick=function(){ var mnv=byId('sup-testcall-min')?byId('sup-testcall-min').value:8; var rr=createTestCall(mnv); var tb=document.querySelector('#tabs button[data-s="suiviappels"]'); if(tb)tb.click(); if(byId('sa-from'))byId('sa-from').value=rr.mdateISO; if(byId('sa-to'))byId('sa-to').value=rr.mdateISO; if(typeof renderSuiviAppels==='function')renderSuiviAppels(); alert('✅ Appel de test créé : « APPEL TEST » — prise a '+rr.mheure+' (heure France) le '+rr.mdate+'. Tu es dans Suivi des appels, cale sur le bon jour : la case Fait sera cochable 5 min avant.'); }; if(byId('sup-ins-date')&&!byId('sup-ins-date').value)byId('sup-ins-date').value=impTodayISO(); if(byId('sup-ins-btn'))byId('sup-ins-btn').onclick=function(){ var _d=byId('sup-ins-date')?byId('sup-ins-date').value:'', _h=byId('sup-ins-heure')?byId('sup-ins-heure').value:'', _txt=(byId('sup-ins-txt')?byId('sup-ins-txt').value:'').trim(); if(!_d){alert('Choisis une date.');return;} if(!_txt){alert('Écris l\'objet du ticket.');return;} var _cs=csgLoad(); _cs.push({id:csgNewId(),texte:_txt,client:'',site:'',ville:'',cp:'',mdate:_d,heure:_h||'',done:false,note:''}); csgSave(_cs); var _tb=document.querySelector('#tabs button[data-s="suiviappels"]'); if(_tb)_tb.click(); if(byId('sa-from'))byId('sa-from').value=_d; if(byId('sa-to'))byId('sa-to').value=_d; if(typeof saType!=='undefined')saType='all'; if(typeof renderSuiviAppels==='function')renderSuiviAppels(); alert('🎫 Ticket inséré dans Suivi des appels le '+_d.split('-').reverse().join('/')+(_h?' à '+_h:'')+'.'); }; if(byId('sup-ro-win'))byId('sup-ro-win').onchange=function(){ var v=parseInt(this.value,10); if(!(v>0))v=15; try{localStorage.setItem('fkh_ro_win',String(v));}catch(e){} if(typeof cloudPush==='function')cloudPush('fkh_ro_win'); if(roCalls)roReportSup(); }; document.querySelectorAll('.opernom-in').forEach(function(inp){ inp.onchange=function(){ var mmn=operNamesLoad(),l=inp.getAttribute('data-lbl'),v=(inp.value||'').trim(); if(v)mmn[l]=v; else delete mmn[l]; try{localStorage.setItem('fkh_oper_names',JSON.stringify(mmn));}catch(e){} if(typeof cloudPush==='function')cloudPush('fkh_oper_names'); if(typeof renderSuiviAppels==='function')renderSuiviAppels(); }; }); if(byId('ai-scan-btn'))byId('ai-scan-btn').onclick=function(){aiScanNow(false);}; if(byId('ai-reana-btn'))byId('ai-reana-btn').onclick=function(){aiScanNow(true);}; if(byId('ai-sim-btn'))byId('ai-sim-btn').onclick=aiSimulate; document.querySelectorAll('[data-aicreate]').forEach(function(b){ b.onclick=function(){ aiCreateDemande(b.getAttribute('data-aicreate')); }; }); document.querySelectorAll('[data-aidismiss]').forEach(function(b){ b.onclick=function(){ aiDismiss(b.getAttribute('data-aidismiss')); }; }); if(byId('ai-num-add'))byId('ai-num-add').onclick=aiNumAdd; if(byId('ai-num-import'))byId('ai-num-import').onclick=aiNumImportClients; document.querySelectorAll('[data-ainumdel]').forEach(function(b){ b.onclick=function(){ aiNumDel(+b.getAttribute('data-ainumdel')); }; }); }
+      function wireRo(){ if(byId('sup-ph-btn'))byId('sup-ph-btn').onclick=phScan; if(phMatches)phRender(); if(byId('sup-ro-date')&&!byId('sup-ro-date').value)byId('sup-ro-date').value=impTodayISO(); if(byId('sup-ro-btn'))byId('sup-ro-btn').onclick=roReportSup; if(byId('sup-ro-diag'))byId('sup-ro-diag').onclick=roProbe; if(byId('sup-testcall-btn'))byId('sup-testcall-btn').onclick=function(){ var mnv=byId('sup-testcall-min')?byId('sup-testcall-min').value:8; var rr=createTestCall(mnv); var tb=document.querySelector('#tabs button[data-s="suiviappels"]'); if(tb)tb.click(); if(byId('sa-from'))byId('sa-from').value=rr.mdateISO; if(byId('sa-to'))byId('sa-to').value=rr.mdateISO; if(typeof renderSuiviAppels==='function')renderSuiviAppels(); alert('✅ Appel de test créé : « APPEL TEST » — prise a '+rr.mheure+' (heure France) le '+rr.mdate+'. Tu es dans Suivi des appels, cale sur le bon jour : la case Fait sera cochable 5 min avant.'); }; if(byId('sup-ins-date')&&!byId('sup-ins-date').value)byId('sup-ins-date').value=impTodayISO(); if(byId('sup-ins-btn'))byId('sup-ins-btn').onclick=function(){ var _d=byId('sup-ins-date')?byId('sup-ins-date').value:'', _h=byId('sup-ins-heure')?byId('sup-ins-heure').value:'', _txt=(byId('sup-ins-txt')?byId('sup-ins-txt').value:'').trim(); if(!_d){alert('Choisis une date.');return;} if(!_txt){alert('Écris l\'objet du ticket.');return;} var _cs=csgLoad(); _cs.push({id:csgNewId(),texte:_txt,client:'',site:'',ville:'',cp:'',mdate:_d,heure:_h||'',done:false,note:''}); csgSave(_cs); var _tb=document.querySelector('#tabs button[data-s="suiviappels"]'); if(_tb)_tb.click(); if(byId('sa-from'))byId('sa-from').value=_d; if(byId('sa-to'))byId('sa-to').value=_d; if(typeof saType!=='undefined')saType='all'; if(typeof renderSuiviAppels==='function')renderSuiviAppels(); alert('🎫 Ticket inséré dans Suivi des appels le '+_d.split('-').reverse().join('/')+(_h?' à '+_h:'')+'.'); }; if(byId('sup-ro-win'))byId('sup-ro-win').onchange=function(){ var v=parseInt(this.value,10); if(!(v>0))v=15; try{localStorage.setItem('fkh_ro_win',String(v));}catch(e){} if(typeof cloudPush==='function')cloudPush('fkh_ro_win'); if(roCalls)roReportSup(); }; document.querySelectorAll('.opernom-in').forEach(function(inp){ inp.onchange=function(){ var mmn=operNamesLoad(),l=inp.getAttribute('data-lbl'),v=(inp.value||'').trim(); if(v)mmn[l]=v; else delete mmn[l]; try{localStorage.setItem('fkh_oper_names',JSON.stringify(mmn));}catch(e){} if(typeof cloudPush==='function')cloudPush('fkh_oper_names'); if(typeof renderSuiviAppels==='function')renderSuiviAppels(); }; }); if(byId('ai-scan-btn'))byId('ai-scan-btn').onclick=function(){aiScanNow(false);}; if(byId('ai-reana-btn'))byId('ai-reana-btn').onclick=function(){aiScanNow(true);}; document.querySelectorAll('[data-aicreate]').forEach(function(b){ b.onclick=function(){ aiCreateDemande(b.getAttribute('data-aicreate')); }; }); document.querySelectorAll('[data-aidismiss]').forEach(function(b){ b.onclick=function(){ aiDismiss(b.getAttribute('data-aidismiss')); }; }); if(byId('ai-num-add'))byId('ai-num-add').onclick=aiNumAdd; if(byId('ai-num-import'))byId('ai-num-import').onclick=aiNumImportClients; document.querySelectorAll('[data-ainumdel]').forEach(function(b){ b.onclick=function(){ aiNumDel(+b.getAttribute('data-ainumdel')); }; }); }
       if(!opr.length){ wrap.innerHTML=geoCard+roCard+operNamesCard+testCallCard+insertTicketCard+noDateCard+'<div class="card"><div class="sub" style="margin:0">✅ Rien à traiter dans l\'immédiat. Tout est sous contrôle.</div></div>'; wireRo(); wireNoDate(); return; }
       var shownO=supOperShowDone?opr:activeO; SUP_OPER=shownO;
       function itHtml(a){ var i=SUP_OPER.indexOf(a); var isDone=a._done; return '<div class="it oper-it" data-op="'+i+'" style="cursor:pointer;flex-direction:column;align-items:stretch'+(isDone?';opacity:.5':'')+'"><div style="display:flex;align-items:center;width:100%"><label class="chk" style="margin:0 8px 0 0" title="Marquer traité"><input type="checkbox" class="oper-done-cb" data-okey="'+esc(a._key)+'"'+(isDone?' checked':'')+'></label><div style="flex:1"><div class="fa-n">'+(a.step?'<span style="display:inline-block;font-size:11px;font-weight:700;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 7px;margin-right:6px">'+esc(a.step)+'</span>':'')+a.ic+' '+esc(a.type)+(a.agent?' — '+esc(a.agent):'')+(isDone?(a._why==='justifie'?' <span style="color:var(--muted);font-weight:400">🚫 justifié (pas une anomalie)</span>':' <span style="color:var(--ok);font-weight:400">✓ traité</span>'):'')+'</div>'+(a.ctx?'<div class="fa-d">'+a.ctx+'</div>':'')+'<div class="fa-d" style="color:var(--muted)">'+[esc(a.when),esc(a.detail)].filter(Boolean).join(' · ')+(a.timerCt?' · <span class="oper-timer" data-ct="'+a.timerCt+'" data-lbl="'+esc(a.timerLbl||'non fait depuis')+'" style="font-weight:700"></span>':'')+'</div></div><div style="color:var(--muted);font-size:16px;margin-left:6px">▾</div></div><div class="oper-panel hidden" data-op="'+i+'" style="margin-top:8px"></div></div>'; }
@@ -6506,7 +6618,7 @@ box.querySelectorAll('.an-ok').forEach(function(b){ b.onclick=function(){ if(con
     {k:'appel_danger',   ic:'⛔', lbl:'Prise/fin de service non pointée (+10 min)'},
     {k:'nouvelle_demande',ic:'🆕', lbl:'Nouvelle demande reçue (en recherche)'},
     {k:'demande_1h',     ic:'🕵️', lbl:'Demande en recherche depuis + d\'1 h'},
-    {k:'annul_mail',    ic:'🔴', lbl:'Annulation reçue par mail (à confirmer)'},{k:'pc_vacant',     ic:'🎧', lbl:'Personne au PC (poste vacant)'},{k:'mail_arret', ic:'📧', lbl:'Collecte des mails à l’arrêt (+15 min)'},{k:'prise_retard',   ic:'🕓', lbl:'Agent en retard à la prise de service'}
+    {k:'annul_mail',    ic:'🔴', lbl:'Annulation reçue par mail (à confirmer)'},{k:'ticket_recu',   ic:'🎫', lbl:'Ticket qui m’est adressé'},{k:'ticket_reponse',ic:'💬', lbl:'Retour sur un ticket que j’ai envoyé'},{k:'pc_vacant',     ic:'🎧', lbl:'Personne au PC (poste vacant)'},{k:'mail_arret', ic:'📧', lbl:'Collecte des mails à l’arrêt (+15 min)'},{k:'prise_retard',   ic:'🕓', lbl:'Agent en retard à la prise de service'}
   ];
   function notifLoadCfg(){ var c=null; try{c=JSON.parse(localStorage.getItem('fkh_notif_cfg')||'null');}catch(e){} if(!c||typeof c!=='object')c={}; if(typeof c.on!=='boolean')c.on=false; if(typeof c.sound!=='boolean')c.sound=true; if(!c.cats||typeof c.cats!=='object')c.cats={}; NOTIF_CATS.forEach(function(t){ if(typeof c.cats[t.k]!=='boolean')c.cats[t.k]=true; }); NOTIF.cfg=c; }
   function notifSaveCfg(){ try{localStorage.setItem('fkh_notif_cfg',JSON.stringify(NOTIF.cfg));}catch(e){} }
@@ -6516,6 +6628,12 @@ box.querySelectorAll('.an-ok').forEach(function(b){ b.onclick=function(){ if(con
   function notifFire(a){ try{ var n=new Notification(a.title,{body:a.body,tag:a.cat+':'+a.key}); n.onclick=function(){ try{window.focus();}catch(e){} var btn=document.querySelector('#tabs button[data-s="'+a.go+'"]'); if(btn)btn.click(); try{n.close();}catch(e){} }; }catch(e){} notifBeep(); }
   function notifThresholdAlerts(){
     var now=Date.now(), out=[];
+    /* b242 : un ticket qui m'est adresse et qui n'est pas clos est une alerte ; une reponse a mon ticket aussi. */
+    try{ tkxLoad().forEach(function(t){
+      if(t.kind!=='echange')return;
+      if(tkxPourMoi(t)&&t.etat!=='fait'){ out.push({cat:'ticket_recu',key:'tkr'+t.id,title:'🎫 '+t.objet,body:(t.deNom||'')+' attend un retour de toi.',when:(typeof impTodayISO==='function'?impTodayISO():'')}); }
+      else if(tkxDeMoi(t)&&t.fil&&t.fil.length&&t.etat!=='a_faire'){ out.push({cat:'ticket_reponse',key:'tkp'+t.id+'_'+t.fil.length,title:'💬 Retour — '+t.objet,body:(TK_ETATS[t.etat]||['',''])[0]+' · '+(t.fil[t.fil.length-1].txt||''),when:(typeof impTodayISO==='function'?impTodayISO():'')}); }
+    }); }catch(_e){}
     /* b229 : une annulation non tranchee est une alerte — elle part aussi en notification telephone. */
     try{ if(annulVisible())annulListe().forEach(function(x){
       out.push({cat:'annul_mail',key:'an'+x.id, title:'🔴 Annulation signalée — '+x.site,
