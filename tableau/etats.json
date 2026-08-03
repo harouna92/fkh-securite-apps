@@ -3,6 +3,22 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 271,
+      "titre": "Bon de commande : le sujet du mail fait foi, comme côté serveur",
+      "source": "Zeus — relance",
+      "theme": "Mails & collecte",
+      "local": true,
+      "pourquoipas": "Se vérifiera sur le prochain bon de commande reçu."
+    },
+    {
+      "b": 272,
+      "titre": "Pastille 📷 : 5 vues — sans photo, photo REFUSÉE, photo hors délai (prise et fin)",
+      "source": "Zeus",
+      "theme": "Photos & preuves",
+      "local": true,
+      "pourquoipas": "Se voit en ouvrant la pastille 📷 : les 5 tuiles."
+    },
+    {
       "b": 267,
       "titre": "« L'agent a refusé d'envoyer la photo » + origine du retard (saisi / déduit)",
       "source": "Zeus",

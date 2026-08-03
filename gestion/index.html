@@ -223,7 +223,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b271</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b272</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -6089,7 +6089,23 @@ button.big:active{transform:translateY(1px)}
       if(!isTe){ if(now<due+60000)return; var start=isC2?0:PP_START; if(start==null||due<start)return; } // b166 : photos controle = tout l'historique ; b167 : la tenue gere sa propre fenetre
       var r=(S[e.mid]&&S[e.mid][e.key])||{};
       var it={tel:e.agentTel||'',mid:e.mid,key:e.key,label:e.label,site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:due,since:now-due};
-      if(isPF){ if(!r.done)sc.op.push(it); if(!r.avise)sc.cli.push(it); if(!(r.photoKey||r.photo))sc.ph.push(it); }
+      if(isPF){ if(!r.done)sc.op.push(it); if(!r.avise)sc.cli.push(it);
+        /* b272 (regle Zeus) : tout le suivi photo d'une prise ou d'une fin tient dans CETTE pastille.
+           Trois situations, qu'il ne faut surtout pas confondre :
+             manq  = pas de photo, on relance ;
+             refus = l'agent a dit non, on ne relance plus mais on trace ;
+             delai = la photo existe, mais prise a plus de 5 min de l'heure prevue — on appelle pour comprendre.
+           Sans cette separation, on relancait un agent qui avait refuse, et on ne voyait jamais les
+           photos faites hors delai puisque la ligne disparaissait des qu'une photo arrivait. */
+        var _aPhoto=!!(r.photoKey||r.photo);
+        if(!_aPhoto){ it.sousvue=r.refusPhoto?'refus':'manq'; sc.ph.push(it); }
+        else {
+          var _ec=null;
+          try{ if(r.at&&it.heure){ var _d=new Date(r.at), _pm=toMin(it.heure), _am=_d.getHours()*60+_d.getMinutes();
+                 if(_pm!=null){ var _v=_am-_pm; if(_v<-720)_v+=1440; if(_v>720)_v-=1440; _ec=_v; } } }catch(_e){}
+          if(_ec!=null&&Math.abs(_ec)>=5){ it.sousvue='delai'; it.ecartMin=_ec; it.photoAt=r.at||0; sc.ph.push(it); }
+        }
+      }
       else if(isTe){ // b167 : entre dans la liste 12 h AVANT la prise, y RESTE tant que la PHOTO de controle n'est pas deposee
         if(r.photoKey||r.tenuePhoto)return;
         if(now<due-43200000)return;
@@ -6557,11 +6573,34 @@ button.big:active{transform:translateY(1px)}
       var LL3=L.filter(function(x){return x.phase===PP_VIEW.sub;});
       h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+LL3.length+' agent(s) · '+(PP_VIEW.sub==='avant'?'avant la prise':PP_VIEW.sub==='pendant'?'en service':'service terminé')+' · '+D.verb+'</span></div>'+rowsOf(LL3);
     } else if(D.tiles&&!PP_VIEW.sub){
-      h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="prise"><b>'+pr.length+'</b>🟢 Prises de service<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div><div class="pp-tile" data-sub="fin"><b>'+fi.length+'</b>🔚 Fins de service<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div></div>';
+      /* b272 : cinq entrees — manquantes, refusees, hors delai — separees prise / fin. */
+      var _mq=L.filter(function(x){return (x.sousvue||'manq')==='manq';});
+      var _rf=L.filter(function(x){return x.sousvue==='refus';});
+      var _dl=L.filter(function(x){return x.sousvue==='delai';});
+      function _n(a2,k){ return a2.filter(function(x){return x.key===k;}).length; }
+      function _tuile(sub,nb,titre,soustitre,couleur){
+        return '<div class="pp-tile" data-sub="'+sub+'"'+(couleur?(' style="border-color:'+couleur+'"'):'')+'><b>'+nb+'</b>'+titre
+          +'<br><span class="sub" style="margin:0;font-size:11.5px">'+soustitre+'</span></div>';
+      }
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap">'
+        +_tuile('prise',_n(_mq,'prise'),'🟢 Prises de service','sans photo','')
+        +_tuile('fin',_n(_mq,'fin'),'🔚 Fins de service','sans photo','')
+        +_tuile('rprise',_n(_rf,'prise'),'🚫 Prises','photo REFUSÉE','#e5322d')
+        +_tuile('rfin',_n(_rf,'fin'),'🚫 Fins','photo REFUSÉE','#e5322d')
+        +_tuile('delai',_dl.length,'\u23F1 Hors délai','photo faite à plus de 5 min','#e0a13b')
+        +'</div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+' · une échéance entre ici 1 min après son heure prévue. Clique sur une tuile pour le détail par vacation (durée écoulée).</p>';
     } else if(D.tiles&&PP_VIEW.sub){
-      var LL=(PP_VIEW.sub==='prise')?pr:fi;
-      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+LL.length+' '+(PP_VIEW.sub==='prise'?'prise(s)':'fin(s)')+' · '+D.verb+'</span></div>'+rowsOf(LL);
+      /* b272 : chaque tuile ouvre sa propre famille. */
+      var _sv=PP_VIEW.sub, LL;
+      if(_sv==='rprise'||_sv==='rfin'){ LL=L.filter(function(x){return x.sousvue==='refus'&&x.key===(_sv==='rprise'?'prise':'fin');}); }
+      else if(_sv==='delai'){ LL=L.filter(function(x){return x.sousvue==='delai';})
+        .sort(function(u,v){ return Math.abs(v.ecartMin||0)-Math.abs(u.ecartMin||0); }); }
+      else { LL=L.filter(function(x){return (x.sousvue||'manq')==='manq'&&x.key===_sv;}); }
+      /* b272 : l'entete dit ce qu'on regarde vraiment — « sans photo » n'a aucun sens sur la vue
+         des photos hors delai, ni sur celle des refus. */
+      var _lbl={prise:'prise(s) sans photo',fin:'fin(s) sans photo',rprise:'prise(s) — photo REFUSÉE par l’agent',rfin:'fin(s) — photo REFUSÉE par l’agent',delai:'photo(s) faite(s) hors délai (plus de 5 min d’écart)'}[_sv]||'';
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+LL.length+' '+_lbl+'</span></div>'+rowsOf(LL);
     } else {
       h+='<div class="acts" style="margin-bottom:8px"><span class="sub" style="margin:0">'+L.length+' en attente · '+D.depuis+'</span></div>'+rowsOf(L);
     }
