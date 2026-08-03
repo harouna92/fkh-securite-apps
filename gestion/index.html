@@ -2765,6 +2765,16 @@ button.big:active{transform:translateY(1px)}
       quoi:'L’application vue par un opérateur.',
       aFaire:'Dans la barre, tu vois « 🎧 Prise de service PC » — il n’existe que pour les opérateurs. Clique dessus : il passe au vert « Fin de service PC ». Repasse en « super-admin » avec le bandeau : le bouton disparaît, mais la pastille 🎧 t’affiche qui tient le poste.',
       monter:function(){ try{localStorage.setItem('fkh_pc_poste',JSON.stringify({postes:[]}));}catch(e){} } },
+    tenues:{ titre:'📦 Tenues envoyées non confirmées',
+      quoi:'Deux agents attendent leur tenue depuis 6 et 11 jours, sans confirmation de réception.',
+      aFaire:'Ouvre la pastille 📦. Change le délai (4 → 8 jours) : un des deux sort de la liste. Sur l’autre, clique « +2 j » : il disparaît, et reviendra dans 2 jours. Puis « ✅ Il l’a reçu » : la ligne se ferme pour de bon.',
+      monter:function(){ try{
+        var D=(typeof distLoad==='function')?distLoad():{};
+        function iso(j){ var d=new Date(Date.now()-j*86400000); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+        D['demo agent alpha']={nom:'DEMO Agent ALPHA',statut:'envoye',pieces:'2 polos + 1 pantalon',dateEnvoi:iso(6),dateRecu:'',urgence:''};
+        D['demo agent beta']={nom:'DEMO Agent BETA',statut:'envoye',pieces:'1 parka + 1 paire de chaussures',dateEnvoi:iso(11),dateRecu:'',urgence:''};
+        save('fkh_tenues_dist',D); localStorage.removeItem('fkh_td_delai');
+      }catch(e){} } },
     reponse:{ titre:'✅ Comment l’auteur est prévenu',
       quoi:'Une réponse à une demande que tu aurais faite, non encore lue.',
       aFaire:'Regarde la bulle 💬 en bas à droite : elle porte une PASTILLE ROUGE. Ouvre la cloche 🔔 : l’alerte « Ta demande a été traitée » y est aussi — c’est elle qui part en notification sur le téléphone, appli fermée. Clique la bulle pour lire : la pastille s’éteint.',
