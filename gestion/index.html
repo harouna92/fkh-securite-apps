@@ -216,7 +216,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b247+b116</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b248+b116</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3320,6 +3320,7 @@ button.big:active{transform:translateY(1px)}
   function cloudLogout(msg){ CLOUD.on=false; CLOUD.pass=''; try{sessionStorage.removeItem('fkh_pass');}catch(e){} clearTimeout(CLOUD.pollT); var lo=byId('loginOverlay'); if(lo)lo.style.display='flex'; if(msg)byId('login-err').textContent=msg; var _lf=byId('logout-fab'); if(_lf)_lf.style.display='none'; }
   function cloudStart(){
     try{ setTimeout(apercuInit,900); }catch(e){}   /* b238 */
+    try{ setTimeout(mailHbFetch,1200); setInterval(mailHbFetch,300000); }catch(e){}   /* b248 */
     try{ setTimeout(mailsAutoPlanFetch,4000); if(!window._MAP_T)window._MAP_T=setInterval(mailsAutoPlanFetch,600000); }catch(e){}   /* b224 : les BDC descendent au Planning sans ouvrir la section Mails */ CLOUD.on=true; try{sessionStorage.setItem('fkh_pass',CLOUD.pass);}catch(e){} var lo=byId('loginOverlay'); if(lo)lo.style.display='none'; var _lf=byId('logout-fab'); if(_lf)_lf.style.display='block'; if(typeof applySectionAccess==='function')applySectionAccess(); if(typeof applyRoleLayout==='function')applyRoleLayout(); cloudBar('☁︎ Connecté'+(CLOUD.user?(' — '+operNom(CLOUD.user)):(CLOUD.sections?' — accès restreint':' — données partagées')),true); cloudToggleImport(); cloudPull().then(function(){ cloudPoll(); if(typeof terrainNotify==='function')terrainNotify(); }); if(typeof asgOnConnect==='function')asgOnConnect(); }
   // Y a-t-il des données locales pas encore dans le classeur commun ? (sert à n'afficher le bouton que quand c'est utile)
   function cloudHasLocalData(){ for(var i=0;i<SYNC_KEYS.length;i++){ var v=localStorage.getItem(SYNC_KEYS[i]); if(v&&v.length>2&&v!=='[]'&&v!=='{}')return true; } return false; }
@@ -6223,6 +6224,14 @@ box.querySelectorAll('.td-ok').forEach(function(b){ b.onclick=function(){ if(con
     var d=Date.now()-hb.at;
     return {ko:(d>MAIL_HB_SEUIL)?1:0, depuis:d, at:hb.at, erreur:hb.erreur||'', runs:hb.runs||0, lastMail:hb.lastMail||0, txt:ppSince?ppSince(d):Math.round(d/60000)+' min'};
   }
+  /* b248 : on va chercher le temoin des le demarrage, sans attendre que quelqu'un ouvre la section. */
+  function mailHbFetch(){
+    try{ if(typeof CLOUD==='undefined'||!CLOUD||!CLOUD.on)return;
+      fetch(CLOUD.base+'/mails/hb').then(function(r){return r.json();}).then(function(j){
+        if(j&&j.ok&&j.hb&&j.hb.at){ MAIL_HB=j.hb; try{localStorage.setItem('fkh_mail_hb',JSON.stringify({hb:j.hb,lu:Date.now()}));}catch(e){} }
+      }).catch(function(){});
+    }catch(e){}
+  }
   function mailHbBanner(){
     var e=mailHbEtat(), h='';
     var hhmm=e.at?(new Date(e.at)).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
@@ -6764,14 +6773,21 @@ box.querySelectorAll('.td-ok').forEach(function(b){ b.onclick=function(){ if(con
         body:'Vacation du '+((x.mdate||'').split('-').reverse().join('/'))+(x.heure?(' à '+x.heure):'')+' : annulation reçue par mail, à confirmer.',
         when:(typeof impTodayISO==='function'?impTodayISO():'')}); }); }catch(_e){}
     /* b227 : PC vacant = alerte immediate. Une cle par heure : l'alerte se rappelle a nous tant que le trou dure. */
-    try{ if(!pcOuverts().length&&(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)){
-      out.push({cat:'pc_vacant',key:'pc'+Math.floor(now/3600000),
+    /* b248 : « Personne au PC » n'a de sens que si quelqu'un prend le poste au moins de temps en temps.
+       Tant qu'aucune prise de service n'a jamais ete enregistree, la fonctionnalite n'est pas encore
+       entree dans les habitudes : alerter reviendrait a sonner dans le vide toutes les heures.
+       On n'alerte donc qu'apres la premiere prise de poste, et une seule fois par DEMI-JOURNEE. */
+    try{ var _pcH=pcLoad().postes.length; if(_pcH&&!pcOuverts().length&&(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)){
+      out.push({cat:'pc_vacant',key:'pc'+Math.floor(now/43200000),
         title:'\u26a0\uFE0F Personne au PC',
         body:'Aucune prise de service en cours : les appels et les demandes ne sont tenus par personne.',
         when:(typeof impTodayISO==='function'?impTodayISO():'')}); } }catch(_e){}
     /* b223 : la collecte des mails a l'arret est une alerte a part entiere — c'est ce qui a manque le 02/08.
        Une seule alerte par jour (cle = date) : elle reste visible tant que la collecte n'est pas repartie. */
-    try{ var _hbE=mailHbEtat(); if(_hbE.ko&&(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)){
+    /* b248 : l'alerte partait meme quand on n'avait JAMAIS lu le temoin — c'est-a-dire tant que personne
+       n'avait ouvert la section Mails. « jamais donne signe de vie » decrivait notre ignorance, pas la
+       realite du script. On ne dit plus rien avant d'avoir interroge le serveur (mailHbFetch ci-dessous). */
+    try{ var _hbE=mailHbEtat(); if(_hbE.ko&&!_hbE.jamais&&(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)){
       out.push({cat:'mail_arret',key:'hb'+(typeof impTodayISO==='function'?impTodayISO():''),
         title:'⚠️ Collecte des mails à l’arrêt',
         body:(_hbE.jamais?'Le script Gmail n’a jamais donné signe de vie.':'Aucun signal depuis '+_hbE.txt+'. Les bons de commande ne descendent plus dans le Planning.'),
