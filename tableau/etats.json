@@ -3,6 +3,22 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 273,
+      "titre": "Dépassement de 5 min : échange avec l'agent, client avisé, photo consultable",
+      "source": "Zeus",
+      "theme": "Photos & preuves",
+      "local": true,
+      "demo": "photos5"
+    },
+    {
+      "b": 274,
+      "titre": "Le nom de qui met une demande en recherche apparaît sur la ligne",
+      "source": "Zeus",
+      "theme": "Planning & vacations",
+      "local": true,
+      "pourquoipas": "Se voit dans Suivi demandes → En recherche."
+    },
+    {
       "b": 271,
       "titre": "Bon de commande : le sujet du mail fait foi, comme côté serveur",
       "source": "Zeus — relance",
@@ -16,7 +32,7 @@
       "source": "Zeus",
       "theme": "Photos & preuves",
       "local": true,
-      "pourquoipas": "Se voit en ouvrant la pastille 📷 : les 5 tuiles."
+      "demo": "photos5"
     },
     {
       "b": 267,

@@ -223,7 +223,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b272</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b274</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1371,7 +1371,7 @@ button.big:active{transform:translateY(1px)}
     var SR=window.SpeechRecognition||window.webkitSpeechRecognition, rec=null, listening=false;
     if(mic){ if(!SR){ mic.disabled=true; mic.style.opacity='.5'; mic.title='Dictée non supportée par ce navigateur (essaie Chrome)'; }
       else mic.onclick=function(){ if(listening){ try{rec.stop();}catch(e){} return; } var secure=(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'); if(!secure){ res.innerHTML='<span style="color:var(--warn)">🎤 La dictée n\'est possible que sur le site EN LIGNE (https), pas en ouvrant le fichier en local. En attendant, tape à la main.</span>'; return; } rec=new SR(); rec.lang='fr-FR'; rec.continuous=true; rec.interimResults=true; var base=ta.value; rec.onresult=function(ev){ var fin='',intr=''; for(var i=ev.resultIndex;i<ev.results.length;i++){ var tr=ev.results[i][0].transcript; if(ev.results[i].isFinal)fin+=tr; else intr+=tr; } if(fin)base=(base+' '+fin).replace(/\s+/g,' ').trim(); ta.value=(base+(intr?' '+intr:'')).trim(); }; rec.onend=function(){ listening=false; mic.textContent='🎤 Dicter'; }; rec.onerror=function(ev){ listening=false; mic.textContent='🎤 Dicter'; var e=(ev&&ev.error)||''; var msg=(e==='not-allowed'||e==='service-not-allowed')?'🎤 Micro bloqué — clique le cadenas 🔒 dans la barre d\'adresse → Micro → Autoriser, puis réessaie.':(e==='no-speech')?'🎤 Rien entendu, réessaie.':(e==='network')?'🎤 Réseau indisponible pour la dictée.':'🎤 Dictée indisponible — tape à la main, ça marche pareil.'; res.innerHTML='<span style="color:var(--warn)">'+msg+'</span>'; }; try{ rec.start(); listening=true; mic.textContent='⏹️ Stop'; res.innerHTML='🎙️ Parle, j\'écris…'; }catch(e){ res.innerHTML='<span style="color:var(--warn)">🎤 Dictée indisponible ici — tape à la main.</span>'; } }; }
-    if(sv)sv.onclick=function(){ var txt=(ta.value||'').trim(); if(!txt){ res.innerHTML='<span style="color:var(--warn)">Écris ou dicte au moins un mot.</span>'; ta.focus(); return; } var now=Date.now(); var o={id:'exp'+now+'_'+Math.round(Math.random()*9999),texte:txt,titre:(txt.split('\n')[0]||txt).slice(0,60),statut:'recherche',motif:'',pris:now,valide:null,ville:(typeof extractVille==='function'?extractVille(txt):''),la:null,lo:null,assoc:[],_express:true}; SUIVI.unshift(o); if(typeof saveSuivi==='function')saveSuivi(); ta.value=''; res.innerHTML='✅ Enregistré dans <b>Suivi demandes → En recherche</b>. Complète-la là-bas quand tu veux.'; if(typeof renderSuivi==='function')renderSuivi(); setTimeout(function(){ if(res)res.innerHTML=''; },6000); }; })();
+    if(sv)sv.onclick=function(){ var txt=(ta.value||'').trim(); if(!txt){ res.innerHTML='<span style="color:var(--warn)">Écris ou dicte au moins un mot.</span>'; ta.focus(); return; } var now=Date.now(); var o={id:'exp'+now+'_'+Math.round(Math.random()*9999),texte:txt,titre:(txt.split('\n')[0]||txt).slice(0,60),statut:'recherche',motif:'',parQui:(typeof opNow==='function'?opNow():''),parAt:now,pris:now,valide:null,ville:(typeof extractVille==='function'?extractVille(txt):''),la:null,lo:null,assoc:[],_express:true}; SUIVI.unshift(o); if(typeof saveSuivi==='function')saveSuivi(); ta.value=''; res.innerHTML='✅ Enregistré dans <b>Suivi demandes → En recherche</b>. Complète-la là-bas quand tu veux.'; if(typeof renderSuivi==='function')renderSuivi(); setTimeout(function(){ if(res)res.innerHTML=''; },6000); }; })();
   ['sitename','adr-num','adr-type','adr-nom','agents','ref','notes'].forEach(function(id){var e=byId(id);if(e)e.addEventListener('input',genText);});
   byId('adr-type').addEventListener('change',genText);
   byId('copy').onclick=function(){var x=byId('out').textContent;if(navigator.clipboard)navigator.clipboard.writeText(x);var b=byId('copy'),o=b.textContent;b.textContent='Copié ✓';setTimeout(function(){b.textContent=o;},1400);};
@@ -1443,7 +1443,7 @@ button.big:active{transform:translateY(1px)}
     if(!items.length) return 0;
     var now=Date.now();
     items.forEach(function(txt,idx){
-      var o={id:'d'+now+'_'+(idc++),texte:txt,titre:titreFrom(txt),statut:'recherche',motif:'',pris:now,valide:null,ville:extractVille(txt),la:null,lo:null,assoc:[]};
+      var o={id:'d'+now+'_'+(idc++),texte:txt,titre:titreFrom(txt),statut:'recherche',motif:'',parQui:(typeof opNow==='function'?opNow():''),parAt:now,pris:now,valide:null,ville:extractVille(txt),la:null,lo:null,assoc:[]};
       if(curIn&&idx===items.length-1&&sel&&sel._la!=null){ o.ville=sel.nom; o.la=sel._la; o.lo=sel._lo; }
       SUIVI.unshift(o);
     });
@@ -2003,7 +2003,11 @@ button.big:active{transform:translateY(1px)}
     var arr=SUIVI.filter(function(x){return x.statut===suiviBucket&&matchQ(x);});
     if(!arr.length){ wrap.innerHTML='<div class="svempty">'+(q?'Aucun résultat pour « '+esc(q)+' ».':'Aucune demande dans cette catégorie.')+'</div>'; return; }
     function svItem(x){
+      /* b274 (Zeus) : savoir QUI a mis une demande en recherche. Sans ce nom, impossible de retourner
+         vers la bonne personne pour un detail — et personne ne se sent responsable d'une ligne anonyme. */
+      var _par=(x.statut==='recherche'&&x.parQui)?('<span class="sub" style="margin:0;font-size:11.5px"> · mis en recherche par <b>'+esc(x.parQui)+'</b></span>'):'';
       var meta=(x.statut==='recherche'?'<span class="sv-rtimer" data-since="'+x.pris+'" style="font-weight:700;color:#e0a13b"></span>':'')+'<span>📥 En recherche depuis : '+fmtDT(x.pris)+'</span>';
+      meta+=_par;
       if(x.valide)meta+='<span>🏁 Traitée : '+fmtDT(x.valide)+'</span><span class="delai">⏱ Délai : '+fmtDelai(x.valide-x.pris)+'</span>';
       var body;
       if(x._pending){
@@ -2829,6 +2833,30 @@ button.big:active{transform:translateY(1px)}
       quoi:'L’application vue par un opérateur.',
       aFaire:'Dans la barre, tu vois « 🎧 Prise de service PC » — il n’existe que pour les opérateurs. Clique dessus : il passe au vert « Fin de service PC ». Repasse en « super-admin » avec le bandeau : le bouton disparaît, mais la pastille 🎧 t’affiche qui tient le poste.',
       monter:function(){ try{localStorage.setItem('fkh_pc_poste',JSON.stringify({postes:[]}));}catch(e){} } },
+    photos5:{ titre:'📷 Les 7 vues du suivi photo',
+      quoi:'Cinq situations différentes sur les prises et fins de service, plus les deux rappels à passer.',
+      aFaire:'Suis les étapes : tu vas voir chaque vue et ce qu’elle sert à faire.',
+      monter:function(){ try{
+        var d=new Date(), iso=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+        SUIVI.unshift({id:'demo_p1',statut:'validee',client:'AQUILA',siteAgent:'CARREFOUR Sainte-Savine',ville:'Sainte-Savine',mdate:iso,mheure:'20:00',mfin:'06:00'});
+        SUIVI.unshift({id:'demo_p2',statut:'validee',client:'SECURITAS',siteAgent:'GARE DE JARNY',ville:'Jarny',mdate:iso,mheure:'19:00',mfin:'07:00'});
+        SUIVI.unshift({id:'demo_p3',statut:'validee',client:'AQUILA',siteAgent:'BASIC FIT Niort',ville:'Niort',mdate:iso,mheure:'08:00',mfin:'18:00'});
+        save('fkh_suivi',SUIVI);
+        var S=ssLoad();
+        S['demo_p1']={prise:{done:true,avise:true}};                                   /* sans photo */
+        S['demo_p2']={prise:{done:true,avise:true,refusPhoto:true,refusPar:'Opérateur 1',refusAt:Date.now()-7200000}};   /* refus */
+        var t=new Date(); t.setHours(8,22,0,0);
+        S['demo_p3']={prise:{done:true,avise:true,photoKey:'u/niort/'+t.getTime()+'.jpg',at:t.getTime()}};               /* hors delai : 22 min */
+        ssSave(S);
+      }catch(e){} },
+      guide:function(){ return [
+        {sel:'#pp-ph', txt:'Toute la vie photo d’une prise ou d’une fin tient dans <b>cette seule pastille</b>. Ouvre-la.', btn:'Ouvrir', fait:function(){ var b=byId('pp-ph'); if(b)b.click(); }, attendre:600},
+        {sel:'#pp-box', txt:'<b>Sept entrées.</b> Les deux premières : prises et fins <b>sans photo</b> — on relance, ça peut encore rentrer.', btn:'Voir les refus', fait:function(){ var t=document.querySelectorAll('#pp-box .pp-tile'); if(t[2])t[2].click(); }, attendre:600},
+        {sel:'#pp-box', txt:'<b>🚫 Photo REFUSÉE</b> : l’agent a dit non. On ne le relance plus — mais c’est écrit, daté, et signé par celui qui l’a constaté. Le jour où il faut en parler, la trace est là.', btn:'Voir les hors délai', fait:function(){ var b=byId('pp-back'); if(b)b.click(); setTimeout(function(){ var t=document.querySelectorAll('#pp-box .pp-tile'); if(t[4])t[4].click(); },350); }, attendre:900},
+        {sel:'#pp-box', txt:'<b>⏱ Hors délai</b> : la photo existe, mais elle a été prise <b>22 min après</b> l’heure prévue. Sous 5 min on ne dit rien ; au-delà, il faut comprendre.', btn:'Noter l’appel à l’agent', fait:function(){ var b=document.querySelector('.hd-b[data-q="agent"]'); if(b)b.click(); }, attendre:600},
+        {sel:'#pp-box', txt:'L’échange avec l’agent est noté — <b>daté et signé</b>. La ligne quitte la vue « Agent à contacter ». Reste le client : il vaut mieux qu’il l’apprenne de nous.', btn:'Aviser le client', fait:function(){ var b=document.querySelector('.hd-b[data-q="client"]'); if(b)b.click(); }, attendre:600},
+        {sel:'#pp-box', txt:'Les deux appels sont tracés. Les vues <b>🗣️ Agent à contacter</b> et <b>🏢 Client à aviser</b> ne montrent que <b>ce qui reste à faire</b> — quand elles sont vides, tout a été traité. Clique 🧹 Effacer la démo pour retirer les données d’essai.'}
+      ]; } },
     photo:{ titre:'📎 Rattacher une photo sans correspondance',
       quoi:'Une photo prise à 20 h 12 qu’aucun ticket n’a réclamée, et trois vacations du jour.',
       aFaire:'Suis les étapes : tu vas ouvrir la liste des tickets, élargir la fenêtre horaire, et rattacher la photo à la main.',
@@ -5537,7 +5565,7 @@ button.big:active{transform:translateY(1px)}
           if((SUIVI||[]).some(function(m){ return m.mailSrc===call.cdr_id; })) return;
         }
         if(SUIVI.some(function(m){return String(m.id)===id;}))return; var now=Date.now();
-        var it={id:id,texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:((typeof svCallerName==='function'&&svCallerName(call.number))||notFKH(d.client)||''),la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiNature:nat,aiCdr:call.cdr_id,aiNumber:call.number||'',aiDir:call.direction||''}; if(call._sim)it.sim=true; SUIVI.unshift(it); changed=true; if(!firstNew)firstNew=it; aiRouteNear(it,bd); /* consigne « nouvelle demande gardiennage » retirée (l'opérateur prend les appels, il est déjà au courant) */
+        var it={id:id,texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',parQui:(typeof opNow==='function'?opNow():''),parAt:now,pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:((typeof svCallerName==='function'&&svCallerName(call.number))||notFKH(d.client)||''),la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiNature:nat,aiCdr:call.cdr_id,aiNumber:call.number||'',aiDir:call.direction||''}; if(call._sim)it.sim=true; SUIVI.unshift(it); changed=true; if(!firstNew)firstNew=it; aiRouteNear(it,bd); /* consigne « nouvelle demande gardiennage » retirée (l'opérateur prend les appels, il est déjà au courant) */
       });
       // --- ARRÊT du gardiennage (initiative CLIENT) → consigne « Informer l'agent » dans Suivi des appels ---
       arrets.forEach(function(ar,aidx){ var acid='arret_'+call.cdr_id+'_'+aidx; if(call._sim||typeof csgLoad!=='function')return; try{ var _cc=csgLoad(); if(_cc.some(function(x){return x.srcId===acid;}))return; var lieu=[ar.site,ar.ville].filter(Boolean).join(' — '); _cc.push({id:csgNewId(),srcId:acid,texte:'🛑 ARRÊT DU GARDIENNAGE — INITIATIVE CLIENT.\n👉 INFORMER L\'AGENT que la prestation s\'arrête.'+(ar.client?'\n🏢 Client : '+ar.client:'')+(lieu?'\n📍 '+lieu:'')+(ar.motif?'\n📝 Motif : '+ar.motif:''),client:(ar.client||''),site:(ar.site||''),ville:(ar.ville||''),cp:'',mdate:impTodayISO(),heure:ssNowHM(),done:false,note:'',aiGen:true,arret:true}); csgSave(_cc); changed=true; arretN++; if(!firstArret)firstArret={client:(ar.client||''),lieu:lieu}; }catch(_e){} });
@@ -5578,7 +5606,7 @@ button.big:active{transform:translateY(1px)}
         return;
       }
       // --- GARDIENNAGE collé → Suivi demandes ---
-      var it={id:'mail'+now+'_'+idx+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:notFKH(d.client),la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiNature:nat,source:(origin==='img'?'capture':'mail')}; SUIVI.unshift(it); if(typeof aiRouteNear==='function')aiRouteNear(it,bd); n++; /* consigne « nouvelle demande gardiennage » retirée */ });
+      var it={id:'mail'+now+'_'+idx+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',parQui:(typeof opNow==='function'?opNow():''),parAt:now,pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:notFKH(d.client),la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiNature:nat,source:(origin==='img'?'capture':'mail')}; SUIVI.unshift(it); if(typeof aiRouteNear==='function')aiRouteNear(it,bd); n++; /* consigne « nouvelle demande gardiennage » retirée */ });
     arrets.forEach(function(ar){ if(typeof csgLoad!=='function')return; try{ var _cc=csgLoad(); var lieu=[ar.site,ar.ville].filter(Boolean).join(' — '); _cc.push({id:csgNewId(),texte:'🛑 ARRÊT DU GARDIENNAGE — INITIATIVE CLIENT ('+(origin==='img'?'capture':'texte')+').\n👉 INFORMER L\'AGENT que la prestation s\'arrête.'+(ar.client?'\n🏢 Client : '+ar.client:'')+(lieu?'\n📍 '+lieu:'')+(ar.motif?'\n📝 Motif : '+ar.motif:''),client:(ar.client||''),site:(ar.site||''),ville:(ar.ville||''),cp:'',mdate:impTodayISO(),heure:ssNowHM(),done:false,note:'',aiGen:true,arret:true}); csgSave(_cc); arretN++; }catch(_e){} });
     if(typeof saveSuivi==='function')saveSuivi();
     if(ivN&&typeof window._ivRender==='function')window._ivRender();
@@ -5608,7 +5636,7 @@ button.big:active{transform:translateY(1px)}
   }
   function aiCreateDemande(key){ var pr=String(key).split('|'),cdr=pr[0],idx=+pr[1]; var call=aiDetected.filter(function(x){return String(x.cdr_id)===String(cdr);})[0]; if(!call||!call.demandes||!call.demandes[idx])return; var d=call.demandes[idx];
     var bd=aiBuildDemande(call,d), vn=bd.vn, cp=bd.cp, la=bd.la, lo=bd.lo, near=bd.near;
-    var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',pris:now,valide:null,ville:vn,cp:cp,client:((typeof svCallerName==='function'&&svCallerName(call.number))||d.client||''),la:la,lo:lo,assoc:[],urgent:!!d.urgent,_express:true,aiCdr:call.cdr_id,aiNumber:call.number||'',aiDir:call.direction||''};
+    var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',parQui:(typeof opNow==='function'?opNow():''),parAt:now,pris:now,valide:null,ville:vn,cp:cp,client:((typeof svCallerName==='function'&&svCallerName(call.number))||d.client||''),la:la,lo:lo,assoc:[],urgent:!!d.urgent,_express:true,aiCdr:call.cdr_id,aiNumber:call.number||'',aiDir:call.direction||''};
     SUIVI.unshift(it); if(typeof saveSuivi==='function')saveSuivi();
     if(la!=null)near.forEach(function(x){ fetch('https://router.project-osrm.org/route/v1/driving/'+lo+','+la+';'+x.lo+','+x.la+'?overview=false').then(function(r){return r.json();}).then(function(jj){ if(jj&&jj.routes&&jj.routes[0]){ var mn=Math.round(jj.routes[0].duration/60),hh=Math.floor(mn/60),mm=mn%60,dur=hh?(hh+'h'+(mm?('0'+mm).slice(-2):'')):(mn+' min'); it.texte=it.texte.replace('↦ '+x.n+' à '+x.d+' km','↦ '+x.n+' à '+x.d+' km · '+dur+' de route'); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderSuivi==='function')renderSuivi(); } }).catch(function(){}); });
     call.demandes.splice(idx,1); if(!call.demandes.length){ if(CLOUD.on)fetch(CLOUD.base+'/ai/created',{method:'POST',headers:cloudHdr(),body:JSON.stringify({cdr_id:cdr})}).catch(function(){}); aiDetected=aiDetected.filter(function(x){return String(x.cdr_id)!==String(cdr);}); }
@@ -6339,6 +6367,49 @@ button.big:active{transform:translateY(1px)}
      COMMENT : un bouton sur chaque ligne. Le refus est horodate et signe par qui l'a constate. La ligne
      reste visible, barree d'un « REFUS », mais ne compte plus dans le badge : il n'y a plus rien a
      attendre. Le retour en arriere est possible d'un clic — un refus se constate, il ne se devine pas. */
+  /* ===== b273 : UN DEPASSEMENT DE 5 MIN SE TRAITE, IL NE SE CONSTATE PAS =====
+     POURQUOI (Zeus) : voir qu'une photo a ete prise 20 min apres l'heure ne sert a rien si personne ne
+     sait ce qui a ete fait ensuite. Deux appels s'imposent — l'AGENT, pour comprendre ; le CLIENT, pour
+     qu'il ne l'apprenne pas par son propre personnel. Sans trace, on ne sait plus qui a ete appele, et
+     on rappelle deux fois ou pas du tout.
+     COMMENT : deux marqueurs par ligne, horodates et signes. Deux vues dediees listent ce qui reste a
+     faire — « agent pas encore contacte » et « client pas encore avise ». Une ligne quitte la vue des
+     que l'appel est note : ce qui reste affiche est ce qui reste a faire. */
+  function hdMarquer(mid,key,quoi,oui){
+    try{
+      var S=ssLoad(); S[mid]=S[mid]||{}; var patch={};
+      var qui=(typeof opNow==='function'?opNow():'');
+      if(quoi==='agent'){ patch.hdAgent=!!oui; patch.hdAgentPar=oui?qui:''; patch.hdAgentAt=oui?Date.now():0; }
+      else { patch.hdClient=!!oui; patch.hdClientPar=oui?qui:''; patch.hdClientAt=oui?Date.now():0; }
+      S[mid][key]=Object.assign({},S[mid][key]||{},patch);
+      ssSave(S);
+      if(typeof ppRefresh==='function')ppRefresh();
+      if(typeof ppRender==='function')ppRender();
+    }catch(e){}
+  }
+  function hdEtat(mid,key){
+    try{ var S=ssLoad(), r=(S[mid]&&S[mid][key])||{};
+      return {agent:!!r.hdAgent,agentPar:r.hdAgentPar||'',agentAt:r.hdAgentAt||0,
+              client:!!r.hdClient,clientPar:r.hdClientPar||'',clientAt:r.hdClientAt||0,photo:r.photoKey||r.photo||''}; }
+    catch(e){ return {agent:false,client:false,photo:''}; }
+  }
+  function hdBloc(x){
+    if(x.sousvue!=='delai')return '';
+    var k=x.key||'prise', e=hdEtat(x.mid,k);
+    function f(t){ var d=new Date(t); return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' '+('0'+d.getHours()).slice(-2)+'h'+('0'+d.getMinutes()).slice(-2); }
+    var h='<div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">';
+    h+= e.agent
+      ? '<span style="color:#1a9e5c;font-weight:700;font-size:12px">\u2705 Agent contacté'+(e.agentAt?(' · '+f(e.agentAt)):'')+(e.agentPar?(' par '+esc(e.agentPar)):'')+'</span>'
+        +'<button type="button" class="hd-x" data-mid="'+esc(x.mid)+'" data-k="'+esc(k)+'" data-q="agent" style="font-size:11px">↩️</button>'
+      : '<button type="button" class="hd-b" data-mid="'+esc(x.mid)+'" data-k="'+esc(k)+'" data-q="agent" style="font-size:12px">🗣️ J’ai échangé avec l’agent</button>';
+    h+= e.client
+      ? '<span style="color:#1a9e5c;font-weight:700;font-size:12px">\u2705 Client avisé'+(e.clientAt?(' · '+f(e.clientAt)):'')+(e.clientPar?(' par '+esc(e.clientPar)):'')+'</span>'
+        +'<button type="button" class="hd-x" data-mid="'+esc(x.mid)+'" data-k="'+esc(k)+'" data-q="client" style="font-size:11px">↩️</button>'
+      : '<button type="button" class="hd-b" data-mid="'+esc(x.mid)+'" data-k="'+esc(k)+'" data-q="client" style="font-size:12px">🏢 J’ai avisé le client</button>';
+    if(e.photo&&typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.base)
+      h+='<a href="'+esc(CLOUD.base+'/photo?key='+encodeURIComponent(e.photo))+'" target="_blank" rel="noopener" style="font-size:12px;color:var(--brand,#6ea8fe)">🖼️ Voir la photo</a>';
+    return h+'</div>';
+  }
   function refusMarquer(mid,key,oui){
     try{
       var S=ssLoad(); S[mid]=S[mid]||{}; S[mid][key]=Object.assign({},S[mid][key]||{},
@@ -6459,7 +6530,7 @@ button.big:active{transform:translateY(1px)}
       return '';
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
-      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+ecartPhoto(x.mid,(x.key||'prise'),x.heure,x.mdate)+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+ecartPhoto(x.mid,(x.key||'prise'),x.heure,x.mdate)+hdBloc(x)+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
     if(D.tdv){
       h+='<div class="acts" style="margin-bottom:10px;gap:6px;align-items:center"><span class="sub" style="margin:0">On relance au bout de</span>'
        +'<input type="number" id="td-delai" value="'+tdDelai()+'" min="1" max="60" style="width:64px;text-align:center">'
@@ -6587,19 +6658,23 @@ button.big:active{transform:translateY(1px)}
         +_tuile('fin',_n(_mq,'fin'),'🔚 Fins de service','sans photo','')
         +_tuile('rprise',_n(_rf,'prise'),'🚫 Prises','photo REFUSÉE','#e5322d')
         +_tuile('rfin',_n(_rf,'fin'),'🚫 Fins','photo REFUSÉE','#e5322d')
-        +_tuile('delai',_dl.length,'\u23F1 Hors délai','photo faite à plus de 5 min','#e0a13b')
+        +_tuile('delai',_dl.length,'⏱ Hors délai','photo faite à plus de 5 min','#e0a13b')
+        +_tuile('dagent',_dl.filter(function(x){return !hdEtat(x.mid,x.key||'prise').agent;}).length,'🗣️ Agent à contacter','dépassement non expliqué','#e5322d')
+        +_tuile('dclient',_dl.filter(function(x){return !hdEtat(x.mid,x.key||'prise').client;}).length,'🏢 Client à aviser','dépassement non signalé','#e5322d')
         +'</div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+' · une échéance entre ici 1 min après son heure prévue. Clique sur une tuile pour le détail par vacation (durée écoulée).</p>';
     } else if(D.tiles&&PP_VIEW.sub){
       /* b272 : chaque tuile ouvre sa propre famille. */
       var _sv=PP_VIEW.sub, LL;
       if(_sv==='rprise'||_sv==='rfin'){ LL=L.filter(function(x){return x.sousvue==='refus'&&x.key===(_sv==='rprise'?'prise':'fin');}); }
+      else if(_sv==='dagent'){ LL=L.filter(function(x){return x.sousvue==='delai'&&!hdEtat(x.mid,x.key||'prise').agent;}); }
+      else if(_sv==='dclient'){ LL=L.filter(function(x){return x.sousvue==='delai'&&!hdEtat(x.mid,x.key||'prise').client;}); }
       else if(_sv==='delai'){ LL=L.filter(function(x){return x.sousvue==='delai';})
         .sort(function(u,v){ return Math.abs(v.ecartMin||0)-Math.abs(u.ecartMin||0); }); }
       else { LL=L.filter(function(x){return (x.sousvue||'manq')==='manq'&&x.key===_sv;}); }
       /* b272 : l'entete dit ce qu'on regarde vraiment — « sans photo » n'a aucun sens sur la vue
          des photos hors delai, ni sur celle des refus. */
-      var _lbl={prise:'prise(s) sans photo',fin:'fin(s) sans photo',rprise:'prise(s) — photo REFUSÉE par l’agent',rfin:'fin(s) — photo REFUSÉE par l’agent',delai:'photo(s) faite(s) hors délai (plus de 5 min d’écart)'}[_sv]||'';
+      var _lbl={prise:'prise(s) sans photo',fin:'fin(s) sans photo',rprise:'prise(s) — photo REFUSÉE par l’agent',rfin:'fin(s) — photo REFUSÉE par l’agent',delai:'photo(s) faite(s) hors délai (plus de 5 min d’écart)',dagent:'dépassement(s) dont l’agent n’a pas encore été contacté',dclient:'dépassement(s) dont le client n’a pas encore été avisé'}[_sv]||'';
       h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+LL.length+' '+_lbl+'</span></div>'+rowsOf(LL);
     } else {
       h+='<div class="acts" style="margin-bottom:8px"><span class="sub" style="margin:0">'+L.length+' en attente · '+D.depuis+'</span></div>'+rowsOf(L);
@@ -6618,6 +6693,10 @@ button.big:active{transform:translateY(1px)}
         byId('pp-ask').onclick=function(){ tkxDemander(PP_VIEW.mode,_ttl,_lg); };
       }
     }catch(_e){}
+    box.querySelectorAll('.hd-b').forEach(function(b){ b.onclick=function(){
+      hdMarquer(b.getAttribute('data-mid'),b.getAttribute('data-k'),b.getAttribute('data-q'),true); }; });
+    box.querySelectorAll('.hd-x').forEach(function(b){ b.onclick=function(){
+      hdMarquer(b.getAttribute('data-mid'),b.getAttribute('data-k'),b.getAttribute('data-q'),false); }; });
     box.querySelectorAll('.pp-refus').forEach(function(b){ b.onclick=function(){
       if(confirm('Noter que l’agent a REFUSÉ d’envoyer la photo ?\n\nLa ligne cessera d’être relancée et le refus sera tracé, avec ton nom et l’heure.'))
         refusMarquer(b.getAttribute('data-mid'),b.getAttribute('data-k'),true); }; });
@@ -7445,7 +7524,7 @@ box.querySelectorAll('.td-ok').forEach(function(b){ b.onclick=function(){ if(con
     var lastR=null,lastSel=null,lastTxt='',gexpDate='',gexpH24=false,gexpAsap=false,gexpDepart='',gexpH1='',gexpH2='',gexpH24End='',gexpH24H1='',gexpH24H2='',gexpClient='',gexpSite='',gexpVille='',gexpVilleSel=null,gexpCP='',gexpAsapH='',gexpAsapDate='',gexpAgence=false,gexpAgS1a='',gexpAgS1b='',gexpAgS2a='',gexpAgS2b='',gexpVacs=[],gexpAdded=[],lastDateIso='',gexpAsapMode='',gexpNearN=2,gexpNear=[],gexpMeas=[],gexpSurv='';
     function gexpHasCur(){ return !!(inp.value.trim()||gexpDate||gexpH1||gexpH2||gexpH24||gexpAsap||gexpDepart||gexpClient||gexpSite||gexpVille||gexpCP||gexpAgence||gexpSurv||gexpVacs.length); }
     function gexpPayload(){ var now=Date.now(), vn=lastSel?lastSel.nom:(lastR.ville||''), cp=lastR.cp||(lastSel&&lastSel.codesPostaux?lastSel.codesPostaux[0]:''), co=lastSel&&lastSel.centre?lastSel.centre.coordinates:null, v0=gexpVacs[0]||null, dIso=(v0&&v0.date)||lastDateIso||'', dFin=(v0&&v0.dateFin)||'', H1=(v0&&v0.h1)||gexpH1||lastR.hours[0]||'', H2=(v0&&v0.h2)||gexpH2||lastR.hours[1]||'', hh=gexpH24?'':H1, mfin=(!gexpH24&&H2)?(((dFin||dIso)?((dFin||dIso).split('-').reverse().join('/')+' '):'')+H2):'';
-      return {id:'gx'+now+'_'+Math.round(Math.random()*9999),texte:lastTxt,titre:(lastR.site||lastR.client||vn||'Demande gardiennage').slice(0,60),statut:'recherche',motif:'',pris:now,valide:null,ville:vn,cp:cp,la:co?co[1]:null,lo:co?co[0]:null,assoc:[],mdate:dIso,mheure:hh,mfin:mfin,h24:gexpH24,urgent:!!lastR.urgent,_express:true}; }
+      return {id:'gx'+now+'_'+Math.round(Math.random()*9999),texte:lastTxt,titre:(lastR.site||lastR.client||vn||'Demande gardiennage').slice(0,60),statut:'recherche',motif:'',parQui:(typeof opNow==='function'?opNow():''),parAt:now,pris:now,valide:null,ville:vn,cp:cp,la:co?co[1]:null,lo:co?co[0]:null,assoc:[],mdate:dIso,mheure:hh,mfin:mfin,h24:gexpH24,urgent:!!lastR.urgent,_express:true}; }
     function doTranscribe(){ var p=byId('gexp-prev'); var hasCur=gexpHasCur(); if(!hasCur&&!gexpAdded.length){ p.classList.add('hidden'); return; } var R=parse(inp.value); if(gexpClient)R.client=gexpClient; if(gexpSite)R.site=gexpSite; if(gexpVille){R.ville=gexpVille; R.cp=gexpCP||'';} else if(gexpCP){R.cp=gexpCP;} var sel=gexpVilleSel||resolveVille(R); if(typeof gexpSyncNear==='function')gexpSyncNear(sel); var dateIso=R.date||gexpDate, txt=toText(R,sel,dateIso,gexpH24,gexpAsap,gexpDepart); lastR=R; lastSel=sel; lastTxt=txt; lastDateIso=dateIso; try{window._gexpLastInfo={client:R.client||gexpClient||'',ville:(sel&&sel.nom)||R.ville||'',cp:R.cp||gexpCP||'',la:(sel&&sel.centre)?sel.centre.coordinates[1]:null,lo:(sel&&sel.centre)?sel.centre.coordinates[0]:null};}catch(e){}
       var nTot=gexpAdded.length+(hasCur?1:0);
       var addedHtml=gexpAdded.length?('<div class="fa-d" style="margin:0 0 6px">📦 '+gexpAdded.length+' demande'+(gexpAdded.length>1?'s':'')+' préparée'+(gexpAdded.length>1?'s':'')+' :'+gexpAdded.map(function(o,i){return '<div style="display:flex;align-items:center;gap:6px;margin-top:3px"><span style="flex:1">• '+esc(o.titre)+(o.mdate?' ('+o.mdate.split('-').reverse().join('/')+')':'')+'</span><button type="button" data-gxrm="'+i+'" style="width:26px;height:26px;padding:0">✕</button></div>';}).join('')+'</div>'):'';
