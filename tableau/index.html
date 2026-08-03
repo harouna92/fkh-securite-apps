@@ -27,6 +27,9 @@
   .demo:hover{filter:brightness(1.12)}
   .urgent{border-left-color:#e5322d}
   .note{margin-top:5px;font-size:11.5px;color:#e0a13b}
+  .theme{margin:10px 0 4px;font-size:11.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--brand);display:flex;gap:6px;align-items:center}
+  .theme span{font-weight:600;color:var(--muted);background:var(--panel2);border-radius:999px;padding:0 7px}
+  .theme:first-child{margin-top:0}
   .pas{margin-top:5px;font-size:11.5px;color:var(--muted);font-style:italic}
   .vide{color:var(--muted);font-size:12.5px;padding:6px 2px}
   .expl{padding:8px 12px;font-size:11.5px;color:var(--muted);border-bottom:1px solid var(--line);background:rgba(110,168,254,.05)}
@@ -90,11 +93,23 @@ function carte(it, enLigne, etat){
     +'<div class="acts">'+demo+act+'</div></div>';
 }
 
+/* b262 (regle Zeus) : au-dela de 8 cartes, une colonne devient une liste qu'on ne lit plus.
+   On regroupe alors par theme, le plus fourni en premier. En dessous, on laisse la liste simple :
+   des intertitres sur trois cartes seraient du decor. */
+function corps(items,enLigne,etat){
+  if(items.length<=8)return items.map(function(i){return carte(i,enLigne,etat);}).join('');
+  var g={}; items.forEach(function(i){ var t=i.theme||'Divers'; (g[t]=g[t]||[]).push(i); });
+  var cles=Object.keys(g).sort(function(a2,b2){ return g[b2].length-g[a2].length; });
+  return cles.map(function(t){
+    return '<div class="theme">'+esc(t)+' <span>'+g[t].length+'</span></div>'
+      +g[t].map(function(i){return carte(i,enLigne,etat);}).join('');
+  }).join('');
+}
 function colonne(icone, titre, items, enLigne, vide, explique, etat){
   return '<section class="col" data-cible="'+esc(etat||'')+'"><h2>'+icone+' '+titre+'<span class="n">'+items.length+'</span></h2>'
     +(explique?'<div class="expl">'+explique+'</div>':'')
     +'<div class="body">'
-    +(items.length?items.map(function(i){return carte(i,enLigne,etat);}).join(''):'<div class="vide">'+vide+'</div>')
+    +(items.length?corps(items,enLigne,etat):'<div class="vide">'+vide+'</div>')
     +'</div></section>';
 }
 
@@ -155,6 +170,13 @@ function deplacer(id,cible){
   else if(cible==='code'){ delete it.local; if(!it.b)it.b=0; DATA.items.unshift(it); }
   else if(cible==='local'){ it.local=true; if(!it.b)it.b=0; DATA.items.unshift(it); }
   else { DATA[f.src].splice(f.i,0,it); return; }   /* on ne fait pas passer en ligne par un glisser : ca se pousse */
+  /* b262 : le deplacement ecrit l'etat, mais il ne me reveille pas. Pour que le geste suffise, on copie
+     dans la foulee l'ordre correspondant : il ne reste qu'a le coller. */
+  var verbe={attente:'Traite le sujet',decide:'Code le sujet',code:'Déploie en local et prépare la démo',local:'Mets en ligne'}[cible];
+  var phrase=verbe+' : '+((it.b&&(cible==='local'||cible==='code'))?('b'+it.b+' — '):'')+it.titre;
+  try{ navigator.clipboard.writeText(phrase); }catch(e){}
+  var p=document.getElementById('pied');
+  if(p){ p.textContent='✅ Déplacé et copié : « '+phrase+' » — colle-le dans le chat pour que je m’en occupe.'; p.style.color='#1a9e5c'; }
   enregistrer();
 }
 function enregistrer(){
