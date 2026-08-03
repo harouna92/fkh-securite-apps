@@ -5,18 +5,21 @@
     {
       "b": 254,
       "titre": "Tableau de bord des états des demandes",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "C'est ce tableau de bord."
     },
     {
       "b": 255,
       "titre": "Tableau de bord : 4 états + boutons d'ordre",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "C'est ce tableau de bord."
     },
     {
       "b": 256,
       "titre": "Photos sans correspondance : rattachement manuel, fenêtre horaire réglable",
       "source": "remontées #53/#54/#57",
-      "note": "±1 h à toute la journée ; prise, fin, tenue et contrôles 2 h"
+      "note": "±1 h à toute la journée ; prise, fin, tenue et contrôles 2 h",
+      "pourquoipas": "Démo à écrire."
     },
     {
       "b": 253,
@@ -57,12 +60,14 @@
     {
       "b": 248,
       "titre": "Fin des fausses alertes (collecte, PC vacant)",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "Rien à jouer : ce sont deux alertes qui ne partent PLUS. La preuve, c'est leur absence."
     },
     {
       "b": 247,
       "titre": "Déconnexion déplacée en bas à gauche",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "Rien à jouer : la Déconnexion a simplement changé de coin. Ça se constate à l'écran."
     },
     {
       "b": 246,
@@ -80,52 +85,62 @@
       "b": 244,
       "titre": "Mode selfie sur le lien photo",
       "source": "remontée #67",
-      "note": "à valider sur téléphone"
+      "note": "à valider sur téléphone",
+      "pourquoipas": "Ne peut se tester QUE sur un téléphone : le navigateur du PC n'a pas de caméra."
     },
     {
       "b": 243,
       "titre": "Suppression du bouton Simuler + nettoyage des 2 lignes",
-      "source": "remontée #62"
+      "source": "remontée #62",
+      "pourquoipas": "Rien à jouer : c'est un retrait (le bouton Simuler a disparu) + un nettoyage de 2 lignes en base."
     },
     {
       "b": 242,
       "titre": "Tickets entre collaborateurs depuis une pastille",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "Démo à écrire — il faut deux rôles pour la jouer."
     },
     {
       "b": 241,
       "titre": "Modes d'emploi retirés à l'opérateur",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "Se voit en basculant en vue opérateur : les textes d'explication ont disparu."
     },
     {
       "b": 240,
       "titre": "Le bandeau d'aperçu ne recouvre plus les onglets",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "Rien à jouer : le bandeau ne recouvre plus les onglets. Visible d'un coup d'œil."
     },
     {
       "b": 239,
       "titre": "Bandeau d'état + bulle réglables",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "Se voit en basculant en vue opérateur : ni bandeau d'état ni bulle."
     },
     {
       "b": 238,
       "titre": "Aperçu d'un rôle en ligne (admin + super-admin)",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "Se joue dans la démo « Ce que voit un superviseur »."
     },
     {
       "b": 237,
       "titre": "Vue opérateur : cloche et recherche retirées",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "Se voit en basculant en vue opérateur : ni cloche ni recherche."
     },
     {
       "b": 236,
       "titre": "Régler la vue d'un rôle depuis la vue",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "Se joue dans la démo « Retirer sur place » (bouton Régler cette vue)."
     },
     {
       "b": 235,
       "titre": "Bascule de rôle permanente en sandbox",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "Rien à jouer : la bascule de rôle est simplement toujours disponible en sandbox."
     },
     {
       "b": 234,
@@ -142,7 +157,8 @@
     {
       "b": 231,
       "titre": "Mode démo (?sandbox=1&demo=…)",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "C'est le moteur des démos lui-même."
     },
     {
       "b": 230,
@@ -172,7 +188,8 @@
     {
       "b": 222,
       "titre": "Vacations non affectées : 24 h / 7 j / le reste",
-      "source": "Zeus"
+      "source": "Zeus",
+      "pourquoipas": "Se voit dans la pastille 🧍 : les tuiles 24 h / 7 jours / le reste."
     }
   ],
   "attente": [

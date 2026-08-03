@@ -27,6 +27,7 @@
   .demo:hover{filter:brightness(1.12)}
   .urgent{border-left-color:#e5322d}
   .note{margin-top:5px;font-size:11.5px;color:#e0a13b}
+  .pas{margin-top:5px;font-size:11.5px;color:var(--muted);font-style:italic}
   .vide{color:var(--muted);font-size:12.5px;padding:6px 2px}
   .expl{padding:8px 12px;font-size:11.5px;color:var(--muted);border-bottom:1px solid var(--line);background:rgba(110,168,254,.05)}
   .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
@@ -85,6 +86,7 @@ function carte(it, enLigne, etat){
     +'<b class="t">'+esc(it.titre)+'</b>'
     +'<div class="meta">'+(it.b?('<span class="tag">b'+it.b+'</span>'):'')+esc(it.source||'')+'</div>'
     +(it.note?('<div class="note">⚠️ '+esc(it.note)+'</div>'):'')
+    +((!it.demo&&it.pourquoipas&&(etat==='local'||etat==='ligne'))?('<div class="pas">🎬 Pas de démo — '+esc(it.pourquoipas)+'</div>'):'')
     +'<div class="acts">'+demo+act+'</div></div>';
 }
 
