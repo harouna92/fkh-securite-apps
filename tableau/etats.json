@@ -3,6 +3,14 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 265,
+      "titre": "Corbeille : le lâcher d'un onglet sur 🗑️ est enfin détecté",
+      "source": "Zeus — bug signalé",
+      "theme": "Rôles, droits & vues",
+      "local": true,
+      "demo": "corbeille"
+    },
+    {
       "b": 264,
       "titre": "Tableau : la page sait si elle est en ligne ou sur le poste de pilotage",
       "source": "Zeus",
@@ -282,12 +290,6 @@
     {
       "titre": "Backfill des mails SECURITAS / RANC + mails de juin",
       "source": "chantier mails"
-    },
-    {
-      "titre": "Corbeille (b230) : Zeus signale que ça ne marche pas",
-      "source": "Zeus 03/08",
-      "urgent": true,
-      "note": "en attente du geste exact pour reproduire"
     }
   ],
   "decide": [

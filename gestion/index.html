@@ -223,7 +223,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b263</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b265</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1032,12 +1032,21 @@ button.big:active{transform:translateY(1px)}
     function keyOf(b){ return b&&b.getAttribute?b.getAttribute('data-s'):null; }
     (function apply(){ var o=null; try{o=JSON.parse(localStorage.getItem(LS)||'null');}catch(e){} if(!o||!o.length)return; var map={}; Array.prototype.forEach.call(bar.children,function(b){ var k=keyOf(b); if(k)map[k]=b; }); o.forEach(function(k){ if(map[k])bar.appendChild(map[k]); }); })();
     function save(){ var arr=Array.prototype.map.call(bar.children,keyOf).filter(Boolean); try{localStorage.setItem(LS,JSON.stringify(arr));}catch(e){} }
-    var timer=null, dragging=null, moved=false, sx=0, sy=0;
-    bar.addEventListener('pointerdown',function(e){ if(!peutReorganiser())return; var b=e.target.closest?e.target.closest('button[data-s]'):null; if(!b)return; sx=e.clientX; sy=e.clientY; moved=false; timer=setTimeout(function(){ dragging=b; b.classList.add('tab-drag'); if(navigator.vibrate){try{navigator.vibrate(15);}catch(_){}}} ,350); });
-    bar.addEventListener('pointermove',function(e){ if(timer&&!dragging&&(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8)){ clearTimeout(timer); timer=null; } if(!dragging)return; e.preventDefault(); moved=true; var u=document.elementFromPoint(e.clientX,e.clientY); var t=u&&u.closest?u.closest('button[data-s]'):null; if(!t||t===dragging||t.parentNode!==bar)return; var r=t.getBoundingClientRect(); bar.insertBefore(dragging, (e.clientX>(r.left+r.width/2))?t.nextSibling:t); });
+    var timer=null, dragging=null, moved=false, sx=0, sy=0, derniereCible=null;
+    bar.addEventListener('pointerdown',function(e){ if(!peutReorganiser())return; derniereCible=null; var b=e.target.closest?e.target.closest('button[data-s]'):null; if(!b)return; sx=e.clientX; sy=e.clientY; moved=false; timer=setTimeout(function(){ dragging=b; b.classList.add('tab-drag'); if(navigator.vibrate){try{navigator.vibrate(15);}catch(_){}}} ,350); });
+    /* b265 (bug corbeille signale par Zeus) : le lacher n'etait jamais detecte. En glissant, on
+       reordonne les onglets EN DIRECT — donc au moment du relachement, l'element sous le doigt
+       etait l'onglet deplace lui-meme, qui avait pris la place de la Corbeille. On memorise
+       desormais la derniere cible survolee, et on ne reordonne PAS quand on passe sur la
+       Corbeille : elle doit rester sous le doigt pour qu'on puisse y lacher. */
+    bar.addEventListener('pointermove',function(e){ if(timer&&!dragging&&(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8)){ clearTimeout(timer); timer=null; } if(!dragging)return; e.preventDefault(); moved=true; var u=document.elementFromPoint(e.clientX,e.clientY); var t=u&&u.closest?u.closest('button[data-s]'):null; if(t&&t!==dragging)derniereCible=t; if(t&&t.getAttribute('data-s')==='corbeille'){ t.style.outline='2px dashed #e5322d'; return; } bar.querySelectorAll('button[data-s="corbeille"]').forEach(function(cb){cb.style.outline='';}); if(!t||t===dragging||t.parentNode!==bar)return; var r=t.getBoundingClientRect(); bar.insertBefore(dragging, (e.clientX>(r.left+r.width/2))?t.nextSibling:t); });
     function end(e){ if(timer){clearTimeout(timer);timer=null;}
       if(dragging){
-        var cible=null; try{ var el=(e&&e.clientX!=null)?document.elementFromPoint(e.clientX,e.clientY):null; cible=el&&el.closest?el.closest('button[data-s]'):null; }catch(_e){}
+        var cible=derniereCible;
+        try{ var el=(e&&e.clientX!=null)?document.elementFromPoint(e.clientX,e.clientY):null;
+             var sous=el&&el.closest?el.closest('button[data-s]'):null;
+             if(sous&&sous!==dragging)cible=sous; }catch(_e){}
+        try{ bar.querySelectorAll('button[data-s="corbeille"]').forEach(function(cb){cb.style.outline='';}); }catch(_e){}
         var k=dragging.getAttribute('data-s');
         dragging.classList.remove('tab-drag'); dragging=null;
         if(cible&&cible.getAttribute('data-s')==='corbeille'&&k!=='corbeille'){ if(typeof cbJeter==='function')cbJeter(k); return; }   /* b230 */
