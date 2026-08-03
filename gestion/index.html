@@ -220,7 +220,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b250</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b251</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2740,6 +2740,53 @@ button.big:active{transform:translateY(1px)}
     var rz=byId('dr-reset'); if(rz)rz.onclick=function(){ if(confirm('Revenir aux réglages d’origine ?'))
       { drSave({sections:{},pastilles:{}}); renderDroits(); try{ applySectionAccess(); ppRefresh(); }catch(e){} } };
   }
+  /* ===== b251 : MODES D'EMPLOI =====
+     POURQUOI : dire a quelqu'un « c'est en ligne » ne lui apprend pas a s'en servir. Sans mode d'emploi
+     joint, la fonctionnalite existe mais personne ne l'utilise — et la demande revient dans un mois.
+     COMMENT : chaque reponse peut porter un marqueur [[aide:cle]]. L'appli le transforme en bouton
+     « Comment ça marche » ; un clic ouvre la fiche, sans quitter l'ecran. Le meme lien fonctionne en
+     adresse directe : ?aide=selfie — donc partageable par message ou par mail. */
+  var AIDES={
+    selfie:{t:'\U0001F933 Photo en selfie',pour:'Se photographier soi-même pour un contrôle de tenue.',
+      pas:['Ouvre le lien photo qu’on t’a envoyé.','Sous le bouton de prise de vue, touche « \U0001F933 Passer en selfie ».','Pour un contrôle de tenue, la caméra avant s’ouvre déjà toute seule.','Cadre-toi en entier, écusson visible, puis prends la photo.'],
+      note:'Tu te vois en miroir pour te cadrer, mais la photo enregistrée ne l’est pas : ton écusson reste lisible.'},
+    pc:{t:'\U0001F3A7 Prise de service au PC',pour:'Faire savoir à tous que quelqu’un tient le poste.',
+      pas:['En arrivant, touche « \U0001F3A7 Prise de service PC » dans la barre du haut.','Le bouton passe au vert : « Fin de service PC ».','En partant, touche-le à nouveau.'],
+      note:'Si tu es le dernier au poste, l’appli te prévient avant de fermer : sans personne au PC, une alerte part à l’encadrement.'},
+    tickets:{t:'\U0001F3AB Demander un point à quelqu’un',pour:'Confier un sujet et savoir ce qu’il en a fait.',
+      pas:['Ouvre la pastille concernée (vacations non affectées, photos manquantes…).','En bas, touche « \U0001F3AB Demander un point à… ».','Choisis à qui, écris ton mot, envoie.','La liste que tu regardes part avec le ticket : le destinataire sait de quoi tu parles.'],
+      note:'Il répond en deux clics (À faire / En cours / Fait / Bloqué + un mot). Tu es prévenu de son retour.'},
+    tenues:{t:'\U0001F4E6 Tenues envoyées non confirmées',pour:'S’assurer qu’un agent a bien reçu sa tenue.',
+      pas:['Ouvre la pastille \U0001F4E6.','Appelle l’agent (son numéro est cliquable).','S’il l’a reçue : « \u2705 Il l’a reçu » — la ligne se ferme.','Sinon : « +2 j », « +4 j » ou « +7 j » — son nom reviendra à cette échéance.'],
+      note:'Le délai de relance se règle en haut de la vue (4 jours par défaut).'},
+    apercu:{t:'\U0001F441\uFE0F Voir l’application comme un autre',pour:'Vérifier ce que voit un collaborateur.',
+      pas:['Dans le bandeau du haut, clique le rôle voulu.','Le bandeau devient ORANGE : tu n’es plus dans ta vue.','Pour retirer un élément de sa vue, clique la petite croix rouge dessus.','Reviens à ta vue en cliquant ton propre rôle.'],
+      note:'On ne peut voir que des vues moins ouvertes que la sienne. Seul le super-admin peut modifier.'},
+    annulation:{t:'\U0001F534 Annulation reçue par mail',pour:'Traiter une annulation sans casser une mission par erreur.',
+      pas:['La pastille \U0001F534 s’allume, la vacation apparaît hachurée rouge au Planning.','Ouvre la pastille : site, date, heure de réception du mail.','Vérifie auprès du client.','« \u2705 Confirmer » retire la vacation et ses appels ; « \u274c Fausse alerte » la laisse intacte.'],
+      note:'Une annulation ne supprime jamais rien toute seule : c’est toujours un humain qui tranche.'}
+  };
+  function aideOuvrir(cle){
+    var A=AIDES[cle]; if(!A){ alert('Mode d’emploi introuvable.'); return; }
+    var old=byId('aide-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='aide-pop';
+    pop.style.cssText='position:fixed;inset:8% 6%;z-index:230;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:16px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+    pop.innerHTML='<div style="display:flex;align-items:center;gap:8px"><b style="flex:1;font-size:16px">'+esc(A.t)+'</b><button type="button" id="aide-x">✕</button></div>'
+      +'<div class="sub" style="margin:6px 0 12px">'+esc(A.pour)+'</div>'
+      +A.pas.map(function(x,i){ return '<div style="display:flex;gap:10px;margin-bottom:8px"><b style="min-width:22px;color:#6ea8fe">'+(i+1)+'.</b><div>'+esc(x)+'</div></div>'; }).join('')
+      +(A.note?('<div class="card" style="margin-top:10px;border-left:3px solid #e0a13b"><div class="sub" style="margin:0">\U0001F4A1 '+esc(A.note)+'</div></div>'):'');
+    document.body.appendChild(pop);
+    byId('aide-x').onclick=function(){ pop.parentNode.removeChild(pop); };
+  }
+  /* Transforme [[aide:cle]] en bouton, partout ou un texte est affiche. */
+  function aideBoutons(html){
+    return String(html||'').replace(/\[\[aide:([a-z]+)\]\]/g, function(m,c){
+      var A=AIDES[c]; if(!A)return '';
+      return '<button type="button" class="aide-b" data-a="'+c+'" style="font-size:12.5px;margin-top:6px">\U0001F4D6 Comment ça marche — '+esc(A.t)+'</button>';
+    });
+  }
+  document.addEventListener('click',function(ev){ var b=ev.target&&ev.target.closest?ev.target.closest('.aide-b'):null; if(b){ ev.preventDefault(); ev.stopPropagation(); aideOuvrir(b.getAttribute('data-a')); } });
+  function aideWire(root){ (root||document).querySelectorAll('.aide-b').forEach(function(b){ b.onclick=function(){ aideOuvrir(b.getAttribute('data-a')); }; }); }
   var DEMOS={
     annulation:{ titre:'🔴 Annulation signalée',
       quoi:'Une vacation AQUILA demain soir, sur laquelle un mail d’annulation vient d’arriver.',
@@ -2784,17 +2831,27 @@ button.big:active{transform:translateY(1px)}
         D['demo agent beta']={nom:'DEMO Agent BETA',statut:'envoye',pieces:'1 parka + 1 paire de chaussures',dateEnvoi:iso(11),dateRecu:'',urgence:''};
         save('fkh_tenues_dist',D); localStorage.removeItem('fkh_td_delai');
       }catch(e){} } },
-    reponse:{ titre:'✅ Comment l’auteur est prévenu',
-      quoi:'Une réponse à une demande que tu aurais faite, non encore lue.',
-      aFaire:'Regarde la bulle 💬 en bas à droite : elle porte une PASTILLE ROUGE. Ouvre la cloche 🔔 : l’alerte « Ta demande a été traitée » y est aussi — c’est elle qui part en notification sur le téléphone, appli fermée. Clique la bulle pour lire : la pastille s’éteint.',
+    reponse:{ titre:'\u2705 Comment un collaborateur est prévenu',
+      quoi:'Tu te mets à la place de JULES : il avait demandé le mode selfie, on vient de le mettre en ligne.',
+      aFaire:'Quatre choses, dans l’ordre. 1) La bulle \U0001F4AC en bas à droite porte une PASTILLE ROUGE — le premier signal, visible sans rien ouvrir. 2) Ouvre la cloche \U0001F514 : l’alerte « Ta demande a été traitée » y est. 3) Touche « \U0001F514 Voir la notification » dans ce bandeau : ton navigateur affichera EXACTEMENT ce que le collaborateur reçoit sur son téléphone, appli fermée. 4) Clique la bulle : la réponse contient un bouton « \U0001F4D6 Comment ça marche » qui ouvre le mode d’emploi. La pastille ne s’éteint qu’à ce moment-là.',
       monter:function(){ try{
         ASG.msgs=ASG.msgs||{};
         var id=990001;
         ASG.msgs[id]={id:id,canal:'analyse',auteur:(typeof asgAuthor==='function'?asgAuthor():'moi'),
           texte:'Il faudrait pouvoir passer la caméra en selfie pour les contrôles de tenue.',
-          reponse:'C’est en ligne : sur le lien photo, un bouton « 🤳 Passer en selfie ». Un contrôle de tenue s’ouvre même directement en caméra avant. Dis-moi si ça te convient.',
+          reponse:'C’est en ligne. Sur le lien photo, un bouton « \U0001F933 Passer en selfie » — et un contrôle de tenue s’ouvre déjà en caméra avant. Dis-moi si ça te convient.\n[[aide:selfie]]',
           created_at:Date.now()-3600000, replied_at:Date.now()-120000, statut:'repondu'};
         localStorage.removeItem('fkh_asg_lus');
+        setTimeout(function(){ var bar=byId('demo-bar'); if(!bar||byId('demo-notif'))return;
+          var b=document.createElement('button'); b.type='button'; b.id='demo-notif'; b.style.fontSize='12px'; b.textContent='\U0001F514 Voir la notification';
+          b.onclick=function(){
+            function envoyer(){ try{ new Notification('\u2705 Ta demande a été traitée',{body:'Le mode selfie est en ligne — ouvre \U0001F4AC pour lire la réponse et le mode d’emploi.',tag:'demo-fkh'}); }catch(e){ alert('Notification impossible : '+e); } }
+            if(!('Notification' in window))return alert('Ce navigateur ne gère pas les notifications.');
+            if(Notification.permission==='granted')envoyer();
+            else Notification.requestPermission().then(function(pm){ if(pm==='granted')envoyer(); else alert('Tu as refusé les notifications — c’est ce refus qui empêcherait un collaborateur d’être prévenu.'); });
+          };
+          var z=bar.querySelector('div:last-child'); if(z)z.appendChild(b);
+        },700);
       }catch(e){} } },
     droits:{ titre:'🔐 Droits d’accès',
       quoi:'La grille « qui voit quoi » telle qu’elle est aujourd’hui.',
@@ -3504,7 +3561,7 @@ button.big:active{transform:translateY(1px)}
       var cls='<select class="remo-classe" data-id="'+esc(m.id)+'" style="font-size:11px;padding:2px 4px;width:auto">'+REMO_CLASSE.map(function(o){return '<option value="'+o[0]+'"'+(effCls===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
       var autoBadge=(!curCls&&auto)?(' <span class="sub" title="Proposition automatique par mots-cles — choisis une valeur pour confirmer ou corriger" style="font-size:10px;color:#7b61ff;white-space:nowrap">🤖 auto</span>'):'';
       var stt='<select class="remo-statut" data-id="'+esc(m.id)+'" style="font-size:11px;padding:2px 4px;width:auto">'+REMO_STATUT.map(function(o){return '<option value="'+o[0]+'"'+((mt.statut||'')===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
-      var rep=m.reponse?('<div class="sub" style="margin:4px 0 0"><b>Claude :</b> '+esc(m.reponse)+'</div>'):'';
+      var rep=m.reponse?('<div class="sub" style="margin:4px 0 0"><b>Claude :</b> '+aideBoutons(esc(m.reponse))+'</div>'):'';
       return '<div style="border:1px solid var(--line);border-radius:9px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="font-size:11px;color:var(--muted)">'+esc(m.auteur||'—')+' · '+when+'</div><div style="margin:2px 0">'+esc(m.texte)+'</div><div class="acts" style="gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center">'+cls+autoBadge+stt+'</div>'+rep+'</div>';
     }).join('');
     box.querySelectorAll('.remo-classe').forEach(function(s){ s.onchange=function(){ remoSet(s.getAttribute('data-id'),{classe:s.value}); renderRemoCockpit(); }; });
@@ -3522,7 +3579,7 @@ button.big:active{transform:translateY(1px)}
     box.innerHTML=arr.map(function(m){
       var d=new Date(m.created_at), when=(''+d.getDate()).padStart(2,'0')+'/'+(''+(d.getMonth()+1)).padStart(2,'0')+' '+(''+d.getHours()).padStart(2,'0')+':'+(''+d.getMinutes()).padStart(2,'0');
       var badge=m.canal==='retour'?'🗣️ Observation':'🔎 Analyse';
-      var rep=m.reponse?('<div style="margin-top:6px;padding:8px;border-radius:8px;background:var(--panel);border-left:3px solid var(--brand)"><b>Claude :</b> '+esc(m.reponse)+'</div>'):('<div style="margin-top:6px;font-size:12px;color:var(--muted)">⏳ En attente de réponse…</div>');
+      var rep=m.reponse?('<div style="margin-top:6px;padding:8px;border-radius:8px;background:var(--panel);border-left:3px solid var(--brand)"><b>Claude :</b> '+aideBoutons(esc(m.reponse))+'</div>'):('<div style="margin-top:6px;font-size:12px;color:var(--muted)">⏳ En attente de réponse…</div>');
       return '<div style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--panel2)"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">'+badge+' · '+esc(m.auteur||'—')+' · '+when+'</div><div>'+esc(m.texte)+'</div>'+rep+'</div>';
     }).join('');
   }
@@ -7196,6 +7253,7 @@ box.querySelectorAll('.td-ok').forEach(function(b){ b.onclick=function(){ if(con
        COMMENT : ?sandbox=1&demo=<scenario> monte le decor, affiche un bandeau, et « Effacer la demo »
        remet tout a zero. Tout est marque `demo_` : rien ne se melange aux vraies donnees, et le mode
        sandbox garantit qu'aucune ligne ne part au cloud. */
+    try{ var _qa=new URLSearchParams(location.search).get('aide'); if(_qa)setTimeout(function(){ aideOuvrir(_qa); },800); }catch(e){}   /* b251 : ?aide=selfie ouvre la fiche, meme en ligne */
     try{ if(_SBX){ var _q=new URLSearchParams(location.search);
       var _dm=_q.get('demo'); if(_dm)demoMonter(_dm);
       /* b235 : en sandbox le selecteur de role est TOUJOURS la — c'est le moyen le plus rapide de verifier un droit,
