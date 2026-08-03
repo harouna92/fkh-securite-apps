@@ -3,29 +3,47 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 259,
+      "titre": "Démos jouables pour le rattachement photo et la galerie",
+      "source": "Zeus",
+      "local": true,
+      "pourquoipas": "Ce sont les démos elles-mêmes."
+    },
+    {
+      "b": 260,
+      "titre": "Tableau : copie silencieuse (plus de fenêtre)",
+      "source": "Zeus",
+      "local": true,
+      "pourquoipas": "C'est ce tableau de bord."
+    },
+    {
       "b": 258,
       "titre": "Choisir une photo déjà remontée par l'agent (galerie du cloud)",
       "source": "remontée #67",
-      "pourquoipas": "Démo à écrire — le déploiement local est la prochaine étape."
+      "local": true,
+      "demo": "galerie"
     },
     {
       "b": 254,
       "titre": "Tableau de bord des états des demandes",
       "source": "Zeus",
-      "pourquoipas": "C'est ce tableau de bord."
+      "pourquoipas": "C'est ce tableau de bord.",
+      "local": true
     },
     {
       "b": 255,
       "titre": "Tableau de bord : 4 états + boutons d'ordre",
       "source": "Zeus",
-      "pourquoipas": "C'est ce tableau de bord."
+      "pourquoipas": "C'est ce tableau de bord.",
+      "local": true
     },
     {
       "b": 256,
       "titre": "Photos sans correspondance : rattachement manuel, fenêtre horaire réglable",
       "source": "remontées #53/#54/#57",
       "note": "±1 h à toute la journée ; prise, fin, tenue et contrôles 2 h",
-      "pourquoipas": "Démo à écrire."
+      "local": true,
+      "demo": "photo"
     },
     {
       "b": 253,

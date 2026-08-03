@@ -223,7 +223,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b258</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b259</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2820,6 +2820,41 @@ button.big:active{transform:translateY(1px)}
       quoi:'L’application vue par un opérateur.',
       aFaire:'Dans la barre, tu vois « 🎧 Prise de service PC » — il n’existe que pour les opérateurs. Clique dessus : il passe au vert « Fin de service PC ». Repasse en « super-admin » avec le bandeau : le bouton disparaît, mais la pastille 🎧 t’affiche qui tient le poste.',
       monter:function(){ try{localStorage.setItem('fkh_pc_poste',JSON.stringify({postes:[]}));}catch(e){} } },
+    photo:{ titre:'📎 Rattacher une photo sans correspondance',
+      quoi:'Une photo prise à 20 h 12 qu’aucun ticket n’a réclamée, et trois vacations du jour.',
+      aFaire:'Suis les étapes : tu vas ouvrir la liste des tickets, élargir la fenêtre horaire, et rattacher la photo à la main.',
+      monter:function(){ try{
+        var d=new Date(), iso=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+        SUIVI.unshift({id:'demo_ph1',statut:'validee',client:'AQUILA',siteAgent:'CARREFOUR Sainte-Savine',ville:'Sainte-Savine',mdate:iso,mheure:'20:00',mfin:'06:00',ctrls:['22:00','00:00','02:00']});
+        SUIVI.unshift({id:'demo_ph2',statut:'validee',client:'SECURITAS',siteAgent:'GARE DE JARNY',ville:'Jarny',mdate:iso,mheure:'19:30',mfin:'07:30'});
+        SUIVI.unshift({id:'demo_ph3',statut:'validee',client:'AQUILA',siteAgent:'SG TOTAL TROYES',ville:'Troyes',mdate:iso,mheure:'08:00',mfin:'18:00'});
+        save('fkh_suivi',SUIVI);
+        var t=new Date(); t.setHours(20,12,0,0);
+        phMatches=[{ph:{key:'u/ville_inconnue/'+t.getTime()+'.jpg',fmt:'uni',city:'ville_inconnue',ts:t.getTime(),type:'controle'},aiCheck:null}];
+      }catch(e){} } ,
+      guide:function(){ return [
+        {sel:null, txt:'Une photo est arrivée à <b>20 h 12</b> <b>sans position</b> : le rapprochement automatique n’a rien pu faire. Elle existe, elle prouve quelque chose — mais elle n’est rattachée à aucun ticket.', btn:'Ouvrir le choix manuel', fait:function(){ phmOuvrir(0); }, attendre:600},
+        {sel:'#phm-pop', txt:'Voici <b>tous les tickets du jour</b> dans la fenêtre par défaut de <b>± 2 h</b>, triés par écart avec l’heure de la photo. L’écart est vert sous 30 min, orange sous 2 h.', btn:'Élargir à toute la journée', fait:function(){ var b=document.querySelector('.phm-f[data-f="1440"]'); if(b)b.click(); }, attendre:500},
+        {sel:'#phm-pop', txt:'En élargissant, <b>la vacation de jour de Troyes apparaît aussi</b> — utile quand l’heure de la photo est douteuse. Les contrôles des 2 h sont proposés au même titre que la prise et la fin.', btn:'Rattacher le plus proche', fait:function(){ var b=document.querySelector('.phm-go'); if(b)b.click(); }, attendre:600},
+        {sel:null, txt:'C’est fait : le ticket est réglé et <b>cette photo en est la preuve</b>, exactement comme si le rapprochement automatique avait réussi. Clique 🧹 Effacer la démo pour retirer les vacations d’essai.'}
+      ]; } },
+    galerie:{ titre:'🖼️ Choisir une photo déjà remontée',
+      quoi:'Six photos arrivées par le lien envoyé aux agents.',
+      aFaire:'Tu vas ouvrir la galerie du cloud et en choisir une, au lieu de fouiller la pellicule du téléphone.',
+      monter:function(){ try{
+        var n=Date.now(), L=[];
+        [['agent/tenue/DIALLO_Mamadou',2],['agent/prise/TRAORE_Ousmane',5],['u/sainte_savine',9],
+         ['agent/fin/DIALLO_Mamadou',26],['u/jarny',30],['agent/tenue/KEITA_Sekou',50]].forEach(function(x){
+          L.push(x[0]+'/'+(n-x[1]*3600000)+'.jpg');
+        });
+        GAL.items=L; GAL.charge=Date.now();
+      }catch(e){} },
+      guide:function(){ return [
+        {sel:null, txt:'Avant, « Importer la photo » n’ouvrait que <b>la pellicule du téléphone</b>. Or les photos des agents arrivent par le lien qu’on leur envoie : elles sont <b>déjà dans le cloud, horodatées et tamponnées</b>.', btn:'Ouvrir la galerie', fait:function(){ galOuvrir(function(k){ window._galChoix=k; alert('Photo choisie :\n'+k+'\n\nDans l’application, ce clic la rattache à l’étape — sans rien re-téléverser.'); }); }, attendre:600},
+        {sel:'#gal-pop', txt:'La <b>plus récente en tête</b>. Chaque vignette dit <b>qui</b>, <b>quand</b> et de quel type de lien elle vient. Tape un nom dans le filtre pour restreindre.', btn:'Filtrer sur « DIALLO »', fait:function(){ var q=byId('gal-q'); if(q){ q.value='DIALLO'; q.dispatchEvent(new Event('input',{bubbles:true})); } }, attendre:450},
+        {sel:'#gal-liste', txt:'Il ne reste que les siennes. <b>Un clic la désigne comme preuve de l’étape</b> — rien n’est re-téléversé, la photo est déjà là, avec son tampon.', btn:'Choisir la première', fait:function(){ var c=document.querySelector('.gal-c'); if(c)c.click(); }, attendre:600},
+        {sel:null, txt:'C’est tout. Ce bouton est présent <b>partout où l’import existait</b> : contrôles tenue, photos de prise et de fin, contrôles des 2 h.'}
+      ]; } },
     retirer:{ titre:'✂️ Retirer une pastille ou une section sur place',
       quoi:'Tu arrives directement dans la vue du SUPERVISEUR, en aperçu.',
       aFaire:'Le bandeau est ORANGE et affiche « APERÇU » — le repère qui dit que tu n’es pas dans ta vue. Regarde les pastilles en haut à droite et les onglets : chacun porte une petite CROIX ROUGE. Clique celle de 🦺 Tenues (ou de n’importe quelle pastille) : elle quitte la vue du superviseur, tout de suite. Reviens sur « super-admin » : chez toi tout est intact et les croix disparaissent. Pour remettre : 🔐 Droits d’accès, ou « ✏️ Régler cette vue ».',

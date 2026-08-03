@@ -122,7 +122,7 @@ function rendre(data, bLigne, bLocal){
   document.querySelectorAll('.ord').forEach(function(b){
     b.onclick=function(){
       var txt=b.getAttribute('data-o');
-      function ok(){ montrer(txt); }
+      function ok(){ montrer(txt,b); }
       try{ navigator.clipboard.writeText(txt).then(ok,ok); }catch(e){ ok(); }
     };
   });
@@ -134,15 +134,13 @@ function rendre(data, bLigne, bLocal){
     +' · La démo devient possible à partir de l’état « Codé ».';
 }
 
-function montrer(txt){
-  var old=document.getElementById('ord-bar'); if(old)old.parentNode.removeChild(old);
-  var d=document.createElement('div'); d.id='ord-bar';
-  d.innerHTML='<b>Copié.</b> Colle ceci dans le chat :<div class="ord-txt">'+esc(txt)+'</div>'
-    +'<button type="button" id="ord-x">Fermer</button>';
-  document.body.appendChild(d);
-  document.getElementById('ord-x').onclick=function(){ d.parentNode.removeChild(d); };
-  var t=d.querySelector('.ord-txt');
-  try{ var r=document.createRange(); r.selectNodeContents(t); var sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r); }catch(e){}
+function montrer(txt,btn){
+  /* b260 (retour Zeus) : la fenetre etait du bruit — on copie, on le signale sur le bouton, c'est tout. */
+  if(!btn)return;
+  var avant=btn.textContent;
+  btn.textContent='✅ Copié — colle dans le chat';
+  btn.style.borderColor='#1a9e5c'; btn.style.color='#1a9e5c';
+  setTimeout(function(){ btn.textContent=avant; btn.style.borderColor=''; btn.style.color=''; },2600);
 }
 function charger(){
   document.getElementById('pied').textContent='Vérification en cours…';
