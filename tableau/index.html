@@ -58,6 +58,8 @@
    n'y est PAS ecrit : il est CALCULE en lisant le tampon reellement publie sur l'application. Le tableau
    ne peut donc pas affirmer qu'une chose est en ligne alors qu'elle ne l'est pas. */
 var URL_LIGNE='https://harouna92.github.io/fkh-securite-apps/gestion/';
+var API='https://fkh-gestion-api.hacamara2.workers.dev';
+var JETON='fkh-mail-ingest-2026';
 var BASE_DEMO_LOCAL='http://localhost:8143/';
 var BASE_DEMO_LIGNE=URL_LIGNE;
 
@@ -175,8 +177,18 @@ function deplacer(id,cible){
   var verbe={attente:'Traite le sujet',decide:'Code le sujet',code:'Déploie en local et prépare la démo',local:'Mets en ligne'}[cible];
   var phrase=verbe+' : '+((it.b&&(cible==='local'||cible==='code'))?('b'+it.b+' — '):'')+it.titre;
   try{ navigator.clipboard.writeText(phrase); }catch(e){}
+  /* b263 : l'ordre part AUSSI dans la file de la base. Claude la lit au demarrage de chaque session :
+     plus besoin de coller quoi que ce soit pour que le travail parte. La copie reste, pour qui veut
+     lancer tout de suite. */
   var p=document.getElementById('pied');
-  if(p){ p.textContent='✅ Déplacé et copié : « '+phrase+' » — colle-le dans le chat pour que je m’en occupe.'; p.style.color='#1a9e5c'; }
+  fetch(API+'/ordre?k='+encodeURIComponent(JETON),{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({texte:phrase,auteur:'tableau de bord'})})
+    .then(function(r){return r.json();})
+    .then(function(j){ if(p){ p.textContent=(j&&j.ok)
+        ? ((j.deja?'↩️ Déjà dans la file : « ':'✅ Ordre enregistré : « ')+phrase+' » — je le traiterai à la prochaine session. (Copié aussi, si tu veux lancer tout de suite.)')
+        : ('⚠️ Ordre NON enregistré dans la file. Il est copié : colle-le dans le chat.');
+      p.style.color=(j&&j.ok)?'#1a9e5c':'#e0a13b'; } })
+    .catch(function(){ if(p){ p.textContent='⚠️ File injoignable (hors ligne ?). L’ordre est copié : colle-le dans le chat.'; p.style.color='#e0a13b'; } });
   enregistrer();
 }
 function enregistrer(){

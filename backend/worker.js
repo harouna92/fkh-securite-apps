@@ -336,6 +336,29 @@ export default {
       return json({ ok: true, key: key });
     }
 
+    /* --- b263 : FILE D'ORDRES du tableau de bord.
+       Une page web ne peut pas reveiller Claude. Elle peut en revanche DEPOSER l'ordre ici : au
+       demarrage de chaque session, Claude lit cette file et traite ce qui s'y trouve. Zeus deplace une
+       carte le soir, le travail part le lendemain sans qu'il ait rien a coller.
+       Canal 'ordre' de la table messages, pour ne pas multiplier les schemas. */
+    if (path === "/ordre" && request.method === "POST") {
+      const tok = url.searchParams.get("k") || "";
+      if (tok !== (env.MAIL_INGEST_TOKEN || "fkh-mail-ingest-2026")) return json({ error: "bad_token" }, 403);
+      let b = {}; try { b = await request.json(); } catch (_) {}
+      const txt = String(b.texte || "").slice(0, 800);
+      if (!txt.trim()) return json({ error: "vide" }, 400);
+      const dej = await env.DB.prepare("SELECT id FROM messages WHERE canal='ordre' AND statut='nouveau' AND texte = ?").bind(txt).first();
+      if (dej) return json({ ok: true, deja: true });   // deplacer deux fois la meme carte ne cree pas deux ordres
+      await env.DB.prepare("INSERT INTO messages (canal, auteur, texte, statut, created_at) VALUES ('ordre', ?, ?, 'nouveau', ?)")
+        .bind(String(b.auteur || "tableau de bord").slice(0, 60), txt, Date.now()).run();
+      return json({ ok: true });
+    }
+    if (path === "/ordres" && request.method === "GET") {
+      const tok = url.searchParams.get("k") || "";
+      if (tok !== (env.MAIL_INGEST_TOKEN || "fkh-mail-ingest-2026")) return json({ error: "bad_token" }, 403);
+      const rs = await env.DB.prepare("SELECT id, auteur, texte, created_at FROM messages WHERE canal='ordre' AND statut='nouveau' ORDER BY id").all();
+      return json({ ok: true, ordres: rs.results || [] });
+    }
     // --- b223 TEMOIN DE VIE : le script Gmail signale CHAQUE passage, meme quand il n'y a aucun mail.
     // Sans ca, "aucun mail en base" est ambigu : script mort ou boite vide ? Le heartbeat leve l'ambiguite.
     if (path === "/mail/ping" && request.method === "POST") {
