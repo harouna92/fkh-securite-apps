@@ -134,7 +134,8 @@ button.big:active{transform:translateY(1px)}
 .cloudbar .cb-txt{flex:1}
 .cloudbar button{font-family:inherit;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
 #notif-bell{position:fixed;top:7px;right:9px;z-index:90;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:17px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}
-#logout-fab{position:fixed;top:7px;right:53px;z-index:90;height:38px;padding:0 12px;border-radius:19px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);display:none}
+#logout-fab{position:fixed;left:10px;bottom:10px;top:auto;right:auto;z-index:88;height:30px;padding:0 10px;border-radius:15px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:11.5px;font-weight:600;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2);opacity:.5;transition:opacity .15s;display:none}
+#logout-fab:hover{opacity:1;color:var(--ink)}
 #notif-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:none}
 #notif-badge.nb-g{background:#1a9e5c}
 #notif-badge.nb-o{background:#e08600}
@@ -215,7 +216,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b246</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b247</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
