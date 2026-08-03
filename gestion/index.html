@@ -214,7 +214,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b236</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b237</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2660,7 +2660,7 @@ button.big:active{transform:translateY(1px)}
      aux autres tant que Zeus ne l'aura pas cochee — sans qu'il faille y penser dans le code. */
   var DR_SECTIONS_ENCADREMENT=['noterapide','demandes','suivi','planning','fiche','zone','suiviappels','tenues',
     'services','interv','cfgiv','appels','suivisite','supervision','numeros','terrain','supterrain','mails'];
-  var DR_PASTILLES_ENCADREMENT=['op','cli','ph','te','c2','ro','af','rt','gp','pc'];
+  var DR_PASTILLES_ENCADREMENT=['op','cli','ph','te','c2','ro','af','rt','gp','pc','cloche','recherche'];
   function drDefSection(k,role){
     if(_secSuperOnly(k))return false;
     if(role==='operateur')return DR_OPERATEUR_DEF.indexOf(k)>=0;
@@ -2693,7 +2693,7 @@ button.big:active{transform:translateY(1px)}
     if(c&&typeof c==='object'&&typeof c[r]==='boolean')return c[r];
     return drDefPastille(k,r);
   }
-  var DR_PASTILLES=[['pc','🎧 Qui est au PC'],['an','🔴 Annulations à confirmer'],['op','⏰ Prises/fins non pointées'],
+  var DR_PASTILLES=[['cloche','🔔 Cloche des alertes'],['recherche','🔎 Barre de recherche intelligente'],['pc','🎧 Qui est au PC'],['an','🔴 Annulations à confirmer'],['op','⏰ Prises/fins non pointées'],
     ['cli','🏢 Client non avisé'],['ph','📷 Photos prise/fin'],['te','🦺 Contrôles tenue'],
     ['c2','🌙 Photos de contrôle 2 h'],['ro','🔌 Pointage sans appel'],['af','🧍 Vacations non affectées'],
     ['rt','🐢 Retards de prise'],['gp','📵 Photos sans position']];
@@ -2869,11 +2869,16 @@ button.big:active{transform:translateY(1px)}
     byId('demo-clean').onclick=demoNettoyer;
     byId('demo-hide').onclick=function(){ el.style.display='none'; };
   }
+  /* b237 : la cloche suit la meme regle que les pastilles — reglable dans la grille des droits.
+     Par defaut l'operateur ne l'a pas : ses alertes (retards, non-pointes) sont des alertes d'encadrement. */
+  function clocheMaj(){ try{ var b=byId('notif-bell'); if(b)b.style.display=(typeof drVoitPastille==='function'&&!drVoitPastille('cloche'))?'none':''; }catch(e){} }
+  /* b237 : la barre de recherche intelligente suit la meme regle — l'operateur travaille dans ses listes, pas dans une recherche transverse. */
+  function rechercheMaj(){ try{ var w=byId('gsearch-wrap'); if(w)w.style.display=(typeof drVoitPastille==='function'&&!drVoitPastille('recherche'))?'none':''; }catch(e){} }
   function applySectionAccess(){ tabsOrdreRole(); var allowed=CLOUD.sections, btns=document.querySelectorAll('#tabs button'), firstOk=null; btns.forEach(function(b){ var s=b.getAttribute('data-s'); if(!s)return;   /* b232 : le bouton PC vit dans la barre sans etre un onglet — il ne doit pas etre reaffiche ici */ var ok=((!allowed)||allowed.indexOf(s)>=0) && !(_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin());
       /* b230 : l'onglet Assistant quitte la barre — la bulle 💬 en bas a droite reste, c'est par elle qu'on ecrit. */
       if(s==='assistant')ok=false;
       try{ if(cbHidden().indexOf(s)>=0||cbDeleted().indexOf(s)>=0)ok=false; }catch(_e){}
-      try{ if(ok&&typeof drVoitSection==='function'&&!drVoitSection(s))ok=false; }catch(_e){}   /* b232 : droits regles depuis l'appli */ b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); try{pcMaj();}catch(e){}   /* b232 : apres le balayage des onglets, sinon il serait reaffiche */ if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
+      try{ if(ok&&typeof drVoitSection==='function'&&!drVoitSection(s))ok=false; }catch(_e){}   /* b232 : droits regles depuis l'appli */ b.style.display=ok?'':'none'; if(ok&&!firstOk)firstOk=b; }); try{pcMaj();}catch(e){}   /* b232 : apres le balayage des onglets, sinon il serait reaffiche */ try{clocheMaj();rechercheMaj();}catch(e){} if(allowed){ var active=document.querySelector('#tabs button.on'); if((!active||allowed.indexOf(active.getAttribute('data-s'))<0)&&firstOk)firstOk.click(); } }
 
   /* ===== Cockpit « Reste à payer sous-traitant » (N4 Super-Admin) — lit la clé synchronisée fkh_st_reste ===== */
   function renderStReste(){
