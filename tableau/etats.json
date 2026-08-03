@@ -1,41 +1,205 @@
 {
-  "_lisezmoi": "Source unique du tableau de bord. L'etat 'en ligne' n'est PAS ecrit ici : le tableau lit le tampon reellement publie et le compare au numero de build. Ainsi il ne peut pas mentir.",
+  "_lisezmoi": "Source unique du tableau de bord. 4 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' avec un numero de build = code (en local tant que le tampon publie ne l'a pas atteint, en ligne ensuite). L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie, donc le tableau ne peut pas mentir.",
   "maj": "2026-08-03",
   "items": [
-    { "b": 253, "titre": "Démos vivantes : visite guidée pas à pas", "source": "Zeus", "demo": "reponse", "note": "halo + défilement + le geste s'exécute" },
-    { "b": 252, "titre": "Croix de retrait seulement en mode réglage", "source": "Zeus", "demo": "retirer" },
-    { "b": 251, "titre": "Modes d'emploi joints aux réponses ([[aide:…]])", "source": "Zeus", "demo": "reponse" },
-    { "b": 250, "titre": "Croix de retrait fiable (26 px, pointerdown, ruban Annuler)", "source": "Zeus", "demo": "retirer" },
-    { "b": 249, "titre": "Retirer une pastille/section depuis la vue", "source": "Zeus", "demo": "retirer" },
-    { "b": 248, "titre": "Fin des fausses alertes (collecte, PC vacant)", "source": "Zeus" },
-    { "b": 247, "titre": "Déconnexion déplacée en bas à gauche", "source": "Zeus" },
-    { "b": 246, "titre": "Prévenir l'auteur quand sa demande est traitée", "source": "Zeus", "demo": "reponse" },
-    { "b": 245, "titre": "Pastille tenues envoyées non confirmées", "source": "Zeus", "demo": "tenues" },
-    { "b": 244, "titre": "Mode selfie sur le lien photo", "source": "remontée #67", "note": "à valider sur téléphone" },
-    { "b": 243, "titre": "Suppression du bouton Simuler + nettoyage des 2 lignes", "source": "remontée #62" },
-    { "b": 242, "titre": "Tickets entre collaborateurs depuis une pastille", "source": "Zeus" },
-    { "b": 241, "titre": "Modes d'emploi retirés à l'opérateur", "source": "Zeus" },
-    { "b": 240, "titre": "Le bandeau d'aperçu ne recouvre plus les onglets", "source": "Zeus" },
-    { "b": 239, "titre": "Bandeau d'état + bulle réglables", "source": "Zeus" },
-    { "b": 238, "titre": "Aperçu d'un rôle en ligne (admin + super-admin)", "source": "Zeus" },
-    { "b": 237, "titre": "Vue opérateur : cloche et recherche retirées", "source": "Zeus" },
-    { "b": 236, "titre": "Régler la vue d'un rôle depuis la vue", "source": "Zeus" },
-    { "b": 235, "titre": "Bascule de rôle permanente en sandbox", "source": "Zeus" },
-    { "b": 234, "titre": "Endosser un autre rôle", "source": "Zeus", "demo": "mails" },
-    { "b": 232, "titre": "Panneau Droits d'accès (sections × rôles)", "source": "Zeus", "demo": "droits" },
-    { "b": 231, "titre": "Mode démo (?sandbox=1&demo=…)", "source": "Zeus" },
-    { "b": 230, "titre": "Corbeille des sections + bouton PC opérateur", "source": "Zeus", "demo": "corbeille", "note": "Zeus signale que ça ne marche pas — à reproduire" },
-    { "b": 229, "titre": "Annulations signalées sans suppression", "source": "Zeus", "demo": "annulation" },
-    { "b": 227, "titre": "Qui est au PC (prise/fin de service)", "source": "Zeus", "demo": "pcvide" },
-    { "b": 223, "titre": "Témoin de vie de la collecte des mails", "source": "Zeus", "demo": "collecte" },
-    { "b": 222, "titre": "Vacations non affectées : 24 h / 7 j / le reste", "source": "Zeus" }
+    {
+      "b": 253,
+      "titre": "Démos vivantes : visite guidée pas à pas",
+      "source": "Zeus",
+      "demo": "reponse",
+      "note": "halo + défilement + le geste s'exécute"
+    },
+    {
+      "b": 252,
+      "titre": "Croix de retrait seulement en mode réglage",
+      "source": "Zeus",
+      "demo": "retirer"
+    },
+    {
+      "b": 251,
+      "titre": "Modes d'emploi joints aux réponses ([[aide:…]])",
+      "source": "Zeus",
+      "demo": "reponse"
+    },
+    {
+      "b": 250,
+      "titre": "Croix de retrait fiable (26 px, pointerdown, ruban Annuler)",
+      "source": "Zeus",
+      "demo": "retirer"
+    },
+    {
+      "b": 249,
+      "titre": "Retirer une pastille/section depuis la vue",
+      "source": "Zeus",
+      "demo": "retirer"
+    },
+    {
+      "b": 248,
+      "titre": "Fin des fausses alertes (collecte, PC vacant)",
+      "source": "Zeus"
+    },
+    {
+      "b": 247,
+      "titre": "Déconnexion déplacée en bas à gauche",
+      "source": "Zeus"
+    },
+    {
+      "b": 246,
+      "titre": "Prévenir l'auteur quand sa demande est traitée",
+      "source": "Zeus",
+      "demo": "reponse"
+    },
+    {
+      "b": 245,
+      "titre": "Pastille tenues envoyées non confirmées",
+      "source": "Zeus",
+      "demo": "tenues"
+    },
+    {
+      "b": 244,
+      "titre": "Mode selfie sur le lien photo",
+      "source": "remontée #67",
+      "note": "à valider sur téléphone"
+    },
+    {
+      "b": 243,
+      "titre": "Suppression du bouton Simuler + nettoyage des 2 lignes",
+      "source": "remontée #62"
+    },
+    {
+      "b": 242,
+      "titre": "Tickets entre collaborateurs depuis une pastille",
+      "source": "Zeus"
+    },
+    {
+      "b": 241,
+      "titre": "Modes d'emploi retirés à l'opérateur",
+      "source": "Zeus"
+    },
+    {
+      "b": 240,
+      "titre": "Le bandeau d'aperçu ne recouvre plus les onglets",
+      "source": "Zeus"
+    },
+    {
+      "b": 239,
+      "titre": "Bandeau d'état + bulle réglables",
+      "source": "Zeus"
+    },
+    {
+      "b": 238,
+      "titre": "Aperçu d'un rôle en ligne (admin + super-admin)",
+      "source": "Zeus"
+    },
+    {
+      "b": 237,
+      "titre": "Vue opérateur : cloche et recherche retirées",
+      "source": "Zeus"
+    },
+    {
+      "b": 236,
+      "titre": "Régler la vue d'un rôle depuis la vue",
+      "source": "Zeus"
+    },
+    {
+      "b": 235,
+      "titre": "Bascule de rôle permanente en sandbox",
+      "source": "Zeus"
+    },
+    {
+      "b": 234,
+      "titre": "Endosser un autre rôle",
+      "source": "Zeus",
+      "demo": "mails"
+    },
+    {
+      "b": 232,
+      "titre": "Panneau Droits d'accès (sections × rôles)",
+      "source": "Zeus",
+      "demo": "droits"
+    },
+    {
+      "b": 231,
+      "titre": "Mode démo (?sandbox=1&demo=…)",
+      "source": "Zeus"
+    },
+    {
+      "b": 230,
+      "titre": "Corbeille des sections + bouton PC opérateur",
+      "source": "Zeus",
+      "demo": "corbeille",
+      "note": "Zeus signale que ça ne marche pas — à reproduire"
+    },
+    {
+      "b": 229,
+      "titre": "Annulations signalées sans suppression",
+      "source": "Zeus",
+      "demo": "annulation"
+    },
+    {
+      "b": 227,
+      "titre": "Qui est au PC (prise/fin de service)",
+      "source": "Zeus",
+      "demo": "pcvide"
+    },
+    {
+      "b": 223,
+      "titre": "Témoin de vie de la collecte des mails",
+      "source": "Zeus",
+      "demo": "collecte"
+    },
+    {
+      "b": 222,
+      "titre": "Vacations non affectées : 24 h / 7 j / le reste",
+      "source": "Zeus"
+    }
   ],
   "attente": [
-    { "titre": "Sélection multiple de vacations au Planning + modification en lot", "source": "JULES — remontées #65/#66", "urgent": true },
-    { "titre": "Import CSV : reprendre l'affectation d'une vacation existante sans agent", "source": "remontée #64" },
-    { "titre": "Choisir une photo déjà remontée par l'agent (pas seulement la pellicule)", "source": "remontée #67" },
-    { "titre": "Photos sans correspondance : rattachement manuel avec fenêtre horaire réglable", "source": "remontées #53/#54/#57" },
-    { "titre": "Import CSV : détecter les quasi-doublons au lieu de les créer", "source": "remontées #58/#59" },
-    { "titre": "Bloc « flux demande propre » b138–b146 : test guidé par Zeus", "source": "file ancienne" }
+    {
+      "titre": "Sélection multiple de vacations au Planning + modification en lot",
+      "source": "JULES — remontées #65/#66",
+      "urgent": true,
+      "note": "reçu, pas encore cadré : quelles actions en lot exactement ?"
+    },
+    {
+      "titre": "Bloc « flux demande propre » b138–b146 : test guidé par Zeus",
+      "source": "file ancienne",
+      "note": "codé depuis le 01/08, jamais validé"
+    },
+    {
+      "titre": "Backfill des mails SECURITAS / RANC + mails de juin",
+      "source": "chantier mails"
+    },
+    {
+      "titre": "Corbeille (b230) : Zeus signale que ça ne marche pas",
+      "source": "Zeus 03/08",
+      "urgent": true,
+      "note": "en attente du geste exact pour reproduire"
+    }
+  ],
+  "decide": [
+    {
+      "titre": "Photos sans correspondance : bouton de rattachement manuel, fenêtre horaire réglable (±2 h par défaut, jusqu'à 24 h)",
+      "source": "remontées #53/#54/#57",
+      "note": "règle arrêtée avec Zeus ; reste à coder"
+    },
+    {
+      "titre": "Choisir une photo déjà remontée par l'agent, en plus de la pellicule du téléphone",
+      "source": "remontée #67 (2e partie)",
+      "note": "décidé le 03/08 ; dépend du rattachement manuel"
+    },
+    {
+      "titre": "Import CSV : si la vacation existe sans agent et que le CSV en apporte un, reprendre l'affectation au lieu de créer un doublon",
+      "source": "remontée #64",
+      "note": "règle validée par Zeus, à coder"
+    },
+    {
+      "titre": "Import CSV : détecter les quasi-doublons (même site, même date, horaires différents) et les signaler au lieu de les créer",
+      "source": "remontées #58/#59"
+    },
+    {
+      "titre": "Pastille 🌙 : tenir compte de l'heure du premier contrôle dans « avant / en cours »",
+      "source": "remontée #55"
+    }
   ]
 }
