@@ -225,7 +225,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v04-08·b304</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b305</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -4674,7 +4674,7 @@ button.big:active{transform:translateY(1px)}
       else if(k9==='route'){ m.routeH=v9; }
       else if(k9==='j15'){ m.j15H=v9; }
       else if(k9.indexOf('ctrl')===0){ var i9=parseInt(k9.slice(4),10)||0; var arr9=(Array.isArray(m.ctrls)&&m.ctrls.length)?m.ctrls.slice():(apControls(m)||[]).slice(); if(i9<arr9.length){arr9[i9]=v9;} else {arr9.push(v9);} arr9.sort(); m.ctrls=arr9; }
-      if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
+      m.valide=Date.now(); /* b305 */ if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
     card.querySelectorAll('.pl-tk-x').forEach(function(b9){ b9.onclick=function(){ var k9=b9.getAttribute('data-k'),ex9=saExclLoad(); if(ex9[k9]){ delete ex9[k9]; } else { ex9[k9]=Date.now(); } saExclSave(ex9); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
     card.querySelectorAll('.pl-tk-del').forEach(function(b9){ b9.onclick=function(){ var h9=b9.getAttribute('data-h'); if(!Array.isArray(m.ctrls))return; m.ctrls=m.ctrls.filter(function(x9){return x9!==h9;}); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
     var tka=card.querySelector('.pl-tk-add'); if(tka)tka.onclick=function(){ var h9=(card.querySelector('.pl-tk-add-h').value||'').trim(); if(!h9){alert('Choisis une heure de contrôle.');return;} if(!Array.isArray(m.ctrls)||!m.ctrls.length)m.ctrls=(apControls(m)||[]).slice(); if(m.ctrls.indexOf(h9)<0)m.ctrls.push(h9); m.ctrls.sort(); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
@@ -4744,7 +4744,7 @@ button.big:active{transform:translateY(1px)}
   // Ajouter une vacation sur un site+horaire+jour (clic case vide d'une ligne d'horaire) puis ouvrir la modale (affecter).
   function planningAddVacH(day,site,h1,h2){ _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift(signerVac({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day,mheure:h1||'',mfin:h2||'',src:'planning'})); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
   // Copier un site : duplique toutes ses vacations de la semaine affichée vers la semaine SUIVANTE (mêmes horaires, agents à réaffecter).
-  function planningCopySite(site){ var wk=[],i; for(i=0;i<7;i++)wk.push(svcAddDays(plWeek,i)); var src=SUIVI.filter(function(m){ return m.statut==='validee'&&(m.siteAgent||m.titre||'—')===site&&m.mdate&&wk.indexOf(m.mdate)>=0; }); if(!src.length){ alert('Aucune vacation à copier pour ce site cette semaine.'); return; } if(!confirm('Copier les '+src.length+' vacation(s) de « '+site+' » vers la semaine suivante ?\n(Mêmes horaires, agents à réaffecter.)'))return; var now=Date.now(),n=0; src.forEach(function(m,k){ var c={}; for(var key in m){ if(key.charAt(0)!=='_')c[key]=m[key]; } c.id='pl'+now+'_'+k+'_'+Math.round(Math.random()*9999); c.mdate=svcAddDays(m.mdate,7); delete c.agentId; delete c.vacStatus; c.valide=now; c.pris=now; SUIVI.unshift(c); n++; }); if(typeof saveSuivi==='function')saveSuivi(); plWeek=svcAddDays(plWeek,7); renderPlanning(); alert('✅ '+n+' vacation(s) copiée(s) sur la semaine suivante (à affecter).'); }
+  function planningCopySite(site){ var wk=[],i; for(i=0;i<7;i++)wk.push(svcAddDays(plWeek,i)); var src=SUIVI.filter(function(m){ return !m.deleted&&m.statut==='validee'&&(m.siteAgent||m.titre||'—')===site&&m.mdate&&wk.indexOf(m.mdate)>=0; }); if(!src.length){ alert('Aucune vacation à copier pour ce site cette semaine.'); return; } if(!confirm('Copier les '+src.length+' vacation(s) de « '+site+' » vers la semaine suivante ?\n(Mêmes horaires, agents à réaffecter.)'))return; var now=Date.now(),n=0; src.forEach(function(m,k){ var nextDate=svcAddDays(m.mdate,7); if((SUIVI||[]).some(function(x){return !x.deleted&&x.statut==='validee'&&x.mdate===nextDate&&(x.siteAgent||x.titre||'—')===site;}))return; /* b305 : anti-doublon double-clic */ var c={}; for(var key in m){ if(key.charAt(0)!=='_')c[key]=m[key]; } c.id='pl'+now+'_'+k+'_'+Math.round(Math.random()*9999); c.mdate=nextDate; delete c.agentId; delete c.vacStatus; c.valide=now; c.pris=now; SUIVI.unshift(c); n++; }); if(typeof saveSuivi==='function')saveSuivi(); plWeek=svcAddDays(plWeek,7); renderPlanning(); alert('✅ '+n+' vacation(s) copiée(s) sur la semaine suivante (à affecter).'); }
   // ===== Tableau des heures (calque Sekur) : Hj/Hn/Hjf/Hnf, colonnes Semaine/Dimanche — nuit 21h→06h, fériés FR calculés, découpage à la minute =====
   function _plEaster(y){ var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,mm=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*mm+114)/31),da=((h+l-7*mm+114)%31)+1; return new Date(y,mo-1,da); }
   function _plFerie(iso){ var p=iso.split('-'),y=+p[0],mmdd=p[1]+'-'+p[2]; if(['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'].indexOf(mmdd)>=0)return true; var E=_plEaster(y); function off(n){ var d=new Date(E.getFullYear(),E.getMonth(),E.getDate()+n); return ('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); } return mmdd===off(1)||mmdd===off(39)||mmdd===off(50); }
@@ -7088,7 +7088,8 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
   }
   function mailsMatchMission(pp){
     var sn=siteNorm(pp.site||''); var best=null;
-    (SUIVI||[]).forEach(function(m){ if(m.statut!=='validee'&&m.statut!=='recherche')return; if(m.retiree)return;
+    (SUIVI||[]).forEach(function(m){ if(m.deleted)return; // b305 : exclure soft-deletes du rapprochement
+      if(m.statut!=='validee'&&m.statut!=='recherche')return; if(m.retiree)return;
       var score=0;
       if(pp.ref&&(String(m.texte||'').indexOf(pp.ref)>=0||String(m.titre||'').indexOf(pp.ref)>=0||String(m.ref||'')===pp.ref))score+=4;
       if(sn){ var ms=siteNorm(m.siteAgent||m.titre||'');
@@ -7196,7 +7197,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
       (items||[]).forEach(function(it){ if(it.dismissed)return; var pp=mailsParse(it);
         if(pp.kind!=='demande'||!pp.site||!pp.mdate)return;
         if(_ref.indexOf(it.cdr_id)>=0)return;
-        if((SUIVI||[]).some(function(m){return m.mailSrc===it.cdr_id&&!m.deleted;}))return; // b304 : ignore soft-deletes
+        if((SUIVI||[]).some(function(m){return m.mailSrc===it.cdr_id;}))return; // b305 : skip TOUJOURS même si deleted (suppression définitive — Zeus 05/08)
         if(mailsMatchMission(pp))return;
         var _mpKey=(pp.site||'').toLowerCase().replace(/\s+/g,' ').trim()+'|'+(pp.mdate||'');
         if(_mpKey&&_mpCreated[_mpKey])return; // b304 : même site+date déjà créé dans ce batch
@@ -7257,7 +7258,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
       _mailsRender(items); }; });
     box.querySelectorAll('.mails-ref').forEach(function(b){ b.onclick=function(){ if(!confirm('Refuser cette vacation ? Elle sera retirée du Planning (le mail reste dans la liste).'))return;
       var mid=b.getAttribute('data-mid'), cid=b.getAttribute('data-id');
-      for(var i=0;i<SUIVI.length;i++){ if(SUIVI[i].id===mid){ SUIVI.splice(i,1); break; } }
+      for(var i=0;i<SUIVI.length;i++){ if(SUIVI[i].id===mid){ SUIVI[i].deleted=true; SUIVI[i].creeAt=Date.now(); break; } } // b305 : soft-delete (cloudPull ne ramène plus la vacation)
       save('fkh_suivi',SUIVI); if(typeof cloudPush==='function'){try{cloudPush('fkh_suivi');}catch(e){}}
       var _rf=[]; try{_rf=JSON.parse(localStorage.getItem('fkh_mail_refuse')||'[]')||[];}catch(e){} if(_rf.indexOf(cid)<0)_rf.push(cid); try{localStorage.setItem('fkh_mail_refuse',JSON.stringify(_rf));}catch(e){}
       if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
