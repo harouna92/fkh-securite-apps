@@ -153,6 +153,8 @@ button.big:active{transform:translateY(1px)}
 #pp-pc{right:449px}
 #pp-an{right:493px}
 #pp-td{right:537px}
+#pp-an2{right:581px}
+#pp-an2.pc-vide{border-color:#e0a13b;background:rgba(224,161,59,.18);animation:pcpulse 1.6s ease-in-out infinite}
 .rv-x{position:absolute;top:-8px;left:-8px;width:26px;height:26px;border-radius:50%;background:#e5322d;color:#fff;font-size:15px;font-weight:800;line-height:26px;text-align:center;cursor:pointer;z-index:99;box-shadow:0 1px 5px rgba(0,0,0,.6);touch-action:manipulation;user-select:none}
 .rv-x:active{transform:scale(.88)}
 .gd-halo{outline:3px solid #6ea8fe !important;outline-offset:3px;border-radius:10px;animation:gdpulse 1.4s ease-in-out infinite;position:relative;z-index:150}
@@ -223,7 +225,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b277</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b279</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -281,6 +283,7 @@ button.big:active{transform:translateY(1px)}
 <button type="button" id="pp-pc" class="pp-btn" title="Qui est au PC (prises de poste des opérateurs)" aria-label="Qui est au PC">🎧<span class="pp-badge" id="pp-pc-n"></span></button>
 <button type="button" id="pp-an" class="pp-btn" title="Annulations reçues par mail — à confirmer" aria-label="Annulations à traiter">🔴<span class="pp-badge" id="pp-an-n"></span></button>
 <button type="button" id="pp-td" class="pp-btn" title="Tenues envoyées dont la réception n'est pas confirmée" aria-label="Tenues non confirmées">📦<span class="pp-badge" id="pp-td-n"></span></button>
+<button type="button" id="pp-an2" class="pp-btn" title="Anomalies signalées — à traiter" aria-label="Anomalies">⚠️<span class="pp-badge" id="pp-an2-n"></span></button>
 <div id="pp-ovl"><div id="pp-box"></div></div>
 <button type="button" id="rech-bar" title="Missions en recherche d'agent — cliquer pour les traiter"></button>
 <button type="button" id="ask-fab" title="Poser une question (métier ou sur l'appli)" aria-label="Poser une question">💬</button>
@@ -2683,7 +2686,7 @@ button.big:active{transform:translateY(1px)}
      aux autres tant que Zeus ne l'aura pas cochee — sans qu'il faille y penser dans le code. */
   var DR_SECTIONS_ENCADREMENT=['noterapide','demandes','suivi','planning','fiche','zone','suiviappels','tenues',
     'services','interv','cfgiv','appels','suivisite','supervision','numeros','terrain','supterrain','mails','tickets'];
-  var DR_PASTILLES_ENCADREMENT=['op','cli','ph','te','c2','ro','af','rt','gp','pc','cloche','bandeau','bulle','aides'];   /* b263 : 'recherche' retiree — la barre intelligente est desormais super-admin seul (regle Zeus 03/08), reglable dans la grille des Droits */
+  var DR_PASTILLES_ENCADREMENT=['op','cli','ph','te','c2','ro','af','rt','gp','pc','an2','cloche','bandeau','bulle','aides'];   /* b263 : 'recherche' retiree — la barre intelligente est desormais super-admin seul (regle Zeus 03/08), reglable dans la grille des Droits */
   function drDefSection(k,role){
     if(_secSuperOnly(k))return false;
     if(role==='operateur')return DR_OPERATEUR_DEF.indexOf(k)>=0;
@@ -2716,7 +2719,7 @@ button.big:active{transform:translateY(1px)}
     if(c&&typeof c==='object'&&typeof c[r]==='boolean')return c[r];
     return drDefPastille(k,r);
   }
-  var DR_PASTILLES=[['cloche','🔔 Cloche des alertes'],['recherche','🔎 Barre de recherche intelligente'],['bandeau','🖥️ Bandeau d’état (sandbox / connexion)'],['bulle','💬 Bulle Assistant (bas à droite)'],['aides','📖 Textes d’explication sous les titres'],['pc','🎧 Qui est au PC'],['an','🔴 Annulations à confirmer'],['op','⏰ Prises/fins non pointées'],
+  var DR_PASTILLES=[['an2','⚠️ Anomalies signalées'],['cloche','🔔 Cloche des alertes'],['recherche','🔎 Barre de recherche intelligente'],['bandeau','🖥️ Bandeau d’état (sandbox / connexion)'],['bulle','💬 Bulle Assistant (bas à droite)'],['aides','📖 Textes d’explication sous les titres'],['pc','🎧 Qui est au PC'],['an','🔴 Annulations à confirmer'],['op','⏰ Prises/fins non pointées'],
     ['cli','🏢 Client non avisé'],['ph','📷 Photos prise/fin'],['te','🦺 Contrôles tenue'],
     ['c2','🌙 Photos de contrôle 2 h'],['ro','🔌 Pointage sans appel'],['af','🧍 Vacations non affectées'],
     ['rt','🐢 Retards de prise'],['gp','📵 Photos sans position']];
@@ -4444,7 +4447,8 @@ button.big:active{transform:translateY(1px)}
   function _plMonday(iso){ try{ var d=new Date(iso+'T00:00:00'); var wd=(d.getDay()+6)%7; return svcAddDays(iso,-wd); }catch(e){ return iso; } }
   function planningGo(mid){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===mid){m=SUIVI[i];break;} if(!m)return; if(typeof suiviBucket!=='undefined')suiviBucket=(m.statut==='validee'?'validee':(m.statut||'recherche')); var tb=document.querySelector('#tabs button[data-s="suivi"]'); if(tb)tb.click(); if(typeof renderSuivi==='function')renderSuivi(); }
   function _plNormHM(v){ v=String(v||'').trim(); if(!v)return ''; var m=v.match(/^(\d{1,2})\s*[:hH]?\s*(\d{0,2})$/); if(!m)return v; return ('0'+m[1]).slice(-2)+':'+(m[2]?('0'+m[2]).slice(-2):'00'); }
-  function planningAddVac(day,site){ var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day||impTodayISO(),mheure:'',mfin:'',src:'planning'}); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
+  var _plJourCible='';   /* b278 : date de la colonne d'ou l'on a clique « Ajouter » */
+  function planningAddVac(day,site){ _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day||impTodayISO(),mheure:'',mfin:'',src:'planning'}); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
   // ===== Statuts de vacation (calqués sur Sekur : 9 codes) — voir releve-sekur/services-vacations.md =====
   function _plStatusMap(){ return {100:{l:'En attente',c:'#8a8f98'},110:{l:'En retard',c:'#e0562d'},120:{l:'Non réalisé',c:'#7a1f1f'},200:{l:'En cours',c:'#2563eb'},250:{l:'Prolongation',c:'#7b61ff'},300:{l:'Terminé',c:'#1a9e5c'},400:{l:'Interrompu',c:'#c02626'},500:{l:'En pause',c:'#e0a13b'},800:{l:'Non terminé',c:'#8a6d00'}}; }
   // État affiché : statut MANUEL prioritaire (m.vacStatus), sinon DÉRIVÉ de l'agent + l'heure (zéro ressaisie).
@@ -4492,13 +4496,34 @@ button.big:active{transform:translateY(1px)}
     function stepVac(){ cc.innerHTML=head('🕐 Nouveau service / vacation')
       +'<label class="f"><div class="lab">🏢 Client</div><input class="pa-vcli" list="pa-dlc2" placeholder="Client\u2026" autocomplete="off">'+dlClients('pa-dlc2')+'</label>'
       +'<label class="f" style="margin-top:6px"><div class="lab">📍 Site</div><input class="pa-vsite" list="pa-dls" placeholder="Site\u2026" autocomplete="off"><datalist id="pa-dls"></datalist></label>'
-      +'<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:6px;margin-top:6px"><input type="date" class="pa-vdate" value="'+esc((typeof impTodayISO==='function')?impTodayISO():'')+'"><input type="time" class="pa-vh1" title="Heure d\u00e9but"><input type="time" class="pa-vh2" title="Heure fin"></div>'+foot('Cr\u00e9er la vacation'); wire();
+      +'<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:6px;margin-top:6px"><input type="date" class="pa-vdate" value="'+esc(_plJourCible||'')+'" required title="Date de la vacation — verifie-la, elle n’est pas pre-remplie au hasard"><input type="time" class="pa-vh1" title="Heure d\u00e9but"><input type="time" class="pa-vh2" title="Heure fin"></div>'+foot('Cr\u00e9er la vacation'); wire();
       var siteInp=cc.querySelector('.pa-vsite'), cliInp=cc.querySelector('.pa-vcli');
+      /* b278 (bug releve par Zeus : une vacation SOTEL creee au 04/08 au lieu du 06/08) : le champ date
+         etait pre-rempli avec AUJOURD'HUI. Qui ajoute une vacation depuis le Planning pense au site et
+         aux horaires, pas a corriger une date deja remplie — la vacation partait donc au mauvais jour
+         sans que rien ne le signale. On propose desormais la date de la COLONNE cliquee ; a defaut, le
+         champ reste vide et le formulaire refuse de partir sans elle. */
       function fillSites(){ var dl=cc.querySelector('#pa-dls'); if(dl)dl.innerHTML=_plKnownSites((cliInp.value||'').trim()).map(function(x){return '<option value="'+esc(x)+'">';}).join(''); }
       cliInp.oninput=fillSites; fillSites();
       cc.querySelector('.pa-go').onclick=function(){ var cli=(cliInp.value||'').trim(), st2=(siteInp.value||'').trim(), d=(cc.querySelector('.pa-vdate').value||'').trim(), h1=(cc.querySelector('.pa-vh1').value||'').trim(), h2=(cc.querySelector('.pa-vh2').value||'').trim();
         if(!cli){alert('Client obligatoire (hi\u00e9rarchie).');return;} if(!st2){alert('Site obligatoire (hi\u00e9rarchie).');return;} if(!d||!h1){alert('Date et heure de d\u00e9but obligatoires.');return;}
         var vi=''; try{ vi=(typeof siteMetaGet==='function')?(siteMetaGet(st2).ville||''):''; }catch(e){}
+        /* b278 : le meme site a une date PROCHE mais differente est presque toujours une erreur de saisie.
+           On le montre avant d'enregistrer, sans interdire — parfois deux vacations voisines sont reelles. */
+        try{
+          var _sn=(typeof siteNorm==='function')?siteNorm(st2):st2.toUpperCase();
+          var _proches=(SUIVI||[]).filter(function(m){
+            if(!m.mdate||m.mdate===d||m.retiree)return false;
+            var _ms=(typeof siteNorm==='function')?siteNorm(m.siteAgent||m.titre||''):'';
+            if(!_ms||(_ms.indexOf(_sn)<0&&_sn.indexOf(_ms)<0))return false;
+            return Math.abs(new Date(m.mdate+'T12:00:00')-new Date(d+'T12:00:00'))<=7*86400000;
+          });
+          if(_proches.length){
+            var _l=_proches.slice(0,4).map(function(m){ return '  • '+m.mdate.split('-').reverse().join('/')+(m.mheure?(' a '+m.mheure):''); }).join(String.fromCharCode(10));
+            if(!confirm('⚠️ Ce site a deja une ou plusieurs vacations a moins de 7 jours :'+String.fromCharCode(10)+_l+String.fromCharCode(10)+String.fromCharCode(10)
+              +'Tu crees celle du '+d.split('-').reverse().join('/')+'. Est-ce bien la bonne date ?'))return;
+          }
+        }catch(_e){}
         var now=Date.now(), id='pl'+now+'_'+Math.round(Math.random()*9999);
         SUIVI.unshift({id:id,titre:st2,siteAgent:st2,client:cli,ville:vi,statut:'validee',motif:'',pris:now,valide:now,assoc:[],mdate:d,mheure:h1,mfin:h2,src:'planning'});
         if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning();
@@ -4618,7 +4643,7 @@ button.big:active{transform:translateY(1px)}
   function siteMetaSet(site,patch){ var o=siteMetaLoad(),k=(typeof tnorm==='function'?tnorm(site):String(site||'')); o[k]=Object.assign({},o[k]||{},patch); save('fkh_sites_meta',o); }
   function _plDurTxt(h1,h2){ var s=toMin(h1),e=toMin(h2); if(s==null||e==null)return ''; var d=e-s; if(d<=0)d+=1440; var hh=Math.floor(d/60),mm=d%60; return hh+'h'+(mm?('0'+mm).slice(-2):''); }
   // Ajouter une vacation sur un site+horaire+jour (clic case vide d'une ligne d'horaire) puis ouvrir la modale (affecter).
-  function planningAddVacH(day,site,h1,h2){ var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day,mheure:h1||'',mfin:h2||'',src:'planning'}); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
+  function planningAddVacH(day,site,h1,h2){ _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day,mheure:h1||'',mfin:h2||'',src:'planning'}); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
   // Copier un site : duplique toutes ses vacations de la semaine affichée vers la semaine SUIVANTE (mêmes horaires, agents à réaffecter).
   function planningCopySite(site){ var wk=[],i; for(i=0;i<7;i++)wk.push(svcAddDays(plWeek,i)); var src=SUIVI.filter(function(m){ return m.statut==='validee'&&(m.siteAgent||m.titre||'—')===site&&m.mdate&&wk.indexOf(m.mdate)>=0; }); if(!src.length){ alert('Aucune vacation à copier pour ce site cette semaine.'); return; } if(!confirm('Copier les '+src.length+' vacation(s) de « '+site+' » vers la semaine suivante ?\n(Mêmes horaires, agents à réaffecter.)'))return; var now=Date.now(),n=0; src.forEach(function(m,k){ var c={}; for(var key in m){ if(key.charAt(0)!=='_')c[key]=m[key]; } c.id='pl'+now+'_'+k+'_'+Math.round(Math.random()*9999); c.mdate=svcAddDays(m.mdate,7); delete c.agentId; delete c.vacStatus; c.valide=now; c.pris=now; SUIVI.unshift(c); n++; }); if(typeof saveSuivi==='function')saveSuivi(); plWeek=svcAddDays(plWeek,7); renderPlanning(); alert('✅ '+n+' vacation(s) copiée(s) sur la semaine suivante (à affecter).'); }
   // ===== Tableau des heures (calque Sekur) : Hj/Hn/Hjf/Hnf, colonnes Semaine/Dimanche — nuit 21h→06h, fériés FR calculés, découpage à la minute =====
@@ -6125,6 +6150,7 @@ button.big:active{transform:translateY(1px)}
     ph:{title:'📷 Photos de PRISE / FIN manquantes',verb:'sans photo',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     te:{title:'🦺 Agents planifiés SANS photo de contrôle tenue',verb:'photo de contrôle manquante',tiles:3,depuis:'Visés dès 12 h AVANT la prise de service, tant que la photo n’est pas déposée'},
     c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,phaseSite:1,depuis:'Tout l’historique · classées Terminées / En cours puis PAR SITE · dépôt de la photo sur chaque créneau'},
+    an2:{title:'\u26a0\uFE0F Anomalies signalées',verb:'anomalie(s) ouverte(s)',tiles:0,anov:1,depuis:'Ce que le terrain remonte et qui n’est pas une demande : lien non reçu, numéro manquant, consigne fausse — un défaut non résolu se reproduira'},
     td:{title:'📦 Tenues envoyées — réception NON confirmée',verb:'agent(s) à rappeler',tiles:0,tdv:1,depuis:'Un colis parti n’est pas un colis reçu : tant que l’agent n’a pas confirmé, il n’a peut-être pas de tenue'},
     an:{title:'🔴 Annulations à confirmer',verb:'annulation(s) signalée(s)',tiles:0,anv:1,depuis:'Une annulation reçue par mail ne supprime jamais une vacation : elle la signale. Confirme, ou écarte la fausse alerte'},
     pc:{title:'🎧 Qui est au PC',verb:'personne(s) au poste',tiles:0,pcv:1,depuis:'Le PC ne doit jamais être vacant : tant que personne n’a ouvert son service, les appels et les demandes ne sont tenus par personne'},
@@ -6203,6 +6229,10 @@ button.big:active{transform:translateY(1px)}
     // b177 : vacations validees SANS agent, d'aujourd'hui vers le futur (classees par site au rendu)
     // b210 : retards de prise signales par l'operateur (case Agent en retard du ticket)
     // b219 : agents ayant envoye des photos SANS position (cle u/ville_inconnue) - via l'archive de rattachement
+    sc.an2=anoVisible()?anoOuvertes().map(function(a3){
+      return {ano:1,id:a3.id,cat:a3.cat,texte:a3.texte,ou:a3.ou,etat:a3.etat,deNom:a3.deNom,parQui:a3.parQui||'',
+              site:(a3.ou||'—'),mdate:'',heure:'',due:a3.cree,since:(Date.now()-a3.cree)};
+    }):[];
     sc.td=tdListe();
     sc.an=annulVisible()?annulListe():[];
     sc.pc=pcOuverts().map(function(x){ return {pc:1,agent:x.nom,role:x.role,user:x.user,due:x.debut,since:(now-x.debut),site:'PC',mdate:'',heure:''}; });
@@ -6452,12 +6482,71 @@ button.big:active{transform:translateY(1px)}
   function refusInfo(mid,key){
     try{ var S=ssLoad(), r=(S[mid]&&S[mid][key])||{}; return r.refusPhoto?{par:r.refusPar||'',at:r.refusAt||0}:null; }catch(e){ return null; }
   }
+  /* ===== b279 : TICKETS D'ANOMALIE =====
+     POURQUOI (Zeus) : « l'agent de Jacob est arrive sur site sans avoir recu le lien », « le client Terca
+     n'a pas son numero dans le ticket ». Ces defauts se disent au telephone, se perdent, et se
+     reproduisent la semaine suivante parce que personne ne les a ecrits. Ce ne sont ni des demandes ni
+     des tickets adresses a quelqu'un : ce sont des DEFAUTS DU SYSTEME, que les trois niveaux
+     d'encadrement doivent voir en meme temps.
+     COMMENT : un signalement en deux champs. Il est visible par le superviseur, l'administrateur et le
+     super-admin — pas adresse a une personne, offert a qui peut le traiter. Chacun peut le PRENDRE
+     (son nom s'inscrit, on ne se marche plus dessus) puis le RESOUDRE en disant ce qui a ete fait.
+     La pastille reste allumee tant qu'il en reste : un defaut non resolu se reproduira. */
+  var ANO_CATS=[['lien','🔗 Lien photo non reçu par l’agent'],['numero','\u260E\uFE0F Numéro manquant (client ou agent)'],
+                ['consigne','📋 Consigne absente ou fausse'],['acces','🔑 Problème d’accès au site'],
+                ['planning','📅 Erreur de planning (date, horaire, site)'],['autre','\u2753 Autre']];
+  function anoLoad(){ return tkxLoad().filter(function(t){ return t&&t.kind==='anomalie'; }); }
+  function anoVisible(){ try{ var r=drRole(); return r!=='operateur'; }catch(e){ return true; } }
+  function anoOuvertes(){ return anoLoad().filter(function(a2){ return a2.etat!=='resolu'; }); }
+  function anoCreer(cat,txt,ou){
+    var arr=tkxLoad();
+    arr.push({id:'an'+Date.now()+'_'+Math.round(Math.random()*9999),kind:'anomalie',
+      cat:cat||'autre', texte:txt||'', ou:ou||'',
+      deUser:tkxMoi(), deNom:tkxMonNom(), cree:Date.now(), etat:'ouverte', fil:[]});
+    tkxSave(arr);
+    try{ if(typeof notifScan==='function')notifScan(); }catch(e){}
+    if(typeof ppRefresh==='function')ppRefresh(); if(typeof ppRender==='function')ppRender();
+  }
+  function anoMaj(id,etat,mot){
+    var arr=tkxLoad();
+    for(var i=0;i<arr.length;i++){ if(arr[i].id!==id)continue;
+      if(etat==='prise'){ arr[i].etat='prise'; arr[i].parQui=tkxMonNom(); arr[i].parAt=Date.now(); }
+      else if(etat==='resolu'){ arr[i].etat='resolu'; arr[i].resPar=tkxMonNom(); arr[i].resAt=Date.now(); }
+      else if(etat==='ouverte'){ arr[i].etat='ouverte'; arr[i].parQui=''; arr[i].parAt=0; arr[i].resPar=''; arr[i].resAt=0; }
+      if(mot)arr[i].fil.push({qui:tkxMonNom(),at:Date.now(),txt:mot});
+      break; }
+    tkxSave(arr);
+    if(typeof ppRefresh==='function')ppRefresh(); if(typeof ppRender==='function')ppRender();
+  }
+  function anoFormulaire(){
+    var old=byId('ano-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='ano-pop';
+    pop.style.cssText='position:fixed;inset:10% 6%;z-index:250;background:var(--panel);border:1.5px solid #e0a13b;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+    pop.innerHTML='<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">\u26a0\uFE0F Signaler une anomalie</b><button type="button" id="ano-x">✕</button></div>'
+      +'<label class="f" style="margin-top:8px"><div class="lab">De quoi s’agit-il ?</div><select id="ano-cat">'
+        +ANO_CATS.map(function(c){return '<option value="'+c[0]+'">'+c[1]+'</option>';}).join('')+'</select></label>'
+      +'<label class="f" style="margin-top:6px"><div class="lab">Ce qui s’est passé</div><input id="ano-txt" placeholder="Ex. L’agent de Jacob est arrivé sur site sans avoir reçu le lien photo."></label>'
+      +'<label class="f" style="margin-top:6px"><div class="lab">Où / qui <span class="sub" style="font-weight:400">(site, agent, client — facultatif)</span></div><input id="ano-ou" placeholder="Ex. TERCA · Jacob"></label>'
+      +'<div class="acts" style="margin-top:12px"><button type="button" id="ano-go" class="ok">\u26a0\uFE0F Signaler</button></div>'
+      +'<p class="sub" style="margin:10px 0 0;font-size:11.5px">Visible immédiatement par le superviseur, l’administrateur et le super-admin. Chacun peut la prendre en charge.</p>';
+    document.body.appendChild(pop);
+    byId('ano-x').onclick=function(){ pop.parentNode.removeChild(pop); };
+    byId('ano-go').onclick=function(){
+      var t=(byId('ano-txt').value||'').trim();
+      if(!t){ alert('Décris en une phrase ce qui s’est passé.'); return; }
+      anoCreer(byId('ano-cat').value,t,(byId('ano-ou').value||'').trim());
+      pop.parentNode.removeChild(pop);
+    };
+  }
   function ppRefresh(){ try{ppReorderInit();}catch(e){}   /* b263 : le glisser-deposer des pastilles etait branche par ppRender(), donc SEULEMENT apres avoir ouvert une pastille — il ne s'armait jamais si on n'en ouvrait aucune. On le branche des le premier rafraichissement. */
     try{setTimeout(ppPlacer,0);}catch(e){} var hide=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); // b150 : réservé superviseur/admin/super-admin
     var sc=hide?null:ppScan(), any=false;
-    ['op','cli','ph','te','c2','ro','af','rt','gp','pc','an','td'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
+    ['op','cli','ph','te','c2','ro','af','rt','gp','pc','an','td','an2'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
       b.style.display=hide?'none':'';
       if(typeof drVoitPastille==='function'&&!drVoitPastille(k)){ b.style.display='none'; return; }   /* b232 */
+      if(k==='an2'){ var Lo=sc.an2||[]; b.style.display=hide?'none':'';
+        b.classList.toggle('pc-vide',!!Lo.length); n.textContent=Lo.length; n.style.display=Lo.length?'':'none';
+        b.title=Lo.length?(Lo.length+' anomalie(s) à traiter'):'Aucune anomalie ouverte'; return; }
       if(k==='an'){ var La=sc.an||[]; b.style.display=(hide||!La.length)?'none':'';
         b.classList.toggle('pc-vide',!!La.length); n.textContent=La.length; n.style.display=La.length?'':'none';
         b.title=La.length?(La.length+' annulation(s) reçue(s) par mail — à confirmer'):''; return; }
@@ -6474,7 +6563,7 @@ button.big:active{transform:translateY(1px)}
   /* b226 : ranger les PASTILLES. Elles sont posees a des emplacements fixes (right: 53, 97, 141 ... px).
      Deplacer une pastille = lui donner l'emplacement d'une autre, et decaler les autres. L'ordre est
      memorise par appareil (fkh_pp_order). Reserve au super-admin et a l'administrateur, comme les onglets. */
-  var PP_ORDRE_DEF=['pp-an','pp-pc','pp-td','pp-op','pp-cli','pp-ph','pp-te','pp-c2','pp-ro','pp-af','pp-rt','pp-gp'];
+  var PP_ORDRE_DEF=['pp-an2','pp-an','pp-pc','pp-td','pp-op','pp-cli','pp-ph','pp-te','pp-c2','pp-ro','pp-af','pp-rt','pp-gp'];
   function ppPeutRanger(){ try{ var r=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; return r==='superadmin'||r==='full'||r==='admin'; }catch(e){ return false; } }
   function ppOrdre(){ var o=null;
     /* b236 : pour un role regle par le super-admin, son ordre prime sur le rangement local. */
@@ -6560,7 +6649,27 @@ button.big:active{transform:translateY(1px)}
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
       return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+ecartPhoto(x.mid,(x.key||'prise'),x.heure,x.mdate)+hdBloc(x)+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
-    if(D.tdv){
+    if(D.anov){
+      h+='<div class="acts" style="margin-bottom:10px"><button type="button" id="ano-new" class="ok" style="font-size:13px">\u2795 Signaler une anomalie</button></div>';
+      var _lib={}; ANO_CATS.forEach(function(c){_lib[c[0]]=c[1];});
+      h+=L.length?L.map(function(x){
+        var d=new Date(x.due), q=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' à '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2);
+        var pris=(x.etat==='prise');
+        return '<div style="border:1px solid '+(pris?'#6ea8fe':'#e0a13b')+';border-radius:10px;padding:10px;margin-bottom:8px;background:var(--panel2)">'
+          +'<div style="font-weight:700">'+esc(_lib[x.cat]||x.cat)+'</div>'
+          +'<div style="margin-top:3px">'+esc(x.texte)+'</div>'
+          +'<div class="sub" style="margin:4px 0 0">'+(x.ou?('📍 '+esc(x.ou)+' · '):'')+'signalé par '+esc(x.deNom||'—')+' le '+esc(q)+'</div>'
+          +(pris?('<div class="sub" style="margin:3px 0 0;color:#6ea8fe">👤 Pris en charge par <b>'+esc(x.parQui)+'</b></div>'):'')
+          +'<div class="acts" style="margin-top:8px;gap:6px;flex-wrap:wrap">'
+          +(pris?'':'<button type="button" class="ano-p" data-id="'+esc(x.id)+'" style="font-size:12.5px">🙋 Je m’en occupe</button>')
+          +'<button type="button" class="ano-r ok" data-id="'+esc(x.id)+'" style="font-size:12.5px">\u2705 Résolu</button></div></div>';
+      }).join(''):'<div class="sub">Aucune anomalie ouverte 🎉</div>';
+      var _res=anoLoad().filter(function(a4){return a4.etat==='resolu';}).sort(function(u,v){return (v.resAt||0)-(u.resAt||0);}).slice(0,6);
+      if(_res.length){ h+='<div class="lab" style="margin:14px 0 5px">Résolues récemment</div>'
+        +_res.map(function(a5){ var d2=a5.resAt?new Date(a5.resAt):null;
+          return '<div class="sub" style="margin:0 0 3px">\u2705 '+esc(a5.texte.slice(0,80))+(d2?(' · '+('0'+d2.getDate()).slice(-2)+'/'+('0'+(d2.getMonth()+1)).slice(-2)):'')+(a5.resPar?(' par '+esc(a5.resPar)):'')+'</div>'; }).join(''); }
+      h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
+    } else if(D.tdv){
       h+='<div class="acts" style="margin-bottom:10px;gap:6px;align-items:center"><span class="sub" style="margin:0">On relance au bout de</span>'
        +'<input type="number" id="td-delai" value="'+tdDelai()+'" min="1" max="60" style="width:64px;text-align:center">'
        +'<span class="sub" style="margin:0">jour(s) sans confirmation</span></div>';
@@ -6732,7 +6841,10 @@ button.big:active{transform:translateY(1px)}
     box.querySelectorAll('.pp-refus-x').forEach(function(b){ b.onclick=function(){
       refusMarquer(b.getAttribute('data-mid'),b.getAttribute('data-k'),false); }; });
     var cl=byId('pp-close'); if(cl)cl.onclick=ppClose;
-box.querySelectorAll('.td-ok').forEach(function(b){ b.onclick=function(){ if(confirm('Confirmer que l’agent a bien reçu sa tenue ?\n\nLa ligne se ferme définitivement.'))tdRecu(b.getAttribute('data-k')); }; });
+var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
+    box.querySelectorAll('.ano-p').forEach(function(b){ b.onclick=function(){ anoMaj(b.getAttribute('data-id'),'prise',''); }; });
+    box.querySelectorAll('.ano-r').forEach(function(b){ b.onclick=function(){ var m=prompt('Qu’as-tu fait pour la résoudre ?'); if(m!==null)anoMaj(b.getAttribute('data-id'),'resolu',m); }; });
+    box.querySelectorAll('.td-ok').forEach(function(b){ b.onclick=function(){ if(confirm('Confirmer que l’agent a bien reçu sa tenue ?\n\nLa ligne se ferme définitivement.'))tdRecu(b.getAttribute('data-k')); }; });
     box.querySelectorAll('.td-plus').forEach(function(b){ b.onclick=function(){ tdRepousser(b.getAttribute('data-k'),+b.getAttribute('data-j')); }; });
     var _td=byId('td-delai'); if(_td)_td.onchange=function(){ var n=parseInt(_td.value,10); if(n>0&&n<90){ tdDelaiSet(n); ppRefresh(); ppRender(); } };
     box.querySelectorAll('.an-ok').forEach(function(b){ b.onclick=function(){ if(confirm('Confirmer l’annulation ?\n\nLa vacation sort du Planning et ses tickets d’appel disparaissent. Pense à prévenir l’agent s’il y en a un.'))annulTrancher(b.getAttribute('data-id'),true); }; });
@@ -6785,7 +6897,7 @@ box.querySelectorAll('.td-ok').forEach(function(b){ b.onclick=function(){ if(con
   setTimeout(function(){ try{ppRoScan();}catch(_e){} },3000);
   function ppOpen(mode){ PP_VIEW={mode:mode,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.add('on'); ppRender(); }
   function ppClose(){ PP_VIEW={mode:null,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.remove('on'); }
-  (function(){ ['op','cli','ph','te','c2','ro','af','rt','gp','pc','an','td'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
+  (function(){ ['op','cli','ph','te','c2','ro','af','rt','gp','pc','an','td','an2'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
     var o=byId('pp-ovl'); if(o)o.addEventListener('click',function(ev){ if(ev.target===o)ppClose(); });
     setInterval(function(){ try{ppRefresh();}catch(_e){} },30000);
     setTimeout(function(){ try{ppRefresh();}catch(_e){} },900);
@@ -7361,7 +7473,7 @@ box.querySelectorAll('.td-ok').forEach(function(b){ b.onclick=function(){ if(con
     {k:'appel_danger',   ic:'⛔', lbl:'Prise/fin de service non pointée (+10 min)'},
     {k:'nouvelle_demande',ic:'🆕', lbl:'Nouvelle demande reçue (en recherche)'},
     {k:'demande_1h',     ic:'🕵️', lbl:'Demande en recherche depuis + d\'1 h'},
-    {k:'annul_mail',    ic:'🔴', lbl:'Annulation reçue par mail (à confirmer)'},{k:'reponse_demande',ic:'✅', lbl:'Réponse à une demande que j’ai faite'},{k:'ticket_recu',   ic:'🎫', lbl:'Ticket qui m’est adressé'},{k:'ticket_reponse',ic:'💬', lbl:'Retour sur un ticket que j’ai envoyé'},{k:'pc_vacant',     ic:'🎧', lbl:'Personne au PC (poste vacant)'},{k:'mail_arret', ic:'📧', lbl:'Collecte des mails à l’arrêt (+15 min)'},{k:'prise_retard',   ic:'🕓', lbl:'Agent en retard à la prise de service'}
+    {k:'anomalie',      ic:'⚠️', lbl:'Anomalie signalée par un collaborateur'},{k:'annul_mail',    ic:'🔴', lbl:'Annulation reçue par mail (à confirmer)'},{k:'reponse_demande',ic:'✅', lbl:'Réponse à une demande que j’ai faite'},{k:'ticket_recu',   ic:'🎫', lbl:'Ticket qui m’est adressé'},{k:'ticket_reponse',ic:'💬', lbl:'Retour sur un ticket que j’ai envoyé'},{k:'pc_vacant',     ic:'🎧', lbl:'Personne au PC (poste vacant)'},{k:'mail_arret', ic:'📧', lbl:'Collecte des mails à l’arrêt (+15 min)'},{k:'prise_retard',   ic:'🕓', lbl:'Agent en retard à la prise de service'}
   ];
   function notifLoadCfg(){ var c=null; try{c=JSON.parse(localStorage.getItem('fkh_notif_cfg')||'null');}catch(e){} if(!c||typeof c!=='object')c={}; if(typeof c.on!=='boolean')c.on=false; if(typeof c.sound!=='boolean')c.sound=true; if(!c.cats||typeof c.cats!=='object')c.cats={}; NOTIF_CATS.forEach(function(t){ if(typeof c.cats[t.k]!=='boolean')c.cats[t.k]=true; }); NOTIF.cfg=c; }
   function notifSaveCfg(){ try{localStorage.setItem('fkh_notif_cfg',JSON.stringify(NOTIF.cfg));}catch(e){} }
@@ -7371,6 +7483,13 @@ box.querySelectorAll('.td-ok').forEach(function(b){ b.onclick=function(){ if(con
   function notifFire(a){ try{ var n=new Notification(a.title,{body:a.body,tag:a.cat+':'+a.key}); n.onclick=function(){ try{window.focus();}catch(e){} var btn=document.querySelector('#tabs button[data-s="'+a.go+'"]'); if(btn)btn.click(); try{n.close();}catch(e){} }; }catch(e){} notifBeep(); }
   function notifThresholdAlerts(){
     var now=Date.now(), out=[];
+    /* b279 : une anomalie non prise en charge alerte les trois niveaux. Une fois prise, elle cesse de
+       sonner — quelqu'un s'en occupe, insister ne sert plus a rien. */
+    try{ if(anoVisible())anoOuvertes().forEach(function(a6){
+      if(a6.etat==='prise')return;
+      out.push({cat:'anomalie',key:'ano'+a6.id,title:'\u26a0\uFE0F Anomalie signalée',
+        body:(a6.texte||'').slice(0,90)+((a6.ou)?(' — '+a6.ou):''),
+        when:(typeof impTodayISO==='function'?impTodayISO():'')}); }); }catch(_e){}
     /* b246 : une reponse a MA demande est une alerte — c'est ainsi qu'on previent l'auteur, meme appli fermee. */
     try{ asgNonLues().forEach(function(m){
       out.push({cat:'reponse_demande',key:'rep'+m.id,

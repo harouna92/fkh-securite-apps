@@ -3,6 +3,22 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 278,
+      "titre": "Ajout au Planning : date non pré-remplie + alerte si le site a déjà une vacation à moins de 7 jours",
+      "source": "Zeus — bug SOTEL 04/08 au lieu du 06/08",
+      "theme": "Planning & vacations",
+      "local": true,
+      "pourquoipas": "Se voit en cliquant ➕ Ajouter dans le Planning."
+    },
+    {
+      "b": 279,
+      "titre": "⚠️ Tickets d'ANOMALIE — visibles des trois niveaux d'encadrement, prise en charge et résolution",
+      "source": "Zeus",
+      "theme": "Outils de pilotage",
+      "local": true,
+      "pourquoipas": "Se voit en ouvrant la pastille ⚠️ : bouton « Signaler une anomalie »."
+    },
+    {
       "b": 276,
       "titre": "Les ordres portent leur PROJET : plusieurs tableaux, plusieurs sessions",
       "source": "Zeus",
