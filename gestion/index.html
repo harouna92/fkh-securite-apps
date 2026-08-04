@@ -225,7 +225,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v04-08·b296</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v04-08·b300</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -740,7 +740,7 @@ button.big:active{transform:translateY(1px)}
     <div id="sa-superzone">
     <div class="acts" style="gap:8px;flex-wrap:wrap;margin-bottom:4px"><button type="button" id="sa-cfg-toggle" class="big" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">⚙️ Filtres &amp; configuration de l'affichage</button><button type="button" id="sa-sel-toggle" class="big" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line)">☑ Sélectionner</button></div>
     <div class="card" id="sa-filtres-card" style="display:none">
-      <div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="sa-from"></label><label class="f"><div class="lab">Au</div><input type="date" id="sa-to"></label></div>
+      <div class="grid2"><label class="f"><div class="lab">Du</div><input type="date" id="sa-from" autocomplete="off"></label><label class="f"><div class="lab">Au</div><input type="date" id="sa-to" autocomplete="off"></label></div>
       <div style="margin-top:8px"><label class="f" style="max-width:160px"><div class="lab">À partir de (heure)</div><input type="time" id="sa-heure-debut" style="padding:6px 8px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--ink)"></label></div>
       <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><button type="button" class="sa-preset" data-d="1">Aujourd'hui</button><button type="button" class="sa-preset" data-d="3">3 j</button><button type="button" class="sa-preset" data-d="7">7 j</button><button type="button" class="sa-preset" data-d="30">30 j</button><button type="button" class="sa-preset" data-d="all">Tout</button></div>
       <div class="acts" style="flex-wrap:wrap;gap:6px;margin-top:8px"><span class="sub" style="margin:0;align-self:center">Type :</span><button type="button" class="sa-type on" data-ty="all">Tous</button><button type="button" class="sa-type" data-ty="avant">☎ Avant</button><button type="button" class="sa-type" data-ty="prise">🟢 Prise</button><button type="button" class="sa-type" data-ty="pendant">🌙 Pendant</button><button type="button" class="sa-type" data-ty="fin">🔚 Fin</button></div>
@@ -6010,7 +6010,7 @@ button.big:active{transform:translateY(1px)}
   if(byId('sa-sel-cancel'))byId('sa-sel-cancel').onclick=function(){ saSelMode=false; saSelected={}; var t=byId('sa-sel-toggle'); if(t)t.textContent='☑ Sélectionner'; renderSuiviAppels(); }; // b294
   if(byId('sa-sel-retirer'))byId('sa-sel-retirer').onclick=function(){ var keys=Object.keys(saSelected); if(!keys.length){alert('Aucun ticket sélectionné.');return;} if(!confirm('Retirer '+keys.length+' ticket'+(keys.length>1?'s':'')+' de l\'agenda ?\nIls seront masqués, mais restaurables à tout moment via ↩️ Restaurer.'))return; var ex=saExclLoad(); keys.forEach(function(k){ ex[k]=Date.now(); }); saExclSave(ex); saSelMode=false; saSelected={}; var t=byId('sa-sel-toggle'); if(t)t.textContent='☑ Sélectionner'; renderSuiviAppels(); }; // b294
   (function(){ var sel=byId('sa-operateur'), info=byId('sa-operateur-info'); if(!sel)return; function ops(){ var o=load('fkh_operateurs'); return (o&&typeof o==='object'&&!Array.isArray(o))?o:{}; } function refresh(){ var t=impTodayISO(), o=ops(), n=o[t]||''; sel.value=n; if(info)info.innerHTML=n?('✅ <b>'+esc(n)+'</b> est de service aujourd\'hui ('+t+'). Toute anomalie d\'appel du jour lui sera rattachée.'):'⚠️ Choisis l\'opérateur de service : les anomalies d\'appels du jour seront rattachées à son nom.'; } sel.addEventListener('change',function(){ var t=impTodayISO(), o=ops(); if(sel.value)o[t]=sel.value; else delete o[t]; save('fkh_operateurs',o); refresh(); }); refresh(); })();
-  (function(){ var t=impTodayISO(); if(byId('sa-from')&&!byId('sa-from').value)byId('sa-from').value=t; if(byId('sa-to')&&!byId('sa-to').value)byId('sa-to').value=t; })();
+  (function(){ var t=impTodayISO(); if(byId('sa-from'))byId('sa-from').value=t; if(byId('sa-to'))byId('sa-to').value=t; })(); // b300 : toujours forcer aujourd'hui au chargement (le navigateur pouvait mémoriser la veille)
   (function(){ function tick(){ var el=byId('sa-clock'); if(!el)return; var d=new Date(); el.textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2); } tick(); setInterval(tick,1000); })();
   // ===== Consignes / tâches libres greffées dans l'agenda des appels =====
   // ===== Consignes : anti-réapparition (#8). Fusion par ticket à la synchro (comme #11 pour les coches) + suppression par TOMBSTONE (un ticket supprimé ne revient plus via un appareil périmé). =====
@@ -7581,7 +7581,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
   if(byId('tc-agent'))byId('tc-agent').addEventListener('input',function(){ var q=this.value.toLowerCase().trim(),box=byId('sugg-tc-agent'); if(q.length<1||typeof FA==='undefined'||!FA){box.classList.add('hidden');return;} var m=FA.filter(function(a){return (a.nom||'').toLowerCase().indexOf(q)>=0;}).slice(0,6); if(!m.length){box.classList.add('hidden');return;} box.innerHTML=m.map(function(a){return '<div data-v="'+esc(a.nom||'')+'">'+esc(a.nom||'')+'</div>';}).join(''); box.classList.remove('hidden'); box.querySelectorAll('div').forEach(function(d){d.addEventListener('mousedown',function(e){e.preventDefault();});d.addEventListener('click',function(e){e.preventDefault();byId('tc-agent').value=d.getAttribute('data-v');box.classList.add('hidden');});}); });
 
   // ===== #6 Notifications — Niveau 1 (appli ouverte, téléphone + ordinateur) =====
-  var NOTIF={ cfg:null, seen:{}, knownRech:null, primed:false, audio:null };
+  var NOTIF={ cfg:null, seen:{}, seenDay:null, knownRech:null, primed:false, audio:null };
   var NOTIF_CATS=[
     {k:'appel_retard',   ic:'🔴', lbl:'Prise/fin de service en retard (+5 min)'},
     {k:'appel_danger',   ic:'⛔', lbl:'Prise/fin de service non pointée (+10 min)'},
@@ -7650,8 +7650,9 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
         if(e.key!=='prise'&&e.key!=='fin')return; // notifs UNIQUEMENT pour la prise et la fin de service (plus de pré-prise / appels de contrôle)
         var ct=frMs(e.mdate,e.abs||0); if(!ct||ct<gl)return;
         var dmin=(now-ct)/60000, loc=(e.label||(e.key==='prise'?'Prise de service':'Fin de service'))+' — '+(e.site||'');
-        if(dmin>=10)out.push({cat:'appel_danger',key:e.mid+'|'+e.key,title:'⛔ '+(e.key==='prise'?'Prise':'Fin')+' de service NON pointée',body:loc+' · prévu '+e.heure+' (+'+Math.floor(dmin)+' min)',go:'suiviappels'});
-        else if(dmin>=4.5)out.push({cat:'appel_retard',key:e.mid+'|'+e.key,title:'🔴 '+(e.key==='prise'?'Prise':'Fin')+' de service en retard',body:loc+' · prévu '+e.heure,go:'suiviappels'});
+        var _ctDate=new Date(ct).toISOString().slice(0,10); // b299 : date réelle du service (pas mdate) pour filtrer les vieilles vacations
+        if(dmin>=10)out.push({cat:'appel_danger',key:e.mid+'|'+e.key,title:'⛔ '+(e.key==='prise'?'Prise':'Fin')+' de service NON pointée',body:loc+' · prévu '+e.heure+' (+'+Math.floor(dmin)+' min)',go:'suiviappels',when:_ctDate});
+        else if(dmin>=4.5)out.push({cat:'appel_retard',key:e.mid+'|'+e.key,title:'🔴 '+(e.key==='prise'?'Prise':'Fin')+' de service en retard',body:loc+' · prévu '+e.heure,go:'suiviappels',when:_ctDate});
       });
     }catch(_){}
     try{ SUIVI.forEach(function(m){ if(m.statut==='recherche'&&m.pris&&(now-m.pris)>=3600000)out.push({cat:'demande_1h',key:m.id,title:'🕵️ Demande en recherche > 1 h',body:(m.titre||'Demande').slice(0,60)+(m.client?' — '+m.client:''),go:'suivi'}); }); }catch(_){}
@@ -7662,10 +7663,13 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     var active=notifThresholdAlerts(), activeKeys={}, badge=0;
     // b221 : la cloche ne compte QUE les alertes du JOUR (avant, elle cumulait tout l'historique -> badge fige a 47, plus personne ne le regardait)
     var _tdN=(typeof impTodayISO==='function')?impTodayISO():'';
+    // b299 : persist seen journalier en localStorage pour ne pas re-notifier au rechargement de page
+    if(_tdN&&NOTIF.seenDay!==_tdN){ NOTIF.seenDay=_tdN; try{NOTIF.seen=JSON.parse(localStorage.getItem('fkh_notif_seen_'+_tdN)||'{}');}catch(_n){NOTIF.seen={};} }
     active=active.filter(function(a2){ var w=String(a2.when||''); if(!w)return true; var d2=(w.match(/(\d{4}-\d{2}-\d{2})/)||[])[1]; return !d2||d2===_tdN; });
     active.forEach(function(a){ var kk=a.cat+':'+a.key; activeKeys[kk]=1; if(NOTIF.cfg.cats[a.cat])badge++;
       if(NOTIF.cfg.cats[a.cat]&&!NOTIF.seen[kk]){ if(NOTIF.primed&&notifCanFire())notifFire(a); NOTIF.seen[kk]=1; } });
     Object.keys(NOTIF.seen).forEach(function(kk){ if(!activeKeys[kk])delete NOTIF.seen[kk]; });
+    if(_tdN)try{localStorage.setItem('fkh_notif_seen_'+_tdN,JSON.stringify(NOTIF.seen));}catch(_n){}
     var rechIds=[]; try{ SUIVI.forEach(function(m){ if(m.statut==='recherche')rechIds.push(m.id); }); }catch(_){}
     if(NOTIF.knownRech===null){ NOTIF.knownRech={}; rechIds.forEach(function(id){NOTIF.knownRech[id]=1;}); }
     else rechIds.forEach(function(id){ if(!NOTIF.knownRech[id]){ NOTIF.knownRech[id]=1; if(NOTIF.cfg.cats.nouvelle_demande&&notifCanFire()){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){m=SUIVI[i];break;} notifFire({cat:'nouvelle_demande',key:id,title:'🆕 Nouvelle demande',body:(m&&m.titre?m.titre.slice(0,60):'Nouvelle demande')+((m&&m.client)?' — '+m.client:''),go:'suivi'}); } } });
