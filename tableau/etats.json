@@ -3,6 +3,14 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 282,
+      "titre": "Appels : le serveur vocal n'écrase plus la conversation (nettoyage + limite 2000 → 12000 car.)",
+      "source": "Zeus — appel AQUILA 9h19",
+      "theme": "Mails & collecte",
+      "local": true,
+      "pourquoipas": "Déjà déployé côté serveur ; se vérifie sur le prochain appel avec attente longue."
+    },
+    {
       "b": 280,
       "titre": "Toute création de vacation est signée (nom, compte, heure)",
       "source": "Zeus",
@@ -421,11 +429,6 @@
     }
   ],
   "decide": [
-    {
-      "titre": "Appels non exploitables (que de la musique d'attente) : les signaler en anomalie au lieu de les perdre en silence",
-      "source": "Zeus — appel AQUILA du 04/08 09:31",
-      "note": "vérifier d'abord si la transcription est tronquée (2027 car. pour un appel long)"
-    },
     {
       "titre": "Sélection multiple de vacations au Planning : cocher plusieurs vacations puis, en lot — changer l'agent, décaler les horaires, couper/rétablir les tickets",
       "source": "JULES — remontées #65/#66",

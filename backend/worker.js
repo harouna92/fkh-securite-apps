@@ -205,6 +205,37 @@ async function aiTranscribe(env, audioUrl) {
   const j = await r.json();
   return j.text || "";
 }
+/* ===== b282 : L'ATTENTE N'EST PAS LA CONVERSATION =====
+   Un appel sortant vers AQUILA du 04/08 a 09h19 n'a rien donne. Cause : la transcription etait coupee a
+   2000 caracteres, et ces 2000 caracteres etaient ENTIEREMENT occupes par le serveur vocal — accueil,
+   touches a taper, « votre temps d'attente est estime a moins de 2 minutes » repete trente fois. La vraie
+   conversation venait apres, et elle etait jetee avant que l'IA la lise.
+   Deux corrections : on retire les phrases du serveur vocal, et on garde beaucoup plus de texte. */
+function nettoyerAttente(txt) {
+  let t = String(txt || "");
+  const bruits = [
+    /votre appel est enregistr[eé][^.?!]*/gi,
+    /votre temps d.attente est estim[eé][^.?!]*/gi,
+    /savez-vous que vous pouvez saisir[^.?!]*/gi,
+    /plus d.informations?\s+www[^\s]*/gi,
+    /pour signaler une effraction[^.?!]*/gi,
+    /(?:tapez|appuyez sur)\s*\d[^.?!]*/gi,
+    /merci de patienter[^.?!]*/gi,
+    /toutes nos lignes sont occup[eé]es[^.?!]*/gi,
+  ];
+  for (const r of bruits) t = t.replace(r, " ");
+  // une meme phrase repetee en boucle par le repondeur : on n'en garde qu'un exemplaire
+  const vues = new Set();
+  t = t.split(/(?<=[.?!])\s+/).filter((ph) => {
+    const k = ph.trim().toLowerCase();
+    if (k.length < 12) return true;
+    if (vues.has(k)) return false;
+    vues.add(k);
+    return true;
+  }).join(" ");
+  return t.replace(/\s{2,}/g, " ").trim();
+}
+
 const AI_PROMPT_BASE = "Tu analyses un message (appel transcrit, mail, SMS ou capture d'ecran) d'une societe de securite privee. Determine s'il contient une (ou plusieurs) demande(s) operationnelle(s), de trois NATURES possibles :\n- GARDIENNAGE : un agent est POSTE pour SURVEILLER un site sur une vacation / une duree (nuit, week-end, chantier, magasin...). Surveillance statique, l'agent reste sur place.\n- INTERVENTION : un DEPLACEMENT PONCTUEL declenche par une ALARME / une levee de doute / une alerte (l'agent se rend sur place, verifie, repart). Ponctuel, dure typiquement 1 h.\n- RONDE : un ou plusieurs PASSAGES de verification / pointage / tournee sur un ou plusieurs sites.\nEn cas de DOUTE entre gardiennage et intervention/ronde, choisis GARDIENNAGE.\nReponds UNIQUEMENT en JSON strict, sans aucun texte autour :\n{\"is_demande\": true|false, \"resume\": \"\", \"demandes\": [{\"nature\":\"gardiennage|intervention|ronde\",\"client\":\"\",\"ville\":\"\",\"cp\":\"\",\"site\":\"\",\"type_site\":\"\",\"nb_agents\":\"\",\"urgent\":true,\"vacations\":[{\"date\":\"\",\"horaires\":\"\"}]}],\"arrets\":[{\"client\":\"\",\"site\":\"\",\"ville\":\"\",\"motif\":\"\"}]}\nREGLES ABSOLUES :\n- FKH (FKH SECURITE) n'est JAMAIS le champ 'client' : FKH c'est NOUS, le destinataire des demandes. Le client est l'AUTRE societe (donneur d'ordre). Si le seul nom present est FKH, laisse 'client' vide.\n- 'nature' est OBLIGATOIRE pour CHAQUE demande : exactement 'gardiennage', 'intervention' ou 'ronde'.\n- Le champ 'client' est PRIORITAIRE : cherche ACTIVEMENT le donneur d'ordre et reprends-le exactement comme il est dit (Securitas, Sotel, etc.). Regarde partout : societe qui appelle/mande, nom cite, en-tete ou signature du mail, expediteur, en-tete de SMS. C'est souvent une societe de securite qui nous sous-traite. Ne laisse 'client' vide QUE si vraiment AUCUN nom de donneur d'ordre n'apparait nulle part.\n- UNE demande = UN SEUL SITE. Si le message concerne PLUSIEURS SITES differents (villes ou lieux differents), cree PLUSIEURS entrees distinctes dans 'demandes', une par site. NE JAMAIS regrouper plusieurs sites dans une seule demande.\n- Pour un MEME site (gardiennage) demande sur PLUSIEURS DATES : c'est UNE SEULE demande, mais mets UNE entree PAR DATE dans 'vacations', chaque entree = {date, horaires (creneau de cette date)}. NE PAS regrouper toutes les dates ensemble. Pour une intervention ou une ronde ponctuelle, 'vacations' peut rester vide (ou contenir la date/heure prevue si elle est precisee).\n- ARRET / ANNULATION a l'initiative du CLIENT : si le message est un client qui ARRETE, ANNULE ou met FIN a une prestation de gardiennage EN COURS (ex. « on arrete la surveillance du site X », « plus besoin d'agent a partir de demain », « on suspend la mission »), NE le mets PAS dans 'demandes' → mets une entree dans 'arrets' {client, site, ville, motif}. C'est le client qui prend l'initiative de l'arret.\n- is_demande=false, demandes=[] et arrets=[] si ce n'est NI du gardiennage, NI une intervention, NI une ronde, NI un arret (facture, RH, commercial, conversation, autre).\n- Laisse \"\" si une info est absente. resume = 1 phrase courte resumant le message.";
 function aiParseJson(j) { const txt = (j.content && j.content[0] && j.content[0].text) || "{}"; const m = txt.match(/\{[\s\S]*\}/); try { return JSON.parse(m ? m[0] : txt); } catch (e) { return { is_demande: false, resume: "analyse illisible" }; } }
 async function aiAnalyze(env, transcript, direction) {
@@ -282,7 +313,7 @@ async function aiScan(env, maxCalls, force) {
     let data = {}, isDem = 0;
     try {
       const transcript = await aiTranscribe(env, c.record);
-      if (transcript) { const an = await aiAnalyze(env, transcript, c.direction); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [], transcript: transcript.slice(0, 2000), number: c.contact_number, direction: c.direction, start: c.start_time }; isDem = (data.demandes.length || data.arrets.length) ? 1 : 0; }
+      if (transcript) { const utile = nettoyerAttente(transcript); const an = await aiAnalyze(env, utile || transcript, c.direction); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [], transcript: transcript.slice(0, 12000), number: c.contact_number, direction: c.direction, start: c.start_time }; isDem = (data.demandes.length || data.arrets.length) ? 1 : 0; }
       else data = { skip: "no_transcript" };
     } catch (e) { data = { error: String((e && e.message) || e) }; }
     await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(id, Date.now(), isDem, JSON.stringify(data)).run();
