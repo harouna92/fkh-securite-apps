@@ -47,6 +47,9 @@ async function planifierDepuisMail(env, cdr, texte, data) {
   const vac = {
     id: "mv" + Date.now() + "_" + Math.round(Math.random() * 99999),
     statut: "validee", mailPending: true, mailSrc: cdr,
+    /* b281 : meme creee par le systeme, une vacation dit d'ou elle vient. Le super-admin doit pouvoir
+       repondre « qui l'a mise la » pour n'importe quelle ligne — y compris quand la reponse est « personne ». */
+    creePar: "Système — mail reçu", creeUser: "worker", creeAt: Date.now(),
     client: bdc.client, siteAgent: bdc.site, ville: pdf.ville || "", cp: pdf.cp || "",
     adresse: pdf.adresse || "", mdate: bdc.mdate, mheure: bdc.heure, mfin: "",
     ref: bdc.ref, titre: bdc.sujet.slice(0, 90), src: "mail",

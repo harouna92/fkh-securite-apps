@@ -225,7 +225,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b279</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b281</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -4448,7 +4448,39 @@ button.big:active{transform:translateY(1px)}
   function planningGo(mid){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===mid){m=SUIVI[i];break;} if(!m)return; if(typeof suiviBucket!=='undefined')suiviBucket=(m.statut==='validee'?'validee':(m.statut||'recherche')); var tb=document.querySelector('#tabs button[data-s="suivi"]'); if(tb)tb.click(); if(typeof renderSuivi==='function')renderSuivi(); }
   function _plNormHM(v){ v=String(v||'').trim(); if(!v)return ''; var m=v.match(/^(\d{1,2})\s*[:hH]?\s*(\d{0,2})$/); if(!m)return v; return ('0'+m[1]).slice(-2)+':'+(m[2]?('0'+m[2]).slice(-2):'00'); }
   var _plJourCible='';   /* b278 : date de la colonne d'ou l'on a clique « Ajouter » */
-  function planningAddVac(day,site){ _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day||impTodayISO(),mheure:'',mfin:'',src:'planning'}); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
+  /* ===== b280 : SIGNER TOUTE CREATION DE VACATION =====
+     POURQUOI (Zeus, apres la vacation SOTEL creee au mauvais jour) : « qui a cree cette vacation ? » —
+     impossible de repondre. Chacun a son mot de passe, mais rien n'etait ecrit sur la ligne. Sans nom,
+     on ne peut ni comprendre l'erreur avec la personne, ni lui montrer le bon geste.
+     COMMENT : toute vacation nait signee — le nom lisible, le compte, et l'heure. Affiche dans sa fiche. */
+  /* ===== b281 : D'OU VIENT CETTE VACATION ? =====
+     POURQUOI (Zeus) : le super-admin doit pouvoir dire, pour n'importe quelle ligne du Planning, qui
+     l'a mise la — un collegue, un import, un mail, un appel, ou le systeme lui-meme. Sans cela, une
+     erreur ne se corrige pas a la source : on rectifie la ligne, et la meme faute revient le lendemain.
+     COMMENT : les creations recentes sont signees (b280). Pour tout ce qui existe deja, le PREFIXE de
+     l'identifiant dit l'origine — c'est retroactif, sans avoir a reconstruire quoi que ce soit. */
+  function origineVac(m){
+    if(!m)return '';
+    if(m.creePar)return '👤 '+m.creePar+(m.creeUser?(' ('+m.creeUser+')'):'');
+    var id=String(m.id||'');
+    if(id.indexOf('mv')===0||m.mailSrc)return '📧 Mail reçu — créée automatiquement par le système';
+    if(id.indexOf('imp')===0)return '📥 Import CSV';
+    if(id.indexOf('ai_mail')===0)return '📧 Mail — proposée par l’IA, validée par un collaborateur';
+    if(id.indexOf('ai_')===0)return '📞 Appel téléphonique — proposée par l’IA, validée par un collaborateur';
+    if(id.indexOf('gx')===0)return '🔎 Recherche intelligente';
+    if(id.indexOf('pl')===0)return '📅 Ajout manuel au Planning (avant la signature — auteur inconnu)';
+    if(id.indexOf('d')===0)return '✍️ Saisie manuelle';
+    return '❓ Origine inconnue';
+  }
+  function signerVac(o){
+    try{
+      o.creePar=(typeof opNow==='function'?opNow():'')||'';
+      o.creeUser=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'';
+      o.creeAt=Date.now();
+    }catch(e){}
+    return o;
+  }
+  function planningAddVac(day,site){ _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift(signerVac({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day||impTodayISO(),mheure:'',mfin:'',src:'planning'})); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
   // ===== Statuts de vacation (calqués sur Sekur : 9 codes) — voir releve-sekur/services-vacations.md =====
   function _plStatusMap(){ return {100:{l:'En attente',c:'#8a8f98'},110:{l:'En retard',c:'#e0562d'},120:{l:'Non réalisé',c:'#7a1f1f'},200:{l:'En cours',c:'#2563eb'},250:{l:'Prolongation',c:'#7b61ff'},300:{l:'Terminé',c:'#1a9e5c'},400:{l:'Interrompu',c:'#c02626'},500:{l:'En pause',c:'#e0a13b'},800:{l:'Non terminé',c:'#8a6d00'}}; }
   // État affiché : statut MANUEL prioritaire (m.vacStatus), sinon DÉRIVÉ de l'agent + l'heure (zéro ressaisie).
@@ -4525,7 +4557,7 @@ button.big:active{transform:translateY(1px)}
           }
         }catch(_e){}
         var now=Date.now(), id='pl'+now+'_'+Math.round(Math.random()*9999);
-        SUIVI.unshift({id:id,titre:st2,siteAgent:st2,client:cli,ville:vi,statut:'validee',motif:'',pris:now,valide:now,assoc:[],mdate:d,mheure:h1,mfin:h2,src:'planning'});
+        SUIVI.unshift(signerVac({id:id,titre:st2,siteAgent:st2,client:cli,ville:vi,statut:'validee',motif:'',pris:now,valide:now,assoc:[],mdate:d,mheure:h1,mfin:h2,src:'planning'}));
         if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning();
         planningAffect(id); }; }
     step0(); }
@@ -4579,6 +4611,8 @@ button.big:active{transform:translateY(1px)}
       
       +'<div class="lab" style="margin:10px 0 3px">🔪 Découper en vacations</div><div class="acts" style="gap:6px;flex-wrap:wrap"><button class="pl-split" data-rule="720">12h</button><button class="pl-split" data-rule="480">8h</button><button class="pl-split" data-rule="360">6h</button><button class="pl-split" data-rule="0">Garder tel quel</button></div>'
       
+      +'<div class="sub" style="margin:4px 0 0;font-size:11.5px;color:var(--muted)">Origine : <b>'+esc(origineVac(m))+'</b>'+(m.creeAt?(' · le '+(function(){var d=new Date(m.creeAt);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' à '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2);})()):'')+'</div>'
+
       +(m.mailPending?'<div class="meta" style="background:rgba(123,97,255,.15);border:1.5px solid #7b61ff;border-radius:10px;padding:7px 10px;margin-top:6px"><span style="color:#a99bff;font-weight:700">📧 Vacation issue d’un mail — À VALIDER</span><div class="acts" style="margin-top:6px"><button type="button" class="ok pl-mail-ok" style="font-size:12px">✅ Valider cette vacation</button><button type="button" class="no pl-mail-ref" style="font-size:12px">🗑 Refuser (supprimer)</button></div></div>':'')+'<div class="acts" style="margin-top:10px;flex-wrap:wrap"><button class="pl-tenue" title="Créer un ticket contrôle tenue pour cette vacation (remontée #27)">🦺 Contrôle tenue</button><button class="pl-jump">↗ Ouvrir dans Suivi demandes</button><button class="pl-saoff" style="border-color:#e0a13b;color:#e0a13b">'+(m.saOff?'🔔 Réactiver dans Suivi des appels':'🔕 Retirer du Suivi des appels')+'</button><button class="no pl-del" title="Suppression DÉFINITIVE : disparaît du Planning et de Suivi des appels. Pour la remettre : en recréer une.">🗑️ Supprimer la vacation (définitif)</button><button class="pl-close">Fermer</button></div>';
     card.querySelectorAll('.pl-close').forEach(function(b){b.onclick=planningAffectClose;});
     var sel=card.querySelector('.pl-status'); if(sel)sel.onchange=function(){ if(sel.value)m.vacStatus=parseInt(sel.value,10); else delete m.vacStatus; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); };
@@ -4643,7 +4677,7 @@ button.big:active{transform:translateY(1px)}
   function siteMetaSet(site,patch){ var o=siteMetaLoad(),k=(typeof tnorm==='function'?tnorm(site):String(site||'')); o[k]=Object.assign({},o[k]||{},patch); save('fkh_sites_meta',o); }
   function _plDurTxt(h1,h2){ var s=toMin(h1),e=toMin(h2); if(s==null||e==null)return ''; var d=e-s; if(d<=0)d+=1440; var hh=Math.floor(d/60),mm=d%60; return hh+'h'+(mm?('0'+mm).slice(-2):''); }
   // Ajouter une vacation sur un site+horaire+jour (clic case vide d'une ligne d'horaire) puis ouvrir la modale (affecter).
-  function planningAddVacH(day,site,h1,h2){ _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day,mheure:h1||'',mfin:h2||'',src:'planning'}); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
+  function planningAddVacH(day,site,h1,h2){ _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift(signerVac({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day,mheure:h1||'',mfin:h2||'',src:'planning'})); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
   // Copier un site : duplique toutes ses vacations de la semaine affichée vers la semaine SUIVANTE (mêmes horaires, agents à réaffecter).
   function planningCopySite(site){ var wk=[],i; for(i=0;i<7;i++)wk.push(svcAddDays(plWeek,i)); var src=SUIVI.filter(function(m){ return m.statut==='validee'&&(m.siteAgent||m.titre||'—')===site&&m.mdate&&wk.indexOf(m.mdate)>=0; }); if(!src.length){ alert('Aucune vacation à copier pour ce site cette semaine.'); return; } if(!confirm('Copier les '+src.length+' vacation(s) de « '+site+' » vers la semaine suivante ?\n(Mêmes horaires, agents à réaffecter.)'))return; var now=Date.now(),n=0; src.forEach(function(m,k){ var c={}; for(var key in m){ if(key.charAt(0)!=='_')c[key]=m[key]; } c.id='pl'+now+'_'+k+'_'+Math.round(Math.random()*9999); c.mdate=svcAddDays(m.mdate,7); delete c.agentId; delete c.vacStatus; c.valide=now; c.pris=now; SUIVI.unshift(c); n++; }); if(typeof saveSuivi==='function')saveSuivi(); plWeek=svcAddDays(plWeek,7); renderPlanning(); alert('✅ '+n+' vacation(s) copiée(s) sur la semaine suivante (à affecter).'); }
   // ===== Tableau des heures (calque Sekur) : Hj/Hn/Hjf/Hnf, colonnes Semaine/Dimanche — nuit 21h→06h, fériés FR calculés, découpage à la minute =====

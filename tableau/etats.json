@@ -3,6 +3,22 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 280,
+      "titre": "Toute création de vacation est signée (nom, compte, heure)",
+      "source": "Zeus",
+      "theme": "Planning & vacations",
+      "local": true,
+      "pourquoipas": "Se voit sur une vacation créée après la mise en ligne."
+    },
+    {
+      "b": 281,
+      "titre": "Origine de chaque vacation : qui l'a mise au Planning, y compris le système (rétroactif)",
+      "source": "Zeus",
+      "theme": "Planning & vacations",
+      "local": true,
+      "pourquoipas": "Se voit en ouvrant n'importe quelle vacation du Planning."
+    },
+    {
       "b": 278,
       "titre": "Ajout au Planning : date non pré-remplie + alerte si le site a déjà une vacation à moins de 7 jours",
       "source": "Zeus — bug SOTEL 04/08 au lieu du 06/08",
@@ -405,6 +421,11 @@
     }
   ],
   "decide": [
+    {
+      "titre": "Appels non exploitables (que de la musique d'attente) : les signaler en anomalie au lieu de les perdre en silence",
+      "source": "Zeus — appel AQUILA du 04/08 09:31",
+      "note": "vérifier d'abord si la transcription est tronquée (2027 car. pour un appel long)"
+    },
     {
       "titre": "Sélection multiple de vacations au Planning : cocher plusieurs vacations puis, en lot — changer l'agent, décaler les horaires, couper/rétablir les tickets",
       "source": "JULES — remontées #65/#66",
