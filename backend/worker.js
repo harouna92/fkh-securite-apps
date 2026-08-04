@@ -15,6 +15,50 @@
  *  Le MVP mot de passe commun ci-dessous est le socle de cette évolution (pas de reconstruction).
  */
 
+// ===== b269 : creation serveur de la vacation « A VALIDER » a partir d'un bon de commande =====
+function _norm(x) {
+  return String(x || "").toUpperCase().replace(/[^A-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+}
+function lireBonDeCommande(texte) {
+  const sujet = String(texte || "").split("\n")[0].trim();
+  const up = sujet.toUpperCase();
+  if (!/(DEMANDE|MISSION|GARDIENNAGE)/.test(up) || /ANNULATION/.test(up)) return null;
+  // Format AQUILA : « ... AQUILA 5284730 le 03/08/2026 20:00 chez GRAND FRAIS ... (22698801) »
+  const m = sujet.match(/AQUILA\s+\d+\s+le\s+(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2})\s+chez\s+(.+?)\s*(?:\(|$)/i);
+  if (!m) return null;
+  return { mdate: m[3] + "-" + m[2] + "-" + m[1], heure: m[4], site: m[5].trim(),
+           ref: (sujet.match(/AQUILA\s+(\d{6,})/i) || [])[1] || "", client: "AQUILA", sujet };
+}
+async function planifierDepuisMail(env, cdr, texte, data) {
+  const bdc = lireBonDeCommande(texte);
+  if (!bdc) return;
+  const row = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_suivi'").first();
+  if (!row || !row.v) return;
+  let liste = [];
+  try { liste = JSON.parse(row.v) || []; } catch (_) { return; }
+  const sn = _norm(bdc.site);
+  for (const m of liste) {
+    if (m && m.mailSrc === cdr) return;                          // ce mail a deja donne sa vacation
+    if (!m || (m.mdate || "") !== bdc.mdate) continue;           // date differente : ce n'est pas la meme
+    const ms = _norm(m.siteAgent || m.titre || "");
+    if (ms && (ms.indexOf(sn) >= 0 || sn.indexOf(ms) >= 0)) return;   // deja planifie ce jour-la
+  }
+  const pdf = (data && data.pdf) || {};
+  const vac = {
+    id: "mv" + Date.now() + "_" + Math.round(Math.random() * 99999),
+    statut: "validee", mailPending: true, mailSrc: cdr,
+    /* b281 : meme creee par le systeme, une vacation dit d'ou elle vient. Le super-admin doit pouvoir
+       repondre « qui l'a mise la » pour n'importe quelle ligne — y compris quand la reponse est « personne ». */
+    creePar: "Système — mail reçu", creeUser: "worker", creeAt: Date.now(),
+    client: bdc.client, siteAgent: bdc.site, ville: pdf.ville || "", cp: pdf.cp || "",
+    adresse: pdf.adresse || "", mdate: bdc.mdate, mheure: bdc.heure, mfin: "",
+    ref: bdc.ref, titre: bdc.sujet.slice(0, 90), src: "mail",
+  };
+  // json_insert ajoute en fin de tableau sans reecrire tout le document : pas de limite de taille atteinte.
+  await env.DB.prepare("UPDATE store SET v = json_insert(v, '$[#]', json(?)), updated_at = ? WHERE k = 'fkh_suivi'")
+    .bind(JSON.stringify(vac), Date.now()).run();
+}
+
 function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": origin || "*",
@@ -161,16 +205,70 @@ async function aiTranscribe(env, audioUrl) {
   const j = await r.json();
   return j.text || "";
 }
+/* ===== b282 : L'ATTENTE N'EST PAS LA CONVERSATION =====
+   Un appel sortant vers AQUILA du 04/08 a 09h19 n'a rien donne. Cause : la transcription etait coupee a
+   2000 caracteres, et ces 2000 caracteres etaient ENTIEREMENT occupes par le serveur vocal — accueil,
+   touches a taper, « votre temps d'attente est estime a moins de 2 minutes » repete trente fois. La vraie
+   conversation venait apres, et elle etait jetee avant que l'IA la lise.
+   Deux corrections : on retire les phrases du serveur vocal, et on garde beaucoup plus de texte. */
+function nettoyerAttente(txt) {
+  let t = String(txt || "");
+  const bruits = [
+    /votre appel est enregistr[eé][^.?!]*/gi,
+    /votre temps d.attente est estim[eé][^.?!]*/gi,
+    /savez-vous que vous pouvez saisir[^.?!]*/gi,
+    /plus d.informations?\s+www[^\s]*/gi,
+    /pour signaler une effraction[^.?!]*/gi,
+    /(?:tapez|appuyez sur)\s*\d[^.?!]*/gi,
+    /merci de patienter[^.?!]*/gi,
+    /toutes nos lignes sont occup[eé]es[^.?!]*/gi,
+  ];
+  for (const r of bruits) t = t.replace(r, " ");
+  // une meme phrase repetee en boucle par le repondeur : on n'en garde qu'un exemplaire
+  const vues = new Set();
+  t = t.split(/(?<=[.?!])\s+/).filter((ph) => {
+    const k = ph.trim().toLowerCase();
+    if (k.length < 12) return true;
+    if (vues.has(k)) return false;
+    vues.add(k);
+    return true;
+  }).join(" ");
+  return t.replace(/\s{2,}/g, " ").trim();
+}
+
 const AI_PROMPT_BASE = "Tu analyses un message (appel transcrit, mail, SMS ou capture d'ecran) d'une societe de securite privee. Determine s'il contient une (ou plusieurs) demande(s) operationnelle(s), de trois NATURES possibles :\n- GARDIENNAGE : un agent est POSTE pour SURVEILLER un site sur une vacation / une duree (nuit, week-end, chantier, magasin...). Surveillance statique, l'agent reste sur place.\n- INTERVENTION : un DEPLACEMENT PONCTUEL declenche par une ALARME / une levee de doute / une alerte (l'agent se rend sur place, verifie, repart). Ponctuel, dure typiquement 1 h.\n- RONDE : un ou plusieurs PASSAGES de verification / pointage / tournee sur un ou plusieurs sites.\nEn cas de DOUTE entre gardiennage et intervention/ronde, choisis GARDIENNAGE.\nReponds UNIQUEMENT en JSON strict, sans aucun texte autour :\n{\"is_demande\": true|false, \"resume\": \"\", \"demandes\": [{\"nature\":\"gardiennage|intervention|ronde\",\"client\":\"\",\"ville\":\"\",\"cp\":\"\",\"site\":\"\",\"type_site\":\"\",\"nb_agents\":\"\",\"urgent\":true,\"vacations\":[{\"date\":\"\",\"horaires\":\"\"}]}],\"arrets\":[{\"client\":\"\",\"site\":\"\",\"ville\":\"\",\"motif\":\"\"}]}\nREGLES ABSOLUES :\n- FKH (FKH SECURITE) n'est JAMAIS le champ 'client' : FKH c'est NOUS, le destinataire des demandes. Le client est l'AUTRE societe (donneur d'ordre). Si le seul nom present est FKH, laisse 'client' vide.\n- 'nature' est OBLIGATOIRE pour CHAQUE demande : exactement 'gardiennage', 'intervention' ou 'ronde'.\n- Le champ 'client' est PRIORITAIRE : cherche ACTIVEMENT le donneur d'ordre et reprends-le exactement comme il est dit (Securitas, Sotel, etc.). Regarde partout : societe qui appelle/mande, nom cite, en-tete ou signature du mail, expediteur, en-tete de SMS. C'est souvent une societe de securite qui nous sous-traite. Ne laisse 'client' vide QUE si vraiment AUCUN nom de donneur d'ordre n'apparait nulle part.\n- UNE demande = UN SEUL SITE. Si le message concerne PLUSIEURS SITES differents (villes ou lieux differents), cree PLUSIEURS entrees distinctes dans 'demandes', une par site. NE JAMAIS regrouper plusieurs sites dans une seule demande.\n- Pour un MEME site (gardiennage) demande sur PLUSIEURS DATES : c'est UNE SEULE demande, mais mets UNE entree PAR DATE dans 'vacations', chaque entree = {date, horaires (creneau de cette date)}. NE PAS regrouper toutes les dates ensemble. Pour une intervention ou une ronde ponctuelle, 'vacations' peut rester vide (ou contenir la date/heure prevue si elle est precisee).\n- ARRET / ANNULATION a l'initiative du CLIENT : si le message est un client qui ARRETE, ANNULE ou met FIN a une prestation de gardiennage EN COURS (ex. « on arrete la surveillance du site X », « plus besoin d'agent a partir de demain », « on suspend la mission »), NE le mets PAS dans 'demandes' → mets une entree dans 'arrets' {client, site, ville, motif}. C'est le client qui prend l'initiative de l'arret.\n- is_demande=false, demandes=[] et arrets=[] si ce n'est NI du gardiennage, NI une intervention, NI une ronde, NI un arret (facture, RH, commercial, conversation, autre).\n- Laisse \"\" si une info est absente. resume = 1 phrase courte resumant le message.";
-function aiParseJson(j) { const txt = (j.content && j.content[0] && j.content[0].text) || "{}"; const m = txt.match(/\{[\s\S]*\}/); try { return JSON.parse(m ? m[0] : txt); } catch (e) { return { is_demande: false, resume: "analyse illisible" }; } }
+/* b284 : quand l'analyse echoue, on ne se contente plus de dire « illisible » — on GARDE ce que l'IA a
+   repondu. Sans cette trace, on cherche la cause a l'aveugle : reponse tronquee ? refus ? autre format ?
+   Trois relances de l'appel du 04/08 n'ont rien appris parce que l'erreur n'etait ecrite nulle part. */
+function aiParseJson(j) {
+  const txt = (j && j.content && j.content[0] && j.content[0].text) || "";
+  const stop = (j && j.stop_reason) || "";
+  const m = txt.match(/\{[\s\S]*\}/);
+  try {
+    return JSON.parse(m ? m[0] : txt);
+  } catch (e) {
+    return { is_demande: false, demandes: [], arrets: [],
+             resume: "analyse illisible",
+             err: String((e && e.message) || e).slice(0, 120),
+             stop_reason: stop,
+             brut: txt.slice(0, 600) };
+  }
+}
 async function aiAnalyze(env, transcript, direction) {
   const dirLine = direction === "in" ? "\n\nContexte : appel ENTRANT (le correspondant nous appelle)."
     : direction === "out" ? "\n\nContexte : appel SORTANT (c'est NOUS qui appelons le correspondant)."
     : "";
   const prompt = AI_PROMPT_BASE + dirLine + "\n\nTexte a analyser :\n\"\"\"" + transcript + "\"\"\"";
-  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 500, messages: [{ role: "user", content: prompt }] }) });
+  /* b286 : Haiku decroche sur les conversations longues et desordonnees (noms deformes par la
+     transcription, appel sortant de validation avec bavardage). Sonnet est ~3-4x plus cher sur ces
+     appels-la, mais recuperer une commande perdue vaut plus que quelques centimes.
+     Seuil : 1500 caracteres = appel court et net → Haiku suffit. Au-dela → Sonnet. */
+  const _model = transcript.length > 1500 ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001";
+  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: _model, max_tokens: 4000, messages: [{ role: "user", content: prompt }] }) });
   if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
-  return aiParseJson(await r.json());
+  const parsed = aiParseJson(await r.json());
+  parsed.modele = _model; // b286 : traçabilité du modèle utilisé
+  return parsed;
 }
 // b203 : lecture des PIECES JOINTES PDF (bons de commande) par l'IA -> adresse exacte du site, refs, horaires
 async function aiReadPdf(env, pdfs) {
@@ -238,7 +336,7 @@ async function aiScan(env, maxCalls, force) {
     let data = {}, isDem = 0;
     try {
       const transcript = await aiTranscribe(env, c.record);
-      if (transcript) { const an = await aiAnalyze(env, transcript, c.direction); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [], transcript: transcript.slice(0, 2000), number: c.contact_number, direction: c.direction, start: c.start_time }; isDem = (data.demandes.length || data.arrets.length) ? 1 : 0; }
+      if (transcript) { const utile = nettoyerAttente(transcript); const an = await aiAnalyze(env, utile || transcript, c.direction); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [], transcript: transcript.slice(0, 12000), number: c.contact_number, direction: c.direction, start: c.start_time }; isDem = (data.demandes.length || data.arrets.length) ? 1 : 0; }
       else data = { skip: "no_transcript" };
     } catch (e) { data = { error: String((e && e.message) || e) }; }
     await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(id, Date.now(), isDem, JSON.stringify(data)).run();
@@ -349,8 +447,12 @@ export default {
       if (!txt.trim()) return json({ error: "vide" }, 400);
       const dej = await env.DB.prepare("SELECT id FROM messages WHERE canal='ordre' AND statut='nouveau' AND texte = ?").bind(txt).first();
       if (dej) return json({ ok: true, deja: true });   // deplacer deux fois la meme carte ne cree pas deux ordres
+      /* b276 : le PROJET voyage avec l'ordre. Zeus a plusieurs chantiers ouverts ; sans cette etiquette,
+         un ordre depose depuis le tableau de GESTION apparaitrait au demarrage d'une session portant sur
+         un tout autre sujet. On le range dans l'auteur, sans nouvelle colonne. */
+      const proj = String(b.projet || "gestion").slice(0, 30);
       await env.DB.prepare("INSERT INTO messages (canal, auteur, texte, statut, created_at) VALUES ('ordre', ?, ?, 'nouveau', ?)")
-        .bind(String(b.auteur || "tableau de bord").slice(0, 60), txt, Date.now()).run();
+        .bind((proj + " · " + String(b.auteur || "tableau de bord")).slice(0, 60), txt, Date.now()).run();
       return json({ ok: true });
     }
     if (path === "/ordres" && request.method === "GET") {
@@ -401,11 +503,30 @@ export default {
       const fromStr = String(b.from || "");
       const knownSender = /(securitas|reseau-aquila|ranc-developpement|banzai-communication)/i.test(fromStr);
       const missionWords = /(gardien|prestation|surveillance|annulation|bon de commande|vacation|agent de s[eé]curit|rondier|intervention|ronde)/i.test(text);
+      /* b270 (regle Zeus 03/08) : les mails de FACTURATION ne sont pas des mails de mission. Ils polluaient
+         la section Mails missions et la comparaison avec le Planning. On les ecarte de ce flux, mais on les
+         MARQUE (cat:'facturation') au lieu de les jeter : la section qui les recevra reste a definir, et le
+         jour ou elle existera, l'historique sera deja la. */
+      const factureWords = /(pr[eé]facturation|facturation|facture|avoir|r[eé]glement|paiement|relev[eé] de compte|echeancier|[eé]ch[eé]ancier)/i.test(String(b.subject || "") + " " + text);
+      if (factureWords && !/(bon de commande|gardiennage sur site)/i.test(text)) {
+        await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, 0, 1, 0, ?)")
+          .bind(cdr, Date.now(), JSON.stringify({ skip: 1, cat: "facturation", transcript: text.slice(0, 2000), from: String(b.from || "") })).run();
+        return json({ ok: true, skipped: "facturation" });
+      }
       if (!isDem && !knownSender && !missionWords) {
         await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, 0, 1, 0, ?)").bind(cdr, Date.now(), JSON.stringify({ skip: 1, transcript: text.slice(0, 300), number: fromStr, source: "mail" })).run();
         return json({ ok: true, skipped: "hors-mission" });
       }
       await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(cdr, Date.now(), isDem, JSON.stringify(data)).run();
+      /* ===== b269 : LA VACATION DESCEND AU PLANNING TOUT DE SUITE =====
+         POURQUOI : jusqu'ici la vacation violette « A VALIDER » etait creee par le NAVIGATEUR, en ouvrant
+         l'application. Un bon de commande recu la nuit, ou pendant qu'aucun poste n'est ouvert, restait
+         invisible — c'est ce qui est arrive au bon de commande AQUILA du 03/08 signale par Zeus.
+         Ici, elle est ecrite des la reception du mail, cote serveur : elle existe avant que quiconque
+         ouvre l'application.
+         GARDE-FOU : jamais deux fois le meme mail, et jamais si une vacation existe deja pour ce SITE a
+         cette DATE — un site revient toutes les semaines, seule la date fait foi. */
+      try { await planifierDepuisMail(env, cdr, text, data); } catch (e) {}
       if (isDem) { try { await pushAll(env, aiDemandeNotif({ cdr_id: cdr, direction: "in" }, data.demandes)); } catch (e) {} }
       return json({ ok: true, detected: isDem ? data.demandes.length : 0 });
     }
