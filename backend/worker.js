@@ -693,6 +693,24 @@ export default {
         ? body.items
         : (body.k != null ? [{ k: body.k, v: body.v }] : []);
       if (!items.length) return json({ error: "empty" }, 400);
+      // b289 : fkh_suivi — fusion locale+D1 avant écriture (union par id, locale gagne).
+      // Évite qu'une session aux données obsolètes n'écrase les vacations absentes de son localStorage.
+      // Les suppressions volontaires utilisent deleted=Date.now() côté client (soft-delete) :
+      // le merge conserve l'item avec le flag deleted, qui se propage à tous les appareils.
+      for (let _mi = 0; _mi < items.length; _mi++) {
+        if (String(items[_mi].k) !== 'fkh_suivi') continue;
+        try {
+          const _r = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_suivi'").first();
+          if (!_r || !_r.v) continue;
+          const _d1 = JSON.parse(_r.v) || [];
+          const _lv = typeof items[_mi].v === 'string' ? items[_mi].v : JSON.stringify(items[_mi].v);
+          const _loc = JSON.parse(_lv) || [];
+          const _map = {};
+          _d1.forEach(function(m) { if (m && m.id) _map[m.id] = m; });
+          _loc.forEach(function(m) { if (m && m.id) _map[m.id] = m; }); // locale écrase D1
+          items[_mi].v = JSON.stringify(Object.values(_map));
+        } catch(_e) {}
+      }
       const now = Date.now();
       const stmt = env.DB.prepare(
         "INSERT INTO store (k, v, updated_at) VALUES (?, ?, ?) " +
