@@ -225,7 +225,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b305</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b306</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3680,8 +3680,7 @@ button.big:active{transform:translateY(1px)}
     }
     try{ localStorage.setItem(k,v); }catch(e){}
     try{
-      if(false){ /* fkh_suivi géré ci-dessus (b301) */ }
-      else if(k==='fkh_fa'){ FA=load('fkh_fa'); FA.forEach(function(a){if(a.tel&&!a.tels){a.tels=[a.tel];delete a.tel;}}); if(typeof renderFA==='function')renderFA(); }
+      if(k==='fkh_fa'){ FA=load('fkh_fa'); FA.forEach(function(a){if(a.tel&&!a.tels){a.tels=[a.tel];delete a.tel;}}); if(typeof renderFA==='function')renderFA(); }
       else if(k==='fkh_thiam'){ TH=load('fkh_thiam'); if(typeof thRenderBoard==='function')thRenderBoard(); if(typeof thRenderOut==='function')thRenderOut(); if(typeof thRenderAuto==='function')thRenderAuto(); }
       else if(k==='fkh_zones_diff'){ try{ZDIFF=JSON.parse(localStorage.getItem('fkh_zones_diff')||'{}')||{};}catch(e){ZDIFF={};} if(typeof renderZone==='function' && byId('sec-zone') && !byId('sec-zone').classList.contains('hidden'))renderZone(); }
       else if(k==='fkh_tenues_ctrl'){ TCTRL=load('fkh_tenues_ctrl'); if(typeof renderTenues==='function')renderTenues(); if(typeof renderFA==='function')renderFA(); if(typeof renderSuivi==='function')renderSuivi(); }
@@ -5718,15 +5717,7 @@ button.big:active{transform:translateY(1px)}
   function aiAutoCreate(){ var changed=false, firstNew=null, ivN=0, firstIv=null, arretN=0, firstArret=null;
     (aiDetected||[]).forEach(function(call){ var dems=call.demandes||[], arrets=call.arrets||[];
       dems.forEach(function(d,idx){ var id='ai_'+call.cdr_id+'_'+idx; var nat=aiNature(d), bd=aiBuildDemande(call,d);
-        // --- INTERVENTION / RONDE → section Interventions (fkh_interv_dem) ---
-        if(false&&(nat==='intervention'||nat==='ronde')&&typeof window._ivCreateFromAI==='function'){ // b138 : TOUT arrive en gardiennage/En recherche (règle Zeus 01-08) — bascule manuelle possible
-          var ok=window._ivCreateFromAI({id:id,nature:nat,presta:(nat==='ronde'?'Ronde':'Intervention'),client:(d.client||''),site:(d.site||''),sitetype:(d.type_site||''),ville:bd.vn,cp:bd.cp,la:bd.la,lo:bd.lo,dep:(bd.cp?String(bd.cp).slice(0,2):''),date:impTodayISO(),hdeb:'',hfin:'',aiCdr:call.cdr_id,sim:!!call._sim});
-          if(ok){ changed=true; ivN++; if(!firstIv)firstIv={id:id,nat:nat,who:(d.site||d.client||bd.vn||'')};
-            /* consigne « nouvelle intervention/ronde » retirée (l'opérateur prend les appels, il est déjà au courant) */
-          }
-          return;
-        }
-        // --- GARDIENNAGE → Suivi demandes (comportement existant) ---
+        // --- GARDIENNAGE → Suivi demandes (comportement existant) --- // b306 : bloc intervention/ronde retiré (if(false) — règle b138 : tout en gardiennage)
         /* b225 (regle Zeus 03/08) : un MAIL qui porte un site ET une date n'a rien a faire dans
            Suivi des demandes. Soit il descend au Planning en vacation « A VALIDER », soit le site est
            deja planifie : dans les deux cas le suivi se fait naturellement dans le Planning, ou la
@@ -5783,13 +5774,6 @@ button.big:active{transform:translateY(1px)}
     if(!dems.length&&!arrets.length){ if(msg){msg.style.color='var(--warn)';msg.textContent='Aucune demande détectée '+(origin==='img'?'dans cette image.':'dans ce texte.');} return; }
     var now=Date.now(), n=0, ivN=0, arretN=0;
     dems.forEach(function(d,idx){ var call={resume:j.resume||'',_paste:true}; var nat=aiNature(d), bd=aiBuildDemande(call,d);
-      // --- INTERVENTION / RONDE collée → section Interventions ---
-      if(false&&(nat==='intervention'||nat==='ronde')&&typeof window._ivCreateFromAI==='function'){ // b138 : TOUT arrive en gardiennage/En recherche (règle Zeus 01-08) — bascule manuelle possible
-        var ivid='ivmail'+now+'_'+idx+'_'+Math.round(Math.random()*9999);
-        var ok=window._ivCreateFromAI({id:ivid,nature:nat,presta:(nat==='ronde'?'Ronde':'Intervention'),client:(d.client||''),site:(d.site||''),sitetype:(d.type_site||''),ville:bd.vn,cp:bd.cp,la:bd.la,lo:bd.lo,dep:(bd.cp?String(bd.cp).slice(0,2):''),date:impTodayISO(),hdeb:'',hfin:''});
-        if(ok){ ivN++; /* consigne « nouvelle intervention/ronde » retirée */ }
-        return;
-      }
       // --- GARDIENNAGE collé → Suivi demandes ---
       var it={id:'mail'+now+'_'+idx+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',parQui:(typeof opNow==='function'?opNow():''),parAt:now,pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:notFKH(d.client),la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiNature:nat,source:(origin==='img'?'capture':'mail')}; SUIVI.unshift(it); if(typeof aiRouteNear==='function')aiRouteNear(it,bd); n++; /* consigne « nouvelle demande gardiennage » retirée */ });
     arrets.forEach(function(ar){ if(typeof csgLoad!=='function')return; try{ var _cc=csgLoad(); var lieu=[ar.site,ar.ville].filter(Boolean).join(' — '); _cc.push({id:csgNewId(),texte:'🛑 ARRÊT DU GARDIENNAGE — INITIATIVE CLIENT ('+(origin==='img'?'capture':'texte')+').\n👉 INFORMER L\'AGENT que la prestation s\'arrête.'+(ar.client?'\n🏢 Client : '+ar.client:'')+(lieu?'\n📍 '+lieu:'')+(ar.motif?'\n📝 Motif : '+ar.motif:''),client:(ar.client||''),site:(ar.site||''),ville:(ar.ville||''),cp:'',mdate:impTodayISO(),heure:ssNowHM(),done:false,note:'',aiGen:true,arret:true}); csgSave(_cc); arretN++; }catch(_e){} });
