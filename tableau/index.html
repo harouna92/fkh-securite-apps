@@ -129,6 +129,8 @@ function rendre(data, bLigne, bLocal){
 
   document.getElementById('p-ligne').innerHTML='en ligne : <b>b'+(bLigne||'?')+'</b>';
   document.getElementById('p-local').innerHTML='local : <b>b'+(bLocal||'?')+'</b>';
+  /* b276 : plusieurs projets, plusieurs tableaux — celui-ci dit lequel il est. */
+  try{ var t1=document.querySelector('h1'); if(t1&&data.projetLabel)t1.textContent='📊 '+data.projetLabel+' — états des demandes'; }catch(e){}
   var ou=document.getElementById('p-ou');
   if(ou){ ou.innerHTML=EN_LIGNE?'📖 <b>version en ligne</b> — lecture + envoi d’ordres':'✏️ <b>poste de pilotage</b> — tout est enregistré';
           ou.style.borderColor=EN_LIGNE?'#e0a13b':'#1a9e5c'; }
@@ -187,7 +189,7 @@ function deplacer(id,cible){
      lancer tout de suite. */
   var p=document.getElementById('pied');
   fetch(API+'/ordre?k='+encodeURIComponent(JETON),{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({texte:phrase,auteur:'tableau de bord'})})
+        body:JSON.stringify({texte:phrase,auteur:'tableau de bord',projet:(DATA&&DATA.projet)||'gestion'})})
     .then(function(r){return r.json();})
     .then(function(j){ if(p){ p.textContent=(j&&j.ok)
         ? ((j.deja?'↩️ Déjà dans la file : « ':'✅ Ordre envoyé : « ')+phrase+' » — Claude le traitera.'

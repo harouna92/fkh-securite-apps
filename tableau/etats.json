@@ -3,6 +3,134 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 282,
+      "titre": "Appels : le serveur vocal n'écrase plus la conversation (nettoyage + limite 2000 → 12000 car.)",
+      "source": "Zeus — appel AQUILA 9h19",
+      "theme": "Mails & collecte",
+      "local": true,
+      "pourquoipas": "Déjà déployé côté serveur ; se vérifie sur le prochain appel avec attente longue."
+    },
+    {
+      "b": 280,
+      "titre": "Toute création de vacation est signée (nom, compte, heure)",
+      "source": "Zeus",
+      "theme": "Planning & vacations",
+      "local": true,
+      "pourquoipas": "Se voit sur une vacation créée après la mise en ligne."
+    },
+    {
+      "b": 281,
+      "titre": "Origine de chaque vacation : qui l'a mise au Planning, y compris le système (rétroactif)",
+      "source": "Zeus",
+      "theme": "Planning & vacations",
+      "local": true,
+      "pourquoipas": "Se voit en ouvrant n'importe quelle vacation du Planning."
+    },
+    {
+      "b": 278,
+      "titre": "Ajout au Planning : date non pré-remplie + alerte si le site a déjà une vacation à moins de 7 jours",
+      "source": "Zeus — bug SOTEL 04/08 au lieu du 06/08",
+      "theme": "Planning & vacations",
+      "local": true,
+      "pourquoipas": "Se voit en cliquant ➕ Ajouter dans le Planning."
+    },
+    {
+      "b": 279,
+      "titre": "⚠️ Tickets d'ANOMALIE — visibles des trois niveaux d'encadrement, prise en charge et résolution",
+      "source": "Zeus",
+      "theme": "Outils de pilotage",
+      "local": true,
+      "pourquoipas": "Se voit en ouvrant la pastille ⚠️ : bouton « Signaler une anomalie »."
+    },
+    {
+      "b": 276,
+      "titre": "Les ordres portent leur PROJET : plusieurs tableaux, plusieurs sessions",
+      "source": "Zeus",
+      "theme": "Outils de pilotage",
+      "local": true,
+      "pourquoipas": "Se vérifie au démarrage d'une session : les ordres du projet en cours passent en tête."
+    },
+    {
+      "b": 277,
+      "titre": "Ticket prise/fin : deux « Fait » distincts — agent appelé ET client avisé",
+      "source": "Zeus",
+      "theme": "Planning & vacations",
+      "local": true,
+      "pourquoipas": "Se voit dans Suivi des appels sur un ticket de prise."
+    },
+    {
+      "b": 275,
+      "titre": "Accusé de réception : « vu le … » sur les tickets envoyés",
+      "source": "Zeus",
+      "theme": "Outils de pilotage",
+      "local": true,
+      "pourquoipas": "Se voit dans 🎫 Tickets : la carte d'un ticket envoyé porte « ⏳ pas encore ouvert » puis « ✅ vu le … »."
+    },
+    {
+      "b": 273,
+      "titre": "Dépassement de 5 min : échange avec l'agent, client avisé, photo consultable",
+      "source": "Zeus",
+      "theme": "Photos & preuves",
+      "local": true,
+      "demo": "photos5"
+    },
+    {
+      "b": 274,
+      "titre": "Le nom de qui met une demande en recherche apparaît sur la ligne",
+      "source": "Zeus",
+      "theme": "Planning & vacations",
+      "local": true,
+      "pourquoipas": "Se voit dans Suivi demandes → En recherche."
+    },
+    {
+      "b": 271,
+      "titre": "Bon de commande : le sujet du mail fait foi, comme côté serveur",
+      "source": "Zeus — relance",
+      "theme": "Mails & collecte",
+      "local": true,
+      "pourquoipas": "Se vérifiera sur le prochain bon de commande reçu."
+    },
+    {
+      "b": 272,
+      "titre": "Pastille 📷 : 5 vues — sans photo, photo REFUSÉE, photo hors délai (prise et fin)",
+      "source": "Zeus",
+      "theme": "Photos & preuves",
+      "local": true,
+      "demo": "photos5"
+    },
+    {
+      "b": 267,
+      "titre": "« L'agent a refusé d'envoyer la photo » + origine du retard (saisi / déduit)",
+      "source": "Zeus",
+      "theme": "Photos & preuves",
+      "local": true,
+      "pourquoipas": "Se voit dans la pastille 📷 : bouton sur chaque ligne."
+    },
+    {
+      "b": 268,
+      "titre": "Écart entre l'heure prévue et l'heure de la photo (alerte au-delà de 5 min)",
+      "source": "Zeus",
+      "theme": "Photos & preuves",
+      "local": true,
+      "pourquoipas": "Se voit sur une ligne ayant déjà sa photo."
+    },
+    {
+      "b": 269,
+      "titre": "La vacation « À VALIDER » est créée par le SERVEUR à la réception du mail",
+      "source": "Zeus",
+      "theme": "Mails & collecte",
+      "local": true,
+      "pourquoipas": "Vérifié en production avec le sujet réel d'un bon de commande AQUILA."
+    },
+    {
+      "b": 270,
+      "titre": "Les mails de facturation sortent du flux Mails missions (marqués, section à définir)",
+      "source": "Zeus",
+      "theme": "Mails & collecte",
+      "local": true,
+      "pourquoipas": "Se vérifie sur le prochain mail de facturation reçu."
+    },
+    {
       "b": 266,
       "titre": "Bon de commande : va au Planning, plus dans Suivi des demandes (2 causes corrigées)",
       "source": "Zeus — bug signalé",
@@ -326,5 +454,7 @@
       "titre": "Pastille 🌙 : tenir compte de l'heure du premier contrôle dans « avant / en cours »",
       "source": "remontée #55"
     }
-  ]
+  ],
+  "projet": "gestion",
+  "projetLabel": "Appli GESTION — FKH SÉCURITÉ"
 }
