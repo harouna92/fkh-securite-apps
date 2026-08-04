@@ -225,7 +225,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b306</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b307</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3656,16 +3656,21 @@ button.big:active{transform:translateY(1px)}
     }
     if(k==='fkh_tenues_ctrl'){ // fusion au lieu d'écraser — protège les contrôles de tenue enregistrés sur un autre appareil
       var remC=[]; try{remC=JSON.parse(v)||[];}catch(_){remC=[];} if(!Array.isArray(remC))remC=[];
+      var _prevTC=localStorage.getItem('fkh_tenues_ctrl');   /* b307 : etat AVANT fusion */
       var mrgC=tcMerge(load('fkh_tenues_ctrl'),remC), mvC=JSON.stringify(mrgC);
       try{ localStorage.setItem('fkh_tenues_ctrl',mvC); }catch(e){}
       TCTRL=mrgC;
       if(mvC!==v && typeof cloudPush==='function')cloudPush('fkh_tenues_ctrl'); // le local avait des contrôles en plus -> renvoie l'union (soigne le classeur commun)
-      if(typeof renderTenues==='function')renderTenues(); if(typeof renderFA==='function')renderFA(); if(typeof renderSuivi==='function')renderSuivi();
+      if(typeof renderTenues==='function')renderTenues(); if(typeof renderFA==='function')renderFA(); if(mvC!==_prevTC&&typeof renderSuivi==='function')renderSuivi();   /* b307 : ne redessine le Suivi que si les controles ont VRAIMENT change — sinon la synchro remontait la page toutes les 4 s */
       if(typeof notifScan==='function')notifScan();
       return;
     }
     if(k==='fkh_suivi'){ // b301 : merge au lieu d'écraser — un cloud pull n'efface plus les vacations Planning créées localement
       var remS=[]; try{remS=JSON.parse(v)||[];}catch(_S){remS=[];} if(!Array.isArray(remS))remS=[];
+      /* b307 : EMPREINTE AVANT fusion. On ne peut pas comparer deux textes JSON : le serveur renvoie les memes
+         vacations avec les cles dans un autre ordre, donc le texte differe alors que RIEN n'a change — et on
+         redessinait le Planning toutes les 4 s, ce qui remontait la page en haut des qu'on scrollait. */
+      var _sigA=(SUIVI||[]).filter(function(x){return !x.sim;}).map(function(x){return x.id+'@'+(x.creeAt||0)+'@'+(x.deleted?1:0);}).sort().join('|');
       var mrgS=suiviMerge(load('fkh_suivi').filter(function(x){return !x.sim;}),remS), mvS=JSON.stringify(mrgS);
       try{localStorage.setItem('fkh_suivi',mvS);}catch(e){}
       var _sims=SUIVI.filter(function(x){return x.sim;}), _tr={};
@@ -3673,7 +3678,9 @@ button.big:active{transform:translateY(1px)}
       SUIVI=load('fkh_suivi'); if(_sims.length)SUIVI=_sims.concat(SUIVI);
       SUIVI.forEach(function(x){delete x._pending;delete x._pick;delete x._pick2;var _f=_tr[String(x.id)];if(_f)for(var _k2 in _f)x[_k2]=_f[_k2];});
       if(typeof suiviCleanFins==='function')suiviCleanFins(); if(typeof suiviHeriteSite==='function')suiviHeriteSite(); if(typeof saOffMigrate==='function')saOffMigrate();
-      if(typeof renderSuivi==='function')renderSuivi(); if(byId('sec-planning')&&!byId('sec-planning').classList.contains('hidden')&&typeof renderPlanning==='function')renderPlanning();
+      /* b307 : empreinte APRES fusion — on ne redessine QUE si une vacation a ete ajoutee, supprimee ou modifiee. */
+      var _sigB=(SUIVI||[]).filter(function(x){return !x.sim;}).map(function(x){return x.id+'@'+(x.creeAt||0)+'@'+(x.deleted?1:0);}).sort().join('|'), _chg=(_sigB!==_sigA);
+      if(_chg&&typeof renderSuivi==='function')renderSuivi(); if(_chg&&byId('sec-planning')&&!byId('sec-planning').classList.contains('hidden')&&typeof renderPlanning==='function')renderPlanning();
       if(mvS!==v && typeof cloudPush==='function')cloudPush('fkh_suivi'); // local avait plus → renvoie la fusion au cloud
       if(typeof notifScan==='function')notifScan();
       return;
