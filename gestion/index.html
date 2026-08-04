@@ -225,7 +225,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v04-08·b302</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v04-08·b304</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2005,12 +2005,12 @@ button.big:active{transform:translateY(1px)}
     var _svOp=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); // opérateur : seulement le sous-onglet « En recherche »
     if(_svOp)suiviBucket='recherche';
     document.querySelectorAll('#suiviTabs button').forEach(function(b){ b.style.display=(_svOp&&b.getAttribute('data-b')!=='recherche')?'none':''; });
-    ['recherche','validee','annulee','nongeree','traitee'].forEach(function(b){var el=byId('cnt-'+b);if(el)el.textContent=SUIVI.filter(function(x){return x.statut===b&&(b!=='recherche'||!x.dupOf);}).length;});
+    ['recherche','validee','annulee','nongeree','traitee'].forEach(function(b){var el=byId('cnt-'+b);if(el)el.textContent=SUIVI.filter(function(x){return x.statut===b&&!x.deleted&&(b!=='recherche'||!x.dupOf);}).length;});
     document.querySelectorAll('#suiviTabs button').forEach(function(bt){bt.classList.toggle('on',bt.getAttribute('data-b')===suiviBucket);});
     if(byId('val-controls'))byId('val-controls').classList.toggle('hidden',suiviBucket!=='validee');
     var q=((byId('suivi-q')&&byId('suivi-q').value)||'').toLowerCase().trim(), wrap=byId('suiviList');
     function matchQ(x){ if(!q)return true; var an=(x.agentId&&faById(x.agentId))?faById(x.agentId).nom:''; return (((x.titre||'')+' '+(x.texte||'')+' '+(x.ville||'')+' '+(x.client||'')+' '+(x.siteBDC||'')+' '+(an||'')).toLowerCase().indexOf(q)>=0); }
-    var arr=SUIVI.filter(function(x){return x.statut===suiviBucket&&matchQ(x);});
+    var arr=SUIVI.filter(function(x){return x.statut===suiviBucket&&!x.deleted&&matchQ(x);});
     if(!arr.length){ wrap.innerHTML='<div class="svempty">'+(q?'Aucun résultat pour « '+esc(q)+' ».':'Aucune demande dans cette catégorie.')+'</div>'; return; }
     function svItem(x){
       /* b274 (Zeus) : savoir QUI a mis une demande en recherche. Sans ce nom, impossible de retourner
@@ -3632,7 +3632,9 @@ button.big:active{transform:translateY(1px)}
     function ts(x){ return Math.max(+(x.valide||0),+(x.pris||0),+(x.creeAt||0)); }
     var map={},order=[];
     function add(x){ if(!x||!x.id)return; var k=String(x.id); if(!(k in map)){order.push(k);map[k]=x;return;} if(ts(x)>ts(map[k]))map[k]=x; }
-    loc.forEach(add); rem.forEach(add); return order.map(function(k){return map[k];}); }
+    loc.forEach(add); rem.forEach(add);
+    var _cut=Date.now()-30*24*60*60*1000; // b303 : purge soft-deletes > 30 j
+    return order.map(function(k){return map[k];}).filter(function(x){return !(x.deleted&&ts(x)<_cut);}); }
   function cloudApply(k,v){
     if(v==null || localStorage.getItem(k)===v) return; // identique / notre propre écho
     if(k==='fkh_suivisite'){ // #11 : fusion au lieu d'écraser (garde la coche la plus récente par appel)
@@ -4664,7 +4666,7 @@ button.big:active{transform:translateY(1px)}
     _bindE('.pl-e-site','siteAgent',false); _bindE('.pl-e-client','client',false); _bindE('.pl-e-date','mdate',false); _bindE('.pl-e-h1','mheure',true); _bindE('.pl-e-h2','mfin',true); var _df8=card.querySelector('.pl-e-datefin'); if(_df8)_df8.onchange=function(){ var v=(_df8.value||'').trim(); if(v)m.mdateFin=v; else delete m.mdateFin; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); }; _bindE('.pl-e-qual','qual',false);
     var _nc=card.querySelector('.pl-e-nomcli'); if(_nc)_nc.onchange=function(){ if(typeof siteMetaSet==='function')siteMetaSet(m.siteAgent||m.titre||'',{nomClient:(_nc.value||'').trim()}); if(typeof renderPlanning==='function')renderPlanning(); };
     var _pl=card.querySelector('.pl-e-plan'); if(_pl)_pl.onchange=function(){ if(_pl.checked)m.planifie=true; else delete m.planifie; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); };
-    var del=card.querySelector('.pl-del'); if(del)del.onclick=function(){ if(!confirm('SUPPRIMER DÉFINITIVEMENT cette vacation ?\n\nElle disparaît du Planning ET de Suivi des appels. IRRÉVERSIBLE (pour la remettre, il faudra la recréer).'))return; var id=_plAffId; SUIVI=SUIVI.filter(function(x){return x.id!==id;}); if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; /* b195 : suppression DEFINITIVE (JULES) */
+    var del=card.querySelector('.pl-del'); if(del)del.onclick=function(){ if(!confirm('SUPPRIMER DÉFINITIVEMENT cette vacation ?\n\nElle disparaît du Planning ET de Suivi des appels. IRRÉVERSIBLE (pour la remettre, il faudra la recréer).'))return; m.deleted=true; m.creeAt=Date.now(); /* b303 : soft-delete — survit au merge cloud-pull sans revenir */ if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; /* b195 : suppression DEFINITIVE (JULES) */
     var sof=card.querySelector('.pl-saoff'); if(sof)sof.onclick=function(){ if(!m.saOff){ if(!confirm('Retirer cette vacation du SUIVI DES APPELS ?\n\nElle reste visible au Planning (trace 🔕) et pourra être RÉACTIVÉE ici à tout moment. Elle ne reviendra jamais toute seule.'))return; m.saOff=true; } else { delete m.saOff; } if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
     card.querySelectorAll('.pl-tk-h').forEach(function(b9){ b9.onchange=function(){ var k9=b9.getAttribute('data-key'), v9=(b9.value||'').trim(); if(!v9)return;
       if(k9==='prise'){ m.mheure=v9; }
@@ -4677,7 +4679,7 @@ button.big:active{transform:translateY(1px)}
     card.querySelectorAll('.pl-tk-del').forEach(function(b9){ b9.onclick=function(){ var h9=b9.getAttribute('data-h'); if(!Array.isArray(m.ctrls))return; m.ctrls=m.ctrls.filter(function(x9){return x9!==h9;}); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
     var tka=card.querySelector('.pl-tk-add'); if(tka)tka.onclick=function(){ var h9=(card.querySelector('.pl-tk-add-h').value||'').trim(); if(!h9){alert('Choisis une heure de contrôle.');return;} if(!Array.isArray(m.ctrls)||!m.ctrls.length)m.ctrls=(apControls(m)||[]).slice(); if(m.ctrls.indexOf(h9)<0)m.ctrls.push(h9); m.ctrls.sort(); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
     var tk2=card.querySelector('.pl-tk-add2h'); if(tk2)tk2.onclick=function(){ var s9=toMin(m.mheure||''); if(s9==null){alert('Heure de début requise.');return;} var e9m=missEndMin(m); if(e9m==null){alert('Heure de fin requise (ou ajoute les contrôles un par un).');return;} if(e9m<=s9)e9m+=1440; var out9=[]; for(var t9=s9+120;t9<e9m;t9+=120){ out9.push(pad2(Math.floor((t9%1440)/60))+':'+pad2(t9%60)); } if(!out9.length){alert('Vacation trop courte pour des contrôles 2 h.');return;} m.ctrls=out9; if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
-    var mok=card.querySelector('.pl-mail-ok'); if(mok)mok.onclick=function(){ delete m.mailPending; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; var mrf=card.querySelector('.pl-mail-ref'); if(mrf)mrf.onclick=function(){ if(!confirm('Refuser cette vacation issue d'+String.fromCharCode(8217)+'un mail ? Elle sera supprimée du Planning.'))return; var id2=_plAffId; SUIVI=SUIVI.filter(function(x){return x.id!==id2;}); try{ var rf=JSON.parse(localStorage.getItem('fkh_mail_refuse')||'[]')||[]; if(m.mailSrc&&rf.indexOf(m.mailSrc)<0){rf.push(m.mailSrc);localStorage.setItem('fkh_mail_refuse',JSON.stringify(rf));} }catch(e){} if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); };
+    var mok=card.querySelector('.pl-mail-ok'); if(mok)mok.onclick=function(){ delete m.mailPending; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; var mrf=card.querySelector('.pl-mail-ref'); if(mrf)mrf.onclick=function(){ if(!confirm('Refuser cette vacation issue d'+String.fromCharCode(8217)+'un mail ? Elle sera supprimée du Planning.'))return; m.deleted=true; m.creeAt=Date.now(); /* b303 : soft-delete */ try{ var rf=JSON.parse(localStorage.getItem('fkh_mail_refuse')||'[]')||[]; if(m.mailSrc&&rf.indexOf(m.mailSrc)<0){rf.push(m.mailSrc);localStorage.setItem('fkh_mail_refuse',JSON.stringify(rf));} }catch(e){} if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); };
     var tn=card.querySelector('.pl-tenue'); if(tn)tn.onclick=function(){ var agNom=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):''; if(!agNom&&!confirm('Aucun agent affecté sur cette vacation — créer quand même le ticket contrôle tenue ?'))return; var ok=(typeof tenueCtrlDemand==='function')&&tenueCtrlDemand(agNom,m.id,(m.siteAgent||m.titre||''),m.mdate||'',m.mheure||'','demande manuelle (Planning)'); alert(ok?'🦺 Ticket contrôle tenue créé dans Suivi des appels.':'Un contrôle tenue est déjà en attente pour cet agent à cette date.'); };
     var badd=card.querySelector('.pl-brk-add'); if(badd)badd.onclick=function(){ var h1=_plNormHM(card.querySelector('.pl-brk-h1').value), h2=_plNormHM(card.querySelector('.pl-brk-h2').value); if(!h1||!h2){ alert('Heures de début et fin de pause obligatoires.'); return; } if(!Array.isArray(m.breaks))m.breaks=[]; m.breaks.push({h1:h1,h2:h2,type:(card.querySelector('.pl-brk-type').value||'').trim(),notWork:card.querySelector('.pl-brk-nw').checked,notCharge:card.querySelector('.pl-brk-nc').checked}); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); };
     card.querySelectorAll('.pl-brkdel').forEach(function(b){ b.onclick=function(){ if(!Array.isArray(m.breaks))return; m.breaks.splice(+b.getAttribute('data-i'),1); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); }; });
@@ -4823,7 +4825,7 @@ button.big:active{transform:translateY(1px)}
     if(!plWeek)plWeek=_plMonday(impTodayISO());
     var days=_plDays(), i;
     var dn=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'], today=impTodayISO();
-    var missAll=(typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){ return m.statut==='validee'&&!m.aDecouper&&!m.retiree&&m.mdate&&days.indexOf(m.mdate)>=0; });
+    var missAll=(typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){ return m.statut==='validee'&&!m.aDecouper&&!m.retiree&&!m.deleted&&m.mdate&&days.indexOf(m.mdate)>=0; }); // b303 : exclure soft-deletes
     var _nDec=(typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){ return m.statut==='validee'&&m.aDecouper; }).length;
     var _nRet=(typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){ return m.statut==='validee'&&m.retiree; }).length; // b156
     var _plClients={}; missAll.forEach(function(m){ if(m.client)_plClients[m.client]=1; });
@@ -5864,7 +5866,8 @@ button.big:active{transform:translateY(1px)}
   function saEntries(from,to,inclExcl){
     // #13 On inclut aussi les missions démarrant la VEILLE de `from` : leurs appels d'après-minuit tombent dans la période demandée (continuité de nuit à travers minuit).
     var fromV=from?svcAddDays(from,-1):'';
-    var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; if(x.mailPending)return false; if(x.retiree||x.saOff)return false; /* b195 : retrait du Suivi des appels (reversible), la vacation reste au Planning */ /* b154 : vacation creee depuis un mail, en attente de validation -> pas encore de tickets */ var d=x.mdate||''; if((from||to)&&!d)return false; if(from&&d&&d<fromV)return false; if(to&&d&&d>to)return false; return true; });
+    var missions=SUIVI.filter(function(x){ if(x.statut!=='validee')return false; if(x.deleted)return false; // b303 : exclure soft-deletes
+      if(x.mailPending)return false; if(x.retiree||x.saOff)return false; /* b195 : retrait du Suivi des appels (reversible), la vacation reste au Planning */ /* b154 : vacation creee depuis un mail, en attente de validation -> pas encore de tickets */ var d=x.mdate||''; if((from||to)&&!d)return false; if(from&&d&&d<fromV)return false; if(to&&d&&d>to)return false; return true; });
     if(typeof apDeconflict==='function')apDeconflict(missions,10);
     var out=[];
     missions.forEach(function(m){ var start=toMin(m.mheure); var _ag=(m.agentId&&faById(m.agentId))?faById(m.agentId):null; var _tels=(_ag&&_ag.tels&&_ag.tels.length)?_ag.tels.filter(function(t){return !!t;}):[]; var _tel=_tels[0]||''; ssSteps(m).forEach(function(s){ if(!s.heure)return; var mn=toMin(s.heure),abs=(mn==null?0:mn); if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn!=null&&mn<start)abs=mn+1440;
@@ -7704,7 +7707,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
         else if(dmin>=4.5)out.push({cat:'appel_retard',key:e.mid+'|'+e.key,title:'🔴 '+(e.key==='prise'?'Prise':'Fin')+' de service en retard',body:loc+' · prévu '+e.heure,go:'suiviappels',when:_ctDate});
       });
     }catch(_){}
-    try{ SUIVI.forEach(function(m){ if(m.statut==='recherche'&&m.pris&&(now-m.pris)>=3600000)out.push({cat:'demande_1h',key:m.id,title:'🕵️ Demande en recherche > 1 h',body:(m.titre||'Demande').slice(0,60)+(m.client?' — '+m.client:''),go:'suivi'}); }); }catch(_){}
+    try{ SUIVI.forEach(function(m){ if(m.deleted)return; if(m.statut==='recherche'&&m.pris&&(now-m.pris)>=3600000)out.push({cat:'demande_1h',key:m.id,title:'🕵️ Demande en recherche > 1 h',body:(m.titre||'Demande').slice(0,60)+(m.client?' — '+m.client:''),go:'suivi'}); }); }catch(_){}
     return out;
   }
   function notifScan(){
