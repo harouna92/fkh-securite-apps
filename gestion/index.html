@@ -225,7 +225,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b309</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b310</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1434,7 +1434,28 @@ button.big:active{transform:translateY(1px)}
   var MOTIFS_AN=["Annulée par le client","Client a choisi une autre société","Reportée","Doublon","Plus besoin","Autre"];
   var suiviBucket='recherche', idc=0, valSub='toaff';
   // Les items de SIMULATION (x.sim) ne sont JAMAIS sauvegardés ni synchronisés : ils vivent uniquement en mémoire (local), pour ne pas parasiter les vraies données.
-  function saveSuivi(){ save('fkh_suivi',SUIVI.filter(function(x){return !x.sim;}).map(function(x){var c={};for(var k in x)if(k.charAt(0)!=='_')c[k]=x[k];return c;})); }
+  /* ===== b310 : HORODATER AUTOMATIQUEMENT CE QU'ON MODIFIE =====
+     POURQUOI : la synchro garde, pour chaque vacation, la version au plus grand horodatage
+     (et a egalite c'est le classeur commun qui l'emporte). Une modification faite ici sans
+     toucher a l'horodatage se faisait donc ecraser au cycle suivant : le clic disparaissait
+     tout seul. Exemple mesure : « Rouvrir » une demande validee remettait meme l'horodatage
+     a zero, donc la demande redevenait « validee » 4 secondes plus tard.
+     COMMENT : on retient l'empreinte du contenu de chaque vacation. Si elle a change depuis
+     la derniere sauvegarde, on pose l'heure courante — la modification gagne alors la synchro.
+     Une vacation inchangee n'est jamais touchee, et les valeurs recues du classeur commun
+     sont reprises comme reference (svSigReset) pour ne pas etre prises pour des modifications
+     locales. */
+  var _svSig={};
+  function _svEmpreinte(m){ var o={}; for(var k in m){ if(k.charAt(0)!=='_'&&k!=='valide'&&k!=='pris'&&k!=='creeAt')o[k]=m[k]; } return JSON.stringify(o); }
+  function svSigReset(){ _svSig={}; (SUIVI||[]).forEach(function(m){ if(m&&m.id)_svSig[String(m.id)]=_svEmpreinte(m); }); }
+  function saveSuivi(){
+    var _now=Date.now();
+    (SUIVI||[]).forEach(function(m){ if(!m||!m.id||m.sim)return;
+      var k=String(m.id), s=_svEmpreinte(m);
+      if(_svSig[k]!==undefined && _svSig[k]!==s)m.creeAt=_now;   /* b310 : contenu modifie -> on horodate */
+      _svSig[k]=s; });
+    save('fkh_suivi',SUIVI.filter(function(x){return !x.sim;}).map(function(x){var c={};for(var k in x)if(k.charAt(0)!=='_')c[k]=x[k];return c;})); }
+  svSigReset();   /* b310 : etat de depart — la premiere sauvegarde n'horodate rien */
   function titreFrom(txt){
     function g(re){var m=re.exec(txt);return m?m[1].trim():'';}
     var p=g(/Prestation : (.+)/), v=g(/Ville : ([^\n(—]+)/), d=g(/Date : (.+)/), asap=/DÈS QUE POSSIBLE/.test(txt);
@@ -2076,7 +2097,7 @@ button.big:active{transform:translateY(1px)}
       var vcl=(byId('val-client')&&byId('val-client').value)||'', vsi=(byId('val-site')&&byId('val-site').value)||'';
       // Peuple les listes Client / Site à partir de toutes les missions validées (Site restreint au client choisi)
       (function(){
-        var allV=SUIVI.filter(function(x){return x.statut==='validee';}), cs={}, ss={};
+        var allV=SUIVI.filter(function(x){return !x.deleted&&x.statut==='validee';}), cs={}, ss={};   /* b310 : une vacation supprimee ne doit plus peupler les filtres Client / Site */
         allV.forEach(function(x){ if(x.client)cs[x.client]=1; if(!vcl||(x.client||'')===vcl){ var s=x.siteAgent||x.titre||''; if(s)ss[s]=1; } });
         var selC=byId('val-client'); if(selC){ selC.innerHTML='<option value="">Tous les clients</option>'+Object.keys(cs).sort().map(function(c){return '<option value="'+esc(c)+'"'+(c===vcl?' selected':'')+'>'+esc(c)+'</option>';}).join(''); if(selC.value!==vcl){selC.value='';vcl='';} }
         var selS=byId('val-site'); if(selS){ selS.innerHTML='<option value="">Tous les sites</option>'+Object.keys(ss).sort().map(function(s){return '<option value="'+esc(s)+'"'+(s===vsi?' selected':'')+'>'+esc(s)+'</option>';}).join(''); if(selS.value!==vsi){selS.value='';vsi='';} }
@@ -3565,7 +3586,7 @@ button.big:active{transform:translateY(1px)}
   // ===== Affecter des tenues aux agents en mission (filtré jour/nuit + client) =====
   var tafSlice='all', tafSelDates=[], TAF_DRILL={};
   function tafWeekDates(){ var d=new Date(),day=(d.getDay()+6)%7,mon=new Date(d); mon.setDate(d.getDate()-day); var out=[]; for(var i=0;i<7;i++){ var x=new Date(mon); x.setDate(mon.getDate()+i); out.push(x.getFullYear()+'-'+('0'+(x.getMonth()+1)).slice(-2)+'-'+('0'+x.getDate()).slice(-2)); } return out; }
-  function tafMissions(){ return (typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){ return m.statut==='validee'&&m.agentId; }); }
+  function tafMissions(){ return (typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){ return !m.deleted&&m.statut==='validee'&&m.agentId; }); }   /* b310 */
   function renderTenueAffect(){ var wrap=byId('taf-list'); if(!wrap)return;
     var miss=tafMissions();
     // remplir la liste des clients
@@ -3677,6 +3698,7 @@ button.big:active{transform:translateY(1px)}
       (SUIVI||[]).forEach(function(x){var f={};for(var _k in x)if(_k.charAt(0)==='_'&&_k!=='_pending'&&_k!=='_pick'&&_k!=='_pick2')f[_k]=x[_k];if(Object.keys(f).length)_tr[String(x.id)]=f;});
       SUIVI=load('fkh_suivi'); if(_sims.length)SUIVI=_sims.concat(SUIVI);
       SUIVI.forEach(function(x){delete x._pending;delete x._pick;delete x._pick2;var _f=_tr[String(x.id)];if(_f)for(var _k2 in _f)x[_k2]=_f[_k2];});
+      if(typeof svSigReset==='function')svSigReset();   /* b310 : ce qui vient du classeur commun devient la reference — sinon on le prendrait pour une modification locale */
       if(typeof suiviCleanFins==='function')suiviCleanFins(); if(typeof suiviHeriteSite==='function')suiviHeriteSite(); if(typeof saOffMigrate==='function')saOffMigrate();
       /* b307 : empreinte APRES fusion — on ne redessine QUE si une vacation a ete ajoutee, supprimee ou modifiee. */
       var _sigB=(SUIVI||[]).filter(function(x){return !x.sim;}).map(function(x){return x.id+'@'+(x.creeAt||0)+'@'+(x.deleted?1:0);}).sort().join('|'), _chg=(_sigB!==_sigA);
@@ -6081,7 +6103,7 @@ button.big:active{transform:translateY(1px)}
     var rm=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur')?'':'<button type="button" class="csg-del" data-cid="'+esc(e.cid)+'" title="'+(e._valid?'Annuler l\'envoi et retirer de Suivi des appels':'Retirer ce ticket')+'" style="font-size:11px;margin-left:auto;color:var(--muted)">'+(e._valid?'✖ Annuler l\'envoi':'🗑️ Retirer')+'</button>';
     return '<div class="card sacard" data-ct="'+ct+'" data-done="'+(done?1:0)+'" style="padding:8px;border-left:4px solid '+(e._valid&&!done?_vc:'#7b61ff')+(done?';opacity:.6':'')+'">'+head+sos+body+'<div class="acts" style="gap:8px;margin-top:4px;flex-wrap:wrap;align-items:center">'+fait+note+rm+'</div></div>';
   }
-  function csgFillMid(){ var sel=byId('csg-mid'); if(!sel)return; var d=byId('csg-date')?byId('csg-date').value:''; var ms=SUIVI.filter(function(x){return x.statut==='validee'&&(!d||x.mdate===d);}); var cur=sel.value; sel.innerHTML='<option value="">— aucune (consigne libre sur le créneau) —</option>'+ms.map(function(m){ var s=m.siteAgent||m.titre||'—'; return '<option value="'+esc(m.id)+'">'+esc(s)+(m.mheure?' · '+esc(m.mheure):'')+(m.mdate?' ('+esc(m.mdate)+')':'')+'</option>'; }).join(''); if(cur)sel.value=cur; }
+  function csgFillMid(){ var sel=byId('csg-mid'); if(!sel)return; var d=byId('csg-date')?byId('csg-date').value:''; var ms=SUIVI.filter(function(x){return !x.deleted&&x.statut==='validee'&&(!d||x.mdate===d);});/* b310 */ var cur=sel.value; sel.innerHTML='<option value="">— aucune (consigne libre sur le créneau) —</option>'+ms.map(function(m){ var s=m.siteAgent||m.titre||'—'; return '<option value="'+esc(m.id)+'">'+esc(s)+(m.mheure?' · '+esc(m.mheure):'')+(m.mdate?' ('+esc(m.mdate)+')':'')+'</option>'; }).join(''); if(cur)sel.value=cur; }
   function csgRenderList(){ var box=byId('csg-list'); if(!box)return; var a=csgLoad().slice().sort(function(x,y){ var dx=(x.mdate||'')+' '+(x.heure||''),dy=(y.mdate||'')+' '+(y.heure||''); return dx<dy?1:dx>dy?-1:0; }); if(!a.length){ box.innerHTML='<div class="sub" style="margin:0">Aucune consigne enregistrée.</div>'; return; } box.innerHTML='<div class="lab" style="margin:0 0 4px">'+a.length+' consigne'+(a.length>1?'s':'')+'</div><div class="list">'+a.map(function(c){ var m=c.mid?csgMissById(c.mid):null, site=m?(m.siteAgent||m.titre||''):''; return '<div class="it"><div style="flex:1"><div class="fa-n">'+(c.done?'✅':'📋')+' <span style="color:var(--muted);font-weight:400">'+esc(c.mdate||'')+(c.heure?' '+esc(c.heure):'')+'</span> '+esc((c.client||site)?('· '+(c.client||site)):'')+'</div><div class="fa-d">'+esc(c.texte||'')+'</div></div><button class="no csg-dellist" data-cid="'+esc(c.id)+'" title="Supprimer" style="width:30px;height:30px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);cursor:pointer">🗑️</button></div>'; }).join('')+'</div>'; box.querySelectorAll('.csg-dellist').forEach(function(b){ b.onclick=function(){ if(!confirm('Supprimer cette consigne ?'))return; csgDel(b.getAttribute('data-cid')); csgRenderList(); if(typeof renderSuiviAppels==='function')renderSuiviAppels(); }; }); }
   if(byId('csg-toggle'))byId('csg-toggle').onclick=function(){ var f=byId('csg-form'); if(!f)return; if(f.classList.contains('hidden')){ f.classList.remove('hidden'); if(byId('csg-date')&&!byId('csg-date').value)byId('csg-date').value=impTodayISO(); csgFillMid(); csgRenderList(); } else f.classList.add('hidden'); };
   if(byId('csg-date'))byId('csg-date').addEventListener('change',csgFillMid);
@@ -7416,7 +7438,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
       var OD=operDoneLoad(); opr.forEach(function(a){ a._key=operKey(a); var dv=OD[a._key]; a._done=!!dv; a._why=dv; });
       opr.sort(function(a,b){return b.sev-a.sev;});
       var activeO=opr.filter(function(a){return !a._done;}), doneO=opr.filter(function(a){return a._done;});
-      var roCliOpts='<option value="">Tous les clients</option>'+Object.keys((function(){var o={};SUIVI.forEach(function(m){if(m.client)o[m.client]=1;});return o;})()).sort().map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('');
+      var roCliOpts='<option value="">Tous les clients</option>'+Object.keys((function(){var o={};SUIVI.forEach(function(m){if(m.deleted)return;/* b310 */ if(m.client)o[m.client]=1;});return o;})()).sort().map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('');
       var geoCard=(function(){ var g=window._PHGEO||{total:0,sans:0}; if(!g.total)return ''; var pct=Math.round(g.sans*100/g.total);
         return '<div class="card" style="border:1.5px solid '+(pct>=20?'var(--bad)':'var(--line)')+'"><div class="lab" style="margin:0 0 4px">📍 Photos terrain sans position</div><div class="fa-d" style="margin:0"><b style="font-size:18px;color:'+(pct>=20?'var(--bad)':'var(--ok)')+'">'+g.sans+'</b> photo(s) sur '+g.total+' reçues par le lien unique <b>('+pct+' %)</b> n’ont pas de géolocalisation — elles prouvent l’heure mais <b>pas la présence sur site</b>.</div><div class="sub" style="margin:4px 0 0;font-size:11.5px">Rappelle aux agents d’accepter la demande de position (bandeau rouge sur la page photo + bouton Réessayer).</div></div>'; })();
       var roCard='<details class="card" id="sup-ro-card"'+(roCalls?' open':'')+'><summary style="cursor:pointer;font-weight:700">🔌 Vérification des appels (Ringover)</summary><div style="margin-top:8px"><div class="acts" style="gap:8px;flex-wrap:wrap;align-items:center"><span class="sub" style="margin:0">Jour :</span><input type="date" id="sup-ro-date" style="width:auto;padding:5px 8px"><select id="sup-ro-client" style="width:auto;padding:5px 8px">'+roCliOpts+'</select><button type="button" class="ok" id="sup-ro-btn">🔌 Vérifier les appels</button><button type="button" id="sup-ro-diag" style="font-size:12px">🔍 Diagnostic API</button><span class="sub" style="margin:0 0 0 4px">· fenêtre ±</span><input type="number" id="sup-ro-win" min="1" max="240" value="'+roWin()+'" title="Tolérance en minutes autour de l\'heure prévue pour rapprocher un appel" style="width:56px;padding:5px 6px"><span class="sub" style="margin:0">min</span></div><p class="sub" style="margin:6px 0 0;font-size:11.5px">Croise chaque case cochée avec les appels réels (une <b>trace</b> d\'appel = ✅, décroché ou non) · fenêtre ±'+roWin()+' min réglable · filtre par client pour un rapport de preuve donneur d\'ordre.</p><div id="sup-ro-results" style="margin-top:8px;max-height:360px;overflow:auto"></div></div></details>';
