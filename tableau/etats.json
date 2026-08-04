@@ -3,6 +3,22 @@
   "maj": "2026-08-03",
   "items": [
     {
+      "b": 276,
+      "titre": "Les ordres portent leur PROJET : plusieurs tableaux, plusieurs sessions",
+      "source": "Zeus",
+      "theme": "Outils de pilotage",
+      "local": true,
+      "pourquoipas": "Se vérifie au démarrage d'une session : les ordres du projet en cours passent en tête."
+    },
+    {
+      "b": 277,
+      "titre": "Ticket prise/fin : deux « Fait » distincts — agent appelé ET client avisé",
+      "source": "Zeus",
+      "theme": "Planning & vacations",
+      "local": true,
+      "pourquoipas": "Se voit dans Suivi des appels sur un ticket de prise."
+    },
+    {
       "b": 275,
       "titre": "Accusé de réception : « vu le … » sur les tickets envoyés",
       "source": "Zeus",
@@ -398,5 +414,7 @@
       "titre": "Pastille 🌙 : tenir compte de l'heure du premier contrôle dans « avant / en cours »",
       "source": "remontée #55"
     }
-  ]
+  ],
+  "projet": "gestion",
+  "projetLabel": "Appli GESTION — FKH SÉCURITÉ"
 }

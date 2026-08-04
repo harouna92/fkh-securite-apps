@@ -390,8 +390,12 @@ export default {
       if (!txt.trim()) return json({ error: "vide" }, 400);
       const dej = await env.DB.prepare("SELECT id FROM messages WHERE canal='ordre' AND statut='nouveau' AND texte = ?").bind(txt).first();
       if (dej) return json({ ok: true, deja: true });   // deplacer deux fois la meme carte ne cree pas deux ordres
+      /* b276 : le PROJET voyage avec l'ordre. Zeus a plusieurs chantiers ouverts ; sans cette etiquette,
+         un ordre depose depuis le tableau de GESTION apparaitrait au demarrage d'une session portant sur
+         un tout autre sujet. On le range dans l'auteur, sans nouvelle colonne. */
+      const proj = String(b.projet || "gestion").slice(0, 30);
       await env.DB.prepare("INSERT INTO messages (canal, auteur, texte, statut, created_at) VALUES ('ordre', ?, ?, 'nouveau', ?)")
-        .bind(String(b.auteur || "tableau de bord").slice(0, 60), txt, Date.now()).run();
+        .bind((proj + " · " + String(b.auteur || "tableau de bord")).slice(0, 60), txt, Date.now()).run();
       return json({ ok: true });
     }
     if (path === "/ordres" && request.method === "GET") {
