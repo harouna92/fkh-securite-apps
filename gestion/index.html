@@ -225,7 +225,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b281+dom</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v01-08·b285+dom</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2157,8 +2157,8 @@ button.big:active{transform:translateY(1px)}
     else if(act==='annule'){it._pending='annulee';}
     else if(act==='nongere'){it._pending='nongeree';}
     else if(act==='cancel'){delete it._pending;}
-    else if(act==='confirm'){var s=byId('suiviList').querySelector('select[data-sel="'+id+'"]');it.statut=it._pending;it.motif=s?s.value:'';it.valide=Date.now();delete it._pending;}
-    else if(act==='reopen'){it.statut='recherche';it.valide=null;it.motif='';delete it._pending;}
+    else if(act==='confirm'){var s=byId('suiviList').querySelector('select[data-sel="'+id+'"]');it.statut=it._pending;it.motif=s?s.value:'';it.valide=Date.now();delete it._pending; saveSuivi(); if(typeof cloudPush==='function')try{cloudPush('fkh_suivi');}catch(_e){} renderSuivi(); return; /* b285 : push cloud sinon le sync écrase le statut et la demande « revient » */ }
+    else if(act==='reopen'){it.statut='recherche';it.valide=null;it.motif='';delete it._pending; saveSuivi(); if(typeof cloudPush==='function')try{cloudPush('fkh_suivi');}catch(_e){} renderSuivi(); return; }
     else if(act==='togsearch'){ it.noSearch=!it.noSearch; delete it._near; delete it._pick; delete it._pick2; if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); return; }
     else if(act==='toiv'){ if(!confirm('Basculer cette demande vers la section 🚨 Interventions ?\n\nElle y démarre en recherche (cascade d’appels) et sera close ici (« Basculée vers Interventions »).'))return; var _o={id:'iv'+Date.now()+'_'+Math.round(Math.random()*9999),nature:(it.aiNature==='ronde'?'ronde':'intervention'),presta:(it.aiNature==='ronde'?'Ronde':'Intervention'),client:it.client||'',site:(it.siteAgent||it.titre||''),sitetype:'',ville:it.ville||'',cp:it.cp||'',la:(it.la!=null?it.la:null),lo:(it.lo!=null?it.lo:null),dep:(it.cp?String(it.cp).slice(0,2):''),date:(it.mdate||impTodayISO()),hdeb:(it.mheure||''),hfin:(it.mfin||''),aiCdr:it.aiCdr||''}; var _ok=(typeof window._ivCreateFromAI==='function')&&window._ivCreateFromAI(_o); if(_ok){ it.statut='traitee'; it.valide=Date.now(); it.motif='Basculée vers Interventions'; delete it.aiPending; saveSuivi(); renderSuivi(); if(typeof window._ivRender==='function')window._ivRender(); alert('🚨 Basculée — retrouve-la dans l’onglet Interventions.'); } else alert('Bascule impossible (module Interventions indisponible).'); return; }
     else if(act==='traite'){ it.statut='traitee'; it.valide=Date.now(); it.motif='Traité (sans recherche)'; delete it._pending; delete it._near; delete it._pick; delete it._pick2; if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); return; }
@@ -3649,7 +3649,7 @@ button.big:active{transform:translateY(1px)}
     }
     try{ localStorage.setItem(k,v); }catch(e){}
     try{
-      if(k==='fkh_suivi'){ var _sims=SUIVI.filter(function(x){return x.sim;}); SUIVI=load('fkh_suivi'); if(_sims.length)SUIVI=_sims.concat(SUIVI); SUIVI.forEach(function(x){delete x._pending;delete x._pick;delete x._pick2;}); if(typeof suiviCleanFins==='function')suiviCleanFins(); if(typeof suiviHeriteSite==='function')suiviHeriteSite(); if(typeof saOffMigrate==='function')saOffMigrate(); if(typeof renderSuivi==='function')renderSuivi(); }
+      if(k==='fkh_suivi'){ var _sims=SUIVI.filter(function(x){return x.sim;}); /* b285 : sauvegarder les flags transitoires (_near,_edit,_affect,_valopen…) avant d'écraser — sinon le sync cloud ferme les panneaux ouverts */ var _tr={}; (SUIVI||[]).forEach(function(x){ var f={}; for(var _k in x)if(_k.charAt(0)==='_'&&_k!=='_pending'&&_k!=='_pick'&&_k!=='_pick2')f[_k]=x[_k]; if(Object.keys(f).length)_tr[String(x.id)]=f; }); SUIVI=load('fkh_suivi'); if(_sims.length)SUIVI=_sims.concat(SUIVI); SUIVI.forEach(function(x){ delete x._pending;delete x._pick;delete x._pick2; var _f=_tr[String(x.id)]; if(_f)for(var _k2 in _f)x[_k2]=_f[_k2]; }); if(typeof suiviCleanFins==='function')suiviCleanFins(); if(typeof suiviHeriteSite==='function')suiviHeriteSite(); if(typeof saOffMigrate==='function')saOffMigrate(); if(typeof renderSuivi==='function')renderSuivi(); }
       else if(k==='fkh_fa'){ FA=load('fkh_fa'); FA.forEach(function(a){if(a.tel&&!a.tels){a.tels=[a.tel];delete a.tel;}}); if(typeof renderFA==='function')renderFA(); }
       else if(k==='fkh_thiam'){ TH=load('fkh_thiam'); if(typeof thRenderBoard==='function')thRenderBoard(); if(typeof thRenderOut==='function')thRenderOut(); if(typeof thRenderAuto==='function')thRenderAuto(); }
       else if(k==='fkh_zones_diff'){ try{ZDIFF=JSON.parse(localStorage.getItem('fkh_zones_diff')||'{}')||{};}catch(e){ZDIFF={};} if(typeof renderZone==='function' && byId('sec-zone') && !byId('sec-zone').classList.contains('hidden'))renderZone(); }

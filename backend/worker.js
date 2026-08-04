@@ -237,15 +237,38 @@ function nettoyerAttente(txt) {
 }
 
 const AI_PROMPT_BASE = "Tu analyses un message (appel transcrit, mail, SMS ou capture d'ecran) d'une societe de securite privee. Determine s'il contient une (ou plusieurs) demande(s) operationnelle(s), de trois NATURES possibles :\n- GARDIENNAGE : un agent est POSTE pour SURVEILLER un site sur une vacation / une duree (nuit, week-end, chantier, magasin...). Surveillance statique, l'agent reste sur place.\n- INTERVENTION : un DEPLACEMENT PONCTUEL declenche par une ALARME / une levee de doute / une alerte (l'agent se rend sur place, verifie, repart). Ponctuel, dure typiquement 1 h.\n- RONDE : un ou plusieurs PASSAGES de verification / pointage / tournee sur un ou plusieurs sites.\nEn cas de DOUTE entre gardiennage et intervention/ronde, choisis GARDIENNAGE.\nReponds UNIQUEMENT en JSON strict, sans aucun texte autour :\n{\"is_demande\": true|false, \"resume\": \"\", \"demandes\": [{\"nature\":\"gardiennage|intervention|ronde\",\"client\":\"\",\"ville\":\"\",\"cp\":\"\",\"site\":\"\",\"type_site\":\"\",\"nb_agents\":\"\",\"urgent\":true,\"vacations\":[{\"date\":\"\",\"horaires\":\"\"}]}],\"arrets\":[{\"client\":\"\",\"site\":\"\",\"ville\":\"\",\"motif\":\"\"}]}\nREGLES ABSOLUES :\n- FKH (FKH SECURITE) n'est JAMAIS le champ 'client' : FKH c'est NOUS, le destinataire des demandes. Le client est l'AUTRE societe (donneur d'ordre). Si le seul nom present est FKH, laisse 'client' vide.\n- 'nature' est OBLIGATOIRE pour CHAQUE demande : exactement 'gardiennage', 'intervention' ou 'ronde'.\n- Le champ 'client' est PRIORITAIRE : cherche ACTIVEMENT le donneur d'ordre et reprends-le exactement comme il est dit (Securitas, Sotel, etc.). Regarde partout : societe qui appelle/mande, nom cite, en-tete ou signature du mail, expediteur, en-tete de SMS. C'est souvent une societe de securite qui nous sous-traite. Ne laisse 'client' vide QUE si vraiment AUCUN nom de donneur d'ordre n'apparait nulle part.\n- UNE demande = UN SEUL SITE. Si le message concerne PLUSIEURS SITES differents (villes ou lieux differents), cree PLUSIEURS entrees distinctes dans 'demandes', une par site. NE JAMAIS regrouper plusieurs sites dans une seule demande.\n- Pour un MEME site (gardiennage) demande sur PLUSIEURS DATES : c'est UNE SEULE demande, mais mets UNE entree PAR DATE dans 'vacations', chaque entree = {date, horaires (creneau de cette date)}. NE PAS regrouper toutes les dates ensemble. Pour une intervention ou une ronde ponctuelle, 'vacations' peut rester vide (ou contenir la date/heure prevue si elle est precisee).\n- ARRET / ANNULATION a l'initiative du CLIENT : si le message est un client qui ARRETE, ANNULE ou met FIN a une prestation de gardiennage EN COURS (ex. « on arrete la surveillance du site X », « plus besoin d'agent a partir de demain », « on suspend la mission »), NE le mets PAS dans 'demandes' → mets une entree dans 'arrets' {client, site, ville, motif}. C'est le client qui prend l'initiative de l'arret.\n- is_demande=false, demandes=[] et arrets=[] si ce n'est NI du gardiennage, NI une intervention, NI une ronde, NI un arret (facture, RH, commercial, conversation, autre).\n- Laisse \"\" si une info est absente. resume = 1 phrase courte resumant le message.";
-function aiParseJson(j) { const txt = (j.content && j.content[0] && j.content[0].text) || "{}"; const m = txt.match(/\{[\s\S]*\}/); try { return JSON.parse(m ? m[0] : txt); } catch (e) { return { is_demande: false, resume: "analyse illisible" }; } }
+/* b284 : quand l'analyse echoue, on ne se contente plus de dire « illisible » — on GARDE ce que l'IA a
+   repondu. Sans cette trace, on cherche la cause a l'aveugle : reponse tronquee ? refus ? autre format ?
+   Trois relances de l'appel du 04/08 n'ont rien appris parce que l'erreur n'etait ecrite nulle part. */
+function aiParseJson(j) {
+  const txt = (j && j.content && j.content[0] && j.content[0].text) || "";
+  const stop = (j && j.stop_reason) || "";
+  const m = txt.match(/\{[\s\S]*\}/);
+  try {
+    return JSON.parse(m ? m[0] : txt);
+  } catch (e) {
+    return { is_demande: false, demandes: [], arrets: [],
+             resume: "analyse illisible",
+             err: String((e && e.message) || e).slice(0, 120),
+             stop_reason: stop,
+             brut: txt.slice(0, 600) };
+  }
+}
 async function aiAnalyze(env, transcript, direction) {
   const dirLine = direction === "in" ? "\n\nContexte : appel ENTRANT (le correspondant nous appelle)."
     : direction === "out" ? "\n\nContexte : appel SORTANT (c'est NOUS qui appelons le correspondant)."
     : "";
   const prompt = AI_PROMPT_BASE + dirLine + "\n\nTexte a analyser :\n\"\"\"" + transcript + "\"\"\"";
-  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 500, messages: [{ role: "user", content: prompt }] }) });
+  /* b286 : Haiku decroche sur les conversations longues et desordonnees (noms deformes par la
+     transcription, appel sortant de validation avec bavardage). Sonnet est ~3-4x plus cher sur ces
+     appels-la, mais recuperer une commande perdue vaut plus que quelques centimes.
+     Seuil : 1500 caracteres = appel court et net → Haiku suffit. Au-dela → Sonnet. */
+  const _model = transcript.length > 1500 ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001";
+  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: _model, max_tokens: 4000, messages: [{ role: "user", content: prompt }] }) });
   if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
-  return aiParseJson(await r.json());
+  const parsed = aiParseJson(await r.json());
+  parsed.modele = _model; // b286 : traçabilité du modèle utilisé
+  return parsed;
 }
 // b203 : lecture des PIECES JOINTES PDF (bons de commande) par l'IA -> adresse exacte du site, refs, horaires
 async function aiReadPdf(env, pdfs) {
