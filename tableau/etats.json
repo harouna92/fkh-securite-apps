@@ -569,6 +569,14 @@
       "theme": "Suivi des demandes",
       "pourquoipas": "Suivi des demandes → En recherche : la dernière arrivée est en première position. Elle s'affiche même si un panneau était ouvert.",
       "local": true
+    },
+    {
+      "b": 328,
+      "titre": "Prestation « Gardiennage » d'office + « Agents proches » sur les missions validées sans agent",
+      "source": "Zeus — 05/08",
+      "theme": "Suivi des demandes",
+      "pourquoipas": "Gardiennage → le champ Prestation est pré-rempli et ne propose que Gardiennage. Suivi des demandes → Validées → Non affectées : le bloc « Agents proches » est là.",
+      "local": true
     }
   ],
   "attente": [
