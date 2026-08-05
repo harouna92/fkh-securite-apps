@@ -465,6 +465,14 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Toute pastille photo → « 📷 Choisir une photo reçue » → galerie de tout ce qui est arrivé, avec rattachement au ticket ou désignation en photo de tenue.",
       "local": true
+    },
+    {
+      "b": 314,
+      "titre": "La tenue de l'agent visible depuis la vacation",
+      "source": "Zeus — 05/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Planning → cliquer une vacation avec un agent affecté : ses photos de tenue s'affichent sous son nom, ou « aucune photo » avec accès au portail.",
+      "local": true
     }
   ],
   "attente": [
