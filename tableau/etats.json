@@ -505,6 +505,14 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Suivi des appels → une photo reçue → taper un nom dans « 🦺 Photo de contrôle de… » puis associer. Et « 🗑 Supprimer la photo ».",
       "local": true
+    },
+    {
+      "b": 319,
+      "titre": "Pastille « agents sans photo de tenue » visible par le superviseur et l'administrateur",
+      "source": "Zeus — 05/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Se connecter en superviseur ou administrateur : la pastille 👕 est dans la barre avec son compteur. L'opérateur ne la voit pas.",
+      "local": true
     }
   ],
   "attente": [
