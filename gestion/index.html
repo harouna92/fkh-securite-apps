@@ -154,6 +154,7 @@ button.big:active{transform:translateY(1px)}
 #pp-an{right:493px}
 #pp-td{right:537px}
 #pp-an2{right:581px}
+#pp-tn{right:625px}
 #pp-an2.pc-vide{border-color:#e0a13b;background:rgba(224,161,59,.18);animation:pcpulse 1.6s ease-in-out infinite}
 .rv-x{position:absolute;top:-8px;left:-8px;width:26px;height:26px;border-radius:50%;background:#e5322d;color:#fff;font-size:15px;font-weight:800;line-height:26px;text-align:center;cursor:pointer;z-index:99;box-shadow:0 1px 5px rgba(0,0,0,.6);touch-action:manipulation;user-select:none}
 .rv-x:active{transform:scale(.88)}
@@ -225,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b314</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b315</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -277,6 +278,7 @@ button.big:active{transform:translateY(1px)}
 <button type="button" id="pp-te" class="pp-btn" title="Contrôles tenue (photo) NON FAITS depuis lundi" aria-label="Tenues non contrôlées">🦺<span class="pp-badge" id="pp-te-n"></span></button>
 <button type="button" id="pp-c2" class="pp-btn" title="Photos de contrôle (toutes les 2 h) manquantes" aria-label="Photos contrôles manquantes">🌙<span class="pp-badge" id="pp-c2-n"></span></button>
 <button type="button" id="pp-ro" class="pp-btn" title="Pointages SANS trace d’appel réel (Ringover)" aria-label="Pointages sans appel réel">🔌<span class="pp-badge" id="pp-ro-n"></span></button>
+<button type="button" id="pp-tn" class="pp-btn" title="Photos de contrôle tenue — agents du jour sans photo, sites couverts / non couverts" aria-label="Photos de contrôle tenue">🦺<span class="pp-badge" id="pp-tn-n"></span></button>
 <button type="button" id="pp-af" class="pp-btn" title="Vacations SANS AGENT à partir d’aujourd’hui — classées par site" aria-label="Vacations non affectées">🧍<span class="pp-badge" id="pp-af-n"></span></button>
 <button type="button" id="pp-rt" class="pp-btn" title="Agents EN RETARD à la prise de service" aria-label="Retards de prise">🐢<span class="pp-badge" id="pp-rt-n"></span></button>
 <button type="button" id="pp-gp" class="pp-btn" title="Agents ayant envoyé des photos SANS géolocalisation" aria-label="Photos sans position par agent">📵<span class="pp-badge" id="pp-gp-n"></span></button>
@@ -2785,7 +2787,7 @@ button.big:active{transform:translateY(1px)}
   }
   var DR_PASTILLES=[['an2','⚠️ Anomalies signalées'],['cloche','🔔 Cloche des alertes'],['recherche','🔎 Barre de recherche intelligente'],['bandeau','🖥️ Bandeau d’état (sandbox / connexion)'],['bulle','💬 Bulle Assistant (bas à droite)'],['aides','📖 Textes d’explication sous les titres'],['pc','🎧 Qui est au PC'],['an','🔴 Annulations à confirmer'],['op','⏰ Prises/fins non pointées'],
     ['cli','🏢 Client non avisé'],['ph','📷 Photos prise/fin'],['te','🦺 Contrôles tenue'],
-    ['c2','🌙 Photos de contrôle 2 h'],['ro','🔌 Pointage sans appel'],['af','🧍 Vacations non affectées'],
+    ['c2','🌙 Photos de contrôle 2 h'],['ro','🔌 Pointage sans appel'],['af','🧍 Vacations non affectées'],['tn','🦺 Photos de contrôle tenue'],
     ['rt','🐢 Retards de prise'],['gp','📵 Photos sans position']];
   function renderDroits(){
     var box=byId('dr-body'); if(!box)return;
@@ -6372,6 +6374,93 @@ button.big:active{transform:translateY(1px)}
      COMMENT : le bouton ouvre la galerie de tout ce qui est arrive, la plus recente en tete, chacune
      avec ce qu'on peut en faire — la rattacher au ticket d'ou l'on vient, ou la designer comme photo
      de tenue de l'agent. Les propositions de rapprochement restent affichees : on propose, Zeus tranche. */
+  /* ===== b315 : PASTILLE PHOTOS DE CONTROLE TENUE =====
+     POURQUOI (Zeus, 05/08) : savoir d'un coup d'oeil de quels agents on ignore la tenue. La photo est
+     un attribut de l'AGENT, pas du jour : une photo d'il y a deux semaines prouve encore comment il
+     s'habille. On regarde donc les agents planifies AUJOURD'HUI, et pour chacun : a-t-il, quelque part
+     dans la base, une photo de tenue ?
+     COMMENT : trois entrees — les agents sans photo (avec de quoi en designer une tout de suite), les
+     sites couverts, les sites non couverts. On descend jusqu'a l'action sans quitter la pastille. */
+  function tnCalc(){
+    var jour=(typeof impTodayISO==='function')?impTodayISO():'';
+    var parAgent={}, parSite={};
+    (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){
+      if(!m||m.deleted)return;
+      if(m.statut!=='validee'||m.retiree)return;
+      if((m.mdate||'')!==jour)return;
+      if(!m.agentId)return;
+      var a=(typeof faById==='function')?faById(m.agentId):null; if(!a)return;
+      var nom=a.nom||'', site=m.siteAgent||m.titre||'—';
+      if(!parAgent[nom])parAgent[nom]={nom:nom,sites:{},aPhoto:(typeof agentAPhotoTenue==='function')?agentAPhotoTenue(nom):false};
+      parAgent[nom].sites[site]=1;
+      if(!parSite[site])parSite[site]={site:site,agents:{}};
+      parSite[site].agents[nom]=1;
+    });
+    var sans=[], avec=[];
+    Object.keys(parAgent).forEach(function(n){ var o=parAgent[n];
+      o.sitesL=Object.keys(o.sites); (o.aPhoto?avec:sans).push(o); });
+    var sitesOK=[], sitesKO=[];
+    Object.keys(parSite).forEach(function(s){ var o=parSite[s];
+      var ags=Object.keys(o.agents);
+      var manquants=ags.filter(function(n){ return parAgent[n]&&!parAgent[n].aPhoto; });
+      (manquants.length?sitesKO:sitesOK).push({site:s,agents:ags,manquants:manquants}); });
+    sans.sort(function(a,b){return String(a.nom).localeCompare(String(b.nom));});
+    sitesOK.sort(function(a,b){return String(a.site).localeCompare(String(b.site));});
+    sitesKO.sort(function(a,b){return String(a.site).localeCompare(String(b.site));});
+    return {jour:jour, sans:sans, avec:avec, sitesOK:sitesOK, sitesKO:sitesKO};
+  }
+  function tnRefresh(){
+    var b=byId('pp-tn'), n=byId('pp-tn-n'); if(!b||!n)return;
+    if(typeof drVoitPastille==='function'&&!drVoitPastille('tn')){ b.style.display='none'; return; }
+    var d=tnCalc(), k=d.sans.length;
+    b.style.display='';
+    n.textContent=k; n.style.display=k?'':'none';
+    b.classList.toggle('pc-vide',!!k);
+    b.title=k?(k+' agent(s) planifié(s) aujourd\'hui sans photo de tenue'):'Tous les agents du jour ont une photo de tenue';
+  }
+  function tnOuvrir(vue){
+    var d=tnCalc();
+    var old=byId('tn-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='tn-pop';
+    pop.style.cssText='position:fixed;inset:5% 5%;z-index:255;background:var(--panel);border:1.5px solid #e0a13b;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+    var jourFR=(d.jour||'').split('-').reverse().join('/');
+    function tuile(cle,ico,nb,lbl){ return '<div class="pp-tile tn-tile" data-v="'+cle+'"'+(vue===cle?' style="border-color:#e0a13b"':'')+'><b>'+nb+'</b>'+ico+' '+lbl+'</div>'; }
+    var htm='<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">🦺 Photos de contrôle tenue</b><button type="button" id="tn-x">✕</button></div>'
+      +'<div class="sub" style="margin:4px 0 10px">Agents planifiés le '+esc(jourFR)+'. Une photo, même ancienne, suffit : elle montre comment l\'agent est habillé.</div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">'
+      +tuile('sans','🚨',d.sans.length,'agent(s) sans photo')
+      +tuile('ko','📍',d.sitesKO.length,'site(s) non couvert(s)')
+      +tuile('ok','✅',d.sitesOK.length,'site(s) couvert(s)')
+      +'</div>';
+    if(vue==='sans'){
+      htm+=d.sans.length?d.sans.map(function(o){
+        return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)">'
+          +'<div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b style="flex:1;min-width:140px">'+esc(o.nom)+'</b>'
+          +'<span class="sub" style="margin:0">📍 '+esc(o.sitesL.join(' · '))+'</span></div>'
+          +'<div class="acts" style="margin-top:7px"><button type="button" class="tn-portail" data-nom="'+esc(o.nom)+'" style="font-size:12px;border-color:#6ea8fe;color:#6ea8fe">📷 Choisir une photo reçue</button></div></div>';
+      }).join(''):'<div class="sub">Tous les agents planifiés aujourd\'hui ont une photo de tenue.</div>';
+    } else if(vue==='ko'){
+      htm+=d.sitesKO.length?d.sitesKO.map(function(o){
+        return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)">'
+          +'<b>'+esc(o.site)+'</b> <span class="sub" style="margin:0">— '+o.manquants.length+' agent(s) sans photo sur '+o.agents.length+'</span>'
+          +'<div style="margin-top:6px">'+o.manquants.map(function(n){
+              return '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:3px 0"><span style="flex:1;min-width:130px">👤 '+esc(n)+'</span>'
+                +'<button type="button" class="tn-portail" data-nom="'+esc(n)+'" style="font-size:11.5px;border-color:#6ea8fe;color:#6ea8fe">📷 Choisir une photo reçue</button></div>'; }).join('')
+          +'</div></div>';
+      }).join(''):'<div class="sub">Aucun site en manque : tous les agents du jour ont une photo.</div>';
+    } else {
+      htm+=d.sitesOK.length?d.sitesOK.map(function(o){
+        return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)">'
+          +'<b>'+esc(o.site)+'</b> <span class="sub" style="margin:0">— '+o.agents.length+' agent(s), tous avec photo</span>'
+          +'<div class="sub" style="margin:4px 0 0">'+esc(o.agents.join(' · '))+'</div></div>';
+      }).join(''):'<div class="sub">Aucun site entièrement couvert pour le moment.</div>';
+    }
+    pop.innerHTML=htm; document.body.appendChild(pop);
+    byId('tn-x').onclick=function(){ var q=byId('tn-pop'); if(q)q.parentNode.removeChild(q); };
+    pop.querySelectorAll('.tn-tile').forEach(function(t){ t.onclick=function(){ tnOuvrir(t.getAttribute('data-v')); }; });
+    pop.querySelectorAll('.tn-portail').forEach(function(b){ b.onclick=function(){
+      if(typeof photoPortail==='function')photoPortail('','',b.getAttribute('data-nom'),'Photo de tenue'); }; });
+  }
   function photoPortail(mid, stepKey, nomAgent, titreCtx){
     var old=byId('pph-pop'); if(old)old.parentNode.removeChild(old);
     var pop=document.createElement('div'); pop.id='pph-pop';
@@ -6855,6 +6944,7 @@ button.big:active{transform:translateY(1px)}
   function ppRefresh(){ try{ppReorderInit();}catch(e){}   /* b263 : le glisser-deposer des pastilles etait branche par ppRender(), donc SEULEMENT apres avoir ouvert une pastille — il ne s'armait jamais si on n'en ouvrait aucune. On le branche des le premier rafraichissement. */
     try{setTimeout(ppPlacer,0);}catch(e){} var hide=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); // b150 : réservé superviseur/admin/super-admin
     var sc=hide?null:ppScan(), any=false;
+    try{ if(typeof tnRefresh==='function')tnRefresh(); }catch(_e){}   /* b315 */
     ['op','cli','ph','te','c2','ro','af','rt','gp','pc','an','td','an2'].forEach(function(k){ var b=byId('pp-'+k),n=byId('pp-'+k+'-n'); if(!b||!n)return; any=true;
       b.style.display=hide?'none':'';
       if(typeof drVoitPastille==='function'&&!drVoitPastille(k)){ b.style.display='none'; return; }   /* b232 */
@@ -7238,7 +7328,8 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
   setTimeout(function(){ try{ppRoScan();}catch(_e){} },3000);
   function ppOpen(mode){ PP_VIEW={mode:mode,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.add('on'); ppRender(); }
   function ppClose(){ PP_VIEW={mode:null,sub:null,sub2:null}; var o=byId('pp-ovl'); if(o)o.classList.remove('on'); }
-  (function(){ ['op','cli','ph','te','c2','ro','af','rt','gp','pc','an','td','an2'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
+  (function(){ var _tb=byId('pp-tn'); if(_tb)_tb.onclick=function(){ tnOuvrir('sans'); };   /* b315 */
+    ['op','cli','ph','te','c2','ro','af','rt','gp','pc','an','td','an2'].forEach(function(k){ var b=byId('pp-'+k); if(b)b.onclick=function(){ppOpen(k);}; });
     var o=byId('pp-ovl'); if(o)o.addEventListener('click',function(ev){ if(ev.target===o)ppClose(); });
     setInterval(function(){ try{ppRefresh();}catch(_e){} },30000);
     setTimeout(function(){ try{ppRefresh();}catch(_e){} },900);
