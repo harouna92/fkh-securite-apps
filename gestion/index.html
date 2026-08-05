@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b338</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b340</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1028,7 +1028,20 @@ button.big:active{transform:translateY(1px)}
   // Branche un bouton .gtime sur la grille : clic -> grille -> data-v + callback
   function bindTimeBtn(el,onPick){ if(!el)return; el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); openTimeGrid(el, tbGet(el), function(v){ tbSet(el,v); if(onPick)onPick(v); }); }); }
   var secs=['droits','corbeille','demandes','noterapide','prise','fin','suivi','planning','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','numeros','clientsf','terrain','supterrain','streste','cockpitfkh','depots','mails','ref'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;if(s==='ref'){var _r8=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; if(_r8!=='admin'&&_r8!=='superadmin'&&_r8!=='full')return;} /* b198 : Sites & Clients = admin + super-admin */document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});try{document.body.classList.toggle('plfull',s==='planning');}catch(e){} /* b207 */if(s==='droits'&&typeof renderDroits==='function')renderDroits();if(s==='corbeille'&&typeof renderCorbeille==='function')renderCorbeille();if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='terrain'&&typeof renderTerrain==='function')renderTerrain();if(s==='supterrain'&&typeof renderSupTerrain==='function')renderSupTerrain();if(s==='clientsf'&&typeof renderClientsF==='function')renderClientsF();if(s==='planning'&&typeof renderPlanning==='function')renderPlanning();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if(s==='mails'&&typeof renderMails==='function')renderMails();if(s==='ref'&&typeof renderRef==='function')renderRef();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});window.scrollTo(0,0);};});
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;if(s==='ref'){var _r8=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; if(_r8!=='admin'&&_r8!=='superadmin'&&_r8!=='full')return;} /* b198 : Sites & Clients = admin + super-admin */document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});try{document.body.classList.toggle('plfull',s==='planning');}catch(e){} /* b207 */if(s==='droits'&&typeof renderDroits==='function')renderDroits();if(s==='corbeille'&&typeof renderCorbeille==='function')renderCorbeille();if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='terrain'&&typeof renderTerrain==='function')renderTerrain();if(s==='supterrain'&&typeof renderSupTerrain==='function')renderSupTerrain();if(s==='clientsf'&&typeof renderClientsF==='function')renderClientsF();if(s==='planning'&&typeof renderPlanning==='function')renderPlanning();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if(s==='mails'&&typeof renderMails==='function')renderMails();if(s==='ref'&&typeof renderRef==='function')renderRef();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});_scrollGarder(s);};});
+  /* ===== b340 : ON REVIENT LA OU L'ON ETAIT =====
+     POURQUOI (Zeus, 05/08) : dans Suivi des appels on descend jusqu'au ticket qu'on traite ; on passe
+     une seconde ailleurs, on revient — et tout est remonte en haut. Il faut re-descendre a chaque
+     fois, et on perd le fil au milieu de trente tickets.
+     COMMENT : on retient la position de chaque section quand on la quitte, et on la restitue en y
+     revenant. Une section jamais visitee s'ouvre en haut, comme avant. */
+  var _SCROLLPOS={}, _SCROLLCUR=null;
+  function _scrollGarder(nouvelle){
+    try{ if(_SCROLLCUR)_SCROLLPOS[_SCROLLCUR]=window.pageYOffset||document.documentElement.scrollTop||0; }catch(e){}
+    _SCROLLCUR=nouvelle;
+    var y=(_SCROLLPOS[nouvelle]!=null)?_SCROLLPOS[nouvelle]:0;
+    try{ window.scrollTo(0,y); setTimeout(function(){ try{window.scrollTo(0,y);}catch(_e){} },60); }catch(e){}
+  }
   // ===== Réorganiser les SECTIONS (onglets) par glisser-déposer — appui long, mémorisé par appareil =====
   (function tabReorder(){
     var bar=byId('tabs'); if(!bar)return; var LS='fkh_tabs_order';
@@ -6572,6 +6585,20 @@ button.big:active{transform:translateY(1px)}
     b.classList.toggle('pc-vide',!!k);
     b.title=k?(k+' agent(s) planifié(s) aujourd\'hui sans photo de tenue'):'Tous les agents du jour ont une photo de tenue';
   }
+  /* b339 : on ne veut pas seulement SAVOIR qu'un agent a une photo — on veut la VOIR. Un nom seul ne
+     dit pas comment l'agent est habille, et c'est justement la question posee. Chaque agent porte donc
+     sa vignette, cliquable pour l'agrandir ; celui qui n'en a pas le dit, avec le bouton pour y remedier
+     tout de suite. (Demande Zeus 05/08.) */
+  function _tnLigneAgent(n){
+    var ph=(typeof agentPhotosTenue==='function')?agentPhotosTenue(n):[];
+    var vign=ph.length
+      ? (ph.slice(0,2).map(function(p){ return '<span class="tn-ph" data-k="'+esc(p.key)+'" style="cursor:zoom-in">'+((typeof photoThumbTag==='function')?photoThumbTag(p.key):'')+'</span>'; }).join('')
+         +(ph.length>2?('<span class="sub" style="margin:0;font-size:11px">+'+(ph.length-2)+'</span>'):''))
+      : ('<span style="color:var(--warn);font-size:12px">\u2014 pas de photo</span>'
+         +'<button type="button" class="tn-portail" data-nom="'+esc(n)+'" style="font-size:11.5px;margin-left:6px;border-color:#6ea8fe;color:#6ea8fe">\ud83d\udcf7 Choisir une photo re\u00e7ue</button>');
+    return '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:4px 0;border-bottom:1px dashed var(--line)">'
+      +'<span style="flex:1;min-width:140px">\ud83d\udc64 '+esc(n)+'</span>'+vign+'</div>';
+  }
   function tnOuvrir(vue){
     var d=tnCalc();
     var old=byId('tn-pop'); if(old)old.parentNode.removeChild(old);
@@ -6597,21 +6624,25 @@ button.big:active{transform:translateY(1px)}
       htm+=d.sitesKO.length?d.sitesKO.map(function(o){
         return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)">'
           +'<b>'+esc(o.site)+'</b> <span class="sub" style="margin:0">— '+o.manquants.length+' agent(s) sans photo sur '+o.agents.length+'</span>'
-          +'<div style="margin-top:6px">'+o.manquants.map(function(n){
-              return '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:3px 0"><span style="flex:1;min-width:130px">👤 '+esc(n)+'</span>'
-                +'<button type="button" class="tn-portail" data-nom="'+esc(n)+'" style="font-size:11.5px;border-color:#6ea8fe;color:#6ea8fe">📷 Choisir une photo reçue</button></div>'; }).join('')
+          +'<div style="margin-top:6px">'+o.agents.map(_tnLigneAgent).join('')
           +'</div></div>';
       }).join(''):'<div class="sub">Aucun site en manque : tous les agents du jour ont une photo.</div>';
     } else {
       htm+=d.sitesOK.length?d.sitesOK.map(function(o){
         return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)">'
           +'<b>'+esc(o.site)+'</b> <span class="sub" style="margin:0">— '+o.agents.length+' agent(s), tous avec photo</span>'
-          +'<div class="sub" style="margin:4px 0 0">'+esc(o.agents.join(' · '))+'</div></div>';
+          +'<div style="margin-top:6px">'+o.agents.map(_tnLigneAgent).join('')+'</div></div>';   /* b339 */
       }).join(''):'<div class="sub">Aucun site entièrement couvert pour le moment.</div>';
     }
     pop.innerHTML=htm; document.body.appendChild(pop);
     byId('tn-x').onclick=function(){ var q=byId('tn-pop'); if(q)q.parentNode.removeChild(q); };
     pop.querySelectorAll('.tn-tile').forEach(function(t){ t.onclick=function(){ tnOuvrir(t.getAttribute('data-v')); }; });
+    if(typeof photoHydrate==='function'){try{photoHydrate(pop);}catch(e){}}   /* b339 */
+    pop.querySelectorAll('.tn-ph').forEach(function(sp){ sp.onclick=function(){
+      var k=sp.getAttribute('data-k');
+      if(typeof photoOpen==='function'){ photoOpen(k); return; }
+      if(typeof photoBlobUrl==='function')photoBlobUrl(k,function(u){ if(u)window.open(u,'_blank'); });
+    }; });
     pop.querySelectorAll('.tn-portail').forEach(function(b){ b.onclick=function(){
       if(typeof photoPortail==='function')photoPortail('','',b.getAttribute('data-nom'),'Photo de tenue'); }; });
   }
