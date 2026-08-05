@@ -3,6 +3,14 @@
   "maj": "2026-08-05",
   "items": [
     {
+      "b": 341,
+      "titre": "Tickets cochés qui réapparaissent : la coche est ancrée sur l'HEURE du contrôle",
+      "source": "Zeus — problème récurrent, corrigé le 05/08",
+      "theme": "Suivi des appels",
+      "local": true,
+      "pourquoipas": "Cas d'école joué sur l'ancienne et la nouvelle version : 3 contrôles cochés (23:00 / 01:00 / 03:00), on ajoute un contrôle à 21:00. Avant : 23:00 perd sa coche et 21:00 arrive déjà coché. Après : rien ne bouge. Contre-épreuve sur les vraies données : 139 coches retraduites, 105 tickets retirés retraduits, 0 perdu."
+    },
+    {
       "b": 262,
       "titre": "Colonne En ligne regroupée par thèmes + copie au glisser",
       "source": "Zeus",
@@ -743,12 +751,6 @@
     }
   ],
   "decide": [
-    {
-      "titre": "PRIORITÉ — Tickets cochés qui réapparaissent : ancrer la coche sur l'HEURE du contrôle",
-      "source": "Zeus — problème récurrent, diagnostiqué le 05/08",
-      "urgent": true,
-      "note": "CAUSE TROUVÉE : la coche est enregistrée sous une clé POSITIONNELLE (ctrl0, ctrl1, ctrl2…), construite par saEntries/ssSteps depuis apControls(m). Or apControls recalcule les contrôles à partir des horaires. Dès qu'un horaire change, qu'un contrôle est ajouté/retiré (m.ctrls), ou qu'un import CSV met à jour mheure/mfin, TOUTES les positions se décalent : ctrl0 devient un autre horaire, et le dernier n'a plus de coche → les tickets réapparaissent en masse dans la file. Ce n'est PAS la synchro : saSet horodate correctement (r.at=Date.now()) et ssMerge garde le plus récent. CORRECTION : clé ancrée sur l'heure (ex. ctrl@23:00) au lieu de l'index, AVEC migration des coches existantes (fkh_suivisite) pour n'en perdre aucune. TEST EXIGÉ : cas d'école — cocher 3 contrôles, ajouter un contrôle avant, vérifier qu'aucune coche ne bouge ; puis contre-épreuve sur les vraies données AVANT de pousser. Zone sensible (Suivi des appels) : rejouer la non-régression."
-    },
     {
       "titre": "Sélection multiple de vacations au Planning + modification en lot",
       "source": "JULES — remontées #65/#66",

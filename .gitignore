@@ -2,3 +2,6 @@
 backend/.wrangler/
 node_modules/
 .DS_Store
+# Bac à sable de test : contient des copies des VRAIES données (vacations, agents) — jamais versionné
+tmp/
+.wrangler/

@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b340</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b341</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1473,6 +1473,7 @@ button.big:active{transform:translateY(1px)}
       var k=String(m.id), s=_svEmpreinte(m);
       if(_svSig[k]!==undefined && _svSig[k]!==s)m.creeAt=_now;   /* b310 : contenu modifie -> on horodate */
       _svSig[k]=s; });
+    if(typeof apDcInvalidate==='function')apDcInvalidate();   /* b341 : horaires modifies -> les heures de controle sont a recalculer */
     save('fkh_suivi',SUIVI.filter(function(x){return !x.sim;}).map(function(x){var c={};for(var k in x)if(k.charAt(0)!=='_')c[k]=x[k];return c;})); }
   svSigReset();   /* b310 : etat de depart — la premiere sauvegarde n'horodate rien */
   function titreFrom(txt){
@@ -2954,6 +2955,14 @@ button.big:active{transform:translateY(1px)}
   document.addEventListener('click',function(ev){ var b=ev.target&&ev.target.closest?ev.target.closest('.aide-b'):null; if(b){ ev.preventDefault(); ev.stopPropagation(); aideOuvrir(b.getAttribute('data-a')); } });
   function aideWire(root){ (root||document).querySelectorAll('.aide-b').forEach(function(b){ b.onclick=function(){ aideOuvrir(b.getAttribute('data-a')); }; }); }
   var DEMOS={
+    coches:{ titre:'🎛️ Une coche de contrôle ne bouge plus',
+      quoi:'Une vacation de nuit d’hier, 20 h → 6 h, avec trois appels de contrôle : 23:00, 01:00 et 03:00.',
+      aFaire:'Va dans « Suivi des appels » (période : hier → aujourd’hui) et coche les trois contrôles « Fait ». Reviens au 📅 Planning, ouvre la vacation SITE ÉTALON, et dans « 🎫 Tickets de cette vacation » ajoute un contrôle à 21:00. Retourne au Suivi des appels : les trois coches doivent être exactement là où tu les as mises, et 21:00 doit arriver vierge. (Avant, 23:00 revenait dans la file et 21:00 arrivait déjà coché.) Essaie aussi de changer l’heure d’un contrôle déjà coché : sa coche le suit.',
+      monter:function(){
+        var d=new Date(Date.now()-86400000), iso=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+        SUIVI.unshift({id:'demo_coches',statut:'validee',motif:'',client:'CLIENT ÉTALON',titre:'SITE ÉTALON',siteAgent:'SITE ÉTALON',ville:'Villetest',assoc:[],
+                       mdate:iso,mheure:'20:00',mfin:'06:00',ctrls:['23:00','01:00','03:00'],src:'planning',creeAt:Date.now(),pris:Date.now(),valide:Date.now()});
+      } },
     annulation:{ titre:'🔴 Annulation signalée',
       quoi:'Une vacation AQUILA demain soir, sur laquelle un mail d’annulation vient d’arriver.',
       aFaire:'Ouvre la pastille 🔴 en haut à droite : tu dois voir le site, l’heure et l’heure de réception. Essaie « \u274c Fausse alerte » (la vacation reste intacte), puis recharge et essaie « \u2705 Confirmer ».',
@@ -3777,6 +3786,7 @@ button.big:active{transform:translateY(1px)}
     if(v==null || localStorage.getItem(k)===v) return; // identique / notre propre écho
     if(k==='fkh_suivisite'){ // #11 : fusion au lieu d'écraser (garde la coche la plus récente par appel)
       var rem={}; try{rem=JSON.parse(v)||{};}catch(_){rem={};}
+      if(typeof ssMigrateObj==='function')ssMigrateObj(rem);   /* b341 : un appareil pas encore a jour renvoie des cles positionnelles -> on les retraduit A L'ARRIVEE */
       var merged=ssMerge(ssLoad(),rem), mv=JSON.stringify(merged);
       try{ localStorage.setItem('fkh_suivisite',mv); }catch(e){}
       if(mv!==v && typeof cloudPush==='function')cloudPush('fkh_suivisite'); // le local avait des coches plus récentes -> on renvoie la version fusionnée
@@ -3817,6 +3827,7 @@ button.big:active{transform:translateY(1px)}
       SUIVI.forEach(function(x){delete x._pending;delete x._pick;delete x._pick2;var _f=_tr[String(x.id)];if(_f)for(var _k2 in _f)x[_k2]=_f[_k2];});
       if(typeof svSigReset==='function')svSigReset();   /* b310 : ce qui vient du classeur commun devient la reference — sinon on le prendrait pour une modification locale */
       if(typeof suiviCleanFins==='function')suiviCleanFins(); if(typeof suiviHeriteSite==='function')suiviHeriteSite(); if(typeof saOffMigrate==='function')saOffMigrate();
+      if(typeof apDcInvalidate==='function')apDcInvalidate(); if(typeof ssMigrateCtrl==='function')ssMigrateCtrl();   /* b341 : les vacations sont connues -> les coches restees en attente de traduction sont traitees */
       /* b307 : empreinte APRES fusion — on ne redessine QUE si une vacation a ete ajoutee, supprimee ou modifiee. */
       var _sigB=(SUIVI||[]).filter(function(x){return !x.sim;}).map(function(x){return x.id+'@'+(x.creeAt||0)+'@'+(x.deleted?1:0);}).sort().join('|'), _chg=(_sigB!==_sigA);
       if(_chg)_majVue(typeof renderSuivi==='function'?renderSuivi:null);   /* b322 */
@@ -3827,6 +3838,7 @@ button.big:active{transform:translateY(1px)}
     }
     try{ localStorage.setItem(k,v); }catch(e){}
     try{
+      if(k==='fkh_appels'){ if(typeof apDcInvalidate==='function')apDcInvalidate(); }   /* b341 : nb de controles change ailleurs -> heures a recalculer */
       if(k==='fkh_fa'){ FA=load('fkh_fa'); FA.forEach(function(a){if(a.tel&&!a.tels){a.tels=[a.tel];delete a.tel;}}); if(typeof renderFA==='function')renderFA(); }
       else if(k==='fkh_thiam'){ TH=load('fkh_thiam'); if(typeof thRenderBoard==='function')thRenderBoard(); if(typeof thRenderOut==='function')thRenderOut(); if(typeof thRenderAuto==='function')thRenderAuto(); }
       else if(k==='fkh_zones_diff'){ try{ZDIFF=JSON.parse(localStorage.getItem('fkh_zones_diff')||'{}')||{};}catch(e){ZDIFF={};} if(typeof renderZone==='function' && byId('sec-zone') && !byId('sec-zone').classList.contains('hidden'))renderZone(); }
@@ -4458,7 +4470,7 @@ button.big:active{transform:translateY(1px)}
   var svcTab='synth';
   var svcAnomFilter='';
   function svcNeedPhoto(s){ return s.key==='prise'||s.key==='fin'||s.key==='tenue'||s.key.indexOf('ctrl')===0; }
-  function svcShortLbl(s){ if(s.key==='prise')return 'Prise'; if(s.key==='fin')return 'Fin'; if(s.key==='tenue')return 'Tenue'; if(s.key==='j15')return 'Pré-prise'; if(s.key==='route')return 'Route'; if(s.key.indexOf('ctrl')===0)return 'Contrôle '+((+s.key.slice(4))+1); return s.label; }
+  function svcShortLbl(s){ if(s.key==='prise')return 'Prise'; if(s.key==='fin')return 'Fin'; if(s.key==='tenue')return 'Tenue'; if(s.key==='j15')return 'Pré-prise'; if(s.key==='route')return 'Route'; if(s.key.indexOf('ctrl')===0)return String(s.label||'Contrôle').replace(/^[^A-Za-zÀ-ÿ]+/,''); return s.label; }   /* b341 : le numero vient du libelle (la cle porte l'heure) */
   var SVC_GRACE=15; // minutes de tolérance après l'heure prévue avant de considérer une étape « en retard »
   function svcStepMs(m,s){ if(!s.heure||!m.mdate)return null; var start=toMin(m.mheure),mn=toMin(s.heure); if(mn==null)return null; var abs=mn; if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn<start)abs=mn+1440; return frMs(m.mdate,abs); }
   function svcDue(m,s){ var ms=svcStepMs(m,s); return ms==null?true:(Date.now()>ms+SVC_GRACE*60000); }
@@ -4874,7 +4886,12 @@ button.big:active{transform:translateY(1px)}
       else if(k9==='fin'){ m.mfin=v9; }
       else if(k9==='route'){ m.routeH=v9; }
       else if(k9==='j15'){ m.j15H=v9; }
-      else if(k9.indexOf('ctrl')===0){ var i9=parseInt(k9.slice(4),10)||0; var arr9=(Array.isArray(m.ctrls)&&m.ctrls.length)?m.ctrls.slice():(apControls(m)||[]).slice(); if(i9<arr9.length){arr9[i9]=v9;} else {arr9.push(v9);} arr9.sort(); m.ctrls=arr9; }
+      else if(k9.indexOf('ctrl')===0){ /* b341 : on repere le controle par SON HEURE (plus par son rang) et sa coche le suit */
+        var arr9=(Array.isArray(m.ctrls)&&m.ctrls.length)?m.ctrls.slice():(apControls(m)||[]).slice(), i9=-1;
+        for(var z9=0;z9<arr9.length;z9++){ if(ctrlKey(arr9[z9])===k9){ i9=z9; break; } }
+        if(i9>=0)arr9[i9]=v9; else arr9.push(v9);
+        arr9.sort(); m.ctrls=arr9;
+        if(typeof ssRenameKey==='function')ssRenameKey(m.id,k9,ctrlKey(v9)); }
       m.valide=Date.now(); /* b305 */ if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
     card.querySelectorAll('.pl-tk-x').forEach(function(b9){ b9.onclick=function(){ var k9=b9.getAttribute('data-k'),ex9=saExclLoad(); if(ex9[k9]){ delete ex9[k9]; } else { ex9[k9]=Date.now(); } saExclSave(ex9); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
     card.querySelectorAll('.pl-tk-del').forEach(function(b9){ b9.onclick=function(){ var h9=b9.getAttribute('data-h'); if(!Array.isArray(m.ctrls))return; m.ctrls=m.ctrls.filter(function(x9){return x9!==h9;}); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
@@ -5720,7 +5737,7 @@ button.big:active{transform:translateY(1px)}
 
   // ===== Appels par mission : plan avant/pendant/fin, pré-rempli pour les nuits, heures France + Mali =====
   function apLoad(){ var a=load('fkh_appels'); return (a&&typeof a==='object'&&!Array.isArray(a))?a:{}; }
-  function apSave(a){ save('fkh_appels',a); }
+  function apSave(a){ save('fkh_appels',a); if(typeof apDcInvalidate==='function')apDcInvalidate(); /* b341 */ }
   function apFinHeure(m){ var mm=/(\d{1,2}):(\d{2})/.exec(String(m.mfin||'')); return mm?(pad2(+mm[1])+':'+mm[2]):''; }
   function apIsNight(start,end){ if(start==null)return false; if(start>=18*60)return true; if(end!=null&&end<=start)return true; return false; }
   function apPlan(m){
@@ -5739,20 +5756,30 @@ button.big:active{transform:translateY(1px)}
   function apSetOn(mid,on){ var A=apLoad(); if(!A[mid])A[mid]={}; A[mid].on=on; apSave(A); }
   function apSetNb(mid,nb){ var A=apLoad(); if(!A[mid])A[mid]={}; A[mid].nb=Math.max(0,nb); A[mid].on=true; apSave(A); }
   // Dé-confliction : décale les appels de contrôle des missions du même jour pour laisser >= gap min entre 2 sites
-  var AP_DC={};
-  function apDeconflict(arr,gap){
-    gap=gap||10; AP_DC={};
-    var groups={};
-    (arr||[]).forEach(function(m){ var p=apPlan(m); if(!p||!p.on||!p.controls.length)return; (groups[m.mdate||'']=groups[m.mdate||'']||[]).push({m:m,p:p}); });
-    Object.keys(groups).forEach(function(d){
-      var items=[];
-      groups[d].forEach(function(g){ var sm=toMin(g.m.mheure); g.p.controls.forEach(function(c,idx){ var mn=toMin(c),abs=mn; if(sm!=null&&mn!=null&&mn<sm)abs=mn+1440; items.push({mid:g.m.id,idx:idx,abs:abs}); }); });
-      items.sort(function(a,b){return a.abs-b.abs;});
-      var last=-1e9;
-      items.forEach(function(it){ if(it.abs-last<gap)it.abs=last+gap; last=it.abs; var hm=pad2(Math.floor((it.abs%1440)/60))+':'+pad2(it.abs%60); (AP_DC[it.mid]=AP_DC[it.mid]||[])[it.idx]=hm; });
+  /* b341 — POURQUOI ce changement : le décalage était calculé sur la SEULE liste affichée, et remis à zéro
+     à chaque rendu. Selon le filtre de dates ou la vue ouverte (Suivi site / Suivi des appels / Appels),
+     un même contrôle pouvait donc tomber à 23:00 ici et à 23:10 là. Tant que la coche était rangée sous un
+     rang (ctrl0…) ça ne se voyait pas ; maintenant qu'elle est rangée sous l'HEURE du contrôle, cette heure
+     doit être la MÊME partout. On calcule donc par JOUR, sur TOUTES les vacations validées de ce jour, et
+     on mémorise. Le résultat ne dépend plus de ce qui est affiché. */
+  var AP_GAP=10, AP_DC={}, AP_DC_JOUR={}, AP_DC_IDX=null;
+  function apDcInvalidate(){ AP_DC={}; AP_DC_JOUR={}; AP_DC_IDX=null; }
+  function apDcIndex(){ if(AP_DC_IDX)return AP_DC_IDX; AP_DC_IDX={}; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(!m||m.deleted||m.statut!=='validee')return; var d=m.mdate||''; if(!d)return; (AP_DC_IDX[d]=AP_DC_IDX[d]||[]).push(m); }); return AP_DC_IDX; }
+  function apDcJour(d){
+    if(!d||AP_DC_JOUR[d])return; AP_DC_JOUR[d]=true;
+    var items=[];
+    (apDcIndex()[d]||[]).forEach(function(m){
+      if(Array.isArray(m.ctrls)&&m.ctrls.length)return;   // contrôles figés sur la vacation : on n'y touche pas
+      var p=apPlan(m); if(!p||!p.on||!p.controls.length)return;
+      var sm=toMin(m.mheure);
+      p.controls.forEach(function(c,idx){ var mn=toMin(c),abs=mn; if(sm!=null&&mn!=null&&mn<sm)abs=mn+1440; items.push({mid:m.id,idx:idx,abs:abs}); });
     });
+    items.sort(function(a,b){ return (a.abs-b.abs)||(String(a.mid)<String(b.mid)?-1:1); });
+    var last=-1e9;
+    items.forEach(function(it){ if(it.abs-last<AP_GAP)it.abs=last+AP_GAP; last=it.abs; var hm=pad2(Math.floor((it.abs%1440)/60))+':'+pad2(it.abs%60); (AP_DC[it.mid]=AP_DC[it.mid]||[])[it.idx]=hm; });
   }
-  function apControls(m){ if(m&&Array.isArray(m.ctrls)&&m.ctrls.length)return m.ctrls.slice(); /* b188 : controles personnalises de la vacation */ return (AP_DC[m.id]&&AP_DC[m.id].length)?AP_DC[m.id]:(((typeof apPlan==='function'?apPlan(m):null)||{}).controls||[]); }
+  function apDeconflict(arr,gap){ var vus={}; (arr||[]).forEach(function(m){ var d=(m&&m.mdate)||''; if(d&&!vus[d]){ vus[d]=1; apDcJour(d); } }); }
+  function apControls(m){ if(!m)return []; if(Array.isArray(m.ctrls)&&m.ctrls.length)return m.ctrls.slice(); /* b188 : controles personnalises de la vacation */ apDcJour(m.mdate||''); return (AP_DC[m.id]&&AP_DC[m.id].length)?AP_DC[m.id].slice():(((typeof apPlan==='function'?apPlan(m):null)||{}).controls||[]); }
   function renderAppels(){
     var wrap=byId('ap-body'); if(!wrap)return;
     var from=byId('ap-from')?byId('ap-from').value:'', to=byId('ap-to')?byId('ap-to').value:'';
@@ -5791,23 +5818,113 @@ button.big:active{transform:translateY(1px)}
   // #11 Fusion anti-écrasement : pour chaque (mission,appel), on garde l'enregistrement le PLUS RÉCENT (champ `at`).
   // Évite qu'une synchro distante « dernier qui écrit gagne » ne fasse réapparaître un appel déjà coché.
   function ssMerge(a,b){ a=a||{}; b=b||{}; var out={},mid,key; for(mid in a)out[mid]=Object.assign({},a[mid]); for(mid in b){ if(!out[mid]){out[mid]=Object.assign({},b[mid]);continue;} for(key in b[mid]){ var ra=out[mid][key],rb=b[mid][key]; if(!ra){out[mid][key]=rb;continue;} out[mid][key]=((rb&&rb.at||0)>(ra&&ra.at||0))?rb:ra; } } return out; }
+  /* b341 — MIGRATION des coches positionnelles `ctrl0/ctrl1/…` vers `ctrl@HHMM`.
+     Règle : on ne perd AUCUNE coche. Pour chaque vacation, le rang N est traduit en l'heure qu'il désigne
+     aujourd'hui (apControls). Si ce rang n'existe plus (contrôle supprimé), on laisse la vieille clé en place
+     plutôt que de l'effacer. En cas de collision (les deux formes présentes), la plus récente (`at`) gagne.
+     Tourne au démarrage ET après chaque arrivée du cloud : tant qu'un autre appareil n'est pas à jour, il
+     peut renvoyer d'anciennes clés — elles sont retraduites à l'arrivée. Idempotent. */
+  function ssMigrateObj(S){
+    var chg=false; if(!S||typeof S!=='object')return false;
+    Object.keys(S).forEach(function(mid){
+      var rec=S[mid]; if(!rec||typeof rec!=='object')return;
+      var vieilles=Object.keys(rec).filter(function(k){ return /^ctrl\d+$/.test(k); });
+      if(!vieilles.length)return;
+      var m=null,i; for(i=0;i<(SUIVI||[]).length;i++)if(String(SUIVI[i].id)===String(mid)){ m=SUIVI[i]; break; }
+      if(!m)return;                                  // vacation pas encore chargée : on ne touche à rien
+      var cc=apControls(m)||[];
+      vieilles.forEach(function(k){
+        var h=cc[parseInt(k.slice(4),10)], nk=h?ctrlKey(h):'';
+        if(!nk)return;                               // plus de contrôle à ce rang : on garde la vieille clé (rien n'est effacé)
+        var av=rec[nk], ap=rec[k];
+        if(!av || (+((ap&&ap.at)||0) > +((av&&av.at)||0)))rec[nk]=ap;
+        delete rec[k]; chg=true;
+      });
+    });
+    return chg;
+  }
+  function ssMigrateCtrl(){
+    try{
+      var S=ssLoad(); if(ssMigrateObj(S))ssSave(S);
+      // Toute vacation dont un contrôle a déjà été pointé voit ses heures inscrites une bonne fois (voir ctrlsFiger).
+      var fige=0;
+      Object.keys(S).forEach(function(mid){
+        var pointe=Object.keys(S[mid]||{}).some(function(k){ return k.indexOf('ctrl')===0 && S[mid][k] && S[mid][k].done; });
+        if(pointe&&ctrlsFiger(mid,true))fige++;
+      });
+      if(fige&&typeof saveSuivi==='function')saveSuivi();
+      // Tickets RETIRÉS par le superviseur (fkh_sa_excl) : même traduction, sinon un ticket retiré réapparaît.
+      var X=(typeof saExclLoad==='function')?saExclLoad():{}, chgX=false;
+      Object.keys(X||{}).forEach(function(kk){
+        var p=String(kk).split('|'); if(p.length!==2||!/^ctrl\d+$/.test(p[1]))return;
+        var m=null,i; for(i=0;i<(SUIVI||[]).length;i++)if(String(SUIVI[i].id)===String(p[0])){ m=SUIVI[i]; break; }
+        if(!m)return; var h=(apControls(m)||[])[parseInt(p[1].slice(4),10)], nk=h?ctrlKey(h):''; if(!nk)return;
+        X[p[0]+'|'+nk]=X[kk]; delete X[kk]; chgX=true;
+      });
+      if(chgX&&typeof saExclSave==='function')saExclSave(X);
+      // Photos archivées : la clé stable (site|date|étape) porte aussi l'étape.
+      var A=load('fkh_photo_archive'), chgA=false;
+      if(Array.isArray(A))A.forEach(function(o){
+        if(!o||!o.sk)return; var p=String(o.sk).split('|'); if(p.length<3||!/^ctrl\d+$/.test(p[p.length-1]))return;
+        var m=null,i; for(i=0;i<(SUIVI||[]).length;i++)if(String(SUIVI[i].id)===String(o.mid)){ m=SUIVI[i]; break; }
+        if(!m)return; var h=(apControls(m)||[])[parseInt(p[p.length-1].slice(4),10)], nk=h?ctrlKey(h):''; if(!nk)return;
+        p[p.length-1]=nk; o.sk=p.join('|'); chgA=true;
+      });
+      if(chgA)save('fkh_photo_archive',A);
+    }catch(e){}
+  }
+  /* b341 — CE QUI A ÉTÉ POINTÉ NE SE RECALCULE PLUS.
+     Tant qu'une vacation n'a pas de contrôles à elle, ses heures de contrôle sont CALCULÉES, et le décalage
+     anti-collision (10 min entre deux sites) les redistribue dès qu'une vacation arrive le même jour — un
+     import CSV suffit. Mesuré sur les vraies données : UNE vacation ajoutée le 04/08 déplaçait 13 coches sur 44.
+     Dès qu'on coche un contrôle, on inscrit donc les heures DANS la vacation : elles deviennent des faits,
+     plus un calcul. Effet voulu : cette vacation n'est plus redistribuée. */
+  function ctrlsFiger(mid,sansSauver){
+    try{
+      var m=null,i; for(i=0;i<(SUIVI||[]).length;i++)if(String(SUIVI[i].id)===String(mid)){ m=SUIVI[i]; break; }
+      if(!m||m.sim)return false; if(Array.isArray(m.ctrls)&&m.ctrls.length)return false;
+      var cc=apControls(m)||[]; if(!cc.length)return false;
+      m.ctrls=cc.slice(); if(!sansSauver&&typeof saveSuivi==='function')saveSuivi();
+      return true;
+    }catch(e){ return false; }
+  }
+  /* b341 : un contrôle qu'on déplace (23:00 → 22:00) emporte sa coche et son état « retiré ». */
+  function ssRenameKey(mid,ancienne,nouvelle){
+    if(!mid||!ancienne||!nouvelle||ancienne===nouvelle)return;
+    try{
+      var S=ssLoad(); if(S[mid]&&S[mid][ancienne]){ var r=S[mid][ancienne]; delete S[mid][ancienne]; r.at=Date.now(); S[mid][nouvelle]=r; ssSave(S); }
+      var X=(typeof saExclLoad==='function')?saExclLoad():{}, a=String(mid)+'|'+ancienne, b=String(mid)+'|'+nouvelle;
+      if(X&&X[a]){ X[b]=X[a]; delete X[a]; if(typeof saExclSave==='function')saExclSave(X); }
+    }catch(e){}
+  }
+  ssMigrateCtrl();   /* b341 : au demarrage, sur ce qui est deja dans l'appareil */
   function ssParams(){ var p=load('fkh_ss_params'); if(!p||typeof p!=='object'||Array.isArray(p))p={}; return {before:(p.before!=null?p.before:15), route:(p.route!=null?p.route:30)}; }
   function ssNowHM(){ try{ var p=frParts(); return p.hour+':'+p.minute; }catch(e){ var d=new Date(); return pad2(d.getHours())+':'+pad2(d.getMinutes()); } }
   function ssMissions(from,to){ return SUIVI.filter(function(x){ if(x.deleted)return false;/* b309 */ if(x.statut!=='validee')return false; var d=x.mdate||''; if(from&&(!d||d<from))return false; if(to&&(!d||d>to))return false; return true; }).sort(function(a,b){var da=(a.mdate||'')+' '+(a.mheure||''),db=(b.mdate||'')+' '+(b.mheure||'');return da<db?-1:da>db?1:0;}); }
+  /* b341 — LA COCHE D'UN CONTRÔLE EST ANCRÉE SUR SON HEURE, PLUS SUR SON RANG.
+     Avant : la coche était rangée sous `ctrl0`, `ctrl1`, `ctrl2`… c'est-à-dire la POSITION du contrôle dans
+     une liste RECALCULÉE depuis les horaires. Un horaire modifié, un contrôle ajouté, un import CSV, et tout
+     se décalait : `ctrl0` désignait un autre horaire, le dernier contrôle n'avait plus de coche → des tickets
+     déjà faits revenaient en masse dans la file, avec leurs alertes rouges.
+     Maintenant : `ctrl@2300` = le contrôle de 23 h 00. On peut ajouter un contrôle à 21 h, en retirer un,
+     changer l'ordre : chaque coche reste sur SON heure. */
+  function ctrlKey(h){ var mm=/^(\d{1,2})[:hH.]?(\d{2})$/.exec(String(h||'').trim()); return mm?('ctrl@'+pad2(+mm[1])+String(mm[2])):''; }
+  function ctrlKeyHM(k){ var s=String(k||''); if(s.indexOf('ctrl@')!==0)return ''; var d=s.slice(5); return /^\d{4}$/.test(d)?(d.slice(0,2)+':'+d.slice(2)):''; }
   function ssSteps(m){
     var P=ssParams(), steps=[], prise=m.mheure||'';
     if(prise)steps.push({key:'route',label:'☎ Route (renseignements)',heure:(m.routeH||shiftTime(prise,-P.route)),type:'route'}); /* b206 : H24 = pas d'appel route */
     if(prise)steps.push({key:'j15',label:'☎ Pré-prise (J‑'+P.before+')',heure:(m.j15H||shiftTime(prise,-P.before)),type:'j15'}); /* b206 */
     steps.push({key:'prise',label:'🟢 Prise de service',heure:prise,type:'prise'});
     if(m.agentId&&prise){ var _an=faById(m.agentId); if(_an&&typeof agentCtrl==='function'){ var _c=agentCtrl(_an.nom||''),_dd=(_c&&typeof ctrlDays==='function')?ctrlDays(_c['Date contrôle']):null, _need=!_c||(_dd!=null&&_dd>14); if(_need)steps.push({key:'tenue',label:'🦺 Contrôle tenue + PHOTO',heure:prise,type:'tenue'}); } }
-    apControls(m).forEach(function(c,i){ steps.push({key:'ctrl'+i,label:'🌙 Contrôle '+(i+1),heure:c,type:'call'}); });
+    var _vus={}; apControls(m).forEach(function(c,i){ var ck=ctrlKey(c); if(!ck)return; if(_vus[ck])return; _vus[ck]=1; steps.push({key:ck,label:'🌙 Contrôle '+(steps.filter(function(s){return s.type==='call';}).length+1),heure:c,type:'call'}); });   /* b341 : cle = heure du controle */
     steps.push({key:'fin',label:'🔚 Fin de service',heure:(typeof apFinHeure==='function')?apFinHeure(m):'',type:'fin'});
     return steps;
   }
   function ssPoint(mid,key,heurePrevue,type){
     var S=ssLoad(); if(!S[mid])S[mid]={};
     if(S[mid][key]&&S[mid][key].done){ delete S[mid][key]; }
-    else { var now=ssNowHM(),rec={done:true,hm:now,at:Date.now(),by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'')}; if(type==='prise'&&heurePrevue){ var dd=toMin(now)-toMin(heurePrevue); if(dd!=null)rec.retard=dd; } S[mid][key]=rec; }
+    else { if(String(key||'').indexOf('ctrl')===0&&typeof ctrlsFiger==='function')ctrlsFiger(mid);   /* b341 */
+      var now=ssNowHM(),rec={done:true,hm:now,at:Date.now(),by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'')}; if(type==='prise'&&heurePrevue){ var dd=toMin(now)-toMin(heurePrevue); if(dd!=null)rec.retard=dd; } S[mid][key]=rec; }
     ssSave(S); renderSuiviSite();
   }
   function ssCard(m){
@@ -5839,15 +5956,15 @@ button.big:active{transform:translateY(1px)}
     if(ssTab==='hist'){
       var S=ssLoad(), ev=[];
       // Chaque pointage est classé à sa date RÉELLE (report après minuit, comme dans Suivi des appels)
-      Object.keys(S).forEach(function(mid){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===mid)m=SUIVI[i]; var md=m?m.mdate:''; if(ssSlice!=='all'&&(!m||!ssSliceMatch(m)))return; var hmap={},dmap={}; if(m){ var start=toMin(m.mheure); ssSteps(m).forEach(function(s){ hmap[s.key]=s.heure; var mn=toMin(s.heure),abs=(mn==null?0:mn); if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn!=null&&mn<start)abs=mn+1440; dmap[s.key]=(m.mdate?svcAddDays(m.mdate,Math.floor(abs/1440)):''); }); } Object.keys(S[mid]).forEach(function(k){ var r=S[mid][k]; if(!(r&&r.done))return; var ed=dmap[k]||md; if(from&&(!ed||ed<from))return; if(to&&(!ed||ed>to))return; ev.push({mid:mid,k:k,at:r.at,by:r.by||'',hm:r.hm,retard:r.retard,site:m?(m.siteAgent||m.titre):mid,client:m?(m.client||''):'',mdate:ed,heure:hmap[k]||'',ag:(m&&m.agentId&&faById(m.agentId))?faById(m.agentId).nom:''}); }); });
+      Object.keys(S).forEach(function(mid){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===mid)m=SUIVI[i]; var md=m?m.mdate:''; if(ssSlice!=='all'&&(!m||!ssSliceMatch(m)))return; var hmap={},dmap={},lmap={}; if(m){ var start=toMin(m.mheure); ssSteps(m).forEach(function(s){ hmap[s.key]=s.heure; lmap[s.key]=s.label;   /* b341 */ var mn=toMin(s.heure),abs=(mn==null?0:mn); if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn!=null&&mn<start)abs=mn+1440; dmap[s.key]=(m.mdate?svcAddDays(m.mdate,Math.floor(abs/1440)):''); }); } Object.keys(S[mid]).forEach(function(k){ var r=S[mid][k]; if(!(r&&r.done))return; var ed=dmap[k]||md; if(from&&(!ed||ed<from))return; if(to&&(!ed||ed>to))return; ev.push({mid:mid,k:k,lbl:lmap[k]||'',at:r.at,by:r.by||'',hm:r.hm,retard:r.retard,site:m?(m.siteAgent||m.titre):mid,client:m?(m.client||''):'',mdate:ed,heure:hmap[k]||'',ag:(m&&m.agentId&&faById(m.agentId))?faById(m.agentId).nom:''}); }); });
       // Tri par MOMENT RÉEL du pointage (at = instant du clic), du plus récent au plus ancien. Fallback : date réelle + heure pointée, décroissant.
       ev.sort(function(a,b){ var aa=a.at||0,ba=b.at||0; if(aa!==ba)return ba-aa; var da=(a.mdate||'')+' '+(a.hm||a.heure||''),db=(b.mdate||'')+' '+(b.hm||b.heure||''); return da<db?1:-1; });
       var _hq=(ssHistQ||'').toLowerCase().trim();
       if(_hq)ev=ev.filter(function(e){ return ((e.site||'')+' '+(e.ag||'')+' '+(e.client||'')).toLowerCase().indexOf(_hq)>=0; });
       var histSearch='<div class="card" style="padding:8px"><input id="ss-histq" placeholder="🔎 Filtrer l\'historique : agent, client, site…" autocomplete="off" value="'+esc(ssHistQ)+'" style="width:100%"></div>';
       if(!ev.length){ wrap.innerHTML=histSearch+'<div class="card"><div class="sub" style="margin:0">Aucun pointage '+(ssHistQ?'pour « '+esc(ssHistQ)+' »':esc(lbl))+'.</div></div>'; var _si0=byId('ss-histq'); if(_si0){_si0.oninput=function(){ssHistQ=this.value;renderSuiviSite();var e2=byId('ss-histq');if(e2){e2.focus();var l=e2.value.length;e2.setSelectionRange(l,l);}};} return; }
-      var lblK=function(k){ if(k.indexOf('ctrl')===0)return 'Contrôle '+((+k.slice(4))+1)+' pendant le service'; return {route:'Appel route (renseignements)',j15:'Pré-prise (J‑15)',prise:'Prise de service',after:'Après la prise',tenue:'Contrôle tenue',fin:'Fin de service'}[k]||k; };
-      wrap.innerHTML=histSearch+'<div class="card"><div class="lab" style="margin:0 0 6px">'+ev.length+' pointage'+(ev.length>1?'s':'')+' — '+esc(lbl)+(ssHistQ?' · filtre « '+esc(ssHistQ)+' »':'')+'</div><div class="list">'+ev.map(function(e,ix){ return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(e.site||'—')+(e.client?' <span style="color:var(--muted);font-weight:400">('+esc(e.client)+')</span>':'')+' <span style="color:var(--muted);font-weight:400">· '+esc(lblK(e.k))+'</span></div><div class="fa-d">'+esc(e.mdate||'')+(e.ag?' · 👤 '+esc(e.ag):'')+(e.heure?' · <b>prévu à '+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span>':'')+' · pointé '+esc(e.hm||'')+(e.retard!=null&&e.retard>0?' <span style="color:var(--bad)">retard '+e.retard+' min</span>':(e.retard!=null&&e.retard<0?' <span style="color:var(--ok)">'+(-e.retard)+' min d\'avance</span>':''))+(e.by?' <span style="color:var(--muted)">· par '+esc(operNom(e.by))+'</span>':'')+'</div></div><button type="button" data-ssreact="'+esc(e.mid)+'" data-k="'+esc(e.k)+'" title="Annuler la coche et remettre cet appel dans la file de Suivi des appels" style="white-space:nowrap">↩️ Remettre dans la file</button></div>'; }).join('')+'</div></div>';
+      var lblK=function(k,lbl){ if(k.indexOf('ctrl')===0){ var _n=String(lbl||'').replace(/^[^A-Za-zÀ-ÿ]+/,''); if(_n)return _n+' pendant le service'; var _h=ctrlKeyHM(k); return 'Contrôle'+(_h?' de '+_h:'')+' pendant le service'; }   /* b341 : le rang n'est plus dans la cle */ return {route:'Appel route (renseignements)',j15:'Pré-prise (J‑15)',prise:'Prise de service',after:'Après la prise',tenue:'Contrôle tenue',fin:'Fin de service'}[k]||k; };
+      wrap.innerHTML=histSearch+'<div class="card"><div class="lab" style="margin:0 0 6px">'+ev.length+' pointage'+(ev.length>1?'s':'')+' — '+esc(lbl)+(ssHistQ?' · filtre « '+esc(ssHistQ)+' »':'')+'</div><div class="list">'+ev.map(function(e,ix){ return '<div class="it"><div style="flex:1"><div class="fa-n">'+esc(e.site||'—')+(e.client?' <span style="color:var(--muted);font-weight:400">('+esc(e.client)+')</span>':'')+' <span style="color:var(--muted);font-weight:400">· '+esc(lblK(e.k,e.lbl))+'</span></div><div class="fa-d">'+esc(e.mdate||'')+(e.ag?' · 👤 '+esc(e.ag):'')+(e.heure?' · <b>prévu à '+esc(e.heure)+'</b> <span class="thc-mali">🇫🇷→🇲🇱 '+esc(thToMali(e.heure))+'</span>':'')+' · pointé '+esc(e.hm||'')+(e.retard!=null&&e.retard>0?' <span style="color:var(--bad)">retard '+e.retard+' min</span>':(e.retard!=null&&e.retard<0?' <span style="color:var(--ok)">'+(-e.retard)+' min d\'avance</span>':''))+(e.by?' <span style="color:var(--muted)">· par '+esc(operNom(e.by))+'</span>':'')+'</div></div><button type="button" data-ssreact="'+esc(e.mid)+'" data-k="'+esc(e.k)+'" title="Annuler la coche et remettre cet appel dans la file de Suivi des appels" style="white-space:nowrap">↩️ Remettre dans la file</button></div>'; }).join('')+'</div></div>';
       var _si=byId('ss-histq'); if(_si)_si.oninput=function(){ ssHistQ=this.value; renderSuiviSite(); var e2=byId('ss-histq'); if(e2){e2.focus(); var l=e2.value.length; e2.setSelectionRange(l,l);} };
       wrap.querySelectorAll('[data-ssreact]').forEach(function(b){ b.onclick=function(){ if(!confirm('Remettre ce pointage dans la file de Suivi des appels ? Sa coche sera annulée.'))return; var S2=ssLoad(),mid=b.getAttribute('data-ssreact'),k=b.getAttribute('data-k'); if(S2[mid]&&S2[mid][k]){ S2[mid][k].done=false; S2[mid][k].at=Date.now(); delete S2[mid][k].doneTs; ssSave(S2); } renderSuiviSite(); if(typeof renderSuiviAppels==='function')renderSuiviAppels(); }; });
       return; }
@@ -5875,7 +5992,10 @@ button.big:active{transform:translateY(1px)}
   (function(){ var t=impTodayISO(); if(byId('ss-from')&&!byId('ss-from').value)byId('ss-from').value=t; if(byId('ss-to')&&!byId('ss-to').value)byId('ss-to').value=t; })();
 
   // ===== Suivi des appels : agenda chronologique des appels à faire (issus des missions) =====
-  function saSet(mid,key,patch){ var S=ssLoad(); if(!S[mid])S[mid]={}; var r=S[mid][key]||{}; for(var k in patch)r[k]=patch[k]; r.at=Date.now(); S[mid][key]=r; ssSave(S); if(typeof ppRefresh==='function')setTimeout(function(){try{ppRefresh();}catch(_e){}},80);
+  function saSet(mid,key,patch){
+    /* b341 : on coche (ou on prouve par photo) un contrôle -> ses heures sont inscrites dans la vacation, plus recalculées */
+    if(patch&&(patch.done===true||patch.photoKey)&&String(key||'').indexOf('ctrl')===0&&typeof ctrlsFiger==='function')ctrlsFiger(mid);
+    var S=ssLoad(); if(!S[mid])S[mid]={}; var r=S[mid][key]||{}; for(var k in patch)r[k]=patch[k]; r.at=Date.now(); S[mid][key]=r; ssSave(S); if(typeof ppRefresh==='function')setTimeout(function(){try{ppRefresh();}catch(_e){}},80);
     // Contrôle tenue « Fait / photo prise » → enregistre un contrôle DATÉ DU JOUR (sinon l'agent est re-sollicité chaque jour car agentCtrl ne voit aucun contrôle récent).
     if(key==='tenue'){ var tc=String(r.tenueCtrl||''); var refusOrWait=tc.indexOf('REFUS')>=0||tc.indexOf('attente')>=0; if(!refusOrWait&&(tc.indexOf('Fait')>=0||r.tenuePhoto||r.photoKey||r.done))saTenueRegister(mid,r); }
   }
@@ -6409,7 +6529,7 @@ button.big:active{transform:translateY(1px)}
   function phmEcart(a,b){ var d=Math.abs(a-b); return Math.min(d,1440-d); }   /* la nuit passe minuit */
   function phmEtapes(m){
     var out=[{k:'prise',lbl:'🟢 Prise de service',h:(m.mheure||'')},{k:'fin',lbl:'🔚 Fin de service',h:(m.mfin||'')},{k:'tenue',lbl:'🦺 Contrôle tenue',h:(m.mheure||'')}];
-    try{ var c=(m.ctrls&&m.ctrls.length)?m.ctrls:[]; c.forEach(function(h,i){ out.push({k:'ctrl'+(i+1),lbl:'🌙 Contrôle '+(i+1),h:h}); }); }catch(e){}
+    try{ var c=apControls(m)||[]; c.forEach(function(h,i){ var k=ctrlKey(h); if(k)out.push({k:k,lbl:'🌙 Contrôle '+(i+1),h:h}); }); }catch(e){}   /* b341 : meme cle que le ticket (avant : ctrl1 pour le 1er controle, qui ne reglait donc rien) */
     return out;
   }
   function phmOuvrir(i, photoDirecte){
@@ -6517,7 +6637,7 @@ button.big:active{transform:translateY(1px)}
   // Candidats : étapes (prise/fin) des missions validées du jour de la photo — fenêtre ±60 min (sinon ±3 h = « décalé ») ; la ville GPS trie en premier.
   function _phCandidates(it){ var dateISO=phDateISO(it.ts), pmin=phMinOfDay(it.ts); if(!dateISO||pmin==null)return [];
     var out=[]; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.deleted)return;/* b311 */ if(m.statut!=='validee')return; if((m.mdate||'')!==dateISO&&(typeof svcAddDays==='function'&&svcAddDays(m.mdate||'',1)!==dateISO))return;
-      var steps=[]; if(m.mheure)steps.push({k:'prise',t:toMin(m.mheure)}); if(m.mfin)steps.push({k:'fin',t:toMin(m.mfin)}); try{ (apControls(m)||[]).forEach(function(c9,i9){ var t9=toMin(c9); if(t9!=null)steps.push({k:'ctrl'+i9,t:t9}); }); }catch(e9){} /* b196 : les appels controle sont aussi des candidats de rattachement */
+      var steps=[]; if(m.mheure)steps.push({k:'prise',t:toMin(m.mheure)}); if(m.mfin)steps.push({k:'fin',t:toMin(m.mfin)}); try{ (apControls(m)||[]).forEach(function(c9,i9){ var t9=toMin(c9),k9=ctrlKey(c9); if(t9!=null&&k9)steps.push({k:k9,t:t9}); }); }catch(e9){}   /* b341 */ /* b196 : les appels controle sont aussi des candidats de rattachement */
       steps.forEach(function(s){ if(s.t==null)return; var diff=Math.abs(pmin-s.t); if(diff>720)diff=1440-diff; if(diff>180)return; var S=ssLoad(); var done=!!(S[m.id]&&S[m.id][s.k]&&S[m.id][s.k].done);
         out.push({hm:(('0'+Math.floor(s.t/60)).slice(-2)+':'+('0'+(s.t%60)).slice(-2)),m:m,step:s.k,t:s.t,diff:diff,late:diff>60,done:done,cityMatch:(it.city&&typeof slugForPhoto==='function'&&slugForPhoto(m.ville||'')===it.city)}); }); });
     out.sort(function(a,b){ return (b.cityMatch-a.cityMatch)||(a.diff-b.diff); });
