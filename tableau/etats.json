@@ -657,6 +657,22 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Rapprocher une photo (prise, fin, contrôle, tenue) depuis Suivi des appels : la ligne disparaît des pastilles au lieu de basculer en « hors délai ».",
       "local": true
+    },
+    {
+      "b": 339,
+      "titre": "Sites couverts / non couverts : la photo de chaque agent, pas seulement son nom",
+      "source": "Zeus — 05/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Pastille 👕 → sites couverts ou non couverts : chaque agent affiche sa vignette, ou « pas de photo » avec le bouton pour en désigner une.",
+      "local": true
+    },
+    {
+      "b": 340,
+      "titre": "On revient à sa position dans une section (Suivi des appels notamment)",
+      "source": "Zeus — 05/08",
+      "theme": "Suivi des appels",
+      "pourquoipas": "Descendre dans Suivi des appels, aller ailleurs, revenir : on retrouve sa position au lieu de remonter en haut.",
+      "local": true
     }
   ],
   "attente": [
