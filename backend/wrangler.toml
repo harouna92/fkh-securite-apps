@@ -15,4 +15,4 @@ bucket_name = "fkh-tenues-photos"
 
 # IA : scan automatique des appels entrants toutes les 2 minutes (détection demandes de gardiennage)
 [triggers]
-crons = ["*/2 * * * *"]
+crons = ["* * * * *"]   # b327 : passage a chaque minute (Zeus 05/08) — le nombre d analyses ne change pas, seul le delai d attente du prochain passage diminue
