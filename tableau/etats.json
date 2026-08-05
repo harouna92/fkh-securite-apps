@@ -585,6 +585,14 @@
       "theme": "Suivi des appels",
       "pourquoipas": "Pastille 🏢 Client non avisé : plus aucune ligne des jours précédents, seulement celles du jour.",
       "local": true
+    },
+    {
+      "b": 330,
+      "titre": "Vues « Aujourd'hui » / « Jours passés » + suppression des tuiles qui affichaient toujours zéro",
+      "source": "Zeus — 05/08",
+      "theme": "Suivi des appels",
+      "pourquoipas": "Pastille ⏰ → « Prises de service » : deux boutons 📅 Aujourd'hui / 🕓 Jours passés. Et plus de tuiles « Hors délai » figées à 0 hors de la pastille photos.",
+      "local": true
     }
   ],
   "attente": [
