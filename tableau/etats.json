@@ -529,6 +529,14 @@
       "theme": "Droits & rôles",
       "pourquoipas": "Se connecter en superviseur : les 8 pastilles se suivent sans espace vide.",
       "local": true
+    },
+    {
+      "b": 322,
+      "titre": "Un panneau ouvert n'empêche plus de recevoir (poste sourd sur Supervision)",
+      "source": "Zeus — 05/08",
+      "theme": "Fiabilité des données",
+      "pourquoipas": "Rester sur Supervision (dépliant ouvert d'office) : les nouvelles demandes arrivent désormais aussi sur ce poste.",
+      "local": true
     }
   ],
   "attente": [
