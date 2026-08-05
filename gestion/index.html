@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b325</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b326</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2174,7 +2174,11 @@ button.big:active{transform:translateY(1px)}
       wrap.innerHTML=h;
     } else {
       var list=arr;
-      if(suiviBucket==='recherche'){ list=arr.map(function(x,i){return {x:x,l:demPrio(x).lvl,i:i};}).sort(function(a,b){ return (b.l-a.l)||(a.i-b.i); }).map(function(o){return o.x;}); }
+      /* b326 : on classait par duree de vacation, puis par ordre d'insertion interne — imprevisible.
+         Une demande qui venait de tomber apparaissait donc au milieu d'une liste de vingt, et passait
+         inapercue : on la croyait absente. Regle posee par Zeus : DU PLUS RECENT AU PLUS ANCIEN, dans
+         tous les cas. Ce qui vient d'arriver est en haut, toujours au meme endroit. */
+      if(suiviBucket==='recherche'){ list=arr.map(function(x,i){return {x:x,t:(+x.pris||+x.creeAt||0),i:i};}).sort(function(a,b){ return (b.t-a.t)||(a.i-b.i); }).map(function(o){return o.x;}); }
       wrap.innerHTML=list.map(svItem).join('');
     }
     if(typeof svTick==='function')svTick();
@@ -5923,7 +5927,15 @@ button.big:active{transform:translateY(1px)}
       arrets.forEach(function(ar,aidx){ var acid='arret_'+call.cdr_id+'_'+aidx; if(call._sim||typeof csgLoad!=='function')return; try{ var _cc=csgLoad(); if(_cc.some(function(x){return x.srcId===acid;}))return; var lieu=[ar.site,ar.ville].filter(Boolean).join(' — '); _cc.push({id:csgNewId(),srcId:acid,texte:'🛑 ARRÊT DU GARDIENNAGE — INITIATIVE CLIENT.\n👉 INFORMER L\'AGENT que la prestation s\'arrête.'+(ar.client?'\n🏢 Client : '+ar.client:'')+(lieu?'\n📍 '+lieu:'')+(ar.motif?'\n📝 Motif : '+ar.motif:''),client:(ar.client||''),site:(ar.site||''),ville:(ar.ville||''),cp:'',mdate:impTodayISO(),heure:ssNowHM(),done:false,note:'',aiGen:true,arret:true}); csgSave(_cc); changed=true; arretN++; if(!firstArret)firstArret={client:(ar.client||''),lieu:lieu}; }catch(_e){} });
       if((dems.length||arrets.length)&&CLOUD.on&&!call._sim)fetch(CLOUD.base+'/ai/created',{method:'POST',headers:cloudHdr(),body:JSON.stringify({cdr_id:call.cdr_id})}).catch(function(){});
     });
-    if(changed){ if(typeof saveSuivi==='function')saveSuivi(); aiDetected=[]; var _busy=(typeof _activeBusy==='function'&&_activeBusy()); if(!_busy&&typeof renderSuivi==='function')renderSuivi(); if(!_busy&&ivN&&typeof window._ivRender==='function')window._ivRender(); if(!_busy&&typeof renderSuiviAppels==='function')renderSuiviAppels(); if(!_busy&&byId('sec-supervision')&&!byId('sec-supervision').classList.contains('hidden')&&supTab==='oper')renderSupervision(); if(firstNew&&typeof notifFire==='function'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:firstNew.id,title:'🤖 Demande détectée (à vérifier)',body:(firstNew.titre||'')+' — Suivi demandes',go:'suivi'}); if(firstIv&&typeof notifFire==='function'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:firstIv.id,title:'🚨 '+(firstIv.nat==='ronde'?'Ronde':'Intervention')+' détectée (à vérifier)',body:(firstIv.who||'')+' — Interventions',go:'interv'}); if(firstArret&&typeof notifFire==='function'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'arret'+Date.now(),title:'🛑 Arrêt gardiennage (client) — informer l\'agent',body:(firstArret.client||'')+(firstArret.lieu?' · '+firstArret.lieu:''),go:'suiviappels'}); } }
+    if(changed){ if(typeof saveSuivi==='function')saveSuivi(); aiDetected=[];
+      /* b326 : la demande etait bien creee et la notification partait, mais l'ecran n'etait PAS
+         redessine si un panneau se trouvait ouvert — et rien ne rattrapait ensuite. On recevait donc
+         « nouvelle demande en recherche » sans jamais la voir dans la liste. On passe par le redessin
+         differe : immediat si l'ecran est libre, sinon rejoue des qu'il l'est. */
+      _majVue(typeof renderSuivi==='function'?renderSuivi:null);
+      if(ivN)_majVue(typeof window._ivRender==='function'?window._ivRender:null);
+      _majVue(typeof renderSuiviAppels==='function'?renderSuiviAppels:null);
+      if(byId('sec-supervision')&&!byId('sec-supervision').classList.contains('hidden')&&supTab==='oper')_majVue(typeof renderSupervision==='function'?renderSupervision:null); if(firstNew&&typeof notifFire==='function'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:firstNew.id,title:'🤖 Demande détectée (à vérifier)',body:(firstNew.titre||'')+' — Suivi demandes',go:'suivi'}); if(firstIv&&typeof notifFire==='function'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:firstIv.id,title:'🚨 '+(firstIv.nat==='ronde'?'Ronde':'Intervention')+' détectée (à vérifier)',body:(firstIv.who||'')+' — Interventions',go:'interv'}); if(firstArret&&typeof notifFire==='function'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'arret'+Date.now(),title:'🛑 Arrêt gardiennage (client) — informer l\'agent',body:(firstArret.client||'')+(firstArret.lieu?' · '+firstArret.lieu:''),go:'suiviappels'}); } }
   function aiScanNow(force){ if(typeof CLOUD==='undefined'||!CLOUD.on){ alert('Connecte-toi (en ligne).'); return; } if(force&&!confirm('Re-analyser les appels récents (même déjà traités) avec la logique à jour ? Cela ré-analyse et peut avoir un petit coût.'))return; var b=byId(force?'ai-reana-btn':'ai-scan-btn'); if(b){b.disabled=true;b.textContent='⏳ …';} fetch(CLOUD.base+'/ai/scan'+(force?'?force=1':''),{method:'POST',headers:cloudHdr()}).then(function(r){return r.json();}).then(function(j){ if(b){b.disabled=false;b.textContent=force?'🔁 Re-analyser':'🔄 Scanner maintenant';} if(j&&j.ok){ var m=(force?'Re-analyse':'Scan')+' terminé : '+(j.processed||0)+' appel(s) analysé(s), '+(j.detected||0)+' demande(s) détectée(s).'+(j.note?' ('+j.note+')':''); if(!(j.processed)&&j.diag){ m+='\n\nDiagnostic (fenêtre '+(j.window_h||'?')+'h) :\n• '+j.diag.fetched+' appel(s) trouvé(s) sur Ringover\n• '+j.diag.answered+' décroché(s)\n• '+j.diag.withRecord+' avec enregistrement\n• '+j.diag.whitelisted+' sur un numéro suivi\n→ '+(j.diag.fetched===0?'Aucun appel dans la fenêtre.':(j.diag.withRecord===0?'Aucun appel enregistré (active l\'enregistrement Ringover).':(j.diag.whitelisted===0?'Aucun appel sur un numéro suivi.':'Aucun appel ne réunit décroché + enregistré + numéro suivi.'))); } alert(m); aiLoadDemandes(); } else { alert('Scan : '+((j&&j.error)||'erreur')+((j&&j.status)?' ('+j.status+')':'')); } }).catch(function(){ if(b){b.disabled=false;b.textContent=force?'🔁 Re-analyser':'🔄 Scanner maintenant';} alert('Serveur injoignable.'); }); }
   // À partir d'un horaires « 20h00 → 22h00 » renvoie « · 2h de plage » (durée calculée, gère la nuit).
   function vacPlage(hor){ if(!hor)return ''; var m=vacDurMin(hor); return m?(' · '+fmtDurMin(m)+' de plage'):''; }
