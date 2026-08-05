@@ -577,6 +577,14 @@
       "theme": "Suivi des demandes",
       "pourquoipas": "Gardiennage → le champ Prestation est pré-rempli et ne propose que Gardiennage. Suivi des demandes → Validées → Non affectées : le bloc « Agents proches » est là.",
       "local": true
+    },
+    {
+      "b": 329,
+      "titre": "« Client non avisé » limitée au jour même",
+      "source": "Zeus — 05/08",
+      "theme": "Suivi des appels",
+      "pourquoipas": "Pastille 🏢 Client non avisé : plus aucune ligne des jours précédents, seulement celles du jour.",
+      "local": true
     }
   ],
   "attente": [
@@ -609,6 +617,21 @@
       "titre": "Balayage final « oubli du filtre des vacations supprimées »",
       "source": "audit complet 05/08",
       "note": "17 occurrences corrigées (b309/b310/b311). Balayer tout le code pour cette signature afin de fermer la famille définitivement."
+    },
+    {
+      "titre": "Traçabilité appel→demande pour les demandes DÉJÀ en recherche",
+      "source": "Zeus — 05/08",
+      "note": "b323 n'affiche le délai que pour les demandes à venir : l'heure de l'appel n'était pas retenue avant. Pour les anciennes, il faudrait redemander les heures au serveur — mais /ringover/calls ne renvoie pas encore l'identifiant de l'appel, donc une modification du Worker serait nécessaire. À faire seulement si Zeus le juge utile."
+    },
+    {
+      "titre": "Délai Ringover : mesurer le temps de mise à disposition des enregistrements",
+      "source": "audit 05/08",
+      "note": "Le serveur ne peut analyser un appel que si son enregistrement audio est publié. C'est là qu'est passé l'essentiel des 6 minutes constatées, pas dans la fréquence de passage (descendue à 1 min en b327). Mesurer ce délai sur quelques appels donnerait un chiffre solide à opposer à Ringover."
+    },
+    {
+      "titre": "PP_START figé au 01/08/2026 dans le code",
+      "source": "audit 05/08",
+      "note": "La borne de départ des pastilles est écrite en dur (frMs('2026-08-01',480)). Elle vieillira : dans un mois les pastilles remonteront sur 30 jours, dans un an sur 365. À remplacer par une fenêtre glissante."
     }
   ],
   "decide": [
@@ -630,6 +653,23 @@
     {
       "titre": "Pastille 🌙 : tenir compte de l'heure du premier contrôle dans « avant / en cours »",
       "source": "remontée #55"
+    },
+    {
+      "titre": "Responsable secteur = mission TOUJOURS non affectée",
+      "source": "Zeus — 05/08",
+      "urgent": true,
+      "note": "Affecter un responsable secteur ne pourvoit pas la mission : il doit ensuite rendre le nom, prénom et contact du vrai agent. La mission doit donc RESTER dans « Validées → Non affectées », et on doit pouvoir y voir la liste de celles confiées à un responsable secteur, en attente de retour. La case « 🧭 Responsable secteur » existe déjà sur la fiche agent (fa-respsecteur) — reste à voir sous quel champ elle est enregistrée et à en tenir compte partout où l'on teste agentId."
+    },
+    {
+      "titre": "Contrôle superviseur : délai entre la demande et chaque action",
+      "source": "Zeus — 05/08",
+      "note": "Section réservée au super-administrateur. Pour chaque demande tombée en recherche : ce que le superviseur a fait dans « Agents proches » (appel en cours, appel passé, message envoyé…) et au bout de combien de temps. Et surtout : marquer les demandes où RIEN n'a été fait. À vérifier d'abord : l'appli enregistre-t-elle l'HEURE de ces actions, ou seulement le fait qu'elles ont eu lieu ? Sans horodatage, il faut d'abord l'ajouter — et cela ne vaudra que pour les actions futures."
+    },
+    {
+      "titre": "Heure de fin manquante sur les vacations créées depuis un mail",
+      "source": "audit 05/08",
+      "urgent": true,
+      "note": "Toute vacation née d'un mail naît avec mfin vide (écrit en dur). Conséquences : elle ne compte pas dans le total des heures, n'a ni fin de service à pointer ni contrôles. Le serveur ne demande à l'IA que la date et l'heure de DÉBUT du bon de commande. Corriger demande de modifier le prompt du Worker puis de le redéployer. C'est le plus utile de ce qui reste : cela touche toutes les missions venues de bons de commande."
     }
   ]
 }
