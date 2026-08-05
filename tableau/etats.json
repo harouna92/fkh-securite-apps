@@ -489,6 +489,14 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Pastille ⏰ → une ligne sans photo → « 📷 Choisir une photo reçue ». Et la pastille tenue affiche 👕, plus 🦺 (déjà pris).",
       "local": true
+    },
+    {
+      "b": 317,
+      "titre": "Une photo rattachée par l'agence sort vraiment de la vue (ne bascule plus en « hors délai »)",
+      "source": "Zeus — cas KOYA 05/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Pastille 📷 → « Choisir une photo reçue » sur une prise : la ligne disparaît des 7 tuiles. Un retard réel de l'agent reste signalé.",
+      "local": true
     }
   ],
   "attente": [
