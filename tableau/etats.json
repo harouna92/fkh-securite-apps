@@ -617,6 +617,14 @@
       "theme": "Droits & rôles",
       "pourquoipas": "Se connecter en superviseur : la pastille ⚠️ Anomalies est de retour. Les trois pastilles de pilotage restent masquées.",
       "local": true
+    },
+    {
+      "b": 334,
+      "titre": "« Non pointées » et « Client non avisé » parlent de pointage, plus de photo",
+      "source": "Zeus — 05/08",
+      "theme": "Suivi des appels",
+      "pourquoipas": "Pastille ⏰ : plus de bouton photo, le bouton dit « ✔ Agent appelé — pointer », et l'en-tête « non pointée(s) — agent non appelé ».",
+      "local": true
     }
   ],
   "attente": [
