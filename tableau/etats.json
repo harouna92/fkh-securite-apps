@@ -473,6 +473,14 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Planning → cliquer une vacation avec un agent affecté : ses photos de tenue s'affichent sous son nom, ou « aucune photo » avec accès au portail.",
       "local": true
+    },
+    {
+      "b": 315,
+      "titre": "Pastille « Photos de contrôle tenue » : agents sans photo, sites couverts / non couverts",
+      "source": "Zeus — 05/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Pastille 🦺 en haut à droite : le compteur = agents planifiés aujourd'hui sans photo. Trois tuiles, et « 📷 Choisir une photo reçue » sur chaque agent.",
+      "local": true
     }
   ],
   "attente": [
