@@ -545,6 +545,14 @@
       "theme": "Suivi des demandes",
       "pourquoipas": "Suivi des demandes → une demande née d'un appel : bandeau « 📞 Appel entrant le … → 📥 en recherche le … · ⏱ délai ». Orange au-delà de 2 min, avec le détail.",
       "local": true
+    },
+    {
+      "b": 324,
+      "titre": "Plus de doublon : appel puis mail (on garde le mail + l'agent) et import CSV (l'agent est reporté)",
+      "source": "Zeus — 05/08",
+      "theme": "Fiabilité des données",
+      "pourquoipas": "Valider une demande venue d'un appel, puis laisser arriver le mail du bon de commande : une seule vacation reste, celle du mail, avec l'agent déjà affecté.",
+      "local": true
     }
   ],
   "attente": [
