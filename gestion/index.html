@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b335</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b336</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -6399,8 +6399,10 @@ button.big:active{transform:translateY(1px)}
     try{ var c=(m.ctrls&&m.ctrls.length)?m.ctrls:[]; c.forEach(function(h,i){ out.push({k:'ctrl'+(i+1),lbl:'🌙 Contrôle '+(i+1),h:h}); }); }catch(e){}
     return out;
   }
-  function phmOuvrir(i){
-    var m=phMatches&&phMatches[i]; if(!m)return;
+  function phmOuvrir(i, photoDirecte){
+    /* b336 : on peut desormais ouvrir le rapprochement sur une photo qui n'est pas dans la liste
+       courante — celle qu'on vient de reperer dans la pastille des photos sans position. */
+    var m=photoDirecte?{ph:photoDirecte}:(phMatches&&phMatches[i]); if(!m)return;
     var it=m.ph, dISO=phDateISO(it.ts), pmin=it.ts?phmMinutes(it.ts):0;
     function rendre(){
       var lignes=[];
@@ -6462,6 +6464,34 @@ button.big:active{transform:translateY(1px)}
   function phAttach(i,mid,stepKey){ var m=phMatches&&phMatches[i]; if(!m)return; var sk=stepKey||PH_TYPE_STEP[m.ph.type]||'tenue'; var S=ssLoad(); S[mid]=S[mid]||{}; S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:m.ph.key,done:true,at:m.ph.ts||Date.now()}); ssSave(S); alert('📎 Photo rattachée (étape « '+(PH_STEP_LBL[sk]||sk)+' »).'); phRender(); }
   // ===== 📸 Photos à rattacher (remontées #7/#14/#19) : lien UNIQUE (u/) ou lien agent (agent/) → association à une étape de vacation → le ticket de la file est RÉGLÉ avec preuve photo. =====
   var SA_PH=null;
+  /* ===== b336 : LES PHOTOS SANS POSITION QU'ON N'A PAS ENCORE RATTACHEES =====
+     POURQUOI (Zeus, 05/08) : la pastille ne lisait que l'archive, laquelle n'est alimentee qu'AU
+     MOMENT du rattachement. Une photo qui vient d'arriver sans position n'y figurait donc pas du
+     tout — on la cherchait sous un titre qui promettait de la montrer. Et son agent ne peut pas
+     etre devine : le lien unique ne porte aucune identite, c'est son principe.
+     COMMENT : on releve a part les photos deposees dans « ville inconnue » et encore non rattachees.
+     Elles rejoignent la pastille sous « (agent non identifié) », avec un bouton qui ouvre directement
+     le rapprochement — on voit tout au meme endroit, et on peut agir. */
+  var GP_LIB=[];
+  try{ GP_LIB=JSON.parse(localStorage.getItem('fkh_gp_libres')||'[]')||[]; }catch(_e){ GP_LIB=[]; }
+  function gpScan(){
+    if(typeof photoReady!=='function'||!photoReady())return;
+    if(typeof photoList!=='function')return;
+    photoList('u/ville_inconnue/',function(keys){
+      var out=[];
+      (keys||[]).forEach(function(o){
+        var k=(o&&o.key)||o; if(!k)return;
+        if(typeof phIsAttached==='function'&&phIsAttached(k))return;
+        var ts=0; try{ var mm=/(\d{10,})/.exec(String(k)); if(mm)ts=+mm[1]; }catch(e){}
+        out.push({key:k,ts:ts});
+      });
+      out.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+      GP_LIB=out.slice(0,50);
+      try{ localStorage.setItem('fkh_gp_libres',JSON.stringify(GP_LIB)); }catch(e){}
+      if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
+    });
+  }
+  try{ setTimeout(gpScan,6000); setInterval(gpScan,300000); }catch(_e){}
   function _phParseU(k){ var p=String(k).split('/'); if(p[0]!=='u'||p.length!==3)return null; return {key:k,fmt:'uni',city:p[1]||'',file:p[2]||'',ts:phTs(p[2])}; }
   function _phStepLbl(k){ return k==='prise'?'🟢 Prise':k==='fin'?'🔚 Fin':k.indexOf('ctrl')===0?'🌙 Contrôle':k; }
   // Candidats : étapes (prise/fin) des missions validées du jour de la photo — fenêtre ±60 min (sinon ±3 h = « décalé ») ; la ville GPS trie en premier.
@@ -6869,7 +6899,17 @@ button.big:active{transform:translateY(1px)}
       });
       Object.keys(_byAg).forEach(function(k){ var g=_byAg[k]; g.items.sort(function(u,v){return v.ts-u.ts;});
         sc.gp.push({gp:1,agent:g.agent,tel:g.tel,nb:g.items.length,items:g.items,site:(g.items[0]&&g.items[0].site)||'',mdate:(g.items[0]&&g.items[0].mdate)||'',heure:'',due:(g.items[0]&&g.items[0].ts)||now,since:0}); });
-      sc.gp.sort(function(x,y){return y.nb-x.nb;});
+      /* b336 : les photos sans position pas encore rattachees — agent inconnu tant qu'on n'a pas
+         rapproche, c'est justement ce qu'on vient faire ici. */
+      (GP_LIB||[]).forEach(function(p){
+        if(typeof phIsAttached==='function'&&phIsAttached(p.key))return;
+        var d=p.ts?new Date(p.ts):null;
+        sc.gp.push({gp:1,libre:1,key:p.key,agent:'(agent non identifié)',tel:'',nb:1,
+          items:[{site:'\u2014',mdate:d?(d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)):'',step:'',ts:p.ts||0,key:p.key,libre:1}],
+          site:'\u2014',mdate:d?(d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)):'',
+          heure:d?(('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)):'',due:p.ts||now,since:0});
+      });
+      sc.gp.sort(function(x,y){return (y.due||0)-(x.due||0);});
     }catch(_e){}
     sc.rt=[];
     try{ var _S=ssLoad();
@@ -7274,7 +7314,9 @@ button.big:active{transform:translateY(1px)}
       if(!x||!x.mid)return '';
       return '<button type="button" class="pp-act-retirer" data-mid="'+esc(x.mid)+'" data-key="'+esc(x.key||'prise')+'" title="Retirer cette échéance du suivi (réversible depuis la vacation)" style="font-size:12px;margin-left:6px;color:var(--muted);border-color:var(--line)">🗑 Retirer</button>';
     }
-    function rowAct(x){ var md=PP_VIEW.mode; // b160 : corriger l'info manquante DIRECTEMENT depuis la ligne
+    function rowAct(x){ var md=PP_VIEW.mode;
+      /* b336 : une photo sans position et sans rattachement — le seul geste utile est de la rapprocher. */
+      if(md==='gp'&&x&&x.libre)return '<button type="button" class="pp-act-rappro ok" data-k="'+esc(x.key||'')+'" data-ts="'+esc(String(x.due||0))+'" style="font-size:12px">📎 Rapprocher cette photo</button>'; // b160 : corriger l'info manquante DIRECTEMENT depuis la ligne
       /* b311 : on agit SUR PLACE — affecter, mais aussi modifier ou supprimer sans avoir a rejoindre le Planning (demande Zeus 05/08). */
       if(md==='af')return '<button type="button" class="pp-act-aff" data-mid="'+esc(x.mid||'')+'" style="font-size:12px;border-color:#e0a13b;color:#e0a13b;font-weight:700">👤 Affecter un agent</button>'
         +'<button type="button" class="pp-act-edit" data-mid="'+esc(x.mid||'')+'" style="font-size:12px;margin-left:6px">✏️ Modifier</button>'
@@ -7367,7 +7409,8 @@ button.big:active{transform:translateY(1px)}
       var g2=L.filter(function(x){return x.agent===PP_VIEW.sub;})[0]||{items:[]};
       h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">👤 '+esc(PP_VIEW.sub)+'</b>'+(g2.tel?('<a class="call" href="tel:'+esc(String(g2.tel).replace(/\s+/g,''))+'" style="font-size:13px">📞 '+esc(g2.tel)+'</a>'):'')+'<span class="sub" style="margin:0">'+(g2.items||[]).length+' photo(s)</span></div>';
       h+=(g2.items||[]).map(function(it2){ var d5=(it2.mdate||'').split('-').reverse().join('/'); var hh=''; try{ var dd=new Date(it2.ts); hh=('0'+dd.getHours()).slice(-2)+':'+('0'+dd.getMinutes()).slice(-2); }catch(e){}
-        return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><b>📍 '+esc(it2.site||'—')+'</b><div class="fa-d" style="margin-top:2px">'+(d5?('le '+d5+' '):'')+(hh?('à '+hh):'')+(it2.step?(' · '+esc(it2.step)):'')+' · <b style="color:var(--bad)">photo sans position</b></div></div>'; }).join('');
+        var _rap=(it2.libre&&it2.key)?('<div class="acts" style="margin-bottom:6px"><button type="button" class="pp-act-rappro ok" data-k="'+esc(it2.key)+'" data-ts="'+esc(String(it2.ts||0))+'" style="font-size:12px">📎 Rapprocher cette photo</button></div>'):'';
+        return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)">'+_rap+'<b>📍 '+esc(it2.site||'—')+'</b><div class="fa-d" style="margin-top:2px">'+(d5?('le '+d5+' '):'')+(hh?('à '+hh):'')+(it2.step?(' · '+esc(it2.step)):'')+' · <b style="color:var(--bad)">photo sans position</b></div></div>'; }).join('');
       h+='<p class="sub" style="margin:8px 0 0;font-size:11.5px">Appelle l’agent et rappelle-lui d’accepter la demande de position : sans elle, sa photo ne prouve pas sa présence sur le site.</p>';
     } else if(D.bySite2&&!PP_VIEW.sub){ /* b210 : retards par SITE */
       var _gr={}; L.forEach(function(x){ (_gr[x.site]=_gr[x.site]||[]).push(x); });
@@ -7538,6 +7581,12 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
         var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.jour!=null){PP_VIEW.jour=null;} else if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };   /* b332 */
     box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else {PP_VIEW.sub=t.getAttribute('data-sub'); PP_VIEW.jour=null;} ppRender(); }; });   /* b332 : on repart du palier */
     box.querySelectorAll('.pp-jr').forEach(function(b){ b.onclick=function(){ PP_VIEW.jour=b.getAttribute('data-j'); ppRender(); }; });
+    /* b336 : ouvrir le rapprochement sur la photo choisie */
+    box.querySelectorAll('.pp-act-rappro').forEach(function(b){ b.onclick=function(){
+      var k=b.getAttribute('data-k'), ts=+b.getAttribute('data-ts')||0;
+      if(typeof phmOuvrir!=='function'){ alert('Rapprochement indisponible.'); return; }
+      ppClose(); phmOuvrir(null,{key:k,ts:ts,city:'ville_inconnue',fmt:'uni'});
+    }; });
     /* b335 */
     box.querySelectorAll('.pp-act-retirer').forEach(function(b){ b.onclick=function(){
       if(typeof isSuperAdmin!=='function'||!isSuperAdmin())return;
