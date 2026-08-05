@@ -449,6 +449,22 @@
       "source": "historique",
       "theme": "Divers",
       "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 312,
+      "titre": "Désigner une photo comme photo de tenue d'un agent (visible dans sa fiche)",
+      "source": "Zeus — 05/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Suivi des appels → une photo reçue → « 🦺 Photo de tenue de X ». Elle apparaît ensuite dans la fiche de l'agent, dépliant 📷 Photos tenue.",
+      "local": true
+    },
+    {
+      "b": 313,
+      "titre": "Portail des photos reçues : choisir une photo déjà arrivée au lieu d'en téléverser une",
+      "source": "Zeus — 05/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Toute pastille photo → « 📷 Choisir une photo reçue » → galerie de tout ce qui est arrivé, avec rattachement au ticket ou désignation en photo de tenue.",
+      "local": true
     }
   ],
   "attente": [
