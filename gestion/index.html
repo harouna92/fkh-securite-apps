@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b316</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b317</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -6493,7 +6493,7 @@ button.big:active{transform:translateY(1px)}
         var it=L[+b.getAttribute('data-i')]; if(!it)return;
         var S=ssLoad(); S[mid]=S[mid]||{};
         var sk=stepKey||'tenue';
-        S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:it.key,done:true,at:it.ts||Date.now()});
+        S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:it.key,done:true,at:it.ts||Date.now(),man:1});   /* b317 : rattache par l'agence */
         ssSave(S);
         if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
         if(typeof notifScan==='function'){try{notifScan();}catch(e){}}
@@ -6589,7 +6589,12 @@ button.big:active{transform:translateY(1px)}
           var _ec=null;
           try{ if(r.at&&it.heure){ var _d=new Date(r.at), _pm=toMin(it.heure), _am=_d.getHours()*60+_d.getMinutes();
                  if(_pm!=null){ var _v=_am-_pm; if(_v<-720)_v+=1440; if(_v>720)_v-=1440; _ec=_v; } } }catch(_e){}
-          if(_ec!=null&&Math.abs(_ec)>=5){ it.sousvue='delai'; it.ecartMin=_ec; it.photoAt=r.at||0; sc.ph.push(it); }
+          /* b317 : si c'est l'agence qui a rattache la photo (portail, rapprochement manuel), l'ecart
+             entre l'heure de la photo et l'heure prevue ne dit RIEN du pointage de l'agent — on ne le
+             signale donc ni en « hors delai », ni en « agent a contacter », ni en « client a aviser ».
+             Le ticket est regle : il sort de la vue, ce qui est bien ce qu'on attend en rattachant. */
+          if(r.man){ /* rattache par l'agence : rien a signaler */ }
+          else if(_ec!=null&&Math.abs(_ec)>=5){ it.sousvue='delai'; it.ecartMin=_ec; it.photoAt=r.at||0; sc.ph.push(it); }
         }
       }
       else if(isTe){ // b167 : entre dans la liste 12 h AVANT la prise, y RESTE tant que la PHOTO de controle n'est pas deposee
