@@ -609,6 +609,14 @@
       "theme": "Suivi des appels",
       "pourquoipas": "Pastille ⏰ → une tuile → deux tuiles Aujourd'hui / Jours passés avec leur chiffre → la liste. Retour remonte cran par cran.",
       "local": true
+    },
+    {
+      "b": 333,
+      "titre": "Les anomalies signalées reviennent au superviseur",
+      "source": "Zeus — 05/08",
+      "theme": "Droits & rôles",
+      "pourquoipas": "Se connecter en superviseur : la pastille ⚠️ Anomalies est de retour. Les trois pastilles de pilotage restent masquées.",
+      "local": true
     }
   ],
   "attente": [
@@ -656,6 +664,11 @@
       "titre": "PP_START figé au 01/08/2026 dans le code",
       "source": "audit 05/08",
       "note": "La borne de départ des pastilles est écrite en dur (frMs('2026-08-01',480)). Elle vieillira : dans un mois les pastilles remonteront sur 30 jours, dans un an sur 365. À remplacer par une fenêtre glissante."
+    },
+    {
+      "titre": "Chemin complet : par où un opérateur signale une anomalie",
+      "source": "Zeus — 05/08",
+      "note": "L'opérateur ne voit pas la pastille ⚠️ Anomalies (prévu depuis l'origine). Vérifier par quel chemin il signale une anomalie (bulle Assistant ? SOS de Suivi des appels ?) et que cela remonte bien jusqu'au superviseur, de bout en bout."
     }
   ],
   "decide": [
