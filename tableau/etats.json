@@ -521,6 +521,14 @@
       "theme": "Droits & rôles",
       "pourquoipas": "Se connecter en superviseur : il ne reste que les 8 pastilles opérationnelles. L'administrateur les garde toutes.",
       "local": true
+    },
+    {
+      "b": 321,
+      "titre": "Barre de pastilles : plus de trou (la pastille 👕 restait isolée)",
+      "source": "Zeus — 05/08",
+      "theme": "Droits & rôles",
+      "pourquoipas": "Se connecter en superviseur : les 8 pastilles se suivent sans espace vide.",
+      "local": true
     }
   ],
   "attente": [
