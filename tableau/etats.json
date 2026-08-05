@@ -641,6 +641,14 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Pastille 📵 : les photos sans position non rattachées sont listées sous « (agent non identifié) », avec « 📎 Rapprocher cette photo ».",
       "local": true
+    },
+    {
+      "b": 337,
+      "titre": "Photos sans position : paliers identifiés/non identifiés puis jour/passés",
+      "source": "Zeus — 05/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Pastille 📵 : 👤 identifiés / ❓ non identifiés → 📅 aujourd'hui / 🕓 jours passés → la liste. Plus de lignes identiques empilées.",
+      "local": true
     }
   ],
   "attente": [
