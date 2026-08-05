@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b323</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b324</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -4289,7 +4289,11 @@ button.big:active{transform:translateY(1px)}
       function siteNorm(b){return String(b||'').trim().toLowerCase().replace(/\s+/g,' ');}
       function endHM(txt){ var m=/(\d{1,2}):(\d{2})\s*$/.exec(String(txt||'')); return m?(('0'+m[1]).slice(-2)+':'+m[2]):''; }
       // Unité de comparaison mission = site + date + horaire début + horaire fin (pas la Référence)
-      var existMiss={}; SUIVI.forEach(function(x){ if(x.mdate){ existMiss[siteNorm(x.siteBDC||x.siteAgent||x.titre||'')+'|'+x.mdate+'|'+(x.mheure||'')+'|'+endHM(x.mfin)]=true; } });
+      /* b324 : on retient AUSSI si la vacation deja en base porte un agent. Sans cette nuance, une
+         ligne du fichier etait ecartee des l'analyse — et l'agent qu'elle apportait etait perdu, alors
+         que la mise a jour savait deja le reporter. */
+      var existMiss={}, existAgent={}; SUIVI.forEach(function(x){ if(x.mdate){ var _k=siteNorm(x.siteBDC||x.siteAgent||x.titre||'')+'|'+x.mdate+'|'+(x.mheure||'')+'|'+endHM(x.mfin); existMiss[_k]=true; if(x.agentId)existAgent[_k]=true; } });
+      var vusCSV={};
       var includeEmpty=byId('imp-empty').checked, includePast=byId('imp-past')&&byId('imp-past').checked;
       var agentsByPhone={}, missions=[], sites={}, past=0, dupRef=0, emptySkipped=0, frais=0;
       data.forEach(function(r,idx){
@@ -4309,12 +4313,16 @@ button.big:active{transform:translateY(1px)}
           var bdc=C.site>=0?String(r[C.site]||'').trim():''; var sn=siteNorm(bdc);
           var endh=(C.fin>=0)?((impDMY(r[C.fin])||{}).heure||''):'';
           var mk=sn+'|'+dt.date+'|'+(dt.heure||'')+'|'+endh;
-          if(existMiss[mk]){ dupRef++; return; }   // même site + date + horaires déjà en base -> ignoré
           var hasAgent=(pk&&pk.length>=9)||!!nom;
+          /* b324 : doublon a l'interieur du fichier -> on ecarte. Deja en base -> on n'ecarte QUE si la
+             ligne n'apporte rien : sans agent, ou sur une vacation qui en a deja un. Sinon on la laisse
+             passer, et la mise a jour reportera l'agent sur la vacation existante (regle Zeus 05/08). */
+          if(vusCSV[mk]){ dupRef++; return; }
+          if(existMiss[mk] && (!hasAgent || existAgent[mk])){ dupRef++; return; }
           if(!hasAgent&&!includeEmpty){ emptySkipped++; return; }
           if(bdc&&!sites[sn])sites[sn]={bdc:bdc,agent:siteMap[sn]||impSiteAgent(bdc)};
           missions.push({mdate:dt.date,mheure:dt.heure,finRaw:C.fin>=0?r[C.fin]:'',client:C.client>=0?String(r[C.client]||'').trim():'',bdc:bdc,sn:sn,rue:C.rue>=0?String(r[C.rue]||'').trim():'',cp:C.cp>=0?String(r[C.cp]||'').trim():'',ville:ville,poste:C.spec>=0?String(r[C.spec]||'').trim():'',agentNom:nom,agentTel:(pk&&pk.length>=9)?impNormPhone(rawTel):'',agentRef:agentRef,ref:ref});
-          existMiss[mk]=true;
+          vusCSV[mk]=true;   /* b324 */
         } else past++;
       });
       IMP={agentsByPhone:agentsByPhone,missions:missions,sites:sites,past:past,dupRef:dupRef,emptySkipped:emptySkipped,frais:frais,includePast:includePast};
@@ -7626,7 +7634,36 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
         var _mpKey=(pp.site||'').toLowerCase().replace(/\s+/g,' ').trim()+'|'+(pp.mdate||'');
         if(_mpKey&&_mpCreated[_mpKey])return; // b304 : même site+date déjà créé dans ce batch
         if(_mpKey)_mpCreated[_mpKey]=1;
+        /* ===== b324 : LE MEME BESOIN, DEUX PORTES =====
+           Un client appelle : la demande entre en recherche, on la valide, elle devient une mission.
+           Puis son mail arrive avec le bon de commande : une SECONDE vacation naissait pour la meme
+           chose. On garde celle du MAIL — c'est elle qui porte toutes les informations — et on retire
+           celle nee de l'appel, en reportant l'agent s'il en avait deja ete affecte un, pour ne pas
+           avoir a le replacer. (Regle Zeus 05/08.)
+           Prudence : on ne rapproche que d'une vacation issue d'un APPEL, meme site, meme date, et
+           dont l'heure de debut ne s'ecarte pas de plus de 2 h — sinon on confondrait un jour et une
+           nuit sur le meme site. */
+        var _agentRepris=null;
+        try{
+          var _sN=(typeof siteNorm==='function')?siteNorm(pp.site||''):String(pp.site||'').toLowerCase();
+          var _hM=(typeof toMin==='function')?toMin(pp.heure||''):null;
+          (SUIVI||[]).forEach(function(m){
+            if(!m||m.deleted||m.mailSrc)return;
+            if(m.statut!=='validee')return;
+            var _neeDAppel=(!!m.callAt)||(String(m.id||'').indexOf('ai')===0);
+            if(!_neeDAppel)return;
+            if((m.mdate||'')!==(pp.mdate||''))return;
+            var _s2=(typeof siteNorm==='function')?siteNorm(m.siteAgent||m.titre||''):String(m.siteAgent||m.titre||'').toLowerCase();
+            if(!_sN||_s2!==_sN)return;
+            var _h2=(typeof toMin==='function')?toMin(m.mheure||''):null;
+            if(_hM!=null&&_h2!=null&&Math.abs(_hM-_h2)>120)return;
+            if(m.agentId&&!_agentRepris)_agentRepris=m.agentId;
+            m.deleted=true; m.creeAt=Date.now();   /* retiree au profit de celle du mail */
+            m.fusionVers='mail';
+          });
+        }catch(_f){}
         SUIVI.unshift({id:'mv'+Date.now()+'_'+Math.round(Math.random()*99999),statut:'validee',mailPending:true,mailSrc:it.cdr_id,client:pp.client||'',siteAgent:pp.site,ville:pp.ville||'',mdate:pp.mdate,mheure:pp.heure||'',mfin:'',titre:(pp.subject||'').slice(0,80),texte:'📧 Cree automatiquement depuis un mail'+(pp.ref?' (ref '+pp.ref+')':'')});
+        if(_agentRepris){ try{ SUIVI[0].agentId=_agentRepris; }catch(_g){} }   /* b324 : l'agent deja affecte ne se perd pas */
         _crea=true; });
       if(_crea){ save('fkh_suivi',SUIVI); if(typeof cloudPush==='function'){try{cloudPush('fkh_suivi');}catch(e){}} }
     if(mailsAnnulScan(items))_crea=true;   /* b229 */
