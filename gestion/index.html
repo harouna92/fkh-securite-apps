@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b330</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b332</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2246,8 +2246,12 @@ button.big:active{transform:translateY(1px)}
       if(_manque.length){ it.infoManque=_manque.slice(); } else { delete it.infoManque; }
       it.statut='validee'; it.valide=Date.now(); it.motif=''; delete it._pending; delete it.aiPending; if(!it.mdate){ if(_fv&&_fv.mdate)it.mdate=_fv.mdate; else if(_relDate)it.mdate=_relDate; if(_fv&&_fv.mheure)it.mheure=_fv.mheure; if(_fv&&_fv.mfin)it.mfin=_fv.mfin; }
       // ÉTAPE INTERMÉDIAIRE (demande Zeus 01-08) : validée ≠ au Planning. Elle doit d'abord être DÉCOUPÉE (ou « gardée telle quelle ») — le sélecteur s'ouvre tout de suite.
-      it.aDecouper=true; it._splitpick=true; if(typeof suiviBucket!=='undefined')suiviBucket='validee';
-      if(_manque.length){ alert('✅ Demande validée.\n\n⚠️ Info encore à compléter : '+_manque.join(', ')+'.\n\n🔪 Choisis maintenant le découpage en vacations — elle n\'apparaîtra au Planning qu\'après.'); } }
+      /* b331 : valider bascule la carte en « validee », mais on RESTE dans « En recherche » — on
+         enchaine sur la demande suivante au lieu d'etre expedie ailleurs a chaque clic. La mission
+         part dans les Validees avec sa mention « 🔪 Validée — À DÉCOUPER », donc rien ne se perd.
+         (Demande Zeus 05/08.) */
+      it.aDecouper=true; it._splitpick=true;
+      if(_manque.length){ alert('✅ Demande validée.\n\n⚠️ Info encore à compléter : '+_manque.join(', ')+'.\n\n🔪 Elle attend son découpage dans « ✅ Validées » — elle n\'apparaîtra au Planning qu\'après.'); } }
     else if(act==='dovalidate'){ var _rule=b.getAttribute('data-rule'), _rm; if(_rule==='custom'){ var _inp=b.closest('.sv')?b.closest('.sv').querySelector('.splitcustom'):null; var _h=_inp?parseFloat(_inp.value):0; _rm=(_h>0)?Math.round(_h*60):0; } else _rm=parseInt(_rule,10)||0; delete it._splitpick; svValidateSplit(it,_rm); saveSuivi(); renderSuivi(); return; }
     else if(act==='splitcancel'){ delete it._splitpick; renderSuivi(); return; }
     else if(act==='resplit'){ var _grp=it.vacGroup; if(!_grp){ return; } var _mem=SUIVI.filter(function(m){return m.vacGroup===_grp;}); var _aff=_mem.filter(function(m){return m.agentId;}).length; if(!confirm('Réassembler cette mission ('+_mem.length+' vacation'+(_mem.length>1?'s':'')+') et redéfinir le découpage ?'+(_aff?'\n\n⚠️ '+_aff+' vacation(s) déjà affectée(s) à un agent — elles seront à réaffecter.':'')))return; var _ref=_mem[0]; var _now2=Date.now(); _mem.forEach(function(m){ m.deleted=true; m.creeAt=_now2; });/* b309 : suppression douce — sinon la synchro ramenait les vacations decoupees et creait des doublons */ var _src={id:'grp'+_now2+'_'+Math.round(Math.random()*9999),titre:(_ref.vacSrcTitre||_ref.titre||'Demande'),statut:'validee',motif:'',pris:(_ref.pris||_now2),valide:_now2,ville:_ref.ville,cp:_ref.cp,client:_ref.client,la:_ref.la,lo:_ref.lo,assoc:[],vacations:(_ref.vacSource||[]),texte:(_ref.vacSrcTexte||_ref.texte||'')}; SUIVI.unshift(_src); saveSuivi(); if(typeof suiviBucket!=='undefined')suiviBucket='validee'; renderSuivi(); return; }
@@ -7445,12 +7449,15 @@ button.big:active{transform:translateY(1px)}
          par ou commencer.
          COMMENT : deux vues sur la meme liste — « Aujourd'hui » ouverte d'office, « Jours passes » a
          cote avec son compte. Seules les deux vues « sans photo » sont concernees. */
+      /* b332 : « Aujourd'hui » et « Jours passes » ne sont plus deux boutons poses au-dessus de la
+         liste, mais un vrai PALIER DE TUILES — on descend d'un cran comme partout ailleurs dans les
+         pastilles, et « ← Retour » remonte ce cran. Applique a TOUTES les vues de cette pastille,
+         pas seulement aux « sans photo ». (Demande Zeus 05/08.) */
+      var _ajd=(typeof impTodayISO==='function')?impTodayISO():'';
+      var _duJour=LL.filter(function(x){return (x.mdate||'')===_ajd;});
+      var _avant=LL.filter(function(x){return (x.mdate||'')!==_ajd;});
       var _jrBar='';
-      if(_sv==='prise'||_sv==='fin'){
-        var _ajd=(typeof impTodayISO==='function')?impTodayISO():'';
-        var _duJour=LL.filter(function(x){return (x.mdate||'')===_ajd;});
-        var _avant=LL.filter(function(x){return (x.mdate||'')!==_ajd;});
-        if(PP_VIEW.jour==null)PP_VIEW.jour='j';
+      if(false){
         _jrBar='<div class="acts" style="margin-bottom:8px;gap:6px">'
           +'<button type="button" class="pp-jr" data-j="j" style="font-size:12.5px'+(PP_VIEW.jour==='j'?';border-color:#6ea8fe;color:#6ea8fe;font-weight:700':'')+'">📅 Aujourd\u2019hui ('+_duJour.length+')</button>'
           +'<button type="button" class="pp-jr" data-j="p" style="font-size:12.5px'+(PP_VIEW.jour==='p'?';border-color:#e0a13b;color:#e0a13b;font-weight:700':'')+'">🕓 Jours pass\u00e9s ('+_avant.length+')</button>'
@@ -7460,7 +7467,16 @@ button.big:active{transform:translateY(1px)}
       /* b272 : l'entete dit ce qu'on regarde vraiment — « sans photo » n'a aucun sens sur la vue
          des photos hors delai, ni sur celle des refus. */
       var _lbl={prise:'prise(s) sans photo',fin:'fin(s) sans photo',rprise:'prise(s) — photo REFUSÉE par l’agent',rfin:'fin(s) — photo REFUSÉE par l’agent',delai:'photo(s) faite(s) hors délai (plus de 5 min d’écart)',dagent:'dépassement(s) dont l’agent n’a pas encore été contacté',dclient:'dépassement(s) dont le client n’a pas encore été avisé'}[_sv]||'';
-      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+LL.length+' '+_lbl+'</span></div>'+_jrBar+rowsOf(LL);   /* b330 */
+      if(PP_VIEW.jour==null){   /* b332 : le palier */
+        h+='<div class="acts" style="margin-bottom:10px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+LL.length+' '+_lbl+'</span></div>'
+          +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
+          +'<div class="pp-tile pp-jr" data-j="j"><b>'+_duJour.length+'</b>📅 Aujourd’hui<br><span class="sub" style="margin:0;font-size:11.5px">encore rattrapable</span></div>'
+          +'<div class="pp-tile pp-jr" data-j="p"'+(_avant.length?' style="border-color:#e0a13b"':'')+'><b>'+_avant.length+'</b>🕓 Jours passés<br><span class="sub" style="margin:0;font-size:11.5px">à constater</span></div>'
+          +'</div>';
+      } else {
+        LL=(PP_VIEW.jour==='p')?_avant:_duJour;
+        h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+LL.length+' '+_lbl+' · '+((PP_VIEW.jour==='p')?'🕓 jours passés':'📅 aujourd’hui')+'</span></div>'+rowsOf(LL);
+      }
     } else {
       h+='<div class="acts" style="margin-bottom:8px"><span class="sub" style="margin:0">'+L.length+' en attente · '+D.depuis+'</span></div>'+rowsOf(L);
     }
@@ -7497,8 +7513,8 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     box.querySelectorAll('.an-ok').forEach(function(b){ b.onclick=function(){ if(confirm('Confirmer l’annulation ?\n\nLa vacation sort du Planning et ses tickets d’appel disparaissent. Pense à prévenir l’agent s’il y en a un.'))annulTrancher(b.getAttribute('data-id'),true); }; });
     box.querySelectorAll('.an-ko').forEach(function(b){ b.onclick=function(){ annulTrancher(b.getAttribute('data-id'),false); }; });
     var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitter():pcPrendre(); ppRender(); };
-        var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };
-    box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else {PP_VIEW.sub=t.getAttribute('data-sub'); PP_VIEW.jour='j';} ppRender(); }; });   /* b330 : on rouvre toujours sur le jour */
+        var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.jour!=null){PP_VIEW.jour=null;} else if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };   /* b332 */
+    box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else {PP_VIEW.sub=t.getAttribute('data-sub'); PP_VIEW.jour=null;} ppRender(); }; });   /* b332 : on repart du palier */
     box.querySelectorAll('.pp-jr').forEach(function(b){ b.onclick=function(){ PP_VIEW.jour=b.getAttribute('data-j'); ppRender(); }; });
     box.querySelectorAll('.pp-act-aff').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); ppClose(); if(typeof planningAffect==='function')planningAffect(mid); }; });
     /* b313 : ouvrir le portail des photos recues, en sachant d'ou l'on vient (ticket + agent). */
