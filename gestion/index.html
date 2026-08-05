@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b329</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b330</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -7414,13 +7414,19 @@ button.big:active{transform:translateY(1px)}
           +'<br><span class="sub" style="margin:0;font-size:11.5px">'+soustitre+'</span></div>';
       }
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap">'
-        +_tuile('prise',_n(_mq,'prise'),'🟢 Prises de service','sans photo','')
-        +_tuile('fin',_n(_mq,'fin'),'🔚 Fins de service','sans photo','')
-        +_tuile('rprise',_n(_rf,'prise'),'🚫 Prises','photo REFUSÉE','#e5322d')
+        /* b330 : les cinq tuiles « photo » (refus, hors delai, agent/client a prevenir) ne vivent
+           que dans la pastille des PHOTOS MANQUANTES — c'est la seule dont les lignes portent ces
+           etats. Ailleurs (« non pointees », « client non avise ») elles filtraient une liste qui ne
+           les contient pas : elles affichaient zero pour toujours, quel que soit le nombre de photos
+           en retard. Constate par Zeus le 05/08. On ne montre plus un compteur qui ne peut pas bouger.
+           Le sous-titre des deux premieres suit la pastille au lieu de dire « sans photo » partout. */
+        +_tuile('prise',_n(_mq,'prise'),'🟢 Prises de service',(D.verb||'sans photo'),'')
+        +_tuile('fin',_n(_mq,'fin'),'🔚 Fins de service',(D.verb||'sans photo'),'')
+        +((PP_VIEW.mode==='ph')?(_tuile('rprise',_n(_rf,'prise'),'🚫 Prises','photo REFUSÉE','#e5322d')
         +_tuile('rfin',_n(_rf,'fin'),'🚫 Fins','photo REFUSÉE','#e5322d')
         +_tuile('delai',_dl.length,'⏱ Hors délai','photo faite à plus de 5 min','#e0a13b')
         +_tuile('dagent',_dl.filter(function(x){return !hdEtat(x.mid,x.key||'prise').agent;}).length,'🗣️ Agent à contacter','dépassement non expliqué','#e5322d')
-        +_tuile('dclient',_dl.filter(function(x){return !hdEtat(x.mid,x.key||'prise').client;}).length,'🏢 Client à aviser','dépassement non signalé','#e5322d')
+        +_tuile('dclient',_dl.filter(function(x){return !hdEtat(x.mid,x.key||'prise').client;}).length,'🏢 Client à aviser','dépassement non signalé','#e5322d')):'')
         +'</div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+' · une échéance entre ici 1 min après son heure prévue. Clique sur une tuile pour le détail par vacation (durée écoulée).</p>';
     } else if(D.tiles&&PP_VIEW.sub){
@@ -7432,10 +7438,29 @@ button.big:active{transform:translateY(1px)}
       else if(_sv==='delai'){ LL=L.filter(function(x){return x.sousvue==='delai';})
         .sort(function(u,v){ return Math.abs(v.ecartMin||0)-Math.abs(u.ecartMin||0); }); }
       else { LL=L.filter(function(x){return (x.sousvue||'manq')==='manq'&&x.key===_sv;}); }
+      /* ===== b330 : LE JOUR D'ABORD, LE RESTE ENSUITE =====
+         POURQUOI (Zeus, 05/08) : une prise sans photo de ce matin se rattrape — on appelle l'agent, la
+         photo peut encore arriver. Une prise sans photo d'il y a trois jours ne se rattrape plus, elle
+         se constate. Melangees, celles du jour se noyaient dans celles d'avant, et on ne savait plus
+         par ou commencer.
+         COMMENT : deux vues sur la meme liste — « Aujourd'hui » ouverte d'office, « Jours passes » a
+         cote avec son compte. Seules les deux vues « sans photo » sont concernees. */
+      var _jrBar='';
+      if(_sv==='prise'||_sv==='fin'){
+        var _ajd=(typeof impTodayISO==='function')?impTodayISO():'';
+        var _duJour=LL.filter(function(x){return (x.mdate||'')===_ajd;});
+        var _avant=LL.filter(function(x){return (x.mdate||'')!==_ajd;});
+        if(PP_VIEW.jour==null)PP_VIEW.jour='j';
+        _jrBar='<div class="acts" style="margin-bottom:8px;gap:6px">'
+          +'<button type="button" class="pp-jr" data-j="j" style="font-size:12.5px'+(PP_VIEW.jour==='j'?';border-color:#6ea8fe;color:#6ea8fe;font-weight:700':'')+'">📅 Aujourd\u2019hui ('+_duJour.length+')</button>'
+          +'<button type="button" class="pp-jr" data-j="p" style="font-size:12.5px'+(PP_VIEW.jour==='p'?';border-color:#e0a13b;color:#e0a13b;font-weight:700':'')+'">🕓 Jours pass\u00e9s ('+_avant.length+')</button>'
+          +'</div>';
+        LL=(PP_VIEW.jour==='p')?_avant:_duJour;
+      }
       /* b272 : l'entete dit ce qu'on regarde vraiment — « sans photo » n'a aucun sens sur la vue
          des photos hors delai, ni sur celle des refus. */
       var _lbl={prise:'prise(s) sans photo',fin:'fin(s) sans photo',rprise:'prise(s) — photo REFUSÉE par l’agent',rfin:'fin(s) — photo REFUSÉE par l’agent',delai:'photo(s) faite(s) hors délai (plus de 5 min d’écart)',dagent:'dépassement(s) dont l’agent n’a pas encore été contacté',dclient:'dépassement(s) dont le client n’a pas encore été avisé'}[_sv]||'';
-      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+LL.length+' '+_lbl+'</span></div>'+rowsOf(LL);
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+LL.length+' '+_lbl+'</span></div>'+_jrBar+rowsOf(LL);   /* b330 */
     } else {
       h+='<div class="acts" style="margin-bottom:8px"><span class="sub" style="margin:0">'+L.length+' en attente · '+D.depuis+'</span></div>'+rowsOf(L);
     }
@@ -7473,7 +7498,8 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     box.querySelectorAll('.an-ko').forEach(function(b){ b.onclick=function(){ annulTrancher(b.getAttribute('data-id'),false); }; });
     var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitter():pcPrendre(); ppRender(); };
         var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };
-    box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else {PP_VIEW.sub=t.getAttribute('data-sub');} ppRender(); }; });
+    box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else {PP_VIEW.sub=t.getAttribute('data-sub'); PP_VIEW.jour='j';} ppRender(); }; });   /* b330 : on rouvre toujours sur le jour */
+    box.querySelectorAll('.pp-jr').forEach(function(b){ b.onclick=function(){ PP_VIEW.jour=b.getAttribute('data-j'); ppRender(); }; });
     box.querySelectorAll('.pp-act-aff').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); ppClose(); if(typeof planningAffect==='function')planningAffect(mid); }; });
     /* b313 : ouvrir le portail des photos recues, en sachant d'ou l'on vient (ticket + agent). */
     box.querySelectorAll('.pp-act-portail').forEach(function(b){ b.onclick=function(){
