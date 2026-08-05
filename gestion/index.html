@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b317</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b318</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -6461,6 +6461,55 @@ button.big:active{transform:translateY(1px)}
     pop.querySelectorAll('.tn-portail').forEach(function(b){ b.onclick=function(){
       if(typeof photoPortail==='function')photoPortail('','',b.getAttribute('data-nom'),'Photo de tenue'); }; });
   }
+  /* ===== b318 : DEUX ACTIONS SUR TOUTE PHOTO RECUE =====
+     POURQUOI (Zeus, 05/08) : les propositions de rapprochement ne couvrent que les vacations proches
+     en heure. Or une photo de tenue peut concerner N'IMPORTE QUEL agent, sans rapport avec un ticket.
+     Il faut donc une porte d'entree directe : « c'est une photo de controle » + le nom, et l'affaire
+     est faite. Et quand une photo n'a rien a faire la, il faut pouvoir la jeter.
+     COMMENT : sur chaque photo, deux boutons de plus. Le champ nom propose les agents des la frappe
+     (meme mecanique que l'affectation en serie). Une fois associee, la photo remonte d'elle-meme dans
+     la fiche de l'agent et sous son nom dans les vacations ou il est affecte. */
+  function _phAgentsDatalist(id){
+    return '<datalist id="'+id+'">'+((typeof FA!=='undefined'&&FA)?FA.map(function(a){return '<option value="'+esc(a.nom||'')+'">';}).join(''):'')+'</datalist>';
+  }
+  function _phAgentTrouve(saisi){
+    var n=(typeof tnorm==='function')?tnorm(saisi||''):String(saisi||'').toLowerCase();
+    if(!n)return null;
+    var L=(typeof FA!=='undefined'&&FA)?FA:[], t=null;
+    L.forEach(function(a){ if(!t&&((typeof tnorm==='function'?tnorm(a.nom||''):String(a.nom||'').toLowerCase())===n))t=a; });
+    if(!t)L.forEach(function(a){ var an=(typeof tnorm==='function'?tnorm(a.nom||''):String(a.nom||'').toLowerCase());
+      if(!t&&an&&an.indexOf(n)>=0)t=a; });
+    /* b318 : « obrien » doit trouver « O'BRIEN » — l'apostrophe et le trait d'union deviennent des
+       espaces a la normalisation, alors qu'on les tape rarement. On compare donc aussi sans espaces. */
+    if(!t){ var nc=n.replace(/ /g,'');
+      if(nc)L.forEach(function(a){ var ac=(typeof tnorm==='function'?tnorm(a.nom||''):String(a.nom||'').toLowerCase()).replace(/ /g,'');
+        if(!t&&ac&&ac.indexOf(nc)>=0)t=a; }); }
+    return t;
+  }
+  /* Associer une photo comme photo de tenue d'un agent, depuis n'importe ou. */
+  function phTenueAssocier(saisi, key, apres){
+    var a=_phAgentTrouve(saisi);
+    if(!a){ alert('Agent introuvable : « '+(saisi||'')+' ».\n\nChoisis un nom dans la liste proposee.'); return false; }
+    if(typeof agentAttachPhoto!=='function'){ alert('Fonction indisponible.'); return false; }
+    agentAttachPhoto(a.nom, key);
+    if(typeof cloudPush==='function'){try{cloudPush('fkh_tenues_ctrl');}catch(e){}}
+    if(typeof renderTenues==='function'){try{renderTenues();}catch(e){}}
+    if(typeof renderFA==='function'){try{renderFA();}catch(e){}}
+    if(typeof tnRefresh==='function'){try{tnRefresh();}catch(e){}}
+    alert('🦺 Enregistre : photo de tenue de '+a.nom+'.\n\nElle apparait dans sa fiche agent et sous son nom dans les vacations.');
+    if(apres)apres(a);
+    return true;
+  }
+  /* Jeter une photo qui n'a rien a faire la. */
+  function phSupprimer(key, apres){
+    if(!key)return;
+    if(!confirm('SUPPRIMER cette photo ?\n\nElle sera effacee du serveur. Irreversible.'))return;
+    if(typeof photoDelete!=='function'){ alert('Suppression indisponible hors ligne.'); return; }
+    photoDelete(key,function(r){
+      if(r&&r.error){ alert('Suppression impossible : '+r.error); return; }
+      if(apres)apres();
+    });
+  }
   function photoPortail(mid, stepKey, nomAgent, titreCtx){
     var old=byId('pph-pop'); if(old)old.parentNode.removeChild(old);
     var pop=document.createElement('div'); pop.id='pph-pop';
@@ -6486,6 +6535,10 @@ button.big:active{transform:translateY(1px)}
           +'<div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap">'
           +(mid?('<button type="button" class="pph-att ok" data-i="'+i+'" style="font-size:12px">📎 C\'est cette photo</button>'):'')
           +(nomAgent?('<button type="button" class="pph-tenue" data-i="'+i+'" style="font-size:12px;border-color:#e0a13b;color:#e0a13b">🦺 Photo de tenue de '+esc(nomAgent)+'</button>'):'')
+          /* b318 : associer a n'importe quel agent, meme si le contexte n'en propose aucun */
+          +'<input class="pph-ag" data-i="'+i+'" list="pph-dl" placeholder="🦺 …ou photo de contrôle de (nom)" autocomplete="off" style="min-width:180px;font-size:12px;padding:3px 6px">'
+          +'<button type="button" class="pph-tenue2" data-i="'+i+'" style="font-size:12px;border-color:#e0a13b;color:#e0a13b">🦺 Associer</button>'
+          +'<button type="button" class="pph-del" data-i="'+i+'" style="font-size:12px;color:var(--bad);border-color:var(--bad)">🗑 Supprimer</button>'
           +'</div></div></div>';
       }).join('');
       if(typeof photoHydrate==='function')photoHydrate(box);
@@ -6501,6 +6554,19 @@ button.big:active{transform:translateY(1px)}
         if(typeof ppRender==='function'){try{ppRender();}catch(e){}}
         alert('📎 Photo rattachee.');
         var q=byId('pph-pop'); if(q)q.parentNode.removeChild(q);
+      }; });
+      box.insertAdjacentHTML('beforeend', _phAgentsDatalist('pph-dl'));   /* b318 */
+      box.querySelectorAll('.pph-tenue2').forEach(function(b){ b.onclick=function(){
+        var it=L[+b.getAttribute('data-i')]; if(!it)return;
+        var ch=box.querySelector('.pph-ag[data-i="'+b.getAttribute('data-i')+'"]');
+        var saisi=(ch&&ch.value||'').trim();
+        if(!saisi){ alert('Écris le nom de l\'agent — la liste te le propose dès les premières lettres.'); if(ch)ch.focus(); return; }
+        phTenueAssocier(saisi, it.key, function(){ var q=byId('pph-pop'); if(q)q.parentNode.removeChild(q); });
+      }; });
+      box.querySelectorAll('.pph-del').forEach(function(b){ b.onclick=function(){
+        var it=L[+b.getAttribute('data-i')]; if(!it)return;
+        phSupprimer(it.key, function(){ var q=byId('pph-pop'); if(q)q.parentNode.removeChild(q);
+          if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} });
       }; });
       box.querySelectorAll('.pph-tenue').forEach(function(b){ b.onclick=function(){
         var it=L[+b.getAttribute('data-i')]; if(!it||typeof agentAttachPhoto!=='function')return;
@@ -6525,9 +6591,32 @@ button.big:active{transform:translateY(1px)}
     list.innerHTML=SA_PH.map(function(it,i){ var when=(phDateISO(it.ts)?phDateISO(it.ts).split('-').reverse().join('/'):'?')+' à '+phHM(it.ts); var city=(it.city||'').replace(/_/g,' ');
       var cands=_phCandidates(it);
       var btns=cands.length?cands.map(function(c){ var site=c.m.siteAgent||c.m.titre||'—'; var ag=(c.m.agentId&&typeof faById==='function'&&faById(c.m.agentId))?faById(c.m.agentId).nom:''; return '<button type="button" class="sa-ph-att" data-i="'+i+'" data-mid="'+esc(c.m.id)+'" data-step="'+esc(c.step)+'" style="font-size:11.5px;margin:2px 4px 0 0;'+(c.done?'opacity:.55;':'')+(c.cityMatch?'border-color:var(--ok);':'')+(c.late?'border-color:#e0a13b;':'')+'">'+_phStepLbl(c.step)+' '+esc(site)+' '+esc(c.hm||'')+(ag?' · '+esc(ag):'')+(c.cityMatch?' 📍':'')+(c.late?' (décalé)':'')+(c.done?' (déjà coché)':'')+'</button>'+'<button type="button" class="sa-ph-att" data-i="'+i+'" data-mid="'+esc(c.m.id)+'" data-step="tenue" title="Associer comme CONTRÔLE TENUE de '+esc(site)+' (part en validation superviseur — 🧭 Terrain)" style="font-size:11.5px;margin:2px 6px 0 0;border-color:#7b61ff;color:#a99bff">🦺</button>'; }).join(''):'<span class="sub" style="font-size:11.5px">aucune vacation proche trouvée ce jour-là (±3 h)</span>';
+      var _dlid='sa-ph-dl-'+i;
+      var _extra='<div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap;align-items:center">'
+        +'<input class="sa-ph-ag" data-i="'+i+'" list="'+_dlid+'" placeholder="🦺 Photo de contrôle de… (nom de l\'agent)" autocomplete="off" style="flex:1;min-width:170px;font-size:12px;padding:3px 6px">'
+        +_phAgentsDatalist(_dlid)
+        +'<button type="button" class="sa-ph-tenue" data-i="'+i+'" style="font-size:11.5px;border-color:#e0a13b;color:#e0a13b">🦺 C\'est une photo de contrôle</button>'
+        +'<button type="button" class="sa-ph-del" data-i="'+i+'" style="font-size:11.5px;color:var(--bad);border-color:var(--bad)">🗑 Supprimer la photo</button>'
+        +'</div>';
       return '<div style="border:1px solid var(--line);border-radius:9px;padding:7px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:flex-start"><div style="flex:0 0 auto">'+((typeof photoThumbTag==='function')?photoThumbTag(it.key):'')+'</div><div style="flex:1;min-width:0"><div style="font-size:12px"><b>🕐 '+esc(when)+'</b>'+(city?' · 📍 '+esc(city):' · <b style="color:var(--bad)">⚠️ SANS POSITION</b>')+' · <span class="sub">'+(it.fmt==='uni'?'lien unique':'lien agent')+'</span></div><div style="margin-top:3px">'+btns+'</div></div></div></div>';
     }).join('');
     if(typeof photoHydrate==='function')photoHydrate(list);
+    /* b318 */
+    list.querySelectorAll('.sa-ph-tenue').forEach(function(b){ b.onclick=function(){
+      var i=+b.getAttribute('data-i'), it=SA_PH&&SA_PH[i]; if(!it)return;
+      var ch=list.querySelector('.sa-ph-ag[data-i="'+i+'"]');
+      var saisi=(ch&&ch.value||'').trim();
+      if(!saisi){ alert('Écris le nom de l\'agent — la liste te le propose dès les premières lettres.'); if(ch)ch.focus(); return; }
+      phTenueAssocier(saisi, it.key, function(){ if(ch)ch.value=''; if(typeof renderSuiviAppels==='function')renderSuiviAppels(); });
+    }; });
+    list.querySelectorAll('.sa-ph-del').forEach(function(b){ b.onclick=function(){
+      var i=+b.getAttribute('data-i'), it=SA_PH&&SA_PH[i]; if(!it)return;
+      phSupprimer(it.key, function(){
+        try{ SA_PH.splice(i,1); }catch(e){}
+        _phFillList();
+        if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
+      });
+    }; });
     list.querySelectorAll('.sa-ph-att').forEach(function(b){ b.onclick=function(){ var i=+b.getAttribute('data-i'), it=SA_PH[i]; if(!it)return; var mid=b.getAttribute('data-mid'), step=b.getAttribute('data-step'); var m=null; for(var j=0;j<SUIVI.length;j++)if(SUIVI[j].id===mid){m=SUIVI[j];break;} if(!m)return;
       if(step==='tenue'){ // Remontées #27/#22a : photo = contrôle tenue → validation SUPERVISEUR (🧭 Terrain), pas la file opérateur.
         if(!confirm('Associer cette photo comme CONTRÔLE TENUE de « '+(m.siteAgent||m.titre||'')+' » ?\n\n🦺 Elle part en validation superviseur (section 🧭 Terrain).'))return;
