@@ -21,6 +21,16 @@ class Handler(SimpleHTTPRequestHandler):
     def log_message(self, *a):
         pass  # silence : les logs polluent la sortie sans rien apprendre
 
+    def do_GET(self):
+        # Ce serveur est CELUI du tableau de bord : ouvrir la racine doit donner le tableau,
+        # pas la page des applications. Sans ca, cliquer sur « localhost:8150 » tombe a cote.
+        if self.path.split('?')[0] in ('/', ''):
+            self.send_response(302)
+            self.send_header('Location', '/tableau/')
+            self.end_headers()
+            return
+        return super().do_GET()
+
     def do_POST(self):
         if self.path.split('?')[0] != '/tableau/etats.json':
             self.send_error(404)

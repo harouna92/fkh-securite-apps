@@ -225,7 +225,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b311</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b313</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1802,7 +1802,23 @@ button.big:active{transform:translateY(1px)}
     root.querySelectorAll('.fapro-f').forEach(function(inp){ inp.onchange=function(){ var a=faById(inp.getAttribute('data-id')); if(!a)return; a[inp.getAttribute('data-k')]=inp.value.trim(); if(typeof saveFA==='function')saveFA(); }; });
     root.querySelectorAll('.fapro-badge').forEach(function(b){ b.onclick=function(){ var a=faById(b.getAttribute('data-id')); if(a)faBadgePrint(a); }; }); }
   function faPhotoBlock(nom){ return '<details class="faphoto-det" data-nom="'+esc(nom||'')+'" style="margin-top:4px"><summary style="cursor:pointer;color:#6ea8fe;font-weight:700;font-size:13px">📷 Photos tenue (voir / ajouter)</summary><div style="margin-top:6px"><label class="btn" style="cursor:pointer;font-size:12px">📤 Ajouter une photo<input type="file" accept="image/*" class="faphoto-up" data-nom="'+esc(nom||'')+'" style="display:none"></label><div class="faphoto-list" style="margin-top:6px"></div></div></details>'; }
-  function faPhotoLoad(det,nom){ var box=det.querySelector('.faphoto-list'); if(!box)return; if(typeof photoReady!=='function'||!photoReady()){ box.innerHTML='<div class="sub" style="margin:0">Connexion en ligne requise pour voir / ajouter des photos.</div>'; return; } box.innerHTML='<div class="sub" style="margin:0">Chargement…</div>'; photoList(photoAgentPrefix(nom),function(keys){ if(!keys.length){ box.innerHTML='<div class="sub" style="margin:0">Aucune photo pour cet agent.</div>'; return; } keys.sort(function(a,b){return String(b.uploaded||'').localeCompare(String(a.uploaded||''));}); box.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px">'+keys.map(function(o){ return '<div style="text-align:center">'+photoThumbTag(o.key)+'<div class="sub" style="margin:2px 0 0;font-size:10px">'+esc(o.uploaded?String(o.uploaded).slice(0,10):'')+'</div></div>'; }).join('')+'</div>'; photoHydrate(box); }); }
+  /* b312 : une photo peut arriver par n'importe quel lien (lien unique, lien par agent, depot manuel).
+     Ce qui compte n'est pas OU elle est rangee, mais qu'on ait dit « c'est la tenue de cet agent ».
+     On lit donc les deux : le dossier de l'agent, et les photos designees dans ses fiches de controle. */
+  function faPhotoDesignees(nom){
+    var n=(typeof tnorm==='function'?tnorm(nom):String(nom||'')), out=[];
+    try{ (load('fkh_tenues_ctrl')||[]).forEach(function(c){
+      if(!c||!c.photoKey)return;
+      var cn=(typeof tnorm==='function'?tnorm(c.Agent||''):String(c.Agent||''));
+      if(!cn||!(cn===n||cn.indexOf(n)>=0||n.indexOf(cn)>=0))return;
+      out.push({key:c.photoKey,uploaded:String(c['Date contrôle']||'')});
+    }); }catch(e){}
+    return out; }
+  function faPhotoLoad(det,nom){ var box=det.querySelector('.faphoto-list'); if(!box)return; if(typeof photoReady!=='function'||!photoReady()){ box.innerHTML='<div class="sub" style="margin:0">Connexion en ligne requise pour voir / ajouter des photos.</div>'; return; } box.innerHTML='<div class="sub" style="margin:0">Chargement…</div>'; photoList(photoAgentPrefix(nom),function(keys){
+    keys=(keys||[]).slice();
+    var vus={}; keys.forEach(function(o){ if(o&&o.key)vus[o.key]=1; });
+    faPhotoDesignees(nom).forEach(function(o){ if(o.key&&!vus[o.key]){ vus[o.key]=1; keys.push(o); } });   /* b312 */
+    if(!keys.length){ box.innerHTML='<div class="sub" style="margin:0">Aucune photo pour cet agent.</div>'; return; } keys.sort(function(a,b){return String(b.uploaded||'').localeCompare(String(a.uploaded||''));}); box.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px">'+keys.map(function(o){ return '<div style="text-align:center">'+photoThumbTag(o.key)+'<div class="sub" style="margin:2px 0 0;font-size:10px">'+esc(o.uploaded?String(o.uploaded).slice(0,10):'')+'</div></div>'; }).join('')+'</div>'; photoHydrate(box); }); }
   function agentAttachPhoto(nom,key){ var T=load('fkh_tenues_ctrl'); if(!Array.isArray(T))T=[]; var n=tnorm(nom),idx=-1,bd=''; T.forEach(function(c,k){var cn=tnorm(c.Agent); if(cn&&(cn===n||cn.indexOf(n)>=0||n.indexOf(cn)>=0)){var dd=String(c['Date contrôle']||''); if(idx<0||dd>bd){idx=k;bd=dd;}}}); if(idx>=0)T[idx].photoKey=key; else T.push({'Date contrôle':impTodayISO(),'Agent':nom,'photoKey':key,'Statut tenue':'','Manquants':''}); save('fkh_tenues_ctrl',T); TCTRL=T; if(typeof renderTenues==='function')renderTenues(); }
   function agentStats(nom){ if(!nom||typeof ssLoad!=='function'||typeof SUIVI==='undefined')return null; var n=tnorm(nom); if(!n)return null; var S=ssLoad(); var st={missions:0,priseDone:0,priseNoPhoto:0,finDone:0,finNoPhoto:0,retardPrise:0,injo:0,nePeutRoute:0,retardAnnonce:0,refusTenue:0,ctrlNoPhoto:0,demAttente:0};
     function noPhoto(r){ return !r.photo||r.photo==='Pas de photo'||r.photo==='Photo non horodatée'; }
@@ -6258,7 +6274,10 @@ button.big:active{transform:translateY(1px)}
               +'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b style="flex:1;min-width:150px">'+esc(l.site)+'</b>'
               +'<span style="color:'+(l.ec<=30?'#1a9e5c':(l.ec<=120?'#e0a13b':'var(--muted)'))+';font-weight:700">écart '+(l.ec<60?(l.ec+' min'):(Math.floor(l.ec/60)+' h '+(l.ec%60)+' min'))+'</span></div>'
               +'<div class="fa-d" style="margin-top:2px">'+esc(l.lbl)+' prévu à '+esc(l.h)+(l.agent?(' · 👤 '+esc(l.agent)):' · <span style="color:var(--bad)">sans agent</span>')+'</div>'
-              +'<div class="acts" style="margin-top:7px"><button type="button" class="phm-go ok" data-mid="'+esc(l.mid)+'" data-step="'+esc(l.step)+'" style="font-size:12.5px">📎 Rattacher ici</button></div></div>';
+              +'<div class="acts" style="margin-top:7px;gap:6px;flex-wrap:wrap"><button type="button" class="phm-go ok" data-mid="'+esc(l.mid)+'" data-step="'+esc(l.step)+'" style="font-size:12.5px">📎 Rattacher ici</button>'
+              /* b312 : la meme photo peut servir de preuve du ticket ET de photo de tenue de l'agent. On laisse choisir. */
+              +(l.agent?('<button type="button" class="phm-tenue" data-nom="'+esc(l.agent)+'" style="font-size:12.5px;border-color:#e0a13b;color:#e0a13b">🦺 Photo de tenue de '+esc(l.agent)+'</button>'):'')
+              +'</div></div>';
           }).join('')
           :'<div class="sub">Aucun ticket dans cette fenêtre. Élargis-la — jusqu’à « toute la journée » si l’heure de la photo est douteuse.</div>')
         +'<p class="sub" style="margin:10px 0 0;font-size:11.5px">Le rattachement manuel vaut le rattachement automatique : le ticket est réglé, la photo devient sa preuve.</p>';
@@ -6267,6 +6286,16 @@ button.big:active{transform:translateY(1px)}
       pop.querySelectorAll('.phm-f').forEach(function(b){ b.onclick=function(){ PHM_FEN=+b.getAttribute('data-f'); rendre(); }; });
       pop.querySelectorAll('.phm-go').forEach(function(b){ b.onclick=function(){
         phAttach(i,b.getAttribute('data-mid'),b.getAttribute('data-step'));
+        var q=byId('phm-pop'); if(q)q.parentNode.removeChild(q);
+      }; });
+      /* b312 : « c'est la photo de tenue de cet agent » — la photo rejoint sa fiche, ou qu'elle ait ete deposee. */
+      pop.querySelectorAll('.phm-tenue').forEach(function(b){ b.onclick=function(){
+        var nom=b.getAttribute('data-nom'), mm=phMatches&&phMatches[i];
+        if(!mm||!mm.ph||!mm.ph.key){ alert('Photo introuvable.'); return; }
+        if(typeof agentAttachPhoto!=='function'){ alert('Fonction indisponible.'); return; }
+        agentAttachPhoto(nom, mm.ph.key);
+        if(typeof cloudPush==='function'){try{cloudPush('fkh_tenues_ctrl');}catch(e){}}
+        alert('🦺 Enregistre : cette photo est desormais la photo de tenue de '+nom+'.\n\nElle apparait dans sa fiche agent.');
         var q=byId('phm-pop'); if(q)q.parentNode.removeChild(q);
       }; });
     }
@@ -6296,6 +6325,73 @@ button.big:active{transform:translateY(1px)}
         var items=[].concat((k1||[]).map(function(o){return _phParseU((o&&o.key)||o);}),(k2||[]).map(function(o){return phParseKey((o&&o.key)||o);})).filter(Boolean).filter(function(it){ return !phIsAttached(it.key); });
         items.sort(function(a,b2){return (b2.ts||0)-(a.ts||0);}); SA_PH=items.slice(0,25); renderSaPhotosIn(); _phFillList(); }); }); };
     if(SA_PH&&SA_PH.length)_phFillList(); else if(SA_PH){ var l=byId('sa-ph-list'); if(l)l.innerHTML='<div class="sub" style="margin:0">✅ Aucune photo en attente de rattachement.</div>'; }
+  }
+  /* ===== b313 : LE PORTAIL DES PHOTOS RECUES =====
+     POURQUOI : avec un seul lien pour tout le monde, les photos arrivent en vrac — c'est l'agence qui
+     dit ensuite a quoi chacune correspond. Quand une pastille signale une photo manquante, la bonne
+     photo est donc souvent DEJA arrivee : demander d'en televerser une nouvelle n'a pas de sens.
+     COMMENT : le bouton ouvre la galerie de tout ce qui est arrive, la plus recente en tete, chacune
+     avec ce qu'on peut en faire — la rattacher au ticket d'ou l'on vient, ou la designer comme photo
+     de tenue de l'agent. Les propositions de rapprochement restent affichees : on propose, Zeus tranche. */
+  function photoPortail(mid, stepKey, nomAgent, titreCtx){
+    var old=byId('pph-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='pph-pop';
+    pop.style.cssText='position:fixed;inset:5% 5%;z-index:260;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+    pop.innerHTML='<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">📷 Choisir une photo deja recue</b><button type="button" id="pph-x">✕</button></div>'
+      +'<div class="sub" style="margin:4px 0 10px">'+(titreCtx?esc(titreCtx)+' — ':'')+'toutes les photos arrivees par le lien, la plus recente en premier.</div>'
+      +'<div id="pph-list"><div class="sub">Chargement…</div></div>';
+    document.body.appendChild(pop);
+    byId('pph-x').onclick=function(){ var q=byId('pph-pop'); if(q)q.parentNode.removeChild(q); };
+    var box=byId('pph-list');
+    if(typeof photoReady!=='function'||!photoReady()){ box.innerHTML='<div class="sub">Connexion en ligne requise pour voir les photos recues.</div>'; return; }
+    var tout=[];
+    function fini(){
+      tout.sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+      var L=tout.slice(0,60);
+      if(!L.length){ box.innerHTML='<div class="sub">Aucune photo recue pour le moment.</div>'; return; }
+      box.innerHTML=L.map(function(it,i){
+        var when=(typeof phDateISO==='function'&&phDateISO(it.ts))?(phDateISO(it.ts).split('-').reverse().join('/')+' a '+phHM(it.ts)):'date inconnue';
+        var city=String(it.city||'').replace(/_/g,' ');
+        return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2);display:flex;gap:10px;align-items:flex-start">'
+          +'<div style="flex:0 0 auto">'+((typeof photoThumbTag==='function')?photoThumbTag(it.key):'')+'</div>'
+          +'<div style="flex:1;min-width:0"><div style="font-size:12.5px"><b>🕐 '+esc(when)+'</b>'+(city?(' · 📍 '+esc(city)):'')+'</div>'
+          +'<div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap">'
+          +(mid?('<button type="button" class="pph-att ok" data-i="'+i+'" style="font-size:12px">📎 C\'est cette photo</button>'):'')
+          +(nomAgent?('<button type="button" class="pph-tenue" data-i="'+i+'" style="font-size:12px;border-color:#e0a13b;color:#e0a13b">🦺 Photo de tenue de '+esc(nomAgent)+'</button>'):'')
+          +'</div></div></div>';
+      }).join('');
+      if(typeof photoHydrate==='function')photoHydrate(box);
+      box.querySelectorAll('.pph-att').forEach(function(b){ b.onclick=function(){
+        var it=L[+b.getAttribute('data-i')]; if(!it)return;
+        var S=ssLoad(); S[mid]=S[mid]||{};
+        var sk=stepKey||'tenue';
+        S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:it.key,done:true,at:it.ts||Date.now()});
+        ssSave(S);
+        if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
+        if(typeof notifScan==='function'){try{notifScan();}catch(e){}}
+        if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
+        if(typeof ppRender==='function'){try{ppRender();}catch(e){}}
+        alert('📎 Photo rattachee.');
+        var q=byId('pph-pop'); if(q)q.parentNode.removeChild(q);
+      }; });
+      box.querySelectorAll('.pph-tenue').forEach(function(b){ b.onclick=function(){
+        var it=L[+b.getAttribute('data-i')]; if(!it||typeof agentAttachPhoto!=='function')return;
+        agentAttachPhoto(nomAgent, it.key);
+        if(typeof cloudPush==='function'){try{cloudPush('fkh_tenues_ctrl');}catch(e){}}
+        if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
+        if(typeof ppRender==='function'){try{ppRender();}catch(e){}}
+        alert('🦺 Enregistre : photo de tenue de '+nomAgent+'.');
+        var q=byId('pph-pop'); if(q)q.parentNode.removeChild(q);
+      }; });
+    }
+    var restants=2;
+    function ajouter(keys){ (keys||[]).forEach(function(o){ if(!o||!o.key)return;
+      var ts=0; try{ var mm=String(o.key).match(/(\d{10,13})/); if(mm)ts=+mm[1]; }catch(e){}
+      if(!ts&&o.uploaded)ts=Date.parse(o.uploaded)||0;
+      var city=''; try{ var p=String(o.key).split('/'); city=p.length>1?p[p.length-2]:''; }catch(e){}
+      tout.push({key:o.key,ts:ts,city:city,uploaded:o.uploaded||''}); });
+      if(!--restants)fini(); }
+    photoList('u/',ajouter); photoList('agent/',ajouter);
   }
   function _phFillList(){ var list=byId('sa-ph-list'); if(!list||!SA_PH)return;
     list.innerHTML=SA_PH.map(function(it,i){ var when=(phDateISO(it.ts)?phDateISO(it.ts).split('-').reverse().join('/'):'?')+' à '+phHM(it.ts); var city=(it.city||'').replace(/_/g,' ');
@@ -6825,7 +6921,10 @@ button.big:active{transform:translateY(1px)}
         +'<button type="button" class="pp-act-del" data-mid="'+esc(x.mid||'')+'" style="font-size:12px;margin-left:6px;color:var(--bad);border-color:var(--bad)">🗑 Supprimer</button>';
       if(md==='op')return '<button type="button" class="pp-act-fait" data-mid="'+esc(x.mid||'')+'" data-key="'+esc(x.key)+'" style="font-size:12px">✔ Marquer fait</button>';
       if(md==='cli')return '<button type="button" class="pp-act-avise" data-mid="'+esc(x.mid||'')+'" data-key="'+esc(x.key)+'" style="font-size:12px">📞 Client avisé ✔</button>';
-      if(md==='ph'||md==='c2'||md==='te')return refusBtn(x,md)+((typeof photoReady==='function'&&photoReady()&&typeof photoBtn==='function')?photoBtn('ppph-'+String(x.mid||'').replace(/[^a-zA-Z0-9]/g,'')+'-'+x.key,'📷 Ajouter la photo'):'<span class="sub" style="font-size:11px;margin:0">📷 connexion en ligne requise pour envoyer la photo</span>');
+      /* b313 : la photo est peut-etre deja arrivee — on va la chercher au lieu d'en redemander une. */
+      if(md==='ph'||md==='c2'||md==='te')return refusBtn(x,md)
+        +'<button type="button" class="pp-act-portail" data-mid="'+esc(x.mid||'')+'" data-step="'+esc(x.key||'')+'" data-agent="'+esc(x.agent||'')+'" data-site="'+esc(x.site||'')+'" style="font-size:12px;margin-right:6px;border-color:#6ea8fe;color:#6ea8fe">📷 Choisir une photo reçue</button>'
+        +((typeof photoReady==='function'&&photoReady()&&typeof photoBtn==='function')?photoBtn('ppph-'+String(x.mid||'').replace(/[^a-zA-Z0-9]/g,'')+'-'+x.key,'📷 Ajouter la photo'):'<span class="sub" style="font-size:11px;margin:0">📷 connexion en ligne requise pour envoyer la photo</span>');
       /* b267 : le refus se declare sur la ligne meme, a cote du depot de photo. */
       return '';
     }
@@ -7035,6 +7134,11 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
         var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };
     box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else {PP_VIEW.sub=t.getAttribute('data-sub');} ppRender(); }; });
     box.querySelectorAll('.pp-act-aff').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); ppClose(); if(typeof planningAffect==='function')planningAffect(mid); }; });
+    /* b313 : ouvrir le portail des photos recues, en sachant d'ou l'on vient (ticket + agent). */
+    box.querySelectorAll('.pp-act-portail').forEach(function(b){ b.onclick=function(){
+      if(typeof photoPortail!=='function')return;
+      photoPortail(b.getAttribute('data-mid'), b.getAttribute('data-step'), b.getAttribute('data-agent'), b.getAttribute('data-site'));
+    }; });
     /* b311 : « Modifier » ouvre la fiche complete de la vacation (horaires, site, client, controles…) — la meme que depuis le Planning. */
     box.querySelectorAll('.pp-act-edit').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); ppClose(); if(typeof planningAffect==='function')planningAffect(mid); }; });
     /* b311 : « Supprimer » sur place — suppression douce, comme partout ailleurs, pour que la synchro ne la ramene pas. */
