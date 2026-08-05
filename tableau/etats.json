@@ -312,143 +312,143 @@
     },
     {
       "b": 224,
-      "titre": "Inclus dans le lot « Build b224 a b227 (pousse) : b224 les bons de commande desce »",
+      "titre": "Livré avec le lot b224–b227 — b224 les bons de commande descendent au Planning sans ouvrir la section Mails ; b225 plus de doublon dans Suivi des d…",
       "source": "lot groupé",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 225,
-      "titre": "Inclus dans le lot « Build b224 a b227 (pousse) : b224 les bons de commande desce »",
+      "titre": "Livré avec le lot b224–b227 — b224 les bons de commande descendent au Planning sans ouvrir la section Mails ; b225 plus de doublon dans Suivi des d…",
       "source": "lot groupé",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 226,
-      "titre": "Inclus dans le lot « Build b224 a b227 (pousse) : b224 les bons de commande desce »",
+      "titre": "Livré avec le lot b224–b227 — b224 les bons de commande descendent au Planning sans ouvrir la section Mails ; b225 plus de doublon dans Suivi des d…",
       "source": "lot groupé",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 228,
-      "titre": "Inclus dans le lot « Builds b228 a b236 (pousse en bloc) : Mails missions ouvert »",
+      "titre": "Livré avec le lot b228–b236 — Mails missions ouvert au superviseur+admin (app+worker) ; ANNULATIONS signalees sans suppression (pastille, hachure a…",
       "source": "lot groupé",
       "theme": "Mails & bons de commande",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 233,
-      "titre": "Inclus dans le lot « Builds b228 a b236 (pousse en bloc) : Mails missions ouvert »",
+      "titre": "Livré avec le lot b228–b236 — Mails missions ouvert au superviseur+admin (app+worker) ; ANNULATIONS signalees sans suppression (pastille, hachure a…",
       "source": "lot groupé",
       "theme": "Mails & bons de commande",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 257,
-      "titre": "Inclus dans le lot « Builds b249 a b261 (pousse, liste validee par Zeus). APPLI G »",
+      "titre": "Livré avec le lot b249–b261 — b249+b250+b252 retirer une pastille ou une section depuis la vue d'un role, croix affichees seulement en mode reglage…",
       "source": "lot groupé",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 261,
-      "titre": "Inclus dans le lot « Builds b249 a b261 (pousse, liste validee par Zeus). APPLI G »",
+      "titre": "Livré avec le lot b249–b261 — b249+b250+b252 retirer une pastille ou une section depuis la vue d'un role, croix affichees seulement en mode reglage…",
       "source": "lot groupé",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 288,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "Suivi des appels semaine + vacations sans heure + reste ouvert",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 290,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "Suivi des appels — tickets jours passés neutres (pas rouges)",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 291,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "agent — tous les numéros dans le ticket + modale planning",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 292,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "Suivi des appels — défaut = aujourd'hui (corrige b288)",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 293,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "filtre heure de début dans Suivi des appels (superviseur+)",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 296,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "creation agent directe depuis la modale Planning",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 297,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "multi-selection cases vides Planning pour creation en batch",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 299,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "fix notifs dupliquees (seen persiste + when:date) + Suivi des appels force aujourd'hui au chargement",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 301,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "merge fkh_suivi au lieu d'ecraser — les vacations Planning survivent au cloud pull",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 303,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "soft-delete vacations Planning — fix disparition au reload",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 304,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "fix pertes de donnees Planning — timestamps + dedup mails",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 305,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "fix definitif vacations mail — soft-delete + anti-recreation",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 306,
-      "titre": "(build publié, titre non retrouvé)",
+      "titre": "nettoyage code mort if(false) — audit Planning complet",
       "source": "historique",
       "theme": "Divers",
-      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
     },
     {
       "b": 312,

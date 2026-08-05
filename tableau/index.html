@@ -65,7 +65,10 @@ var BASE_DEMO_LIGNE=URL_LIGNE;
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});}
 
-function tampon(txt){ var m=/v01-08[··]b(\d+)/.exec(txt||''); return m?parseInt(m[1],10):0; }
+/* La date du tampon etait ecrite en dur (v01-08) : des le lendemain, plus aucun build n'etait
+   reconnu comme en ligne, et des livraisons publiees depuis des jours restaient affichees en
+   « Code, pas deploye ». On lit desormais n'importe quelle date. */
+function tampon(txt){ var m=/v\d{2}-\d{2}[·.·‧]b(\d+)/.exec(txt||''); return m?parseInt(m[1],10):0; }
 
 /* b255 : bouton d'ordre par carte.
    LIMITE ASSUMEE : une page web ne peut pas me reveiller — aucun clic ici ne declenche un travail tout
