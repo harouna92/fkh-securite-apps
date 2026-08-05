@@ -40,7 +40,8 @@
       "source": "remontée #67",
       "local": true,
       "demo": "galerie",
-      "theme": "Photos & preuves"
+      "theme": "Photos & preuves",
+      "pourquoipas": "Suivi des appels → une photo reçue → « 📷 Choisir une photo reçue » ouvre la galerie du cloud."
     },
     {
       "b": 254,
@@ -65,7 +66,8 @@
       "note": "±1 h à toute la journée ; prise, fin, tenue et contrôles 2 h",
       "local": true,
       "demo": "photo",
-      "theme": "Photos & preuves"
+      "theme": "Photos & preuves",
+      "pourquoipas": "Suivi des appels → une photo sans correspondance → « 📎 Rattacher » : la fenêtre horaire se règle (± 1 h à toute la journée)."
     },
     {
       "b": 253,
@@ -74,7 +76,8 @@
       "demo": "reponse",
       "note": "halo + défilement + le geste s'exécute",
       "local": true,
-      "theme": "Outils de pilotage"
+      "theme": "Outils de pilotage",
+      "pourquoipas": "Ouvrir une visite guidée : elle avance pas à pas et pointe l'élément dont elle parle."
     },
     {
       "b": 252,
@@ -82,7 +85,8 @@
       "source": "Zeus",
       "demo": "retirer",
       "local": true,
-      "theme": "Rôles, droits & vues"
+      "theme": "Rôles, droits & vues",
+      "pourquoipas": "La croix de retrait sur une pastille n'apparaît qu'en mode réglage, pas en usage courant."
     },
     {
       "b": 251,
@@ -90,7 +94,8 @@
       "source": "Zeus",
       "demo": "reponse",
       "local": true,
-      "theme": "Rôles, droits & vues"
+      "theme": "Rôles, droits & vues",
+      "pourquoipas": "Une réponse de l'Assistant porte son mode d'emploi joint, ouvrable depuis la réponse."
     },
     {
       "b": 250,
@@ -98,7 +103,8 @@
       "source": "Zeus",
       "demo": "retirer",
       "local": true,
-      "theme": "Rôles, droits & vues"
+      "theme": "Rôles, droits & vues",
+      "pourquoipas": "Appui sur la croix de retrait d'une pastille : elle part, et un ruban « Annuler » permet de revenir."
     },
     {
       "b": 249,
@@ -106,7 +112,8 @@
       "source": "Zeus",
       "demo": "retirer",
       "local": true,
-      "theme": "Rôles, droits & vues"
+      "theme": "Rôles, droits & vues",
+      "pourquoipas": "Appui long sur une pastille ou un onglet → le lâcher sur 🗑️ Corbeille le retire de la barre."
     },
     {
       "b": 248,
@@ -127,14 +134,16 @@
       "titre": "Prévenir l'auteur quand sa demande est traitée",
       "source": "Zeus",
       "demo": "reponse",
-      "theme": "Outils de pilotage"
+      "theme": "Outils de pilotage",
+      "pourquoipas": "Une remontée traitée : son auteur reçoit la réponse dans son Assistant."
     },
     {
       "b": 245,
       "titre": "Pastille tenues envoyées non confirmées",
       "source": "Zeus",
       "demo": "tenues",
-      "theme": "Planning & vacations"
+      "theme": "Planning & vacations",
+      "pourquoipas": "Pastille des tenues : celles envoyées mais non confirmées par l'agent y sont comptées."
     },
     {
       "b": 244,
@@ -212,14 +221,16 @@
       "titre": "Endosser un autre rôle",
       "source": "Zeus",
       "demo": "mails",
-      "theme": "Rôles, droits & vues"
+      "theme": "Rôles, droits & vues",
+      "pourquoipas": "En sandbox, le bandeau du haut permet d'endosser super-admin / superviseur / admin / opérateur."
     },
     {
       "b": 232,
       "titre": "Panneau Droits d'accès (sections × rôles)",
       "source": "Zeus",
       "demo": "droits",
-      "theme": "Rôles, droits & vues"
+      "theme": "Rôles, droits & vues",
+      "pourquoipas": "Section 🔐 Droits d'accès : la grille sections × rôles, réglable case par case."
     },
     {
       "b": 231,
@@ -234,28 +245,32 @@
       "source": "Zeus",
       "demo": "corbeille",
       "note": "Zeus signale que ça ne marche pas — à reproduire",
-      "theme": "Rôles, droits & vues"
+      "theme": "Rôles, droits & vues",
+      "pourquoipas": "Section 🗑️ Corbeille : les onglets retirés y attendent, restaurables en un clic."
     },
     {
       "b": 229,
       "titre": "Annulations signalées sans suppression",
       "source": "Zeus",
       "demo": "annulation",
-      "theme": "Planning & vacations"
+      "theme": "Planning & vacations",
+      "pourquoipas": "Une annulation reçue par mail est signalée (pastille 🔴, hachures au Planning) sans rien supprimer."
     },
     {
       "b": 227,
       "titre": "Qui est au PC (prise/fin de service)",
       "source": "Zeus",
       "demo": "pcvide",
-      "theme": "PC & permanence"
+      "theme": "PC & permanence",
+      "pourquoipas": "Pastille 🎧 : qui tient le poste en ce moment, avec sa prise et sa fin de service."
     },
     {
       "b": 223,
       "titre": "Témoin de vie de la collecte des mails",
       "source": "Zeus",
       "demo": "collecte",
-      "theme": "Mails & collecte"
+      "theme": "Mails & collecte",
+      "pourquoipas": "Section Mails missions : le témoin de vie indique que la collecte tourne."
     },
     {
       "b": 222,
@@ -694,7 +709,7 @@
     {
       "titre": "Ringover : les demandes prises par téléphone ne remontent pas dans « En recherche »",
       "source": "Zeus — 05/08",
-      "note": "Chaîne serveur complète et fonctionnelle (Ringover → Whisper → Claude). Reste à trouver pourquoi rien ne sort : liste blanche des 6 numéros suivis, présence d'un enregistrement, ou aucune demande réellement détectée. Diagnostic à faire avec l'endpoint de scan qui renvoie déjà fetched/answered/withRecord/whitelisted."
+      "note": "DIAGNOSTIC FAIT le 05/08 : la chaîne serveur est complète et fonctionne (Ringover → enregistrement → transcription Whisper → analyse Claude → création). Les 6 numéros suivis sont bien reconnus quel que soit le format, 11 à 22 appels passent les filtres chaque jour, et les enregistrements sont disponibles. Le cron est passé de 2 min à 1 min (b327). Le délai constaté (6 min) vient de l'attente de mise à disposition de l'enregistrement CHEZ RINGOVER, pas de l'appli — b323 affiche désormais cette décomposition sur chaque demande. RESTE : mesurer précisément ce délai côté Ringover pour le leur opposer, et voir le verdict d'analyse appel par appel (table ai_calls non lisible avec l'accès local — nécessiterait un écran de diagnostic côté serveur)."
     },
     {
       "titre": "Audit des sections encore non couvertes",
