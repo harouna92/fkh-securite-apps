@@ -633,6 +633,14 @@
       "theme": "Droits & rôles",
       "pourquoipas": "En super-admin, sur toute ligne de pastille : « 🗑 Retirer » écarte l'échéance du suivi (réversible depuis la vacation). Invisible pour les autres rôles.",
       "local": true
+    },
+    {
+      "b": 336,
+      "titre": "Photos sans géolocalisation : celles non encore rattachées apparaissent enfin",
+      "source": "Zeus — 05/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Pastille 📵 : les photos sans position non rattachées sont listées sous « (agent non identifié) », avec « 📎 Rapprocher cette photo ».",
+      "local": true
     }
   ],
   "attente": [
