@@ -3,6 +3,14 @@
   "maj": "2026-08-05",
   "items": [
     {
+      "b": 342,
+      "titre": "On revient vraiment là où l'on était (Planning + rechargement du téléphone)",
+      "source": "Zeus — 05/08",
+      "theme": "Suivi des appels",
+      "local": true,
+      "pourquoipas": "Trois trous reproduits puis vérifiés : le Planning scrolle dans son propre cadre (jamais mémorisé, il revenait en haut À GAUCHE) ; au rechargement — ce que fait le téléphone dès qu'on passe un appel — on retombait sur « Prise de note rapide » ; et la position était reposée après 60 ms alors que la liste met 700 à 1000 ms à se dessiner. Non-régression b341/b342 sur le même jeu de vraies données : aucun écart."
+    },
+    {
       "b": 341,
       "titre": "Tickets cochés qui réapparaissent : la coche est ancrée sur l'HEURE du contrôle",
       "source": "Zeus — problème récurrent, corrigé le 05/08",

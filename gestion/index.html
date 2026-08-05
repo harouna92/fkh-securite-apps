@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b341</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b342</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1028,20 +1028,84 @@ button.big:active{transform:translateY(1px)}
   // Branche un bouton .gtime sur la grille : clic -> grille -> data-v + callback
   function bindTimeBtn(el,onPick){ if(!el)return; el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); openTimeGrid(el, tbGet(el), function(v){ tbSet(el,v); if(onPick)onPick(v); }); }); }
   var secs=['droits','corbeille','demandes','noterapide','prise','fin','suivi','planning','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','numeros','clientsf','terrain','supterrain','streste','cockpitfkh','depots','mails','ref'];
-  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;if(s==='ref'){var _r8=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; if(_r8!=='admin'&&_r8!=='superadmin'&&_r8!=='full')return;} /* b198 : Sites & Clients = admin + super-admin */document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});try{document.body.classList.toggle('plfull',s==='planning');}catch(e){} /* b207 */if(s==='droits'&&typeof renderDroits==='function')renderDroits();if(s==='corbeille'&&typeof renderCorbeille==='function')renderCorbeille();if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='terrain'&&typeof renderTerrain==='function')renderTerrain();if(s==='supterrain'&&typeof renderSupTerrain==='function')renderSupTerrain();if(s==='clientsf'&&typeof renderClientsF==='function')renderClientsF();if(s==='planning'&&typeof renderPlanning==='function')renderPlanning();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if(s==='mails'&&typeof renderMails==='function')renderMails();if(s==='ref'&&typeof renderRef==='function')renderRef();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});_scrollGarder(s);};});
+  document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;
+    /* b342 : on releve la position AVANT de masquer la section — une section masquee rend toujours 0. */
+    if(typeof _posPrendre==='function'&&s!==_SCROLLCUR)_posPrendre(_SCROLLCUR);if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;if(s==='ref'){var _r8=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; if(_r8!=='admin'&&_r8!=='superadmin'&&_r8!=='full')return;} /* b198 : Sites & Clients = admin + super-admin */document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});try{document.body.classList.toggle('plfull',s==='planning');}catch(e){} /* b207 */if(s==='droits'&&typeof renderDroits==='function')renderDroits();if(s==='corbeille'&&typeof renderCorbeille==='function')renderCorbeille();if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='terrain'&&typeof renderTerrain==='function')renderTerrain();if(s==='supterrain'&&typeof renderSupTerrain==='function')renderSupTerrain();if(s==='clientsf'&&typeof renderClientsF==='function')renderClientsF();if(s==='planning'&&typeof renderPlanning==='function')renderPlanning();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if(s==='mails'&&typeof renderMails==='function')renderMails();if(s==='ref'&&typeof renderRef==='function')renderRef();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});_scrollGarder(s);};});
   /* ===== b340 : ON REVIENT LA OU L'ON ETAIT =====
      POURQUOI (Zeus, 05/08) : dans Suivi des appels on descend jusqu'au ticket qu'on traite ; on passe
      une seconde ailleurs, on revient — et tout est remonte en haut. Il faut re-descendre a chaque
      fois, et on perd le fil au milieu de trente tickets.
      COMMENT : on retient la position de chaque section quand on la quitte, et on la restitue en y
      revenant. Une section jamais visitee s'ouvre en haut, comme avant. */
+  /* ===== b342 : ON REVIENT VRAIMENT LA OU L'ON ETAIT =====
+     b340 ne retenait que le scroll de la PAGE, en memoire, et le reposait une seule fois apres 60 ms.
+     Trois trous constates le 05/08 sur les vraies donnees :
+     (a) le PLANNING ne scrolle pas dans la page mais dans son propre cadre (`#pl-scroll`, 4200 px de haut
+         et 850 px de large pour une fenetre de 500x660) : on quittait l'onglet, on revenait, il etait
+         revenu en haut A GAUCHE. Rien n'etait retenu.
+     (b) au RECHARGEMENT de la page — ce qui arrive tout seul sur telephone des qu'on passe un appel ou
+         qu'on laisse l'appli quelques minutes en arriere-plan — on retombait sur « Prise de note rapide »,
+         en haut. La position n'existait qu'en memoire vive.
+     (c) reposer la position apres 60 ms ne suffit pas : Suivi des appels met 700 a 1000 ms a se redessiner
+         sur telephone (1000 tickets). Tant que la page n'a pas sa hauteur finale, `scrollTo` est ecrete
+         et on se retrouve beaucoup plus haut. On repose donc plusieurs fois, tant que la page grandit. */
   var _SCROLLPOS={}, _SCROLLCUR=null;
-  function _scrollGarder(nouvelle){
-    try{ if(_SCROLLCUR)_SCROLLPOS[_SCROLLCUR]=window.pageYOffset||document.documentElement.scrollTop||0; }catch(e){}
-    _SCROLLCUR=nouvelle;
-    var y=(_SCROLLPOS[nouvelle]!=null)?_SCROLLPOS[nouvelle]:0;
-    try{ window.scrollTo(0,y); setTimeout(function(){ try{window.scrollTo(0,y);}catch(_e){} },60); }catch(e){}
+  var SCROLL_LS='fkh_position', SCROLL_TTL=2*3600000;   /* au-dela de 2 h, on rouvre normalement : on ne rend pas a un operateur du matin l'ecran de la veille */
+  function _plCadre(){ return byId('pl-scroll'); }      /* le cadre qui scrolle vraiment dans le Planning */
+  function _posLire(sec){
+    var p=_SCROLLPOS[sec]; if(p&&typeof p==='object')return p;
+    return {y:(typeof p==='number'?p:0),it:0,il:0};
   }
+  function _posPrendre(sec){
+    if(!sec)return;
+    var c=_plCadre();
+    _SCROLLPOS[sec]={ y:(window.pageYOffset||document.documentElement.scrollTop||0),
+                      it:(sec==='planning'&&c)?c.scrollTop:0,
+                      il:(sec==='planning'&&c)?c.scrollLeft:0 };
+    _posGraver();
+  }
+  function _posGraver(){ try{ localStorage.setItem(SCROLL_LS,JSON.stringify({at:Date.now(),sec:_SCROLLCUR,pos:_SCROLLPOS})); }catch(e){} }
+  /* On repose la position tant que la page continue de grandir (rendu long) — au plus 1,2 s. */
+  function _posRendre(sec){
+    var p=_posLire(sec), essais=0, hDerniere=-1;
+    function poser(){
+      try{
+        if(p.y)window.scrollTo(0,p.y);
+        var c=_plCadre(); if(c&&(p.it||p.il)){ if(p.it)c.scrollTop=p.it; if(p.il)c.scrollLeft=p.il; }
+      }catch(e){}
+      var h=document.body.scrollHeight;
+      var atteint=(!p.y||Math.abs((window.pageYOffset||0)-p.y)<4);
+      if(++essais<8 && (!atteint || h!==hDerniere)){ hDerniere=h; setTimeout(poser,essais<3?40:150); }
+    }
+    poser();
+  }
+  function _scrollGarder(nouvelle){
+    /* la position de la section qu'on quitte a deja ete relevee au DEBUT du clic, avant le masquage :
+       la relever ici l'ecraserait par des zeros (une section masquee ne rend pas son scroll). */
+    _SCROLLCUR=nouvelle;
+    if(_SCROLLPOS[nouvelle]==null){ try{ window.scrollTo(0,0); }catch(e){} var c0=_plCadre(); if(c0){c0.scrollTop=0;c0.scrollLeft=0;} _posGraver(); return; }
+    _posRendre(nouvelle);
+    _posGraver();
+  }
+  /* Le telephone peut decharger l'onglet a tout moment : on grave la position en continu, pas seulement
+     au changement de section. */
+  (function _posSuivi(){
+    var t=null;
+    window.addEventListener('scroll',function(){ if(t)return; t=setTimeout(function(){ t=null; _posPrendre(_SCROLLCUR); },400); },{passive:true});
+    document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden')_posPrendre(_SCROLLCUR); });
+    window.addEventListener('pagehide',function(){ _posPrendre(_SCROLLCUR); });
+    document.addEventListener('scroll',function(e){ var c=_plCadre(); if(c&&e.target===c){ if(t)return; t=setTimeout(function(){ t=null; _posPrendre(_SCROLLCUR); },400); } },true);
+  })();
+  /* Au chargement : on rouvre la section quittee, a sa position — si elle date de moins de 2 h. */
+  window.addEventListener('load',function(){ setTimeout(function(){
+    var o=null; try{ o=JSON.parse(localStorage.getItem(SCROLL_LS)||'null'); }catch(e){}
+    if(!o||!o.at||(Date.now()-o.at)>SCROLL_TTL||!o.sec||o.sec==='noterapide')return;
+    var b=document.querySelector('#tabs button[data-s="'+o.sec+'"]');
+    if(!b||b.offsetParent===null)return;                                     // section masquee pour ce role : on ne force rien
+    try{ if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(o.sec)<0)return; }catch(e){}
+    _SCROLLPOS=(o.pos&&typeof o.pos==='object')?o.pos:{};
+    b.click();                                                               // le clic refait le rendu ET restitue la position
+  },200); });
   // ===== Réorganiser les SECTIONS (onglets) par glisser-déposer — appui long, mémorisé par appareil =====
   (function tabReorder(){
     var bar=byId('tabs'); if(!bar)return; var LS='fkh_tabs_order';
