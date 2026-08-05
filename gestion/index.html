@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b315</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b316</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -278,7 +278,7 @@ button.big:active{transform:translateY(1px)}
 <button type="button" id="pp-te" class="pp-btn" title="Contrôles tenue (photo) NON FAITS depuis lundi" aria-label="Tenues non contrôlées">🦺<span class="pp-badge" id="pp-te-n"></span></button>
 <button type="button" id="pp-c2" class="pp-btn" title="Photos de contrôle (toutes les 2 h) manquantes" aria-label="Photos contrôles manquantes">🌙<span class="pp-badge" id="pp-c2-n"></span></button>
 <button type="button" id="pp-ro" class="pp-btn" title="Pointages SANS trace d’appel réel (Ringover)" aria-label="Pointages sans appel réel">🔌<span class="pp-badge" id="pp-ro-n"></span></button>
-<button type="button" id="pp-tn" class="pp-btn" title="Photos de contrôle tenue — agents du jour sans photo, sites couverts / non couverts" aria-label="Photos de contrôle tenue">🦺<span class="pp-badge" id="pp-tn-n"></span></button>
+<button type="button" id="pp-tn" class="pp-btn" title="Photos de contrôle tenue — agents du jour sans photo, sites couverts / non couverts" aria-label="Photos de contrôle tenue">👕<span class="pp-badge" id="pp-tn-n"></span></button>
 <button type="button" id="pp-af" class="pp-btn" title="Vacations SANS AGENT à partir d’aujourd’hui — classées par site" aria-label="Vacations non affectées">🧍<span class="pp-badge" id="pp-af-n"></span></button>
 <button type="button" id="pp-rt" class="pp-btn" title="Agents EN RETARD à la prise de service" aria-label="Retards de prise">🐢<span class="pp-badge" id="pp-rt-n"></span></button>
 <button type="button" id="pp-gp" class="pp-btn" title="Agents ayant envoyé des photos SANS géolocalisation" aria-label="Photos sans position par agent">📵<span class="pp-badge" id="pp-gp-n"></span></button>
@@ -2787,7 +2787,7 @@ button.big:active{transform:translateY(1px)}
   }
   var DR_PASTILLES=[['an2','⚠️ Anomalies signalées'],['cloche','🔔 Cloche des alertes'],['recherche','🔎 Barre de recherche intelligente'],['bandeau','🖥️ Bandeau d’état (sandbox / connexion)'],['bulle','💬 Bulle Assistant (bas à droite)'],['aides','📖 Textes d’explication sous les titres'],['pc','🎧 Qui est au PC'],['an','🔴 Annulations à confirmer'],['op','⏰ Prises/fins non pointées'],
     ['cli','🏢 Client non avisé'],['ph','📷 Photos prise/fin'],['te','🦺 Contrôles tenue'],
-    ['c2','🌙 Photos de contrôle 2 h'],['ro','🔌 Pointage sans appel'],['af','🧍 Vacations non affectées'],['tn','🦺 Photos de contrôle tenue'],
+    ['c2','🌙 Photos de contrôle 2 h'],['ro','🔌 Pointage sans appel'],['af','🧍 Vacations non affectées'],['tn','👕 Photos de contrôle tenue'],
     ['rt','🐢 Retards de prise'],['gp','📵 Photos sans position']];
   function renderDroits(){
     var box=byId('dr-body'); if(!box)return;
@@ -6425,7 +6425,7 @@ button.big:active{transform:translateY(1px)}
     pop.style.cssText='position:fixed;inset:5% 5%;z-index:255;background:var(--panel);border:1.5px solid #e0a13b;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
     var jourFR=(d.jour||'').split('-').reverse().join('/');
     function tuile(cle,ico,nb,lbl){ return '<div class="pp-tile tn-tile" data-v="'+cle+'"'+(vue===cle?' style="border-color:#e0a13b"':'')+'><b>'+nb+'</b>'+ico+' '+lbl+'</div>'; }
-    var htm='<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">🦺 Photos de contrôle tenue</b><button type="button" id="tn-x">✕</button></div>'
+    var htm='<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">👕 Photos de contrôle tenue</b><button type="button" id="tn-x">✕</button></div>'
       +'<div class="sub" style="margin:4px 0 10px">Agents planifiés le '+esc(jourFR)+'. Une photo, même ancienne, suffit : elle montre comment l\'agent est habillé.</div>'
       +'<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">'
       +tuile('sans','🚨',d.sans.length,'agent(s) sans photo')
@@ -7048,7 +7048,9 @@ button.big:active{transform:translateY(1px)}
       if(md==='af')return '<button type="button" class="pp-act-aff" data-mid="'+esc(x.mid||'')+'" style="font-size:12px;border-color:#e0a13b;color:#e0a13b;font-weight:700">👤 Affecter un agent</button>'
         +'<button type="button" class="pp-act-edit" data-mid="'+esc(x.mid||'')+'" style="font-size:12px;margin-left:6px">✏️ Modifier</button>'
         +'<button type="button" class="pp-act-del" data-mid="'+esc(x.mid||'')+'" style="font-size:12px;margin-left:6px;color:var(--bad);border-color:var(--bad)">🗑 Supprimer</button>';
-      if(md==='op')return '<button type="button" class="pp-act-fait" data-mid="'+esc(x.mid||'')+'" data-key="'+esc(x.key)+'" style="font-size:12px">✔ Marquer fait</button>';
+      /* b316 : la photo attendue est souvent deja arrivee par le lien — on va la chercher. */
+      if(md==='op')return '<button type="button" class="pp-act-portail" data-mid="'+esc(x.mid||'')+'" data-step="'+esc(x.key||'')+'" data-agent="'+esc(x.agent||'')+'" data-site="'+esc(x.site||'')+'" style="font-size:12px;margin-right:6px;border-color:#6ea8fe;color:#6ea8fe">📷 Choisir une photo reçue</button>'
+        +'<button type="button" class="pp-act-fait" data-mid="'+esc(x.mid||'')+'" data-key="'+esc(x.key)+'" style="font-size:12px">✔ Marquer fait</button>';
       if(md==='cli')return '<button type="button" class="pp-act-avise" data-mid="'+esc(x.mid||'')+'" data-key="'+esc(x.key)+'" style="font-size:12px">📞 Client avisé ✔</button>';
       /* b313 : la photo est peut-etre deja arrivee — on va la chercher au lieu d'en redemander une. */
       if(md==='ph'||md==='c2'||md==='te')return refusBtn(x,md)
