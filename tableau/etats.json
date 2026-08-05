@@ -625,6 +625,14 @@
       "theme": "Suivi des appels",
       "pourquoipas": "Pastille ⏰ : plus de bouton photo, le bouton dit « ✔ Agent appelé — pointer », et l'en-tête « non pointée(s) — agent non appelé ».",
       "local": true
+    },
+    {
+      "b": 335,
+      "titre": "« 🗑 Retirer » une ligne de pastille — super-administrateur uniquement",
+      "source": "Zeus — 05/08",
+      "theme": "Droits & rôles",
+      "pourquoipas": "En super-admin, sur toute ligne de pastille : « 🗑 Retirer » écarte l'échéance du suivi (réversible depuis la vacation). Invisible pour les autres rôles.",
+      "local": true
     }
   ],
   "attente": [
