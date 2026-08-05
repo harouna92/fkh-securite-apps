@@ -537,6 +537,14 @@
       "theme": "Fiabilité des données",
       "pourquoipas": "Rester sur Supervision (dépliant ouvert d'office) : les nouvelles demandes arrivent désormais aussi sur ce poste.",
       "local": true
+    },
+    {
+      "b": 323,
+      "titre": "Traçabilité appel → demande : heures, délai, et où le temps est passé",
+      "source": "Zeus — 05/08",
+      "theme": "Suivi des demandes",
+      "pourquoipas": "Suivi des demandes → une demande née d'un appel : bandeau « 📞 Appel entrant le … → 📥 en recherche le … · ⏱ délai ». Orange au-delà de 2 min, avec le détail.",
+      "local": true
     }
   ],
   "attente": [
