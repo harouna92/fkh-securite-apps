@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b322</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b323</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2074,6 +2074,29 @@ button.big:active{transform:translateY(1px)}
          vers la bonne personne pour un detail — et personne ne se sent responsable d'une ligne anonyme. */
       var _par=(x.statut==='recherche'&&x.parQui)?('<span class="sub" style="margin:0;font-size:11.5px"> · mis en recherche par <b>'+esc(x.parQui)+'</b></span>'):'';
       var meta=(x.statut==='recherche'?'<span class="sv-rtimer" data-since="'+x.pris+'" style="font-weight:700;color:#e0a13b"></span>':'')+'<span>📥 En recherche depuis : '+fmtDT(x.pris)+'</span>';
+      /* b323 : pour une demande nee d'un appel, on montre le trajet complet — quand le client a
+         appele, quand la demande est apparue ici, et le temps qu'il a fallu. Au-dela de 2 minutes on
+         dit AUSSI ou ce temps est passe : l'analyse de l'appel cote serveur, ou l'attente cote appli.
+         Sans ce decoupage, « 7 minutes » ne se corrige pas : on ne sait pas quoi regarder. */
+      meta+=(function(){
+        if(!x.callAt)return '';
+        var dir=(x.callDir==='in')?'entrant':((x.callDir==='out')?'sortant':'');
+        var tot=Math.max(0,(+x.pris||0)-(+x.callAt||0));
+        var mn=Math.round(tot/60000), lent=(tot>120000);
+        function duree(ms){ var s=Math.round(ms/1000); if(s<60)return s+' s'; var m=Math.floor(s/60); return m+' min'+((s%60)?' '+(s%60)+' s':''); }
+        var det='';
+        if(lent&&x.aiAt){
+          var tAnalyse=Math.max(0,(+x.aiAt)-(+x.callAt)), tAppli=Math.max(0,(+x.pris)-(+x.aiAt));
+          det='<div class="fa-d" style="margin-top:3px;font-size:11.5px">'
+            +'· analyse de l\'appel : <b>'+duree(tAnalyse)+'</b> <span style="color:var(--muted)">(le serveur relit les appels toutes les 2 min, puis transcrit)</span><br>'
+            +'· puis attente ici : <b>'+duree(tAppli)+'</b> <span style="color:var(--muted)">(l\'appli va chercher les demandes chaque minute, et seulement si elle est ouverte)</span></div>';
+        }
+        return '<div class="meta" style="margin-top:4px;background:'+(lent?'rgba(224,161,59,.13)':'var(--panel2)')+';border:1px solid '+(lent?'#e0a13b':'var(--line)')+';border-radius:9px;padding:6px 9px">'
+          +'<div style="font-size:12.5px">📞 Appel '+esc(dir)+' le <b>'+esc(fmtDT(x.callAt))+'</b>'
+          +' → 📥 en recherche le <b>'+esc(fmtDT(x.pris))+'</b>'
+          +' · ⏱ <b style="color:'+(lent?'#e0a13b':'var(--ok)')+'">'+duree(tot)+'</b>'
+          +(lent?' <span style="color:#e0a13b;font-weight:700">— plus de 2 min</span>':'')+'</div>'+det+'</div>';
+      })();
       meta+=_par;
       if(x.valide)meta+='<span>🏁 Traitée : '+fmtDT(x.valide)+'</span><span class="delai">⏱ Délai : '+fmtDelai(x.valide-x.pris)+'</span>';
       var body;
@@ -5858,7 +5881,13 @@ button.big:active{transform:translateY(1px)}
           if((SUIVI||[]).some(function(m){ return m.mailSrc===call.cdr_id; })) return;
         }
         if(SUIVI.some(function(m){return String(m.id)===id;}))return; var now=Date.now();
-        var it={id:id,texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',parQui:(typeof opNow==='function'?opNow():''),parAt:now,pris:now,valide:null,ville:bd.vn,cp:bd.cp,client:((typeof svCallerName==='function'&&svCallerName(call.number))||notFKH(d.client)||''),la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiNature:nat,aiCdr:call.cdr_id,aiNumber:call.number||'',aiDir:call.direction||''}; if(call._sim)it.sim=true; SUIVI.unshift(it); changed=true; if(!firstNew)firstNew=it; aiRouteNear(it,bd); /* consigne « nouvelle demande gardiennage » retirée (l'opérateur prend les appels, il est déjà au courant) */
+        /* b323 : trois moments, pour savoir ou passe le temps entre l'appel et la mise en recherche.
+             callAt = quand l'appel a eu lieu (donne par Ringover)
+             aiAt   = quand le serveur a fini de l'analyser
+             pris   = quand la demande est apparue ici, en recherche */
+        var _callAt=0; try{ if(call.start)_callAt=Date.parse(call.start)||0; }catch(_c){}
+        var it={id:id,texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',parQui:(typeof opNow==='function'?opNow():''),parAt:now,pris:now,valide:null,
+          callAt:_callAt, callDir:(call.direction||''), aiAt:(+call.at||0),ville:bd.vn,cp:bd.cp,client:((typeof svCallerName==='function'&&svCallerName(call.number))||notFKH(d.client)||''),la:bd.la,lo:bd.lo,assoc:[],urgent:!!d.urgent,vacations:(Array.isArray(d.vacations)?d.vacations:[]),aiPending:true,aiNature:nat,aiCdr:call.cdr_id,aiNumber:call.number||'',aiDir:call.direction||''}; if(call._sim)it.sim=true; SUIVI.unshift(it); changed=true; if(!firstNew)firstNew=it; aiRouteNear(it,bd); /* consigne « nouvelle demande gardiennage » retirée (l'opérateur prend les appels, il est déjà au courant) */
       });
       // --- ARRÊT du gardiennage (initiative CLIENT) → consigne « Informer l'agent » dans Suivi des appels ---
       arrets.forEach(function(ar,aidx){ var acid='arret_'+call.cdr_id+'_'+aidx; if(call._sim||typeof csgLoad!=='function')return; try{ var _cc=csgLoad(); if(_cc.some(function(x){return x.srcId===acid;}))return; var lieu=[ar.site,ar.ville].filter(Boolean).join(' — '); _cc.push({id:csgNewId(),srcId:acid,texte:'🛑 ARRÊT DU GARDIENNAGE — INITIATIVE CLIENT.\n👉 INFORMER L\'AGENT que la prestation s\'arrête.'+(ar.client?'\n🏢 Client : '+ar.client:'')+(lieu?'\n📍 '+lieu:'')+(ar.motif?'\n📝 Motif : '+ar.motif:''),client:(ar.client||''),site:(ar.site||''),ville:(ar.ville||''),cp:'',mdate:impTodayISO(),heure:ssNowHM(),done:false,note:'',aiGen:true,arret:true}); csgSave(_cc); changed=true; arretN++; if(!firstArret)firstArret={client:(ar.client||''),lieu:lieu}; }catch(_e){} });
