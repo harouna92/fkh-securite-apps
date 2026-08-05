@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b334</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b335</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -7261,6 +7261,19 @@ button.big:active{transform:translateY(1px)}
     }
     return '<button type="button" class="pp-refus" data-mid="'+esc(x.mid)+'" data-k="'+esc(k)+'" style="font-size:12px;margin-left:4px">🚫 A refusé d’envoyer</button>';
   }
+    /* ===== b335 : RETIRER UNE LIGNE (super-administrateur seul) =====
+       POURQUOI (Zeus, 05/08) : certaines echeances n'ont plus lieu d'etre suivies — un site ferme, une
+       vacation annulee cote client, une ligne creee par erreur. Sans moyen de les ecarter, elles restent
+       la indefiniment et diluent ce qui compte vraiment.
+       COMMENT : « 🗑 Retirer » ecarte cette echeance de TOUTES les listes. Rien n'est detruit : la
+       vacation reste au Planning, seule l'echeance sort du suivi, et elle se restaure depuis la fiche
+       de la vacation (« ↩️ Restaurer »). Reserve au super-administrateur — c'est un geste de menage,
+       pas une action d'exploitation. */
+    function rowRetirer(x){
+      if(typeof isSuperAdmin!=='function'||!isSuperAdmin())return '';
+      if(!x||!x.mid)return '';
+      return '<button type="button" class="pp-act-retirer" data-mid="'+esc(x.mid)+'" data-key="'+esc(x.key||'prise')+'" title="Retirer cette échéance du suivi (réversible depuis la vacation)" style="font-size:12px;margin-left:6px;color:var(--muted);border-color:var(--line)">🗑 Retirer</button>';
+    }
     function rowAct(x){ var md=PP_VIEW.mode; // b160 : corriger l'info manquante DIRECTEMENT depuis la ligne
       /* b311 : on agit SUR PLACE — affecter, mais aussi modifier ou supprimer sans avoir a rejoindre le Planning (demande Zeus 05/08). */
       if(md==='af')return '<button type="button" class="pp-act-aff" data-mid="'+esc(x.mid||'')+'" style="font-size:12px;border-color:#e0a13b;color:#e0a13b;font-weight:700">👤 Affecter un agent</button>'
@@ -7279,7 +7292,7 @@ button.big:active{transform:translateY(1px)}
       return '';
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
-      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+'</div>':'')+ecartPhoto(x.mid,(x.key||'prise'),x.heure,x.mdate)+hdBloc(x)+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+rowRetirer(x)+'</div>':'')+ecartPhoto(x.mid,(x.key||'prise'),x.heure,x.mdate)+hdBloc(x)+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
     if(D.anov){
       h+='<div class="acts" style="margin-bottom:10px"><button type="button" id="ano-new" class="ok" style="font-size:13px">\u2795 Signaler une anomalie</button></div>';
       var _lib={}; ANO_CATS.forEach(function(c){_lib[c[0]]=c[1];});
@@ -7525,6 +7538,23 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
         var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.jour!=null){PP_VIEW.jour=null;} else if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };   /* b332 */
     box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else {PP_VIEW.sub=t.getAttribute('data-sub'); PP_VIEW.jour=null;} ppRender(); }; });   /* b332 : on repart du palier */
     box.querySelectorAll('.pp-jr').forEach(function(b){ b.onclick=function(){ PP_VIEW.jour=b.getAttribute('data-j'); ppRender(); }; });
+    /* b335 */
+    box.querySelectorAll('.pp-act-retirer').forEach(function(b){ b.onclick=function(){
+      if(typeof isSuperAdmin!=='function'||!isSuperAdmin())return;
+      var mid=b.getAttribute('data-mid'), key=b.getAttribute('data-key')||'prise';
+      var m=null; for(var i=0;i<SUIVI.length;i++){ if(String(SUIVI[i].id)===String(mid)){ m=SUIVI[i]; break; } }
+      var quoi=(m&&(m.siteAgent||m.titre))||'cette vacation';
+      var etape=(key==='prise')?'la prise de service':((key==='fin')?'la fin de service':('l\'étape « '+key+' »'));
+      if(!confirm('Retirer '+etape+' du suivi ?\n\n  '+quoi+((m&&m.mdate)?('\n  le '+String(m.mdate).split('-').reverse().join('/')):'')
+        +'\n\nElle sortira de toutes les listes. La vacation reste au Planning, et l\'échéance se restaure depuis sa fiche.'))return;
+      var ex=(typeof saExclLoad==='function')?saExclLoad():{};
+      ex[String(mid)+'|'+key]=Date.now();
+      if(typeof saExclSave==='function')saExclSave(ex);
+      if(typeof notifScan==='function'){try{notifScan();}catch(e){}}
+      if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
+      if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
+      if(typeof ppRender==='function')ppRender();
+    }; });
     box.querySelectorAll('.pp-act-aff').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); ppClose(); if(typeof planningAffect==='function')planningAffect(mid); }; });
     /* b313 : ouvrir le portail des photos recues, en sachant d'ou l'on vient (ticket + agent). */
     box.querySelectorAll('.pp-act-portail').forEach(function(b){ b.onclick=function(){
