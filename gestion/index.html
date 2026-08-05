@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b336</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b337</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -6898,12 +6898,21 @@ button.big:active{transform:translateY(1px)}
         if(tel&&!_byAg[ag].tel)_byAg[ag].tel=tel;
       });
       Object.keys(_byAg).forEach(function(k){ var g=_byAg[k]; g.items.sort(function(u,v){return v.ts-u.ts;});
-        sc.gp.push({gp:1,agent:g.agent,tel:g.tel,nb:g.items.length,items:g.items,site:(g.items[0]&&g.items[0].site)||'',mdate:(g.items[0]&&g.items[0].mdate)||'',heure:'',due:(g.items[0]&&g.items[0].ts)||now,since:0}); });
+        sc.gp.push({gp:1,ident:1,agent:g.agent,tel:g.tel,nb:g.items.length,items:g.items,site:(g.items[0]&&g.items[0].site)||'',mdate:(g.items[0]&&g.items[0].mdate)||'',heure:'',due:(g.items[0]&&g.items[0].ts)||now,since:0}); });
       /* b336 : les photos sans position pas encore rattachees — agent inconnu tant qu'on n'a pas
          rapproche, c'est justement ce qu'on vient faire ici. */
+      /* b337 : une seule entree « non identifie » qui porte toutes ces photos — on affichait une
+         ligne par photo, toutes identiques, illisibles des qu'il y en avait six. */
+      var _lib=[];
       (GP_LIB||[]).forEach(function(p){
         if(typeof phIsAttached==='function'&&phIsAttached(p.key))return;
         var d=p.ts?new Date(p.ts):null;
+        _lib.push({site:'\u2014',mdate:d?(d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)):'',step:'',ts:p.ts||0,key:p.key,libre:1});
+      });
+      if(_lib.length){ _lib.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+        sc.gp.push({gp:1,libre:1,agent:'(agent non identifié)',tel:'',nb:_lib.length,items:_lib,
+          site:'\u2014',mdate:(_lib[0]&&_lib[0].mdate)||'',heure:'',due:(_lib[0]&&_lib[0].ts)||now,since:0}); }
+      if(false)(GP_LIB||[]).forEach(function(p){ var d=null;
         sc.gp.push({gp:1,libre:1,key:p.key,agent:'(agent non identifié)',tel:'',nb:1,
           items:[{site:'\u2014',mdate:d?(d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)):'',step:'',ts:p.ts||0,key:p.key,libre:1}],
           site:'\u2014',mdate:d?(d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)):'',
@@ -7402,7 +7411,65 @@ button.big:active{transform:translateY(1px)}
         + _hist.map(function(x){ var f=function(t){ var d=new Date(t); return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); };
             return '<div class="sub" style="margin:0 0 3px">👤 '+esc(x.nom||x.user||'')+' \u00b7 '+f(x.debut)+' \u2192 '+f(x.fin)+'</div>'; }).join(''); }
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
-    } else if(D.byAgent&&!PP_VIEW.sub){ /* b219 : par AGENT */
+    } else if(D.byAgent){
+      /* ===== b337 : ON DESCEND PAR PALIERS =====
+         POURQUOI (Zeus, 05/08) : la pastille listait tout a plat, et depuis b336 une ligne par photo
+         non identifiee — six lignes rigoureusement identiques, illisibles. Or il y a deux populations
+         qui ne se traitent pas pareil : un agent qu'on connait, qu'on rappelle pour le sensibiliser ;
+         et une photo dont on ignore l'auteur, qu'il faut d'abord rapprocher.
+         COMMENT : trois crans. 1) identifies / non identifies. 2) aujourd'hui / jours passes.
+         3) la liste. « ← Retour » remonte un cran a la fois. */
+      var _ajdG=(typeof impTodayISO==='function')?impTodayISO():'';
+      function _plat(L2,identOnly){
+        var out=[];
+        (L2||[]).forEach(function(g){
+          var estIdent=!g.libre;
+          if(identOnly!=null&&estIdent!==identOnly)return;
+          (g.items||[]).forEach(function(it2){ out.push({g:g,it:it2}); });
+        });
+        return out;
+      }
+      function _duJourG(a){ return a.filter(function(o){ return (o.it.mdate||'')===_ajdG; }); }
+      function _avantG(a){ return a.filter(function(o){ return (o.it.mdate||'')!==_ajdG; }); }
+      var _tousI=_plat(L,true), _tousN=_plat(L,false);
+
+      if(!PP_VIEW.sub){   /* cran 1 : deux populations */
+        h+='<div style="display:flex;gap:10px;flex-wrap:wrap">'
+          +'<div class="pp-tile" data-sub="ident"><b>'+_tousI.length+'</b>\ud83d\udc64 Agents identifi\u00e9s<br><span class="sub" style="margin:0;font-size:11.5px">a rappeler pour les sensibiliser</span></div>'
+          +'<div class="pp-tile" data-sub="nonident"'+(_tousN.length?' style="border-color:#e0a13b"':'')+'><b>'+_tousN.length+'</b>\u2753 Agents non identifi\u00e9s<br><span class="sub" style="margin:0;font-size:11.5px">photo a rapprocher d\'abord</span></div>'
+          +'</div>';
+        h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
+      } else {
+        var _estI=(PP_VIEW.sub==='ident');
+        var _pool=_estI?_tousI:_tousN;
+        var _pj=_duJourG(_pool), _pp=_avantG(_pool);
+        var _titreP=_estI?'\ud83d\udc64 Agents identifi\u00e9s':'\u2753 Agents non identifi\u00e9s';
+        if(PP_VIEW.jour==null){   /* cran 2 : aujourd'hui / jours passes */
+          h+='<div class="acts" style="margin-bottom:10px"><button type="button" id="pp-back">\u2190 Retour</button><b style="margin:0">'+_titreP+'</b><span class="sub" style="margin:0">'+_pool.length+' photo(s) sans position</span></div>'
+            +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
+            +'<div class="pp-tile pp-jr" data-j="j"><b>'+_pj.length+'</b>\ud83d\udcc5 Aujourd\u2019hui<br><span class="sub" style="margin:0;font-size:11.5px">'+(_estI?'a rappeler maintenant':'a rapprocher maintenant')+'</span></div>'
+            +'<div class="pp-tile pp-jr" data-j="p"'+(_pp.length?' style="border-color:#e0a13b"':'')+'><b>'+_pp.length+'</b>\ud83d\udd53 Jours pass\u00e9s<br><span class="sub" style="margin:0;font-size:11.5px">a constater</span></div>'
+            +'</div>';
+        } else {   /* cran 3 : la liste */
+          var _liste=(PP_VIEW.jour==='p')?_pp:_pj;
+          h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">\u2190 Retour</button><b style="margin:0">'+_titreP+'</b><span class="sub" style="margin:0">'+_liste.length+' photo(s) \u00b7 '+((PP_VIEW.jour==='p')?'\ud83d\udd53 jours pass\u00e9s':'\ud83d\udcc5 aujourd\u2019hui')+'</span></div>';
+          h+=_liste.length?_liste.map(function(o){
+            var g=o.g, it2=o.it;
+            var d5=(it2.mdate||'').split('-').reverse().join('/');
+            var hh=''; try{ if(it2.ts){ var dd=new Date(it2.ts); hh=('0'+dd.getHours()).slice(-2)+':'+('0'+dd.getMinutes()).slice(-2); } }catch(e){}
+            var act=(it2.libre&&it2.key)
+              ?('<button type="button" class="pp-act-rappro ok" data-k="'+esc(it2.key)+'" data-ts="'+esc(String(it2.ts||0))+'" style="font-size:12px">\ud83d\udcce Rapprocher cette photo</button>')
+              :(g.tel?('<a class="call" href="tel:'+esc(String(g.tel).replace(/\s+/g,''))+'" style="font-size:13px">\ud83d\udcde '+esc(g.tel)+'</a>'):'');
+            return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)">'
+              +'<div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>\ud83d\udc64 '+esc(g.agent||'\u2014')+'</b>'
+              +'<span class="sub" style="margin:0">\ud83d\udccd '+esc(it2.site||'\u2014')+'</span></div>'
+              +'<div class="fa-d" style="margin-top:2px">'+(d5?('le '+esc(d5)+' '):'')+(hh?('\u00e0 '+esc(hh)):'')+' \u00b7 <b style="color:var(--bad)">photo sans position</b></div>'
+              +(act?('<div class="acts" style="margin-top:7px">'+act+'</div>'):'')
+              +'</div>';
+          }).join(''):'<div class="sub">Rien \u00e0 ce niveau.</div>';
+        }
+      }
+    } else if(false&&D.byAgent&&!PP_VIEW.sub){ /* b219 : par AGENT (remplace par b337) */
       h+=L.length?L.map(function(g){ return '<div class="pp-tile" data-sub="'+esc(g.agent)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+g.nb+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">👤 '+esc(g.agent)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(g.tel?('📞 '+esc(g.tel)):'<span style="color:var(--bad)">numéro inconnu</span>')+' · '+g.nb+' photo(s) sans position</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Aucun agent concerné 🎉</div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
     } else if(D.byAgent&&PP_VIEW.sub){
@@ -7579,7 +7646,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     box.querySelectorAll('.an-ko').forEach(function(b){ b.onclick=function(){ annulTrancher(b.getAttribute('data-id'),false); }; });
     var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitter():pcPrendre(); ppRender(); };
         var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.jour!=null){PP_VIEW.jour=null;} else if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };   /* b332 */
-    box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else {PP_VIEW.sub=t.getAttribute('data-sub'); PP_VIEW.jour=null;} ppRender(); }; });   /* b332 : on repart du palier */
+    box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else if(t.getAttribute('data-sub')!=null){PP_VIEW.sub=t.getAttribute('data-sub'); PP_VIEW.jour=null;} ppRender(); }; });   /* b332 : on repart du palier */
     box.querySelectorAll('.pp-jr').forEach(function(b){ b.onclick=function(){ PP_VIEW.jour=b.getAttribute('data-j'); ppRender(); }; });
     /* b336 : ouvrir le rapprochement sur la photo choisie */
     box.querySelectorAll('.pp-act-rappro').forEach(function(b){ b.onclick=function(){
