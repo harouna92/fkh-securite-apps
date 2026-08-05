@@ -1,6 +1,6 @@
 {
   "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
-  "maj": "2026-08-03",
+  "maj": "2026-08-05",
   "items": [
     {
       "b": 262,
@@ -263,6 +263,52 @@
       "source": "Zeus",
       "pourquoipas": "Se voit dans la pastille 🧍 : les tuiles 24 h / 7 jours / le reste.",
       "theme": "Planning & vacations"
+    },
+    {
+      "b": 294,
+      "titre": "Suivi des appels : sélection multiple de tickets",
+      "source": "Zeus",
+      "theme": "Suivi des appels",
+      "pourquoipas": "Commit local, pas encore poussé en ligne ni rejoué en démo."
+    },
+    {
+      "b": 295,
+      "titre": "Planning : tableau des heures pliable",
+      "source": "Zeus",
+      "theme": "Planning & vacations",
+      "pourquoipas": "Commit local, pas encore poussé en ligne ni rejoué en démo."
+    },
+    {
+      "b": 307,
+      "titre": "La vue ne remonte plus toute seule en haut quand on scrolle",
+      "source": "Zeus — bug signalé le 05/08",
+      "theme": "Planning & vacations",
+      "pourquoipas": "Planning : scroller en bas et attendre 20 s sans rien toucher — la page reste en place.",
+      "local": true
+    },
+    {
+      "b": 309,
+      "titre": "Une vacation supprimée ne réapparaît plus (8 sections + « Réassembler » qui doublonnait)",
+      "source": "audit complet 05/08",
+      "theme": "Fiabilité des données",
+      "pourquoipas": "Supprimer une vacation puis la chercher dans Prise, Fin, Services, Dispatch, Appels, Suivi site, Sites & Clients, Clients : absente partout.",
+      "local": true
+    },
+    {
+      "b": 310,
+      "titre": "Ce qu'on modifie n'est plus effacé par la synchro (« Remettre en recherche » tenait 4 s)",
+      "source": "audit complet 05/08",
+      "theme": "Fiabilité des données",
+      "pourquoipas": "Suivi demandes : « ↩︎ Remettre en recherche » sur une demande validée — elle reste en recherche.",
+      "local": true
+    },
+    {
+      "b": 311,
+      "titre": "Pastilles nettoyées + Modifier/Supprimer sur place + total des heures juste (8 h de trop)",
+      "source": "Zeus — capture Entrepôt Roissy",
+      "theme": "Planning & vacations",
+      "pourquoipas": "Pastille 🧍 Vacations non affectées : la supprimée a disparu, et chaque ligne porte ✏️ Modifier et 🗑 Supprimer.",
+      "local": true
     }
   ],
   "attente": [
@@ -280,6 +326,21 @@
       "source": "Zeus 03/08",
       "urgent": true,
       "note": "en attente du geste exact pour reproduire"
+    },
+    {
+      "titre": "Ringover : les demandes prises par téléphone ne remontent pas dans « En recherche »",
+      "source": "Zeus — 05/08",
+      "note": "Chaîne serveur complète et fonctionnelle (Ringover → Whisper → Claude). Reste à trouver pourquoi rien ne sort : liste blanche des 6 numéros suivis, présence d'un enregistrement, ou aucune demande réellement détectée. Diagnostic à faire avec l'endpoint de scan qui renvoie déjà fetched/answered/withRecord/whitelisted."
+    },
+    {
+      "titre": "Audit des sections encore non couvertes",
+      "source": "audit complet 05/08",
+      "note": "Thiam, Zone à couvrir, Interventions, Tickets, Dépôts, Reste ST, Terrain — ouvertes sans erreur mais leur logique propre n'a pas été testée avec des données dédiées."
+    },
+    {
+      "titre": "Balayage final « oubli du filtre des vacations supprimées »",
+      "source": "audit complet 05/08",
+      "note": "17 occurrences corrigées (b309/b310/b311). Balayer tout le code pour cette signature afin de fermer la famille définitivement."
     }
   ],
   "decide": [
