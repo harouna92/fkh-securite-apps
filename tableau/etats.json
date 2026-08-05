@@ -497,6 +497,14 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Pastille 📷 → « Choisir une photo reçue » sur une prise : la ligne disparaît des 7 tuiles. Un retard réel de l'agent reste signalé.",
       "local": true
+    },
+    {
+      "b": 318,
+      "titre": "« C'est une photo de contrôle » (n'importe quel agent, autocomplétion) + supprimer une photo",
+      "source": "Zeus — 05/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Suivi des appels → une photo reçue → taper un nom dans « 🦺 Photo de contrôle de… » puis associer. Et « 🗑 Supprimer la photo ».",
+      "local": true
     }
   ],
   "attente": [
