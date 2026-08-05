@@ -309,6 +309,146 @@
       "theme": "Planning & vacations",
       "pourquoipas": "Pastille 🧍 Vacations non affectées : la supprimée a disparu, et chaque ligne porte ✏️ Modifier et 🗑 Supprimer.",
       "local": true
+    },
+    {
+      "b": 224,
+      "titre": "Inclus dans le lot « Build b224 a b227 (pousse) : b224 les bons de commande desce »",
+      "source": "lot groupé",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 225,
+      "titre": "Inclus dans le lot « Build b224 a b227 (pousse) : b224 les bons de commande desce »",
+      "source": "lot groupé",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 226,
+      "titre": "Inclus dans le lot « Build b224 a b227 (pousse) : b224 les bons de commande desce »",
+      "source": "lot groupé",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 228,
+      "titre": "Inclus dans le lot « Builds b228 a b236 (pousse en bloc) : Mails missions ouvert »",
+      "source": "lot groupé",
+      "theme": "Mails & bons de commande",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 233,
+      "titre": "Inclus dans le lot « Builds b228 a b236 (pousse en bloc) : Mails missions ouvert »",
+      "source": "lot groupé",
+      "theme": "Mails & bons de commande",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 257,
+      "titre": "Inclus dans le lot « Builds b249 a b261 (pousse, liste validee par Zeus). APPLI G »",
+      "source": "lot groupé",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 261,
+      "titre": "Inclus dans le lot « Builds b249 a b261 (pousse, liste validee par Zeus). APPLI G »",
+      "source": "lot groupé",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 288,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 290,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 291,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 292,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 293,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 296,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 297,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 299,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 301,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 303,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 304,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 305,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
+    },
+    {
+      "b": 306,
+      "titre": "(build publié, titre non retrouvé)",
+      "source": "historique",
+      "theme": "Divers",
+      "pourquoipas": "Rattrapage d'historique : build publié, non consigné à l'époque."
     }
   ],
   "attente": [

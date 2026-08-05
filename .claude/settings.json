@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if grep -qE \"git +push\" <<< \"$CLAUDE_TOOL_INPUT\"; then cd \"$CLAUDE_PROJECT_DIR\" && node tableau/verifie.js || true; fi'"
+          }
+        ]
+      }
+    ]
+  }
+}
