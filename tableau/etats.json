@@ -513,6 +513,14 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Se connecter en superviseur ou administrateur : la pastille 👕 est dans la barre avec son compteur. L'opérateur ne la voit pas.",
       "local": true
+    },
+    {
+      "b": 320,
+      "titre": "Superviseur : retrait de 4 pastilles de pilotage (PC, Anomalies, Retards, Sans position)",
+      "source": "Zeus — 05/08",
+      "theme": "Droits & rôles",
+      "pourquoipas": "Se connecter en superviseur : il ne reste que les 8 pastilles opérationnelles. L'administrateur les garde toutes.",
+      "local": true
     }
   ],
   "attente": [
