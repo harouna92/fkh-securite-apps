@@ -593,6 +593,22 @@
       "theme": "Suivi des appels",
       "pourquoipas": "Pastille ⏰ → « Prises de service » : deux boutons 📅 Aujourd'hui / 🕓 Jours passés. Et plus de tuiles « Hors délai » figées à 0 hors de la pastille photos.",
       "local": true
+    },
+    {
+      "b": 331,
+      "titre": "Valider une demande ne fait plus basculer vers « Validées »",
+      "source": "Zeus — 05/08",
+      "theme": "Suivi des demandes",
+      "pourquoipas": "Suivi des demandes → En recherche → valider : on reste dans « En recherche » pour enchaîner.",
+      "local": true
+    },
+    {
+      "b": 332,
+      "titre": "« Aujourd'hui » / « Jours passés » : un palier de tuiles au lieu d'une barre",
+      "source": "Zeus — 05/08",
+      "theme": "Suivi des appels",
+      "pourquoipas": "Pastille ⏰ → une tuile → deux tuiles Aujourd'hui / Jours passés avec leur chiffre → la liste. Retour remonte cran par cran.",
+      "local": true
     }
   ],
   "attente": [
