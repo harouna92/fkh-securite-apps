@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b337</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b338</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -6461,7 +6461,14 @@ button.big:active{transform:translateY(1px)}
     }
     rendre();
   }
-  function phAttach(i,mid,stepKey){ var m=phMatches&&phMatches[i]; if(!m)return; var sk=stepKey||PH_TYPE_STEP[m.ph.type]||'tenue'; var S=ssLoad(); S[mid]=S[mid]||{}; S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:m.ph.key,done:true,at:m.ph.ts||Date.now()}); ssSave(S); alert('📎 Photo rattachée (étape « '+(PH_STEP_LBL[sk]||sk)+' »).'); phRender(); }
+  function phAttach(i,mid,stepKey){ var m=phMatches&&phMatches[i]; if(!m)return; var sk=stepKey||PH_TYPE_STEP[m.ph.type]||'tenue'; var S=ssLoad(); S[mid]=S[mid]||{};
+    /* b338 : marqueur « man » (rapproche par l'agence) + on rafraichit les pastilles dans la foulee.
+       Sans ce rafraichissement, il fallait attendre le cycle suivant pour voir le ticket regle. */
+    S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:m.ph.key,done:true,at:m.ph.ts||Date.now(),man:1}); ssSave(S);
+    if(typeof notifScan==='function'){try{notifScan();}catch(e){}}
+    if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
+    if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
+    alert('📎 Photo rattachée (étape « '+(PH_STEP_LBL[sk]||sk)+' »).'); phRender(); }
   // ===== 📸 Photos à rattacher (remontées #7/#14/#19) : lien UNIQUE (u/) ou lien agent (agent/) → association à une étape de vacation → le ticket de la file est RÉGLÉ avec preuve photo. =====
   var SA_PH=null;
   /* ===== b336 : LES PHOTOS SANS POSITION QU'ON N'A PAS ENCORE RATTACHEES =====
@@ -6768,15 +6775,21 @@ button.big:active{transform:translateY(1px)}
       if(step==='tenue'){ // Remontées #27/#22a : photo = contrôle tenue → validation SUPERVISEUR (🧭 Terrain), pas la file opérateur.
         if(!confirm('Associer cette photo comme CONTRÔLE TENUE de « '+(m.siteAgent||m.titre||'')+' » ?\n\n🦺 Elle part en validation superviseur (section 🧭 Terrain).'))return;
         var agN=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):'';
-        saSet(mid,'tenue',{done:true,hm:phHM(it.ts),tenuePhoto:true,tenueCtrl:'✅ Fait — photo prise',photoKey:it.key,viaPhoto:true,by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'photo')});
+        saSet(mid,'tenue',{done:true,hm:phHM(it.ts),tenuePhoto:true,tenueCtrl:'✅ Fait — photo prise',photoKey:it.key,viaPhoto:true,man:1,by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'photo')});   /* b338 */
         if(typeof supTerrainAdd==='function')supTerrainAdd({type:'tenuephoto',mid:mid,site:(m.siteAgent||m.titre||''),client:m.client||'',agent:agN,photoKey:it.key,by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'')});
         try{ var _cc=csgLoad(),_ch=false; _cc.forEach(function(x){ if(x.tenueCtrl&&!x.done&&(String(x.mid)===String(mid))){ x.done=true; x.doneAt=Date.now(); _ch=true; } }); if(_ch)csgSave(_cc); }catch(_e){}
         if(typeof photoArchiveAdd==='function')photoArchiveAdd({key:it.key,mid:mid,step:'tenue',site:(m.siteAgent||m.titre||''),agent:agN,mdate:m.mdate||'',sk:(typeof tnorm==='function'?tnorm(m.siteAgent||m.titre||''):'')+'|'+(m.mdate||'')+'|tenue'});
         SA_PH.splice(i,1); renderSaPhotosIn(); _phFillList(); if(typeof renderSuiviAppels==='function')renderSuiviAppels(); return; }
       if(!confirm('Associer cette photo à « '+_phStepLbl(step)+' — '+(m.siteAgent||m.titre||'')+' » ?\n\n✅ Le ticket correspondant sera RÉGLÉ (preuve photo) : plus besoin d\'appeler.'))return;
-      saSet(mid,step,{done:true,hm:phHM(it.ts),photo:'Photo horodatée',photoKey:it.key,viaPhoto:true,by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'photo')});
+      /* b338 : « man » dit que c'est l'AGENCE qui a rapproche cette photo. Sans ce marqueur, l'ecart
+         entre l'heure de la photo et l'heure prevue faisait basculer la ligne en « hors delai » : on
+         croyait le rapprochement ignore alors qu'il avait bien eu lieu. Cet ecart ne dit rien du
+         pointage — c'est l'heure de la photo qu'on vient de choisir. */
+      saSet(mid,step,{done:true,hm:phHM(it.ts),photo:'Photo horodatée',photoKey:it.key,viaPhoto:true,man:1,by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'photo')});
       if(typeof photoArchiveAdd==='function')photoArchiveAdd({key:it.key,mid:mid,step:step,site:(m.siteAgent||m.titre||''),agent:(m.agentId&&typeof faById==='function'&&faById(m.agentId))?faById(m.agentId).nom:'',mdate:m.mdate||'',sk:(typeof tnorm==='function'?tnorm(m.siteAgent||m.titre||''):'')+'|'+(m.mdate||'')+'|'+step});
-      SA_PH.splice(i,1); renderSaPhotosIn(); _phFillList(); if(typeof renderSuiviAppels==='function')renderSuiviAppels(); }; });
+      SA_PH.splice(i,1); renderSaPhotosIn(); _phFillList(); if(typeof renderSuiviAppels==='function')renderSuiviAppels();
+      if(typeof notifScan==='function'){try{notifScan();}catch(e){}}   /* b338 */
+      if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}} }; });
   }
   // ===== b149+b150+b152 : pastilles de contrôle (masquées au rôle opérateur) =====
   var PP_START=null,PP_WEEK=null;
