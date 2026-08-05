@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b324</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b325</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2251,7 +2251,29 @@ button.big:active{transform:translateY(1px)}
     else if(act==='togsearch'){ it.noSearch=!it.noSearch; delete it._near; delete it._pick; delete it._pick2; if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); return; }
     else if(act==='toiv'){ if(!confirm('Basculer cette demande vers la section 🚨 Interventions ?\n\nElle y démarre en recherche (cascade d’appels) et sera close ici (« Basculée vers Interventions »).'))return; var _o={id:'iv'+Date.now()+'_'+Math.round(Math.random()*9999),nature:(it.aiNature==='ronde'?'ronde':'intervention'),presta:(it.aiNature==='ronde'?'Ronde':'Intervention'),client:it.client||'',site:(it.siteAgent||it.titre||''),sitetype:'',ville:it.ville||'',cp:it.cp||'',la:(it.la!=null?it.la:null),lo:(it.lo!=null?it.lo:null),dep:(it.cp?String(it.cp).slice(0,2):''),date:(it.mdate||impTodayISO()),hdeb:(it.mheure||''),hfin:(it.mfin||''),aiCdr:it.aiCdr||''}; var _ok=(typeof window._ivCreateFromAI==='function')&&window._ivCreateFromAI(_o); if(_ok){ it.statut='traitee'; it.valide=Date.now(); it.motif='Basculée vers Interventions'; delete it.aiPending; saveSuivi(); renderSuivi(); if(typeof window._ivRender==='function')window._ivRender(); alert('🚨 Basculée — retrouve-la dans l’onglet Interventions.'); } else alert('Bascule impossible (module Interventions indisponible).'); return; }
     else if(act==='traite'){ it.statut='traitee'; it.valide=Date.now(); it.motif='Traité (sans recherche)'; delete it._pending; delete it._near; delete it._pick; delete it._pick2; if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); return; }
-    else if(act==='del'){ if(!confirm('Supprimer définitivement cette demande ?'))return; var _sdel=null; for(var _sdi=0;_sdi<SUIVI.length;_sdi++){if(SUIVI[_sdi].id===id){_sdel=SUIVI[_sdi];break;}} if(_sdel){_sdel.deleted=true;_sdel.creeAt=Date.now();} /* b304 : soft-delete */ }
+    else if(act==='del'){
+      /* b325 : un clic ne doit pas suffire a retirer une mission validee. L'avertissement NOMME ce
+         qu'on supprime — site, date, horaires, agent — et rappelle que la vacation quittera le
+         Planning. Sans ces reperes on confirme sans savoir sur quoi on a clique. */
+      var _sdel=null; for(var _sdi=0;_sdi<SUIVI.length;_sdi++){if(SUIVI[_sdi].id===id){_sdel=SUIVI[_sdi];break;}}
+      if(!_sdel)return;
+      var _quoi=(_sdel.siteAgent||_sdel.titre||'(sans site)');
+      var _q=(_sdel.mdate?('\n  le '+String(_sdel.mdate).split('-').reverse().join('/')):'')
+            +((_sdel.mheure||_sdel.mfin)?(' \u00b7 '+(_sdel.mheure||'?')+' \u2192 '+(_sdel.mfin||'?')):'');
+      var _ag=''; try{ if(_sdel.agentId&&typeof faById==='function'){ var _a=faById(_sdel.agentId); if(_a&&_a.nom)_ag='\n  Agent : '+_a.nom; } }catch(_e){}
+      var _msg;
+      if(_sdel.statut==='validee'){
+        _msg='\u26a0\ufe0f ATTENTION \u2014 MISSION VALID\u00c9E'
+          +'\n\nTu es sur le point de supprimer une vacation qui est dans les missions valid\u00e9es :'
+          +'\n\n  '+_quoi+_q+_ag
+          +'\n\nElle dispara\u00eetra du Planning et de toutes les vues.'
+          +'\n\nConfirmer la suppression ?';
+      } else {
+        _msg='Supprimer cette demande ?\n\n  '+_quoi+_q+_ag;
+      }
+      if(!confirm(_msg))return;
+      _sdel.deleted=true; _sdel.creeAt=Date.now();   /* b304 : suppression douce */
+    }
     else if(act==='pick'){var o=it._pick;delete it._pick2;it._pick=!o;}
     else if(act==='pick2'){var o2=it._pick2;delete it._pick;it._pick2=!o2;}
     else if(act==='near'){ if(it._near){delete it._near;} else { delete it._pick;delete it._pick2; it._near=true; if(it.la==null&&!it._nogeo){ ensureGeo(it,function(){ if(it._near){saveSuivi();renderSuivi();} }); } } saveSuivi(); renderSuivi(); return; }
