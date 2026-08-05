@@ -561,6 +561,14 @@
       "theme": "Fiabilité des données",
       "pourquoipas": "Suivi des demandes → Validées → 🗑️ Supprimer : le message nomme le site, la date, les horaires et l'agent, et rappelle que la vacation quitte le Planning.",
       "local": true
+    },
+    {
+      "b": 326,
+      "titre": "Demandes en recherche : la plus récente en haut + l'écran se met à jour",
+      "source": "Zeus — 05/08",
+      "theme": "Suivi des demandes",
+      "pourquoipas": "Suivi des demandes → En recherche : la dernière arrivée est en première position. Elle s'affiche même si un panneau était ouvert.",
+      "local": true
     }
   ],
   "attente": [
