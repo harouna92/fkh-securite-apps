@@ -3,6 +3,14 @@
   "maj": "2026-08-06",
   "items": [
     {
+      "b": 345,
+      "titre": "La fiche agent ne s'écrase plus · ⚠️ Signaler sur tous les tickets · ✍️ Info au superviseur",
+      "source": "Zeus — 06/08",
+      "theme": "Suivi des appels",
+      "local": true,
+      "pourquoipas": "Cas Varennes-Vauzelles : l'agent créé disparaissait (fkh_fa était la seule donnée sensible sans fusion) — il survit désormais à l'arrivée du classeur. « ⚠️ Signaler » est sur 100 % des tickets (avant : Prise et Fin seulement) : motif au choix, destinataire au choix, et le ticket RESTE non coché dans la file. « ✍️ Info au superviseur » amène la remontée existante dans Suivi des appels au lieu d'en faire sortir. Non-régression b344/b345 sur les vraies données : aucun écart."
+    },
+    {
       "b": 343,
       "titre": "Plus de vacations en double : une seule porte pour import, mails et création à la main",
       "source": "Zeus — 05/08",
