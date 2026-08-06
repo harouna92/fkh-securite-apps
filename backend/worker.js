@@ -19,6 +19,34 @@
 function _norm(x) {
   return String(x || "").toUpperCase().replace(/[^A-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
 }
+/* b343 : memes regles de rapprochement que l'appli (gestion/index.html, vacDejaLa). Si l'une change,
+   changer l'autre — sinon le serveur et l'ecran ne diraient plus la meme chose. */
+function _mots(x) { return _norm(x).split(" ").filter((w) => w.length > 2); }
+function _memeSite(a, b) {
+  const x = _norm(a), y = _norm(b);
+  if (!x || !y) return false;
+  if (x === y) return true;
+  const mx = _mots(x), my = _mots(y);
+  if (!mx.length || !my.length) return false;
+  const court = mx.length <= my.length ? mx : my, lng = court === mx ? my : mx;
+  const communs = court.filter((w) => lng.indexOf(w) >= 0).length;
+  return communs >= Math.max(1, Math.ceil(court.length * 0.6));
+}
+function _memeClient(a, b) {                 // le client sert a ECARTER, jamais a rapprocher
+  const x = _norm(a), y = _norm(b);
+  if (!x || !y) return true;
+  if (x === y) return true;
+  const mx = _mots(x), my = _mots(y);
+  if (!mx.length || !my.length) return true;
+  const court = mx.length <= my.length ? mx : my, lng = court === mx ? my : mx;
+  return court.some((w) => lng.indexOf(w) >= 0);
+}
+function _min(h) { const m = /^(\d{1,2}):(\d{2})/.exec(String(h || "")); return m ? +m[1] * 60 + +m[2] : null; }
+function _memeHeure(a, b) {                  // tolerance 2 h : un jour et une nuit ne se confondent pas
+  const x = _min(a), y = _min(b);
+  if (x === null || y === null) return true;
+  return Math.abs(x - y) <= 120;
+}
 function lireBonDeCommande(texte) {
   const sujet = String(texte || "").split("\n")[0].trim();
   const up = sujet.toUpperCase();
@@ -36,12 +64,30 @@ async function planifierDepuisMail(env, cdr, texte, data) {
   if (!row || !row.v) return;
   let liste = [];
   try { liste = JSON.parse(row.v) || []; } catch (_) { return; }
-  const sn = _norm(bdc.site);
+  /* ===== b343 : LE SERVEUR APPLIQUE LA MEME REGLE QUE L'APPLI =====
+     POURQUOI : ce garde-fou ne comparait que le NOM DU SITE, jamais l'heure, jamais la reference, et
+     ignorait completement les vacations SUPPRIMEES. Resultat mesure sur les vraies donnees : 15 des 20
+     vacations nees d'un mail doublonnaient une autre vacation, et 6 vacations supprimees par Zeus sont
+     revenues toutes seules — recreees ici, cote serveur, pendant qu'il dormait.
+     Meme regle que dans l'appli : reference d'abord, puis client + date + heure (a 2 h pres), le nom du
+     site ne servant plus qu'a ECARTER un faux rapprochement (deux sites differents du meme client le
+     meme jour ne doivent pas etre confondus). Et on REGARDE les supprimees : on ne bloque pas — une
+     prestation peut etre re-commandee — mais la vacation nait avec sa trace, que l'appli affiche. */
+  let supprimee = null;
   for (const m of liste) {
-    if (m && m.mailSrc === cdr) return;                          // ce mail a deja donne sa vacation
-    if (!m || (m.mdate || "") !== bdc.mdate) continue;           // date differente : ce n'est pas la meme
-    const ms = _norm(m.siteAgent || m.titre || "");
-    if (ms && (ms.indexOf(sn) >= 0 || sn.indexOf(ms) >= 0)) return;   // deja planifie ce jour-la
+    if (!m) continue;
+    if (m.mailSrc === cdr) return;                               // ce mail a deja donne sa vacation
+    if (m.statut && m.statut !== "validee") continue;
+    if (bdc.ref && m.ref && String(m.ref) === String(bdc.ref)) { // meme service : rien a creer
+      if (m.deleted) { supprimee = supprimee || m; continue; }
+      return;
+    }
+    if ((m.mdate || "") !== bdc.mdate) continue;                 // date differente : ce n'est pas la meme
+    if (!_memeHeure(m.mheure, bdc.heure)) continue;
+    if (!_memeClient(m.client, bdc.client)) continue;
+    if (!_memeSite(m.siteAgent || m.titre || m.siteBDC || "", bdc.site)) continue;
+    if (m.deleted) { supprimee = supprimee || m; continue; }
+    return;                                                      // deja planifie : le mail n'en refait pas une
   }
   const pdf = (data && data.pdf) || {};
   const vac = {
@@ -54,6 +100,9 @@ async function planifierDepuisMail(env, cdr, texte, data) {
     adresse: pdf.adresse || "", mdate: bdc.mdate, mheure: bdc.heure, mfin: "",
     ref: bdc.ref, titre: bdc.sujet.slice(0, 90), src: "mail",
   };
+  /* b343 : elle avait ete supprimee. On la recree (elle a pu etre re-commandee) mais JAMAIS en silence :
+     l'appli affiche « tu avais supprime cette vacation » sur sa fiche Planning. */
+  if (supprimee) vac.reCree = { quand: Date.now(), avant: String(supprimee.id || ""), supprLe: "" };
   // json_insert ajoute en fin de tableau sans reecrire tout le document : pas de limite de taille atteinte.
   await env.DB.prepare("UPDATE store SET v = json_insert(v, '$[#]', json(?)), updated_at = ? WHERE k = 'fkh_suivi'")
     .bind(JSON.stringify(vac), Date.now()).run();

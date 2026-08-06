@@ -226,7 +226,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v05-08·b342</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b344</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -982,6 +982,8 @@ button.big:active{transform:translateY(1px)}
   </section>
   <section id="sec-planning" class="hidden">
     <div><h1>📅 Planning</h1><p class="sub">Les <b>mêmes missions</b> que « Suivi demandes » (validées), présentées en grille sites × jours. Clique une case pour voir/affecter. Ajoute une vacation directement. Tout est lié : une modif ici se reflète partout.</p></div>
+    <div class="acts" style="margin:0 0 8px"><button type="button" id="pl-dbl-open" style="font-size:12px;border-color:#e0a13b;color:#e0a13b">🔁 Vacations en double</button></div>
+    <div id="pl-dbl-panel" class="hidden"></div>
     <div id="planning-body"></div>
   </section>
 </div>
@@ -4448,7 +4450,11 @@ button.big:active{transform:translateY(1px)}
              ligne n'apporte rien : sans agent, ou sur une vacation qui en a deja un. Sinon on la laisse
              passer, et la mise a jour reportera l'agent sur la vacation existante (regle Zeus 05/08). */
           if(vusCSV[mk]){ dupRef++; return; }
-          if(existMiss[mk] && (!hasAgent || existAgent[mk])){ dupRef++; return; }
+          /* b343 : l'aperçu compte comme « déjà en base » ce que la validation rattachera vraiment —
+             même rapprochement des deux côtés, sinon l'aperçu annonce des nouveautés qui n'en sont pas. */
+          var _dj=vacDejaLa({ref:ref,client:(C.client>=0?String(r[C.client]||'').trim():''),site:bdc,mdate:dt.date,mheure:dt.heure});
+          var _dje=_dj.exact||_dj.proche;
+          if(_dje && (!hasAgent || _dje.agentId)){ dupRef++; return; }
           if(!hasAgent&&!includeEmpty){ emptySkipped++; return; }
           if(bdc&&!sites[sn])sites[sn]={bdc:bdc,agent:siteMap[sn]||impSiteAgent(bdc)};
           missions.push({mdate:dt.date,mheure:dt.heure,finRaw:C.fin>=0?r[C.fin]:'',client:C.client>=0?String(r[C.client]||'').trim():'',bdc:bdc,sn:sn,rue:C.rue>=0?String(r[C.rue]||'').trim():'',cp:C.cp>=0?String(r[C.cp]||'').trim():'',ville:ville,poste:C.spec>=0?String(r[C.spec]||'').trim():'',agentNom:nom,agentTel:(pk&&pk.length>=9)?impNormPhone(rawTel):'',agentRef:agentRef,ref:ref});
@@ -4488,12 +4494,71 @@ button.big:active{transform:translateY(1px)}
     byId('imp-commit').onclick=impCommit;
     byId('imp-reset').onclick=function(){ byId('imp-preview').innerHTML=''; IMP={}; };
   }
+  /* ===== b343 : UNE SEULE PORTE POUR « CETTE VACATION EXISTE-T-ELLE DEJA ? » =====
+     POURQUOI : trois portes creent des vacations — l'import CSV, les mails, la creation a la main au
+     Planning — et chacune avait sa propre facon de chercher si la vacation existait deja. Toutes
+     comparaient le NOM DU SITE, qui est justement ce qui varie d'une source a l'autre :
+       « CENTRE CCIAL CARREFOUR ST ANDRE LES VERGERS » (mail) vs « CARREFOUR ST ANDRE LES VERGERS FRA100 » (import)
+       « Duc » vs « Duc Chailley Surveillance Ronde »
+     Mesure sur les vraies donnees du 05/08 : 15 des 20 vacations issues d'un mail doublonnaient une autre
+     vacation, et 98 doublons d'import dans toute la base.
+     COMMENT : on rapproche sur client + date + heure (a 2 h pres), et le nom du site ne sert plus qu'a
+     ECARTER un faux rapprochement — deux sites franchement differents du meme client le meme jour
+     (« Site n°1 : Poste de Vingeanne » et « Site n°2 : Pylone n°65 ») ne doivent pas etre confondus.
+     On regarde AUSSI les vacations supprimees : sans ca, un nettoyage ne tient pas (constate : 7 vacations
+     supprimees revenues, 6 par le mail). On ne bloque pas pour autant — une prestation peut etre
+     re-commandee apres annulation : on la cree et on le SIGNALE. */
+  function vacTxt(s){
+    var t=String(s||'').toLowerCase();
+    try{ t=t.normalize('NFD').replace(/[̀-ͯ]/g,''); }catch(e){}
+    return t.replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+  }
+  function vacMots(s){ return vacTxt(s).split(' ').filter(function(w){ return w.length>2; }); }
+  /* Deux libelles de site designent-ils le meme endroit ? Tolerant sur la forme, ferme sur le fond. */
+  function vacMemeSite(a,b){
+    var x=vacTxt(a), y=vacTxt(b); if(!x||!y)return false; if(x===y)return true;
+    var mx=vacMots(x), my=vacMots(y); if(!mx.length||!my.length)return false;
+    var court=(mx.length<=my.length)?mx:my, lng=(court===mx)?my:mx;
+    var communs=court.filter(function(w){ return lng.indexOf(w)>=0; }).length;
+    return communs>=Math.max(1,Math.ceil(court.length*0.6));
+  }
+  /* Le client sert a ECARTER, jamais a rapprocher : inconnu d'un cote -> on ne s'en sert pas. */
+  function vacMemeClient(a,b){
+    var x=vacTxt(a), y=vacTxt(b); if(!x||!y)return true; if(x===y)return true;
+    var mx=vacMots(x), my=vacMots(y); if(!mx.length||!my.length)return true;
+    var court=(mx.length<=my.length)?mx:my, lng=(court===mx)?my:mx;
+    return court.some(function(w){ return lng.indexOf(w)>=0; });
+  }
+  /* Renvoie { exact, proche, supprimee } :
+       exact     = meme Reference (identifiant du service, ce qui fait foi)
+       proche    = meme client + meme jour + meme heure (a 2 h pres) + site compatible
+       supprimee = le meme, mais que quelqu'un avait supprime */
+  function vacDejaLa(crit){
+    var out={exact:null,proche:null,supprimee:null};
+    if(!crit)return out;
+    var hm=(typeof toMin==='function')?toMin(crit.mheure||''):null;
+    for(var i=0;i<(SUIVI||[]).length;i++){
+      var m=SUIVI[i]; if(!m||m.sim)continue;
+      if(crit.ignorerId&&String(m.id)===String(crit.ignorerId))continue;
+      if(m.statut!=='validee')continue;
+      if(crit.ref&&m.ref&&String(m.ref)===String(crit.ref)){ if(m.deleted){ if(!out.supprimee)out.supprimee=m; } else if(!out.exact){ out.exact=m; } continue; }
+      if((m.mdate||'')!==(crit.mdate||''))continue;
+      var h2=(typeof toMin==='function')?toMin(m.mheure||''):null;
+      if(hm!=null&&h2!=null&&Math.abs(hm-h2)>120)continue;
+      if(!vacMemeClient(crit.client,m.client))continue;
+      if(!vacMemeSite(crit.site,(m.siteAgent||m.titre||m.siteBDC||'')))continue;
+      if(m.deleted){ if(!out.supprimee)out.supprimee=m; continue; }
+      if(!out.proche)out.proche=m;
+    }
+    return out;
+  }
+  function vacQuand(m){ var t=Math.max(+(m.valide||0),+(m.pris||0),+(m.creeAt||0)); if(!t)return ''; var d=new Date(t); return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' à '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2); }
   function impCommit(){
     var siteMap=impMap();
     document.querySelectorAll('.imp-site').forEach(function(inp){ var k=inp.getAttribute('data-k'); var v=inp.value.trim(); if(v&&IMP.sites[k]){ IMP.sites[k].agent=v; siteMap[k]=v; } });
     var newIds={}, base=Date.now();
     Object.keys(IMP.agentsByPhone).forEach(function(pk,i){ var a=IMP.agentsByPhone[pk]; var id='a'+base+'_'+i+'_'+pk.slice(-4); FA.push({id:id,nom:a.nom||'',tels:[a.tel],ville:a.ville||'',cp:a.cp||'',la:null,lo:null,dep:'',depnom:'',fiab:'',voiture:null,ads:null,intervention:false,interv:[],src:'import'}); newIds[pk]=id; });
-    var siteNoms=load('fkh_site_noms')||[], agentNoms=load('fkh_agent_noms')||[], updated=0;
+    var siteNoms=load('fkh_site_noms')||[], agentNoms=load('fkh_agent_noms')||[], updated=0, _revenues=[];   /* b343 */
     function _trf(hm){ var mn=toMin(hm); if(mn==null)return ''; var h=Math.floor(mn/60); return (h>=8&&h<20)?'j':'n'; }
     IMP.missions.forEach(function(m,i){
       var siteAgent=(m.sn&&IMP.sites[m.sn])?IMP.sites[m.sn].agent:(m.bdc||'');
@@ -4505,10 +4570,12 @@ button.big:active{transform:translateY(1px)}
       lines.push('Début : '+deb); if(finTxt)lines.push('Fin : '+finTxt); if(m.poste)lines.push('Poste : '+m.poste);
       if(agentId){ var an=faById(agentId); lines.push('Agent : '+((an&&an.nom)||m.agentNom||'')+(m.agentTel?' — '+m.agentTel:'')); }
       // #2 (Jules) : ne PAS recréer un doublon. Si une mission existe déjà pour le même site + date + agent + tranche (jour/nuit), on la MET À JOUR (elle garde son ID → donc son état « fait » + photos ; l'import ne redemande plus les actions déjà faites).
-      var _siteN=siteNorm(m.bdc||siteAgent||''), _tr=_trf(m.mheure), _exist=null;
-      // Dédup par RÉFÉRENCE Sekur d'abord : identifiant unique du service. Même réf = même service -> MISE À JOUR en place (garde l'ID, donc les pointages/photos), quel que soit le nom de site ou l'agent. C'est ce qui tue les doublons au ré-import.
-      if(m.ref){ for(var _ri=0;_ri<SUIVI.length;_ri++){ if(SUIVI[_ri]&&SUIVI[_ri].ref&&SUIVI[_ri].ref===m.ref){ _exist=SUIVI[_ri]; break; } } }
-      if(!_exist)for(var _xi=0;_xi<SUIVI.length;_xi++){ var _xm=SUIVI[_xi]; if(_xm.statut!=='validee')continue; if(siteNorm(_xm.siteBDC||_xm.siteAgent||_xm.titre||'')!==_siteN)continue; if((_xm.mdate||'')!==(m.mdate||''))continue; if(_tr&&_trf(_xm.mheure)&&_trf(_xm.mheure)!==_tr)continue; if(agentId&&_xm.agentId&&_xm.agentId!==agentId)continue; _exist=_xm; break; }
+      /* b343 : une seule porte pour savoir si la vacation existe deja (reference, puis client+date+heure,
+         le nom de site ne servant plus qu'a ecarter un faux rapprochement). Avant, la recherche de secours
+         exigeait un nom de site IDENTIQUE : « Duc » et « Duc Chailley Surveillance Ronde » faisaient deux. */
+      var _r343=vacDejaLa({ref:m.ref,client:m.client,site:(m.bdc||siteAgent||''),mdate:m.mdate,mheure:m.mheure});
+      var _exist=_r343.exact||_r343.proche;
+      if(!_exist&&_r343.supprimee){ _revenues.push((siteAgent||m.bdc||'—')+' — '+(m.mdate||'')+(m.mheure?' '+m.mheure:'')+' (supprimée le '+vacQuand(_r343.supprimee)+')'); }
       if(_exist){ if(m.mheure)_exist.mheure=m.mheure; if(finTxt)_exist.mfin=finTxt; _exist.texte=lines.join('\n'); if(m.client)_exist.client=m.client; if(m.ville)_exist.ville=m.ville; if(agentId&&!_exist.agentId)_exist.agentId=agentId; if(m.ref)_exist.ref=m.ref; if(m.bdc)_exist.siteBDC=m.bdc; _exist.src='import'; updated++; if(siteAgent&&siteNoms.indexOf(siteAgent)<0)siteNoms.push(siteAgent); if(m.agentNom&&agentNoms.indexOf(m.agentNom)<0)agentNoms.push(m.agentNom); return; }
       var it={id:'imp'+base+'_'+i,texte:lines.join('\n'),titre:siteAgent+(m.ville?' — '+m.ville:''),statut:'validee',motif:'',pris:base,valide:base,ville:m.ville||'',la:null,lo:null,assoc:[],mdate:m.mdate,mheure:m.mheure,mfin:finTxt,client:m.client||'',siteAgent:siteAgent,siteBDC:m.bdc||'',poste:m.poste||'',ref:m.ref||'',src:'import'};
       if(agentId)it.agentId=agentId;
@@ -4520,7 +4587,10 @@ button.big:active{transform:translateY(1px)}
     saveFA(); saveSuivi();
     if(typeof COMBO_REFRESH!=='undefined'){ ['fkh_site_noms','fkh_agent_noms'].forEach(function(k){(COMBO_REFRESH[k]||[]).forEach(function(f){try{f();}catch(e){}});}); }
     var nMiss=IMP.missions.length, nAg=Object.keys(IMP.agentsByPhone).length;
-    byId('imp-preview').innerHTML='<div class="card" style="margin-top:10px;background:var(--panel2)"><b>✅ Import terminé</b><br>'+(nMiss-updated)+' nouvelle(s) mission(s) · '+updated+' mission(s) MISE(S) À JOUR (leur pointage déjà fait est conservé) · '+nAg+' fiche(s) agent créées.</div>';
+    /* b343 : une vacation qu'on avait supprimée et que le fichier ramène — on la crée (elle a pu être
+       re-commandée), mais on le DIT, sinon le nettoyage se défait en silence. */
+    var _revHtml=_revenues.length?('<div style="margin-top:8px;border-left:3px solid #e0a13b;padding-left:8px"><b style="color:#e0a13b">⚠️ '+_revenues.length+' vacation'+(_revenues.length>1?'s':'')+' que tu avais supprimée'+(_revenues.length>1?'s':'')+' '+(_revenues.length>1?'reviennent':'revient')+' avec ce fichier</b><div class="fa-d" style="margin-top:4px">'+_revenues.slice(0,12).map(esc).join('<br>')+(_revenues.length>12?'<br>… et '+(_revenues.length-12)+' autre(s)':'')+'</div><div class="sub" style="margin-top:4px">Si ce n\'est pas voulu, supprime-les au Planning.</div></div>'):'';
+    byId('imp-preview').innerHTML='<div class="card" style="margin-top:10px;background:var(--panel2)"><b>✅ Import terminé</b><br>'+(nMiss-updated)+' nouvelle(s) mission(s) · '+updated+' mission(s) MISE(S) À JOUR (leur pointage déjà fait est conservé) · '+nAg+' fiche(s) agent créées.'+_revHtml+'</div>';
     suiviBucket='validee'; renderSuivi(); if(typeof renderFA==='function')renderFA();
   }
   if(byId('imp-open'))byId('imp-open').onclick=function(){ byId('imp-panel').classList.toggle('hidden'); };
@@ -4701,9 +4771,25 @@ button.big:active{transform:translateY(1px)}
   if(byId('clf-search'))byId('clf-search').addEventListener('input',function(){ if(typeof renderClientsF==='function')renderClientsF(); });
   // ===== 🦺 Contrôle tenue déclenchable (remontée #27) =====
   // Crée une consigne « contrôle tenue » dans Suivi des appels pour un agent (manuel depuis le Planning, ou auto à la réception d'un ensemble).
-  function tenueCtrlDemand(nom,mid,site,mdate,heure,origine){ if(typeof csgLoad!=='function')return false; var srcId='tctrl_'+(typeof tnorm==='function'?tnorm(nom||''):nom)+'_'+(mdate||impTodayISO()); var cc=csgLoad(); if(cc.some(function(x){return x.srcId===srcId&&!x.done;}))return false;
-    cc.push({id:csgNewId(),srcId:srcId,texte:'🦺 CONTRÔLE TENUE à faire — '+(nom||'agent')+(site?' · '+site:'')+'\n👉 Demander la photo tenue (lien photo) et vérifier gilet / logo / matricule.'+(origine?'\n📎 Déclenché : '+origine:''),client:'',site:site||'',ville:'',cp:'',mdate:mdate||impTodayISO(),heure:heure||'',done:false,note:'',aiGen:false,tenueCtrl:true,mid:mid||''});
-    csgSave(cc); if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:srcId,title:'🦺 Contrôle tenue demandé',body:(nom||'')+(site?' · '+site:''),go:'suiviappels'}); return true; }
+  /* ===== b344 : LE CONTRÔLE TENUE EST L'AFFAIRE DU SUPERVISEUR (règle Zeus, 06/08) =====
+     AVANT : la demande partait en CONSIGNE dans « Suivi des appels », c'est-à-dire dans la file de
+     l'OPÉRATEUR, mêlée à ses tickets d'appels. Le superviseur n'entrait en jeu qu'à la toute fin, pour
+     valider une photo déjà prise (🧭 Terrain).
+     MAINTENANT : la demande part directement chez le superviseur, dans 🧭 Terrain — la même section où
+     il valide les photos. Un seul endroit pour tout ce qui touche la tenue, un seul responsable.
+     Les consignes déjà créées avant ce changement restent dans Suivi des appels jusqu'à ce qu'elles
+     soient cochées : on ne fait disparaître aucune demande en cours. */
+  function tenueCtrlDemand(nom,mid,site,mdate,heure,origine){
+    if(typeof supTerrainAdd!=='function')return false;
+    var srcId='tctrl_'+(typeof tnorm==='function'?tnorm(nom||''):nom)+'_'+(mdate||impTodayISO());
+    var deja=(typeof stLoad2==='function')?stLoad2():[];
+    if(deja.some(function(x){ return x.srcId===srcId&&x.statut!=='resolu'; }))return false;   // une seule demande ouverte par agent et par jour
+    var a=(typeof faByNom==='function')?faByNom(nom):null;
+    supTerrainAdd({type:'tenuedemande',srcId:srcId,agent:nom||'',agentTel:(a&&a.tels&&a.tels[0])||'',
+      site:site||'',mid:mid||'',mdate:mdate||impTodayISO(),heure:heure||'',origine:origine||'',
+      par:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'')});
+    if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:srcId,title:'🦺 Contrôle tenue à faire',body:(nom||'')+(site?' · '+site:''),go:'supterrain'});
+    return true; }
   // Auto : quand un agent REÇOIT un ensemble (Gilet + Logo reçus, règle à affiner ensemble) → contrôle tenue à sa PROCHAINE vacation validée.
   function tenueCtrlAutoCheck(nom){ try{ var r=(typeof distGet==='function')?distGet(nom):null; if(!r)return; var rc=(typeof distRecuArr==='function')?distRecuArr(r):[]; var has=function(p){return rc.some(function(x){return String(x).toLowerCase()===p;});};
     var ensemble=(r.statut==='recu')||(has('gilet')&&has('logo')); if(!ensemble)return;
@@ -4723,10 +4809,20 @@ button.big:active{transform:translateY(1px)}
     var a=stLoad2(); if(!a.length){ box.innerHTML='<div class="card"><div class="sub" style="margin:0">Rien à traiter. Les alertes « 📵 Injoignable » des opérateurs et les contrôles tenue photo arrivent ici.</div></div>'; return; }
     var esc2=a.filter(function(x){return x.statut==='escalade';}), att=a.filter(function(x){return x.statut==='attente';}), res=a.filter(function(x){return x.statut==='resolu';}).slice(0,20);
     function card(x){ var left=x.deadline?Math.max(0,Math.floor((x.deadline-Date.now())/60000)):null; var bord=x.statut==='escalade'?'#c02626':(x.statut==='attente'?'#e0a13b':'var(--ok)');
-      var head=(x.type==='tenuephoto'?'🦺 Contrôle tenue (photo) à valider':'📵 Agent injoignable — '+(x.key==='fin'?'FIN de service':'PRISE de service'));
+      var head=(x.type==='tenuedemande'?'🦺 Contrôle tenue À FAIRE'   /* b344 */
+               :x.type==='tenuephoto'?'🦺 Contrôle tenue (photo) à valider'
+               :'📵 Agent injoignable — '+(x.key==='fin'?'FIN de service':'PRISE de service'));
       var info=[(x.agent?'👤 '+esc(x.agent):''),(x.agentTel?'📞 <a class="call" href="tel:'+esc(String(x.agentTel).replace(/\s/g,''))+'">'+esc(x.agentTel)+'</a>':''),(x.site?'📍 '+esc(x.site):''),(x.client?'🏢 '+esc(x.client):''),(x.heure?'🕐 prévu '+esc(x.heure):''),(x.tries?'☎ '+x.tries+' tentative(s)':''),('signalé par '+esc(x.by||'—'))].filter(Boolean).join(' · ');
       var acts='';
       if(x.statut!=='resolu'){ if(x.type==='injoignable'){ acts='<div class="acts" style="gap:6px;flex-wrap:wrap;margin-top:5px"><button class="ok st2-ok" data-id="'+esc(x.id)+'" style="font-size:12px">✅ Joint — il est sur site (coche le ticket)</button><button class="no st2-esc" data-id="'+esc(x.id)+'" style="font-size:12px">🔴 Toujours injoignable (escalader)</button><button class="st2-close" data-id="'+esc(x.id)+'" style="font-size:12px">✖ Clore sans coche</button></div>'; }
+        /* b344 : une demande de contrôle tenue se TRAITE ici — appeler l'agent, lui envoyer le lien
+           photo, puis clore. Sans ces boutons, le superviseur verrait la demande sans pouvoir agir. */
+        else if(x.type==='tenuedemande'){ acts='<div class="acts" style="gap:6px;flex-wrap:wrap;margin-top:5px">'
+            +(x.agentTel?'<a class="btn call" href="tel:'+esc(String(x.agentTel).replace(/\s/g,''))+'" style="font-size:12px">📞 Appeler l’agent</a>':'<span class="sub" style="font-size:11.5px;align-self:center">n° inconnu</span>')
+            +'<button class="st2-lien" data-id="'+esc(x.id)+'" style="font-size:12px;border-color:#6ea8fe;color:#6ea8fe">📷 Envoyer le lien photo</button>'
+            +'<button class="st2-fiche" data-ag="'+esc(x.agent||'')+'" style="font-size:12px">→ Fiche agent</button>'
+            +'<button class="ok st2-close" data-id="'+esc(x.id)+'" style="font-size:12px">✅ Contrôle fait</button>'
+            +'<button class="st2-close" data-id="'+esc(x.id)+'" style="font-size:12px;color:var(--muted)">🚫 Sans objet</button></div>'; }
         else { acts='<div class="acts" style="gap:6px;flex-wrap:wrap;margin-top:5px">'+(x.photoKey?'<a href="#" class="st2-photo" data-k="'+esc(x.photoKey)+'" style="font-size:12px;color:#6ea8fe;align-self:center">🖼️ voir la photo</a>':'')+'<button class="ok st2-close" data-id="'+esc(x.id)+'" style="font-size:12px">✅ Validé</button></div>'; } }
       return '<div class="card" style="padding:8px;margin-bottom:6px;border-left:4px solid '+bord+'"><div style="font-size:11px;color:var(--muted)">'+new Date(x.at).toLocaleString('fr-FR').slice(0,17)+(x.statut==='escalade'?' · <b style="color:#c02626">🔴 ESCALADÉ (sans réaction en 10 min)</b>':(x.statut==='attente'&&left!=null?' · ⏳ '+left+' min avant escalade':''))+(x.statut==='resolu'?' · <span style="color:var(--ok)">✅ '+esc(x.resolution||'résolu')+(x.resBy?' par '+esc(x.resBy):'')+'</span>':'')+'</div><div style="font-weight:700;margin:2px 0">'+head+'</div><div class="fa-d">'+info+'</div>'+acts+'</div>'; }
     box.innerHTML=(esc2.length?'<div class="lab" style="color:#c02626;margin:0 0 4px">🔴 '+esc2.length+' escaladé'+(esc2.length>1?'s':'')+' — admin/super-admin avisés</div>'+esc2.map(card).join(''):'')
@@ -4736,6 +4832,9 @@ button.big:active{transform:translateY(1px)}
     box.querySelectorAll('.st2-esc').forEach(function(b){ b.onclick=function(){ var a2=stLoad2(),x=a2.filter(function(y){return y.id===b.getAttribute('data-id');})[0]; if(!x)return; x.statut='escalade'; x.escAt=Date.now(); stSave2(a2); if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'stesc'+x.id,title:'🔴 ESCALADE superviseur — agent toujours injoignable',body:(x.agent||'')+' · '+(x.site||''),go:'supterrain'}); renderSupTerrain(); }; });
     box.querySelectorAll('.st2-close').forEach(function(b){ b.onclick=function(){ var a2=stLoad2(),x=a2.filter(function(y){return y.id===b.getAttribute('data-id');})[0]; if(!x)return; x.statut='resolu'; x.resolution=(x.type==='tenuephoto'?'validé':'clos'); x.resAt=Date.now(); x.resBy=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||''; stSave2(a2); renderSupTerrain(); }; });
     box.querySelectorAll('.st2-photo').forEach(function(a3){ a3.onclick=function(ev){ ev.preventDefault(); if(typeof photoOpen==='function')photoOpen(a3.getAttribute('data-k')); }; });
+    /* b344 */
+    box.querySelectorAll('.st2-lien').forEach(function(b){ b.onclick=function(){ var x=stLoad2().filter(function(y){return y.id===b.getAttribute('data-id');})[0]; if(!x)return; if(typeof photoPortail==='function')photoPortail('','',x.agent||'','Photo de tenue'); else alert('Portail photo indisponible.'); }; });
+    box.querySelectorAll('.st2-fiche').forEach(function(b){ b.onclick=function(){ var nm=b.getAttribute('data-ag')||''; var tb=document.querySelector('#tabs button[data-s="fiche"]'); if(tb)tb.click(); var fs=byId('fa-search'); if(fs){ fs.value=nm; fs.dispatchEvent(new Event('input',{bubbles:true})); } }; });
   }
   // ===== 📅 Planning (style Sekur) : MÊMES missions validées (fkh_suivi) présentées en grille sites × jours. Le pont : modifier ici = modifier partout. =====
   var plWeek=null, PL_F={q:'',statut:'',client:'',agent:'',tranche:'',site:'',aff:''}, _plFocusQ=false, PL_GRAN='Semaine', plHeuresOpen=false, plMultiSel=false, plMultiCells=[]; // granularité : Jour · Semaine · Mois (calque Sekur)
@@ -4777,7 +4876,98 @@ button.big:active{transform:translateY(1px)}
     }catch(e){}
     return o;
   }
-  function planningAddVac(day,site){ _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift(signerVac({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day||impTodayISO(),mheure:'',mfin:'',src:'planning'})); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
+  /* ===== b343 : NETTOYER LES VACATIONS EN DOUBLE, LA LISTE SOUS LES YEUX =====
+     On regroupe avec la MEME regle que celle qui empeche desormais d'en creer (client + date + heure,
+     site tolerant). Dans chaque groupe, on garde d'office celui qui porte le TRAVAIL DEJA FAIT —
+     pointages et photos — puis un agent affecte, puis une reference. Rien n'est supprime sans que Zeus
+     ait vu la liste et clique. La suppression est celle du Planning (reversible par la Corbeille). */
+  function plDblGroupes(){
+    var vivantes=(SUIVI||[]).filter(function(m){ return m&&!m.deleted&&!m.sim&&m.statut==='validee'; });
+    var S=(typeof ssLoad==='function')?ssLoad():{};
+    function poids(m){
+      var r=S[m.id]||{}, n=0, ph=0;
+      Object.keys(r).forEach(function(k){ if(r[k]&&r[k].done)n++; if(r[k]&&r[k].photoKey)ph++; });
+      return {pointages:n,photos:ph,score:n*10+ph*10+(m.agentId?3:0)+(m.ref?2:0)+(m.mfin?1:0)};
+    }
+    var pris={}, groupes=[];
+    vivantes.forEach(function(m){
+      if(pris[m.id])return;
+      var g=vivantes.filter(function(x){
+        if(pris[x.id]&&x.id!==m.id)return false;
+        if(String(x.id)===String(m.id))return true;
+        if((x.mdate||'')!==(m.mdate||''))return false;
+        if(x.ref&&m.ref)return String(x.ref)===String(m.ref);
+        var h1=toMin(m.mheure||''), h2=toMin(x.mheure||'');
+        if(h1!=null&&h2!=null&&Math.abs(h1-h2)>120)return false;
+        if(!vacMemeClient(m.client,x.client))return false;
+        return vacMemeSite(m.siteAgent||m.titre||m.siteBDC||'', x.siteAgent||x.titre||x.siteBDC||'');
+      });
+      if(g.length<2)return;
+      g.forEach(function(x){ pris[x.id]=1; });
+      g.forEach(function(x){ x._p=poids(x); });
+      g.sort(function(a,b){ return (b._p.score-a._p.score)||(String(a.id)<String(b.id)?-1:1); });
+      groupes.push(g);
+    });
+    groupes.sort(function(a,b){ var da=(a[0].mdate||''),db=(b[0].mdate||''); return da<db?-1:da>db?1:0; });
+    return groupes;
+  }
+  function plDblOrigine(m){ return m.mailSrc?'📧 mail':(m.src==='import'||String(m.id).indexOf('imp')===0)?'📄 import':(m.src==='planning'||String(m.id).indexOf('pl')===0)?'✍️ créée à la main':(String(m.id).indexOf('ai')===0)?'📞 appel':'—'; }
+  function plDblRender(){
+    var box=byId('pl-dbl-panel'); if(!box)return;
+    var G=plDblGroupes();
+    if(!G.length){ box.innerHTML='<div class="card"><div class="sub" style="margin:0">✅ Aucune vacation en double.</div></div>'; return; }
+    var enTrop=G.reduce(function(n,g){ return n+g.length-1; },0);
+    box.innerHTML='<div class="card" style="border:2px solid #e0a13b">'
+      +'<div class="lab" style="margin:0 0 6px">🔁 '+G.length+' créneau'+(G.length>1?'x':'')+' en plusieurs exemplaires — <b>'+enTrop+' vacation'+(enTrop>1?'s':'')+' en trop</b></div>'
+      +'<p class="sub" style="margin:0 0 8px">Coché = <b>gardé</b>. On garde d’office l’exemplaire qui porte les pointages et les photos. Décoche pour changer d’avis ; les non cochés partiront à la Corbeille (récupérables).</p>'
+      +G.map(function(g,gi){
+        /* On ne decide JAMAIS a la place de Zeus dans deux cas :
+           — deux agents DIFFERENTS : c'est peut-etre un renfort, pas un doublon ;
+           — plusieurs exemplaires portent deja du TRAVAIL FAIT (pointages, photos) : en supprimer un
+             ferait disparaitre des appels reellement passes. (Mesure : 32 vacations dans ce cas.)
+           Dans ces groupes, tout reste coche : rien ne part tant qu'il n'a pas tranche lui-meme. */
+        var _ags={}; g.forEach(function(m){ if(m.agentId)_ags[m.agentId]=1; });
+        var _avecTravail=g.filter(function(m){ return m._p&&(m._p.pointages||m._p.photos); }).length;
+        var _ambigu=(Object.keys(_ags).length>1)||(_avecTravail>1);
+        var _raison=(Object.keys(_ags).length>1)
+          ? '⚠️ Agents différents — c’est peut-être un renfort, pas un doublon.'
+          : (_avecTravail>1 ? '⚠️ Plusieurs exemplaires portent des appels déjà pointés — en supprimer un ferait perdre ces preuves.' : '');
+        return '<div style="border:1px solid '+(_ambigu?'#e0a13b':'var(--line)')+';border-radius:10px;padding:8px;margin-bottom:8px">'
+          +'<div class="fa-n">'+esc(g[0].siteAgent||g[0].titre||'—')+' <span style="color:var(--muted);font-weight:400">'+esc(g[0].mdate||'')+(g[0].mheure?' · '+esc(g[0].mheure):'')+(g[0].client?' · '+esc(g[0].client):'')+'</span></div>'
+          +(_ambigu?'<div class="fa-d" style="color:#e0a13b;font-weight:700;margin-top:2px">'+_raison+' Rien n’est décoché : à toi de trancher.</div>':'')
+          +'<div class="list" style="margin-top:6px">'+g.map(function(m,i){
+            var p=m._p||{pointages:0,photos:0};
+            var info=[]; if(p.pointages)info.push('✅ '+p.pointages+' pointage'+(p.pointages>1?'s':'')); if(p.photos)info.push('📷 '+p.photos+' photo'+(p.photos>1?'s':''));
+            if(m.agentId&&typeof faById==='function'&&faById(m.agentId))info.push('👤 '+(faById(m.agentId).nom||'')); else info.push('👤 non affectée');
+            if(m.ref)info.push('réf '+m.ref);
+            return '<label class="it" style="cursor:pointer"><input type="checkbox" class="pl-dbl-keep" data-g="'+gi+'" data-id="'+esc(m.id)+'"'+((i===0||_ambigu)?' checked':'')+' style="margin-right:8px;align-self:center"><div style="flex:1"><div class="fa-n" style="font-size:13px">'+((i===0&&!_ambigu)?'<span style="color:var(--ok)">à garder</span> · ':'')+esc(m.siteAgent||m.titre||'—')+'</div><div class="fa-d">'+plDblOrigine(m)+' · créée '+esc(vacQuand(m)||'—')+' · '+esc(info.join(' · '))+'</div></div></label>';
+          }).join('')+'</div></div>';
+      }).join('')
+      +'<div class="acts" style="margin-top:6px"><button type="button" class="no" id="pl-dbl-go">🗑️ Supprimer les non cochés</button><button type="button" id="pl-dbl-close">Fermer</button></div></div>';
+    byId('pl-dbl-close').onclick=function(){ box.classList.add('hidden'); };
+    byId('pl-dbl-go').onclick=function(){
+      var garder={}, tous=[];
+      box.querySelectorAll('.pl-dbl-keep').forEach(function(c){ tous.push(c.getAttribute('data-id')); if(c.checked)garder[c.getAttribute('data-id')]=1; });
+      var aSuppr=tous.filter(function(id){ return !garder[id]; });
+      var groupesVides=plDblGroupes().filter(function(g){ return g.every(function(m){ return !garder[m.id]; }); }).length;
+      if(groupesVides){ alert('Chaque créneau doit garder au moins un exemplaire (' + groupesVides + ' n’en a plus).'); return; }
+      if(!aSuppr.length){ alert('Rien à supprimer : tout est coché.'); return; }
+      if(!confirm('Supprimer '+aSuppr.length+' vacation'+(aSuppr.length>1?'s':'')+' en double ?\n\nElles partent à la Corbeille — récupérables.'))return;
+      var n=0; aSuppr.forEach(function(id){ for(var i=0;i<SUIVI.length;i++){ if(String(SUIVI[i].id)===String(id)){ SUIVI[i].deleted=true; SUIVI[i].creeAt=Date.now(); n++; break; } } });
+      if(typeof saveSuivi==='function')saveSuivi();
+      if(typeof renderPlanning==='function')renderPlanning();
+      if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
+      plDblRender();
+      alert('🗑️ '+n+' vacation'+(n>1?'s':'')+' envoyée'+(n>1?'s':'')+' à la Corbeille.');
+    };
+  }
+  if(byId('pl-dbl-open'))byId('pl-dbl-open').onclick=function(){ var box=byId('pl-dbl-panel'); box.classList.toggle('hidden'); if(!box.classList.contains('hidden'))plDblRender(); };
+  function planningAddVac(day,site){
+    if(typeof vacDejaLa==='function'&&site&&site!=='—'){   /* b343 */
+      var _v=vacDejaLa({site:site,mdate:day||impTodayISO()}), _e=_v.exact||_v.proche;
+      if(_e&&!confirm('⚠️ Ce site a déjà une vacation le '+String(day||impTodayISO()).split('-').reverse().join('/')+((_e.mheure)?' à '+_e.mheure:'')+'.\n\nEn créer une SECONDE quand même ?'))return;
+    }
+    _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift(signerVac({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day||impTodayISO(),mheure:'',mfin:'',src:'planning'})); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
   // ===== Statuts de vacation (calqués sur Sekur : 9 codes) — voir releve-sekur/services-vacations.md =====
   function _plStatusMap(){ return {100:{l:'En attente',c:'#8a8f98'},110:{l:'En retard',c:'#e0562d'},120:{l:'Non réalisé',c:'#7a1f1f'},200:{l:'En cours',c:'#2563eb'},250:{l:'Prolongation',c:'#7b61ff'},300:{l:'Terminé',c:'#1a9e5c'},400:{l:'Interrompu',c:'#c02626'},500:{l:'En pause',c:'#e0a13b'},800:{l:'Non terminé',c:'#8a6d00'}}; }
   // État affiché : statut MANUEL prioritaire (m.vacStatus), sinon DÉRIVÉ de l'agent + l'heure (zéro ressaisie).
@@ -4923,6 +5113,7 @@ button.big:active{transform:translateY(1px)}
       
       +'<div class="sub" style="margin:4px 0 0;font-size:11.5px;color:var(--muted)">Origine : <b>'+esc(origineVac(m))+'</b>'+(m.creeAt?(' · le '+(function(){var d=new Date(m.creeAt);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' à '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2);})()):'')+'</div>'
 
+      +(m.reCree?'<div class="meta" style="background:rgba(224,161,59,.15);border:1.5px solid #e0a13b;border-radius:10px;padding:7px 10px;margin-top:6px"><span style="color:#e0a13b;font-weight:700">⚠️ Tu avais supprimé cette vacation</span><div class="fa-d" style="margin-top:3px">Supprimée le '+esc(m.reCree.supprLe||'—')+', puis recréée depuis un mail. Si ce n’est pas une nouvelle commande, supprime-la.</div></div>':'')   /* b343 */
       +(m.mailPending?'<div class="meta" style="background:rgba(123,97,255,.15);border:1.5px solid #7b61ff;border-radius:10px;padding:7px 10px;margin-top:6px"><span style="color:#a99bff;font-weight:700">📧 Vacation issue d’un mail — À VALIDER</span><div class="acts" style="margin-top:6px"><button type="button" class="ok pl-mail-ok" style="font-size:12px">✅ Valider cette vacation</button><button type="button" class="no pl-mail-ref" style="font-size:12px">🗑 Refuser (supprimer)</button></div></div>':'')+'<div class="acts" style="margin-top:10px;flex-wrap:wrap"><button class="pl-tenue" title="Créer un ticket contrôle tenue pour cette vacation (remontée #27)">🦺 Contrôle tenue</button><button class="pl-jump">↗ Ouvrir dans Suivi demandes</button><button class="pl-saoff" style="border-color:#e0a13b;color:#e0a13b">'+(m.saOff?'🔔 Réactiver dans Suivi des appels':'🔕 Retirer du Suivi des appels')+'</button><button class="no pl-del" title="Suppression DÉFINITIVE : disparaît du Planning et de Suivi des appels. Pour la remettre : en recréer une.">🗑️ Supprimer la vacation (définitif)</button><button class="pl-close">Fermer</button></div>';
     card.querySelectorAll('.pl-close').forEach(function(b){b.onclick=planningAffectClose;});
     var sel=card.querySelector('.pl-status'); if(sel)sel.onchange=function(){ if(sel.value)m.vacStatus=parseInt(sel.value,10); else delete m.vacStatus; m.valide=Date.now(); /* b304 */ if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); };
@@ -5024,7 +5215,14 @@ button.big:active{transform:translateY(1px)}
   function siteMetaSet(site,patch){ var o=siteMetaLoad(),k=(typeof tnorm==='function'?tnorm(site):String(site||'')); o[k]=Object.assign({},o[k]||{},patch); save('fkh_sites_meta',o); }
   function _plDurTxt(h1,h2){ var s=toMin(h1),e=toMin(h2); if(s==null||e==null)return ''; var d=e-s; if(d<=0)d+=1440; var hh=Math.floor(d/60),mm=d%60; return hh+'h'+(mm?('0'+mm).slice(-2):''); }
   // Ajouter une vacation sur un site+horaire+jour (clic case vide d'une ligne d'horaire) puis ouvrir la modale (affecter).
-  function planningAddVacH(day,site,h1,h2){ _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift(signerVac({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day,mheure:h1||'',mfin:h2||'',src:'planning'})); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
+  function planningAddVacH(day,site,h1,h2){
+    /* b343 : troisieme porte — la creation a la main. On previent AVANT de creer un doublon. */
+    if(typeof vacDejaLa==='function'){
+      var _v=vacDejaLa({site:site,mdate:day,mheure:h1}), _e=_v.exact||_v.proche;
+      if(_e&&!confirm('⚠️ Une vacation existe déjà pour ce site le '+(day||'').split('-').reverse().join('/')+' à '+((_e.mheure||'?'))+' :\n\n'+((_e.siteAgent||_e.titre||'—'))+(_e.client?' · '+_e.client:'')+'\n\nEn créer une SECONDE quand même ?'))return;
+      if(!_e&&_v.supprimee&&!confirm('⚠️ Tu avais supprimé une vacation identique (le '+vacQuand(_v.supprimee)+').\n\nLa recréer ?'))return;
+    }
+    _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift(signerVac({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day,mheure:h1||'',mfin:h2||'',src:'planning'})); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
   // Copier un site : duplique toutes ses vacations de la semaine affichée vers la semaine SUIVANTE (mêmes horaires, agents à réaffecter).
   function planningCopySite(site){ var wk=[],i; for(i=0;i<7;i++)wk.push(svcAddDays(plWeek,i)); var src=SUIVI.filter(function(m){ return !m.deleted&&m.statut==='validee'&&(m.siteAgent||m.titre||'—')===site&&m.mdate&&wk.indexOf(m.mdate)>=0; }); if(!src.length){ alert('Aucune vacation à copier pour ce site cette semaine.'); return; } if(!confirm('Copier les '+src.length+' vacation(s) de « '+site+' » vers la semaine suivante ?\n(Mêmes horaires, agents à réaffecter.)'))return; var now=Date.now(),n=0; src.forEach(function(m,k){ var nextDate=svcAddDays(m.mdate,7); if((SUIVI||[]).some(function(x){return !x.deleted&&x.statut==='validee'&&x.mdate===nextDate&&(x.siteAgent||x.titre||'—')===site;}))return; /* b305 : anti-doublon double-clic */ var c={}; for(var key in m){ if(key.charAt(0)!=='_')c[key]=m[key]; } c.id='pl'+now+'_'+k+'_'+Math.round(Math.random()*9999); c.mdate=nextDate; delete c.agentId; delete c.vacStatus; c.valide=now; c.pris=now; SUIVI.unshift(c); n++; }); if(typeof saveSuivi==='function')saveSuivi(); plWeek=svcAddDays(plWeek,7); renderPlanning(); alert('✅ '+n+' vacation(s) copiée(s) sur la semaine suivante (à affecter).'); }
   // ===== Tableau des heures (calque Sekur) : Hj/Hn/Hjf/Hnf, colonnes Semaine/Dimanche — nuit 21h→06h, fériés FR calculés, découpage à la minute =====
@@ -6705,7 +6903,13 @@ button.big:active{transform:translateY(1px)}
       steps.forEach(function(s){ if(s.t==null)return; var diff=Math.abs(pmin-s.t); if(diff>720)diff=1440-diff; if(diff>180)return; var S=ssLoad(); var done=!!(S[m.id]&&S[m.id][s.k]&&S[m.id][s.k].done);
         out.push({hm:(('0'+Math.floor(s.t/60)).slice(-2)+':'+('0'+(s.t%60)).slice(-2)),m:m,step:s.k,t:s.t,diff:diff,late:diff>60,done:done,cityMatch:(it.city&&typeof slugForPhoto==='function'&&slugForPhoto(m.ville||'')===it.city)}); }); });
     out.sort(function(a,b){ return (b.cityMatch-a.cityMatch)||(a.diff-b.diff); });
-    if(it.city){ /* b197 : photo geolocalisee => JAMAIS de candidat d'une autre ville (meme ville, ou ville non renseignee sur la vacation) */
+    /* b344 : « ville_inconnue » n'est PAS une ville — c'est l'absence de position.
+       Le portail range la photo sous `u/ville_inconnue/…` quand le GPS n'a pas repondu a temps ; le
+       filtre b197 la prenait pour une ville reelle et ne proposait plus que les vacations SANS ville
+       renseignee. C'est pour ca que Zeus ne voyait que Duc et le Casino, et pas Decathlon (8h30, a
+       9 minutes de la photo) : Decathlon a une ville, donc il etait ecarte.
+       Pas de position = on ne filtre plus sur la ville, on propose tout le jour. */
+    if(it.city && it.city!=='ville_inconnue'){ /* b197 : photo geolocalisee => JAMAIS de candidat d'une autre ville */
       out=out.filter(function(c){ return c.cityMatch || !(c.m.ville&&String(c.m.ville).trim()); });
     }
     return out.slice(0,10); }
@@ -6773,13 +6977,16 @@ button.big:active{transform:translateY(1px)}
      dit pas comment l'agent est habille, et c'est justement la question posee. Chaque agent porte donc
      sa vignette, cliquable pour l'agrandir ; celui qui n'en a pas le dit, avec le bouton pour y remedier
      tout de suite. (Demande Zeus 05/08.) */
-  function _tnLigneAgent(n){
+  /* b344 : depuis un agent sans photo, deux issues — associer une photo déjà reçue, OU créer le ticket
+     de contrôle tenue rattaché à son site. Le ticket part chez le SUPERVISEUR (🧭 Terrain). */
+  function _tnLigneAgent(n,site){
     var ph=(typeof agentPhotosTenue==='function')?agentPhotosTenue(n):[];
     var vign=ph.length
       ? (ph.slice(0,2).map(function(p){ return '<span class="tn-ph" data-k="'+esc(p.key)+'" style="cursor:zoom-in">'+((typeof photoThumbTag==='function')?photoThumbTag(p.key):'')+'</span>'; }).join('')
          +(ph.length>2?('<span class="sub" style="margin:0;font-size:11px">+'+(ph.length-2)+'</span>'):''))
       : ('<span style="color:var(--warn);font-size:12px">\u2014 pas de photo</span>'
-         +'<button type="button" class="tn-portail" data-nom="'+esc(n)+'" style="font-size:11.5px;margin-left:6px;border-color:#6ea8fe;color:#6ea8fe">\ud83d\udcf7 Choisir une photo re\u00e7ue</button>');
+         +'<button type="button" class="tn-portail" data-nom="'+esc(n)+'" style="font-size:11.5px;margin-left:6px;border-color:#6ea8fe;color:#6ea8fe">\ud83d\udcf7 Choisir une photo re\u00e7ue</button>'
+         +'<button type="button" class="tn-ticket" data-nom="'+esc(n)+'" data-site="'+esc(site||'')+'" title="Cr\u00e9er le ticket de contr\u00f4le tenue \u2014 il part chez le superviseur (\ud83e\udded Terrain)" style="font-size:11.5px;margin-left:6px;border-color:#e0a13b;color:#e0a13b">\ud83c\udfab Ticket contr\u00f4le tenue</button>');
     return '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:4px 0;border-bottom:1px dashed var(--line)">'
       +'<span style="flex:1;min-width:140px">\ud83d\udc64 '+esc(n)+'</span>'+vign+'</div>';
   }
@@ -6802,20 +7009,20 @@ button.big:active{transform:translateY(1px)}
         return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)">'
           +'<div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b style="flex:1;min-width:140px">'+esc(o.nom)+'</b>'
           +'<span class="sub" style="margin:0">📍 '+esc(o.sitesL.join(' · '))+'</span></div>'
-          +'<div class="acts" style="margin-top:7px"><button type="button" class="tn-portail" data-nom="'+esc(o.nom)+'" style="font-size:12px;border-color:#6ea8fe;color:#6ea8fe">📷 Choisir une photo reçue</button></div></div>';
+          +'<div class="acts" style="margin-top:7px"><button type="button" class="tn-ticket" data-nom="'+esc(o.nom)+'" data-site="'+esc((o.sitesL&&o.sitesL[0])||'')+'" title="Créer le ticket de contrôle tenue — il part chez le superviseur (🧭 Terrain)" style="font-size:12px;border-color:#e0a13b;color:#e0a13b">🎫 Ticket contrôle tenue</button><button type="button" class="tn-portail" data-nom="'+esc(o.nom)+'" style="font-size:12px;border-color:#6ea8fe;color:#6ea8fe">📷 Choisir une photo reçue</button></div></div>';
       }).join(''):'<div class="sub">Tous les agents planifiés aujourd\'hui ont une photo de tenue.</div>';
     } else if(vue==='ko'){
       htm+=d.sitesKO.length?d.sitesKO.map(function(o){
         return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)">'
           +'<b>'+esc(o.site)+'</b> <span class="sub" style="margin:0">— '+o.manquants.length+' agent(s) sans photo sur '+o.agents.length+'</span>'
-          +'<div style="margin-top:6px">'+o.agents.map(_tnLigneAgent).join('')
+          +'<div style="margin-top:6px">'+o.agents.map(function(_n){return _tnLigneAgent(_n,o.site);}).join('')
           +'</div></div>';
       }).join(''):'<div class="sub">Aucun site en manque : tous les agents du jour ont une photo.</div>';
     } else {
       htm+=d.sitesOK.length?d.sitesOK.map(function(o){
         return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)">'
           +'<b>'+esc(o.site)+'</b> <span class="sub" style="margin:0">— '+o.agents.length+' agent(s), tous avec photo</span>'
-          +'<div style="margin-top:6px">'+o.agents.map(_tnLigneAgent).join('')+'</div></div>';   /* b339 */
+          +'<div style="margin-top:6px">'+o.agents.map(function(_n){return _tnLigneAgent(_n,o.site);}).join('')+'</div></div>';   /* b339 */
       }).join(''):'<div class="sub">Aucun site entièrement couvert pour le moment.</div>';
     }
     pop.innerHTML=htm; document.body.appendChild(pop);
@@ -6826,6 +7033,17 @@ button.big:active{transform:translateY(1px)}
       var k=sp.getAttribute('data-k');
       if(typeof photoOpen==='function'){ photoOpen(k); return; }
       if(typeof photoBlobUrl==='function')photoBlobUrl(k,function(u){ if(u)window.open(u,'_blank'); });
+    }; });
+    /* b344 : le ticket part chez le superviseur, rattaché au site de l'agent. */
+    pop.querySelectorAll('.tn-ticket').forEach(function(b){ b.onclick=function(){
+      var nom=b.getAttribute('data-nom')||'', site=b.getAttribute('data-site')||'';
+      var mid='', ag=(typeof faByNom==='function')?faByNom(nom):null, today=impTodayISO();
+      if(ag)(typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.deleted||m.statut!=='validee'||m.agentId!==ag.id)return; if((m.mdate||'')!==today)return; if(!mid){ mid=m.id; if(!site)site=m.siteAgent||m.titre||''; } });
+      if(!confirm('Créer le ticket « 🦺 CONTRÔLE TENUE à faire » pour '+nom+(site?'\nSite : '+site:'')+'\n\nIl part chez le SUPERVISEUR, dans 🧭 Terrain.'))return;
+      var ok=(typeof tenueCtrlDemand==='function')&&tenueCtrlDemand(nom,mid,site,today,'','pastille 👕 Photos de contrôle tenue');
+      alert(ok?'🎫 Ticket créé — le superviseur le voit dans 🧭 Terrain.':'Un contrôle tenue est déjà en attente pour cet agent aujourd’hui.');
+      if(typeof supTerrainBadge==='function')supTerrainBadge();
+      tnOuvrir(vue);
     }; });
     pop.querySelectorAll('.tn-portail').forEach(function(b){ b.onclick=function(){
       if(typeof photoPortail==='function')photoPortail('','',b.getAttribute('data-nom'),'Photo de tenue'); }; });
@@ -6956,12 +7174,39 @@ button.big:active{transform:translateY(1px)}
       if(!--restants)fini(); }
     photoList('u/',ajouter); photoList('agent/',ajouter);
   }
+  /* b344 : toutes les étapes de toutes les vacations du jour de la photo — sans filtre d'écart horaire
+     ni de ville. C'est le filet quand les propositions automatiques passent à côté. */
+  function _phVacDuJour(it){
+    var dateISO=phDateISO(it.ts); if(!dateISO)return [];
+    var out=[];
+    (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){
+      if(m.deleted||m.statut!=='validee')return;
+      if((m.mdate||'')!==dateISO && (typeof svcAddDays!=='function'||svcAddDays(m.mdate||'',1)!==dateISO))return;
+      var steps=[]; if(m.mheure)steps.push({k:'prise',t:toMin(m.mheure)}); if(m.mfin)steps.push({k:'fin',t:toMin(m.mfin)});
+      try{ (apControls(m)||[]).forEach(function(c){ var t=toMin(c),k=ctrlKey(c); if(t!=null&&k)steps.push({k:k,t:t}); }); }catch(e){}
+      steps.forEach(function(s){ if(s.t==null)return; out.push({m:m,step:s.k,hm:pad2(Math.floor(s.t/60))+':'+pad2(s.t%60),t:s.t}); });
+    });
+    out.sort(function(a,b){ var sa=(a.m.siteAgent||a.m.titre||''),sb=(b.m.siteAgent||b.m.titre||''); return sa<sb?-1:sa>sb?1:(a.t-b.t); });
+    return out;
+  }
   function _phFillList(){ var list=byId('sa-ph-list'); if(!list||!SA_PH)return;
     list.innerHTML=SA_PH.map(function(it,i){ var when=(phDateISO(it.ts)?phDateISO(it.ts).split('-').reverse().join('/'):'?')+' à '+phHM(it.ts); var city=(it.city||'').replace(/_/g,' ');
       var cands=_phCandidates(it);
       var btns=cands.length?cands.map(function(c){ var site=c.m.siteAgent||c.m.titre||'—'; var ag=(c.m.agentId&&typeof faById==='function'&&faById(c.m.agentId))?faById(c.m.agentId).nom:''; return '<button type="button" class="sa-ph-att" data-i="'+i+'" data-mid="'+esc(c.m.id)+'" data-step="'+esc(c.step)+'" style="font-size:11.5px;margin:2px 4px 0 0;'+(c.done?'opacity:.55;':'')+(c.cityMatch?'border-color:var(--ok);':'')+(c.late?'border-color:#e0a13b;':'')+'">'+_phStepLbl(c.step)+' '+esc(site)+' '+esc(c.hm||'')+(ag?' · '+esc(ag):'')+(c.cityMatch?' 📍':'')+(c.late?' (décalé)':'')+(c.done?' (déjà coché)':'')+'</button>'+'<button type="button" class="sa-ph-att" data-i="'+i+'" data-mid="'+esc(c.m.id)+'" data-step="tenue" title="Associer comme CONTRÔLE TENUE de '+esc(site)+' (part en validation superviseur — 🧭 Terrain)" style="font-size:11.5px;margin:2px 6px 0 0;border-color:#7b61ff;color:#a99bff">🦺</button>'; }).join(''):'<span class="sub" style="font-size:11.5px">aucune vacation proche trouvée ce jour-là (±3 h)</span>';
       var _dlid='sa-ph-dl-'+i;
-      var _extra='<div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap;align-items:center">'
+      /* b344 : AUCUN cul-de-sac — si le bon site n'est pas dans les propositions (trop loin dans
+         l'horaire, ou photo sans position), on le choisit ici parmi TOUTES les vacations du jour,
+         toutes villes confondues. Avant, on ne pouvait rien faire. */
+      var _autres=_phVacDuJour(it);
+      var _libre=_autres.length?('<div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap;align-items:center">'
+        +'<span class="sub" style="margin:0;font-size:11.5px">Pas le bon site ?</span>'
+        +'<select class="sa-ph-autre" data-i="'+i+'" style="flex:1;min-width:190px;font-size:11.5px;padding:3px 5px"><option value="">— choisir une vacation du '+esc((phDateISO(it.ts)||'').split('-').reverse().join('/'))+' —</option>'
+        +_autres.map(function(c){ var ag=(c.m.agentId&&typeof faById==='function'&&faById(c.m.agentId))?faById(c.m.agentId).nom:''; return '<option value="'+esc(c.m.id)+'|'+esc(c.step)+'">'+esc((c.m.siteAgent||c.m.titre||'—'))+' · '+esc(c.hm)+' '+esc(_phStepLbl(c.step))+(ag?' · '+esc(ag):'')+(c.m.ville?' ('+esc(c.m.ville)+')':'')+'</option>'; }).join('')
+        +'</select>'
+        +'<button type="button" class="sa-ph-autre-go" data-i="'+i+'" style="font-size:11.5px">📎 Rattacher</button>'
+        +'<button type="button" class="sa-ph-autre-tenue" data-i="'+i+'" title="Associer comme contrôle TENUE de la vacation choisie" style="font-size:11.5px;border-color:#7b61ff;color:#a99bff">🦺 Contrôle tenue</button>'
+        +'</div>'):'';
+      var _extra=_libre+'<div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap;align-items:center">'
         +'<input class="sa-ph-ag" data-i="'+i+'" list="'+_dlid+'" placeholder="🦺 Photo de contrôle de… (nom de l\'agent)" autocomplete="off" style="flex:1;min-width:170px;font-size:12px;padding:3px 6px">'
         +_phAgentsDatalist(_dlid)
         +'<button type="button" class="sa-ph-tenue" data-i="'+i+'" style="font-size:11.5px;border-color:#e0a13b;color:#e0a13b">🦺 C\'est une photo de contrôle</button>'
@@ -6986,7 +7231,23 @@ button.big:active{transform:translateY(1px)}
         if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
       });
     }; });
-    list.querySelectorAll('.sa-ph-att').forEach(function(b){ b.onclick=function(){ var i=+b.getAttribute('data-i'), it=SA_PH[i]; if(!it)return; var mid=b.getAttribute('data-mid'), step=b.getAttribute('data-step'); var m=null; for(var j=0;j<SUIVI.length;j++)if(SUIVI[j].id===mid){m=SUIVI[j];break;} if(!m)return;
+    /* b344 : le choix libre réutilise EXACTEMENT le même chemin que les propositions automatiques —
+       on fabrique le clic sur un bouton .sa-ph-att, pour que la preuve et le ticket soient identiques. */
+    list.querySelectorAll('.sa-ph-autre-go,.sa-ph-autre-tenue').forEach(function(b){ b.onclick=function(){
+      var i=b.getAttribute('data-i'), sel=list.querySelector('.sa-ph-autre[data-i="'+i+'"]');
+      if(!sel||!sel.value){ alert('Choisis d’abord une vacation dans la liste.'); return; }
+      var p=sel.value.split('|'), tenue=b.classList.contains('sa-ph-autre-tenue');
+      var faux=document.createElement('button');
+      faux.className='sa-ph-att'; faux.setAttribute('data-i',i); faux.setAttribute('data-mid',p[0]); faux.setAttribute('data-step',tenue?'tenue':p[1]);
+      faux.style.display='none'; list.appendChild(faux);
+      _phWireAtt(faux); faux.click(); if(faux.parentNode)faux.parentNode.removeChild(faux);
+    }; });
+    _phWireAtt(list.querySelectorAll('.sa-ph-att'));
+  }
+  function _phWireAtt(cible){
+    var list=byId('sa-ph-list');
+    var els=(cible&&cible.length!==undefined)?cible:[cible];
+    Array.prototype.forEach.call(els,function(b){ b.onclick=function(){ var i=+b.getAttribute('data-i'), it=SA_PH[i]; if(!it)return; var mid=b.getAttribute('data-mid'), step=b.getAttribute('data-step'); var m=null; for(var j=0;j<SUIVI.length;j++)if(SUIVI[j].id===mid){m=SUIVI[j];break;} if(!m)return;
       if(step==='tenue'){ // Remontées #27/#22a : photo = contrôle tenue → validation SUPERVISEUR (🧭 Terrain), pas la file opérateur.
         if(!confirm('Associer cette photo comme CONTRÔLE TENUE de « '+(m.siteAgent||m.titre||'')+' » ?\n\n🦺 Elle part en validation superviseur (section 🧭 Terrain).'))return;
         var agN=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):'';
@@ -8102,6 +8363,17 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
         if(_ref.indexOf(it.cdr_id)>=0)return;
         if((SUIVI||[]).some(function(m){return m.mailSrc===it.cdr_id;}))return; // b305 : skip TOUJOURS même si deleted (suppression définitive — Zeus 05/08)
         if(mailsMatchMission(pp))return;
+        /* ===== b343 : LE MAIL EST LA PREMIERE SOURCE DE DOUBLONS =====
+           Mesure du 05/08 : 15 des 20 vacations issues d'un mail doublonnaient une autre vacation du
+           meme client, meme jour, meme heure — parce que le rapprochement ci-dessus compare le NOM DU
+           SITE, et qu'il n'est jamais ecrit pareil d'une source a l'autre. On repasse donc par la porte
+           commune (client + date + heure, site tolerant). */
+        var _d343=vacDejaLa({ref:pp.ref,client:pp.client,site:pp.site,mdate:pp.mdate,mheure:pp.heure});
+        if(_d343.exact||_d343.proche)return;                       // deja planifiee : le mail n'en refait pas une
+        /* Elle avait ete SUPPRIMEE. On ne bloque pas — une prestation peut etre re-commandee apres
+           annulation — mais on ne la ramene plus en silence : la vacation nait avec sa trace, visible
+           au Planning. Sans ca, un nettoyage ne tient pas (constate : 6 vacations revenues par le mail). */
+        var _supp343=_d343.supprimee||null;
         var _mpKey=(pp.site||'').toLowerCase().replace(/\s+/g,' ').trim()+'|'+(pp.mdate||'');
         if(_mpKey&&_mpCreated[_mpKey])return; // b304 : même site+date déjà créé dans ce batch
         if(_mpKey)_mpCreated[_mpKey]=1;
@@ -8135,6 +8407,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
         }catch(_f){}
         SUIVI.unshift({id:'mv'+Date.now()+'_'+Math.round(Math.random()*99999),statut:'validee',mailPending:true,mailSrc:it.cdr_id,client:pp.client||'',siteAgent:pp.site,ville:pp.ville||'',mdate:pp.mdate,mheure:pp.heure||'',mfin:'',titre:(pp.subject||'').slice(0,80),texte:'📧 Cree automatiquement depuis un mail'+(pp.ref?' (ref '+pp.ref+')':'')});
         if(_agentRepris){ try{ SUIVI[0].agentId=_agentRepris; }catch(_g){} }   /* b324 : l'agent deja affecte ne se perd pas */
+        if(_supp343){ try{ SUIVI[0].reCree={quand:Date.now(),avant:String(_supp343.id||''),supprLe:vacQuand(_supp343)}; }catch(_h){} }   /* b343 */
         _crea=true; });
       if(_crea){ save('fkh_suivi',SUIVI); if(typeof cloudPush==='function'){try{cloudPush('fkh_suivi');}catch(e){}} }
     if(mailsAnnulScan(items))_crea=true;   /* b229 */

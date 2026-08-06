@@ -1,7 +1,23 @@
 {
   "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
-  "maj": "2026-08-05",
+  "maj": "2026-08-06",
   "items": [
+    {
+      "b": 343,
+      "titre": "Plus de vacations en double : une seule porte pour import, mails et création à la main",
+      "source": "Zeus — 05/08",
+      "theme": "Planning",
+      "local": true,
+      "pourquoipas": "Rapprochement par client + date + heure, le nom de site ne servant plus qu'à écarter un faux rapprochement. Testé : « Duc » + « DUC CHAILLEY SURVEILLANCE RONDE » → une seule vacation ; les deux sites TERCA restent distincts. Bouton « 🔁 Vacations en double » dans le Planning : 82 proposées, 37 groupes protégés, 0 pointage perdu. Worker corrigé aussi — c'est lui qui recréait la nuit ce que Zeus supprimait."
+    },
+    {
+      "b": 344,
+      "titre": "Le contrôle tenue appartient au superviseur + rattacher une photo à n'importe quel site du jour",
+      "source": "Zeus — 06/08",
+      "theme": "Photos & preuves",
+      "local": true,
+      "pourquoipas": "Pastille 👕 → agent sans photo → « 🎫 Ticket contrôle tenue » → le superviseur le voit dans 🧭 Terrain avec Appeler / Envoyer le lien photo / Fiche agent / Contrôle fait / Sans objet. Et « ville_inconnue » n'est plus prise pour une ville : Decathlon (8h30, à 9 min de la photo) était écarté, il apparaît. Choix libre du site ajouté sous les propositions."
+    },
     {
       "b": 342,
       "titre": "On revient vraiment là où l'on était (Planning + rechargement du téléphone)",
