@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b355</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b356</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -256,6 +256,7 @@ button.big:active{transform:translateY(1px)}
     <button data-s="streste">💶 Reste ST</button>
     <button data-s="cockpitfkh">🌐 Domaines</button>
     <button data-s="tickets">🎫 Tickets</button>
+<button data-s="doublons">🧹 Doublons</button>
 <button data-s="corbeille">🗑️ Corbeille</button>
 <button data-s="droits">🔐 Droits d’accès</button>
 <button type="button" id="pc-btn" title="Prise / fin de service au PC — pour que tout le monde sache qui tient le poste">🎧 Prise de service PC</button>
@@ -956,6 +957,15 @@ button.big:active{transform:translateY(1px)}
     jamais se fermer la porte. Le réglage est <b>partagé</b> : il s’applique à tout le monde dès la prochaine ouverture.</p>
     <div id="dr-body"></div>
   </section>
+  <section id="sec-doublons" class="hidden">
+    <h2>🧹 Doublons certifiés</h2>
+    <p class="sub">Deux vacations qui portent la <b>même Référence Sekur</b> sont le même service : il y en a une de trop.
+    La Référence est l’identifiant que Sekur donne à une ligne de service — elle ne bouge pas, même quand l’horaire est réajusté.
+    <b>Deux Références différentes sur le même créneau, en revanche, ce sont deux agents commandés</b> : on n’y touche jamais.
+    Ici on garde toujours la copie qui porte le plus de travail, on <b>reporte</b> ce qui n’existe que sur l’autre, et la
+    suppression est <b>réversible</b>.</p>
+    <div id="dbl-body"></div>
+  </section>
   <section id="sec-corbeille" class="hidden">
     <h2>🗑️ Corbeille</h2>
     <p class="sub">Range ta barre : appui long sur un onglet, puis lâche-le sur 🗑️ Corbeille — il quitte la barre.
@@ -1035,10 +1045,10 @@ button.big:active{transform:translateY(1px)}
   }
   // Branche un bouton .gtime sur la grille : clic -> grille -> data-v + callback
   function bindTimeBtn(el,onPick){ if(!el)return; el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); openTimeGrid(el, tbGet(el), function(v){ tbSet(el,v); if(onPick)onPick(v); }); }); }
-  var secs=['droits','corbeille','demandes','noterapide','prise','fin','suivi','planning','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','numeros','clientsf','terrain','supterrain','streste','cockpitfkh','depots','mails','ref'];
+  var secs=['droits','corbeille','doublons','demandes','noterapide','prise','fin','suivi','planning','fiche','zone','thiam','suiviappels','assistant','tenues','services','dispatch','interv','cfgiv','appels','suivisite','supervision','tickets','numeros','clientsf','terrain','supterrain','streste','cockpitfkh','depots','mails','ref'];
   document.querySelectorAll('#tabs button').forEach(function(b){b.onclick=function(){var s=b.getAttribute('data-s');if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.sections&&CLOUD.sections.indexOf(s)<0)return;
     /* b342 : on releve la position AVANT de masquer la section — une section masquee rend toujours 0. */
-    if(typeof _posPrendre==='function'&&s!==_SCROLLCUR)_posPrendre(_SCROLLCUR);if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;if(s==='ref'){var _r8=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; if(_r8!=='admin'&&_r8!=='superadmin'&&_r8!=='full')return;} /* b198 : Sites & Clients = admin + super-admin */document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});try{document.body.classList.toggle('plfull',s==='planning');}catch(e){} /* b207 */if(s==='droits'&&typeof renderDroits==='function')renderDroits();if(s==='corbeille'&&typeof renderCorbeille==='function')renderCorbeille();if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='terrain'&&typeof renderTerrain==='function')renderTerrain();if(s==='supterrain'&&typeof renderSupTerrain==='function')renderSupTerrain();if(s==='clientsf'&&typeof renderClientsF==='function')renderClientsF();if(s==='planning'&&typeof renderPlanning==='function')renderPlanning();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if(s==='mails'&&typeof renderMails==='function')renderMails();if(s==='ref'&&typeof renderRef==='function')renderRef();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});_scrollGarder(s);};});
+    if(typeof _posPrendre==='function'&&s!==_SCROLLCUR)_posPrendre(_SCROLLCUR);if(typeof _secSuperOnly==='function'&&_secSuperOnly(s)&&typeof isSuperAdmin==='function'&&!isSuperAdmin())return;if(s==='ref'){var _r8=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full'; if(_r8!=='admin'&&_r8!=='superadmin'&&_r8!=='full')return;} /* b198 : Sites & Clients = admin + super-admin */document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});secs.forEach(function(k){byId('sec-'+k).classList.toggle('hidden',k!==s);});try{document.body.classList.toggle('plfull',s==='planning');}catch(e){} /* b207 */if(s==='droits'&&typeof renderDroits==='function')renderDroits();if(s==='corbeille'&&typeof renderCorbeille==='function')renderCorbeille();if(s==='doublons'&&typeof renderDoublons==='function')renderDoublons();/* b356 */if(s==='fiche'&&typeof renderFA==='function')renderFA();if(s==='zone'&&typeof renderZone==='function')renderZone();if(s==='suiviappels'&&typeof renderSuiviAppels==='function')renderSuiviAppels();if(s==='assistant'&&typeof asgOnOpen==='function')asgOnOpen();if(s==='tenues'&&typeof renderTenues==='function')renderTenues();if(s==='services'&&typeof renderServices==='function')renderServices();if(s==='dispatch'&&typeof renderDispatch==='function')renderDispatch();if(s==='interv'&&typeof window._ivRender==='function')window._ivRender();if(s==='cfgiv'&&typeof renderInterv==='function')renderInterv();if(s==='appels'&&typeof renderAppels==='function')renderAppels();if(s==='suivisite'&&typeof renderSuiviSite==='function')renderSuiviSite();if(s==='supervision'&&typeof renderSupervision==='function')renderSupervision();if(s==='supervision'&&typeof aiLoadDemandes==='function')aiLoadDemandes();if(s==='tickets'&&typeof renderTickets==='function')renderTickets();if(s==='numeros'&&typeof renderNumeros==='function')renderNumeros();if(s==='terrain'&&typeof renderTerrain==='function')renderTerrain();if(s==='supterrain'&&typeof renderSupTerrain==='function')renderSupTerrain();if(s==='clientsf'&&typeof renderClientsF==='function')renderClientsF();if(s==='planning'&&typeof renderPlanning==='function')renderPlanning();if(s==='streste'&&typeof renderStReste==='function')renderStReste();if(s==='depots'&&typeof renderStDepot==='function')renderStDepot();if(s==='cockpitfkh'&&typeof renderCockpitFKH==='function')renderCockpitFKH();if(s==='mails'&&typeof renderMails==='function')renderMails();if(s==='ref'&&typeof renderRef==='function')renderRef();if((s==='prise'||s==='fin')&&typeof SVCREFRESH!=='undefined')SVCREFRESH.forEach(function(f){try{f();}catch(e){}});_scrollGarder(s);};});
   /* ===== b340 : ON REVIENT LA OU L'ON ETAIT =====
      POURQUOI (Zeus, 05/08) : dans Suivi des appels on descend jusqu'au ticket qu'on traite ; on passe
      une seconde ailleurs, on revient — et tout est remonte en haut. Il faut re-descendre a chaque
@@ -2932,7 +2942,7 @@ button.big:active{transform:translateY(1px)}
   var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_pc_poste','fkh_droits','fkh_td_delai','fkh_ph_ecartees','fkh_data'];   /* b353 : les photos mises de côté sont une décision d'agence — elle doit se voir depuis tous les postes, pas rester sur le téléphone de celui qui l'a prise */
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
-  var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','cockpitfkh','streste','depots','clientsf','corbeille','droits']; // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)  /* b228 : 'mails' retire — la section Mails missions (et son temoin de vie) est desormais visible par le superviseur et l'administrateur, pas seulement le super-admin */
+  var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','cockpitfkh','streste','depots','clientsf','corbeille','droits','doublons'];   /* b356 : 'doublons' — nettoyage de base, super-admin par defaut (regle Zeus 03/08 : toute nouveaute nait super-admin seul) */ // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)  /* b228 : 'mails' retire — la section Mails missions (et son temoin de vie) est desormais visible par le superviseur et l'administrateur, pas seulement le super-admin */
   function _secSuperOnly(s){ return SUPERADMIN_SECTIONS.indexOf(s)>=0; }
   // Landing + ordre des onglets selon le rôle : opérateur → « Suivi des appels » en 1er + ouvert ; superviseur/admin/super-admin → « Suivi demandes » en 1er + ouvert.
   function applyRoleLayout(){ try{ var tabs=byId('tabs'); if(!tabs)return; var isOp=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); var primary=isOp?'suiviappels':'suivi'; var pb=tabs.querySelector('button[data-s="'+primary+'"]'); if(!pb)return; tabs.insertBefore(pb,tabs.firstChild); if(!isOp){ var sa=tabs.querySelector('button[data-s="suiviappels"]'); if(sa)tabs.insertBefore(sa,pb.nextSibling); } if(getComputedStyle(pb).display!=='none')pb.click(); }catch(e){} }
@@ -2963,6 +2973,161 @@ button.big:active{transform:translateY(1px)}
   function cbJeter(k){ if(!k||k==='corbeille')return; var h=cbHidden(); if(h.indexOf(k)<0)h.push(k); cbSave(h,cbDeleted()); applySectionAccess(); renderCorbeille(); }
   function cbRestaurer(k){ cbSave(cbHidden().filter(function(x){return x!==k;}), cbDeleted().filter(function(x){return x!==k;})); applySectionAccess(); renderCorbeille(); }
   function cbSupprimer(k){ var h=cbHidden().filter(function(x){return x!==k;}), d=cbDeleted(); if(d.indexOf(k)<0)d.push(k); cbSave(h,d); applySectionAccess(); renderCorbeille(); }
+  /* ===== b356 : DOUBLONS CERTIFIÉS PAR LA RÉFÉRENCE =====
+     POURQUOI (mesuré sur les vraies données le 06/08) : 90 Références Sekur sont portées par DEUX
+     vacations — 90 de trop. L'import compare `site + date + début + fin` ; or Sekur réajuste les heures
+     réelles (31 des 324 services communs ont des horaires différents : CEDEO SEYNOD passé de 20:00 à
+     20:10, DECATHLON/HOUDEMONT de 13:30 à 13:45). La clé change, l'appli croit à un nouveau service,
+     elle en crée un second. C'est la règle du 05/08 non appliquée : une donnée s'ancre sur ce qui
+     l'identifie vraiment, jamais sur une valeur recalculable.
+     CE QU'ON NE FAIT PAS : fusionner deux Références DIFFÉRENTES sur le même créneau. Ce sont deux
+     agents commandés (confirmé par Zeus le 06/08) — les 7 cas « Duc » sont légitimes.
+     CE QU'ON NE PERD PAS : sur les 90 copies à supprimer, 22 portent des pointages, et 7 en portent
+     que la copie gardée n'a PAS. Les jeter effacerait une nuit de contrôles déjà cochés. On les
+     REPORTE d'abord — et comme l'anti-collision décale les heures (ctrl@0000 ici, ctrl@0030 là), on
+     reporte sur le contrôle ÉQUIVALENT de la vacation gardée, pas sur une heure qui n'existe pas chez
+     elle. La suppression est un soft-delete : réversible d'un clic. */
+  function dblRichesse(m){
+    var st={}; try{ st=(ssLoad()[m.id])||{}; }catch(e){}
+    var coches=0,photos=0,cles=[];
+    for(var k in st){ var r=st[k]||{}; if(r.done||r.photoKey)cles.push(k); if(r.done)coches++; if(r.photoKey)photos++; }
+    return {coches:coches,photos:photos,cles:cles,etapes:cles.length,
+            agent:m.agentId?1:0, fin:m.mfin?1:0, cree:m.creeAt||0};
+  }
+  function dblScore(m){ var r=dblRichesse(m); return [r.photos,r.coches,r.agent,r.fin,r.etapes,-(r.cree||0)]; }
+  function dblMieux(a,b){ var x=dblScore(a),y=dblScore(b); for(var i=0;i<x.length;i++){ if(x[i]!==y[i])return x[i]>y[i]?a:b; } return a; }
+  /* Le contrôle équivalent chez la vacation gardée : même heure à 45 min près. */
+  function dblCtrlEquiv(mGarde,cle){
+    if(String(cle).indexOf('ctrl@')!==0)return cle;
+    var hm=(typeof ctrlKeyHM==='function')?ctrlKeyHM(cle):''; if(!hm)return cle;
+    var min=(typeof toMin==='function')?toMin(hm):null; if(min==null)return cle;
+    var best=null,bd=46;
+    try{ (ssSteps(mGarde)||[]).forEach(function(s){
+      if(String(s.key).indexOf('ctrl@')!==0)return;
+      var m2=toMin(s.heure||ctrlKeyHM(s.key)); if(m2==null)return;
+      var d=Math.abs(m2-min); if(d>720)d=1440-d;
+      if(d<bd){ bd=d; best=s.key; }
+    }); }catch(e){}
+    return best||cle;
+  }
+  function dblGroupes(){
+    var par={}, out=[];
+    (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){
+      if(!m||m.deleted)return; var r=String(m.ref||'').trim(); if(!r)return;
+      (par[r]=par[r]||[]).push(m);
+    });
+    Object.keys(par).forEach(function(r){
+      var v=par[r]; if(v.length<2)return;
+      var garde=v[0]; v.forEach(function(m){ garde=dblMieux(garde,m); });
+      var jeter=v.filter(function(m){ return m!==garde; });
+      var gCles=dblRichesse(garde).cles;
+      var lignes=jeter.map(function(m){
+        var rj=dblRichesse(m);
+        var reports=rj.cles.filter(function(k){ return gCles.indexOf(k)<0; })
+                           .map(function(k){ return {de:k,vers:dblCtrlEquiv(garde,k)}; })
+                           .filter(function(x){ return gCles.indexOf(x.vers)<0; });   /* déjà fait chez l'autre : rien à reporter */
+        return {m:m,r:rj,reports:reports};
+      });
+      out.push({ref:r,garde:garde,jeter:lignes,
+                aFusionner:lignes.some(function(l){ return l.reports.length>0; })});
+    });
+    out.sort(function(a,b){ return String(a.garde.mdate||'').localeCompare(String(b.garde.mdate||'')); });
+    return out;
+  }
+  /* Reporte les pointages qui n'existent QUE sur la copie, puis retire la copie (réversible). */
+  function dblNettoyerGroupe(g,silencieux){
+    if(!g)return 0; var S=ssLoad(), n=0;
+    g.jeter.forEach(function(l){
+      var src=S[l.m.id]||{};
+      l.reports.forEach(function(rep){
+        var val=src[rep.de]; if(!val)return;
+        S[g.garde.id]=S[g.garde.id]||{};
+        if(S[g.garde.id][rep.vers])return;                     /* jamais d'écrasement */
+        S[g.garde.id][rep.vers]=Object.assign({},val,{dblDe:l.m.id,dblCle:rep.de});
+      });
+      l.m.deleted=true; l.m.dblDe=g.garde.id; l.m.dblAt=Date.now();
+      l.m.dblPar=((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'');
+      n++;
+    });
+    ssSave(S);
+    if(typeof saveSuivi==='function')saveSuivi(); else { save('fkh_suivi',SUIVI); if(typeof cloudPush==='function')cloudPush('fkh_suivi'); }
+    if(!silencieux){ renderDoublons(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}} }
+    return n;
+  }
+  function dblRetablir(id){
+    /* b356 : rétablir doit TOUT défaire, sinon « réversible » est un mot creux — les pointages reportés
+       resteraient sur la vacation gardée et le même travail compterait des deux côtés. Chaque report
+       porte la marque de sa provenance (dblDe), on sait donc exactement quoi retirer. */
+    try{ var S=ssLoad(), ch=false;
+      for(var mid in S){ for(var k in S[mid]){ var r=S[mid][k];
+        if(r&&String(r.dblDe||'')===String(id)){ delete S[mid][k]; ch=true; } } }
+      if(ch)ssSave(S);
+    }catch(e){}
+    for(var i=0;i<SUIVI.length;i++){ if(String(SUIVI[i].id)!==String(id))continue;
+      delete SUIVI[i].deleted; delete SUIVI[i].dblDe; delete SUIVI[i].dblAt; delete SUIVI[i].dblPar; break; }
+    if(typeof saveSuivi==='function')saveSuivi(); else { save('fkh_suivi',SUIVI); if(typeof cloudPush==='function')cloudPush('fkh_suivi'); }
+    renderDoublons(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
+  }
+  function renderDoublons(){
+    var box=byId('dbl-body'); if(!box)return;
+    if(typeof isSuperAdmin==='function'&&!isSuperAdmin()){ box.innerHTML='<div class="card"><div class="sub" style="margin:0">Réservé au super-administrateur.</div></div>'; return; }
+    var G=dblGroupes();
+    var sansPerte=G.filter(function(g){ return !g.aFusionner; });
+    var aFus=G.filter(function(g){ return g.aFusionner; });
+    var nJeter=G.reduce(function(a,g){ return a+g.jeter.length; },0);
+    var faits=(typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){ return m&&m.deleted&&m.dblDe; });
+    function ag(m){ try{ var a=m.agentId?faById(m.agentId):null; return (a&&a.nom)||''; }catch(e){ return ''; } }
+    function ligne(g){
+      var m0=g.garde;
+      var h='<div class="card" style="padding:9px;margin-bottom:7px;border-left:3px solid '+(g.aFusionner?'#e0a13b':'var(--ok)')+'">'
+        +'<div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b style="flex:1;min-width:150px">'+esc(m0.siteAgent||m0.titre||'—')+'</b>'
+        +'<span class="sub" style="margin:0">'+esc((m0.mdate||'').split('-').reverse().join('/'))+' '+esc(m0.mheure||'')+(m0.mfin?('→'+esc(m0.mfin)):'')+'</span>'
+        +'<code style="font-size:11px;background:var(--panel2);padding:1px 6px;border-radius:6px">réf '+esc(g.ref)+'</code></div>';
+      h+='<div class="fa-d" style="margin-top:4px;color:var(--ok)">✅ <b>GARDÉE</b> — '+esc(ag(m0)||'(non affectée)')
+        +' <span class="sub" style="margin:0">· '+dblRichesse(m0).coches+' coche(s), '+dblRichesse(m0).photos+' photo(s)</span></div>';
+      g.jeter.forEach(function(l){
+        h+='<div class="fa-d" style="margin-top:3px;color:var(--bad)">🗑 <b>à retirer</b> — '+esc(ag(l.m)||'(non affectée)')
+          +' <span class="sub" style="margin:0">· '+l.r.coches+' coche(s), '+l.r.photos+' photo(s)</span></div>';
+        if(l.reports.length)h+='<div class="sub" style="margin:2px 0 0;color:#e0a13b;font-size:11.5px">🔀 à reporter d’abord : '
+          +l.reports.map(function(x){ return esc(x.de)+(x.vers!==x.de?(' → '+esc(x.vers)):''); }).join(', ')+'</div>';
+      });
+      h+='<div class="acts" style="margin-top:6px"><button type="button" class="dbl-go ok" data-ref="'+esc(g.ref)+'" style="font-size:12px">🧹 Nettoyer cette paire</button></div></div>';
+      return h;
+    }
+    var h='<div class="card"><div style="display:flex;gap:10px;flex-wrap:wrap">'
+      +'<div class="pp-tile" style="cursor:default"><b>'+nJeter+'</b>vacations en trop<br><span class="sub" style="margin:0;font-size:11.5px">'+G.length+' Référence(s) en double</span></div>'
+      +'<div class="pp-tile" style="cursor:default;border-color:var(--ok)"><b>'+sansPerte.length+'</b>✅ Sans perte<br><span class="sub" style="margin:0;font-size:11.5px">rien à reporter</span></div>'
+      +'<div class="pp-tile" style="cursor:default;border-color:#e0a13b"><b>'+aFus.length+'</b>🔀 À reporter d’abord<br><span class="sub" style="margin:0;font-size:11.5px">des pointages n’existent que sur la copie</span></div>'
+      +'</div>';
+    if(sansPerte.length)h+='<div class="acts" style="margin-top:10px"><button type="button" id="dbl-tout" class="ok" style="font-size:13px">🧹 Nettoyer les '+sansPerte.length+' paires sans perte</button></div>';
+    h+='<p class="sub" style="margin:8px 0 0;font-size:11.5px">Rien n’est détruit : la copie est retirée du Planning et de Suivi des appels, et se rétablit ici même.</p></div>';
+    if(aFus.length){ h+='<div class="lab" style="margin:14px 0 5px">🔀 À reporter d’abord ('+aFus.length+')</div>'
+      +'<p class="sub" style="margin:0 0 7px;font-size:11.5px">Ces copies portent des pointages que celle qu’on garde n’a pas. Le nettoyage les reporte sur le contrôle équivalent — l’anti-collision décale les heures d’une copie à l’autre.</p>'
+      +aFus.map(ligne).join(''); }
+    if(sansPerte.length){ h+='<div class="lab" style="margin:14px 0 5px">✅ Sans perte ('+sansPerte.length+')</div>'+sansPerte.map(ligne).join(''); }
+    if(!G.length)h+='<div class="card"><div class="sub" style="margin:0">✅ Aucune Référence en double. La base est propre.</div></div>';
+    if(faits.length){ h+='<div class="lab" style="margin:16px 0 5px">↩️ Retirées par ce nettoyage ('+faits.length+')</div>'
+      +faits.map(function(m){ var d=m.dblAt?new Date(m.dblAt):null;
+        return '<div style="display:flex;gap:8px;align-items:center;border:1px dashed var(--line);border-radius:8px;padding:5px 8px;margin-bottom:4px;font-size:12px">'
+          +'<span style="flex:1;min-width:0">'+esc(m.siteAgent||m.titre||'—')+' · '+esc((m.mdate||'').split('-').reverse().join('/'))+' '+esc(m.mheure||'')+' · réf '+esc(m.ref||'')
+          +(d?(' <span class="sub" style="margin:0">le '+('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+(m.dblPar?(' par '+esc(m.dblPar)):'')+'</span>'):'')+'</span>'
+          +'<button type="button" class="dbl-back" data-id="'+esc(m.id)+'" style="font-size:11.5px">↩️ Rétablir</button></div>'; }).join(''); }
+    box.innerHTML=h;
+    box.querySelectorAll('.dbl-go').forEach(function(b){ b.onclick=function(){
+      var g=dblGroupes().filter(function(x){ return x.ref===b.getAttribute('data-ref'); })[0]; if(!g)return;
+      var rep=g.jeter.reduce(function(a,l){ return a+l.reports.length; },0);
+      if(!confirm('Retirer la copie en trop de « '+(g.garde.siteAgent||g.garde.titre||'')+' » ?\n\nRéférence '+g.ref
+        +(rep?('\n🔀 '+rep+' pointage(s) seront d’abord reportés sur la vacation gardée.'):'')
+        +'\n\nRéversible : la copie se rétablit depuis cet écran.'))return;
+      dblNettoyerGroupe(g); }; });
+    var t=byId('dbl-tout'); if(t)t.onclick=function(){
+      var L=dblGroupes().filter(function(g){ return !g.aFusionner; });
+      if(!confirm('Nettoyer '+L.length+' paire(s) sans perte ?\n\nAucun pointage n’est concerné : les copies retirées ne portent rien que la vacation gardée n’ait déjà.\n\nRéversible depuis cet écran.'))return;
+      var n=0; L.forEach(function(g){ n+=dblNettoyerGroupe(g,true); });
+      renderDoublons(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
+      alert('🧹 '+n+' vacation(s) en double retirée(s).\n\nElles restent rétablissables depuis cet écran.'); };
+    box.querySelectorAll('.dbl-back').forEach(function(b){ b.onclick=function(){ dblRetablir(b.getAttribute('data-id')); }; });
+  }
   function renderCorbeille(){
     var box=byId('cb-body'); if(!box)return;
     var h=cbHidden(), d=cbDeleted();
