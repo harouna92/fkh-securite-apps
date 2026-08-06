@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b346</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b347</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1917,21 +1917,93 @@ button.big:active{transform:translateY(1px)}
      cet agent ? Si oui on veut la voir ; si non, c'est ce qui manque.
      COMMENT : on lit les fiches de controle de tenue — une photo « designee » y laisse sa reference.
      Lecture locale : immediate, et vraie meme sans connexion. */
+  /* ===== b347 : UN RATTACHEMENT EST UN FAIT UNIQUE — IL S'ÉCRIT UNE FOIS ET SE LIT PARTOUT =====
+     POURQUOI (règle Zeus, 06/08) : l'information « il y a une photo » vivait à TROIS endroits selon le
+     geste — l'étape de la vacation (fkh_suivisite), la fiche de contrôle tenue (fkh_tenues_ctrl) et
+     l'archive photo — et chaque vue n'en lisait qu'un seul. D'où trois symptômes du même mal :
+       · une photo rattachée comme tenue depuis Suivi des appels restait invisible dans la fiche
+         vacation, qui ne regardait que fkh_tenues_ctrl ;
+       · la pastille prise/fin comptait « sans photo » des étapes qui en avaient une, parce qu'elle
+         testait un LIBELLÉ texte (`photo`) au lieu de la photo réellement rattachée (`photoKey`) ;
+       · une photo marquée REFUSÉE n'arrivait jamais dans la vue « refusées » : le test « a une photo »
+         passait avant le test « refusée », donc la ligne quittait la liste sans y être classée.
+     DÉSORMAIS : une seule fonction répond, et toutes les vues l'interrogent. Aucune vue ne garde sa
+     propre définition. */
+  function phEtape(mid,key){
+    var out={key:'',source:'',refus:null,libelle:''};
+    try{
+      var S=(typeof ssLoad==='function')?ssLoad():{}, r=(S[mid]&&S[mid][key])||{};
+      if(r.photoKey){ out.key=r.photoKey; out.source='etape'; }
+      out.libelle=r.photo||'';
+      if(r.refusPhoto)out.refus={par:r.refusPar||'',at:r.refusAt||0};
+      if(!out.key){   // repli : l'archive garde la trace même si le planning a bougé depuis
+        var A=load('fkh_photo_archive');
+        if(Array.isArray(A))for(var i=A.length-1;i>=0;i--){ if(A[i]&&String(A[i].mid)===String(mid)&&String(A[i].step||'').indexOf(key)>=0){ out.key=A[i].key; out.source='archive'; break; } }
+      }
+    }catch(e){}
+    return out;
+  }
+  /* A-t-on une photo pour cette étape ? (photo rattachée OU libellé posé à la main) */
+  function phAUnePhoto(mid,key){ var e=phEtape(mid,key); return !!(e.key||(e.libelle&&e.libelle!=='Pas de photo'&&e.libelle!=='Photo non horodatée')); }
+  /* Toutes les photos rattachées aux tickets d'une vacation — l'ordre du service. */
+  function phDeLaVacation(m){
+    var out=[], vus={}; if(!m)return out;
+    function lbl(k){ if(k==='prise')return 'Prise de service'; if(k==='fin')return 'Fin de service'; if(k==='tenue')return 'Contrôle tenue';
+      if(k==='route')return 'Appel route'; if(k==='j15')return 'Pré-prise';
+      if(String(k).indexOf('ctrl')===0){ var h=(typeof ctrlKeyHM==='function')?ctrlKeyHM(k):''; return 'Contrôle'+(h?' '+h:''); } return k; }
+    try{
+      /* b347 : on part de CE QUI EST ENREGISTRÉ, pas de ce qui est encore attendu. Une étape peut avoir
+         disparu des tickets une fois faite — le contrôle tenue, par exemple, ne réapparaît plus une fois
+         la photo prise. Sa photo doit rester visible ici. */
+      var S=(typeof ssLoad==='function')?ssLoad():{}, r=S[m.id]||{};
+      var heures={}; try{ (typeof ssSteps==='function'?ssSteps(m):[]).forEach(function(s){ heures[s.key]={h:s.heure||'',l:s.label||''}; }); }catch(_e){}
+      Object.keys(r).forEach(function(k){
+        var e=phEtape(m.id,k); if(!e.key||vus[e.key])return; vus[e.key]=1;
+        var meta=heures[k]||{};
+        out.push({key:e.key,etape:(meta.l||lbl(k)),heure:meta.h||(r[k]&&r[k].hm)||'',source:e.source});
+      });
+    }catch(e){}
+    return out;
+  }
   function agentPhotosTenue(nom){
-    var n=(typeof tnorm==='function'?tnorm(nom):String(nom||'')), out=[];
+    var n=(typeof tnorm==='function'?tnorm(nom):String(nom||'')), out=[], vus={};
     if(!n)return out;
+    function add(k,d){ if(!k||vus[k])return; vus[k]=1; out.push({key:k,date:String(d||'')}); }
+    /* 1. les fiches de contrôle tenue */
     try{ (load('fkh_tenues_ctrl')||[]).forEach(function(c){
       if(!c||!c.photoKey)return;
       var cn=(typeof tnorm==='function'?tnorm(c.Agent||''):String(c.Agent||''));
       if(!cn||!(cn===n||cn.indexOf(n)>=0||n.indexOf(cn)>=0))return;
-      out.push({key:c.photoKey,date:String(c['Date contrôle']||'')});
+      add(c.photoKey,c['Date contrôle']);
     }); }catch(e){}
+    /* 2. b347 : les photos rattachées comme TENUE depuis Suivi des appels — elles n'écrivent pas dans
+          fkh_tenues_ctrl, et restaient donc invisibles partout ailleurs. */
+    try{
+      var S=(typeof ssLoad==='function')?ssLoad():{};
+      (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){
+        if(!m||m.deleted||!m.agentId)return;
+        var a=(typeof faById==='function')?faById(m.agentId):null; if(!a)return;
+        var an=(typeof tnorm==='function'?tnorm(a.nom||''):String(a.nom||''));
+        if(!an||!(an===n||an.indexOf(n)>=0||n.indexOf(an)>=0))return;
+        var r=(S[m.id]&&S[m.id].tenue)||{}; if(r.photoKey)add(r.photoKey,m.mdate||'');
+      });
+    }catch(e){}
+    /* 3. l'archive photo (le planning a pu bouger depuis) */
+    try{ var A=load('fkh_photo_archive');
+      if(Array.isArray(A))A.forEach(function(o){
+        if(!o||!o.key||String(o.step||'').toLowerCase().indexOf('tenue')<0)return;
+        var on=(typeof tnorm==='function'?tnorm(o.agent||''):String(o.agent||''));
+        if(!on||!(on===n||on.indexOf(n)>=0||n.indexOf(on)>=0))return;
+        add(o.key,o.mdate||'');
+      });
+    }catch(e){}
     out.sort(function(a,b){ return String(b.date).localeCompare(String(a.date)); });
     return out; }
   function agentAPhotoTenue(nom){ return agentPhotosTenue(nom).length>0; }
   function agentAttachPhoto(nom,key){ var T=load('fkh_tenues_ctrl'); if(!Array.isArray(T))T=[]; var n=tnorm(nom),idx=-1,bd=''; T.forEach(function(c,k){var cn=tnorm(c.Agent); if(cn&&(cn===n||cn.indexOf(n)>=0||n.indexOf(cn)>=0)){var dd=String(c['Date contrôle']||''); if(idx<0||dd>bd){idx=k;bd=dd;}}}); if(idx>=0)T[idx].photoKey=key; else T.push({'Date contrôle':impTodayISO(),'Agent':nom,'photoKey':key,'Statut tenue':'','Manquants':''}); save('fkh_tenues_ctrl',T); TCTRL=T; if(typeof renderTenues==='function')renderTenues(); }
   function agentStats(nom){ if(!nom||typeof ssLoad!=='function'||typeof SUIVI==='undefined')return null; var n=tnorm(nom); if(!n)return null; var S=ssLoad(); var st={missions:0,priseDone:0,priseNoPhoto:0,finDone:0,finNoPhoto:0,retardPrise:0,injo:0,nePeutRoute:0,retardAnnonce:0,refusTenue:0,ctrlNoPhoto:0,demAttente:0};
-    function noPhoto(r){ return !r.photo||r.photo==='Pas de photo'||r.photo==='Photo non horodatée'; }
+    function noPhoto(r){ if(r&&r.photoKey)return false;   /* b347 : une photo rattachee compte, quel que soit le libelle */
+      return !r.photo||r.photo==='Pas de photo'||r.photo==='Photo non horodatée'; }
     SUIVI.forEach(function(m){ if(m.statut!=='validee'||!m.agentId)return; var a=faById(m.agentId); if(!a||tnorm(a.nom)!==n)return; var resp=S[m.id]; if(!resp)return; st.missions++;
       Object.keys(resp).forEach(function(k){ var r=resp[k]||{};
         if(k==='prise'&&r.done){ st.priseDone++; if(noPhoto(r))st.priseNoPhoto++; if(r.agRetard)st.retardPrise++; }
@@ -5156,6 +5228,17 @@ button.big:active{transform:translateY(1px)}
       +'<div id="pl-newag-zone" style="display:none;margin-top:8px;border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--panel2)"><div class="lab" style="margin:0 0 6px;font-size:12px">Nouvel agent — sera affecté à cette vacation</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><input id="pl-newag-nom" placeholder="Nom prénom *" autocomplete="off" style="width:100%"><input id="pl-newag-tel" placeholder="Téléphone" type="tel" style="width:100%"></div><input id="pl-newag-ville" placeholder="Ville" autocomplete="off" style="width:100%;margin-top:6px"><div class="acts" style="margin-top:8px"><button type="button" class="ok pl-newag-go" style="font-size:12px">✅ Créer et affecter</button><button type="button" class="pl-newag-cancel" style="font-size:12px">✕ Annuler</button></div></div>' // b296
       +'<label style="display:flex;gap:6px;align-items:center;margin-top:8px;font-size:12px;text-transform:none"><input type="checkbox" class="pl-e-circuit" style="height:auto;min-height:0;width:auto"'+(m.isCircuit?' checked':'')+'>🚐 Tournée (circuit — passages sur plusieurs sites)</label>'
       
+      /* b347 : TOUTES les photos rattachees aux tickets de CETTE vacation — prise, controles 2 h,
+         tenue, fin. Elles etaient rattachees mais invisibles ici : il fallait aller les chercher
+         ailleurs pour savoir si la preuve existait. */
+      +(function(){ try{
+          var ph=(typeof phDeLaVacation==='function')?phDeLaVacation(m):[];
+          if(!ph.length)return '<div class="lab" style="margin:10px 0 3px">📷 Photos de cette vacation</div><div class="sub" style="margin:0">Aucune photo rattachée aux tickets de cette vacation pour le moment.</div>';
+          return '<div class="lab" style="margin:10px 0 3px">📷 Photos de cette vacation <span class="sub" style="font-weight:400">— '+ph.length+'</span></div>'
+            +'<div style="display:flex;gap:8px;flex-wrap:wrap">'+ph.map(function(p){
+              return '<div style="text-align:center"><span class="pl-vac-ph" data-k="'+esc(p.key)+'" style="cursor:zoom-in;display:inline-block">'+((typeof photoThumbTag==='function')?photoThumbTag(p.key):'🖼️')+'</span><div class="sub" style="margin:2px 0 0;font-size:10.5px;max-width:88px">'+esc(String(p.etape||'').replace(/^[^A-Za-zÀ-ÿ]+/,''))+(p.heure?'<br>'+esc(p.heure):'')+'</div></div>';
+            }).join('')+'</div>';
+        }catch(e){ return ''; } })()
       +'<div class="lab" style="margin:10px 0 3px">🔪 Découper en vacations</div><div class="acts" style="gap:6px;flex-wrap:wrap"><button class="pl-split" data-rule="720">12h</button><button class="pl-split" data-rule="480">8h</button><button class="pl-split" data-rule="360">6h</button><button class="pl-split" data-rule="0">Garder tel quel</button></div>'
       
       +'<div class="sub" style="margin:4px 0 0;font-size:11.5px;color:var(--muted)">Origine : <b>'+esc(origineVac(m))+'</b>'+(m.creeAt?(' · le '+(function(){var d=new Date(m.creeAt);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' à '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2);})()):'')+'</div>'
@@ -5167,6 +5250,11 @@ button.big:active{transform:translateY(1px)}
     var srch=card.querySelector('.pl-afsearch'); if(srch)srch.oninput=function(){ _plAffQ=srch.value; var box2=card.querySelector('.pl-afres'); if(box2){ box2.innerHTML=_plAgentResults(m); _plWirePicks(card,m); } };
     /* b314 */
     if(typeof photoHydrate==='function'){try{photoHydrate(card);}catch(e){}}
+    card.querySelectorAll('.pl-vac-ph').forEach(function(sp){ sp.onclick=function(){   /* b347 */
+      var k=sp.getAttribute('data-k');
+      if(typeof photoOpen==='function'){ photoOpen(k); return; }
+      if(typeof photoBlobUrl==='function')photoBlobUrl(k,function(u){ if(u)window.open(u,'_blank'); });
+    }; });
     card.querySelectorAll('.pl-tenue-ph').forEach(function(sp){ sp.onclick=function(){
       var k=sp.getAttribute('data-k');
       if(typeof photoOpen==='function'){ photoOpen(k); return; }
@@ -7486,8 +7574,11 @@ button.big:active{transform:translateY(1px)}
              delai = la photo existe, mais prise a plus de 5 min de l'heure prevue — on appelle pour comprendre.
            Sans cette separation, on relancait un agent qui avait refuse, et on ne voyait jamais les
            photos faites hors delai puisque la ligne disparaissait des qu'une photo arrivait. */
-        var _aPhoto=!!(r.photoKey||r.photo);
-        if(!_aPhoto){ it.sousvue=r.refusPhoto?'refus':'manq'; sc.ph.push(it); }
+        /* b347 : le REFUS l'emporte sur tout. Avant, le test « a une photo » passait en premier :
+           une ligne refusee quittait la liste sans jamais etre classee dans « refusees ». */
+        var _aPhoto=(typeof phAUnePhoto==='function')?phAUnePhoto(it.mid,it.key):!!(r.photoKey||r.photo);
+        if(r.refusPhoto){ it.sousvue='refus'; sc.ph.push(it); }
+        else if(!_aPhoto){ it.sousvue='manq'; sc.ph.push(it); }
         else {
           var _ec=null;
           try{ if(r.at&&it.heure){ var _d=new Date(r.at), _pm=toMin(it.heure), _am=_d.getHours()*60+_d.getMinutes();
