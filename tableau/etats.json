@@ -840,6 +840,14 @@
       "theme": "Planning & import",
       "pourquoipas": "Sur chaque vignette : « ✅ 2/2 », « ❗ 1/2 », « 📷 0/3 » en bas à droite — photos reçues sur photos attendues (prise, fin, contrôle tenue, contrôles des 2 h). Vert = complet, rouge = une échéance passée sans photo, orange = en cours. Rien ne s'affiche si la vacation n'attend aucune photo. Mesuré sur les vraies données : 75 compteurs sur 132 vignettes, rendu inchangé (~300 ms) grâce à une lecture mémorisée.",
       "local": true
+    },
+    {
+      "b": 360,
+      "titre": "Une fiche de vacation ouverte ne perd plus son lien avec la base",
+      "source": "Zeus — 06/08",
+      "theme": "Planning & import",
+      "pourquoipas": "Ouvre une vacation au Planning, laisse la fiche ouverte le temps qu'une synchro passe, puis change l'heure de « Route (renseignements) » ou de « Pré-prise (J-15) » : la valeur tient. Avant, elle revenait toute seule au bout de quelques secondes — la fiche écrivait dans une copie orpheline, remplacée par l'arrivée du classeur commun. Les 10 gestes de la fiche sont protégés, pas seulement les heures.",
+      "local": true
     }
   ],
   "attente": [
