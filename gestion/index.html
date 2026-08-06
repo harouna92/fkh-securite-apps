@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b361</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b362</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -7147,7 +7147,24 @@ button.big:active{transform:translateY(1px)}
   }
   function aiCreateDemande(key){ var pr=String(key).split('|'),cdr=pr[0],idx=+pr[1]; var call=aiDetected.filter(function(x){return String(x.cdr_id)===String(cdr);})[0]; if(!call||!call.demandes||!call.demandes[idx])return; var d=call.demandes[idx];
     var bd=aiBuildDemande(call,d), vn=bd.vn, cp=bd.cp, la=bd.la, lo=bd.lo, near=bd.near;
-    var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',parQui:(typeof opNow==='function'?opNow():''),parAt:now,pris:now,valide:null,ville:vn,cp:cp,client:((typeof svCallerName==='function'&&svCallerName(call.number))||d.client||''),la:la,lo:lo,assoc:[],urgent:!!d.urgent,_express:true,aiCdr:call.cdr_id,aiNumber:call.number||'',aiDir:call.direction||''};
+        /* ===== b358 : LA DEMANDE NAIT AVEC SA DATE ET SES HEURES =====
+       POURQUOI (mesure le 06/08) : sur 40 demandes creees automatiquement, 3 SEULEMENT portaient une
+       date de mission. Les creneaux etaient pourtant extraits — ils partaient dans le TEXTE et jamais
+       dans les champs. Sans date ni heures, la demande ne peut etre rapprochee ni du Planning ni du
+       CSV : elle est condamnee a faire doublon plus tard.
+       Plusieurs creneaux dans le mail : on prend le premier ET on retient leur nombre, au lieu d'en
+       perdre en silence. */
+    var _vs=(d&&d.vacations&&d.vacations.length)?d.vacations:[], _md='', _h1='', _h2='';
+    if(_vs.length){ var _v=_vs[0]||{};
+      var _dd=String(_v.date||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+      if(_dd)_md=_dd[3]+'-'+('0'+_dd[2]).slice(-2)+'-'+('0'+_dd[1]).slice(-2);
+      else if(/^\d{4}-\d{2}-\d{2}$/.test(String(_v.date||'')))_md=String(_v.date);
+      var _hh=String(_v.horaires||_v.heure||'');
+      var _mm=_hh.match(/(\d{1,2})[:hH](\d{2})\s*(?:-|–|—|à|au|\/)\s*(\d{1,2})[:hH](\d{2})/);
+      if(_mm){ _h1=('0'+_mm[1]).slice(-2)+':'+_mm[2]; _h2=('0'+_mm[3]).slice(-2)+':'+_mm[4]; }
+      else { var _m1=_hh.match(/(\d{1,2})[:hH](\d{2})/); if(_m1)_h1=('0'+_m1[1]).slice(-2)+':'+_m1[2]; }
+    }
+var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.texte,titre:bd.titre,statut:'recherche',motif:'',mdate:_md,mheure:_h1,mfin:_h2,nbCreneaux:_vs.length,parQui:(typeof opNow==='function'?opNow():''),parAt:now,pris:now,valide:null,ville:vn,cp:cp,client:((typeof svCallerName==='function'&&svCallerName(call.number))||d.client||''),la:la,lo:lo,assoc:[],urgent:!!d.urgent,_express:true,aiCdr:call.cdr_id,aiNumber:call.number||'',aiDir:call.direction||''};
     SUIVI.unshift(it); if(typeof saveSuivi==='function')saveSuivi();
     if(la!=null)near.forEach(function(x){ fetch('https://router.project-osrm.org/route/v1/driving/'+lo+','+la+';'+x.lo+','+x.la+'?overview=false').then(function(r){return r.json();}).then(function(jj){ if(jj&&jj.routes&&jj.routes[0]){ var mn=Math.round(jj.routes[0].duration/60),hh=Math.floor(mn/60),mm=mn%60,dur=hh?(hh+'h'+(mm?('0'+mm).slice(-2):'')):(mn+' min'); it.texte=it.texte.replace('↦ '+x.n+' à '+x.d+' km','↦ '+x.n+' à '+x.d+' km · '+dur+' de route'); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderSuivi==='function')renderSuivi(); } }).catch(function(){}); });
     call.demandes.splice(idx,1); if(!call.demandes.length){ if(CLOUD.on)fetch(CLOUD.base+'/ai/created',{method:'POST',headers:cloudHdr(),body:JSON.stringify({cdr_id:cdr})}).catch(function(){}); aiDetected=aiDetected.filter(function(x){return String(x.cdr_id)!==String(cdr);}); }
@@ -9239,7 +9256,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     setTimeout(function(){ try{ppRefresh();}catch(_e){} },900);
   })();
   // ===== b151 : 📧 Mails missions (super-admin) — remontée des mails BDC + comparaison entrants ↔ planifié =====
-  var MAILS_CACHE_KEY='fkh_mails_cache'; var mailsFilter='tous';
+  var MAILS_CACHE_KEY='fkh_mails_cache'; var mailsFilter='tous'; var MAILS_TOUT=false;   /* b358 : false = on ne montre que les mails de gardiennage / intervention */
   function mailsCache(){ try{return JSON.parse(localStorage.getItem(MAILS_CACHE_KEY)||'[]')||[];}catch(e){return [];} }
   function mailsParse(it){
     var txt=String(it.transcript||''), subject=(txt.split(String.fromCharCode(10))[0]||'').trim(), from=String(it.number||'');
@@ -9254,7 +9271,49 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     var d0=(it.demandes&&it.demandes[0])||{};
     if(!mdate&&d0.date)mdate=String(d0.date); if(!heure&&(d0.heure||d0.debut))heure=String(d0.heure||d0.debut); if(!site&&d0.site)site=String(d0.site);
     var ville=d0.ville?String(d0.ville):'';
-    return {kind:kind,ref:ref,client:client,mdate:mdate,heure:heure,site:site,ville:ville,subject:subject,from:from};
+    /* ===== b358 : LES CRÉNEAUX DU MAIL ÉTAIENT DÉJÀ LÀ — PERSONNE NE LES RAMASSAIT =====
+       POURQUOI (constaté le 06/08 sur les vrais mails) : le mail AQUILA écrit noir sur blanc
+         « GARDIENNAGE N°5282143 SG TOTAL TROYES … / Du : 07/08/2026 08:00 au 07/08/2026 16:00 »
+       et l'analyse en tire déjà {date:"07/08/2026", horaires:"08:00 - 16:00"}. Mais on ne lisait que
+       `d0.heure` et `d0.debut`, deux champs qui n'existent pas — le tableau des créneaux restait dans le
+       TEXTE. D'où 26 vacations sur 37 nées d'un mail SANS heure de fin : sans fin, pas de total d'heures,
+       pas de fin de service à pointer, pas de contrôles.
+       DÉSORMAIS : on lit `vacations[]`. Date, heure de début ET heure de fin entrent dans les champs.
+       Et quand le mail porte PLUSIEURS créneaux, on le dit au lieu de n'en garder qu'un en silence. */
+    var fin='', nbVac=0;
+    try{
+      var _vs=(d0.vacations&&d0.vacations.length)?d0.vacations:[]; nbVac=_vs.length;
+      var v0=_vs[0]||null;
+      if(v0){
+        if(v0.date){ var _d=String(v0.date).match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+          if(_d)mdate=_d[3]+'-'+('0'+_d[2]).slice(-2)+'-'+('0'+_d[1]).slice(-2);
+          else if(/^\d{4}-\d{2}-\d{2}$/.test(String(v0.date)))mdate=String(v0.date); }
+        var _h=String(v0.horaires||v0.heure||'');
+        var _m=_h.match(/(\d{1,2})[:hH](\d{2})\s*(?:-|–|—|à|au|\/)\s*(\d{1,2})[:hH](\d{2})/);
+        if(_m){ heure=('0'+_m[1]).slice(-2)+':'+_m[2]; fin=('0'+_m[3]).slice(-2)+':'+_m[4]; }
+        else { var _m1=_h.match(/(\d{1,2})[:hH](\d{2})/); if(_m1)heure=('0'+_m1[1]).slice(-2)+':'+_m1[2]; }
+      }
+    }catch(_e){}
+    return {kind:kind,ref:ref,client:client,mdate:mdate,heure:heure,fin:fin,nbVac:nbVac,site:site,ville:ville,subject:subject,from:from,
+            demandes:(it.demandes||[])};
+  }
+  /* ===== b358 : « MAILS MISSIONS » NE DOIT CONTENIR QUE DES MISSIONS =====
+     POURQUOI (Zeus, 06/08) : la section recevait tout ce qui tombe dans la boîte — appels manqués
+     Ringover, LinkedIn, GetAccept, Cloudflare, Free Mobile, fidélité Decathlon. Mesuré sur les 120
+     derniers mails : 87 n'avaient rien à y faire, 33 seulement parlaient de gardiennage ou
+     d'intervention. Ce qui compte se noyait.
+     GARDE-FOU (leçon du 05/08 : masquer n'est jamais neutre) : rien n'est supprimé. Ce qui est écarté
+     reste COMPTÉ et consultable d'un clic — et un mail que l'analyse a marqué « demande » est TOUJOURS
+     gardé, même si son sujet ne dit rien : on préfère un intrus à une demande perdue. */
+  var MAILS_RX_MISSION=/DEMANDE|MISSION|GARDIENNAGE|INTERVENTION|PRESTATION|ANNULATION|MODIFICATION|PROLONGATION|CONSIGNE|PROPOSITION|RONDE|SURVEILLANCE/i;
+  var MAILS_RX_BRUIT=/linkedin|getaccept|no-?reply@|newsletter|sedomicilier|cloudflare|lovable|patreon|free-mobile|fidelit|appel manqu|notifications@github/i;
+  function mailsEstMission(it,pp){
+    try{
+      if(it&&it.is_demande)return true;                       /* l'analyse a vu une demande : on garde */
+      var suj=String((pp&&pp.subject)||''), de=String((pp&&pp.from)||it.number||'');
+      if(MAILS_RX_BRUIT.test(de)||MAILS_RX_BRUIT.test(suj))return false;
+      return MAILS_RX_MISSION.test(suj);
+    }catch(e){ return true; }
   }
   function mailsMatchMission(pp){
     var sn=siteNorm(pp.site||''); var best=null;
@@ -9411,7 +9470,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
             m.fusionVers='mail';
           });
         }catch(_f){}
-        SUIVI.unshift({id:'mv'+Date.now()+'_'+Math.round(Math.random()*99999),statut:'validee',mailPending:true,mailSrc:it.cdr_id,client:pp.client||'',siteAgent:pp.site,ville:pp.ville||'',mdate:pp.mdate,mheure:pp.heure||'',mfin:'',titre:(pp.subject||'').slice(0,80),texte:'📧 Cree automatiquement depuis un mail'+(pp.ref?' (ref '+pp.ref+')':'')});
+        SUIVI.unshift({id:'mv'+Date.now()+'_'+Math.round(Math.random()*99999),statut:'validee',mailPending:true,mailSrc:it.cdr_id,client:pp.client||'',siteAgent:pp.site,ville:pp.ville||'',mdate:pp.mdate,mheure:pp.heure||'',mfin:(pp.fin||''),   /* b358 : l'heure de fin etait ecrite en dur a vide — elle est pourtant dans le mail */titre:(pp.subject||'').slice(0,80),texte:'📧 Cree automatiquement depuis un mail'+(pp.ref?' (ref '+pp.ref+')':'')});
         if(_agentRepris){ try{ SUIVI[0].agentId=_agentRepris; }catch(_g){} }   /* b324 : l'agent deja affecte ne se perd pas */
         if(_supp343){ try{ SUIVI[0].reCree={quand:Date.now(),avant:String(_supp343.id||''),supprLe:vacQuand(_supp343)}; }catch(_h){} }   /* b343 */
         _crea=true; });
@@ -9439,14 +9498,30 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     var rows=(items||[]).map(function(it){ var pp=mailsParse(it); var mt=mailsMatchMission(pp); var st;
       if(pp.kind==='annulation'){ st=(mt&&mt.m.statut==='validee')?['🔴 ANNULATION reçue — mission ENCORE planifiée !','var(--bad)',1]:['✔ annulation — rien de planifié en face','var(--muted)',0]; }
       else if(pp.kind==='consigne'||pp.kind==='autre'){ st=['','var(--muted)',0]; }
-      else { st=mt?((mt.m.mailPending)?['💜 Vacation créée automatiquement depuis ce mail — À VALIDER','#7b61ff',1]:((mt.m.statut==='validee')?['✅ planifié — '+(mt.m.siteAgent||mt.m.titre||''),'var(--ok)',0]:['🕵 en recherche dans Suivi demandes','#e0a13b',0])):['❌ PAS planifié (aucune mission en face)','var(--bad)',1]; }
+      /* ===== b358 : « PAS PLANIFIÉ » NE DOIT PLUS CONTREDIRE « CRÉÉE DANS SUIVI DEMANDES » =====
+         POURQUOI (Zeus, 06/08) : la carte affichait à la fois « 🤖 demande détectée → créée dans Suivi
+         demandes » ET « ❌ PAS planifié (aucune mission en face) ». Les deux étaient vraies mais parlaient
+         de deux choses : la première d'une DEMANDE (statut recherche), la seconde d'une VACATION au
+         Planning — qui n'existe pas tant que la demande n'est ni validée ni affectée. Écrit comme ça, ça
+         se lit comme un bug.
+         DÉSORMAIS : on dit où en est la mission, et ce qu'il reste à faire. */
+      else { st=mt?((mt.m.mailPending)?['💜 Vacation créée automatiquement depuis ce mail — À VALIDER','#7b61ff',1]
+              :((mt.m.statut==='validee')?[(mt.m.agentId?'✅ planifié — ':'✅ validé, reste à affecter — ')+(mt.m.siteAgent||mt.m.titre||''),(mt.m.agentId?'var(--ok)':'#e0a13b'),0]
+              :['🔍 demande en recherche — pas encore de vacation au Planning','#e0a13b',0]))
+              :(it.created?['🔍 demande créée dans Suivi demandes (en recherche) — pas encore de vacation au Planning','#e0a13b',0]
+                          :['❌ rien en face — ni demande, ni vacation','var(--bad)',1]); }
       return {it:it,pp:pp,mt:mt,st:st};
     });
+    /* b358 : on ne garde que les mails de gardiennage / intervention. Le reste n'est pas perdu :
+       il est compté, et « voir les autres » le rouvre. */
+    var _horsSujet=rows.filter(function(r){ return !mailsEstMission(r.it,r.pp); });
+    if(!MAILS_TOUT)rows=rows.filter(function(r){ return mailsEstMission(r.it,r.pp); });
     var nRisk=rows.filter(function(r){return r.st[2]===1&&!r.it.dismissed;}).length;
     var flt=rows.filter(function(r){ if(mailsFilter==='risque')return r.st[2]===1; if(mailsFilter==='annulations')return r.pp.kind==='annulation'; if(mailsFilter==='demandes')return r.pp.kind==='demande'||r.pp.kind==='proposition'||r.pp.kind==='modification'; return true; });
     function chip(id,lbl){ return '<button type="button" class="mails-flt'+(mailsFilter===id?' on':'')+'" data-f="'+id+'" style="font-size:12px'+(mailsFilter===id?';font-weight:700;border-color:var(--acc)':'')+'">'+lbl+'</button>'; }
     var h='<div class="card"><div class="lab" style="margin:0 0 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">📧 Mails missions — '+rows.length+' mail(s)'+(nRisk?' · <span style="color:var(--bad);font-weight:800">'+nRisk+' à risque</span>':'')+'<button type="button" id="mails-refresh" style="margin-left:auto;font-size:12px">🔄 Actualiser</button></div>'
-      +'<div class="acts" style="gap:6px;flex-wrap:wrap">'+chip('tous','Tous')+chip('risque','⚠️ À risque ('+rows.filter(function(r){return r.st[2]===1;}).length+')')+chip('demandes','📥 Demandes')+chip('annulations','🔴 Annulations')+'</div>'
+      +'<div class="acts" style="gap:6px;flex-wrap:wrap">'+chip('tous','Tous')+chip('risque','⚠️ À risque ('+rows.filter(function(r){return r.st[2]===1;}).length+')')+chip('demandes','📥 Demandes')+chip('annulations','🔴 Annulations')
+      +(_horsSujet.length?('<button type="button" id="mails-hs" style="font-size:12px;margin-left:auto;color:var(--muted)">'+(MAILS_TOUT?'🎯 Ne montrer que les missions':'📭 Voir les '+_horsSujet.length+' hors sujet')+'</button>'):'')+'</div>'   /* b358 */
       +'<p class="sub" style="margin:8px 0 0;font-size:11.5px">Remonté automatiquement de la boîte Gmail (SECURITAS · AQUILA · RANC · BANZAI + mots-clés). Chaque mail est comparé au Planning : ✅ planifié · 🕵 en recherche · ❌ pas planifié · 🔴 annulation sur mission encore planifiée.</p></div>';
     if(!flt.length){ h+='<div class="card"><div class="sub" style="margin:0">Aucun mail'+(mailsFilter!=='tous'?' pour ce filtre':'')+'. (Le script Gmail doit être installé et l’appli connectée au cloud.)</div></div>'; }
     flt.forEach(function(r){ var it=r.it,pp=r.pp,K=KL[pp.kind]||KL.autre;
@@ -9455,12 +9530,31 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
         +'<div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><span style="font-weight:800">'+K[0]+' '+K[1]+'</span><b style="flex:1;min-width:0">'+esc(pp.subject||'(sans objet)')+'</b><span class="sub" style="margin:0;white-space:nowrap">'+fmtDT(it.at)+'</span></div>'
         +(info?'<div class="fa-d" style="margin-top:3px">'+info+'</div>':'')
         +'<div class="fa-d" style="margin-top:2px;color:var(--muted)">de '+esc(pp.from)+(it.is_demande?' · 🤖 demande détectée'+(it.created?' → créée dans Suivi demandes':''):'')+'</div>'
+        /* ===== b358 : RETROUVER LE MAIL D'ORIGINE EN UN CLIC =====
+           POURQUOI (Zeus, 06/08) : depuis une carte, il faut pouvoir relire le mail exact — pour vérifier
+           un horaire, une consigne, une pièce jointe. Sans ça on cherche à la main dans la boîte.
+           COMMENT : l'identifiant qu'on stocke (`mail_19fd77f484a25326`) EST l'identifiant Gmail du
+           message — le lien ouvre donc le bon mail directement. Et pour les cas où le compte ouvert
+           dans le navigateur n'est pas le bon, un bouton copie une recherche Gmail (expéditeur + objet)
+           qu'il suffit de coller dans la barre de recherche : elle retombe sur ce mail précis. */
+        +(function(){ var gid=String(it.cdr_id||'').replace(/^mail_/,'');
+            var q=[(pp.from?('from:'+((/<([^>]+)>/.exec(pp.from)||[,pp.from])[1])):''),
+                   (pp.subject?('subject:('+String(pp.subject).replace(/["()]/g,' ').trim()+')'):'')].filter(Boolean).join(' ');
+            return '<div class="acts" style="margin-top:4px;gap:6px;flex-wrap:wrap">'
+              +(/^[0-9a-f]{12,20}$/i.test(gid)?('<a href="https://mail.google.com/mail/u/0/#all/'+esc(gid)+'" target="_blank" rel="noopener" style="font-size:11.5px;color:#6ea8fe">📧 Ouvrir ce mail dans Gmail</a>'):'')
+              +(q?('<button type="button" class="mails-cherche" data-q="'+esc(q)+'" style="font-size:11.5px">🔎 Copier la recherche Gmail</button>'):'')
+              +'</div>'; })()
         +(r.st[0]?'<div style="margin-top:5px;font-weight:700;color:'+r.st[1]+'">'+esc(r.st[0])+'</div>':'')
         +'<div class="acts" style="margin-top:6px;gap:6px">'+((r.mt&&r.mt.m.mailPending)?('<button type="button" class="mails-val ok" data-mid="'+esc(r.mt.m.id)+'" style="font-size:12px">✅ Valider la vacation</button><button type="button" class="mails-ref" data-mid="'+esc(r.mt.m.id)+'" data-id="'+esc(it.cdr_id)+'" style="font-size:12px;color:var(--bad)">🗑 Refuser</button>'):'')+(it.dismissed?'<span class="sub" style="margin:0">traité</span>':'<button type="button" class="mails-done" data-id="'+esc(it.cdr_id)+'" style="font-size:12px">✔ Marquer traité</button>')+'</div>'
         +'</div>';
     });
     box.innerHTML=_hbH+h;
     box.querySelectorAll('.mails-flt').forEach(function(b){ b.onclick=function(){ mailsFilter=b.getAttribute('data-f'); _mailsRender(items); }; });
+    var _hs=byId('mails-hs'); if(_hs)_hs.onclick=function(){ MAILS_TOUT=!MAILS_TOUT; _mailsRender(items); };   /* b358 */
+    box.querySelectorAll('.mails-cherche').forEach(function(b){ b.onclick=function(){   /* b358 */
+      var t=b.getAttribute('data-q')||'';
+      try{ navigator.clipboard.writeText(t); b.textContent='✅ copié — colle-le dans la recherche Gmail'; setTimeout(function(){ b.textContent='🔎 Copier la recherche Gmail'; },2600); }
+      catch(e){ prompt('Colle ceci dans la barre de recherche de Gmail :',t); } }; });
     var rf=byId('mails-refresh'); if(rf)rf.onclick=renderMails;
     box.querySelectorAll('.mails-val').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid');
       for(var i=0;i<SUIVI.length;i++){ if(SUIVI[i].id===mid){ delete SUIVI[i].mailPending; break; } }
