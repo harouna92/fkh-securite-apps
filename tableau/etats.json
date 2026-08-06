@@ -816,6 +816,14 @@
       "theme": "Planning & import",
       "pourquoipas": "Onglet 🧹 Doublons (super-admin) : 90 vacations en trop, certifiées par la Référence Sekur portée deux fois. 85 sans perte en un bouton, 5 dont les pointages n'existent que sur la copie sont d'abord REPORTÉS sur le contrôle équivalent (ctrl@2020 → ctrl@2010, décalage anti-collision). Tout se rétablit d'un clic, reports compris.",
       "local": true
+    },
+    {
+      "b": 357,
+      "titre": "L'aperçu d'import dit tout — et sur quel identifiant il a tranché",
+      "source": "Zeus — 06/08",
+      "theme": "Planning & import",
+      "pourquoipas": "Colle le CSV Sekur d'août et clique Analyser : « 182 reconnues par 🔒 Référence Sekur · 9 par ❓ site+jour (à confirmer) · 2 ♻️ supprimées · 9 complétées (agent) · ⚠️ 3 où le fichier annonce un AUTRE agent ». Les désaccords d'agent affichent les DEUX numéros de téléphone et se tranchent d'un clic ; les rapprochements sans identifiant n'agissent que si tu coches. Garde-fou : une vacation portant une AUTRE Référence n'est plus confondue (13 cas dangereux sur ce seul fichier).",
+      "local": true
     }
   ],
   "attente": [

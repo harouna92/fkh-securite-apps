@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b356</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b357</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -4776,7 +4776,7 @@ button.big:active{transform:translateY(1px)}
       var existMiss={}, existAgent={}; SUIVI.forEach(function(x){ if(x.mdate){ var _k=siteNorm(x.siteBDC||x.siteAgent||x.titre||'')+'|'+x.mdate+'|'+(x.mheure||'')+'|'+endHM(x.mfin); existMiss[_k]=true; if(x.agentId)existAgent[_k]=true; } });
       var vusCSV={};
       var includeEmpty=byId('imp-empty').checked, includePast=byId('imp-past')&&byId('imp-past').checked;
-      var agentsByPhone={}, missions=[], sites={}, past=0, dupRef=0, emptySkipped=0, frais=0;
+      var agentsByPhone={}, missions=[], sites={}, past=0, dupRef=0, emptySkipped=0, frais=0, rapproches=[];   /* b357 */
       data.forEach(function(r,idx){
         var dt=impDMY(r[C.deb]); if(!dt)return;
         var spec=C.spec>=0?String(r[C.spec]||''):''; if(/frais|d[eé]placement|indemnit|forfait/i.test(spec)){ frais++; return; } // lignes 'Frais de déplacement' = pas des missions
@@ -4799,18 +4799,44 @@ button.big:active{transform:translateY(1px)}
              ligne n'apporte rien : sans agent, ou sur une vacation qui en a deja un. Sinon on la laisse
              passer, et la mise a jour reportera l'agent sur la vacation existante (regle Zeus 05/08). */
           if(vusCSV[mk]){ dupRef++; return; }
-          /* b343 : l'aperçu compte comme « déjà en base » ce que la validation rattachera vraiment —
-             même rapprochement des deux côtés, sinon l'aperçu annonce des nouveautés qui n'en sont pas. */
-          var _dj=vacDejaLa({ref:ref,client:(C.client>=0?String(r[C.client]||'').trim():''),site:bdc,mdate:dt.date,mheure:dt.heure});
-          var _dje=_dj.exact||_dj.proche;
-          if(_dje && (!hasAgent || _dje.agentId)){ dupRef++; return; }
+          /* ===== b357 : ON CLASSE, ON NE JETTE PLUS EN SILENCE =====
+             Avant, tout ce qui était « déjà en base » tombait dans un seul compteur « ignorées ». On ne
+             savait ni POURQUOI la ligne avait été jugée identique, ni ce qu'elle apportait de neuf.
+             Désormais chaque ligne repart avec son NIVEAU de rapprochement (A/B/C/D), la vacation
+             trouvée, ce qu'elle vient compléter, et l'éventuel désaccord d'agent. Rien n'est appliqué
+             avant que Zeus ait vu l'aperçu. */
+          var _cli=(C.client>=0?String(r[C.client]||'').trim():'');
+          var _rap=vacRapprocher({ref:ref,client:_cli,site:bdc,mdate:dt.date,mheure:dt.heure});
+          var _endh2=endh;
+          if(_rap.vac){
+            var _v=_rap.vac, _id=vacIdent(_v);
+            var _agV=(_v.agentId&&typeof faById==='function')?(faById(_v.agentId)||{}):null;
+            var _nomV=(_agV&&_agV.nom)||'';
+            var _telV=''; if(_agV&&_agV.tels)for(var _t9=0;_t9<_agV.tels.length;_t9++){ var _c9=String(_agV.tels[_t9]||'').replace(/\D/g,''); if(_c9.length>=9){_telV=_c9.slice(-9);break;} }
+            var _telC=String(rawTel||'').replace(/\D/g,'').slice(-9);
+            function _mots(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim().split(' ').filter(function(w){return w.length>1;}).sort().join(' '); }
+            var _memeAgent=(!_nomV&&!nom)||(_telV&&_telC&&_telV===_telC)||(_mots(_nomV)&&_mots(_nomV)===_mots(nom));
+            rapproches.push({niveau:_rap.niveau,pourquoi:_rap.pourquoi,sur:_rap.sur,vac:_v,
+              site:bdc,ville:ville,client:_cli,mdate:dt.date,mheure:dt.heure,fin:_endh2,ref:ref,
+              agentNom:nom,agentTel:_telC,agentRef:agentRef,
+              apporteRef:!!(vacRefSekur(ref)&&!_id.ref),
+              apporteFin:!!(_endh2&&!_v.mfin),
+              apporteAgent:!!(nom&&(!_v.agentId||!_nomV)),   /* b357 : un id d'agent orphelin ne vaut pas un agent */
+              /* b357 : pas de conflit si l'agent du Planning est INTROUVABLE (fiche supprimée, id orphelin) —
+                 « garder — sans n° » ne veut rien dire. Dans ce cas le fichier apporte simplement l'agent. */
+              conflit:(nom&&_v.agentId&&_nomV&&!_memeAgent)?{plan:_nomV,planTel:_telV,csv:nom,csvTel:_telC}:null,
+              horaire:((_v.mheure||'')!==dt.heure||(_v.mfin||'')!==_endh2)?{plan:(_v.mheure||'—')+'→'+(_v.mfin||'—'),csv:dt.heure+'→'+(_endh2||'—')}:null});
+            if(_rap.sur){ vusCSV[mk]=true; return; }        /* A/B/C : sûr, la vacation sera mise à jour */
+            /* D : incertain — on ne crée rien, on ne met rien à jour tant que Zeus n'a pas tranché */
+            vusCSV[mk]=true; return;
+          }
           if(!hasAgent&&!includeEmpty){ emptySkipped++; return; }
           if(bdc&&!sites[sn])sites[sn]={bdc:bdc,agent:siteMap[sn]||impSiteAgent(bdc)};
           missions.push({mdate:dt.date,mheure:dt.heure,finRaw:C.fin>=0?r[C.fin]:'',client:C.client>=0?String(r[C.client]||'').trim():'',bdc:bdc,sn:sn,rue:C.rue>=0?String(r[C.rue]||'').trim():'',cp:C.cp>=0?String(r[C.cp]||'').trim():'',ville:ville,poste:C.spec>=0?String(r[C.spec]||'').trim():'',agentNom:nom,agentTel:(pk&&pk.length>=9)?impNormPhone(rawTel):'',agentRef:agentRef,ref:ref});
           vusCSV[mk]=true;   /* b324 */
         } else past++;
       });
-      IMP={agentsByPhone:agentsByPhone,missions:missions,sites:sites,past:past,dupRef:dupRef,emptySkipped:emptySkipped,frais:frais,includePast:includePast};
+      IMP={agentsByPhone:agentsByPhone,missions:missions,sites:sites,past:past,dupRef:dupRef,emptySkipped:emptySkipped,frais:frais,includePast:includePast,rapproches:rapproches,choix:{}};   /* b357 */
       impRenderPreview();
     }
     var txt=(byId('imp-text').value||'').trim();
@@ -4826,7 +4852,28 @@ button.big:active{transform:translateY(1px)}
     var h='<div class="card" style="margin-top:10px;background:var(--panel2)"><div class="lab" style="margin:0 0 6px">Aperçu — rien n\'est encore enregistré</div><ul style="margin:0 0 8px 18px;padding:0;line-height:1.7">';
     h+='<li><b>'+miss.length+'</b> mission'+(miss.length>1?'s':'')+' '+(IMP.includePast?'(toutes dates)':'(aujourd\'hui + à venir)')+' — <b>'+aff+'</b> avec agent · <b>'+toaff+'</b> à affecter</li>';
     h+='<li><b>'+newAg+'</b> nouvelle'+(newAg>1?'s':'')+' fiche'+(newAg>1?'s':'')+' agent (n° pas déjà en base)</li>';
-    if(IMP.dupRef)h+='<li>'+IMP.dupRef+' mission(s) déjà en base (même site + date + horaires) — ignorées</li>';
+    /* ===== b357 : L'APERÇU DIT TOUT, ET POURQUOI =====
+       Avant : « N missions déjà en base — ignorées ». On ne savait pas ce qui avait été jugé identique
+       ni sur quelle base, et ce que le fichier apportait de neuf (un agent, une heure de fin, une
+       Référence) partait à la poubelle avec la ligne. Maintenant chaque rapprochement est visible,
+       classé par le NIVEAU qui a tranché, et les cas douteux attendent une décision. */
+    var _R=IMP.rapproches||[];
+    var _sur=_R.filter(function(x){return x.sur;}), _dout=_R.filter(function(x){return !x.sur;});
+    var _conf=_R.filter(function(x){return x.conflit;});
+    var _compl=_sur.filter(function(x){return x.apporteAgent||x.apporteFin||x.apporteRef;});
+    if(_R.length){
+      var _pn={A:'🔒 Référence Sekur',B:'🏢 commande SECURITAS',C:'📧 n° de demande client',D:'❓ site + jour, sans identifiant',S:'♻️ vacation supprimée'};
+      var _cnt={}; _R.forEach(function(x){ _cnt[x.niveau]=(_cnt[x.niveau]||0)+1; });
+      h+='</ul><div class="lab" style="margin:10px 0 5px">🔗 Déjà connues — reconnues sur quoi ?</div><ul style="margin:0 0 8px 18px;padding:0;line-height:1.7">';
+      ['A','B','C','D','S'].forEach(function(k){ if(_cnt[k])h+='<li><b>'+_cnt[k]+'</b> — '+_pn[k]+(k==='D'||k==='S'?' <span style="color:#e0a13b">(à confirmer)</span>':'')+'</li>'; });
+      if(_compl.length)h+='<li><b>'+_compl.length+'</b> que le fichier vient <b>compléter</b> — '
+        +[_compl.filter(function(x){return x.apporteAgent;}).length+' agent(s)',
+          _compl.filter(function(x){return x.apporteFin;}).length+' heure(s) de fin',
+          _compl.filter(function(x){return x.apporteRef;}).length+' Référence(s)'].join(' · ')+'</li>';
+      if(_conf.length)h+='<li style="color:var(--bad);font-weight:700">⚠️ '+_conf.length+' vacation(s) où le fichier annonce un AUTRE agent — à trancher ci-dessous</li>';
+      h+='<ul style="margin:0 0 8px 18px;padding:0;line-height:1.7">';
+    }
+    if(IMP.dupRef)h+='<li>'+IMP.dupRef+' ligne(s) en double DANS LE FICHIER — ignorées</li>';
     if(IMP.emptySkipped)h+='<li>'+IMP.emptySkipped+' créneau(x) sans agent ignoré(s)</li>';
     if(IMP.past)h+='<li>'+IMP.past+' ligne(s) passée(s) — agents récupérés, pas de mission</li>';
     if(IMP.frais)h+='<li>'+IMP.frais+' ligne(s) « frais de déplacement » ignorée(s) (pas des missions)</li>';
@@ -4837,6 +4884,31 @@ button.big:active{transform:translateY(1px)}
     if(newAg){ h+='<div class="lab" style="margin:10px 0 4px">Nouveaux agents ('+newAg+')</div><div style="max-height:160px;overflow:auto;font-size:13px">';
       Object.keys(IMP.agentsByPhone).forEach(function(pk){ var a=IMP.agentsByPhone[pk]; h+='<div>• '+esc(a.nom||'(sans nom)')+' — '+esc(a.tel)+(a.ville?' · '+esc(a.ville):'')+' <span style="color:var(--muted)">('+a.n+' mission'+(a.n>1?'s':'')+')</span></div>'; });
       h+='</div>'; }
+    /* b357 : les deux listes où Zeus décide — les désaccords d'agent, puis les rapprochements incertains. */
+    if(_conf.length){
+      h+='<div class="lab" style="margin:14px 0 5px;color:var(--bad)">⚠️ Deux agents pour la même vacation — choisis</div>'
+        +'<p class="sub" style="margin:0 0 7px;font-size:11.5px">Le numéro de téléphone est affiché exprès : plusieurs agents portent le même nom de famille. Tant que rien n’est coché, l’agent du Planning est conservé.</p>';
+      _R.forEach(function(x,i){ if(!x.conflit)return;
+        h+='<div class="card" style="padding:8px;margin-bottom:6px;border-left:3px solid var(--bad)">'
+          +'<b>'+esc(x.site||'—')+'</b> <span class="sub" style="margin:0">'+esc((x.mdate||'').split('-').reverse().join('/'))+' '+esc(x.mheure||'')+'</span>'
+          +'<div class="acts" style="margin-top:5px;gap:8px;flex-wrap:wrap">'
+          +'<label class="chk" style="margin:0"><input type="radio" name="impc'+i+'" class="imp-choix" data-i="'+i+'" value="plan" checked><span>garder <b>'+esc(x.conflit.plan||'—')+'</b> <span class="sub" style="margin:0">'+esc(x.conflit.planTel||'sans n°')+'</span> <i>(Planning)</i></span></label>'
+          +'<label class="chk" style="margin:0"><input type="radio" name="impc'+i+'" class="imp-choix" data-i="'+i+'" value="csv"><span>prendre <b>'+esc(x.conflit.csv||'—')+'</b> <span class="sub" style="margin:0">'+esc(x.conflit.csvTel||'sans n°')+'</span> <i>(fichier)</i></span></label>'
+          +'</div></div>';
+      });
+    }
+    if(_dout.length){
+      h+='<div class="lab" style="margin:14px 0 5px;color:#e0a13b">❓ Rapprochements à confirmer ('+_dout.length+')</div>'
+        +'<p class="sub" style="margin:0 0 7px;font-size:11.5px">Aucun identifiant ne prouve que c’est le même service — seulement le site, le client et le jour. <b>Rien n’est fait tant que tu ne coches pas.</b> Coché : la vacation est complétée. Non coché : la ligne est ignorée (elle reviendra au prochain import).</p>';
+      _R.forEach(function(x,i){ if(x.sur)return;
+        var v=x.vac||{};
+        h+='<div class="card" style="padding:8px;margin-bottom:6px;border-left:3px solid #e0a13b">'
+          +'<label class="chk" style="margin:0"><input type="checkbox" class="imp-conf" data-i="'+i+'"><span><b>'+esc(x.site||'—')+'</b> '+esc((x.mdate||'').split('-').reverse().join('/'))+' '+esc(x.mheure||'')+(x.fin?('→'+esc(x.fin)):'')+'</span></label>'
+          +'<div class="fa-d" style="margin-top:3px">Planning : <b>'+esc(v.siteAgent||v.titre||'—')+'</b> '+esc(v.mheure||'—')+(v.mfin?('→'+esc(v.mfin)):' → <span style="color:var(--bad)">fin absente</span>')
+          +(v.agentId?'':' · <span style="color:var(--bad)">non affectée</span>')+'</div>'
+          +'<div class="sub" style="margin:2px 0 0;font-size:11.5px">'+esc(x.pourquoi)+'</div></div>';
+      });
+    }
     h+='<div class="acts" style="margin-top:10px"><button class="ok" id="imp-commit">✅ Importer maintenant</button><button id="imp-reset">Annuler</button></div></div>';
     byId('imp-preview').innerHTML=h;
     setTimeout(function(){ var _p=byId('imp-preview'); if(_p&&_p.scrollIntoView)_p.scrollIntoView({behavior:'smooth',block:'start'}); },60); // b147 : l'aperçu s'affichait HORS ÉCRAN (cas JULES #28/#29)
@@ -4882,9 +4954,41 @@ button.big:active{transform:translateY(1px)}
        exact     = meme Reference (identifiant du service, ce qui fait foi)
        proche    = meme client + meme jour + meme heure (a 2 h pres) + site compatible
        supprimee = le meme, mais que quelqu'un avait supprime */
+  /* ===== b357 : LE CARNET D'IDENTITÉS =====
+     POURQUOI (mesuré le 06/08 sur le CSV juin→août et la base réelle) : trois portes créent des
+     vacations, et chaque client numérote autrement. Un seul champ `ref` recevait tout — il contient
+     aujourd'hui 449 Références Sekur (8 caractères) ET 8 numéros de demande AQUILA (7 chiffres). Comparer
+     les deux revient à comparer un numéro de sécurité sociale avec un numéro de commande.
+     LES QUATRE IDENTITÉS, de la plus sûre à la plus faible :
+       A · Référence Sekur — 8 caractères, désigne UNE vacation. Ne bouge jamais, même quand l'horaire
+           est réajusté (vérifié : 31 des 324 services communs ont changé d'heure, pas de Référence).
+       B · Code commande SECURITAS — « N° CRI20263258/… » dans le nom du site. 34 % du CSV, 135 vacations.
+           Désigne une COMMANDE (jusqu'à 111 services) : il faut lui adjoindre la date et l'heure.
+       C · Numéro de demande client — 7 chiffres dans le sujet du mail AQUILA. Désigne une DEMANDE.
+       D · site + ville + jour — dernier recours, jamais appliqué en silence.
+     Chaque rapprochement réussi INSCRIT sur la vacation tous les identifiants découverts : une fois la
+     Référence posée, la vacation ne peut plus se dédoubler par aucune porte. */
+  var VAC_RX_CMDSEC=/N[°º o]\s*([A-Z]{2,4}\d{6,12})/i;
+  function vacRefSekur(s){ s=String(s||'').trim(); return (/^[A-Za-z0-9]{8}$/.test(s)&&!/^\d+$/.test(s))?s:''; }
+  function vacNumCli(s){ s=String(s||'').trim(); return /^\d{6,8}$/.test(s)?s:''; }
+  function vacCodeSec(s){ var m=VAC_RX_CMDSEC.exec(String(s||'')); return m?m[1].toUpperCase():''; }
+  /* Les identités portées par une vacation, quelles que soient les portes par lesquelles elle est passée. */
+  function vacIdent(m){
+    if(!m)return {ref:'',num:'',sec:''};
+    var brut=String(m.ref||'').trim();
+    return {ref:vacRefSekur(m.refSekur||brut),
+            num:vacNumCli(m.numCli||(vacRefSekur(brut)?'':brut))||vacNumCli((/\b(\d{7})\b/.exec(String(m.titre||''))||[])[1]||''),
+            sec:vacCodeSec(m.siteBDC||'')||vacCodeSec(m.siteAgent||'')||vacCodeSec(m.titre||'')};
+  }
   function vacDejaLa(crit){
     var out={exact:null,proche:null,supprimee:null};
     if(!crit)return out;
+    /* b357 GARDE-FOU (règle Zeus 06/08 : plusieurs Références = plusieurs agents, on ne fusionne jamais).
+       Sans lui, l'import rapproche un service d'une vacation qui porte une AUTRE Référence Sekur : deux
+       services réels confondus en un seul, et l'un des deux écrasé. Mesuré : 13 cas sur ce seul fichier
+       — dont « N° GCN20260831/DUC » du 06/08 19:00, où DEUX services CSV tombaient sur la MÊME vacation. */
+    var _critRef=vacRefSekur(crit.ref);
+    function _autreService(m){ var r=vacIdent(m).ref; return !!(r&&_critRef&&r!==_critRef); }
     var hm=(typeof toMin==='function')?toMin(crit.mheure||''):null;
     for(var i=0;i<(SUIVI||[]).length;i++){
       var m=SUIVI[i]; if(!m||m.sim)continue;
@@ -4896,13 +5000,63 @@ button.big:active{transform:translateY(1px)}
       if(hm!=null&&h2!=null&&Math.abs(hm-h2)>120)continue;
       if(!vacMemeClient(crit.client,m.client))continue;
       if(!vacMemeSite(crit.site,(m.siteAgent||m.titre||m.siteBDC||'')))continue;
+      if(_autreService(m))continue;   /* b357 : elle porte une AUTRE Référence — c'est un autre service */
       if(m.deleted){ if(!out.supprimee)out.supprimee=m; continue; }
       if(!out.proche)out.proche=m;
     }
     return out;
   }
+  /* b357 : le rapprochement complet, avec le NIVEAU qui a tranché — c'est lui qu'on affiche dans
+     l'aperçu d'import, pour qu'on sache toujours POURQUOI deux lignes ont été jugées identiques. */
+  function vacRapprocher(crit){
+    var r=vacDejaLa(crit);
+    if(r.exact)return {niveau:'A',vac:r.exact,pourquoi:'même Référence Sekur '+vacRefSekur(crit.ref),sur:1};
+    var sec=vacCodeSec(crit.site);
+    if(sec&&crit.mdate){
+      var hm=(typeof toMin==='function')?toMin(crit.mheure||''):null;
+      for(var i=0;i<(SUIVI||[]).length;i++){ var m=SUIVI[i];
+        if(!m||m.deleted||m.sim||m.statut!=='validee')continue;
+        if((m.mdate||'')!==crit.mdate)continue;
+        if(vacIdent(m).sec!==sec)continue;
+        var h2=(typeof toMin==='function')?toMin(m.mheure||''):null;
+        if(hm!=null&&h2!=null&&Math.abs(hm-h2)>90)continue;
+        var rm=vacIdent(m).ref; if(rm&&vacRefSekur(crit.ref)&&rm!==vacRefSekur(crit.ref))continue;
+        return {niveau:'B',vac:m,pourquoi:'même commande SECURITAS '+sec+' au même créneau',sur:1};
+      }
+    }
+    var num=vacNumCli(crit.num);
+    if(num){ for(var j=0;j<(SUIVI||[]).length;j++){ var m2=SUIVI[j];
+      if(!m2||m2.deleted||m2.sim)continue;
+      if(vacIdent(m2).num===num&&(m2.mdate||'')===(crit.mdate||''))
+        return {niveau:'C',vac:m2,pourquoi:'même demande client n° '+num,sur:1}; } }
+    if(r.proche)return {niveau:'D',vac:r.proche,pourquoi:'même site, même client, même jour — aucun identifiant pour confirmer',sur:0};
+    if(r.supprimee)return {niveau:'S',vac:r.supprimee,pourquoi:'une vacation supprimée correspondait',sur:0};
+    return {niveau:'N',vac:null,pourquoi:'aucune correspondance',sur:1};
+  }
   function vacQuand(m){ var t=Math.max(+(m.valide||0),+(m.pris||0),+(m.creeAt||0)); if(!t)return ''; var d=new Date(t); return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' à '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2); }
   function impCommit(){
+    /* ===== b357 : LES RAPPROCHEMENTS S'APPLIQUENT ICI, ET SEULEMENT CE QUI A ÉTÉ VALIDÉ =====
+       A/B/C (un identifiant a tranché) : la vacation est COMPLÉTÉE — jamais recréée, jamais écrasée.
+       D (aucun identifiant) : rien, sauf si Zeus a coché.
+       Désaccord d'agent : on ne remplace que s'il a choisi le fichier. Le silence garde le Planning. */
+    var _conf={}, _cocheD={};
+    try{ document.querySelectorAll('.imp-choix:checked').forEach(function(r){ _conf[r.getAttribute('data-i')]=r.value; }); }catch(e){}
+    try{ document.querySelectorAll('.imp-conf:checked').forEach(function(c){ _cocheD[c.getAttribute('data-i')]=1; }); }catch(e){}
+    var _nMaj=0,_nAg=0,_nFin=0,_nRef=0;
+    (IMP.rapproches||[]).forEach(function(x,i){
+      if(!x.vac)return;
+      if(!x.sur&&!_cocheD[String(i)])return;            /* niveau D non coché : on ne touche à rien */
+      var v=x.vac, id=vacIdent(v), chg=false;
+      if(vacRefSekur(x.ref)&&!id.ref){ v.refSekur=vacRefSekur(x.ref); v.ref=vacRefSekur(x.ref); _nRef++; chg=true; }
+      if(x.fin&&!v.mfin){ v.mfin=x.fin; _nFin++; chg=true; }
+      if(x.site&&!v.siteBDC)v.siteBDC=x.site;
+      if(x.ville&&!v.ville)v.ville=x.ville;
+      var _orph=!!(v.agentId&&typeof faById==='function'&&!faById(v.agentId));
+      if(x.agentRef&&x.agentRef.id&&(!v.agentId||_orph)){ v.agentId=x.agentRef.id; _nAg++; chg=true; }   /* b357 */
+      if(x.conflit&&_conf[String(i)]==='csv'&&x.agentRef&&x.agentRef.id){ v.agentId=x.agentRef.id; _nAg++; chg=true; }
+      if(chg){ v.majImport=Date.now(); _nMaj++; }
+    });
+    IMP._maj={n:_nMaj,ag:_nAg,fin:_nFin,ref:_nRef};
     var siteMap=impMap();
     document.querySelectorAll('.imp-site').forEach(function(inp){ var k=inp.getAttribute('data-k'); var v=inp.value.trim(); if(v&&IMP.sites[k]){ IMP.sites[k].agent=v; siteMap[k]=v; } });
     var newIds={}, base=Date.now();
@@ -4939,7 +5093,7 @@ button.big:active{transform:translateY(1px)}
     /* b343 : une vacation qu'on avait supprimée et que le fichier ramène — on la crée (elle a pu être
        re-commandée), mais on le DIT, sinon le nettoyage se défait en silence. */
     var _revHtml=_revenues.length?('<div style="margin-top:8px;border-left:3px solid #e0a13b;padding-left:8px"><b style="color:#e0a13b">⚠️ '+_revenues.length+' vacation'+(_revenues.length>1?'s':'')+' que tu avais supprimée'+(_revenues.length>1?'s':'')+' '+(_revenues.length>1?'reviennent':'revient')+' avec ce fichier</b><div class="fa-d" style="margin-top:4px">'+_revenues.slice(0,12).map(esc).join('<br>')+(_revenues.length>12?'<br>… et '+(_revenues.length-12)+' autre(s)':'')+'</div><div class="sub" style="margin-top:4px">Si ce n\'est pas voulu, supprime-les au Planning.</div></div>'):'';
-    byId('imp-preview').innerHTML='<div class="card" style="margin-top:10px;background:var(--panel2)"><b>✅ Import terminé</b><br>'+(nMiss-updated)+' nouvelle(s) mission(s) · '+updated+' mission(s) MISE(S) À JOUR (leur pointage déjà fait est conservé) · '+nAg+' fiche(s) agent créées.'+_revHtml+'</div>';
+    byId('imp-preview').innerHTML='<div class="card" style="margin-top:10px;background:var(--panel2)"><b>✅ Import terminé</b><br>'+((IMP._maj&&IMP._maj.n)?('<b>'+IMP._maj.n+'</b> vacation(s) déjà connue(s) <b>complétée(s)</b> — '+IMP._maj.ag+' agent(s), '+IMP._maj.fin+' heure(s) de fin, '+IMP._maj.ref+' Référence(s) inscrite(s)<br>'):'')+(nMiss-updated)+' nouvelle(s) mission(s) · '+updated+' mission(s) MISE(S) À JOUR (leur pointage déjà fait est conservé) · '+nAg+' fiche(s) agent créées.'+_revHtml+'</div>';
     suiviBucket='validee'; renderSuivi(); if(typeof renderFA==='function')renderFA();
   }
   if(byId('imp-open'))byId('imp-open').onclick=function(){ byId('imp-panel').classList.toggle('hidden'); };
