@@ -824,6 +824,22 @@
       "theme": "Planning & import",
       "pourquoipas": "Colle le CSV Sekur d'août et clique Analyser : « 182 reconnues par 🔒 Référence Sekur · 9 par ❓ site+jour (à confirmer) · 2 ♻️ supprimées · 9 complétées (agent) · ⚠️ 3 où le fichier annonce un AUTRE agent ». Les désaccords d'agent affichent les DEUX numéros de téléphone et se tranchent d'un clic ; les rapprochements sans identifiant n'agissent que si tu coches. Garde-fou : une vacation portant une AUTRE Référence n'est plus confondue (13 cas dangereux sur ce seul fichier).",
       "local": true
+    },
+    {
+      "b": 358,
+      "titre": "Mails missions : que des missions, les créneaux lus, et le mail retrouvé en un clic",
+      "source": "Zeus — 06/08",
+      "theme": "Mails & demandes",
+      "pourquoipas": "Section 📧 Mails missions : 33 mails de gardiennage/intervention au lieu de 120 (les 87 Ringover/LinkedIn/GetAccept sont comptés et consultables par « 📭 Voir les 87 hors sujet »). Chaque carte porte « 📧 Ouvrir ce mail dans Gmail » et « 🔎 Copier la recherche Gmail ». Les créneaux du mail entrent enfin dans les champs (date + heure de début + HEURE DE FIN). Et « ❌ PAS planifié » ne contredit plus « créée dans Suivi demandes ».",
+      "local": true
+    },
+    {
+      "b": 359,
+      "titre": "Compteur de photos sur chaque vignette du Planning",
+      "source": "Zeus — 06/08",
+      "theme": "Planning & import",
+      "pourquoipas": "Sur chaque vignette : « ✅ 2/2 », « ❗ 1/2 », « 📷 0/3 » en bas à droite — photos reçues sur photos attendues (prise, fin, contrôle tenue, contrôles des 2 h). Vert = complet, rouge = une échéance passée sans photo, orange = en cours. Rien ne s'affiche si la vacation n'attend aucune photo. Mesuré sur les vraies données : 75 compteurs sur 132 vignettes, rendu inchangé (~300 ms) grâce à une lecture mémorisée.",
+      "local": true
     }
   ],
   "attente": [

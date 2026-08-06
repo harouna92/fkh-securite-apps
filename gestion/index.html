@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b357</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b359</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1939,15 +1939,39 @@ button.big:active{transform:translateY(1px)}
          passait avant le test « refusée », donc la ligne quittait la liste sans y être classée.
      DÉSORMAIS : une seule fonction répond, et toutes les vues l'interrogent. Aucune vue ne garde sa
      propre définition. */
+  /* ===== b359 : UNE LECTURE MÉMORISÉE POUR LE CHEMIN CHAUD =====
+     POURQUOI (mesuré en ajoutant le compteur de photos au Planning) : `ssLoad()` refait un JSON.parse
+     de 121 Ko À CHAQUE APPEL. Le compteur interroge ~5 étapes par vignette, 132 vignettes → 660 parses,
+     et le rendu du Planning passait de 290 ms à 680 ms. Sur téléphone, ça se sent.
+     COMMENT : on garde la dernière valeur BRUTE lue et son objet. Tant que la chaîne stockée n'a pas
+     changé, on rend le même objet. Toute écriture change la chaîne, donc le cache se périme tout seul —
+     rien à invalider à la main, aucun risque de servir une version dépassée.
+     PORTÉE VOLONTAIREMENT ÉTROITE : uniquement la LECTURE des étapes photo. `ssLoad()` n'est pas touché,
+     pour que les endroits qui modifient l'objet gardent leur copie bien à eux. */
+  var _SSC={raw:null,obj:null}, _PAC={raw:null,obj:null};
+  function phArchRead(){
+    try{ var raw=localStorage.getItem('fkh_photo_archive')||'';
+      if(raw===_PAC.raw&&_PAC.obj)return _PAC.obj;
+      var a=JSON.parse(raw||'[]'); if(!Array.isArray(a))a=[];
+      _PAC.raw=raw; _PAC.obj=a; return a;
+    }catch(e){ return []; }
+  }
+  function ssRead(){
+    try{ var raw=localStorage.getItem('fkh_suivisite')||'';
+      if(raw===_SSC.raw&&_SSC.obj)return _SSC.obj;
+      var o=JSON.parse(raw||'{}'); if(!o||typeof o!=='object'||Array.isArray(o))o={};
+      _SSC.raw=raw; _SSC.obj=o; return o;
+    }catch(e){ return (typeof ssLoad==='function')?ssLoad():{}; }
+  }
   function phEtape(mid,key){
     var out={key:'',source:'',refus:null,libelle:''};
     try{
-      var S=(typeof ssLoad==='function')?ssLoad():{}, r=(S[mid]&&S[mid][key])||{};
+      var S=ssRead(), r=(S[mid]&&S[mid][key])||{};   /* b359 : lecture mémorisée */
       if(r.photoKey){ out.key=r.photoKey; out.source='etape'; }
       out.libelle=r.photo||'';
       if(r.refusPhoto)out.refus={par:r.refusPar||'',at:r.refusAt||0};
       if(!out.key){   // repli : l'archive garde la trace même si le planning a bougé depuis
-        var A=load('fkh_photo_archive');
+        var A=phArchRead();   /* b359 : mémorisée, comme ssRead — 34 Ko reparsés à chaque étape sinon */
         if(Array.isArray(A))for(var i=A.length-1;i>=0;i--){ if(A[i]&&String(A[i].mid)===String(mid)&&String(A[i].step||'').indexOf(key)>=0){ out.key=A[i].key; out.source='archive'; break; } }
       }
     }catch(e){}
@@ -5858,6 +5882,46 @@ button.big:active{transform:translateY(1px)}
       +'<div class="warn">⚠️ PROFORMA générée depuis le Planning — à vérifier avant émission officielle (numérotation, mentions légales, retards/écarts non déduits).</div>'
       +'<script>window.print();<\/script></body></html>';
     var w=window.open('','_blank'); if(!w){ alert('Autorise les popups pour afficher la proforma.'); return; } w.document.write(h); w.document.close(); }
+  /* ===== b359 : LE COMPTEUR DE PHOTOS SUR LA VIGNETTE DU PLANNING =====
+     POURQUOI (Zeus, 06/08) : depuis le Planning on voit qui travaille et où, mais pas si les preuves
+     sont arrivées. Il fallait ouvrir la vacation, ou passer par les pastilles, pour savoir s'il manque
+     une photo. Un chiffre sur la vignette répond d'un coup d'œil.
+     CE QU'ON COMPTE : tous les tickets de la vacation qui attendent une photo — prise de service, fin
+     de service, contrôle tenue, et chaque contrôle des 2 h. Une vacation simple donne donc « 0/2 »
+     comme dans l'exemple de Zeus ; une nuit avec quatre contrôles et un contrôle tenue donne « 0/7 ».
+     C'est le vrai reste à faire, pas un raccourci.
+     LA PHOTO EST CELLE DE b350 : une seule fonction de vérité (phAUnePhoto), qu'elle vienne de l'agent,
+     de l'agence ou de l'archive. Un rattachement fait ailleurs se voit donc ici aussi.
+     LA COULEUR : verte quand tout est là, rouge dès qu'une échéance est passée sans photo, orange
+     sinon. Sans elle, un « 0/2 » d'une vacation à venir se confondrait avec un « 0/2 » déjà en retard.
+     RIEN À AFFICHER si la vacation n'attend aucune photo (0/0), ou si elle n'a pas de tickets du tout
+     (retirée du Suivi des appels, ou née d'un mail pas encore validée) : un compteur faux serait pire
+     que pas de compteur. */
+  function plPhotos(m){
+    try{
+      if(!m||m.deleted||m.saOff||m.mailPending||m.retiree)return null;
+      if(typeof ssSteps!=='function'||typeof svcNeedPhoto!=='function')return null;
+      var steps=(ssSteps(m)||[]).filter(svcNeedPhoto);
+      /* une échéance retirée du suivi (« 🗑 Retirer ») ne compte plus dans le total */
+      try{ var ex=(typeof saExclLoad==='function')?saExclLoad():{};
+        steps=steps.filter(function(s){ return !ex[String(m.id)+'|'+s.key]; }); }catch(_e){}
+      if(!steps.length)return null;
+      var n=0, retard=false;
+      steps.forEach(function(s){
+        var a=(typeof phAUnePhoto==='function')?phAUnePhoto(m.id,s.key):false;
+        if(a)n++; else if(typeof svcDue==='function'&&svcDue(m,s))retard=true;
+      });
+      return {n:n,total:steps.length,retard:retard,complet:(n===steps.length)};
+    }catch(e){ return null; }
+  }
+  function plPhotosTag(m){
+    var p=plPhotos(m); if(!p)return '';
+    var col=p.complet?'#7fe0aa':(p.retard?'#ff8f8a':'#ffd479');
+    var ic=p.complet?'✅':(p.retard?'❗':'📷');
+    return '<div style="font-size:9px;font-weight:800;text-align:right;line-height:1.1;color:'+col+'" title="'
+      +esc(p.n+' photo(s) sur '+p.total+' attendue(s)'+(p.complet?' — complet':(p.retard?' — une échéance est passée sans photo':' — en cours')))
+      +'">'+ic+' '+p.n+'/'+p.total+'</div>';
+  }
   function _plMatch(m){ var F=PL_F;
     if(F.aff==='avec'&&!m.agentId)return false; // b186 : filtre affectation / verification
     if(F.aff==='sans'&&m.agentId)return false;
@@ -5924,7 +5988,7 @@ button.big:active{transform:translateY(1px)}
       var byH={},hOrder=[]; siteMap[s].forEach(function(m){ var hk=(m.mheure||'')+'-'+(m.mfin||''); if(!byH[hk]){byH[hk]=[];hOrder.push(hk);} byH[hk].push(m); });
       hOrder.sort();
       hOrder.forEach(function(hk){ var sample=byH[hk][0]; var durt=_plDurTxt(sample.mheure,sample.mfin); var lbl=(sample.mheure||'—')+(sample.mfin?('-'+sample.mfin):'')+(durt?(' ('+durt+')'):''); var qual=sample.qual||sample.specialite||'';
-        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); var hach=(aff&&!m.planifie); var bgS=hach?('background:repeating-linear-gradient(45deg,'+st.c+' 0 6px,rgba(0,0,0,.32) 6px 10px)'):('background:'+st.c); if(m.mailPending){ bgS='background:repeating-linear-gradient(45deg,#7b61ff 0 7px,#3d2f99 7px 12px);outline:2px dashed #fff;outline-offset:-2px'; } return '<div class="pl-chip'+((m.annul&&annulVisible())?' annul':'')+'" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l+(aff?(m.planifie?' · planifié':' · NON planifié (hachuré)'):'')+(m.saOff?' · SANS TICKETS (retiree du Suivi des appels)':''))+'" style="'+bgS+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.annul&&annulVisible()?'🔴 ':'')+(m.saOff?'🔕 ':'')+(m.isCircuit?'🚐 ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+(m.mailPending?'<div style="font-size:9px;font-weight:800">📧 À VALIDER</div>':'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div>')+'</div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc(s)+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
+        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); var hach=(aff&&!m.planifie); var bgS=hach?('background:repeating-linear-gradient(45deg,'+st.c+' 0 6px,rgba(0,0,0,.32) 6px 10px)'):('background:'+st.c); if(m.mailPending){ bgS='background:repeating-linear-gradient(45deg,#7b61ff 0 7px,#3d2f99 7px 12px);outline:2px dashed #fff;outline-offset:-2px'; } return '<div class="pl-chip'+((m.annul&&annulVisible())?' annul':'')+'" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l+(aff?(m.planifie?' · planifié':' · NON planifié (hachuré)'):'')+(m.saOff?' · SANS TICKETS (retiree du Suivi des appels)':''))+'" style="'+bgS+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.annul&&annulVisible()?'🔴 ':'')+(m.saOff?'🔕 ':'')+(m.isCircuit?'🚐 ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+(m.mailPending?'<div style="font-size:9px;font-weight:800">📧 À VALIDER</div>':'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div>')+plPhotosTag(m)/* b359 */+'</div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc(s)+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
         bodyR+='<tr><td class="pl-hlabel" style="position:sticky;left:0;z-index:1"><b>'+esc(lbl)+'</b>'+(qual?'<div style="font-size:10px;opacity:.8">'+esc(qual)+'</div>':'')+'</td>'+cells+'</tr>';
       });
     }); }
