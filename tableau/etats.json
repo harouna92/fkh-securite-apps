@@ -808,6 +808,14 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Sur chaque photo de « 📸 Photos terrain à rattacher » : le choix libre d'une vacation du jour, « 🦺 C'est une photo de contrôle », « 🙈 Écarter » et « 🗑 Supprimer la photo ». Ce bloc était construit dans le code mais jamais inséré dans le HTML — aucun de ces boutons n'existait à l'écran.",
       "local": true
+    },
+    {
+      "b": 356,
+      "titre": "Écran « 🧹 Doublons certifiés » — nettoyage réversible, sans perdre les pointages",
+      "source": "Zeus — 06/08",
+      "theme": "Planning & import",
+      "pourquoipas": "Onglet 🧹 Doublons (super-admin) : 90 vacations en trop, certifiées par la Référence Sekur portée deux fois. 85 sans perte en un bouton, 5 dont les pointages n'existent que sur la copie sont d'abord REPORTÉS sur le contrôle équivalent (ctrl@2020 → ctrl@2010, décalage anti-collision). Tout se rétablit d'un clic, reports compris.",
+      "local": true
     }
   ],
   "attente": [
