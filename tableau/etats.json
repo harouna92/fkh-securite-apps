@@ -3,6 +3,14 @@
   "maj": "2026-08-06",
   "items": [
     {
+      "b": 349,
+      "titre": "Les actions d'un ticket découlent de ce qu'il demande",
+      "source": "Zeus — 06/08",
+      "theme": "Suivi des appels",
+      "local": true,
+      "pourquoipas": "Un ticket « crée la fiche agent de X, et la vacation de 12h à 19h » proposait « Joint — il est sur site », « Toujours injoignable », « Clore sans coche » : les actions d'un agent injoignable, dont le ticket héritait. Désormais on lit le texte : → Ouvrir Fiche agent · → Ouvrir le Planning · 📞 Appeler [RETIRE] · ✅ Fait · ❓ Je n'ai pas compris (cette dernière renvoie la question à l'expéditeur). Rejoué sur le ticket exact de Zeus."
+    },
+    {
       "b": 348,
       "titre": "Un ticket part chez UNE SEULE personne, et la bulle dit où il va",
       "source": "Zeus — 06/08",
