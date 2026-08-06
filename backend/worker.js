@@ -802,12 +802,26 @@ export default {
     }
 
     // --- Liste des photos (repertoire), ?prefix=tenue/ ---
+    /* b354 : le plafond `limit: 500` etait un piege a retardement. R2 rend les cles par ORDRE
+       ALPHABETIQUE, pas par date : passe 500 objets, ce n'est pas « les 500 plus recentes » qu'on perd,
+       c'est tout ce qui vient apres dans l'alphabet — donc, avec des cles `u/<ville>/<horodatage>`, les
+       villes de la fin de l'alphabet, silencieusement. Constate le 06/08 : 358 objets, ~35 par jour.
+       On pagine donc jusqu'au bout (curseur R2), avec une borne haute de securite. */
     if (path === "/photos" && request.method === "GET") {
       if (!env.PHOTOS) return json({ error: "no bucket" }, 500);
       const prefix = url.searchParams.get("prefix") || "";
-      const listed = await env.PHOTOS.list({ prefix, limit: 500 });
-      const keys = (listed.objects || []).map((o) => ({ key: o.key, size: o.size, uploaded: o.uploaded }));
-      return json({ keys });
+      const max = Math.min(parseInt(url.searchParams.get("max") || "5000", 10) || 5000, 20000);
+      const keys = [];
+      let cursor = undefined, tronque = false;
+      for (let page = 0; page < 20; page++) {
+        const listed = await env.PHOTOS.list({ prefix, limit: 1000, cursor });
+        for (const o of (listed.objects || [])) keys.push({ key: o.key, size: o.size, uploaded: o.uploaded });
+        if (!listed.truncated || keys.length >= max) { tronque = !!listed.truncated; break; }
+        cursor = listed.cursor;
+        tronque = true;
+      }
+      // `tronque` dit franchement qu'il en reste : une liste coupee en silence se lit comme une liste complete.
+      return json({ keys, total: keys.length, tronque });
     }
 
     // --- Affichage d'une photo depuis R2 (l'appli fetch avec le mot de passe -> blob) ---
