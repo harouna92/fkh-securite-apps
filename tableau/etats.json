@@ -3,6 +3,14 @@
   "maj": "2026-08-06",
   "items": [
     {
+      "b": 346,
+      "titre": "Bulle 🎫 Envoyer un ticket + les bulles visibles de tout le monde + correction d'affichage",
+      "source": "Zeus — 06/08",
+      "theme": "Suivi des appels",
+      "local": true,
+      "pourquoipas": "La bulle 🎫 est en bas à droite dans toutes les sections : objet, date, heure, pour qui (opérateur par défaut · superviseur · administrateur · super-admin). L'entrée « Insérer un ticket » a quitté Supervision — une seule porte. Les deux bulles sont désormais visibles par défaut pour TOUS les rôles, opérateurs compris (drDefPastille les masquait tous). Corrige aussi l'affichage des choix de b345 : sans width:auto le rond mangeait la ligne."
+    },
+    {
       "b": 345,
       "titre": "La fiche agent ne s'écrase plus · ⚠️ Signaler sur tous les tickets · ✍️ Info au superviseur",
       "source": "Zeus — 06/08",

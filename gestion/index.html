@@ -183,6 +183,8 @@ button.big:active{transform:translateY(1px)}
 #rech-bar.rb-r{background:#e5322d}
 #notif-badge.nb-r.blk,#rech-bar.rb-r.blk{animation:nbblink 1s steps(1,end) infinite}
 #ask-fab{position:fixed;right:12px;bottom:12px;z-index:120;width:52px;height:52px;border-radius:50%;border:none;background:var(--brand,#3b6ef5);color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+/* b346 : la bulle « ticket » — juste au-dessus de la bulle Assistant, disponible depuis n'importe quelle section */
+#tk-fab{position:fixed;right:12px;bottom:74px;z-index:120;width:52px;height:52px;border-radius:50%;border:none;background:#e0a13b;color:#1b1b1b;font-size:23px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.35)}
 .ask-ov{display:none;position:fixed;inset:0;z-index:140;background:rgba(0,0,0,.5);align-items:flex-end;justify-content:flex-end;padding:14px}
 .ask-ov.show{display:flex}
 .ask-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:100%;max-width:400px;padding:14px;box-shadow:0 14px 44px rgba(0,0,0,.5);max-height:88vh;overflow:auto}
@@ -226,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b345</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b346</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -288,6 +290,7 @@ button.big:active{transform:translateY(1px)}
 <button type="button" id="pp-an2" class="pp-btn" title="Anomalies signalées — à traiter" aria-label="Anomalies">⚠️<span class="pp-badge" id="pp-an2-n"></span></button>
 <div id="pp-ovl"><div id="pp-box"></div></div>
 <button type="button" id="rech-bar" title="Missions en recherche d'agent — cliquer pour les traiter"></button>
+<button type="button" id="tk-fab" title="Préparer un ticket et l'envoyer à quelqu'un" aria-label="Envoyer un ticket">🎫</button>
 <button type="button" id="ask-fab" title="Poser une question (métier ou sur l'appli)" aria-label="Poser une question">💬</button>
 <div class="ask-ov" id="ask-ov">
   <div class="ask-box">
@@ -2910,6 +2913,10 @@ button.big:active{transform:translateY(1px)}
      du pilotage : qui est au PC, retards de prise, photos sans position. */
   var DR_PASTILLES_ADMIN=['pc','gp','rt'];
   function drDefPastille(k,role){
+    /* b346 : la bulle 💬 et la bulle 🎫 sont visibles de TOUT LE MONDE, opérateurs compris (règle Zeus).
+       Ce sont les deux moyens qu'a l'opérateur de poser une question et d'envoyer un ticket : les lui
+       masquer, c'est lui couper la parole. Elles restent réglables ici comme les autres. */
+    if(k==='bulle'||k==='tkfab')return true;
     if(role==='operateur')return false;
     if(DR_PASTILLES_ADMIN.indexOf(k)>=0)return role==='admin';   /* b320 : pas le superviseur */
     return DR_PASTILLES_ENCADREMENT.indexOf(k)>=0;   /* 'an' n'y est pas : annulations = super-admin seul */
@@ -2936,7 +2943,7 @@ button.big:active{transform:translateY(1px)}
     if(c&&typeof c==='object'&&typeof c[r]==='boolean')return c[r];
     return drDefPastille(k,r);
   }
-  var DR_PASTILLES=[['an2','⚠️ Anomalies signalées'],['cloche','🔔 Cloche des alertes'],['recherche','🔎 Barre de recherche intelligente'],['bandeau','🖥️ Bandeau d’état (sandbox / connexion)'],['bulle','💬 Bulle Assistant (bas à droite)'],['aides','📖 Textes d’explication sous les titres'],['pc','🎧 Qui est au PC'],['an','🔴 Annulations à confirmer'],['op','⏰ Prises/fins non pointées'],
+  var DR_PASTILLES=[['an2','⚠️ Anomalies signalées'],['cloche','🔔 Cloche des alertes'],['recherche','🔎 Barre de recherche intelligente'],['bandeau','🖥️ Bandeau d’état (sandbox / connexion)'],['bulle','💬 Bulle Assistant (bas à droite)'],['tkfab','🎫 Bulle Envoyer un ticket'],['aides','📖 Textes d’explication sous les titres'],['pc','🎧 Qui est au PC'],['an','🔴 Annulations à confirmer'],['op','⏰ Prises/fins non pointées'],
     ['cli','🏢 Client non avisé'],['ph','📷 Photos prise/fin'],['te','🦺 Contrôles tenue'],
     ['c2','🌙 Photos de contrôle 2 h'],['ro','🔌 Pointage sans appel'],['af','🧍 Vacations non affectées'],['tn','👕 Photos de contrôle tenue'],
     ['rt','🐢 Retards de prise'],['gp','📵 Photos sans position']];
@@ -3421,7 +3428,9 @@ button.big:active{transform:translateY(1px)}
   /* b239 : le bandeau d'etat et la bulle Assistant se reglent de la meme facon. L'operateur n'a que faire
      du bandeau technique « SANDBOX / hors-ligne » : c'est une information de mise au point. */
   function bandeauMaj(){ try{ var b=byId('cloudbar'); if(b)b.style.display=(typeof drVoitPastille==='function'&&!drVoitPastille('bandeau'))?'none':''; }catch(e){} }
-  function bulleMaj(){ try{ var b=byId('ask-fab'); if(b)b.style.display=(typeof drVoitPastille==='function'&&!drVoitPastille('bulle'))?'none':''; }catch(e){} }
+  function bulleMaj(){ try{ var b=byId('ask-fab'); if(b)b.style.display=(typeof drVoitPastille==='function'&&!drVoitPastille('bulle'))?'none':'';
+    var t=byId('tk-fab'); if(t)t.style.display=(typeof drVoitPastille==='function'&&!drVoitPastille('tkfab'))?'none':'';   /* b346 */
+  }catch(e){} }
   /* b241 : les paragraphes d'explication places sous le titre d'une section sont un mode d'emploi.
      Utile a qui decouvre l'outil, du bruit pour qui l'utilise huit heures par jour — l'operateur ne les a pas. */
   function aidesMaj(){ try{ var off=(typeof drVoitPastille==='function'&&!drVoitPastille('aides'));
@@ -6648,10 +6657,12 @@ button.big:active{transform:translateY(1px)}
     pop.innerHTML='<div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><b style="flex:1">⚠️ Signaler une anomalie</b><button type="button" id="sa-sig-x" style="font-size:18px;background:none;border:none;color:var(--muted)">✕</button></div>'
       +'<div class="sub" style="margin:0 0 10px">'+esc(quoi)+(e.site?' — '+esc(e.site):'')+(e.agent?'<br>👤 '+esc(e.agent):'<br><span style="color:var(--warn)">⚠ aucun agent affecté</span>')+'</div>'
       +'<div class="lab" style="margin:0 0 4px">Que se passe-t-il ?</div>'
-      +'<div class="list" style="margin-bottom:10px">'+SA_MOTIFS.map(function(m){ return '<label class="it" style="cursor:pointer"><input type="radio" name="sasigm" value="'+m.k+'"'+(m.k==='nerepond'?' checked':'')+' style="margin-right:8px;align-self:center"><div style="flex:1"><div class="fa-n">'+m.ic+' '+esc(m.t)+'</div><div class="fa-d">'+esc(m.d)+'</div></div></label>'; }).join('')+'</div>'
+      /* b346 : dans cette appli les champs font 100 % de large par défaut — sans width:auto le rond du
+         choix mangeait toute la ligne et le libellé se retrouvait écrasé en colonne à droite. */
+      +'<div class="list" style="margin-bottom:10px">'+SA_MOTIFS.map(function(m){ return '<label class="it" style="cursor:pointer;align-items:center"><input type="radio" name="sasigm" value="'+m.k+'"'+(m.k==='nerepond'?' checked':'')+' style="flex:0 0 auto;width:auto;min-width:0;min-height:0;height:auto;margin:0 10px 0 0"><div style="flex:1;min-width:0"><div class="fa-n">'+m.ic+' '+esc(m.t)+'</div><div class="fa-d">'+esc(m.d)+'</div></div></label>'; }).join('')+'</div>'
       +'<input id="sa-sig-txt" placeholder="Précision (facultatif — obligatoire pour « Autre »)" style="width:100%;margin-bottom:10px">'
       +'<div class="lab" style="margin:0 0 4px">À qui ça part ?</div>'
-      +'<div class="acts" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">'+SA_POUR.map(function(p,i){ return '<label style="display:flex;gap:5px;align-items:center;font-size:12.5px;text-transform:none;border:1px solid var(--line);border-radius:8px;padding:4px 9px"><input type="radio" name="sasigp" value="'+p.k+'"'+(i===0?' checked':'')+' style="width:auto;min-height:0;height:auto">'+esc(p.t)+(p.d?' <span class="sub" style="margin:0;font-size:11px">('+esc(p.d)+')</span>':'')+'</label>'; }).join('')+'</div>'
+      +'<div class="acts" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">'+SA_POUR.map(function(p,i){ return '<label style="display:flex;gap:5px;align-items:center;font-size:12.5px;text-transform:none;border:1px solid var(--line);border-radius:8px;padding:4px 9px"><input type="radio" name="sasigp" value="'+p.k+'"'+(i===0?' checked':'')+' style="flex:0 0 auto;width:auto;min-width:0;min-height:0;height:auto;margin:0">'+esc(p.t)+(p.d?' <span class="sub" style="margin:0;font-size:11px">('+esc(p.d)+')</span>':'')+'</label>'; }).join('')+'</div>'
       +'<div class="acts"><button type="button" class="ok" id="sa-sig-go" style="flex:1">📨 Envoyer</button><button type="button" id="sa-sig-no">Annuler</button></div>';
     document.body.appendChild(pop);
     byId('sa-sig-x').onclick=byId('sa-sig-no').onclick=function(){ var q=byId('sa-sig-pop'); if(q)q.parentNode.removeChild(q); };
@@ -6672,6 +6683,48 @@ button.big:active{transform:translateY(1px)}
       alert('📨 Envoyé à '+(pk==='superviseur'?'ton superviseur':pk==='admin'?'l’administrateur':'le super-admin')+' (section 🧭 Terrain).'+(M.esc?'\n\n⏳ 10 min pour réagir, sinon escalade.':'')+'\n\nLe ticket reste dans ta file.');
     };
   }
+  /* ===== b346 : LA BULLE 🎫 — PRÉPARER UN TICKET ET L'ENVOYER, DEPUIS N'IMPORTE OÙ =====
+     POURQUOI (Zeus, 06/08) : « 🎫 Insérer un ticket » était enfoui dans Supervision. Quand on veut
+     envoyer un ticket à quelqu'un, on veut cliquer tout de suite, comme la bulle Assistant.
+     On DÉPLACE la fonction, on ne la duplique pas : l'entrée de Supervision disparaît au profit de la
+     bulle, pour qu'il n'y ait jamais deux portes vers la même chose.
+     CE QU'ELLE FAIT : un ticket libre dans Suivi des appels, à la date et l'heure choisies, adressé à
+     l'opérateur (par défaut), au superviseur, à l'administrateur ou au super-admin. Quand ce n'est pas
+     l'opérateur, il part AUSSI dans 🧭 Terrain, sinon le destinataire ne le verrait jamais. */
+  var TK_POUR=[{k:'operateur',t:'🎧 Opérateur',d:'par défaut'},{k:'superviseur',t:'👮 Superviseur'},{k:'admin',t:'🧑‍💼 Administrateur'},{k:'superadmin',t:'👑 Super-admin'}];
+  function tkFabPop(){
+    var old=byId('tk-pop'); if(old){ old.parentNode.removeChild(old); return; }
+    var pop=document.createElement('div'); pop.id='tk-pop';
+    pop.style.cssText='position:fixed;inset:auto 4% 78px 4%;max-height:78vh;overflow:auto;z-index:245;background:var(--panel);border:2px solid #e0a13b;border-radius:14px;padding:14px;box-shadow:0 10px 40px rgba(0,0,0,.6)';
+    var auj=(typeof impTodayISO==='function')?impTodayISO():'';
+    pop.innerHTML='<div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><b style="flex:1">🎫 Envoyer un ticket</b><button type="button" id="tk-x" style="font-size:18px;background:none;border:none;color:var(--muted)">✕</button></div>'
+      +'<div class="sub" style="margin:0 0 10px">Un ticket libre (rappel, tâche, consigne) dans Suivi des appels, à la date et l’heure que tu veux.</div>'
+      +'<textarea id="tk-txt" placeholder="Objet du ticket (ex. Rappeler le client X pour la prolongation…)" style="width:100%;min-height:80px;margin-bottom:8px"></textarea>'
+      +'<div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><span class="sub" style="margin:0">Le</span><input type="date" id="tk-date" value="'+esc(auj)+'" style="width:auto;padding:5px 8px"><span class="sub" style="margin:0">à</span><input type="time" id="tk-heure" value="09:00" style="width:auto;padding:5px 8px"></div>'
+      +'<div class="lab" style="margin:0 0 4px">Pour qui ?</div>'
+      +'<div class="acts" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">'+TK_POUR.map(function(p,i){ return '<label style="display:flex;gap:5px;align-items:center;font-size:12.5px;text-transform:none;border:1px solid var(--line);border-radius:8px;padding:4px 9px"><input type="radio" name="tkpour" value="'+p.k+'"'+(i===0?' checked':'')+' style="flex:0 0 auto;width:auto;min-width:0;min-height:0;height:auto;margin:0">'+esc(p.t)+(p.d?' <span class="sub" style="margin:0;font-size:11px">('+esc(p.d)+')</span>':'')+'</label>'; }).join('')+'</div>'
+      +'<div class="acts"><button type="button" class="ok" id="tk-go" style="flex:1">📨 Envoyer le ticket</button><button type="button" id="tk-no">Annuler</button></div>';
+    document.body.appendChild(pop);
+    byId('tk-txt').focus();
+    byId('tk-x').onclick=byId('tk-no').onclick=function(){ var q=byId('tk-pop'); if(q)q.parentNode.removeChild(q); };
+    byId('tk-go').onclick=function(){
+      var txt=(byId('tk-txt').value||'').trim(), d=byId('tk-date').value||'', h=byId('tk-heure').value||'';
+      if(!txt){ alert('Écris l’objet du ticket.'); byId('tk-txt').focus(); return; }
+      if(!d){ alert('Choisis une date.'); return; }
+      var pk=(pop.querySelector('input[name="tkpour"]:checked')||{}).value||'operateur';
+      var cs=csgLoad(); cs.push({id:csgNewId(),texte:txt,client:'',site:'',ville:'',cp:'',mdate:d,heure:h||'',done:false,note:'',pour:pk,
+        par:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'')});
+      csgSave(cs);
+      if(pk!=='operateur'&&typeof supTerrainAdd==='function')supTerrainAdd({type:'anomalie',motif:'ticket',motifLbl:'🎫 Ticket',pour:pk,texte:txt,etape:'Ticket envoyé',mdate:d,heure:h||'',by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||''),deadline:0});
+      if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'tkfab'+Date.now(),title:'🎫 Ticket pour '+(pk==='operateur'?'l’opérateur':pk==='superviseur'?'le superviseur':pk==='admin'?'l’administrateur':'le super-admin'),body:txt.slice(0,80),go:(pk==='operateur'?'suiviappels':'supterrain')});
+      var q=byId('tk-pop'); if(q)q.parentNode.removeChild(q);
+      var lbl=(TK_POUR.filter(function(x){return x.k===pk;})[0]||{}).t||pk;
+      alert('🎫 Ticket envoyé à '+lbl+'\n\nLe '+d.split('-').reverse().join('/')+(h?' à '+h:'')+(pk==='operateur'?'\nIl apparaît dans Suivi des appels ce jour-là.':'\nIl apparaît dans Suivi des appels ET dans 🧭 Terrain.'));
+      if(typeof renderSuiviAppels==='function'&&byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')){try{renderSuiviAppels();}catch(e){}}
+      if(typeof supTerrainBadge==='function')supTerrainBadge();
+    };
+  }
+  if(byId('tk-fab'))byId('tk-fab').onclick=tkFabPop;
   /* ===== b345 : FAIRE REMONTER UNE INFO SANS QUITTER SA FILE =====
      Le canal existe déjà — 📨 Remontées terrain, avec cloche, badge et accusé de réception. On ne crée
      donc PAS un deuxième canal : on amène celui-ci là où l'opérateur travaille. Ce qu'il écrit ici
@@ -6685,7 +6738,7 @@ button.big:active{transform:translateY(1px)}
       +'<div class="sub" style="margin:0 0 8px">'+(ctx?('À propos de : '+esc(ctx)):'Ex. le client X a appelé pour prolonger la mission jusqu’à vendredi…')+'</div>'
       +'<textarea id="sa-inf-txt" placeholder="Écris ce que tu veux faire savoir…" style="width:100%;min-height:90px;margin-bottom:10px"></textarea>'
       +'<div class="lab" style="margin:0 0 4px">À qui ça part ?</div>'
-      +'<div class="acts" style="gap:6px;flex-wrap:wrap;margin-bottom:8px">'+SA_POUR.map(function(p,i){ return '<label style="display:flex;gap:5px;align-items:center;font-size:12.5px;text-transform:none;border:1px solid var(--line);border-radius:8px;padding:4px 9px"><input type="radio" name="sainfp" value="'+p.k+'"'+(i===0?' checked':'')+' style="width:auto;min-height:0;height:auto">'+esc(p.t)+'</label>'; }).join('')+'</div>'
+      +'<div class="acts" style="gap:6px;flex-wrap:wrap;margin-bottom:8px">'+SA_POUR.map(function(p,i){ return '<label style="display:flex;gap:5px;align-items:center;font-size:12.5px;text-transform:none;border:1px solid var(--line);border-radius:8px;padding:4px 9px"><input type="radio" name="sainfp" value="'+p.k+'"'+(i===0?' checked':'')+' style="flex:0 0 auto;width:auto;min-width:0;min-height:0;height:auto;margin:0">'+esc(p.t)+'</label>'; }).join('')+'</div>'
       +'<label class="chk" style="margin:0 0 12px"><input type="checkbox" id="sa-inf-sos"><span>🆘 C’est urgent — ça clignote chez eux</span></label>'
       +'<div class="acts"><button type="button" class="ok" id="sa-inf-go" style="flex:1">📨 Envoyer</button><button type="button" id="sa-inf-no">Annuler</button></div>';
     document.body.appendChild(pop);
@@ -8756,7 +8809,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
       var roCard='<details class="card" id="sup-ro-card"'+(roCalls?' open':'')+'><summary style="cursor:pointer;font-weight:700">🔌 Vérification des appels (Ringover)</summary><div style="margin-top:8px"><div class="acts" style="gap:8px;flex-wrap:wrap;align-items:center"><span class="sub" style="margin:0">Jour :</span><input type="date" id="sup-ro-date" style="width:auto;padding:5px 8px"><select id="sup-ro-client" style="width:auto;padding:5px 8px">'+roCliOpts+'</select><button type="button" class="ok" id="sup-ro-btn">🔌 Vérifier les appels</button><button type="button" id="sup-ro-diag" style="font-size:12px">🔍 Diagnostic API</button><span class="sub" style="margin:0 0 0 4px">· fenêtre ±</span><input type="number" id="sup-ro-win" min="1" max="240" value="'+roWin()+'" title="Tolérance en minutes autour de l\'heure prévue pour rapprocher un appel" style="width:56px;padding:5px 6px"><span class="sub" style="margin:0">min</span></div><p class="sub" style="margin:6px 0 0;font-size:11.5px">Croise chaque case cochée avec les appels réels (une <b>trace</b> d\'appel = ✅, décroché ou non) · fenêtre ±'+roWin()+' min réglable · filtre par client pour un rapport de preuve donneur d\'ordre.</p><div id="sup-ro-results" style="margin-top:8px;max-height:360px;overflow:auto"></div></div></details>';
       var operNamesCard=(typeof isSuperAdmin==='function'&&!isSuperAdmin())?'':'<details class="card"><summary style="cursor:pointer;font-weight:700">👤 Noms des comptes (tous les niveaux — traçabilité)</summary><div style="margin-top:8px"><p class="sub" style="margin:0 0 6px;font-size:11.5px">Donne un nom lisible à chaque compte (opérateur, superviseur, admin, super‑admin). Ce ne sont <b>PAS</b> les mots de passe — juste des étiquettes. <b>Réservé au super‑administrateur.</b></p><div class="list">'+operKnownLabels().map(function(l){ return '<div class="it" style="gap:8px"><span style="min-width:110px;font-weight:600">'+esc(l)+'</span><input class="opernom-in" data-lbl="'+esc(l)+'" value="'+esc(operNamesLoad()[l]||'')+'" placeholder="Nom (ex. Aïcha)" style="flex:1"></div>'; }).join('')+'</div></div></details>';
       var testCallCard='<details class="card"><summary style="cursor:pointer;font-weight:700">🧪 Créer un appel de test</summary><div style="margin-top:8px"><p class="sub" style="margin:0 0 6px;font-size:11.5px">Crée un ticket « APPEL TEST » dans Suivi des appels, avec une prise dans X minutes (heure France). Même logique que les vrais appels (grisé jusqu\'à 5 min avant, décalage horaire pris en compte).</p><div class="acts" style="gap:6px;align-items:center"><span class="sub" style="margin:0">Prise dans</span><input type="number" id="sup-testcall-min" min="1" max="120" value="8" style="width:60px;padding:5px 6px"><span class="sub" style="margin:0">min</span><button type="button" class="ok" id="sup-testcall-btn">➕ Créer l\'appel de test</button></div></div></details>';
-      var insertTicketCard='<details class="card"><summary style="cursor:pointer;font-weight:700">🎫 Insérer un ticket (date/heure au choix)</summary><div style="margin-top:8px"><p class="sub" style="margin:0 0 6px;font-size:11.5px">Ajoute un ticket libre dans Suivi des appels à la date et l\'heure que tu veux (rappel, tâche, note). Il apparaît dans le fil du jour choisi (vue « Tous »).</p><div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap"><span class="sub" style="margin:0">Le</span><input type="date" id="sup-ins-date" style="width:auto;padding:5px 8px"><span class="sub" style="margin:0">à</span><input type="time" id="sup-ins-heure" value="09:00" style="width:auto;padding:5px 8px"></div><input id="sup-ins-txt" placeholder="Objet du ticket (ex. Rappeler le client X…)" style="width:100%;margin:6px 0"><div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px"><span class="sub" style="margin:0">Pour</span><select id="sup-ins-pour" style="width:auto;padding:5px 8px"><option value="operateur">🎧 L’opérateur (par défaut)</option><option value="superviseur">👮 Le superviseur</option><option value="admin">🧑‍💼 L’administrateur</option></select></div><div class="acts"><button type="button" class="ok" id="sup-ins-btn">➕ Insérer dans Suivi des appels</button></div></div></details>';
+      var insertTicketCard='';   /* b346 : deplace dans la bulle 🎫 (en bas a droite, depuis n'importe quelle section) */
       var aiBlock=(function(){ var head='<div class="card" style="border:2px solid #7b61ff"><div class="lab" style="margin:0 0 6px;color:#7b61ff;display:flex;align-items:center;gap:8px;flex-wrap:wrap">🤖 Demandes détectées par IA (appels)'+(aiDetected.length?' — '+aiDetected.length:'')+'<button type="button" id="ai-scan-btn" style="margin-left:auto;font-size:11px">🔄 Scanner maintenant</button><button type="button" id="ai-reana-btn" style="font-size:11px" title="Re-analyser les appels récents avec la logique à jour (découpage par site)">🔁 Re-analyser</button></div>';
         var nums=aiNumLoad(); var numConfig='<details style="margin:2px 0 8px"'+(nums.length?'':' open')+'><summary style="cursor:pointer;color:#7b61ff;font-size:12px">⚙️ Numéros suivis ('+nums.length+') — l\'IA n\'analyse QUE ceux-là</summary><div style="margin-top:6px">'+(nums.length?('<div class="list">'+nums.map(function(x,i){return '<div class="it" style="font-size:12px"><span style="flex:1">📞 '+esc(x.n)+(x.lbl?' — '+esc(x.lbl):'')+' <span style="color:var(--muted)">('+esc(AIDIR[x.dir||'both'])+')</span></span><button data-ainumdel="'+i+'" style="width:24px;height:24px;padding:0">✕</button></div>';}).join('')+'</div>'):'<div class="sub" style="margin:0;color:var(--warn)">⚠️ Aucun numéro suivi — la détection est inactive. Ajoute des numéros ci-dessous.</div>')+'<div class="acts" style="margin-top:6px;gap:5px;flex-wrap:wrap;align-items:center"><input id="ai-num-in" placeholder="Numéro…" inputmode="tel" style="width:120px"><input id="ai-num-lbl" placeholder="Nom (client…)" style="width:120px"><select id="ai-num-dir" style="width:auto;padding:5px"><option value="both">entrants + sortants</option><option value="in">entrants</option><option value="out">sortants</option></select><button class="ok" id="ai-num-add">➕ Ajouter</button><button id="ai-num-import" style="font-size:11px">📇 Importer mes clients</button></div></div></details>'; head+=numConfig;
         var totDem=0; aiDetected.forEach(function(c){ totDem+=((c.demandes||[]).length); });
