@@ -760,6 +760,46 @@
       "theme": "Suivi des appels",
       "pourquoipas": "Descendre dans Suivi des appels, aller ailleurs, revenir : on retrouve sa position au lieu de remonter en haut.",
       "local": true
+    },
+    {
+      "b": 350,
+      "titre": "Une photo présente sort de « sans photo », d'où qu'elle vienne — et le badge ne ment plus",
+      "source": "Zeus — 06/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Pastille 📷 → une prise sans photo affiche « ⏱ Pointé N min après l'heure prévue (heure du pointage — aucune photo) » au lieu de « Photo prise ». Mesuré : 208 lignes mentaient en b349, 0 en b354. Toutes les vues (Suivi site, pastilles 🦺 et 🌙, fiche vacation) interrogent la même fonction de vérité.",
+      "local": true
+    },
+    {
+      "b": 351,
+      "titre": "Chaque photo dit d'où elle vient : envoyée par l'agent, ou rattachée par l'agence",
+      "source": "Zeus — 06/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Sur la ligne de pastille ET sur le ticket de Suivi des appels : « 📲 Envoyée par l'agent », « 📎 Rattachée par l'agence — superviseur-1 le 06/08 », « 📷 Déposée sur le ticket — operateur-2 ». Cas Att Rac Ghs Luant Station Total : la ligne ne disparaît plus sans explication.",
+      "local": true
+    },
+    {
+      "b": 352,
+      "titre": "« 🗑 Retirer » ne disparaît plus en aperçu, et le superviseur y a droit",
+      "source": "Zeus — 06/08",
+      "theme": "Droits & rôles",
+      "pourquoipas": "Regarder l'appli en aperçu superviseur : le bouton « 🗑 Retirer » est là (32 lignes testées) — avant il s'évanouissait car l'aperçu écrase CLOUD.role. Réglable dans la grille des Droits (clé pp-retirer).",
+      "local": true
+    },
+    {
+      "b": 353,
+      "titre": "Écarter une photo sans la détruire",
+      "source": "Zeus — 06/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Dans « 📸 Photos terrain à rattacher » : « 🙈 Écarter » sort la photo de la file, elle reste sur le serveur et se reprend d'un clic depuis « 🙈 Écartées ». La suppression définitive reste à côté.",
+      "local": false
+    },
+    {
+      "b": 354,
+      "titre": "La galerie des photos ne s'arrête plus au 25e",
+      "source": "Zeus — 06/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "171 photos en attente, 25 affichées, 146 invisibles (27 du 05/08, 41 du 02/08…). Désormais 40 puis « ⬇️ Voir 40 de plus » / « 📜 Tout afficher », avec le reste toujours chiffré. Côté serveur, /photos pagine au lieu de couper à 500.",
+      "local": false
     }
   ],
   "attente": [

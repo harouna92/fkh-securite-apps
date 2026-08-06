@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b349</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b354</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1945,6 +1945,45 @@ button.big:active{transform:translateY(1px)}
   }
   /* A-t-on une photo pour cette étape ? (photo rattachée OU libellé posé à la main) */
   function phAUnePhoto(mid,key){ var e=phEtape(mid,key); return !!(e.key||(e.libelle&&e.libelle!=='Pas de photo'&&e.libelle!=='Photo non horodatée')); }
+  /* ===== b350 : L'HEURE D'UNE PHOTO VIENT DE LA PHOTO, ET D'ELLE SEULE =====
+     POURQUOI (constaté sur les vraies données le 06/08) : l'écran annonçait « ⏱ Photo prise 11 min
+     APRÈS l'heure prévue » sur des lignes classées « sans photo » — 206 lignes dans ce cas. Le calcul
+     lisait `r.at`, qui n'est PAS l'heure de la photo : `saSet` l'écrase à `Date.now()` à chaque geste.
+     C'était donc l'heure du COCHAGE, présentée comme celle d'une photo qui n'existait pas.
+     COMMENT : le nom du fichier porte l'horodatage réel du cliché (`…/1785997600852.jpg`) — il ne se
+     discute pas et ne bouge plus. On le lit là. À défaut seulement, on retombe sur `r.at`, et dans ce
+     cas on ne prétend jamais que c'est l'heure d'une photo. */
+  function phTsDeCle(key){ try{ var f=String(key||'').split('/').pop(); var n=parseInt(f,10); return (isNaN(n)||n<1000000000)?0:n; }catch(e){ return 0; } }
+  function phQuand(mid,key){
+    var e=phEtape(mid,key); if(!e.key)return 0;
+    var t=phTsDeCle(e.key); if(t)return t;
+    try{ var S=(typeof ssLoad==='function')?ssLoad():{}, r=(S[mid]&&S[mid][key])||{}; return r.at||0; }catch(_e){ return 0; }
+  }
+  /* ===== b350 : D'OÙ VIENT CETTE PHOTO ? =====
+     POURQUOI (Zeus, 06/08 — cas « Att Rac Ghs Luant Station Total ») : quand l'agence rattache une
+     photo, la ligne quitte la liste SANS RIEN DIRE. On croit à un bug alors que le ticket est réglé.
+     Une ligne ne doit jamais disparaître sans qu'on puisse lire pourquoi.
+     COMMENT : chaque ligne porte son origine — envoyée par l'agent, ou rattachée par l'agence (avec
+     qui et quand). Le marqueur `man` fait foi : il est posé au moment du rattachement par l'agence. */
+  function phOrigine(mid,key){
+    var e=phEtape(mid,key); if(!e.key&&!phAUnePhoto(mid,key))return null;
+    var r={}; try{ var S=(typeof ssLoad==='function')?ssLoad():{}; r=(S[mid]&&S[mid][key])||{}; }catch(_e){}
+    var k=String(e.key||''), qui=String(r.by||''), quand=r.at||0, ts=phQuand(mid,key);
+    if(r.man)return {type:'agence',ic:'📎',txt:'Rattachée par l’agence'+(qui?' — '+qui:''),quand:quand,ts:ts,cle:k};
+    if(k.indexOf('u/')===0||k.indexOf('agent/')===0)return {type:'agent',ic:'📲',txt:'Envoyée par l’agent (lien photo)',quand:quand,ts:ts,cle:k};
+    if(k.indexOf('appel/')===0)return {type:'ticket',ic:'📷',txt:'Déposée sur le ticket'+(qui?' — '+qui:''),quand:quand,ts:ts,cle:k};
+    if(k.indexOf('tenue/')===0)return {type:'tenue',ic:'🦺',txt:'Désignée comme photo de tenue'+(qui?' — '+qui:''),quand:quand,ts:ts,cle:k};
+    if(e.source==='archive')return {type:'archive',ic:'🗂️',txt:'Retrouvée dans l’archive photo',quand:quand,ts:ts,cle:k};
+    if(!k)return {type:'libelle',ic:'✍️',txt:'Notée à la main : « '+esc(e.libelle||'')+' »'+(qui?' — '+qui:''),quand:quand,ts:ts,cle:''};
+    return {type:'autre',ic:'🖼️',txt:'Photo rattachée'+(qui?' — '+qui:''),quand:quand,ts:ts,cle:k};
+  }
+  /* La même chose en une ligne prête à afficher (vide s'il n'y a pas de photo). */
+  function phOrigineTxt(mid,key){
+    var o=phOrigine(mid,key); if(!o)return '';
+    var q=''; try{ if(o.quand&&o.type==='agence'){ var d=new Date(o.quand); q=' le '+('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' à '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2); } }catch(_e){}
+    var col=(o.type==='agence')?'#e0a13b':(o.type==='agent'?'#1a9e5c':'var(--muted)');
+    return '<div style="margin-top:3px;font-size:11.5px;color:'+col+'">'+o.ic+' '+o.txt+esc(q)+'</div>';
+  }
   /* Toutes les photos rattachées aux tickets d'une vacation — l'ordre du service. */
   function phDeLaVacation(m){
     var out=[], vus={}; if(!m)return out;
@@ -2890,7 +2929,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_pc_poste','fkh_droits','fkh_td_delai','fkh_data'];
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_pc_poste','fkh_droits','fkh_td_delai','fkh_ph_ecartees','fkh_data'];   /* b353 : les photos mises de côté sont une décision d'agence — elle doit se voir depuis tous les postes, pas rester sur le téléphone de celui qui l'a prise */
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','cockpitfkh','streste','depots','clientsf','corbeille','droits']; // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)  /* b228 : 'mails' retire — la section Mails missions (et son temoin de vie) est desormais visible par le superviseur et l'administrateur, pas seulement le super-admin */
@@ -2970,7 +3009,7 @@ button.big:active{transform:translateY(1px)}
      aux autres tant que Zeus ne l'aura pas cochee — sans qu'il faille y penser dans le code. */
   var DR_SECTIONS_ENCADREMENT=['noterapide','demandes','suivi','planning','fiche','zone','suiviappels','tenues',
     'services','interv','cfgiv','appels','suivisite','supervision','numeros','terrain','supterrain','mails','tickets'];
-  var DR_PASTILLES_ENCADREMENT=['op','cli','ph','te','c2','ro','af','rt','gp','pc','an2','tn','cloche','bandeau','bulle','aides'];   /* b319 : 'tn' (agents planifies sans photo de tenue) ouverte au superviseur et a l'administrateur — demande Zeus 05/08 */   /* b263 : 'recherche' retiree — la barre intelligente est desormais super-admin seul (regle Zeus 03/08), reglable dans la grille des Droits */
+  var DR_PASTILLES_ENCADREMENT=['op','cli','ph','te','c2','ro','af','rt','gp','pc','an2','tn','cloche','bandeau','bulle','aides','pp-retirer'];   /* b352 : 'pp-retirer' (le bouton « 🗑 Retirer » sur une ligne de pastille) ouvert au SUPERVISEUR et a l'administrateur — decision Zeus 06/08. Le retrait est reversible depuis la fiche de la vacation : rien n'est detruit. */   /* b319 : 'tn' (agents planifies sans photo de tenue) ouverte au superviseur et a l'administrateur — demande Zeus 05/08 */   /* b263 : 'recherche' retiree — la barre intelligente est desormais super-admin seul (regle Zeus 03/08), reglable dans la grille des Droits */
   function drDefSection(k,role){
     if(_secSuperOnly(k))return false;
     if(role==='operateur')return DR_OPERATEUR_DEF.indexOf(k)>=0;
@@ -3018,7 +3057,8 @@ button.big:active{transform:translateY(1px)}
   var DR_PASTILLES=[['an2','⚠️ Anomalies signalées'],['cloche','🔔 Cloche des alertes'],['recherche','🔎 Barre de recherche intelligente'],['bandeau','🖥️ Bandeau d’état (sandbox / connexion)'],['bulle','💬 Bulle Assistant (bas à droite)'],['tkfab','🎫 Bulle Envoyer un ticket'],['aides','📖 Textes d’explication sous les titres'],['pc','🎧 Qui est au PC'],['an','🔴 Annulations à confirmer'],['op','⏰ Prises/fins non pointées'],
     ['cli','🏢 Client non avisé'],['ph','📷 Photos prise/fin'],['te','🦺 Contrôles tenue'],
     ['c2','🌙 Photos de contrôle 2 h'],['ro','🔌 Pointage sans appel'],['af','🧍 Vacations non affectées'],['tn','👕 Photos de contrôle tenue'],
-    ['rt','🐢 Retards de prise'],['gp','📵 Photos sans position']];
+    ['rt','🐢 Retards de prise'],['gp','📵 Photos sans position'],
+    ['pp-retirer','🗑 Bouton « Retirer » sur une ligne de pastille']];   /* b352 */
   function renderDroits(){
     var box=byId('dr-body'); if(!box)return;
     if(!drEstSuper()){ box.innerHTML='<div class="card"><div class="sub" style="margin:0">Réservé au super-administrateur.</div></div>'; return; }
@@ -4727,7 +4767,10 @@ button.big:active{transform:translateY(1px)}
   function svcStepMs(m,s){ if(!s.heure||!m.mdate)return null; var start=toMin(m.mheure),mn=toMin(s.heure); if(mn==null)return null; var abs=mn; if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn<start)abs=mn+1440; return frMs(m.mdate,abs); }
   function svcDue(m,s){ var ms=svcStepMs(m,s); return ms==null?true:(Date.now()>ms+SVC_GRACE*60000); }
   // État d'une vacation : 'complet' (tout fait + photos), 'retard' (une étape échue non faite/sans photo), 'encours' (rien d'échu, en attente)
-  function svcState(m){ var S=ssLoad(),st=S[m.id]||{},steps=ssSteps(m); function dn(s){return !!(st[s.key]&&st[s.key].done);} function ph(s){return !!(st[s.key]&&st[s.key].photoKey);} var phSteps=steps.filter(svcNeedPhoto); if(steps.every(dn)&&phSteps.every(ph))return 'complet'; var lateA=steps.some(function(s){return !dn(s)&&svcDue(m,s);}); var lateP=phSteps.some(function(s){return !ph(s)&&svcDue(m,s);}); return (lateA||lateP)?'retard':'encours'; }
+  /* b350 : « a-t-il une photo ? » ne se redéfinit plus ici — c'est phAUnePhoto qui répond, comme
+     partout ailleurs. Avant, cette vue ne regardait que `photoKey` de l'étape : une photo rattachée
+     par l'agence ou retrouvée dans l'archive laissait la vacation en « incomplet ». */
+  function svcState(m){ var S=ssLoad(),st=S[m.id]||{},steps=ssSteps(m); function dn(s){return !!(st[s.key]&&st[s.key].done);} function ph(s){return (typeof phAUnePhoto==='function')?phAUnePhoto(m.id,s.key):!!(st[s.key]&&st[s.key].photoKey);} var phSteps=steps.filter(svcNeedPhoto); if(steps.every(dn)&&phSteps.every(ph))return 'complet'; var lateA=steps.some(function(s){return !dn(s)&&svcDue(m,s);}); var lateP=phSteps.some(function(s){return !ph(s)&&svcDue(m,s);}); return (lateA||lateP)?'retard':'encours'; }
   // TOUTES les anomalies d'une vacation (une vacation peut en cumuler plusieurs).
   var SVC_ANOM_DEFS=[
     {k:'pointage',   c:'#8f1010', t:'🔴 Prise/fin de service NON pointée'},
@@ -4742,7 +4785,9 @@ button.big:active{transform:translateY(1px)}
   function svcAnomaliesAll(m){
     var S=ssLoad(), st=S[m.id]||{}, steps=ssSteps(m), hasPF=steps.some(function(s){return s.key==='prise'||s.key==='fin';}), out=[];
     function add(k){ var d=SVC_ANOM_DEFS.filter(function(x){return x.k===k;})[0]; if(d)out.push(d); }
-    function photoMiss(pred){ return steps.some(function(s){ var r=st[s.key]; return pred(s)&&r&&r.done&&!r.photoKey&&svcDue(m,s); }); }
+    /* b350 : même source de vérité que partout — une photo rattachée par l'agence, ou retrouvée dans
+       l'archive, éteint la pastille violette au lieu de la laisser allumée pour toujours. */
+    function photoMiss(pred){ return steps.some(function(s){ var r=st[s.key]; var _ap=(typeof phAUnePhoto==='function')?phAUnePhoto(m.id,s.key):!!(r&&r.photoKey); return pred(s)&&r&&r.done&&!_ap&&svcDue(m,s); }); }
     if(steps.some(function(s){ return (s.key==='prise'||s.key==='fin') && !(st[s.key]&&st[s.key].done) && svcDue(m,s); }))add('pointage');
     if(steps.some(function(s){ return s.key.indexOf('ctrl')===0 && !(st[s.key]&&st[s.key].done) && svcDue(m,s); }))add('ctrl');
     if(hasPF && ((st.prise&&st.prise.done&&!st.prise.avise) || (st.fin&&st.fin.done&&!st.fin.avise)))add('avise');
@@ -5699,7 +5744,7 @@ button.big:active{transform:translateY(1px)}
     var _anomDots=_anomAll.length?('<div style="margin:0 0 5px;display:flex;align-items:center;gap:5px;flex-wrap:wrap">'+_anomAll.map(function(a){return '<span title="'+esc(a.t)+'" style="display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;color:'+a.c+'"><span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:'+a.c+'"></span>'+esc(a.t.replace(/^[^ ]+ /,''))+'</span>';}).join('')+'</div>'):'';
     var site=m.siteAgent||m.titre||'—', ag=(m.agentId&&faById(m.agentId))?faById(m.agentId).nom:'';
     var pl=(typeof apPlan==='function')?apPlan(m):null;
-    function dn(s){return !!(st[s.key]&&st[s.key].done);} function ph(s){return !!(st[s.key]&&st[s.key].photoKey);}
+    function dn(s){return !!(st[s.key]&&st[s.key].done);} function ph(s){return (typeof phAUnePhoto==='function')?phAUnePhoto(m.id,s.key):!!(st[s.key]&&st[s.key].photoKey);}   /* b350 */
     // Appels : faits / en retard (échus non faits) / à venir (heure pas encore passée)
     var totA=steps.length, doneA=steps.filter(dn).length;
     var lateA=steps.filter(function(s){return !dn(s)&&svcDue(m,s);});
@@ -5718,7 +5763,14 @@ button.big:active{transform:translateY(1px)}
     var appelsLine=pill(aIc+' Appels '+doneA+'/'+totA,aCls)
       +(lateA.length?'<span class="sub" style="font-size:12px;color:#e0a13b">en retard : '+lateA.map(svcShortLbl).map(esc).join(', ')+'</span>':'')
       +(pendA.length?'<span class="sub" style="font-size:12px"> · à venir : '+pendA.map(svcShortLbl).map(esc).join(', ')+'</span>':'');
-    var phLinks=phSteps.map(function(s){ var r=st[s.key]||{}; if(r.photoKey)return '<a href="#" class="svc-ph" data-k="'+esc(r.photoKey)+'" style="font-size:12px;color:#6ea8fe;margin-right:8px">🖼️ '+esc(svcShortLbl(s))+'</a>'; var late=svcDue(m,s); return '<span style="font-size:12px;color:'+(late?'var(--bad)':'var(--muted)')+';margin-right:8px">'+(late?'❌':'🕓')+' '+esc(svcShortLbl(s))+'</span>'; }).join('');
+    /* b350/b351 : le lien part de la source de vérité (phEtape), pas du seul photoKey de l'étape — une
+       photo rattachée par l'agence ou retrouvée dans l'archive est cliquable ici aussi. Et chaque
+       photo dit D'OÙ ELLE VIENT : sans ça, une ligne quitte les listes sans explication. */
+    var phLinks=phSteps.map(function(s){ var _e=(typeof phEtape==='function')?phEtape(m.id,s.key):{key:(st[s.key]||{}).photoKey||''};
+      var _o=(typeof phOrigine==='function')?phOrigine(m.id,s.key):null;
+      if(_e.key)return '<a href="#" class="svc-ph" data-k="'+esc(_e.key)+'" title="'+esc(_o?(_o.ic+' '+_o.txt):'')+'" style="font-size:12px;color:#6ea8fe;margin-right:8px">🖼️ '+esc(svcShortLbl(s))+(_o?(' <span style="color:var(--muted);font-weight:400">'+_o.ic+'</span>'):'')+'</a>';
+      if(_o)return '<span style="font-size:12px;color:var(--ok);margin-right:8px" title="'+esc(_o.txt)+'">✅ '+esc(svcShortLbl(s))+'</span>';
+      var late=svcDue(m,s); return '<span style="font-size:12px;color:'+(late?'var(--bad)':'var(--muted)')+';margin-right:8px">'+(late?'❌':'🕓')+' '+esc(svcShortLbl(s))+'</span>'; }).join('');
     var pCls=doneP===totP?'ok':(lateP.length?'warn':'neu'), pIc=doneP===totP?'✅':(lateP.length?'⚠️':'🕓');
     var photosLine=pill(pIc+' Photos '+doneP+'/'+totP,pCls)+(totP?'<div style="margin-top:3px">'+phLinks+'</div>':'<span class="sub" style="font-size:12px">aucune photo attendue</span>');
     var cliLine=cliBadge('🟢 Prise',pr,hasPrise)+cliBadge('🔚 Fin',fn,hasFin);
@@ -6707,7 +6759,12 @@ button.big:active{transform:translateY(1px)}
       var tenueSel='<select class="sa-f" data-f="tenueCtrl" '+d0+'>'+['','✅ Fait — photo prise','📩 Demandé — en attente','🚫 Agent a REFUSÉ'].map(function(s){return '<option value="'+esc(s)+'"'+(r.tenueCtrl===s?' selected':'')+'>'+(s||'— contrôle tenue demandé ? —')+'</option>';}).join('')+'</select>';
       var upId='saph-'+String(e.mid).replace(/[^a-zA-Z0-9]/g,'')+'-'+e.key;
       var pv=r.photoKey?' <a href="#" class="sa-photo-view" data-k="'+esc(r.photoKey)+'" style="font-size:12px;color:#6ea8fe;align-self:center">🖼️ voir la photo</a>':(function(){ var _ar=(typeof photoArchiveFind==='function')?photoArchiveFind(saStableKey(e)):null; return _ar?(' <a href="#" class="sa-photo-view" data-k="'+esc(_ar.key)+'" title="Photo de contrôle archivée (conservée malgré la mise à jour du planning)" style="font-size:12px;color:#e0a13b;align-self:center">🖼️ photo archivée</a>'):''; })();
-      var photoUp=(photoReady()?photoBtn(upId,'📤 photo'):'<span class="sub" style="font-size:11px;align-self:center">📷 (connexion en ligne pour envoyer)</span>')+pv; var photoSug=(photoReady()?('<button type="button" class="sa-phsug" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'" data-when="'+esc(String(frMs(e.edate||e.mdate,e.abs)||''))+'" data-city="'+esc(slugForPhoto(e.ville||''))+'" data-cp="'+esc(((typeof siteMetaGet==='function')?(siteMetaGet(e.site||'').cp||''):'')||e.cp||'')+'" data-rue="'+esc((typeof siteMetaGet==='function')?(siteMetaGet(e.site||'').adresse||''):'')+'" data-lbl="'+esc(e.label||'')+'" style="font-size:11px">🖼️ Photos proposées</button>'):''); /* b200 */
+      /* b351 : D'OÙ VIENT CETTE PHOTO — sur le ticket lui-même. Cas Zeus « Att Rac Ghs Luant Station
+         Total » : la prise portait une photo rattachée par superviseur-1, la ligne quittait donc les
+         listes SANS RIEN DIRE. On ne devinait pas si l'agent l'avait envoyée ou si l'agence l'avait
+         rapprochée. Maintenant c'est écrit, avec qui et quand. */
+      var _porig=(typeof phOrigineTxt==='function')?phOrigineTxt(e.mid,e.key):'';
+      var photoUp=(photoReady()?photoBtn(upId,'📤 photo'):'<span class="sub" style="font-size:11px;align-self:center">📷 (connexion en ligne pour envoyer)</span>')+pv+_porig; var photoSug=(photoReady()?('<button type="button" class="sa-phsug" data-mid="'+esc(e.mid)+'" data-key="'+esc(e.key)+'" data-when="'+esc(String(frMs(e.edate||e.mdate,e.abs)||''))+'" data-city="'+esc(slugForPhoto(e.ville||''))+'" data-cp="'+esc(((typeof siteMetaGet==='function')?(siteMetaGet(e.site||'').cp||''):'')||e.cp||'')+'" data-rue="'+esc((typeof siteMetaGet==='function')?(siteMetaGet(e.site||'').adresse||''):'')+'" data-lbl="'+esc(e.label||'')+'" style="font-size:11px">🖼️ Photos proposées</button>'):''); /* b200 */
       // ☎ compteur de tentatives d'appel + 🆘 alerte responsables (remontée SOS clignotante) — remontée Zeus #18
       var _tries=+r.tries||0;
       var tryBtn='<button type="button" class="sa-try" '+d0+' title="J\'ai appelé sans réponse — compte une tentative" style="font-size:12px'+(_tries?';border-color:#e0a13b;color:#e0a13b;font-weight:700':'')+'">☎ +1'+(_tries?' ×'+_tries:'')+'</button>';
@@ -7190,6 +7247,14 @@ button.big:active{transform:translateY(1px)}
     alert('📎 Photo rattachée (étape « '+(PH_STEP_LBL[sk]||sk)+' »).'); phRender(); }
   // ===== 📸 Photos à rattacher (remontées #7/#14/#19) : lien UNIQUE (u/) ou lien agent (agent/) → association à une étape de vacation → le ticket de la file est RÉGLÉ avec preuve photo. =====
   var SA_PH=null;
+  var SA_PH_ALL=[], SA_PH_EC=[], SA_PH_PAS=40, SA_PH_N=40;   /* b354 : la file complète, les écartées, la tranche affichée */
+  /* b354 : une photo traitée (rattachée, supprimée) quitte la file COMPLÈTE, pas seulement la tranche
+     visible — sinon elle réapparaissait au « voir plus » suivant. */
+  function _phSortirDeLaFile(it){
+    if(!it)return;
+    try{ SA_PH_ALL=(SA_PH_ALL||[]).filter(function(x){return x.key!==it.key;}); }catch(e){}
+    try{ SA_PH=(SA_PH_ALL||[]).slice(0,SA_PH_N); }catch(e){ try{ SA_PH=(SA_PH||[]).filter(function(x){return x.key!==it.key;}); }catch(_e){} }
+  }
   /* ===== b336 : LES PHOTOS SANS POSITION QU'ON N'A PAS ENCORE RATTACHEES =====
      POURQUOI (Zeus, 05/08) : la pastille ne lisait que l'archive, laquelle n'est alimentee qu'AU
      MOMENT du rattachement. Une photo qui vient d'arriver sans position n'y figurait donc pas du
@@ -7238,12 +7303,22 @@ button.big:active{transform:translateY(1px)}
     }
     return out.slice(0,10); }
   function renderSaPhotosIn(){ var box=byId('sa-photosin'); if(!box)return; if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'){ box.innerHTML=''; return; }
-    var head='<details class="card" style="border:1px solid #e0a13b"'+(SA_PH&&SA_PH.length?' open':'')+'><summary style="cursor:pointer;font-weight:700;color:#e0a13b">📸 Photos terrain à rattacher'+(SA_PH?(' <span class="cnt" style="background:#e0a13b;color:#fff">'+SA_PH.length+'</span>'):'')+' <span class="sub" style="font-weight:400">(lien unique / lien agent → vacation)</span></summary><div style="margin-top:8px"><button type="button" class="ok" id="sa-ph-scan" style="font-size:12px">🔄 Charger les photos reçues</button><div id="sa-ph-list" style="margin-top:8px"></div></div></details>';
+    var head='<details class="card" style="border:1px solid #e0a13b"'+(SA_PH&&SA_PH.length?' open':'')+'><summary style="cursor:pointer;font-weight:700;color:#e0a13b">📸 Photos terrain à rattacher'+(SA_PH?(' <span class="cnt" style="background:#e0a13b;color:#fff">'+((SA_PH_ALL&&SA_PH_ALL.length)||SA_PH.length)+'</span>'):'')   /* b354 : le compte annonce la FILE ENTIÈRE, pas la tranche affichée */+' <span class="sub" style="font-weight:400">(lien unique / lien agent → vacation)</span></summary><div style="margin-top:8px"><button type="button" class="ok" id="sa-ph-scan" style="font-size:12px">🔄 Charger les photos reçues</button><div id="sa-ph-list" style="margin-top:8px"></div></div></details>';
     box.innerHTML=head;
     if(byId('sa-ph-scan'))byId('sa-ph-scan').onclick=function(){ var b=this; if(typeof CLOUD==='undefined'||!CLOUD.on){ alert('Connecte-toi (en ligne) : les photos sont dans le cloud.'); return; } b.disabled=true; b.textContent='⏳ …';
       photoList('u/',function(k1){ photoList('agent/',function(k2){ b.disabled=false; b.textContent='🔄 Charger les photos reçues';
         var items=[].concat((k1||[]).map(function(o){return _phParseU((o&&o.key)||o);}),(k2||[]).map(function(o){return phParseKey((o&&o.key)||o);})).filter(Boolean).filter(function(it){ return !phIsAttached(it.key); });
-        items.sort(function(a,b2){return (b2.ts||0)-(a.ts||0);}); SA_PH=items.slice(0,25); renderSaPhotosIn(); _phFillList(); }); }); };
+        items.sort(function(a,b2){return (b2.ts||0)-(a.ts||0);});
+        /* ===== b354 : LA GALERIE NE S'ARRÊTE PLUS AU 25e =====
+           POURQUOI (Zeus, 06/08 : « la galerie s'arrête au 5 août ») : mesuré sur les vraies photos —
+           171 en attente de rattachement, 25 affichées, 146 JAMAIS visibles (27 du 05/08, 21 du 04/08,
+           24 du 03/08, 41 du 02/08…). Le plafond n'était pas dans le serveur mais ici : `slice(0,25)`.
+           Une file tronquée en silence se lit comme une file vide — on croit avoir tout traité.
+           COMMENT : 40 d'emblée, puis « voir plus » par tranches, et le compte de ce qui reste est
+           TOUJOURS écrit. Les photos écartées (b353) sont mises de côté à part, pas perdues. */
+        SA_PH_ALL=items.filter(function(it){ return !phEstEcartee(it.key); });
+        SA_PH_EC=items.filter(function(it){ return phEstEcartee(it.key); });
+        SA_PH_N=SA_PH_PAS; SA_PH=SA_PH_ALL.slice(0,SA_PH_N); renderSaPhotosIn(); _phFillList(); }); }); };
     if(SA_PH&&SA_PH.length)_phFillList(); else if(SA_PH){ var l=byId('sa-ph-list'); if(l)l.innerHTML='<div class="sub" style="margin:0">✅ Aucune photo en attente de rattachement.</div>'; }
   }
   /* ===== b313 : LE PORTAIL DES PHOTOS RECUES =====
@@ -7411,6 +7486,25 @@ button.big:active{transform:translateY(1px)}
     if(apres)apres(a);
     return true;
   }
+  /* ===== b353 : ÉCARTER UNE PHOTO SANS LA DÉTRUIRE =====
+     POURQUOI (Zeus, 06/08) : dans « 📸 Photos terrain à rattacher », une photo n'avait que deux
+     issues — la rattacher, ou la SUPPRIMER définitivement du serveur. Or beaucoup ne sont ni l'une ni
+     l'autre : floue, en double, un bout de trottoir, ou simplement « pas maintenant ». Sans troisième
+     geste, on encombrait la file ou on effaçait une preuve qu'on regretterait.
+     COMMENT : « 🙈 Écarter » sort la photo de la file à rattacher. Le fichier reste sur le serveur,
+     rangé dans « écartées » avec qui l'a écartée et quand. Un clic la remet dans la file. La suppression
+     définitive reste à côté, inchangée — deux gestes distincts pour deux intentions distinctes. */
+  function phEcLoad(){ try{ var o=JSON.parse(localStorage.getItem('fkh_ph_ecartees')||'{}'); return (o&&typeof o==='object')?o:{}; }catch(e){ return {}; } }
+  function phEcSave(o){ try{ save('fkh_ph_ecartees',o); if(typeof cloudPush==='function')cloudPush('fkh_ph_ecartees'); }catch(e){} }
+  function phEstEcartee(key){ return !!phEcLoad()[String(key||'')]; }
+  function phEcarter(key,apres){
+    if(!key)return; var o=phEcLoad();
+    o[String(key)]={at:Date.now(),par:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'')};
+    phEcSave(o); if(apres)apres();
+  }
+  function phReprendre(key,apres){
+    if(!key)return; var o=phEcLoad(); delete o[String(key)]; phEcSave(o); if(apres)apres();
+  }
   /* Jeter une photo qui n'a rien a faire la. */
   function phSupprimer(key, apres){
     if(!key)return;
@@ -7534,11 +7628,50 @@ button.big:active{transform:translateY(1px)}
         +'<input class="sa-ph-ag" data-i="'+i+'" list="'+_dlid+'" placeholder="🦺 Photo de contrôle de… (nom de l\'agent)" autocomplete="off" style="flex:1;min-width:170px;font-size:12px;padding:3px 6px">'
         +_phAgentsDatalist(_dlid)
         +'<button type="button" class="sa-ph-tenue" data-i="'+i+'" style="font-size:11.5px;border-color:#e0a13b;color:#e0a13b">🦺 C\'est une photo de contrôle</button>'
+        /* b353 : le geste qui manquait — sortir la photo de la file SANS la détruire. */
+        +'<button type="button" class="sa-ph-ec" data-i="'+i+'" title="Sortir cette photo de la file à rattacher. Elle reste sur le serveur et se reprend d\'un clic." style="font-size:11.5px;border-color:var(--muted);color:var(--muted)">🙈 Écarter</button>'
         +'<button type="button" class="sa-ph-del" data-i="'+i+'" style="font-size:11.5px;color:var(--bad);border-color:var(--bad)">🗑 Supprimer la photo</button>'
         +'</div>';
       return '<div style="border:1px solid var(--line);border-radius:9px;padding:7px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:flex-start"><div style="flex:0 0 auto">'+((typeof photoThumbTag==='function')?photoThumbTag(it.key):'')+'</div><div style="flex:1;min-width:0"><div style="font-size:12px"><b>🕐 '+esc(when)+'</b>'+(city?' · 📍 '+esc(city):' · <b style="color:var(--bad)">⚠️ SANS POSITION</b>')+' · <span class="sub">'+(it.fmt==='uni'?'lien unique':'lien agent')+'</span></div><div style="margin-top:3px">'+btns+'</div></div></div></div>';
     }).join('');
+    /* ===== b354 : ON DIT TOUJOURS COMBIEN IL EN RESTE =====
+       Un plafond silencieux se lit comme « il n'y a plus rien ». Ici le compte est écrit, et le bouton
+       charge la tranche suivante. Les écartées vivent juste en dessous, repliées, reprenables d'un clic. */
+    (function(){
+      var reste=Math.max(0,(SA_PH_ALL||[]).length-(SA_PH||[]).length);
+      var pied='<div class="acts" style="margin-top:8px;gap:8px;align-items:center;flex-wrap:wrap">'
+        +'<span class="sub" style="margin:0;font-size:11.5px">'+(SA_PH||[]).length+' affichée(s) sur <b>'+(SA_PH_ALL||[]).length+'</b> en attente'+(reste?(' · <b style="color:#e0a13b">'+reste+' encore à voir</b>'):' · tout est affiché')+'</span>'
+        +(reste?('<button type="button" id="sa-ph-plus" class="ok" style="font-size:11.5px">⬇️ Voir '+Math.min(reste,SA_PH_PAS)+' de plus</button>'
+                +(reste>SA_PH_PAS?'<button type="button" id="sa-ph-tout" style="font-size:11.5px">📜 Tout afficher ('+reste+')</button>':'')):'')
+        +'</div>';
+      if((SA_PH_EC||[]).length){
+        pied+='<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--muted)">🙈 Écartées ('+SA_PH_EC.length+') — mises de côté, pas supprimées</summary><div style="margin-top:6px">'
+          +SA_PH_EC.map(function(it,j){ var e=phEcLoad()[it.key]||{}, dd=e.at?new Date(e.at):null;
+              return '<div style="display:flex;gap:8px;align-items:center;border:1px dashed var(--line);border-radius:8px;padding:5px 7px;margin-bottom:4px;font-size:11.5px">'
+                +'<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🕐 '+esc((phDateISO(it.ts)||'').split('-').reverse().join('/'))+' '+esc(phHM(it.ts))+(e.par?(' · écartée par '+esc(e.par)):'')+(dd?(' le '+('0'+dd.getDate()).slice(-2)+'/'+('0'+(dd.getMonth()+1)).slice(-2)):'')+'</span>'
+                +'<button type="button" class="sa-ph-rep" data-j="'+j+'" style="font-size:11px">↩️ Remettre dans la file</button></div>'; }).join('')
+          +'</div></details>';
+      }
+      list.insertAdjacentHTML('beforeend',pied);
+      var bp=byId('sa-ph-plus'); if(bp)bp.onclick=function(){ SA_PH_N+=SA_PH_PAS; SA_PH=SA_PH_ALL.slice(0,SA_PH_N); _phFillList(); };
+      var bt=byId('sa-ph-tout'); if(bt)bt.onclick=function(){ SA_PH_N=SA_PH_ALL.length; SA_PH=SA_PH_ALL.slice(); _phFillList(); };
+      list.querySelectorAll('.sa-ph-rep').forEach(function(b){ b.onclick=function(){
+        var it=SA_PH_EC[+b.getAttribute('data-j')]; if(!it)return;
+        phReprendre(it.key,function(){ SA_PH_EC=SA_PH_EC.filter(function(x){return x.key!==it.key;});
+          SA_PH_ALL.push(it); SA_PH_ALL.sort(function(a,b2){return (b2.ts||0)-(a.ts||0);});
+          SA_PH=SA_PH_ALL.slice(0,SA_PH_N); renderSaPhotosIn(); _phFillList(); }); }; });
+    })();
     if(typeof photoHydrate==='function')photoHydrate(list);
+    /* b353 : écarter — la photo sort de la file, reste sur le serveur, revient d'un clic. */
+    list.querySelectorAll('.sa-ph-ec').forEach(function(b){ b.onclick=function(){
+      var i=+b.getAttribute('data-i'), it=SA_PH&&SA_PH[i]; if(!it)return;
+      phEcarter(it.key,function(){
+        SA_PH_ALL=(SA_PH_ALL||[]).filter(function(x){return x.key!==it.key;});
+        SA_PH_EC=[it].concat(SA_PH_EC||[]);
+        SA_PH=SA_PH_ALL.slice(0,SA_PH_N);
+        renderSaPhotosIn(); _phFillList();
+      });
+    }; });
     /* b318 */
     list.querySelectorAll('.sa-ph-tenue').forEach(function(b){ b.onclick=function(){
       var i=+b.getAttribute('data-i'), it=SA_PH&&SA_PH[i]; if(!it)return;
@@ -7550,7 +7683,7 @@ button.big:active{transform:translateY(1px)}
     list.querySelectorAll('.sa-ph-del').forEach(function(b){ b.onclick=function(){
       var i=+b.getAttribute('data-i'), it=SA_PH&&SA_PH[i]; if(!it)return;
       phSupprimer(it.key, function(){
-        try{ SA_PH.splice(i,1); }catch(e){}
+        _phSortirDeLaFile(it);   /* b354 : la file complète suit, sinon la photo revient au « voir plus » suivant */
         _phFillList();
         if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
       });
@@ -7579,7 +7712,7 @@ button.big:active{transform:translateY(1px)}
         if(typeof supTerrainAdd==='function')supTerrainAdd({type:'tenuephoto',mid:mid,site:(m.siteAgent||m.titre||''),client:m.client||'',agent:agN,photoKey:it.key,by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'')});
         try{ var _cc=csgLoad(),_ch=false; _cc.forEach(function(x){ if(x.tenueCtrl&&!x.done&&(String(x.mid)===String(mid))){ x.done=true; x.doneAt=Date.now(); _ch=true; } }); if(_ch)csgSave(_cc); }catch(_e){}
         if(typeof photoArchiveAdd==='function')photoArchiveAdd({key:it.key,mid:mid,step:'tenue',site:(m.siteAgent||m.titre||''),agent:agN,mdate:m.mdate||'',sk:(typeof tnorm==='function'?tnorm(m.siteAgent||m.titre||''):'')+'|'+(m.mdate||'')+'|tenue'});
-        SA_PH.splice(i,1); renderSaPhotosIn(); _phFillList(); if(typeof renderSuiviAppels==='function')renderSuiviAppels(); return; }
+        _phSortirDeLaFile(it); renderSaPhotosIn(); _phFillList(); if(typeof renderSuiviAppels==='function')renderSuiviAppels(); return; }   /* b354 */
       if(!confirm('Associer cette photo à « '+_phStepLbl(step)+' — '+(m.siteAgent||m.titre||'')+' » ?\n\n✅ Le ticket correspondant sera RÉGLÉ (preuve photo) : plus besoin d\'appeler.'))return;
       /* b338 : « man » dit que c'est l'AGENCE qui a rapproche cette photo. Sans ce marqueur, l'ecart
          entre l'heure de la photo et l'heure prevue faisait basculer la ligne en « hors delai » : on
@@ -7587,7 +7720,7 @@ button.big:active{transform:translateY(1px)}
          pointage — c'est l'heure de la photo qu'on vient de choisir. */
       saSet(mid,step,{done:true,hm:phHM(it.ts),photo:'Photo horodatée',photoKey:it.key,viaPhoto:true,man:1,by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'photo')});
       if(typeof photoArchiveAdd==='function')photoArchiveAdd({key:it.key,mid:mid,step:step,site:(m.siteAgent||m.titre||''),agent:(m.agentId&&typeof faById==='function'&&faById(m.agentId))?faById(m.agentId).nom:'',mdate:m.mdate||'',sk:(typeof tnorm==='function'?tnorm(m.siteAgent||m.titre||''):'')+'|'+(m.mdate||'')+'|'+step});
-      SA_PH.splice(i,1); renderSaPhotosIn(); _phFillList(); if(typeof renderSuiviAppels==='function')renderSuiviAppels();
+      _phSortirDeLaFile(it); renderSaPhotosIn(); _phFillList(); if(typeof renderSuiviAppels==='function')renderSuiviAppels();   /* b354 */
       if(typeof notifScan==='function'){try{notifScan();}catch(e){}}   /* b338 */
       if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}} }; });
   }
@@ -7655,13 +7788,19 @@ button.big:active{transform:translateY(1px)}
         }
       }
       else if(isTe){ // b167 : entre dans la liste 12 h AVANT la prise, y RESTE tant que la PHOTO de controle n'est pas deposee
-        if(r.photoKey||r.tenuePhoto)return;
+        /* b350 : même source de vérité que les autres pastilles — une photo de tenue rattachée par
+           l'agence, ou retrouvée dans l'archive, sort la ligne de la liste comme n'importe quelle autre. */
+        if((typeof phAUnePhoto==='function'&&phAUnePhoto(e.mid,e.key))||r.photoKey||r.tenuePhoto)return;
         if(now<due-43200000)return;
         var _fd=_finMap[e.mid]; if(_fd==null)_fd=due+86400000; /* b185 : sans fin connue = terminee 24h apres la prise */ it.phase=(now<due)?'avant':((now>_fd)?'apres':'pendant'); it.since=now-(due-43200000);
         sc.te.push(it); }
       else { var _inj=!!(r.statut&&String(r.statut).indexOf('Injoignable')>=0);
         (_ctlMap[e.mid]=_ctlMap[e.mid]||[]).push({t:due,done:!!r.done,inj:_inj,hm:r.hm||''});
-        if(!(r.photoKey||r.photo)){ var _fd2=_finMap[e.mid]; if(_fd2==null)_fd2=due+86400000; it.phase=(now>_fd2)?'passee':'encours';
+        /* b350 : idem pour les contrôles des 2 h. Au passage, « Pas de photo » / « Photo non horodatée »
+           ne comptent plus comme une photo : c'était un libellé qui disait l'ABSENCE et qui éteignait
+           quand même la ligne. */
+        var _apC=(typeof phAUnePhoto==='function')?phAUnePhoto(e.mid,e.key):!!(r.photoKey||r.photo);
+        if(!_apC){ var _fd2=_finMap[e.mid]; if(_fd2==null)_fd2=due+86400000; it.phase=(now>_fd2)?'passee':'encours';
           it.c2info=_inj?'📵 Agent INJOIGNABLE — l’opérateur a tenté de joindre':(r.done?('☎ Appel contrôle ✅ FAIT'+(r.hm?(' à '+r.hm):'')+' — mais pas de photo'):'☎ Appel contrôle ❌ NON pointé par l’opérateur');
           sc.c2.push(it); } }
     });
@@ -8097,11 +8236,25 @@ button.big:active{transform:translateY(1px)}
      COMMENT : on compare l'heure prevue de l'etape a l'horodatage de la photo deposee. Sous 5 min, rien
      (c'est normal). Au-dela, l'ecart s'affiche en orange, et en rouge des 30 min, avec « à appeler ».
      L'heure vient du tampon de la photo, pas d'une declaration : elle ne se discute pas. */
+  /* ===== b350 : ON NE DIT « PHOTO » QUE S'IL Y A UNE PHOTO =====
+     POURQUOI (vraies données du 06/08) : sur 230 lignes classées « sans photo », 206 affichaient
+     « ⏱ Photo prise N min APRÈS l'heure prévue » — dont la prise KILOUTOU NANCY TP du 06/08 à 00 h 30,
+     annoncée « 11 min après ». Aucune de ces 230 lignes n'avait de photo, nulle part (ni photoKey, ni
+     libellé, ni archive, ni objet dans le stockage). Ce qui était mesuré, c'était l'heure du COCHAGE.
+     Zeus en a conclu, logiquement, que l'appli connaissait la photo et la classait quand même en
+     manquante. C'était l'inverse : le classement était juste, la phrase était fausse.
+     COMMENT : deux phrases distinctes, et jamais l'une pour l'autre.
+       · une photo existe  → « ⏱ Photo prise N min après » — l'heure vient du NOM DU FICHIER (phQuand),
+         pas de `r.at` que `saSet` réécrit à chaque geste ;
+       · pas de photo      → « ⏱ Pointé N min après » — l'information reste (un pointage tardif compte),
+         mais elle dit ce qu'elle mesure. Ne rien afficher aurait coupé une alerte utile. */
   function ecartPhoto(mid,key,heurePrevue,mdate){
     try{
       if(!heurePrevue||!mdate)return '';
       var S=ssLoad(), r=(S[mid]&&S[mid][key])||{};
-      var ts=r.at||0; if(!ts||!r.done)return '';
+      var aPhoto=(typeof phAUnePhoto==='function')?phAUnePhoto(mid,key):!!r.photoKey;
+      var ts=aPhoto?((typeof phQuand==='function'&&phQuand(mid,key))||r.at||0):(r.at||0);
+      if(!ts||!r.done)return '';
       var d=new Date(ts);
       var pm=toMin(heurePrevue); if(pm==null)return '';
       var am=d.getHours()*60+d.getMinutes();
@@ -8110,8 +8263,11 @@ button.big:active{transform:translateY(1px)}
       var av=(ec<0), n=Math.abs(ec);
       var lib=(n<60)?(n+' min'):(Math.floor(n/60)+' h '+('0'+(n%60)).slice(-2));
       var col=(n>=30)?'#e5322d':'#e0a13b';
-      return '<div style="margin-top:3px;font-size:12px;color:'+col+';font-weight:700">⏱ Photo prise '+lib+(av?' AVANT':' APRÈS')+' l’heure prévue ('+esc(heurePrevue)+' → '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2)+')'
-        +(n>=5?' · <span style="font-weight:600">à appeler</span>':'')+'</div>';
+      var quoi=aPhoto?'Photo prise ':'Pointé ';
+      var fin=aPhoto?' · <span style="font-weight:600">à appeler</span>'
+                    :' <span style="font-weight:400;color:var(--muted)">(heure du pointage — aucune photo)</span>';
+      return '<div style="margin-top:3px;font-size:12px;color:'+col+';font-weight:700">⏱ '+quoi+lib+(av?' AVANT':' APRÈS')+' l’heure prévue ('+esc(heurePrevue)+' → '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2)+')'
+        +fin+'</div>';
     }catch(e){ return ''; }
   }
   function refusBtn(x,md){
@@ -8134,8 +8290,21 @@ button.big:active{transform:translateY(1px)}
        vacation reste au Planning, seule l'echeance sort du suivi, et elle se restaure depuis la fiche
        de la vacation (« ↩️ Restaurer »). Reserve au super-administrateur — c'est un geste de menage,
        pas une action d'exploitation. */
+    /* ===== b352 : LE BOUTON EXISTAIT, MAIS L'APERÇU LE FAISAIT DISPARAÎTRE =====
+       POURQUOI (Zeus, 06/08 : « le bouton 🗑 Retirer que je ne vois pas ») : le test était
+       `isSuperAdmin()`, qui lit `CLOUD.role` — or `demoRole()` ÉCRASE `CLOUD.role` pendant un aperçu.
+       Dès qu'on regardait l'application « comme un superviseur », le bouton s'évanouissait, y compris
+       pour son propriétaire. Un aperçu doit montrer ce que voit l'autre, pas amputer ce qu'on peut faire.
+       DÉSORMAIS (décision Zeus 06/08) : le retrait est ouvert au SUPERVISEUR — il est réversible depuis
+       la fiche de la vacation, rien n'est détruit. Le droit se règle d'un clic dans la grille des Droits
+       (clé `pp-retirer`), et le super-administrateur le garde en toutes circonstances, aperçu compris. */
+    function rowPeutRetirer(){
+      try{ return (typeof drVoitPastille==='function')?drVoitPastille('pp-retirer')
+                 :((typeof isSuperAdmin==='function')&&isSuperAdmin()); }
+      catch(e){ return (typeof isSuperAdmin==='function')&&isSuperAdmin(); }
+    }
     function rowRetirer(x){
-      if(typeof isSuperAdmin!=='function'||!isSuperAdmin())return '';
+      if(!rowPeutRetirer())return '';
       if(!x||!x.mid)return '';
       return '<button type="button" class="pp-act-retirer" data-mid="'+esc(x.mid)+'" data-key="'+esc(x.key||'prise')+'" title="Retirer cette échéance du suivi (réversible depuis la vacation)" style="font-size:12px;margin-left:6px;color:var(--muted);border-color:var(--line)">🗑 Retirer</button>';
     }
@@ -8159,7 +8328,7 @@ button.big:active{transform:translateY(1px)}
       return '';
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
-      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+rowRetirer(x)+'</div>':'')+ecartPhoto(x.mid,(x.key||'prise'),x.heure,x.mdate)+hdBloc(x)+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+rowRetirer(x)+'</div>':'')+ecartPhoto(x.mid,(x.key||'prise'),x.heure,x.mdate)+((typeof phOrigineTxt==='function'&&x.mid&&x.key)?phOrigineTxt(x.mid,x.key):'')/* b351 */+hdBloc(x)+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
     if(D.anov){
       h+='<div class="acts" style="margin-bottom:10px"><button type="button" id="ano-new" class="ok" style="font-size:13px">\u2795 Signaler une anomalie</button></div>';
       var _lib={}; ANO_CATS.forEach(function(c){_lib[c[0]]=c[1];});
@@ -8472,7 +8641,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     }; });
     /* b335 */
     box.querySelectorAll('.pp-act-retirer').forEach(function(b){ b.onclick=function(){
-      if(typeof isSuperAdmin!=='function'||!isSuperAdmin())return;
+      if(!rowPeutRetirer())return;   /* b352 : même droit que l'affichage du bouton, pas un second test divergent */
       var mid=b.getAttribute('data-mid'), key=b.getAttribute('data-key')||'prise';
       var m=null; for(var i=0;i<SUIVI.length;i++){ if(String(SUIVI[i].id)===String(mid)){ m=SUIVI[i]; break; } }
       var quoi=(m&&(m.siteAgent||m.titre))||'cette vacation';
