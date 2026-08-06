@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b347</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b348</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -6791,23 +6791,39 @@ button.big:active{transform:translateY(1px)}
       +'<div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><span class="sub" style="margin:0">Le</span><input type="date" id="tk-date" value="'+esc(auj)+'" style="width:auto;padding:5px 8px"><span class="sub" style="margin:0">à</span><input type="time" id="tk-heure" value="09:00" style="width:auto;padding:5px 8px"></div>'
       +'<div class="lab" style="margin:0 0 4px">Pour qui ?</div>'
       +'<div class="acts" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">'+TK_POUR.map(function(p,i){ return '<label style="display:flex;gap:5px;align-items:center;font-size:12.5px;text-transform:none;border:1px solid var(--line);border-radius:8px;padding:4px 9px"><input type="radio" name="tkpour" value="'+p.k+'"'+(i===0?' checked':'')+' style="flex:0 0 auto;width:auto;min-width:0;min-height:0;height:auto;margin:0">'+esc(p.t)+(p.d?' <span class="sub" style="margin:0;font-size:11px">('+esc(p.d)+')</span>':'')+'</label>'; }).join('')+'</div>'
-      +'<div class="acts"><button type="button" class="ok" id="tk-go" style="flex:1">📨 Envoyer le ticket</button><button type="button" id="tk-no">Annuler</button></div>';
+      +'<div class="acts"><button type="button" class="ok" id="tk-go" style="flex:1">📨 Envoyer</button><button type="button" id="tk-no">Annuler</button></div>'
+      +'<div class="sub" id="tk-ou" style="margin:6px 0 0"></div>'   /* b348 : on dit OU ca va, avant de cliquer */;
     document.body.appendChild(pop);
     byId('tk-txt').focus();
+    /* b348 : la destination s'affiche AVANT le clic, et le bouton la nomme. */
+    function tkOu(){ var v=(pop.querySelector('input[name="tkpour"]:checked')||{}).value||'operateur';
+      var e=byId('tk-ou'); if(e)e.innerHTML=(v==='operateur')
+        ? '➡️ Ira dans <b>📞 Suivi des appels</b>, dans le fil du jour choisi.'
+        : '➡️ Ira dans <b>🧭 Terrain</b> — la section de '+(v==='superviseur'?'ton superviseur':v==='admin'?'l’administrateur':'le super-admin')+'. Pas dans la file des appels.';
+      var g=byId('tk-go'); if(g)g.textContent=(v==='operateur')?'📨 Envoyer à l’opérateur':'📨 Envoyer '+(v==='superviseur'?'au superviseur':v==='admin'?'à l’administrateur':'au super-admin');
+    }
+    pop.querySelectorAll('input[name="tkpour"]').forEach(function(r){ r.addEventListener('change',tkOu); });
+    tkOu();
     byId('tk-x').onclick=byId('tk-no').onclick=function(){ var q=byId('tk-pop'); if(q)q.parentNode.removeChild(q); };
     byId('tk-go').onclick=function(){
       var txt=(byId('tk-txt').value||'').trim(), d=byId('tk-date').value||'', h=byId('tk-heure').value||'';
       if(!txt){ alert('Écris l’objet du ticket.'); byId('tk-txt').focus(); return; }
       if(!d){ alert('Choisis une date.'); return; }
       var pk=(pop.querySelector('input[name="tkpour"]:checked')||{}).value||'operateur';
-      var cs=csgLoad(); cs.push({id:csgNewId(),texte:txt,client:'',site:'',ville:'',cp:'',mdate:d,heure:h||'',done:false,note:'',pour:pk,
-        par:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'')});
-      csgSave(cs);
-      if(pk!=='operateur'&&typeof supTerrainAdd==='function')supTerrainAdd({type:'anomalie',motif:'ticket',motifLbl:'🎫 Ticket',pour:pk,texte:txt,etape:'Ticket envoyé',mdate:d,heure:h||'',by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||''),deadline:0});
+      /* b348 (regle Zeus) : UNE SEULE destination, celle de la personne visee. L'operateur travaille dans
+         Suivi des appels — son ticket y va, et nulle part ailleurs. Le superviseur, l'administrateur et le
+         super-admin travaillent dans Terrain — leur ticket y va, et n'encombre PAS la file des appels. */
+      if(pk==='operateur'){
+        var cs=csgLoad(); cs.push({id:csgNewId(),texte:txt,client:'',site:'',ville:'',cp:'',mdate:d,heure:h||'',done:false,note:'',pour:pk,
+          par:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'')});
+        csgSave(cs);
+      } else if(typeof supTerrainAdd==='function'){
+        supTerrainAdd({type:'anomalie',motif:'ticket',motifLbl:'🎫 Ticket',pour:pk,texte:txt,etape:'Ticket envoyé',mdate:d,heure:h||'',by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||''),deadline:0});
+      }
       if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'tkfab'+Date.now(),title:'🎫 Ticket pour '+(pk==='operateur'?'l’opérateur':pk==='superviseur'?'le superviseur':pk==='admin'?'l’administrateur':'le super-admin'),body:txt.slice(0,80),go:(pk==='operateur'?'suiviappels':'supterrain')});
       var q=byId('tk-pop'); if(q)q.parentNode.removeChild(q);
       var lbl=(TK_POUR.filter(function(x){return x.k===pk;})[0]||{}).t||pk;
-      alert('🎫 Ticket envoyé à '+lbl+'\n\nLe '+d.split('-').reverse().join('/')+(h?' à '+h:'')+(pk==='operateur'?'\nIl apparaît dans Suivi des appels ce jour-là.':'\nIl apparaît dans Suivi des appels ET dans 🧭 Terrain.'));
+      alert('🎫 Ticket envoyé à '+lbl+'\n\nLe '+d.split('-').reverse().join('/')+(h?' à '+h:'')+(pk==='operateur'?'\n\nIl apparaît dans 📞 Suivi des appels ce jour-là.':'\n\nIl apparaît dans 🧭 Terrain — pas dans la file des appels.'));
       if(typeof renderSuiviAppels==='function'&&byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')){try{renderSuiviAppels();}catch(e){}}
       if(typeof supTerrainBadge==='function')supTerrainBadge();
     };

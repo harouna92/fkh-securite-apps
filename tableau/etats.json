@@ -3,6 +3,14 @@
   "maj": "2026-08-06",
   "items": [
     {
+      "b": 348,
+      "titre": "Un ticket part chez UNE SEULE personne, et la bulle dit où il va",
+      "source": "Zeus — 06/08",
+      "theme": "Suivi des appels",
+      "local": true,
+      "pourquoipas": "Avant, le ticket allait TOUJOURS dans Suivi des appels, plus dans Terrain si le destinataire n'était pas l'opérateur. Désormais : opérateur → Suivi des appels seul ; superviseur/admin/super-admin → Terrain seul. La bulle annonce la destination avant le clic et le bouton la nomme (« Envoyer au superviseur »). Prouvé : opérateur 1/0, superviseur 0/1, admin 0/1."
+    },
+    {
       "b": 347,
       "titre": "Un rattachement se lit partout : photos de la vacation, tenue, refus",
       "source": "Zeus — 06/08",
