@@ -791,7 +791,7 @@
       "source": "Zeus — 06/08",
       "theme": "Tenues & photos",
       "pourquoipas": "Dans « 📸 Photos terrain à rattacher » : « 🙈 Écarter » sort la photo de la file, elle reste sur le serveur et se reprend d'un clic depuis « 🙈 Écartées ». La suppression définitive reste à côté.",
-      "local": false
+      "local": true
     },
     {
       "b": 354,
@@ -799,7 +799,15 @@
       "source": "Zeus — 06/08",
       "theme": "Tenues & photos",
       "pourquoipas": "171 photos en attente, 25 affichées, 146 invisibles (27 du 05/08, 41 du 02/08…). Désormais 40 puis « ⬇️ Voir 40 de plus » / « 📜 Tout afficher », avec le reste toujours chiffré. Côté serveur, /photos pagine au lieu de couper à 500.",
-      "local": false
+      "local": true
+    },
+    {
+      "b": 355,
+      "titre": "Les actions d'une photo de la galerie atteignent enfin l'écran",
+      "source": "trouvé en montant la démo — 06/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Sur chaque photo de « 📸 Photos terrain à rattacher » : le choix libre d'une vacation du jour, « 🦺 C'est une photo de contrôle », « 🙈 Écarter » et « 🗑 Supprimer la photo ». Ce bloc était construit dans le code mais jamais inséré dans le HTML — aucun de ces boutons n'existait à l'écran.",
+      "local": true
     }
   ],
   "attente": [

@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b354</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b355</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3143,6 +3143,32 @@ button.big:active{transform:translateY(1px)}
   document.addEventListener('click',function(ev){ var b=ev.target&&ev.target.closest?ev.target.closest('.aide-b'):null; if(b){ ev.preventDefault(); ev.stopPropagation(); aideOuvrir(b.getAttribute('data-a')); } });
   function aideWire(root){ (root||document).querySelectorAll('.aide-b').forEach(function(b){ b.onclick=function(){ aideOuvrir(b.getAttribute('data-a')); }; }); }
   var DEMOS={
+    photos:{ titre:'📸 La galerie des photos ne s’arrête plus au 25e',
+      quoi:'171 photos reçues par le lien terrain, réparties sur 9 jours (35 aujourd’hui, 27 le 05/08, 41 le 02/08…) — le volume exact mesuré dans la vraie base le 06/08.',
+      aFaire:'Ouvre « 📞 Suivi des appels », déplie « 📸 Photos terrain à rattacher » et clique « 🔄 Charger les photos reçues ». En bas de la liste tu dois lire combien il en reste, avec « ⬇️ Voir 40 de plus » et « 📜 Tout afficher » — avant, la liste s’arrêtait à 25 sans le dire. Puis clique « 🙈 Écarter » sur une photo : elle quitte la file et se retrouve sous « 🙈 Écartées », où « ↩️ Remettre dans la file » la ramène. Rien n’est supprimé.',
+      monter:function(){
+        /* On simule le stockage : 171 clés de la même forme que les vraies (u/<ville>/<horodatage>.jpg).
+           Les vignettes ne se chargent pas — ici on vérifie le COMPTAGE et les GESTES, pas l'image. */
+        var villes=['niort','dijon','beaune','luant','folschviller','dunkerque','fontenelle','nancy','annecy','montlucon'];
+        var parJour=[35,27,21,24,41,11,4,7,1], faux=[];
+        for(var j=0;j<parJour.length;j++){
+          for(var i=0;i<parJour[j];i++){
+            var t=Date.now()-j*86400000-i*1700000;
+            faux.push({key:'u/'+villes[(j*7+i)%villes.length]+'/'+t+'.jpg',size:180000,uploaded:new Date(t).toISOString()});
+          }
+        }
+        window.__DEMO_PHOTOS=faux;
+        /* Le bloc « Photos terrain » refuse de s'ouvrir hors ligne (CLOUD.on). On l'ouvre POUR LA DEMO,
+           mais on coupe d'abord TOUTE ecriture vers le cloud : la lecon du 05/08 (12 vacations de test
+           parties en production) dit qu'on ne compte jamais sur un 401 pour se proteger. */
+        try{ cloudPush=function(){}; cloudPull=function(){}; }catch(e){}
+        try{ CLOUD.on=true; CLOUD.pass=''; }catch(e){}
+        photoReady=function(){ return true; };
+        photoList=function(prefix,cb){ cb((window.__DEMO_PHOTOS||[]).filter(function(o){ return String(o.key).indexOf(prefix||'')===0; })); };
+        photoHydrate=function(){};
+        photoThumbTag=function(){ return '<div style="width:64px;height:64px;border-radius:8px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:22px">🖼️</div>'; };
+        photoDelete=function(k,cb){ window.__DEMO_PHOTOS=(window.__DEMO_PHOTOS||[]).filter(function(o){return o.key!==k;}); cb({ok:true}); };
+      } },
     coches:{ titre:'🎛️ Une coche de contrôle ne bouge plus',
       quoi:'Une vacation de nuit d’hier, 20 h → 6 h, avec trois appels de contrôle : 23:00, 01:00 et 03:00.',
       aFaire:'Va dans « Suivi des appels » (période : hier → aujourd’hui) et coche les trois contrôles « Fait ». Reviens au 📅 Planning, ouvre la vacation SITE ÉTALON, et dans « 🎫 Tickets de cette vacation » ajoute un contrôle à 21:00. Retourne au Suivi des appels : les trois coches doivent être exactement là où tu les as mises, et 21:00 doit arriver vierge. (Avant, 23:00 revenait dans la file et 21:00 arrivait déjà coché.) Essaie aussi de changer l’heure d’un contrôle déjà coché : sa coche le suit.',
@@ -7632,7 +7658,7 @@ button.big:active{transform:translateY(1px)}
         +'<button type="button" class="sa-ph-ec" data-i="'+i+'" title="Sortir cette photo de la file à rattacher. Elle reste sur le serveur et se reprend d\'un clic." style="font-size:11.5px;border-color:var(--muted);color:var(--muted)">🙈 Écarter</button>'
         +'<button type="button" class="sa-ph-del" data-i="'+i+'" style="font-size:11.5px;color:var(--bad);border-color:var(--bad)">🗑 Supprimer la photo</button>'
         +'</div>';
-      return '<div style="border:1px solid var(--line);border-radius:9px;padding:7px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:flex-start"><div style="flex:0 0 auto">'+((typeof photoThumbTag==='function')?photoThumbTag(it.key):'')+'</div><div style="flex:1;min-width:0"><div style="font-size:12px"><b>🕐 '+esc(when)+'</b>'+(city?' · 📍 '+esc(city):' · <b style="color:var(--bad)">⚠️ SANS POSITION</b>')+' · <span class="sub">'+(it.fmt==='uni'?'lien unique':'lien agent')+'</span></div><div style="margin-top:3px">'+btns+'</div></div></div></div>';
+      return '<div style="border:1px solid var(--line);border-radius:9px;padding:7px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:flex-start"><div style="flex:0 0 auto">'+((typeof photoThumbTag==='function')?photoThumbTag(it.key):'')+'</div><div style="flex:1;min-width:0"><div style="font-size:12px"><b>🕐 '+esc(when)+'</b>'+(city?' · 📍 '+esc(city):' · <b style="color:var(--bad)">⚠️ SANS POSITION</b>')+' · <span class="sub">'+(it.fmt==='uni'?'lien unique':'lien agent')+'</span></div><div style="margin-top:3px">'+btns+'</div>'+_extra+'</div></div></div>';   /* b355 : _extra etait construit et JAMAIS insere — le choix libre d'une vacation, « c'est une photo de controle », « ecarter » et « supprimer » n'atteignaient jamais l'ecran. Constate le 06/08 en montant la demo. */
     }).join('');
     /* ===== b354 : ON DIT TOUJOURS COMBIEN IL EN RESTE =====
        Un plafond silencieux se lit comme « il n'y a plus rien ». Ici le compte est écrit, et le bouton
