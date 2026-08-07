@@ -872,6 +872,14 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Suivi des appels → « 📸 Photos terrain à rattacher » : deux boutons « 📎 À rattacher (171) » et « ✅ Rattachées (57) », et dans chacun « 📅 Aujourd'hui » / « 🕓 Jours passés ». La vue rattachées dit à QUELLE vacation et à quelle étape chaque photo est partie, qui l'a rattachée, et permet de « ↩️ Détacher » en cas d'erreur de vacation. Avant, une photo rattachée disparaissait : impossible de vérifier ni de corriger.",
       "local": true
+    },
+    {
+      "b": 365,
+      "titre": "Un ticket se règle tout seul quand ce qu'il demandait a quitté la file",
+      "source": "Zeus — 07/08",
+      "theme": "Tickets",
+      "pourquoipas": "Envoie un ticket depuis une pastille (« 🎫 Demander un point »). Il affiche désormais son avancement RÉEL, relu dans la file : « 12 sur 25 réglées · 13 restantes » avec une barre. Quand les lignes visées ont toutes disparu, il passe en ✅ Fait tout seul, avec la trace « 🤖 Fermé automatiquement — les 25 lignes visées ont quitté la file ». Un ticket écrit à la main, sans contexte, continue de se fermer à la main.",
+      "local": true
     }
   ],
   "attente": [
