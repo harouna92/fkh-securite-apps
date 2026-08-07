@@ -888,6 +888,14 @@
       "theme": "Tickets",
       "pourquoipas": "Tu envoies un ticket au superviseur, il le traite, tu vois son avancement. Une fois clos, il descend dans « ✅ Traités — tout l'historique » : consultable quand tu le cherches, invisible quand tu travailles. Et « 🔄 Renvoyer — il reste un point » le fait repartir chez la même personne avec tout le fil, sans repartir de zéro. Le nombre de renvois s'affiche sur la carte.",
       "local": true
+    },
+    {
+      "b": 367,
+      "titre": "Tuile 📥 « Photos reçues non rattachées » dans la pastille 📷",
+      "source": "Zeus — 07/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Pastille 📷 → 8e tuile « 📥 Photos reçues — non rattachées, aujourd'hui ». On clique : 📅 Aujourd'hui (depuis 00 h 00) / 🕓 Jours passés, la liste des photos avec leur heure et leur ville, et « 📎 Rapprocher cette photo » sans quitter la vue. Une photo entre en arrivant et n'en sort QUE rattachée ; à minuit le compteur repart, le retard descend dans « jours passés ». Les deux bouts du même trou sont enfin au même endroit.",
+      "local": true
     }
   ],
   "attente": [

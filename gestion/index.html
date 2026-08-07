@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b366</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b367</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3198,7 +3198,7 @@ button.big:active{transform:translateY(1px)}
      aux autres tant que Zeus ne l'aura pas cochee — sans qu'il faille y penser dans le code. */
   var DR_SECTIONS_ENCADREMENT=['noterapide','demandes','suivi','planning','fiche','zone','suiviappels','tenues',
     'services','interv','cfgiv','appels','suivisite','supervision','numeros','terrain','supterrain','mails','tickets'];
-  var DR_PASTILLES_ENCADREMENT=['op','cli','ph','te','c2','ro','af','rt','gp','pc','an2','tn','cloche','bandeau','bulle','aides','pp-retirer'];   /* b352 : 'pp-retirer' (le bouton « 🗑 Retirer » sur une ligne de pastille) ouvert au SUPERVISEUR et a l'administrateur — decision Zeus 06/08. Le retrait est reversible depuis la fiche de la vacation : rien n'est detruit. */   /* b319 : 'tn' (agents planifies sans photo de tenue) ouverte au superviseur et a l'administrateur — demande Zeus 05/08 */   /* b263 : 'recherche' retiree — la barre intelligente est desormais super-admin seul (regle Zeus 03/08), reglable dans la grille des Droits */
+  var DR_PASTILLES_ENCADREMENT=['op','cli','ph','te','c2','ro','af','rt','gp','pc','an2','tn','cloche','bandeau','bulle','aides','pp-retirer'];   /* b367 : '📥' photos non rattachees du jour */   /* b352 : 'pp-retirer' (le bouton « 🗑 Retirer » sur une ligne de pastille) ouvert au SUPERVISEUR et a l'administrateur — decision Zeus 06/08. Le retrait est reversible depuis la fiche de la vacation : rien n'est detruit. */   /* b319 : 'tn' (agents planifies sans photo de tenue) ouverte au superviseur et a l'administrateur — demande Zeus 05/08 */   /* b263 : 'recherche' retiree — la barre intelligente est desormais super-admin seul (regle Zeus 03/08), reglable dans la grille des Droits */
   function drDefSection(k,role){
     if(_secSuperOnly(k))return false;
     if(role==='operateur')return DR_OPERATEUR_DEF.indexOf(k)>=0;
@@ -7849,6 +7849,52 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
      COMMENT : on releve a part les photos deposees dans « ville inconnue » et encore non rattachees.
      Elles rejoignent la pastille sous « (agent non identifié) », avec un bouton qui ouvre directement
      le rapprochement — on voit tout au meme endroit, et on peut agir. */
+  /* ===== b367 : LA PASTILLE DES PHOTOS QUI ATTENDENT =====
+     POURQUOI (Zeus, 07/08) : les photos non rattachees ne se voyaient qu'en ouvrant Suivi des appels
+     puis en depliant un bloc. On ne sait donc pas, a un instant donne, ce qui attend. Or une photo
+     qui dort n'a servi a rien : elle ne prouve la presence de personne tant qu'elle n'est pas
+     accrochee a une vacation.
+     LA REGLE (choix B de Zeus) : le compteur affiche les photos du JOUR (a partir de 00 h 00) pas
+     encore rattachees. Une photo entre en arrivant, elle N'EN SORT QUE RATTACHEE — le temps qui passe
+     ne l'efface pas. A minuit, le compteur repart sur le nouveau jour ; ce qui n'a pas ete traite
+     descend dans « jours passes », toujours a un clic. Un compteur qui affiche 190 en permanence ne
+     se regarde plus ; 14 se traite.
+     PN_RECUES est un cache : on ne rappelle pas le stockage a chaque rafraichissement de pastille. */
+  var PN_RECUES=[];
+  try{ PN_RECUES=JSON.parse(localStorage.getItem('fkh_ph_recues')||'[]')||[]; }catch(_e){ PN_RECUES=[]; }
+  function pnrScan(){
+    if(typeof photoReady!=='function'||!photoReady())return;
+    if(typeof photoList!=='function')return;
+    var out=[], restants=2;
+    function pousser(keys){
+      (keys||[]).forEach(function(o){ var k=(o&&o.key)||o; if(!k)return;
+        var ts=0; try{ var f=String(k).split('/').pop(); var n=parseInt(f,10); if(!isNaN(n)&&n>1000000000)ts=n; }catch(e){}
+        out.push({key:k,ts:ts}); });
+      if(--restants)return;
+      out.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+      PN_RECUES=out.slice(0,600);
+      try{ localStorage.setItem('fkh_ph_recues',JSON.stringify(PN_RECUES)); }catch(e){}
+      if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
+    }
+    photoList('u/',pousser); photoList('agent/',pousser);
+  }
+  try{ setTimeout(pnrScan,7000); setInterval(pnrScan,300000); }catch(_e){}
+  /* Ce qui attend : du jour d'un cote, des jours passes de l'autre. Rattachee = sortie. */
+  function pnrCalc(){
+    var ajd=(typeof impTodayISO==='function')?impTodayISO():'', jour=[], passe=[];
+    (PN_RECUES||[]).forEach(function(p){
+      if(!p||!p.key)return;
+      if(typeof phIsAttached==='function'&&phIsAttached(p.key))return;   /* rattachee : elle sort */
+      var d=p.ts?new Date(p.ts):null;
+      var iso=d?(d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)):'';
+      var ville=''; try{ var q=String(p.key).split('/'); ville=(q.length>1?q[q.length-2]:'').replace(/_/g,' '); }catch(e){}
+      var o={key:p.key, ts:p.ts||0, mdate:iso, ville:ville,
+             site:(ville||'\u2014'), heure:d?(('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)):'',
+             libre:1, due:p.ts||Date.now(), since:0};
+      (iso===ajd?jour:passe).push(o);
+    });
+    return {jour:jour, passe:passe};
+  }
   var GP_LIB=[];
   try{ GP_LIB=JSON.parse(localStorage.getItem('fkh_gp_libres')||'[]')||[]; }catch(_e){ GP_LIB=[]; }
   function gpScan(){
@@ -8077,7 +8123,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     if(typeof cloudPush==='function'){try{cloudPush('fkh_tenues_ctrl');}catch(e){}}
     if(typeof renderTenues==='function'){try{renderTenues();}catch(e){}}
     if(typeof renderFA==='function'){try{renderFA();}catch(e){}}
-    if(typeof tnRefresh==='function'){try{tnRefresh();}catch(e){}}
+    if(typeof tnRefresh==='function'){try{tnRefresh();}catch(e){} try{pnrRefresh();}catch(e){}}
     alert('🦺 Enregistre : photo de tenue de '+a.nom+'.\n\nElle apparait dans sa fiche agent et sous son nom dans les vacations.');
     if(apres)apres(a);
     return true;
@@ -8496,6 +8542,8 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     // b177 : vacations validees SANS agent, d'aujourd'hui vers le futur (classees par site au rendu)
     // b210 : retards de prise signales par l'operateur (case Agent en retard du ticket)
     // b219 : agents ayant envoye des photos SANS position (cle u/ville_inconnue) - via l'archive de rattachement
+    /* b367 : les photos qui attendent — du jour d'abord, le retard juste derriere. */
+    try{ var _pn=pnrCalc(); sc._pnJour=_pn.jour; sc._pnPasse=_pn.passe; }catch(_e){ sc._pnJour=[]; sc._pnPasse=[]; }
     sc.an2=anoVisible()?anoOuvertes().map(function(a3){
       return {ano:1,id:a3.id,cat:a3.cat,texte:a3.texte,ou:a3.ou,etat:a3.etat,deNom:a3.deNom,parQui:a3.parQui||'',
               site:(a3.ou||'—'),mdate:'',heure:'',due:a3.cree,since:(Date.now()-a3.cree)};
@@ -9253,12 +9301,51 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
         +_tuile('rfin',_n(_rf,'fin'),'🚫 Fins','photo REFUSÉE','#e5322d')
         +_tuile('delai',_dl.length,'⏱ Hors délai','photo faite à plus de 5 min','#e0a13b')
         +_tuile('dagent',_dl.filter(function(x){return !hdEtat(x.mid,x.key||'prise').agent;}).length,'🗣️ Agent à contacter','dépassement non expliqué','#e5322d')
-        +_tuile('dclient',_dl.filter(function(x){return !hdEtat(x.mid,x.key||'prise').client;}).length,'🏢 Client à aviser','dépassement non signalé','#e5322d')):'')
+        +_tuile('dclient',_dl.filter(function(x){return !hdEtat(x.mid,x.key||'prise').client;}).length,'🏢 Client à aviser','dépassement non signalé','#e5322d')
+        /* b367 : l'autre bout du meme trou — les photos arrivees qui n'ont trouve aucune vacation. */
+        +_tuile('pnr',((sc._pnJour||[]).length),'📥 Photos reçues','non rattachées — aujourd’hui','#e0a13b')):'')
         +'</div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+' · une échéance entre ici 1 min après son heure prévue. Clique sur une tuile pour le détail par vacation (durée écoulée).</p>';
     } else if(D.tiles&&PP_VIEW.sub){
       /* b272 : chaque tuile ouvre sa propre famille. */
       var _sv=PP_VIEW.sub, LL;
+      /* ===== b367 : LA VUE DES PHOTOS QUI ATTENDENT =====
+         Deux paliers — aujourd'hui depuis 00 h 00, puis les jours passes — et sur chaque photo le
+         bouton qui ouvre le rapprochement. Une photo entre en arrivant et n'en sort QUE rattachee :
+         le temps qui passe ne l'efface pas. C'est le meme chemin de rapprochement que la pastille
+         📵 — une seule facon de rattacher une photo dans toute l'application. */
+      if(_sv==='pnr'){
+        var _pj=sc._pnJour||[], _pp=sc._pnPasse||[], _enJour=(PP_VIEW.jour!=='p'), _LP=(_enJour?_pj:_pp);
+        h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+_LP.length+' photo(s) en attente de rattachement</span></div>'
+          +'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">'
+          +'<div class="pp-tile pp-pnj" data-j="j"'+(_enJour?' style="border-color:#6ea8fe"':'')+'><b>'+_pj.length+'</b>\ud83d\udcc5 Aujourd\u2019hui<br><span class="sub" style="margin:0;font-size:11.5px">depuis 00 h 00</span></div>'
+          +'<div class="pp-tile pp-pnj" data-j="p"'+((!_enJour||_pp.length)?' style="border-color:#e0a13b"':'')+'><b>'+_pp.length+'</b>\ud83d\udd53 Jours pass\u00e9s<br><span class="sub" style="margin:0;font-size:11.5px">toujours pas rattach\u00e9es</span></div>'
+          +'</div>';
+        h+= _LP.length ? _LP.slice(0,60).map(function(x){
+              var d=x.ts?new Date(x.ts):null;
+              var quand=(d?(('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' \u00e0 '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2)):'?');
+              return '<div style="border:1px solid var(--line);border-left:3px solid #e0a13b;border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)">'
+                +'<div style="display:flex;gap:8px;align-items:flex-start">'
+                +'<div style="flex:0 0 auto">'+((typeof photoThumbTag==='function')?photoThumbTag(x.key):'')+'</div>'
+                +'<div style="flex:1;min-width:0">'
+                +'<div style="font-size:12.5px"><b>\ud83d\udd50 '+esc(quand)+'</b>'
+                +(x.ville?(' \u00b7 \ud83d\udccd '+esc(x.ville)):' \u00b7 <b style="color:var(--bad)">\u26a0\ufe0f sans position</b>')+'</div>'
+                +'<div class="acts" style="margin-top:6px"><button type="button" class="pp-pnr-go ok" data-k="'+esc(x.key)+'" data-ts="'+esc(String(x.ts||0))+'" data-city="'+esc(String(x.ville||'').replace(/ /g,'_')||'ville_inconnue')+'" style="font-size:12px">\ud83d\udcce Rapprocher cette photo</button></div>'
+                +'</div></div></div>';
+            }).join('')+((_LP.length>60)?('<div class="sub" style="margin:6px 0 0">\u2026 et '+(_LP.length-60)+' autre(s). Traite celles-ci d\u2019abord.</div>'):'')
+          : '<div class="sub">\u2705 '+(_enJour?'Toutes les photos re\u00e7ues aujourd\u2019hui sont rattach\u00e9es':'Rien en retard')+'</div>';
+        h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">Une photo entre ici en arrivant et n\u2019en sort QUE rattach\u00e9e \u00b7 \u00e0 minuit le compteur repart sur le nouveau jour, le retard descend dans « jours pass\u00e9s ».</p>';
+        box.innerHTML=h;
+        if(typeof photoHydrate==='function')photoHydrate(box);
+        var _bk=byId('pp-back'); if(_bk)_bk.onclick=function(){ PP_VIEW.sub=null; PP_VIEW.jour=null; ppRender(); };
+        box.querySelectorAll('.pp-pnj').forEach(function(b){ b.onclick=function(){ PP_VIEW.jour=(b.getAttribute('data-j')==='p')?'p':null; ppRender(); }; });
+        box.querySelectorAll('.pp-pnr-go').forEach(function(b){ b.onclick=function(){
+          if(typeof phmOuvrir!=='function'){ alert('Rapprochement indisponible.'); return; }
+          ppClose(); phmOuvrir(null,{key:b.getAttribute('data-k'),ts:+(b.getAttribute('data-ts')||0),city:b.getAttribute('data-city')||'ville_inconnue',fmt:'uni'});
+        }; });
+        var _cl2=byId('pp-close'); if(_cl2)_cl2.onclick=ppClose;
+        return;
+      }
       if(_sv==='rprise'||_sv==='rfin'){ LL=L.filter(function(x){return x.sousvue==='refus'&&x.key===(_sv==='rprise'?'prise':'fin');}); }
       else if(_sv==='dagent'){ LL=L.filter(function(x){return x.sousvue==='delai'&&!hdEtat(x.mid,x.key||'prise').agent;}); }
       else if(_sv==='dclient'){ LL=L.filter(function(x){return x.sousvue==='delai'&&!hdEtat(x.mid,x.key||'prise').client;}); }
