@@ -966,7 +966,8 @@
    "titre": "Un filtre de date dans « Choisir une photo reçue »",
    "source": "capture de Zeus, 07/08 — « c'est limité au 5 août »",
    "theme": "Tenues & photos",
-   "pourquoipas": "La liste montrait les 60 photos les plus récentes, quelle que soit la vacation : un ticket du 04/08 ne voyait AUCUNE de ses 32 photos, un ticket du 26/07 aucune de ses 8. La liste s'ouvre désormais sur le jour du ticket, avec un sélecteur de date pour élargir et un bouton « Toutes les dates » pour tout revoir. Sans ticket (photo de tenue), rien ne change."
+   "pourquoipas": "La liste montrait les 60 photos les plus récentes, quelle que soit la vacation : un ticket du 04/08 ne voyait AUCUNE de ses 32 photos, un ticket du 26/07 aucune de ses 8. La liste s'ouvre désormais sur le jour du ticket, avec un sélecteur de date pour élargir et un bouton « Toutes les dates » pour tout revoir. Sans ticket (photo de tenue), rien ne change.",
+   "local": true
   }
  ],
  "attente": [
