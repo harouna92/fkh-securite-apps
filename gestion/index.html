@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b374</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b375</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2079,18 +2079,20 @@ button.big:active{transform:translateY(1px)}
   function agentAPhotoTenue(nom){ return agentPhotosTenue(nom).length>0; }
   function agentAttachPhoto(nom,key){ var T=load('fkh_tenues_ctrl'); if(!Array.isArray(T))T=[]; var n=tnorm(nom),idx=-1,bd=''; T.forEach(function(c,k){var cn=tnorm(c.Agent); if(cn&&(cn===n||cn.indexOf(n)>=0||n.indexOf(cn)>=0)){var dd=String(c['Date contrôle']||''); if(idx<0||dd>bd){idx=k;bd=dd;}}}); if(idx>=0)T[idx].photoKey=key; else T.push({'Date contrôle':impTodayISO(),'Agent':nom,'photoKey':key,'Statut tenue':'','Manquants':''}); save('fkh_tenues_ctrl',T); TCTRL=T; if(typeof renderTenues==='function')renderTenues(); }
   function agentStats(nom){ if(!nom||typeof ssLoad!=='function'||typeof SUIVI==='undefined')return null; var n=tnorm(nom); if(!n)return null; var S=ssLoad(); var st={missions:0,priseDone:0,priseNoPhoto:0,finDone:0,finNoPhoto:0,retardPrise:0,injo:0,nePeutRoute:0,retardAnnonce:0,refusTenue:0,ctrlNoPhoto:0,demAttente:0};
-    function noPhoto(r){ if(r&&r.photoKey)return false;   /* b347 : une photo rattachee compte, quel que soit le libelle */
+    function noPhoto(r,_mid,_k){ if(typeof phAUnePhoto==='function'&&_mid&&_k)return !phAUnePhoto(_mid,_k);   /* b375 : la source de verite, comme partout */
+      if(r&&r.photoKey)return false;   /* b347 : une photo rattachee compte, quel que soit le libelle */
       return !r.photo||r.photo==='Pas de photo'||r.photo==='Photo non horodatée'; }
     SUIVI.forEach(function(m){ if(m.statut!=='validee'||!m.agentId)return; var a=faById(m.agentId); if(!a||tnorm(a.nom)!==n)return; var resp=S[m.id]; if(!resp)return; st.missions++;
       Object.keys(resp).forEach(function(k){ var r=resp[k]||{};
-        if(k==='prise'&&r.done){ st.priseDone++; if(noPhoto(r))st.priseNoPhoto++; if(r.agRetard)st.retardPrise++; }
-        if(k==='fin'&&r.done){ st.finDone++; if(noPhoto(r))st.finNoPhoto++; }
+        if(k==='prise'&&r.done){ st.priseDone++; if(noPhoto(r,m.id,k))st.priseNoPhoto++; if(r.agRetard)st.retardPrise++; }
+        if(k==='fin'&&r.done){ st.finDone++; if(noPhoto(r,m.id,k))st.finNoPhoto++; }
         if(r.statut==='⚠️ Injoignable'||(r.route&&r.route.indexOf('Injoignable')>=0)||(r.ponctuel&&r.ponctuel.indexOf('Injoignable')>=0))st.injo++;
         if(r.route&&/pas pris|ne peut pas/i.test(r.route))st.nePeutRoute++;
         if(r.ponctuel&&r.ponctuel.indexOf('Retard annoncé')>=0)st.retardAnnonce++;
         if(k==='tenue'&&r.tenueCtrl&&r.tenueCtrl.indexOf('attente')>=0)st.demAttente++;
         if(k==='tenue'&&r.tenueCtrl&&r.tenueCtrl.indexOf('REFUS')>=0)st.refusTenue++;
-        if(k.indexOf('ctrl')===0&&r.done&&(r.photo==='Pas de photo'||r.photo==='Photo non horodatée'))st.ctrlNoPhoto++;
+        /* b375 : on lit la photo REELLEMENT rattachee, plus seulement le libelle choisi a la main. */
+        if(k.indexOf('ctrl')===0&&r.done&&((typeof phAUnePhoto==='function')?!phAUnePhoto(m.id,k):(r.photo==='Pas de photo'||r.photo==='Photo non horodatée')))st.ctrlNoPhoto++;
       });
     });
     return st; }
@@ -5471,7 +5473,7 @@ button.big:active{transform:translateY(1px)}
     var S=(typeof ssLoad==='function')?ssLoad():{};
     function poids(m){
       var r=S[m.id]||{}, n=0, ph=0;
-      Object.keys(r).forEach(function(k){ if(r[k]&&r[k].done)n++; if(r[k]&&r[k].photoKey)ph++; });
+      Object.keys(r).forEach(function(k){ if(r[k]&&r[k].done)n++; if((typeof phAUnePhoto==='function')?phAUnePhoto(m.id,k):(r[k]&&r[k].photoKey))ph++; });   /* b375 */
       return {pointages:n,photos:ph,score:n*10+ph*10+(m.agentId?3:0)+(m.ref?2:0)+(m.mfin?1:0)};
     }
     var pris={}, groupes=[];
@@ -7668,7 +7670,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       // Retard de POINTAGE = imputable à l'OPÉRATEUR (celui qui devait passer l'appel de contrôle), PAS à l'agent. L'agent/site n'est que le contexte du contrôle. (Ne pas mettre agent: ni act:'call' → pas de reproche à l'agent.)
       if(r.done&&r.retard!=null&&r.retard>=20)anom.push({sev:(r.retard>=40?3:2),ic:'🕓',type:'Pointage en retard (+'+r.retard+' min)',step:sl(e.key),when:e.mdate+' '+e.heure,detail:'Contrôle de '+(e.agent||'l\'agent')+(e.site?' — '+e.site:'')+' · prévu '+e.heure+' → pointé '+(r.hm||'?'),retard:true});
       if(e.key.indexOf('ctrl')===0&&r.done){ if(r.photo==='Photo non horodatée')anom.push({sev:2,ic:'📷',type:'Photo de contrôle NON horodatée',agent:e.agent,step:'Appel contrôle',when:e.mdate+' '+e.heure,detail:e.site,act:'call',agentTel:e.agentTel,mid:e.mid,skey:e.key,photoBad:true}); else if(r.photo==='Pas de photo')anom.push({sev:2,ic:'📷',type:'Photo de contrôle MANQUANTE',agent:e.agent,step:'Appel contrôle',when:e.mdate+' '+e.heure,detail:e.site,act:'call',agentTel:e.agentTel,mid:e.mid,skey:e.key,photoBad:true}); }
-      if(e.key==='tenue'&&r.tenueCtrl&&r.tenueCtrl.indexOf('Fait')>=0&&!r.photoKey&&!r.tenuePhoto)anom.push({sev:2,ic:'📷',type:'Contrôle tenue « fait » SANS photo',agent:e.agent,step:'Contrôle tenue',when:e.mdate+' '+e.heure,detail:e.site+' — photo à récupérer',act:'call',agentTel:e.agentTel,mid:e.mid,skey:e.key,photoBad:true});
+      if(e.key==='tenue'&&r.tenueCtrl&&r.tenueCtrl.indexOf('Fait')>=0&&!r.tenuePhoto&&((typeof phAUnePhoto==='function')?!phAUnePhoto(e.mid,e.key):!r.photoKey))   /* b375 */anom.push({sev:2,ic:'📷',type:'Contrôle tenue « fait » SANS photo',agent:e.agent,step:'Contrôle tenue',when:e.mdate+' '+e.heure,detail:e.site+' — photo à récupérer',act:'call',agentTel:e.agentTel,mid:e.mid,skey:e.key,photoBad:true});
       if(e.key==='tenue'&&r.tenueCtrl&&r.tenueCtrl.indexOf('REFUS')>=0)anom.push({sev:3,ic:'🚫',type:'Agent a REFUSÉ le contrôle tenue',agent:e.agent,step:'Contrôle tenue',when:e.mdate+' '+e.heure,detail:e.site,act:'call',agentTel:e.agentTel});
       if(e.key==='tenue'&&r.tenueCtrl&&r.tenueCtrl.indexOf('attente')>=0)anom.push({sev:1,ic:'📩',type:'Contrôle tenue demandé — en attente',agent:e.agent,step:'Contrôle tenue',when:e.mdate+' '+e.heure,detail:e.site,act:'ctrl',agentTel:e.agentTel});
       if(e.key==='route'&&r.route&&/pas pris|ne peut pas/i.test(r.route))anom.push({sev:3,ic:'🚗',type:'N\'a pas pris la route',agent:e.agent,step:sl(e.key),when:e.mdate+' '+e.heure,detail:e.site,act:'call',agentTel:e.agentTel});
@@ -10082,7 +10084,8 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     var injoItems=data.filter(function(d){return d.r.statut==='⚠️ Injoignable';}); var injo=injoItems.length;
     var nonfaitItems=data.filter(function(d){return !d.r.done&&d.lateMin!=null&&d.lateMin>=10&&(typeof saGolive!=='function'||d.ct>=saGolive());}); var nonfait=nonfaitItems.length;
     var agRetItems=data.filter(function(d){return d.e.key==='prise'&&d.r.done&&d.r.agRetard;}); var agRetN=agRetItems.length;
-    var photoBadItems=data.filter(function(d){return (d.e.key==='prise'||d.e.key==='fin')&&d.r.done&&(!d.r.photo||d.r.photo==='Pas de photo'||d.r.photo==='Photo non horodatée');}); var photoBad=photoBadItems.length;
+    /* b375 : la supervision lisait le libelle, pas la photo rattachee — une photo rapprochee par l'agence n'eteignait pas la ligne. */
+    var photoBadItems=data.filter(function(d){return (d.e.key==='prise'||d.e.key==='fin')&&d.r.done&&((typeof phAUnePhoto==='function')?!phAUnePhoto(d.e.mid,d.e.key):(!d.r.photo||d.r.photo==='Pas de photo'||d.r.photo==='Photo non horodatée'));}); var photoBad=photoBadItems.length;
     var jamctrl=jamL.length,arectrl=arecL.length,tenIncomp=incL.length,mensN=mensL.length;
     var sansLogoL=[],sansGiletL=[],sansMatL=[],sans3L=[]; Object.keys(affAg).forEach(function(id){ var a=affAg[id],c=(typeof agentCtrl==='function')?agentCtrl(a.nom):null,r=(typeof distGet==='function')?distGet(a.nom):null; var mg=tenueMisses(c,r,'Gilet',a.nom),ml=tenueMisses(c,r,'Logo',a.nom),mm=tenueMisses(c,r,'Matricule',a.nom); if(ml)sansLogoL.push({who:a.nom,sub:'logo manquant',nom:a.nom,act:'tenue-ctrl'}); if(mg)sansGiletL.push({who:a.nom,sub:'gilet manquant',nom:a.nom,act:'tenue-ctrl'}); if(mm)sansMatL.push({who:a.nom,sub:'matricule manquant',nom:a.nom,act:'tenue-ctrl'}); if(mg&&ml&&mm)sans3L.push({who:a.nom,sub:'ni gilet, ni logo, ni matricule',nom:a.nom,act:'tenue-ctrl'}); });
     var sansLogo=sansLogoL.length,sansGilet=sansGiletL.length,sansMat=sansMatL.length,sans3=sans3L.length;
