@@ -896,6 +896,14 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Pastille 📷 → 8e tuile « 📥 Photos reçues — non rattachées, aujourd'hui ». On clique : 📅 Aujourd'hui (depuis 00 h 00) / 🕓 Jours passés, la liste des photos avec leur heure et leur ville, et « 📎 Rapprocher cette photo » sans quitter la vue. Une photo entre en arrivant et n'en sort QUE rattachée ; à minuit le compteur repart, le retard descend dans « jours passés ». Les deux bouts du même trou sont enfin au même endroit.",
       "local": true
+    },
+    {
+      "b": 368,
+      "titre": "La pastille 📷 passe de 8 tuiles à 5 — chacune dit ce que les autres ne disent pas",
+      "source": "Zeus — 07/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Pastille 📷 : « 🚫 Prises » et « 🚫 Fins » fusionnées en une seule « 🚫 Refus (2) » ; « 🗣️ Agent à contacter » (107) et « 🏢 Client à aviser » (106) supprimées — mesuré : elles étaient ENTIÈREMENT incluses dans « ⏱ Hors délai » (108), et 106 des 108 étaient dans les deux à la fois. Les deux cases d'action restent sur CHAQUE LIGNE (131 boutons sur 67 lignes vérifiés) : aucun geste perdu.",
+      "local": true
     }
   ],
   "attente": [

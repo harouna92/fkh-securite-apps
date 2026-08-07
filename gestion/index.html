@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b367</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b368</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -9297,11 +9297,14 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
            Le sous-titre des deux premieres suit la pastille au lieu de dire « sans photo » partout. */
         +_tuile('prise',_n(_mq,'prise'),'🟢 Prises de service',(D.verb||'sans photo'),'')
         +_tuile('fin',_n(_mq,'fin'),'🔚 Fins de service',(D.verb||'sans photo'),'')
-        +((PP_VIEW.mode==='ph')?(_tuile('rprise',_n(_rf,'prise'),'🚫 Prises','photo REFUSÉE','#e5322d')
-        +_tuile('rfin',_n(_rf,'fin'),'🚫 Fins','photo REFUSÉE','#e5322d')
+        /* ===== b368 : CINQ TUILES AU LIEU DE HUIT (mesure du 07/08) =====
+           Les tuiles « Agent à contacter » (107) et « Client à aviser » (106) etaient ENTIEREMENT
+           incluses dans « Hors delai » (108) — et 106 des 108 etaient dans les deux a la fois. Trois
+           tuiles pour une seule information : « 108 depassements, presque aucun traite ». Les deux
+           cases d'action restent SUR CHAQUE LIGNE, la ou on agit : on ne perd aucun geste.
+           Et les deux tuiles de refus (1 et 1) n'en font plus qu'une. */
+        +((PP_VIEW.mode==='ph')?(_tuile('refus',_rf.length,'🚫 Refus','photo refusée par l’agent','#e5322d')
         +_tuile('delai',_dl.length,'⏱ Hors délai','photo faite à plus de 5 min','#e0a13b')
-        +_tuile('dagent',_dl.filter(function(x){return !hdEtat(x.mid,x.key||'prise').agent;}).length,'🗣️ Agent à contacter','dépassement non expliqué','#e5322d')
-        +_tuile('dclient',_dl.filter(function(x){return !hdEtat(x.mid,x.key||'prise').client;}).length,'🏢 Client à aviser','dépassement non signalé','#e5322d')
         /* b367 : l'autre bout du meme trou — les photos arrivees qui n'ont trouve aucune vacation. */
         +_tuile('pnr',((sc._pnJour||[]).length),'📥 Photos reçues','non rattachées — aujourd’hui','#e0a13b')):'')
         +'</div>';
@@ -9346,7 +9349,8 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
         var _cl2=byId('pp-close'); if(_cl2)_cl2.onclick=ppClose;
         return;
       }
-      if(_sv==='rprise'||_sv==='rfin'){ LL=L.filter(function(x){return x.sousvue==='refus'&&x.key===(_sv==='rprise'?'prise':'fin');}); }
+      if(_sv==='refus'){ LL=L.filter(function(x){return x.sousvue==='refus';}); }   /* b368 : prises ET fins */
+      else if(_sv==='rprise'||_sv==='rfin'){ LL=L.filter(function(x){return x.sousvue==='refus'&&x.key===(_sv==='rprise'?'prise':'fin');}); }
       else if(_sv==='dagent'){ LL=L.filter(function(x){return x.sousvue==='delai'&&!hdEtat(x.mid,x.key||'prise').agent;}); }
       else if(_sv==='dclient'){ LL=L.filter(function(x){return x.sousvue==='delai'&&!hdEtat(x.mid,x.key||'prise').client;}); }
       else if(_sv==='delai'){ LL=L.filter(function(x){return x.sousvue==='delai';})
@@ -9380,7 +9384,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
          a appele l'agent, et « client non avise » si on a prevenu le client — aucune photo la-dedans.
          L'en-tete suit desormais la pastille ouverte. */
       var _dim=(PP_VIEW.mode==='op')?'non pointée(s) — agent non appelé':((PP_VIEW.mode==='cli')?'— client non avisé':'sans photo');
-      var _lbl={prise:'prise(s) '+_dim,fin:'fin(s) '+_dim,rprise:'prise(s) — photo REFUSÉE par l’agent',rfin:'fin(s) — photo REFUSÉE par l’agent',delai:'photo(s) faite(s) hors délai (plus de 5 min d’écart)',dagent:'dépassement(s) dont l’agent n’a pas encore été contacté',dclient:'dépassement(s) dont le client n’a pas encore été avisé'}[_sv]||'';
+      var _lbl={prise:'prise(s) '+_dim,fin:'fin(s) '+_dim,refus:'photo(s) REFUSÉE(s) par l’agent — prises et fins',rprise:'prise(s) — photo REFUSÉE par l’agent',rfin:'fin(s) — photo REFUSÉE par l’agent',delai:'photo(s) faite(s) hors délai (plus de 5 min d’écart)',dagent:'dépassement(s) dont l’agent n’a pas encore été contacté',dclient:'dépassement(s) dont le client n’a pas encore été avisé'}[_sv]||'';
       if(PP_VIEW.jour==null){   /* b332 : le palier */
         h+='<div class="acts" style="margin-bottom:10px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+LL.length+' '+_lbl+'</span></div>'
           +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
