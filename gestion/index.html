@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b375</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b376</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -8165,21 +8165,39 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     });
   }
   function photoPortail(mid, stepKey, nomAgent, titreCtx){
+    /* b376 : la date du ticket sert de reglage par defaut — on ne fait pas chercher ce qu'on sait. */
+    var _pphJour=''; try{ for(var _i=0;_i<(SUIVI||[]).length;_i++){ if(String(SUIVI[_i].id)===String(mid)){ _pphJour=SUIVI[_i].mdate||''; break; } } }catch(_e){}
+    var _pphTout=false;
     var old=byId('pph-pop'); if(old)old.parentNode.removeChild(old);
     var pop=document.createElement('div'); pop.id='pph-pop';
     pop.style.cssText='position:fixed;inset:5% 5%;z-index:260;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
     pop.innerHTML='<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">📷 Choisir une photo deja recue</b><button type="button" id="pph-x">✕</button></div>'
       +'<div class="sub" style="margin:4px 0 10px">'+(titreCtx?esc(titreCtx)+' — ':'')+'toutes les photos arrivees par le lien, la plus recente en premier.</div>'
+      /* b376 : le filtre de date — pre-regle sur le jour du ticket. */
+      +'<div class="acts" id="pph-filtre" style="gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0"><span class="sub" style="margin:0">\ud83d\udcc5 Photos du</span>'
+      +'<input type="date" id="pph-date" value="'+esc(_pphJour||'')+'" style="width:auto">'
+      +'<button type="button" id="pph-toutes" style="font-size:12px">\ud83d\udcc2 Toutes les dates</button>'
+      +'<span class="sub" id="pph-compte" style="margin:0"></span></div>'
       +'<div id="pph-list"><div class="sub">Chargement…</div></div>';
     document.body.appendChild(pop);
     byId('pph-x').onclick=function(){ var q=byId('pph-pop'); if(q)q.parentNode.removeChild(q); };
     var box=byId('pph-list');
     if(typeof photoReady!=='function'||!photoReady()){ box.innerHTML='<div class="sub">Connexion en ligne requise pour voir les photos recues.</div>'; return; }
     var tout=[];
+    /* b376 : changer la date, ou tout voir — on relance le rendu, les photos sont deja chargees. */
+    function _pphWire(){
+      var d=byId('pph-date'); if(d)d.onchange=function(){ _pphTout=false; fini(); };
+      var t=byId('pph-toutes'); if(t)t.onclick=function(){ _pphTout=!_pphTout;
+        t.textContent=_pphTout?'📅 Revenir au jour du ticket':'📂 Toutes les dates'; fini(); };
+    }
     function fini(){
       tout.sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
-      var L=tout.slice(0,60);
-      if(!L.length){ box.innerHTML='<div class="sub">Aucune photo recue pour le moment.</div>'; return; }
+      /* b376 : on ne montre que le jour demande, sauf « toutes les dates ». */
+      var _sel=(byId('pph-date')&&byId('pph-date').value)||_pphJour||'';
+      var _vus=(_pphTout||!_sel)?tout:tout.filter(function(it){ return ((typeof phDateISO==='function')?phDateISO(it.ts):'')===_sel; });
+      var _cpt=byId('pph-compte'); if(_cpt)_cpt.textContent=(_pphTout||!_sel)?(tout.length+' photo(s), toutes dates'):(_vus.length+' photo(s) ce jour-la \u00b7 '+tout.length+' en tout');
+      var L=_vus.slice(0,60);
+      if(!L.length){ box.innerHTML='<div class="sub">'+((_pphTout||!_sel)?'Aucune photo re\u00e7ue pour le moment.':'Aucune photo re\u00e7ue ce jour-l\u00e0. Change la date, ou demande <b>toutes les dates</b>.')+'</div>'; _pphWire(); return; }
       box.innerHTML=L.map(function(it,i){
         var when=(typeof phDateISO==='function'&&phDateISO(it.ts))?(phDateISO(it.ts).split('-').reverse().join('/')+' a '+phHM(it.ts)):'date inconnue';
         var city=String(it.city||'').replace(/_/g,' ');
@@ -8196,6 +8214,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
           +'</div></div></div>';
       }).join('');
       if(typeof photoHydrate==='function')photoHydrate(box);
+      _pphWire();   /* b376 */
       box.querySelectorAll('.pph-att').forEach(function(b){ b.onclick=function(){
         var it=L[+b.getAttribute('data-i')]; if(!it)return;
         var S=ssLoad(); S[mid]=S[mid]||{};
