@@ -1,1055 +1,1063 @@
 {
-  "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
-  "maj": "2026-08-07",
-  "items": [
-    {
-      "b": 222,
-      "titre": "Vacations non affectées : 24 h / 7 j / le reste",
-      "source": "Zeus",
-      "pourquoipas": "Se voit dans la pastille 🧍 : les tuiles 24 h / 7 jours / le reste.",
-      "theme": "Planning & vacations"
-    },
-    {
-      "b": 223,
-      "titre": "Témoin de vie de la collecte des mails",
-      "source": "Zeus",
-      "demo": "collecte",
-      "theme": "Mails & collecte",
-      "pourquoipas": "Section Mails missions : le témoin de vie indique que la collecte tourne."
-    },
-    {
-      "b": 224,
-      "titre": "Livré avec le lot b224–b227 — b224 les bons de commande descendent au Planning sans ouvrir la section Mails ; b225 plus de doublon dans Suivi des d…",
-      "source": "lot groupé",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 225,
-      "titre": "Livré avec le lot b224–b227 — b224 les bons de commande descendent au Planning sans ouvrir la section Mails ; b225 plus de doublon dans Suivi des d…",
-      "source": "lot groupé",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 226,
-      "titre": "Livré avec le lot b224–b227 — b224 les bons de commande descendent au Planning sans ouvrir la section Mails ; b225 plus de doublon dans Suivi des d…",
-      "source": "lot groupé",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 227,
-      "titre": "Qui est au PC (prise/fin de service)",
-      "source": "Zeus",
-      "demo": "pcvide",
-      "theme": "PC & permanence",
-      "pourquoipas": "Pastille 🎧 : qui tient le poste en ce moment, avec sa prise et sa fin de service."
-    },
-    {
-      "b": 228,
-      "titre": "Livré avec le lot b228–b236 — Mails missions ouvert au superviseur+admin (app+worker) ; ANNULATIONS signalees sans suppression (pastille, hachure a…",
-      "source": "lot groupé",
-      "theme": "Mails & bons de commande",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 229,
-      "titre": "Annulations signalées sans suppression",
-      "source": "Zeus",
-      "demo": "annulation",
-      "theme": "Planning & vacations",
-      "pourquoipas": "Une annulation reçue par mail est signalée (pastille 🔴, hachures au Planning) sans rien supprimer."
-    },
-    {
-      "b": 230,
-      "titre": "Corbeille des sections + bouton PC opérateur",
-      "source": "Zeus",
-      "demo": "corbeille",
-      "note": "Zeus signale que ça ne marche pas — à reproduire",
-      "theme": "Rôles, droits & vues",
-      "pourquoipas": "Section 🗑️ Corbeille : les onglets retirés y attendent, restaurables en un clic."
-    },
-    {
-      "b": 231,
-      "titre": "Mode démo (?sandbox=1&demo=…)",
-      "source": "Zeus",
-      "pourquoipas": "C'est le moteur des démos lui-même.",
-      "theme": "Outils de pilotage"
-    },
-    {
-      "b": 232,
-      "titre": "Panneau Droits d'accès (sections × rôles)",
-      "source": "Zeus",
-      "demo": "droits",
-      "theme": "Rôles, droits & vues",
-      "pourquoipas": "Section 🔐 Droits d'accès : la grille sections × rôles, réglable case par case."
-    },
-    {
-      "b": 233,
-      "titre": "Livré avec le lot b228–b236 — Mails missions ouvert au superviseur+admin (app+worker) ; ANNULATIONS signalees sans suppression (pastille, hachure a…",
-      "source": "lot groupé",
-      "theme": "Mails & bons de commande",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 234,
-      "titre": "Endosser un autre rôle",
-      "source": "Zeus",
-      "demo": "mails",
-      "theme": "Rôles, droits & vues",
-      "pourquoipas": "En sandbox, le bandeau du haut permet d'endosser super-admin / superviseur / admin / opérateur."
-    },
-    {
-      "b": 235,
-      "titre": "Bascule de rôle permanente en sandbox",
-      "source": "Zeus",
-      "pourquoipas": "Rien à jouer : la bascule de rôle est simplement toujours disponible en sandbox.",
-      "theme": "Rôles, droits & vues"
-    },
-    {
-      "b": 236,
-      "titre": "Régler la vue d'un rôle depuis la vue",
-      "source": "Zeus",
-      "pourquoipas": "Se joue dans la démo « Retirer sur place » (bouton Régler cette vue).",
-      "theme": "Rôles, droits & vues"
-    },
-    {
-      "b": 237,
-      "titre": "Vue opérateur : cloche et recherche retirées",
-      "source": "Zeus",
-      "pourquoipas": "Se voit en basculant en vue opérateur : ni cloche ni recherche.",
-      "theme": "Rôles, droits & vues"
-    },
-    {
-      "b": 238,
-      "titre": "Aperçu d'un rôle en ligne (admin + super-admin)",
-      "source": "Zeus",
-      "pourquoipas": "Se joue dans la démo « Ce que voit un superviseur ».",
-      "theme": "Rôles, droits & vues"
-    },
-    {
-      "b": 239,
-      "titre": "Bandeau d'état + bulle réglables",
-      "source": "Zeus",
-      "pourquoipas": "Se voit en basculant en vue opérateur : ni bandeau d'état ni bulle.",
-      "theme": "Rôles, droits & vues"
-    },
-    {
-      "b": 240,
-      "titre": "Le bandeau d'aperçu ne recouvre plus les onglets",
-      "source": "Zeus",
-      "pourquoipas": "Rien à jouer : le bandeau ne recouvre plus les onglets. Visible d'un coup d'œil.",
-      "theme": "Rôles, droits & vues"
-    },
-    {
-      "b": 241,
-      "titre": "Modes d'emploi retirés à l'opérateur",
-      "source": "Zeus",
-      "pourquoipas": "Se voit en basculant en vue opérateur : les textes d'explication ont disparu.",
-      "theme": "Rôles, droits & vues"
-    },
-    {
-      "b": 242,
-      "titre": "Tickets entre collaborateurs depuis une pastille",
-      "source": "Zeus",
-      "pourquoipas": "Démo à écrire — il faut deux rôles pour la jouer.",
-      "theme": "Planning & vacations"
-    },
-    {
-      "b": 243,
-      "titre": "Suppression du bouton Simuler + nettoyage des 2 lignes",
-      "source": "remontée #62",
-      "pourquoipas": "Rien à jouer : c'est un retrait (le bouton Simuler a disparu) + un nettoyage de 2 lignes en base.",
-      "theme": "Mails & collecte"
-    },
-    {
-      "b": 244,
-      "titre": "Mode selfie sur le lien photo",
-      "source": "remontée #67",
-      "note": "à valider sur téléphone",
-      "pourquoipas": "Ne peut se tester QUE sur un téléphone : le navigateur du PC n'a pas de caméra.",
-      "theme": "Photos & preuves"
-    },
-    {
-      "b": 245,
-      "titre": "Pastille tenues envoyées non confirmées",
-      "source": "Zeus",
-      "demo": "tenues",
-      "theme": "Planning & vacations",
-      "pourquoipas": "Pastille des tenues : celles envoyées mais non confirmées par l'agent y sont comptées."
-    },
-    {
-      "b": 246,
-      "titre": "Prévenir l'auteur quand sa demande est traitée",
-      "source": "Zeus",
-      "demo": "reponse",
-      "theme": "Outils de pilotage",
-      "pourquoipas": "Une remontée traitée : son auteur reçoit la réponse dans son Assistant."
-    },
-    {
-      "b": 247,
-      "titre": "Déconnexion déplacée en bas à gauche",
-      "source": "Zeus",
-      "pourquoipas": "Rien à jouer : la Déconnexion a simplement changé de coin. Ça se constate à l'écran.",
-      "theme": "Rôles, droits & vues"
-    },
-    {
-      "b": 248,
-      "titre": "Fin des fausses alertes (collecte, PC vacant)",
-      "source": "Zeus",
-      "pourquoipas": "Rien à jouer : ce sont deux alertes qui ne partent PLUS. La preuve, c'est leur absence.",
-      "theme": "Mails & collecte"
-    },
-    {
-      "b": 249,
-      "titre": "Retirer une pastille/section depuis la vue",
-      "source": "Zeus",
-      "demo": "retirer",
-      "local": true,
-      "theme": "Rôles, droits & vues",
-      "pourquoipas": "Appui long sur une pastille ou un onglet → le lâcher sur 🗑️ Corbeille le retire de la barre."
-    },
-    {
-      "b": 250,
-      "titre": "Croix de retrait fiable (26 px, pointerdown, ruban Annuler)",
-      "source": "Zeus",
-      "demo": "retirer",
-      "local": true,
-      "theme": "Rôles, droits & vues",
-      "pourquoipas": "Appui sur la croix de retrait d'une pastille : elle part, et un ruban « Annuler » permet de revenir."
-    },
-    {
-      "b": 251,
-      "titre": "Modes d'emploi joints aux réponses ([[aide:…]])",
-      "source": "Zeus",
-      "demo": "reponse",
-      "local": true,
-      "theme": "Rôles, droits & vues",
-      "pourquoipas": "Une réponse de l'Assistant porte son mode d'emploi joint, ouvrable depuis la réponse."
-    },
-    {
-      "b": 252,
-      "titre": "Croix de retrait seulement en mode réglage",
-      "source": "Zeus",
-      "demo": "retirer",
-      "local": true,
-      "theme": "Rôles, droits & vues",
-      "pourquoipas": "La croix de retrait sur une pastille n'apparaît qu'en mode réglage, pas en usage courant."
-    },
-    {
-      "b": 253,
-      "titre": "Démos vivantes : visite guidée pas à pas",
-      "source": "Zeus",
-      "demo": "reponse",
-      "note": "halo + défilement + le geste s'exécute",
-      "local": true,
-      "theme": "Outils de pilotage",
-      "pourquoipas": "Ouvrir une visite guidée : elle avance pas à pas et pointe l'élément dont elle parle."
-    },
-    {
-      "b": 254,
-      "titre": "Tableau de bord des états des demandes",
-      "source": "Zeus",
-      "pourquoipas": "C'est ce tableau de bord.",
-      "local": true,
-      "theme": "Outils de pilotage"
-    },
-    {
-      "b": 255,
-      "titre": "Tableau de bord : 4 états + boutons d'ordre",
-      "source": "Zeus",
-      "pourquoipas": "C'est ce tableau de bord.",
-      "local": true,
-      "theme": "Outils de pilotage"
-    },
-    {
-      "b": 256,
-      "titre": "Photos sans correspondance : rattachement manuel, fenêtre horaire réglable",
-      "source": "remontées #53/#54/#57",
-      "note": "±1 h à toute la journée ; prise, fin, tenue et contrôles 2 h",
-      "local": true,
-      "demo": "photo",
-      "theme": "Photos & preuves",
-      "pourquoipas": "Suivi des appels → une photo sans correspondance → « 📎 Rattacher » : la fenêtre horaire se règle (± 1 h à toute la journée)."
-    },
-    {
-      "b": 257,
-      "titre": "Livré avec le lot b249–b261 — b249+b250+b252 retirer une pastille ou une section depuis la vue d'un role, croix affichees seulement en mode reglage…",
-      "source": "lot groupé",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 258,
-      "titre": "Choisir une photo déjà remontée par l'agent (galerie du cloud)",
-      "source": "remontée #67",
-      "local": true,
-      "demo": "galerie",
-      "theme": "Photos & preuves",
-      "pourquoipas": "Suivi des appels → une photo reçue → « 📷 Choisir une photo reçue » ouvre la galerie du cloud."
-    },
-    {
-      "b": 259,
-      "titre": "Démos jouables pour le rattachement photo et la galerie",
-      "source": "Zeus",
-      "local": true,
-      "pourquoipas": "Ce sont les démos elles-mêmes.",
-      "theme": "Photos & preuves"
-    },
-    {
-      "b": 260,
-      "titre": "Tableau : copie silencieuse (plus de fenêtre)",
-      "source": "Zeus",
-      "local": true,
-      "pourquoipas": "C'est ce tableau de bord.",
-      "theme": "Outils de pilotage"
-    },
-    {
-      "b": 261,
-      "titre": "Livré avec le lot b249–b261 — b249+b250+b252 retirer une pastille ou une section depuis la vue d'un role, croix affichees seulement en mode reglage…",
-      "source": "lot groupé",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 262,
-      "titre": "Colonne En ligne regroupée par thèmes + copie au glisser",
-      "source": "Zeus",
-      "theme": "Outils de pilotage",
-      "pourquoipas": "C'est ce tableau de bord.",
-      "local": true
-    },
-    {
-      "b": 263,
-      "titre": "File d'ordres dans la base + barre intelligente super-admin + fix glisser des pastilles",
-      "source": "Zeus",
-      "theme": "Outils de pilotage",
-      "pourquoipas": "Le glisser des pastilles se constate à l'écran ; la file d'ordres se vérifie en déplaçant une carte.",
-      "local": true
-    },
-    {
-      "b": 288,
-      "titre": "Suivi des appels semaine + vacations sans heure + reste ouvert",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 290,
-      "titre": "Suivi des appels — tickets jours passés neutres (pas rouges)",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 291,
-      "titre": "agent — tous les numéros dans le ticket + modale planning",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 292,
-      "titre": "Suivi des appels — défaut = aujourd'hui (corrige b288)",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 293,
-      "titre": "filtre heure de début dans Suivi des appels (superviseur+)",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 294,
-      "titre": "Suivi des appels : sélection multiple de tickets",
-      "source": "Zeus",
-      "theme": "Suivi des appels",
-      "pourquoipas": "Commit local, pas encore poussé en ligne ni rejoué en démo."
-    },
-    {
-      "b": 295,
-      "titre": "Planning : tableau des heures pliable",
-      "source": "Zeus",
-      "theme": "Planning & vacations",
-      "pourquoipas": "Commit local, pas encore poussé en ligne ni rejoué en démo."
-    },
-    {
-      "b": 296,
-      "titre": "creation agent directe depuis la modale Planning",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 297,
-      "titre": "multi-selection cases vides Planning pour creation en batch",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 299,
-      "titre": "fix notifs dupliquees (seen persiste + when:date) + Suivi des appels force aujourd'hui au chargement",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 301,
-      "titre": "merge fkh_suivi au lieu d'ecraser — les vacations Planning survivent au cloud pull",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 303,
-      "titre": "soft-delete vacations Planning — fix disparition au reload",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 304,
-      "titre": "fix pertes de donnees Planning — timestamps + dedup mails",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 305,
-      "titre": "fix definitif vacations mail — soft-delete + anti-recreation",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 306,
-      "titre": "nettoyage code mort if(false) — audit Planning complet",
-      "source": "historique",
-      "theme": "Divers",
-      "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
-    },
-    {
-      "b": 307,
-      "titre": "La vue ne remonte plus toute seule en haut quand on scrolle",
-      "source": "Zeus — bug signalé le 05/08",
-      "theme": "Planning & vacations",
-      "pourquoipas": "Planning : scroller en bas et attendre 20 s sans rien toucher — la page reste en place.",
-      "local": true
-    },
-    {
-      "b": 309,
-      "titre": "Une vacation supprimée ne réapparaît plus (8 sections + « Réassembler » qui doublonnait)",
-      "source": "audit complet 05/08",
-      "theme": "Fiabilité des données",
-      "pourquoipas": "Supprimer une vacation puis la chercher dans Prise, Fin, Services, Dispatch, Appels, Suivi site, Sites & Clients, Clients : absente partout.",
-      "local": true
-    },
-    {
-      "b": 310,
-      "titre": "Ce qu'on modifie n'est plus effacé par la synchro (« Remettre en recherche » tenait 4 s)",
-      "source": "audit complet 05/08",
-      "theme": "Fiabilité des données",
-      "pourquoipas": "Suivi demandes : « ↩︎ Remettre en recherche » sur une demande validée — elle reste en recherche.",
-      "local": true
-    },
-    {
-      "b": 311,
-      "titre": "Pastilles nettoyées + Modifier/Supprimer sur place + total des heures juste (8 h de trop)",
-      "source": "Zeus — capture Entrepôt Roissy",
-      "theme": "Planning & vacations",
-      "pourquoipas": "Pastille 🧍 Vacations non affectées : la supprimée a disparu, et chaque ligne porte ✏️ Modifier et 🗑 Supprimer.",
-      "local": true
-    },
-    {
-      "b": 312,
-      "titre": "Désigner une photo comme photo de tenue d'un agent (visible dans sa fiche)",
-      "source": "Zeus — 05/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Suivi des appels → une photo reçue → « 🦺 Photo de tenue de X ». Elle apparaît ensuite dans la fiche de l'agent, dépliant 📷 Photos tenue.",
-      "local": true
-    },
-    {
-      "b": 313,
-      "titre": "Portail des photos reçues : choisir une photo déjà arrivée au lieu d'en téléverser une",
-      "source": "Zeus — 05/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Toute pastille photo → « 📷 Choisir une photo reçue » → galerie de tout ce qui est arrivé, avec rattachement au ticket ou désignation en photo de tenue.",
-      "local": true
-    },
-    {
-      "b": 314,
-      "titre": "La tenue de l'agent visible depuis la vacation",
-      "source": "Zeus — 05/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Planning → cliquer une vacation avec un agent affecté : ses photos de tenue s'affichent sous son nom, ou « aucune photo » avec accès au portail.",
-      "local": true
-    },
-    {
-      "b": 315,
-      "titre": "Pastille « Photos de contrôle tenue » : agents sans photo, sites couverts / non couverts",
-      "source": "Zeus — 05/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Pastille 🦺 en haut à droite : le compteur = agents planifiés aujourd'hui sans photo. Trois tuiles, et « 📷 Choisir une photo reçue » sur chaque agent.",
-      "local": true
-    },
-    {
-      "b": 316,
-      "titre": "« Choisir une photo reçue » depuis Prises/fins non pointées + icône 👕 distinct",
-      "source": "Zeus — 05/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Pastille ⏰ → une ligne sans photo → « 📷 Choisir une photo reçue ». Et la pastille tenue affiche 👕, plus 🦺 (déjà pris).",
-      "local": true
-    },
-    {
-      "b": 317,
-      "titre": "Une photo rattachée par l'agence sort vraiment de la vue (ne bascule plus en « hors délai »)",
-      "source": "Zeus — cas KOYA 05/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Pastille 📷 → « Choisir une photo reçue » sur une prise : la ligne disparaît des 7 tuiles. Un retard réel de l'agent reste signalé.",
-      "local": true
-    },
-    {
-      "b": 318,
-      "titre": "« C'est une photo de contrôle » (n'importe quel agent, autocomplétion) + supprimer une photo",
-      "source": "Zeus — 05/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Suivi des appels → une photo reçue → taper un nom dans « 🦺 Photo de contrôle de… » puis associer. Et « 🗑 Supprimer la photo ».",
-      "local": true
-    },
-    {
-      "b": 319,
-      "titre": "Pastille « agents sans photo de tenue » visible par le superviseur et l'administrateur",
-      "source": "Zeus — 05/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Se connecter en superviseur ou administrateur : la pastille 👕 est dans la barre avec son compteur. L'opérateur ne la voit pas.",
-      "local": true
-    },
-    {
-      "b": 320,
-      "titre": "Superviseur : retrait de 4 pastilles de pilotage (PC, Anomalies, Retards, Sans position)",
-      "source": "Zeus — 05/08",
-      "theme": "Droits & rôles",
-      "pourquoipas": "Se connecter en superviseur : il ne reste que les 8 pastilles opérationnelles. L'administrateur les garde toutes.",
-      "local": true
-    },
-    {
-      "b": 321,
-      "titre": "Barre de pastilles : plus de trou (la pastille 👕 restait isolée)",
-      "source": "Zeus — 05/08",
-      "theme": "Droits & rôles",
-      "pourquoipas": "Se connecter en superviseur : les 8 pastilles se suivent sans espace vide.",
-      "local": true
-    },
-    {
-      "b": 322,
-      "titre": "Un panneau ouvert n'empêche plus de recevoir (poste sourd sur Supervision)",
-      "source": "Zeus — 05/08",
-      "theme": "Fiabilité des données",
-      "pourquoipas": "Rester sur Supervision (dépliant ouvert d'office) : les nouvelles demandes arrivent désormais aussi sur ce poste.",
-      "local": true
-    },
-    {
-      "b": 323,
-      "titre": "Traçabilité appel → demande : heures, délai, et où le temps est passé",
-      "source": "Zeus — 05/08",
-      "theme": "Suivi des demandes",
-      "pourquoipas": "Suivi des demandes → une demande née d'un appel : bandeau « 📞 Appel entrant le … → 📥 en recherche le … · ⏱ délai ». Orange au-delà de 2 min, avec le détail.",
-      "local": true
-    },
-    {
-      "b": 324,
-      "titre": "Plus de doublon : appel puis mail (on garde le mail + l'agent) et import CSV (l'agent est reporté)",
-      "source": "Zeus — 05/08",
-      "theme": "Fiabilité des données",
-      "pourquoipas": "Valider une demande venue d'un appel, puis laisser arriver le mail du bon de commande : une seule vacation reste, celle du mail, avec l'agent déjà affecté.",
-      "local": true
-    },
-    {
-      "b": 325,
-      "titre": "Avertissement nommé avant de supprimer une mission validée",
-      "source": "Zeus — 05/08",
-      "theme": "Fiabilité des données",
-      "pourquoipas": "Suivi des demandes → Validées → 🗑️ Supprimer : le message nomme le site, la date, les horaires et l'agent, et rappelle que la vacation quitte le Planning.",
-      "local": true
-    },
-    {
-      "b": 326,
-      "titre": "Demandes en recherche : la plus récente en haut + l'écran se met à jour",
-      "source": "Zeus — 05/08",
-      "theme": "Suivi des demandes",
-      "pourquoipas": "Suivi des demandes → En recherche : la dernière arrivée est en première position. Elle s'affiche même si un panneau était ouvert.",
-      "local": true
-    },
-    {
-      "b": 328,
-      "titre": "Prestation « Gardiennage » d'office + « Agents proches » sur les missions validées sans agent",
-      "source": "Zeus — 05/08",
-      "theme": "Suivi des demandes",
-      "pourquoipas": "Gardiennage → le champ Prestation est pré-rempli et ne propose que Gardiennage. Suivi des demandes → Validées → Non affectées : le bloc « Agents proches » est là.",
-      "local": true
-    },
-    {
-      "b": 329,
-      "titre": "« Client non avisé » limitée au jour même",
-      "source": "Zeus — 05/08",
-      "theme": "Suivi des appels",
-      "pourquoipas": "Pastille 🏢 Client non avisé : plus aucune ligne des jours précédents, seulement celles du jour.",
-      "local": true
-    },
-    {
-      "b": 330,
-      "titre": "Vues « Aujourd'hui » / « Jours passés » + suppression des tuiles qui affichaient toujours zéro",
-      "source": "Zeus — 05/08",
-      "theme": "Suivi des appels",
-      "pourquoipas": "Pastille ⏰ → « Prises de service » : deux boutons 📅 Aujourd'hui / 🕓 Jours passés. Et plus de tuiles « Hors délai » figées à 0 hors de la pastille photos.",
-      "local": true
-    },
-    {
-      "b": 331,
-      "titre": "Valider une demande ne fait plus basculer vers « Validées »",
-      "source": "Zeus — 05/08",
-      "theme": "Suivi des demandes",
-      "pourquoipas": "Suivi des demandes → En recherche → valider : on reste dans « En recherche » pour enchaîner.",
-      "local": true
-    },
-    {
-      "b": 332,
-      "titre": "« Aujourd'hui » / « Jours passés » : un palier de tuiles au lieu d'une barre",
-      "source": "Zeus — 05/08",
-      "theme": "Suivi des appels",
-      "pourquoipas": "Pastille ⏰ → une tuile → deux tuiles Aujourd'hui / Jours passés avec leur chiffre → la liste. Retour remonte cran par cran.",
-      "local": true
-    },
-    {
-      "b": 333,
-      "titre": "Les anomalies signalées reviennent au superviseur",
-      "source": "Zeus — 05/08",
-      "theme": "Droits & rôles",
-      "pourquoipas": "Se connecter en superviseur : la pastille ⚠️ Anomalies est de retour. Les trois pastilles de pilotage restent masquées.",
-      "local": true
-    },
-    {
-      "b": 334,
-      "titre": "« Non pointées » et « Client non avisé » parlent de pointage, plus de photo",
-      "source": "Zeus — 05/08",
-      "theme": "Suivi des appels",
-      "pourquoipas": "Pastille ⏰ : plus de bouton photo, le bouton dit « ✔ Agent appelé — pointer », et l'en-tête « non pointée(s) — agent non appelé ».",
-      "local": true
-    },
-    {
-      "b": 335,
-      "titre": "« 🗑 Retirer » une ligne de pastille — super-administrateur uniquement",
-      "source": "Zeus — 05/08",
-      "theme": "Droits & rôles",
-      "pourquoipas": "En super-admin, sur toute ligne de pastille : « 🗑 Retirer » écarte l'échéance du suivi (réversible depuis la vacation). Invisible pour les autres rôles.",
-      "local": true
-    },
-    {
-      "b": 336,
-      "titre": "Photos sans géolocalisation : celles non encore rattachées apparaissent enfin",
-      "source": "Zeus — 05/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Pastille 📵 : les photos sans position non rattachées sont listées sous « (agent non identifié) », avec « 📎 Rapprocher cette photo ».",
-      "local": true
-    },
-    {
-      "b": 337,
-      "titre": "Photos sans position : paliers identifiés/non identifiés puis jour/passés",
-      "source": "Zeus — 05/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Pastille 📵 : 👤 identifiés / ❓ non identifiés → 📅 aujourd'hui / 🕓 jours passés → la liste. Plus de lignes identiques empilées.",
-      "local": true
-    },
-    {
-      "b": 338,
-      "titre": "Les rapprochements de photos sont pris en compte par toutes les pastilles",
-      "source": "Zeus — 05/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Rapprocher une photo (prise, fin, contrôle, tenue) depuis Suivi des appels : la ligne disparaît des pastilles au lieu de basculer en « hors délai ».",
-      "local": true
-    },
-    {
-      "b": 339,
-      "titre": "Sites couverts / non couverts : la photo de chaque agent, pas seulement son nom",
-      "source": "Zeus — 05/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Pastille 👕 → sites couverts ou non couverts : chaque agent affiche sa vignette, ou « pas de photo » avec le bouton pour en désigner une.",
-      "local": true
-    },
-    {
-      "b": 340,
-      "titre": "On revient à sa position dans une section (Suivi des appels notamment)",
-      "source": "Zeus — 05/08",
-      "theme": "Suivi des appels",
-      "pourquoipas": "Descendre dans Suivi des appels, aller ailleurs, revenir : on retrouve sa position au lieu de remonter en haut.",
-      "local": true
-    },
-    {
-      "b": 341,
-      "titre": "Tickets cochés qui réapparaissent : la coche est ancrée sur l'HEURE du contrôle",
-      "source": "Zeus — problème récurrent, corrigé le 05/08",
-      "theme": "Suivi des appels",
-      "local": true,
-      "pourquoipas": "Cas d'école joué sur l'ancienne et la nouvelle version : 3 contrôles cochés (23:00 / 01:00 / 03:00), on ajoute un contrôle à 21:00. Avant : 23:00 perd sa coche et 21:00 arrive déjà coché. Après : rien ne bouge. Contre-épreuve sur les vraies données : 139 coches retraduites, 105 tickets retirés retraduits, 0 perdu."
-    },
-    {
-      "b": 342,
-      "titre": "On revient vraiment là où l'on était (Planning + rechargement du téléphone)",
-      "source": "Zeus — 05/08",
-      "theme": "Suivi des appels",
-      "local": true,
-      "pourquoipas": "Trois trous reproduits puis vérifiés : le Planning scrolle dans son propre cadre (jamais mémorisé, il revenait en haut À GAUCHE) ; au rechargement — ce que fait le téléphone dès qu'on passe un appel — on retombait sur « Prise de note rapide » ; et la position était reposée après 60 ms alors que la liste met 700 à 1000 ms à se dessiner. Non-régression b341/b342 sur le même jeu de vraies données : aucun écart."
-    },
-    {
-      "b": 343,
-      "titre": "Plus de vacations en double : une seule porte pour import, mails et création à la main",
-      "source": "Zeus — 05/08",
-      "theme": "Planning",
-      "local": true,
-      "pourquoipas": "Rapprochement par client + date + heure, le nom de site ne servant plus qu'à écarter un faux rapprochement. Testé : « Duc » + « DUC CHAILLEY SURVEILLANCE RONDE » → une seule vacation ; les deux sites TERCA restent distincts. Bouton « 🔁 Vacations en double » dans le Planning : 82 proposées, 37 groupes protégés, 0 pointage perdu. Worker corrigé aussi — c'est lui qui recréait la nuit ce que Zeus supprimait."
-    },
-    {
-      "b": 344,
-      "titre": "Le contrôle tenue appartient au superviseur + rattacher une photo à n'importe quel site du jour",
-      "source": "Zeus — 06/08",
-      "theme": "Photos & preuves",
-      "local": true,
-      "pourquoipas": "Pastille 👕 → agent sans photo → « 🎫 Ticket contrôle tenue » → le superviseur le voit dans 🧭 Terrain avec Appeler / Envoyer le lien photo / Fiche agent / Contrôle fait / Sans objet. Et « ville_inconnue » n'est plus prise pour une ville : Decathlon (8h30, à 9 min de la photo) était écarté, il apparaît. Choix libre du site ajouté sous les propositions."
-    },
-    {
-      "b": 345,
-      "titre": "La fiche agent ne s'écrase plus · ⚠️ Signaler sur tous les tickets · ✍️ Info au superviseur",
-      "source": "Zeus — 06/08",
-      "theme": "Suivi des appels",
-      "local": true,
-      "pourquoipas": "Cas Varennes-Vauzelles : l'agent créé disparaissait (fkh_fa était la seule donnée sensible sans fusion) — il survit désormais à l'arrivée du classeur. « ⚠️ Signaler » est sur 100 % des tickets (avant : Prise et Fin seulement) : motif au choix, destinataire au choix, et le ticket RESTE non coché dans la file. « ✍️ Info au superviseur » amène la remontée existante dans Suivi des appels au lieu d'en faire sortir. Non-régression b344/b345 sur les vraies données : aucun écart."
-    },
-    {
-      "b": 346,
-      "titre": "Bulle 🎫 Envoyer un ticket + les bulles visibles de tout le monde + correction d'affichage",
-      "source": "Zeus — 06/08",
-      "theme": "Suivi des appels",
-      "local": true,
-      "pourquoipas": "La bulle 🎫 est en bas à droite dans toutes les sections : objet, date, heure, pour qui (opérateur par défaut · superviseur · administrateur · super-admin). L'entrée « Insérer un ticket » a quitté Supervision — une seule porte. Les deux bulles sont désormais visibles par défaut pour TOUS les rôles, opérateurs compris (drDefPastille les masquait tous). Corrige aussi l'affichage des choix de b345 : sans width:auto le rond mangeait la ligne."
-    },
-    {
-      "b": 347,
-      "titre": "Un rattachement se lit partout : photos de la vacation, tenue, refus",
-      "source": "Zeus — 06/08",
-      "theme": "Photos & preuves",
-      "local": true,
-      "pourquoipas": "Une seule fonction de vérité pour « cette étape a-t-elle une photo, est-elle refusée ? ». Fiche vacation : nouveau bloc 📷 Photos de cette vacation (prise, contrôles, tenue, fin). Prouvé sur EKOMANE Etienne : 2 photos visibles. Pastille 👕 : une photo rattachée depuis Suivi des appels compte enfin. Refus : « 1 fin(s) — photo REFUSÉE » listée sous « jours passés », alors qu'elle disparaissait avant."
-    },
-    {
-      "b": 348,
-      "titre": "Un ticket part chez UNE SEULE personne, et la bulle dit où il va",
-      "source": "Zeus — 06/08",
-      "theme": "Suivi des appels",
-      "local": true,
-      "pourquoipas": "Avant, le ticket allait TOUJOURS dans Suivi des appels, plus dans Terrain si le destinataire n'était pas l'opérateur. Désormais : opérateur → Suivi des appels seul ; superviseur/admin/super-admin → Terrain seul. La bulle annonce la destination avant le clic et le bouton la nomme (« Envoyer au superviseur »). Prouvé : opérateur 1/0, superviseur 0/1, admin 0/1."
-    },
-    {
-      "b": 349,
-      "titre": "Les actions d'un ticket découlent de ce qu'il demande",
-      "source": "Zeus — 06/08",
-      "theme": "Suivi des appels",
-      "local": true,
-      "pourquoipas": "Un ticket « crée la fiche agent de X, et la vacation de 12h à 19h » proposait « Joint — il est sur site », « Toujours injoignable », « Clore sans coche » : les actions d'un agent injoignable, dont le ticket héritait. Désormais on lit le texte : → Ouvrir Fiche agent · → Ouvrir le Planning · 📞 Appeler [RETIRE] · ✅ Fait · ❓ Je n'ai pas compris (cette dernière renvoie la question à l'expéditeur). Rejoué sur le ticket exact de Zeus."
-    },
-    {
-      "b": 350,
-      "titre": "Une photo présente sort de « sans photo », d'où qu'elle vienne — et le badge ne ment plus",
-      "source": "Zeus — 06/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Pastille 📷 → une prise sans photo affiche « ⏱ Pointé N min après l'heure prévue (heure du pointage — aucune photo) » au lieu de « Photo prise ». Mesuré : 208 lignes mentaient en b349, 0 en b354. Toutes les vues (Suivi site, pastilles 🦺 et 🌙, fiche vacation) interrogent la même fonction de vérité.",
-      "local": true
-    },
-    {
-      "b": 351,
-      "titre": "Chaque photo dit d'où elle vient : envoyée par l'agent, ou rattachée par l'agence",
-      "source": "Zeus — 06/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Sur la ligne de pastille ET sur le ticket de Suivi des appels : « 📲 Envoyée par l'agent », « 📎 Rattachée par l'agence — superviseur-1 le 06/08 », « 📷 Déposée sur le ticket — operateur-2 ». Cas Att Rac Ghs Luant Station Total : la ligne ne disparaît plus sans explication.",
-      "local": true
-    },
-    {
-      "b": 352,
-      "titre": "« 🗑 Retirer » ne disparaît plus en aperçu, et le superviseur y a droit",
-      "source": "Zeus — 06/08",
-      "theme": "Droits & rôles",
-      "pourquoipas": "Regarder l'appli en aperçu superviseur : le bouton « 🗑 Retirer » est là (32 lignes testées) — avant il s'évanouissait car l'aperçu écrase CLOUD.role. Réglable dans la grille des Droits (clé pp-retirer).",
-      "local": true
-    },
-    {
-      "b": 353,
-      "titre": "Écarter une photo sans la détruire",
-      "source": "Zeus — 06/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Dans « 📸 Photos terrain à rattacher » : « 🙈 Écarter » sort la photo de la file, elle reste sur le serveur et se reprend d'un clic depuis « 🙈 Écartées ». La suppression définitive reste à côté.",
-      "local": true
-    },
-    {
-      "b": 354,
-      "titre": "La galerie des photos ne s'arrête plus au 25e",
-      "source": "Zeus — 06/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "171 photos en attente, 25 affichées, 146 invisibles (27 du 05/08, 41 du 02/08…). Désormais 40 puis « ⬇️ Voir 40 de plus » / « 📜 Tout afficher », avec le reste toujours chiffré. Côté serveur, /photos pagine au lieu de couper à 500.",
-      "local": true
-    },
-    {
-      "b": 355,
-      "titre": "Les actions d'une photo de la galerie atteignent enfin l'écran",
-      "source": "trouvé en montant la démo — 06/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Sur chaque photo de « 📸 Photos terrain à rattacher » : le choix libre d'une vacation du jour, « 🦺 C'est une photo de contrôle », « 🙈 Écarter » et « 🗑 Supprimer la photo ». Ce bloc était construit dans le code mais jamais inséré dans le HTML — aucun de ces boutons n'existait à l'écran.",
-      "local": true
-    },
-    {
-      "b": 356,
-      "titre": "Écran « 🧹 Doublons certifiés » — nettoyage réversible, sans perdre les pointages",
-      "source": "Zeus — 06/08",
-      "theme": "Planning & import",
-      "pourquoipas": "Onglet 🧹 Doublons (super-admin) : 90 vacations en trop, certifiées par la Référence Sekur portée deux fois. 85 sans perte en un bouton, 5 dont les pointages n'existent que sur la copie sont d'abord REPORTÉS sur le contrôle équivalent (ctrl@2020 → ctrl@2010, décalage anti-collision). Tout se rétablit d'un clic, reports compris.",
-      "local": true
-    },
-    {
-      "b": 357,
-      "titre": "L'aperçu d'import dit tout — et sur quel identifiant il a tranché",
-      "source": "Zeus — 06/08",
-      "theme": "Planning & import",
-      "pourquoipas": "Colle le CSV Sekur d'août et clique Analyser : « 182 reconnues par 🔒 Référence Sekur · 9 par ❓ site+jour (à confirmer) · 2 ♻️ supprimées · 9 complétées (agent) · ⚠️ 3 où le fichier annonce un AUTRE agent ». Les désaccords d'agent affichent les DEUX numéros de téléphone et se tranchent d'un clic ; les rapprochements sans identifiant n'agissent que si tu coches. Garde-fou : une vacation portant une AUTRE Référence n'est plus confondue (13 cas dangereux sur ce seul fichier).",
-      "local": true
-    },
-    {
-      "b": 358,
-      "titre": "Mails missions : que des missions, les créneaux lus, et le mail retrouvé en un clic",
-      "source": "Zeus — 06/08",
-      "theme": "Mails & demandes",
-      "pourquoipas": "Section 📧 Mails missions : 33 mails de gardiennage/intervention au lieu de 120 (les 87 Ringover/LinkedIn/GetAccept sont comptés et consultables par « 📭 Voir les 87 hors sujet »). Chaque carte porte « 📧 Ouvrir ce mail dans Gmail » et « 🔎 Copier la recherche Gmail ». Les créneaux du mail entrent enfin dans les champs (date + heure de début + HEURE DE FIN). Et « ❌ PAS planifié » ne contredit plus « créée dans Suivi demandes ».",
-      "local": true
-    },
-    {
-      "b": 359,
-      "titre": "Compteur de photos sur chaque vignette du Planning",
-      "source": "Zeus — 06/08",
-      "theme": "Planning & import",
-      "pourquoipas": "Sur chaque vignette : « ✅ 2/2 », « ❗ 1/2 », « 📷 0/3 » en bas à droite — photos reçues sur photos attendues (prise, fin, contrôle tenue, contrôles des 2 h). Vert = complet, rouge = une échéance passée sans photo, orange = en cours. Rien ne s'affiche si la vacation n'attend aucune photo. Mesuré sur les vraies données : 75 compteurs sur 132 vignettes, rendu inchangé (~300 ms) grâce à une lecture mémorisée.",
-      "local": true
-    },
-    {
-      "b": 360,
-      "titre": "Une fiche de vacation ouverte ne perd plus son lien avec la base",
-      "source": "Zeus — 06/08",
-      "theme": "Planning & import",
-      "pourquoipas": "Ouvre une vacation au Planning, laisse la fiche ouverte le temps qu'une synchro passe, puis change l'heure de « Route (renseignements) » ou de « Pré-prise (J-15) » : la valeur tient. Avant, elle revenait toute seule au bout de quelques secondes — la fiche écrivait dans une copie orpheline, remplacée par l'arrivée du classeur commun. Les 10 gestes de la fiche sont protégés, pas seulement les heures.",
-      "local": true
-    },
-    {
-      "b": 361,
-      "titre": "Multi-création : on saisit une seule fois pour toutes les cases",
-      "source": "Zeus — 07/08",
-      "theme": "Planning & import",
-      "pourquoipas": "Planning → « ☐ Multi-créer » → clique plusieurs cases vides → « ➕ Créer N vacations » ouvre un FORMULAIRE UNIQUE : client, ville, heures début/fin, agent, qualification, appliqués aux N d'un coup. Pré-rempli avec ce que l'appli sait déjà du site (client, ville, horaires de la dernière vacation). Un agent inconnu est refusé, jamais créé à l'aveugle. Avant, les vacations naissaient nues et il fallait repasser sur chacune.",
-      "local": true
-    },
-    {
-      "b": 363,
-      "titre": "Les 4 gestes de la fiche vacation que j'avais oubliés",
-      "source": "Zeus — 07/08",
-      "theme": "Planning & import",
-      "pourquoipas": "Ouvre une vacation affectée au Planning et clique « ❌ Retirer » à côté de l'agent : il part vraiment. Idem pour le statut de la vacation, la date de fin et la suppression définitive. b360 avait protégé 10 gestes contre la copie orpheline — il en restait 4, dont celui-là. 15 gestes protégés au total, balayage exhaustif cette fois.",
-      "local": true
-    },
-    {
-      "b": 364,
-      "titre": "Photos terrain : deux vues (à rattacher / rattachées), chacune Aujourd'hui et Jours passés",
-      "source": "Zeus — 07/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Suivi des appels → « 📸 Photos terrain à rattacher » : deux boutons « 📎 À rattacher (171) » et « ✅ Rattachées (57) », et dans chacun « 📅 Aujourd'hui » / « 🕓 Jours passés ». La vue rattachées dit à QUELLE vacation et à quelle étape chaque photo est partie, qui l'a rattachée, et permet de « ↩️ Détacher » en cas d'erreur de vacation. Avant, une photo rattachée disparaissait : impossible de vérifier ni de corriger.",
-      "local": true
-    },
-    {
-      "b": 365,
-      "titre": "Un ticket se règle tout seul quand ce qu'il demandait a quitté la file",
-      "source": "Zeus — 07/08",
-      "theme": "Tickets",
-      "pourquoipas": "Envoie un ticket depuis une pastille (« 🎫 Demander un point »). Il affiche désormais son avancement RÉEL, relu dans la file : « 12 sur 25 réglées · 13 restantes » avec une barre. Quand les lignes visées ont toutes disparu, il passe en ✅ Fait tout seul, avec la trace « 🤖 Fermé automatiquement — les 25 lignes visées ont quitté la file ». Un ticket écrit à la main, sans contexte, continue de se fermer à la main.",
-      "local": true
-    },
-    {
-      "b": 366,
-      "titre": "La boucle complète d'un ticket : traité, consultable, renvoyable",
-      "source": "Zeus — 07/08",
-      "theme": "Tickets",
-      "pourquoipas": "Tu envoies un ticket au superviseur, il le traite, tu vois son avancement. Une fois clos, il descend dans « ✅ Traités — tout l'historique » : consultable quand tu le cherches, invisible quand tu travailles. Et « 🔄 Renvoyer — il reste un point » le fait repartir chez la même personne avec tout le fil, sans repartir de zéro. Le nombre de renvois s'affiche sur la carte.",
-      "local": true
-    },
-    {
-      "b": 367,
-      "titre": "Tuile 📥 « Photos reçues non rattachées » dans la pastille 📷",
-      "source": "Zeus — 07/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Pastille 📷 → 8e tuile « 📥 Photos reçues — non rattachées, aujourd'hui ». On clique : 📅 Aujourd'hui (depuis 00 h 00) / 🕓 Jours passés, la liste des photos avec leur heure et leur ville, et « 📎 Rapprocher cette photo » sans quitter la vue. Une photo entre en arrivant et n'en sort QUE rattachée ; à minuit le compteur repart, le retard descend dans « jours passés ». Les deux bouts du même trou sont enfin au même endroit.",
-      "local": true
-    },
-    {
-      "b": 368,
-      "titre": "La pastille 📷 passe de 8 tuiles à 5 — chacune dit ce que les autres ne disent pas",
-      "source": "Zeus — 07/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Pastille 📷 : « 🚫 Prises » et « 🚫 Fins » fusionnées en une seule « 🚫 Refus (2) » ; « 🗣️ Agent à contacter » (107) et « 🏢 Client à aviser » (106) supprimées — mesuré : elles étaient ENTIÈREMENT incluses dans « ⏱ Hors délai » (108), et 106 des 108 étaient dans les deux à la fois. Les deux cases d'action restent sur CHAQUE LIGNE (131 boutons sur 67 lignes vérifiés) : aucun geste perdu.",
-      "local": true
-    },
-    {
-      "b": 369,
-      "titre": "La règle du jour sur les tuiles « sans photo »",
-      "source": "Zeus — 07/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Pastille 📷 : les tuiles « Prises » et « Fins » comptent AUJOURD'HUI (9 et 1) au lieu de tout depuis le 01/08 (47 et 61), avec « + 38 jour(s) passé(s) » écrit dessous. Un mot sous les tuiles prévient que rien n'a disparu. ⚠️ Le BADGE de la pastille compte toujours tout (178) — il n'a pas été changé.",
-      "local": true
-    },
-    {
-      "b": 370,
-      "titre": "Le tampon de version redevient visible",
-      "source": "Zeus — 07/08",
-      "theme": "Divers",
-      "pourquoipas": "L'en-tête « GESTION v07-08·bNNN » était collé en haut de l'ÉCRAN, donc sous le bandeau de rôle en position fixe : il disparaissait. Il se cale maintenant juste sous le bandeau (vérifié : 66 px du haut). C'est la preuve visuelle qu'un déploiement est passé.",
-      "local": true
-    },
-    {
-      "b": 371,
-      "titre": "« c2syn » devient « Contrôle des 2 h »",
-      "source": "Zeus — 07/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Sous une photo rattachée, la fiche affichait la clé interne « c2syn » au lieu du nom de l'étape. On lit maintenant « Contrôle des 2 h » — et on voit donc immédiatement quand une photo est partie sur le mauvais ticket.",
-      "local": true
-    },
-    {
-      "b": 372,
-      "titre": "Plus de créneaux de contrôle inventés (choix A de Zeus)",
-      "source": "Zeus — 07/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Pastille 🌙 : 1140 → 279. L'appli fabriquait un créneau photo toutes les 2 h dès qu'une vacation commençait, même sans aucun contrôle planifié — d'où des lignes « Aucun appel contrôle pointé » incompréhensibles. Pire, tous partageaient la même clé c2syn : une photo rattachée à l'un se collait aux quatre sans en solder aucun. Elle ne réclame plus une photo que là où un contrôle existe vraiment. Contrepartie assumée : une vacation longue sans contrôle planifié ne réclame plus rien — on ajoute les contrôles depuis le Planning.",
-      "local": true
-    },
-    {
-      "b": 373,
-      "titre": "Le badge 📷 ne compte plus que ce qui demande une action maintenant",
-      "source": "Zeus — 07/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Badge de la pastille 📷 : 178 → 14. Il compte les prises/fins sans photo D'AUJOURD'HUI + tous les refus (un refus ne se périme pas). Le retard et les « hors délai » restent lisibles dans les tuiles. Avant, les tuiles disaient 9 et 1 pendant que le badge disait 178 — deux chiffres pour la même pastille.",
-      "local": true
-    },
-    {
-      "b": 374,
-      "titre": "« + 38 jour(s) passé(s) » devient cliquable",
-      "source": "Zeus — 07/08",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Sous chaque tuile « sans photo », la mention du retard s'ouvre d'un clic sur les lignes concernées (vérifié : 38 lignes). Avant il fallait cliquer la tuile puis le palier. Ce qu'on lit doit être ce qu'on touche.",
-      "local": true
-    },
-    {
-      "b": 375,
-      "titre": "Les cinq dernières vues qui ignoraient les photos rattachées",
-      "source": "audit du 07/08 — signalé par Zeus",
-      "theme": "Tenues & photos",
-      "pourquoipas": "Fiche agent (stats prises/fins), contrôles sans photo, compteur de photos d'une vacation, anomalie « contrôle tenue fait SANS photo », et supervision : ces cinq vues gardaient leur propre test et rataient les photos rattachées par l'agence, retrouvées dans l'archive ou désignées comme tenue. Elles interrogent désormais phAUnePhoto, comme le reste. C'était le symptôme de Zeus : « des photos rattachées qui ne sont pas prises en compte par certaines vues ».",
-      "local": true
-    }
-  ],
-  "attente": [
-    {
-      "titre": "Bloc « flux demande propre » b138–b146 : test guidé par Zeus",
-      "source": "file ancienne",
-      "note": "codé depuis le 01/08, jamais validé"
-    },
-    {
-      "titre": "Backfill des mails SECURITAS / RANC + mails de juin",
-      "source": "chantier mails"
-    },
-    {
-      "titre": "Corbeille (b230) : Zeus signale que ça ne marche pas",
-      "source": "Zeus 03/08",
-      "urgent": true,
-      "note": "en attente du geste exact pour reproduire"
-    },
-    {
-      "titre": "Ringover : les demandes prises par téléphone ne remontent pas dans « En recherche »",
-      "source": "Zeus — 05/08",
-      "note": "DIAGNOSTIC FAIT le 05/08 : la chaîne serveur est complète et fonctionne (Ringover → enregistrement → transcription Whisper → analyse Claude → création). Les 6 numéros suivis sont bien reconnus quel que soit le format, 11 à 22 appels passent les filtres chaque jour, et les enregistrements sont disponibles. Le cron est passé de 2 min à 1 min (b327). Le délai constaté (6 min) vient de l'attente de mise à disposition de l'enregistrement CHEZ RINGOVER, pas de l'appli — b323 affiche désormais cette décomposition sur chaque demande. RESTE : mesurer précisément ce délai côté Ringover pour le leur opposer, et voir le verdict d'analyse appel par appel (table ai_calls non lisible avec l'accès local — nécessiterait un écran de diagnostic côté serveur)."
-    },
-    {
-      "titre": "Audit des sections encore non couvertes",
-      "source": "audit complet 05/08",
-      "note": "Thiam, Zone à couvrir, Interventions, Tickets, Dépôts, Reste ST, Terrain — ouvertes sans erreur mais leur logique propre n'a pas été testée avec des données dédiées."
-    },
-    {
-      "titre": "Balayage final « oubli du filtre des vacations supprimées »",
-      "source": "audit complet 05/08",
-      "note": "17 occurrences corrigées (b309/b310/b311). Balayer tout le code pour cette signature afin de fermer la famille définitivement."
-    },
-    {
-      "titre": "Traçabilité appel→demande pour les demandes DÉJÀ en recherche",
-      "source": "Zeus — 05/08",
-      "note": "b323 n'affiche le délai que pour les demandes à venir : l'heure de l'appel n'était pas retenue avant. Pour les anciennes, il faudrait redemander les heures au serveur — mais /ringover/calls ne renvoie pas encore l'identifiant de l'appel, donc une modification du Worker serait nécessaire. À faire seulement si Zeus le juge utile."
-    },
-    {
-      "titre": "Délai Ringover : mesurer le temps de mise à disposition des enregistrements",
-      "source": "audit 05/08",
-      "note": "Le serveur ne peut analyser un appel que si son enregistrement audio est publié. C'est là qu'est passé l'essentiel des 6 minutes constatées, pas dans la fréquence de passage (descendue à 1 min en b327). Mesurer ce délai sur quelques appels donnerait un chiffre solide à opposer à Ringover."
-    },
-    {
-      "titre": "PP_START figé au 01/08/2026 dans le code",
-      "source": "audit 05/08",
-      "note": "La borne de départ des pastilles est écrite en dur (frMs('2026-08-01',480)). Elle vieillira : dans un mois les pastilles remonteront sur 30 jours, dans un an sur 365. À remplacer par une fenêtre glissante."
-    },
-    {
-      "titre": "Chemin complet : par où un opérateur signale une anomalie",
-      "source": "Zeus — 05/08",
-      "note": "L'opérateur ne voit pas la pastille ⚠️ Anomalies (prévu depuis l'origine). Vérifier par quel chemin il signale une anomalie (bulle Assistant ? SOS de Suivi des appels ?) et que cela remonte bien jusqu'au superviseur, de bout en bout."
-    }
-  ],
-  "decide": [
-    {
-      "titre": "Sélection multiple de vacations au Planning + modification en lot",
-      "source": "JULES — remontées #65/#66",
-      "urgent": true,
-      "note": "reçu, pas encore cadré : quelles actions en lot exactement ?"
-    },
-    {
-      "titre": "Import CSV : si la vacation existe sans agent et que le CSV en apporte un, reprendre l'affectation au lieu de créer un doublon",
-      "source": "remontée #64",
-      "note": "règle validée par Zeus, à coder"
-    },
-    {
-      "titre": "Import CSV : détecter les quasi-doublons (même site, même date, horaires différents) et les signaler au lieu de les créer",
-      "source": "remontées #58/#59"
-    },
-    {
-      "titre": "Pastille 🌙 : tenir compte de l'heure du premier contrôle dans « avant / en cours »",
-      "source": "remontée #55"
-    },
-    {
-      "titre": "Responsable secteur = mission TOUJOURS non affectée",
-      "source": "Zeus — 05/08",
-      "urgent": true,
-      "note": "Affecter un responsable secteur ne pourvoit pas la mission : il doit ensuite rendre le nom, prénom et contact du vrai agent. La mission doit donc RESTER dans « Validées → Non affectées », et on doit pouvoir y voir la liste de celles confiées à un responsable secteur, en attente de retour. La case « 🧭 Responsable secteur » existe déjà sur la fiche agent (fa-respsecteur) — reste à voir sous quel champ elle est enregistrée et à en tenir compte partout où l'on teste agentId."
-    },
-    {
-      "titre": "Contrôle superviseur : délai entre la demande et chaque action",
-      "source": "Zeus — 05/08",
-      "note": "Section réservée au super-administrateur. Pour chaque demande tombée en recherche : ce que le superviseur a fait dans « Agents proches » (appel en cours, appel passé, message envoyé…) et au bout de combien de temps. Et surtout : marquer les demandes où RIEN n'a été fait. À vérifier d'abord : l'appli enregistre-t-elle l'HEURE de ces actions, ou seulement le fait qu'elles ont eu lieu ? Sans horodatage, il faut d'abord l'ajouter — et cela ne vaudra que pour les actions futures."
-    },
-    {
-      "titre": "Heure de fin manquante sur les vacations créées depuis un mail",
-      "source": "audit 05/08",
-      "urgent": true,
-      "note": "Toute vacation née d'un mail naît avec mfin vide (écrit en dur). Conséquences : elle ne compte pas dans le total des heures, n'a ni fin de service à pointer ni contrôles. Le serveur ne demande à l'IA que la date et l'heure de DÉBUT du bon de commande. Corriger demande de modifier le prompt du Worker puis de le redéployer. C'est le plus utile de ce qui reste : cela touche toutes les missions venues de bons de commande."
-    }
-  ]
+ "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
+ "maj": "2026-08-07",
+ "items": [
+  {
+   "b": 222,
+   "titre": "Vacations non affectées : 24 h / 7 j / le reste",
+   "source": "Zeus",
+   "pourquoipas": "Se voit dans la pastille 🧍 : les tuiles 24 h / 7 jours / le reste.",
+   "theme": "Planning & vacations"
+  },
+  {
+   "b": 223,
+   "titre": "Témoin de vie de la collecte des mails",
+   "source": "Zeus",
+   "demo": "collecte",
+   "theme": "Mails & collecte",
+   "pourquoipas": "Section Mails missions : le témoin de vie indique que la collecte tourne."
+  },
+  {
+   "b": 224,
+   "titre": "Livré avec le lot b224–b227 — b224 les bons de commande descendent au Planning sans ouvrir la section Mails ; b225 plus de doublon dans Suivi des d…",
+   "source": "lot groupé",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 225,
+   "titre": "Livré avec le lot b224–b227 — b224 les bons de commande descendent au Planning sans ouvrir la section Mails ; b225 plus de doublon dans Suivi des d…",
+   "source": "lot groupé",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 226,
+   "titre": "Livré avec le lot b224–b227 — b224 les bons de commande descendent au Planning sans ouvrir la section Mails ; b225 plus de doublon dans Suivi des d…",
+   "source": "lot groupé",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 227,
+   "titre": "Qui est au PC (prise/fin de service)",
+   "source": "Zeus",
+   "demo": "pcvide",
+   "theme": "PC & permanence",
+   "pourquoipas": "Pastille 🎧 : qui tient le poste en ce moment, avec sa prise et sa fin de service."
+  },
+  {
+   "b": 228,
+   "titre": "Livré avec le lot b228–b236 — Mails missions ouvert au superviseur+admin (app+worker) ; ANNULATIONS signalees sans suppression (pastille, hachure a…",
+   "source": "lot groupé",
+   "theme": "Mails & bons de commande",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 229,
+   "titre": "Annulations signalées sans suppression",
+   "source": "Zeus",
+   "demo": "annulation",
+   "theme": "Planning & vacations",
+   "pourquoipas": "Une annulation reçue par mail est signalée (pastille 🔴, hachures au Planning) sans rien supprimer."
+  },
+  {
+   "b": 230,
+   "titre": "Corbeille des sections + bouton PC opérateur",
+   "source": "Zeus",
+   "demo": "corbeille",
+   "note": "Zeus signale que ça ne marche pas — à reproduire",
+   "theme": "Rôles, droits & vues",
+   "pourquoipas": "Section 🗑️ Corbeille : les onglets retirés y attendent, restaurables en un clic."
+  },
+  {
+   "b": 231,
+   "titre": "Mode démo (?sandbox=1&demo=…)",
+   "source": "Zeus",
+   "pourquoipas": "C'est le moteur des démos lui-même.",
+   "theme": "Outils de pilotage"
+  },
+  {
+   "b": 232,
+   "titre": "Panneau Droits d'accès (sections × rôles)",
+   "source": "Zeus",
+   "demo": "droits",
+   "theme": "Rôles, droits & vues",
+   "pourquoipas": "Section 🔐 Droits d'accès : la grille sections × rôles, réglable case par case."
+  },
+  {
+   "b": 233,
+   "titre": "Livré avec le lot b228–b236 — Mails missions ouvert au superviseur+admin (app+worker) ; ANNULATIONS signalees sans suppression (pastille, hachure a…",
+   "source": "lot groupé",
+   "theme": "Mails & bons de commande",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 234,
+   "titre": "Endosser un autre rôle",
+   "source": "Zeus",
+   "demo": "mails",
+   "theme": "Rôles, droits & vues",
+   "pourquoipas": "En sandbox, le bandeau du haut permet d'endosser super-admin / superviseur / admin / opérateur."
+  },
+  {
+   "b": 235,
+   "titre": "Bascule de rôle permanente en sandbox",
+   "source": "Zeus",
+   "pourquoipas": "Rien à jouer : la bascule de rôle est simplement toujours disponible en sandbox.",
+   "theme": "Rôles, droits & vues"
+  },
+  {
+   "b": 236,
+   "titre": "Régler la vue d'un rôle depuis la vue",
+   "source": "Zeus",
+   "pourquoipas": "Se joue dans la démo « Retirer sur place » (bouton Régler cette vue).",
+   "theme": "Rôles, droits & vues"
+  },
+  {
+   "b": 237,
+   "titre": "Vue opérateur : cloche et recherche retirées",
+   "source": "Zeus",
+   "pourquoipas": "Se voit en basculant en vue opérateur : ni cloche ni recherche.",
+   "theme": "Rôles, droits & vues"
+  },
+  {
+   "b": 238,
+   "titre": "Aperçu d'un rôle en ligne (admin + super-admin)",
+   "source": "Zeus",
+   "pourquoipas": "Se joue dans la démo « Ce que voit un superviseur ».",
+   "theme": "Rôles, droits & vues"
+  },
+  {
+   "b": 239,
+   "titre": "Bandeau d'état + bulle réglables",
+   "source": "Zeus",
+   "pourquoipas": "Se voit en basculant en vue opérateur : ni bandeau d'état ni bulle.",
+   "theme": "Rôles, droits & vues"
+  },
+  {
+   "b": 240,
+   "titre": "Le bandeau d'aperçu ne recouvre plus les onglets",
+   "source": "Zeus",
+   "pourquoipas": "Rien à jouer : le bandeau ne recouvre plus les onglets. Visible d'un coup d'œil.",
+   "theme": "Rôles, droits & vues"
+  },
+  {
+   "b": 241,
+   "titre": "Modes d'emploi retirés à l'opérateur",
+   "source": "Zeus",
+   "pourquoipas": "Se voit en basculant en vue opérateur : les textes d'explication ont disparu.",
+   "theme": "Rôles, droits & vues"
+  },
+  {
+   "b": 242,
+   "titre": "Tickets entre collaborateurs depuis une pastille",
+   "source": "Zeus",
+   "pourquoipas": "Démo à écrire — il faut deux rôles pour la jouer.",
+   "theme": "Planning & vacations"
+  },
+  {
+   "b": 243,
+   "titre": "Suppression du bouton Simuler + nettoyage des 2 lignes",
+   "source": "remontée #62",
+   "pourquoipas": "Rien à jouer : c'est un retrait (le bouton Simuler a disparu) + un nettoyage de 2 lignes en base.",
+   "theme": "Mails & collecte"
+  },
+  {
+   "b": 244,
+   "titre": "Mode selfie sur le lien photo",
+   "source": "remontée #67",
+   "note": "à valider sur téléphone",
+   "pourquoipas": "Ne peut se tester QUE sur un téléphone : le navigateur du PC n'a pas de caméra.",
+   "theme": "Photos & preuves"
+  },
+  {
+   "b": 245,
+   "titre": "Pastille tenues envoyées non confirmées",
+   "source": "Zeus",
+   "demo": "tenues",
+   "theme": "Planning & vacations",
+   "pourquoipas": "Pastille des tenues : celles envoyées mais non confirmées par l'agent y sont comptées."
+  },
+  {
+   "b": 246,
+   "titre": "Prévenir l'auteur quand sa demande est traitée",
+   "source": "Zeus",
+   "demo": "reponse",
+   "theme": "Outils de pilotage",
+   "pourquoipas": "Une remontée traitée : son auteur reçoit la réponse dans son Assistant."
+  },
+  {
+   "b": 247,
+   "titre": "Déconnexion déplacée en bas à gauche",
+   "source": "Zeus",
+   "pourquoipas": "Rien à jouer : la Déconnexion a simplement changé de coin. Ça se constate à l'écran.",
+   "theme": "Rôles, droits & vues"
+  },
+  {
+   "b": 248,
+   "titre": "Fin des fausses alertes (collecte, PC vacant)",
+   "source": "Zeus",
+   "pourquoipas": "Rien à jouer : ce sont deux alertes qui ne partent PLUS. La preuve, c'est leur absence.",
+   "theme": "Mails & collecte"
+  },
+  {
+   "b": 249,
+   "titre": "Retirer une pastille/section depuis la vue",
+   "source": "Zeus",
+   "demo": "retirer",
+   "local": true,
+   "theme": "Rôles, droits & vues",
+   "pourquoipas": "Appui long sur une pastille ou un onglet → le lâcher sur 🗑️ Corbeille le retire de la barre."
+  },
+  {
+   "b": 250,
+   "titre": "Croix de retrait fiable (26 px, pointerdown, ruban Annuler)",
+   "source": "Zeus",
+   "demo": "retirer",
+   "local": true,
+   "theme": "Rôles, droits & vues",
+   "pourquoipas": "Appui sur la croix de retrait d'une pastille : elle part, et un ruban « Annuler » permet de revenir."
+  },
+  {
+   "b": 251,
+   "titre": "Modes d'emploi joints aux réponses ([[aide:…]])",
+   "source": "Zeus",
+   "demo": "reponse",
+   "local": true,
+   "theme": "Rôles, droits & vues",
+   "pourquoipas": "Une réponse de l'Assistant porte son mode d'emploi joint, ouvrable depuis la réponse."
+  },
+  {
+   "b": 252,
+   "titre": "Croix de retrait seulement en mode réglage",
+   "source": "Zeus",
+   "demo": "retirer",
+   "local": true,
+   "theme": "Rôles, droits & vues",
+   "pourquoipas": "La croix de retrait sur une pastille n'apparaît qu'en mode réglage, pas en usage courant."
+  },
+  {
+   "b": 253,
+   "titre": "Démos vivantes : visite guidée pas à pas",
+   "source": "Zeus",
+   "demo": "reponse",
+   "note": "halo + défilement + le geste s'exécute",
+   "local": true,
+   "theme": "Outils de pilotage",
+   "pourquoipas": "Ouvrir une visite guidée : elle avance pas à pas et pointe l'élément dont elle parle."
+  },
+  {
+   "b": 254,
+   "titre": "Tableau de bord des états des demandes",
+   "source": "Zeus",
+   "pourquoipas": "C'est ce tableau de bord.",
+   "local": true,
+   "theme": "Outils de pilotage"
+  },
+  {
+   "b": 255,
+   "titre": "Tableau de bord : 4 états + boutons d'ordre",
+   "source": "Zeus",
+   "pourquoipas": "C'est ce tableau de bord.",
+   "local": true,
+   "theme": "Outils de pilotage"
+  },
+  {
+   "b": 256,
+   "titre": "Photos sans correspondance : rattachement manuel, fenêtre horaire réglable",
+   "source": "remontées #53/#54/#57",
+   "note": "±1 h à toute la journée ; prise, fin, tenue et contrôles 2 h",
+   "local": true,
+   "demo": "photo",
+   "theme": "Photos & preuves",
+   "pourquoipas": "Suivi des appels → une photo sans correspondance → « 📎 Rattacher » : la fenêtre horaire se règle (± 1 h à toute la journée)."
+  },
+  {
+   "b": 257,
+   "titre": "Livré avec le lot b249–b261 — b249+b250+b252 retirer une pastille ou une section depuis la vue d'un role, croix affichees seulement en mode reglage…",
+   "source": "lot groupé",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 258,
+   "titre": "Choisir une photo déjà remontée par l'agent (galerie du cloud)",
+   "source": "remontée #67",
+   "local": true,
+   "demo": "galerie",
+   "theme": "Photos & preuves",
+   "pourquoipas": "Suivi des appels → une photo reçue → « 📷 Choisir une photo reçue » ouvre la galerie du cloud."
+  },
+  {
+   "b": 259,
+   "titre": "Démos jouables pour le rattachement photo et la galerie",
+   "source": "Zeus",
+   "local": true,
+   "pourquoipas": "Ce sont les démos elles-mêmes.",
+   "theme": "Photos & preuves"
+  },
+  {
+   "b": 260,
+   "titre": "Tableau : copie silencieuse (plus de fenêtre)",
+   "source": "Zeus",
+   "local": true,
+   "pourquoipas": "C'est ce tableau de bord.",
+   "theme": "Outils de pilotage"
+  },
+  {
+   "b": 261,
+   "titre": "Livré avec le lot b249–b261 — b249+b250+b252 retirer une pastille ou une section depuis la vue d'un role, croix affichees seulement en mode reglage…",
+   "source": "lot groupé",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 262,
+   "titre": "Colonne En ligne regroupée par thèmes + copie au glisser",
+   "source": "Zeus",
+   "theme": "Outils de pilotage",
+   "pourquoipas": "C'est ce tableau de bord.",
+   "local": true
+  },
+  {
+   "b": 263,
+   "titre": "File d'ordres dans la base + barre intelligente super-admin + fix glisser des pastilles",
+   "source": "Zeus",
+   "theme": "Outils de pilotage",
+   "pourquoipas": "Le glisser des pastilles se constate à l'écran ; la file d'ordres se vérifie en déplaçant une carte.",
+   "local": true
+  },
+  {
+   "b": 288,
+   "titre": "Suivi des appels semaine + vacations sans heure + reste ouvert",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 290,
+   "titre": "Suivi des appels — tickets jours passés neutres (pas rouges)",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 291,
+   "titre": "agent — tous les numéros dans le ticket + modale planning",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 292,
+   "titre": "Suivi des appels — défaut = aujourd'hui (corrige b288)",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 293,
+   "titre": "filtre heure de début dans Suivi des appels (superviseur+)",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 294,
+   "titre": "Suivi des appels : sélection multiple de tickets",
+   "source": "Zeus",
+   "theme": "Suivi des appels",
+   "pourquoipas": "Commit local, pas encore poussé en ligne ni rejoué en démo."
+  },
+  {
+   "b": 295,
+   "titre": "Planning : tableau des heures pliable",
+   "source": "Zeus",
+   "theme": "Planning & vacations",
+   "pourquoipas": "Commit local, pas encore poussé en ligne ni rejoué en démo."
+  },
+  {
+   "b": 296,
+   "titre": "creation agent directe depuis la modale Planning",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 297,
+   "titre": "multi-selection cases vides Planning pour creation en batch",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 299,
+   "titre": "fix notifs dupliquees (seen persiste + when:date) + Suivi des appels force aujourd'hui au chargement",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 301,
+   "titre": "merge fkh_suivi au lieu d'ecraser — les vacations Planning survivent au cloud pull",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 303,
+   "titre": "soft-delete vacations Planning — fix disparition au reload",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 304,
+   "titre": "fix pertes de donnees Planning — timestamps + dedup mails",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 305,
+   "titre": "fix definitif vacations mail — soft-delete + anti-recreation",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 306,
+   "titre": "nettoyage code mort if(false) — audit Planning complet",
+   "source": "historique",
+   "theme": "Divers",
+   "pourquoipas": "Livraison déjà publiée — consignée après coup pour compléter l'historique."
+  },
+  {
+   "b": 307,
+   "titre": "La vue ne remonte plus toute seule en haut quand on scrolle",
+   "source": "Zeus — bug signalé le 05/08",
+   "theme": "Planning & vacations",
+   "pourquoipas": "Planning : scroller en bas et attendre 20 s sans rien toucher — la page reste en place.",
+   "local": true
+  },
+  {
+   "b": 309,
+   "titre": "Une vacation supprimée ne réapparaît plus (8 sections + « Réassembler » qui doublonnait)",
+   "source": "audit complet 05/08",
+   "theme": "Fiabilité des données",
+   "pourquoipas": "Supprimer une vacation puis la chercher dans Prise, Fin, Services, Dispatch, Appels, Suivi site, Sites & Clients, Clients : absente partout.",
+   "local": true
+  },
+  {
+   "b": 310,
+   "titre": "Ce qu'on modifie n'est plus effacé par la synchro (« Remettre en recherche » tenait 4 s)",
+   "source": "audit complet 05/08",
+   "theme": "Fiabilité des données",
+   "pourquoipas": "Suivi demandes : « ↩︎ Remettre en recherche » sur une demande validée — elle reste en recherche.",
+   "local": true
+  },
+  {
+   "b": 311,
+   "titre": "Pastilles nettoyées + Modifier/Supprimer sur place + total des heures juste (8 h de trop)",
+   "source": "Zeus — capture Entrepôt Roissy",
+   "theme": "Planning & vacations",
+   "pourquoipas": "Pastille 🧍 Vacations non affectées : la supprimée a disparu, et chaque ligne porte ✏️ Modifier et 🗑 Supprimer.",
+   "local": true
+  },
+  {
+   "b": 312,
+   "titre": "Désigner une photo comme photo de tenue d'un agent (visible dans sa fiche)",
+   "source": "Zeus — 05/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Suivi des appels → une photo reçue → « 🦺 Photo de tenue de X ». Elle apparaît ensuite dans la fiche de l'agent, dépliant 📷 Photos tenue.",
+   "local": true
+  },
+  {
+   "b": 313,
+   "titre": "Portail des photos reçues : choisir une photo déjà arrivée au lieu d'en téléverser une",
+   "source": "Zeus — 05/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Toute pastille photo → « 📷 Choisir une photo reçue » → galerie de tout ce qui est arrivé, avec rattachement au ticket ou désignation en photo de tenue.",
+   "local": true
+  },
+  {
+   "b": 314,
+   "titre": "La tenue de l'agent visible depuis la vacation",
+   "source": "Zeus — 05/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Planning → cliquer une vacation avec un agent affecté : ses photos de tenue s'affichent sous son nom, ou « aucune photo » avec accès au portail.",
+   "local": true
+  },
+  {
+   "b": 315,
+   "titre": "Pastille « Photos de contrôle tenue » : agents sans photo, sites couverts / non couverts",
+   "source": "Zeus — 05/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Pastille 🦺 en haut à droite : le compteur = agents planifiés aujourd'hui sans photo. Trois tuiles, et « 📷 Choisir une photo reçue » sur chaque agent.",
+   "local": true
+  },
+  {
+   "b": 316,
+   "titre": "« Choisir une photo reçue » depuis Prises/fins non pointées + icône 👕 distinct",
+   "source": "Zeus — 05/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Pastille ⏰ → une ligne sans photo → « 📷 Choisir une photo reçue ». Et la pastille tenue affiche 👕, plus 🦺 (déjà pris).",
+   "local": true
+  },
+  {
+   "b": 317,
+   "titre": "Une photo rattachée par l'agence sort vraiment de la vue (ne bascule plus en « hors délai »)",
+   "source": "Zeus — cas KOYA 05/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Pastille 📷 → « Choisir une photo reçue » sur une prise : la ligne disparaît des 7 tuiles. Un retard réel de l'agent reste signalé.",
+   "local": true
+  },
+  {
+   "b": 318,
+   "titre": "« C'est une photo de contrôle » (n'importe quel agent, autocomplétion) + supprimer une photo",
+   "source": "Zeus — 05/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Suivi des appels → une photo reçue → taper un nom dans « 🦺 Photo de contrôle de… » puis associer. Et « 🗑 Supprimer la photo ».",
+   "local": true
+  },
+  {
+   "b": 319,
+   "titre": "Pastille « agents sans photo de tenue » visible par le superviseur et l'administrateur",
+   "source": "Zeus — 05/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Se connecter en superviseur ou administrateur : la pastille 👕 est dans la barre avec son compteur. L'opérateur ne la voit pas.",
+   "local": true
+  },
+  {
+   "b": 320,
+   "titre": "Superviseur : retrait de 4 pastilles de pilotage (PC, Anomalies, Retards, Sans position)",
+   "source": "Zeus — 05/08",
+   "theme": "Droits & rôles",
+   "pourquoipas": "Se connecter en superviseur : il ne reste que les 8 pastilles opérationnelles. L'administrateur les garde toutes.",
+   "local": true
+  },
+  {
+   "b": 321,
+   "titre": "Barre de pastilles : plus de trou (la pastille 👕 restait isolée)",
+   "source": "Zeus — 05/08",
+   "theme": "Droits & rôles",
+   "pourquoipas": "Se connecter en superviseur : les 8 pastilles se suivent sans espace vide.",
+   "local": true
+  },
+  {
+   "b": 322,
+   "titre": "Un panneau ouvert n'empêche plus de recevoir (poste sourd sur Supervision)",
+   "source": "Zeus — 05/08",
+   "theme": "Fiabilité des données",
+   "pourquoipas": "Rester sur Supervision (dépliant ouvert d'office) : les nouvelles demandes arrivent désormais aussi sur ce poste.",
+   "local": true
+  },
+  {
+   "b": 323,
+   "titre": "Traçabilité appel → demande : heures, délai, et où le temps est passé",
+   "source": "Zeus — 05/08",
+   "theme": "Suivi des demandes",
+   "pourquoipas": "Suivi des demandes → une demande née d'un appel : bandeau « 📞 Appel entrant le … → 📥 en recherche le … · ⏱ délai ». Orange au-delà de 2 min, avec le détail.",
+   "local": true
+  },
+  {
+   "b": 324,
+   "titre": "Plus de doublon : appel puis mail (on garde le mail + l'agent) et import CSV (l'agent est reporté)",
+   "source": "Zeus — 05/08",
+   "theme": "Fiabilité des données",
+   "pourquoipas": "Valider une demande venue d'un appel, puis laisser arriver le mail du bon de commande : une seule vacation reste, celle du mail, avec l'agent déjà affecté.",
+   "local": true
+  },
+  {
+   "b": 325,
+   "titre": "Avertissement nommé avant de supprimer une mission validée",
+   "source": "Zeus — 05/08",
+   "theme": "Fiabilité des données",
+   "pourquoipas": "Suivi des demandes → Validées → 🗑️ Supprimer : le message nomme le site, la date, les horaires et l'agent, et rappelle que la vacation quitte le Planning.",
+   "local": true
+  },
+  {
+   "b": 326,
+   "titre": "Demandes en recherche : la plus récente en haut + l'écran se met à jour",
+   "source": "Zeus — 05/08",
+   "theme": "Suivi des demandes",
+   "pourquoipas": "Suivi des demandes → En recherche : la dernière arrivée est en première position. Elle s'affiche même si un panneau était ouvert.",
+   "local": true
+  },
+  {
+   "b": 328,
+   "titre": "Prestation « Gardiennage » d'office + « Agents proches » sur les missions validées sans agent",
+   "source": "Zeus — 05/08",
+   "theme": "Suivi des demandes",
+   "pourquoipas": "Gardiennage → le champ Prestation est pré-rempli et ne propose que Gardiennage. Suivi des demandes → Validées → Non affectées : le bloc « Agents proches » est là.",
+   "local": true
+  },
+  {
+   "b": 329,
+   "titre": "« Client non avisé » limitée au jour même",
+   "source": "Zeus — 05/08",
+   "theme": "Suivi des appels",
+   "pourquoipas": "Pastille 🏢 Client non avisé : plus aucune ligne des jours précédents, seulement celles du jour.",
+   "local": true
+  },
+  {
+   "b": 330,
+   "titre": "Vues « Aujourd'hui » / « Jours passés » + suppression des tuiles qui affichaient toujours zéro",
+   "source": "Zeus — 05/08",
+   "theme": "Suivi des appels",
+   "pourquoipas": "Pastille ⏰ → « Prises de service » : deux boutons 📅 Aujourd'hui / 🕓 Jours passés. Et plus de tuiles « Hors délai » figées à 0 hors de la pastille photos.",
+   "local": true
+  },
+  {
+   "b": 331,
+   "titre": "Valider une demande ne fait plus basculer vers « Validées »",
+   "source": "Zeus — 05/08",
+   "theme": "Suivi des demandes",
+   "pourquoipas": "Suivi des demandes → En recherche → valider : on reste dans « En recherche » pour enchaîner.",
+   "local": true
+  },
+  {
+   "b": 332,
+   "titre": "« Aujourd'hui » / « Jours passés » : un palier de tuiles au lieu d'une barre",
+   "source": "Zeus — 05/08",
+   "theme": "Suivi des appels",
+   "pourquoipas": "Pastille ⏰ → une tuile → deux tuiles Aujourd'hui / Jours passés avec leur chiffre → la liste. Retour remonte cran par cran.",
+   "local": true
+  },
+  {
+   "b": 333,
+   "titre": "Les anomalies signalées reviennent au superviseur",
+   "source": "Zeus — 05/08",
+   "theme": "Droits & rôles",
+   "pourquoipas": "Se connecter en superviseur : la pastille ⚠️ Anomalies est de retour. Les trois pastilles de pilotage restent masquées.",
+   "local": true
+  },
+  {
+   "b": 334,
+   "titre": "« Non pointées » et « Client non avisé » parlent de pointage, plus de photo",
+   "source": "Zeus — 05/08",
+   "theme": "Suivi des appels",
+   "pourquoipas": "Pastille ⏰ : plus de bouton photo, le bouton dit « ✔ Agent appelé — pointer », et l'en-tête « non pointée(s) — agent non appelé ».",
+   "local": true
+  },
+  {
+   "b": 335,
+   "titre": "« 🗑 Retirer » une ligne de pastille — super-administrateur uniquement",
+   "source": "Zeus — 05/08",
+   "theme": "Droits & rôles",
+   "pourquoipas": "En super-admin, sur toute ligne de pastille : « 🗑 Retirer » écarte l'échéance du suivi (réversible depuis la vacation). Invisible pour les autres rôles.",
+   "local": true
+  },
+  {
+   "b": 336,
+   "titre": "Photos sans géolocalisation : celles non encore rattachées apparaissent enfin",
+   "source": "Zeus — 05/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Pastille 📵 : les photos sans position non rattachées sont listées sous « (agent non identifié) », avec « 📎 Rapprocher cette photo ».",
+   "local": true
+  },
+  {
+   "b": 337,
+   "titre": "Photos sans position : paliers identifiés/non identifiés puis jour/passés",
+   "source": "Zeus — 05/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Pastille 📵 : 👤 identifiés / ❓ non identifiés → 📅 aujourd'hui / 🕓 jours passés → la liste. Plus de lignes identiques empilées.",
+   "local": true
+  },
+  {
+   "b": 338,
+   "titre": "Les rapprochements de photos sont pris en compte par toutes les pastilles",
+   "source": "Zeus — 05/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Rapprocher une photo (prise, fin, contrôle, tenue) depuis Suivi des appels : la ligne disparaît des pastilles au lieu de basculer en « hors délai ».",
+   "local": true
+  },
+  {
+   "b": 339,
+   "titre": "Sites couverts / non couverts : la photo de chaque agent, pas seulement son nom",
+   "source": "Zeus — 05/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Pastille 👕 → sites couverts ou non couverts : chaque agent affiche sa vignette, ou « pas de photo » avec le bouton pour en désigner une.",
+   "local": true
+  },
+  {
+   "b": 340,
+   "titre": "On revient à sa position dans une section (Suivi des appels notamment)",
+   "source": "Zeus — 05/08",
+   "theme": "Suivi des appels",
+   "pourquoipas": "Descendre dans Suivi des appels, aller ailleurs, revenir : on retrouve sa position au lieu de remonter en haut.",
+   "local": true
+  },
+  {
+   "b": 341,
+   "titre": "Tickets cochés qui réapparaissent : la coche est ancrée sur l'HEURE du contrôle",
+   "source": "Zeus — problème récurrent, corrigé le 05/08",
+   "theme": "Suivi des appels",
+   "local": true,
+   "pourquoipas": "Cas d'école joué sur l'ancienne et la nouvelle version : 3 contrôles cochés (23:00 / 01:00 / 03:00), on ajoute un contrôle à 21:00. Avant : 23:00 perd sa coche et 21:00 arrive déjà coché. Après : rien ne bouge. Contre-épreuve sur les vraies données : 139 coches retraduites, 105 tickets retirés retraduits, 0 perdu."
+  },
+  {
+   "b": 342,
+   "titre": "On revient vraiment là où l'on était (Planning + rechargement du téléphone)",
+   "source": "Zeus — 05/08",
+   "theme": "Suivi des appels",
+   "local": true,
+   "pourquoipas": "Trois trous reproduits puis vérifiés : le Planning scrolle dans son propre cadre (jamais mémorisé, il revenait en haut À GAUCHE) ; au rechargement — ce que fait le téléphone dès qu'on passe un appel — on retombait sur « Prise de note rapide » ; et la position était reposée après 60 ms alors que la liste met 700 à 1000 ms à se dessiner. Non-régression b341/b342 sur le même jeu de vraies données : aucun écart."
+  },
+  {
+   "b": 343,
+   "titre": "Plus de vacations en double : une seule porte pour import, mails et création à la main",
+   "source": "Zeus — 05/08",
+   "theme": "Planning",
+   "local": true,
+   "pourquoipas": "Rapprochement par client + date + heure, le nom de site ne servant plus qu'à écarter un faux rapprochement. Testé : « Duc » + « DUC CHAILLEY SURVEILLANCE RONDE » → une seule vacation ; les deux sites TERCA restent distincts. Bouton « 🔁 Vacations en double » dans le Planning : 82 proposées, 37 groupes protégés, 0 pointage perdu. Worker corrigé aussi — c'est lui qui recréait la nuit ce que Zeus supprimait."
+  },
+  {
+   "b": 344,
+   "titre": "Le contrôle tenue appartient au superviseur + rattacher une photo à n'importe quel site du jour",
+   "source": "Zeus — 06/08",
+   "theme": "Photos & preuves",
+   "local": true,
+   "pourquoipas": "Pastille 👕 → agent sans photo → « 🎫 Ticket contrôle tenue » → le superviseur le voit dans 🧭 Terrain avec Appeler / Envoyer le lien photo / Fiche agent / Contrôle fait / Sans objet. Et « ville_inconnue » n'est plus prise pour une ville : Decathlon (8h30, à 9 min de la photo) était écarté, il apparaît. Choix libre du site ajouté sous les propositions."
+  },
+  {
+   "b": 345,
+   "titre": "La fiche agent ne s'écrase plus · ⚠️ Signaler sur tous les tickets · ✍️ Info au superviseur",
+   "source": "Zeus — 06/08",
+   "theme": "Suivi des appels",
+   "local": true,
+   "pourquoipas": "Cas Varennes-Vauzelles : l'agent créé disparaissait (fkh_fa était la seule donnée sensible sans fusion) — il survit désormais à l'arrivée du classeur. « ⚠️ Signaler » est sur 100 % des tickets (avant : Prise et Fin seulement) : motif au choix, destinataire au choix, et le ticket RESTE non coché dans la file. « ✍️ Info au superviseur » amène la remontée existante dans Suivi des appels au lieu d'en faire sortir. Non-régression b344/b345 sur les vraies données : aucun écart."
+  },
+  {
+   "b": 346,
+   "titre": "Bulle 🎫 Envoyer un ticket + les bulles visibles de tout le monde + correction d'affichage",
+   "source": "Zeus — 06/08",
+   "theme": "Suivi des appels",
+   "local": true,
+   "pourquoipas": "La bulle 🎫 est en bas à droite dans toutes les sections : objet, date, heure, pour qui (opérateur par défaut · superviseur · administrateur · super-admin). L'entrée « Insérer un ticket » a quitté Supervision — une seule porte. Les deux bulles sont désormais visibles par défaut pour TOUS les rôles, opérateurs compris (drDefPastille les masquait tous). Corrige aussi l'affichage des choix de b345 : sans width:auto le rond mangeait la ligne."
+  },
+  {
+   "b": 347,
+   "titre": "Un rattachement se lit partout : photos de la vacation, tenue, refus",
+   "source": "Zeus — 06/08",
+   "theme": "Photos & preuves",
+   "local": true,
+   "pourquoipas": "Une seule fonction de vérité pour « cette étape a-t-elle une photo, est-elle refusée ? ». Fiche vacation : nouveau bloc 📷 Photos de cette vacation (prise, contrôles, tenue, fin). Prouvé sur EKOMANE Etienne : 2 photos visibles. Pastille 👕 : une photo rattachée depuis Suivi des appels compte enfin. Refus : « 1 fin(s) — photo REFUSÉE » listée sous « jours passés », alors qu'elle disparaissait avant."
+  },
+  {
+   "b": 348,
+   "titre": "Un ticket part chez UNE SEULE personne, et la bulle dit où il va",
+   "source": "Zeus — 06/08",
+   "theme": "Suivi des appels",
+   "local": true,
+   "pourquoipas": "Avant, le ticket allait TOUJOURS dans Suivi des appels, plus dans Terrain si le destinataire n'était pas l'opérateur. Désormais : opérateur → Suivi des appels seul ; superviseur/admin/super-admin → Terrain seul. La bulle annonce la destination avant le clic et le bouton la nomme (« Envoyer au superviseur »). Prouvé : opérateur 1/0, superviseur 0/1, admin 0/1."
+  },
+  {
+   "b": 349,
+   "titre": "Les actions d'un ticket découlent de ce qu'il demande",
+   "source": "Zeus — 06/08",
+   "theme": "Suivi des appels",
+   "local": true,
+   "pourquoipas": "Un ticket « crée la fiche agent de X, et la vacation de 12h à 19h » proposait « Joint — il est sur site », « Toujours injoignable », « Clore sans coche » : les actions d'un agent injoignable, dont le ticket héritait. Désormais on lit le texte : → Ouvrir Fiche agent · → Ouvrir le Planning · 📞 Appeler [RETIRE] · ✅ Fait · ❓ Je n'ai pas compris (cette dernière renvoie la question à l'expéditeur). Rejoué sur le ticket exact de Zeus."
+  },
+  {
+   "b": 350,
+   "titre": "Une photo présente sort de « sans photo », d'où qu'elle vienne — et le badge ne ment plus",
+   "source": "Zeus — 06/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Pastille 📷 → une prise sans photo affiche « ⏱ Pointé N min après l'heure prévue (heure du pointage — aucune photo) » au lieu de « Photo prise ». Mesuré : 208 lignes mentaient en b349, 0 en b354. Toutes les vues (Suivi site, pastilles 🦺 et 🌙, fiche vacation) interrogent la même fonction de vérité.",
+   "local": true
+  },
+  {
+   "b": 351,
+   "titre": "Chaque photo dit d'où elle vient : envoyée par l'agent, ou rattachée par l'agence",
+   "source": "Zeus — 06/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Sur la ligne de pastille ET sur le ticket de Suivi des appels : « 📲 Envoyée par l'agent », « 📎 Rattachée par l'agence — superviseur-1 le 06/08 », « 📷 Déposée sur le ticket — operateur-2 ». Cas Att Rac Ghs Luant Station Total : la ligne ne disparaît plus sans explication.",
+   "local": true
+  },
+  {
+   "b": 352,
+   "titre": "« 🗑 Retirer » ne disparaît plus en aperçu, et le superviseur y a droit",
+   "source": "Zeus — 06/08",
+   "theme": "Droits & rôles",
+   "pourquoipas": "Regarder l'appli en aperçu superviseur : le bouton « 🗑 Retirer » est là (32 lignes testées) — avant il s'évanouissait car l'aperçu écrase CLOUD.role. Réglable dans la grille des Droits (clé pp-retirer).",
+   "local": true
+  },
+  {
+   "b": 353,
+   "titre": "Écarter une photo sans la détruire",
+   "source": "Zeus — 06/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Dans « 📸 Photos terrain à rattacher » : « 🙈 Écarter » sort la photo de la file, elle reste sur le serveur et se reprend d'un clic depuis « 🙈 Écartées ». La suppression définitive reste à côté.",
+   "local": true
+  },
+  {
+   "b": 354,
+   "titre": "La galerie des photos ne s'arrête plus au 25e",
+   "source": "Zeus — 06/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "171 photos en attente, 25 affichées, 146 invisibles (27 du 05/08, 41 du 02/08…). Désormais 40 puis « ⬇️ Voir 40 de plus » / « 📜 Tout afficher », avec le reste toujours chiffré. Côté serveur, /photos pagine au lieu de couper à 500.",
+   "local": true
+  },
+  {
+   "b": 355,
+   "titre": "Les actions d'une photo de la galerie atteignent enfin l'écran",
+   "source": "trouvé en montant la démo — 06/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Sur chaque photo de « 📸 Photos terrain à rattacher » : le choix libre d'une vacation du jour, « 🦺 C'est une photo de contrôle », « 🙈 Écarter » et « 🗑 Supprimer la photo ». Ce bloc était construit dans le code mais jamais inséré dans le HTML — aucun de ces boutons n'existait à l'écran.",
+   "local": true
+  },
+  {
+   "b": 356,
+   "titre": "Écran « 🧹 Doublons certifiés » — nettoyage réversible, sans perdre les pointages",
+   "source": "Zeus — 06/08",
+   "theme": "Planning & import",
+   "pourquoipas": "Onglet 🧹 Doublons (super-admin) : 90 vacations en trop, certifiées par la Référence Sekur portée deux fois. 85 sans perte en un bouton, 5 dont les pointages n'existent que sur la copie sont d'abord REPORTÉS sur le contrôle équivalent (ctrl@2020 → ctrl@2010, décalage anti-collision). Tout se rétablit d'un clic, reports compris.",
+   "local": true
+  },
+  {
+   "b": 357,
+   "titre": "L'aperçu d'import dit tout — et sur quel identifiant il a tranché",
+   "source": "Zeus — 06/08",
+   "theme": "Planning & import",
+   "pourquoipas": "Colle le CSV Sekur d'août et clique Analyser : « 182 reconnues par 🔒 Référence Sekur · 9 par ❓ site+jour (à confirmer) · 2 ♻️ supprimées · 9 complétées (agent) · ⚠️ 3 où le fichier annonce un AUTRE agent ». Les désaccords d'agent affichent les DEUX numéros de téléphone et se tranchent d'un clic ; les rapprochements sans identifiant n'agissent que si tu coches. Garde-fou : une vacation portant une AUTRE Référence n'est plus confondue (13 cas dangereux sur ce seul fichier).",
+   "local": true
+  },
+  {
+   "b": 358,
+   "titre": "Mails missions : que des missions, les créneaux lus, et le mail retrouvé en un clic",
+   "source": "Zeus — 06/08",
+   "theme": "Mails & demandes",
+   "pourquoipas": "Section 📧 Mails missions : 33 mails de gardiennage/intervention au lieu de 120 (les 87 Ringover/LinkedIn/GetAccept sont comptés et consultables par « 📭 Voir les 87 hors sujet »). Chaque carte porte « 📧 Ouvrir ce mail dans Gmail » et « 🔎 Copier la recherche Gmail ». Les créneaux du mail entrent enfin dans les champs (date + heure de début + HEURE DE FIN). Et « ❌ PAS planifié » ne contredit plus « créée dans Suivi demandes ».",
+   "local": true
+  },
+  {
+   "b": 359,
+   "titre": "Compteur de photos sur chaque vignette du Planning",
+   "source": "Zeus — 06/08",
+   "theme": "Planning & import",
+   "pourquoipas": "Sur chaque vignette : « ✅ 2/2 », « ❗ 1/2 », « 📷 0/3 » en bas à droite — photos reçues sur photos attendues (prise, fin, contrôle tenue, contrôles des 2 h). Vert = complet, rouge = une échéance passée sans photo, orange = en cours. Rien ne s'affiche si la vacation n'attend aucune photo. Mesuré sur les vraies données : 75 compteurs sur 132 vignettes, rendu inchangé (~300 ms) grâce à une lecture mémorisée.",
+   "local": true
+  },
+  {
+   "b": 360,
+   "titre": "Une fiche de vacation ouverte ne perd plus son lien avec la base",
+   "source": "Zeus — 06/08",
+   "theme": "Planning & import",
+   "pourquoipas": "Ouvre une vacation au Planning, laisse la fiche ouverte le temps qu'une synchro passe, puis change l'heure de « Route (renseignements) » ou de « Pré-prise (J-15) » : la valeur tient. Avant, elle revenait toute seule au bout de quelques secondes — la fiche écrivait dans une copie orpheline, remplacée par l'arrivée du classeur commun. Les 10 gestes de la fiche sont protégés, pas seulement les heures.",
+   "local": true
+  },
+  {
+   "b": 361,
+   "titre": "Multi-création : on saisit une seule fois pour toutes les cases",
+   "source": "Zeus — 07/08",
+   "theme": "Planning & import",
+   "pourquoipas": "Planning → « ☐ Multi-créer » → clique plusieurs cases vides → « ➕ Créer N vacations » ouvre un FORMULAIRE UNIQUE : client, ville, heures début/fin, agent, qualification, appliqués aux N d'un coup. Pré-rempli avec ce que l'appli sait déjà du site (client, ville, horaires de la dernière vacation). Un agent inconnu est refusé, jamais créé à l'aveugle. Avant, les vacations naissaient nues et il fallait repasser sur chacune.",
+   "local": true
+  },
+  {
+   "b": 363,
+   "titre": "Les 4 gestes de la fiche vacation que j'avais oubliés",
+   "source": "Zeus — 07/08",
+   "theme": "Planning & import",
+   "pourquoipas": "Ouvre une vacation affectée au Planning et clique « ❌ Retirer » à côté de l'agent : il part vraiment. Idem pour le statut de la vacation, la date de fin et la suppression définitive. b360 avait protégé 10 gestes contre la copie orpheline — il en restait 4, dont celui-là. 15 gestes protégés au total, balayage exhaustif cette fois.",
+   "local": true
+  },
+  {
+   "b": 364,
+   "titre": "Photos terrain : deux vues (à rattacher / rattachées), chacune Aujourd'hui et Jours passés",
+   "source": "Zeus — 07/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Suivi des appels → « 📸 Photos terrain à rattacher » : deux boutons « 📎 À rattacher (171) » et « ✅ Rattachées (57) », et dans chacun « 📅 Aujourd'hui » / « 🕓 Jours passés ». La vue rattachées dit à QUELLE vacation et à quelle étape chaque photo est partie, qui l'a rattachée, et permet de « ↩️ Détacher » en cas d'erreur de vacation. Avant, une photo rattachée disparaissait : impossible de vérifier ni de corriger.",
+   "local": true
+  },
+  {
+   "b": 365,
+   "titre": "Un ticket se règle tout seul quand ce qu'il demandait a quitté la file",
+   "source": "Zeus — 07/08",
+   "theme": "Tickets",
+   "pourquoipas": "Envoie un ticket depuis une pastille (« 🎫 Demander un point »). Il affiche désormais son avancement RÉEL, relu dans la file : « 12 sur 25 réglées · 13 restantes » avec une barre. Quand les lignes visées ont toutes disparu, il passe en ✅ Fait tout seul, avec la trace « 🤖 Fermé automatiquement — les 25 lignes visées ont quitté la file ». Un ticket écrit à la main, sans contexte, continue de se fermer à la main.",
+   "local": true
+  },
+  {
+   "b": 366,
+   "titre": "La boucle complète d'un ticket : traité, consultable, renvoyable",
+   "source": "Zeus — 07/08",
+   "theme": "Tickets",
+   "pourquoipas": "Tu envoies un ticket au superviseur, il le traite, tu vois son avancement. Une fois clos, il descend dans « ✅ Traités — tout l'historique » : consultable quand tu le cherches, invisible quand tu travailles. Et « 🔄 Renvoyer — il reste un point » le fait repartir chez la même personne avec tout le fil, sans repartir de zéro. Le nombre de renvois s'affiche sur la carte.",
+   "local": true
+  },
+  {
+   "b": 367,
+   "titre": "Tuile 📥 « Photos reçues non rattachées » dans la pastille 📷",
+   "source": "Zeus — 07/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Pastille 📷 → 8e tuile « 📥 Photos reçues — non rattachées, aujourd'hui ». On clique : 📅 Aujourd'hui (depuis 00 h 00) / 🕓 Jours passés, la liste des photos avec leur heure et leur ville, et « 📎 Rapprocher cette photo » sans quitter la vue. Une photo entre en arrivant et n'en sort QUE rattachée ; à minuit le compteur repart, le retard descend dans « jours passés ». Les deux bouts du même trou sont enfin au même endroit.",
+   "local": true
+  },
+  {
+   "b": 368,
+   "titre": "La pastille 📷 passe de 8 tuiles à 5 — chacune dit ce que les autres ne disent pas",
+   "source": "Zeus — 07/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Pastille 📷 : « 🚫 Prises » et « 🚫 Fins » fusionnées en une seule « 🚫 Refus (2) » ; « 🗣️ Agent à contacter » (107) et « 🏢 Client à aviser » (106) supprimées — mesuré : elles étaient ENTIÈREMENT incluses dans « ⏱ Hors délai » (108), et 106 des 108 étaient dans les deux à la fois. Les deux cases d'action restent sur CHAQUE LIGNE (131 boutons sur 67 lignes vérifiés) : aucun geste perdu.",
+   "local": true
+  },
+  {
+   "b": 369,
+   "titre": "La règle du jour sur les tuiles « sans photo »",
+   "source": "Zeus — 07/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Pastille 📷 : les tuiles « Prises » et « Fins » comptent AUJOURD'HUI (9 et 1) au lieu de tout depuis le 01/08 (47 et 61), avec « + 38 jour(s) passé(s) » écrit dessous. Un mot sous les tuiles prévient que rien n'a disparu. ⚠️ Le BADGE de la pastille compte toujours tout (178) — il n'a pas été changé.",
+   "local": true
+  },
+  {
+   "b": 370,
+   "titre": "Le tampon de version redevient visible",
+   "source": "Zeus — 07/08",
+   "theme": "Divers",
+   "pourquoipas": "L'en-tête « GESTION v07-08·bNNN » était collé en haut de l'ÉCRAN, donc sous le bandeau de rôle en position fixe : il disparaissait. Il se cale maintenant juste sous le bandeau (vérifié : 66 px du haut). C'est la preuve visuelle qu'un déploiement est passé.",
+   "local": true
+  },
+  {
+   "b": 371,
+   "titre": "« c2syn » devient « Contrôle des 2 h »",
+   "source": "Zeus — 07/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Sous une photo rattachée, la fiche affichait la clé interne « c2syn » au lieu du nom de l'étape. On lit maintenant « Contrôle des 2 h » — et on voit donc immédiatement quand une photo est partie sur le mauvais ticket.",
+   "local": true
+  },
+  {
+   "b": 372,
+   "titre": "Plus de créneaux de contrôle inventés (choix A de Zeus)",
+   "source": "Zeus — 07/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Pastille 🌙 : 1140 → 279. L'appli fabriquait un créneau photo toutes les 2 h dès qu'une vacation commençait, même sans aucun contrôle planifié — d'où des lignes « Aucun appel contrôle pointé » incompréhensibles. Pire, tous partageaient la même clé c2syn : une photo rattachée à l'un se collait aux quatre sans en solder aucun. Elle ne réclame plus une photo que là où un contrôle existe vraiment. Contrepartie assumée : une vacation longue sans contrôle planifié ne réclame plus rien — on ajoute les contrôles depuis le Planning.",
+   "local": true
+  },
+  {
+   "b": 373,
+   "titre": "Le badge 📷 ne compte plus que ce qui demande une action maintenant",
+   "source": "Zeus — 07/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Badge de la pastille 📷 : 178 → 14. Il compte les prises/fins sans photo D'AUJOURD'HUI + tous les refus (un refus ne se périme pas). Le retard et les « hors délai » restent lisibles dans les tuiles. Avant, les tuiles disaient 9 et 1 pendant que le badge disait 178 — deux chiffres pour la même pastille.",
+   "local": true
+  },
+  {
+   "b": 374,
+   "titre": "« + 38 jour(s) passé(s) » devient cliquable",
+   "source": "Zeus — 07/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Sous chaque tuile « sans photo », la mention du retard s'ouvre d'un clic sur les lignes concernées (vérifié : 38 lignes). Avant il fallait cliquer la tuile puis le palier. Ce qu'on lit doit être ce qu'on touche.",
+   "local": true
+  },
+  {
+   "b": 375,
+   "titre": "Les cinq dernières vues qui ignoraient les photos rattachées",
+   "source": "audit du 07/08 — signalé par Zeus",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Fiche agent (stats prises/fins), contrôles sans photo, compteur de photos d'une vacation, anomalie « contrôle tenue fait SANS photo », et supervision : ces cinq vues gardaient leur propre test et rataient les photos rattachées par l'agence, retrouvées dans l'archive ou désignées comme tenue. Elles interrogent désormais phAUnePhoto, comme le reste. C'était le symptôme de Zeus : « des photos rattachées qui ne sont pas prises en compte par certaines vues ».",
+   "local": true
+  },
+  {
+   "b": 376,
+   "titre": "Un filtre de date dans « Choisir une photo reçue »",
+   "source": "capture de Zeus, 07/08 — « c'est limité au 5 août »",
+   "theme": "Tenues & photos",
+   "pourquoipas": "La liste montrait les 60 photos les plus récentes, quelle que soit la vacation : un ticket du 04/08 ne voyait AUCUNE de ses 32 photos, un ticket du 26/07 aucune de ses 8. La liste s'ouvre désormais sur le jour du ticket, avec un sélecteur de date pour élargir et un bouton « Toutes les dates » pour tout revoir. Sans ticket (photo de tenue), rien ne change.",
+   "local": true
+  }
+ ],
+ "attente": [
+  {
+   "titre": "Bloc « flux demande propre » b138–b146 : test guidé par Zeus",
+   "source": "file ancienne",
+   "note": "codé depuis le 01/08, jamais validé"
+  },
+  {
+   "titre": "Backfill des mails SECURITAS / RANC + mails de juin",
+   "source": "chantier mails"
+  },
+  {
+   "titre": "Corbeille (b230) : Zeus signale que ça ne marche pas",
+   "source": "Zeus 03/08",
+   "urgent": true,
+   "note": "en attente du geste exact pour reproduire"
+  },
+  {
+   "titre": "Ringover : les demandes prises par téléphone ne remontent pas dans « En recherche »",
+   "source": "Zeus — 05/08",
+   "note": "DIAGNOSTIC FAIT le 05/08 : la chaîne serveur est complète et fonctionne (Ringover → enregistrement → transcription Whisper → analyse Claude → création). Les 6 numéros suivis sont bien reconnus quel que soit le format, 11 à 22 appels passent les filtres chaque jour, et les enregistrements sont disponibles. Le cron est passé de 2 min à 1 min (b327). Le délai constaté (6 min) vient de l'attente de mise à disposition de l'enregistrement CHEZ RINGOVER, pas de l'appli — b323 affiche désormais cette décomposition sur chaque demande. RESTE : mesurer précisément ce délai côté Ringover pour le leur opposer, et voir le verdict d'analyse appel par appel (table ai_calls non lisible avec l'accès local — nécessiterait un écran de diagnostic côté serveur)."
+  },
+  {
+   "titre": "Audit des sections encore non couvertes",
+   "source": "audit complet 05/08",
+   "note": "Thiam, Zone à couvrir, Interventions, Tickets, Dépôts, Reste ST, Terrain — ouvertes sans erreur mais leur logique propre n'a pas été testée avec des données dédiées."
+  },
+  {
+   "titre": "Balayage final « oubli du filtre des vacations supprimées »",
+   "source": "audit complet 05/08",
+   "note": "17 occurrences corrigées (b309/b310/b311). Balayer tout le code pour cette signature afin de fermer la famille définitivement."
+  },
+  {
+   "titre": "Traçabilité appel→demande pour les demandes DÉJÀ en recherche",
+   "source": "Zeus — 05/08",
+   "note": "b323 n'affiche le délai que pour les demandes à venir : l'heure de l'appel n'était pas retenue avant. Pour les anciennes, il faudrait redemander les heures au serveur — mais /ringover/calls ne renvoie pas encore l'identifiant de l'appel, donc une modification du Worker serait nécessaire. À faire seulement si Zeus le juge utile."
+  },
+  {
+   "titre": "Délai Ringover : mesurer le temps de mise à disposition des enregistrements",
+   "source": "audit 05/08",
+   "note": "Le serveur ne peut analyser un appel que si son enregistrement audio est publié. C'est là qu'est passé l'essentiel des 6 minutes constatées, pas dans la fréquence de passage (descendue à 1 min en b327). Mesurer ce délai sur quelques appels donnerait un chiffre solide à opposer à Ringover."
+  },
+  {
+   "titre": "PP_START figé au 01/08/2026 dans le code",
+   "source": "audit 05/08",
+   "note": "La borne de départ des pastilles est écrite en dur (frMs('2026-08-01',480)). Elle vieillira : dans un mois les pastilles remonteront sur 30 jours, dans un an sur 365. À remplacer par une fenêtre glissante."
+  },
+  {
+   "titre": "Chemin complet : par où un opérateur signale une anomalie",
+   "source": "Zeus — 05/08",
+   "note": "L'opérateur ne voit pas la pastille ⚠️ Anomalies (prévu depuis l'origine). Vérifier par quel chemin il signale une anomalie (bulle Assistant ? SOS de Suivi des appels ?) et que cela remonte bien jusqu'au superviseur, de bout en bout."
+  }
+ ],
+ "decide": [
+  {
+   "titre": "Sélection multiple de vacations au Planning + modification en lot",
+   "source": "JULES — remontées #65/#66",
+   "urgent": true,
+   "note": "reçu, pas encore cadré : quelles actions en lot exactement ?"
+  },
+  {
+   "titre": "Import CSV : si la vacation existe sans agent et que le CSV en apporte un, reprendre l'affectation au lieu de créer un doublon",
+   "source": "remontée #64",
+   "note": "règle validée par Zeus, à coder"
+  },
+  {
+   "titre": "Import CSV : détecter les quasi-doublons (même site, même date, horaires différents) et les signaler au lieu de les créer",
+   "source": "remontées #58/#59"
+  },
+  {
+   "titre": "Pastille 🌙 : tenir compte de l'heure du premier contrôle dans « avant / en cours »",
+   "source": "remontée #55"
+  },
+  {
+   "titre": "Responsable secteur = mission TOUJOURS non affectée",
+   "source": "Zeus — 05/08",
+   "urgent": true,
+   "note": "Affecter un responsable secteur ne pourvoit pas la mission : il doit ensuite rendre le nom, prénom et contact du vrai agent. La mission doit donc RESTER dans « Validées → Non affectées », et on doit pouvoir y voir la liste de celles confiées à un responsable secteur, en attente de retour. La case « 🧭 Responsable secteur » existe déjà sur la fiche agent (fa-respsecteur) — reste à voir sous quel champ elle est enregistrée et à en tenir compte partout où l'on teste agentId."
+  },
+  {
+   "titre": "Contrôle superviseur : délai entre la demande et chaque action",
+   "source": "Zeus — 05/08",
+   "note": "Section réservée au super-administrateur. Pour chaque demande tombée en recherche : ce que le superviseur a fait dans « Agents proches » (appel en cours, appel passé, message envoyé…) et au bout de combien de temps. Et surtout : marquer les demandes où RIEN n'a été fait. À vérifier d'abord : l'appli enregistre-t-elle l'HEURE de ces actions, ou seulement le fait qu'elles ont eu lieu ? Sans horodatage, il faut d'abord l'ajouter — et cela ne vaudra que pour les actions futures."
+  },
+  {
+   "titre": "Heure de fin manquante sur les vacations créées depuis un mail",
+   "source": "audit 05/08",
+   "urgent": true,
+   "note": "Toute vacation née d'un mail naît avec mfin vide (écrit en dur). Conséquences : elle ne compte pas dans le total des heures, n'a ni fin de service à pointer ni contrôles. Le serveur ne demande à l'IA que la date et l'heure de DÉBUT du bon de commande. Corriger demande de modifier le prompt du Worker puis de le redéployer. C'est le plus utile de ce qui reste : cela touche toutes les missions venues de bons de commande."
+  }
+ ]
 }
