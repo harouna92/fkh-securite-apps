@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b365</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b366</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -6162,8 +6162,11 @@ button.big:active{transform:translateY(1px)}
     function carte(t,mien){
       var e=TK_ETATS[t.etat]||TK_ETATS.a_faire;
       var d=new Date(t.cree), dt=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' '+('0'+d.getHours()).slice(-2)+'h'+('0'+d.getMinutes()).slice(-2);
+      var _rv=(t.renvois||0);   /* b366 */
       var h='<div class="card" style="border-left:4px solid '+e[1]+'"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
-        +'<b style="flex:1;min-width:140px">'+esc(t.objet)+'</b><span style="color:'+e[1]+';font-weight:700">'+e[0]+'</span></div>'
+        +'<b style="flex:1;min-width:140px">'+esc(t.objet)+'</b>'
+        +(_rv?('<span class="sub" style="margin:0;color:#a99bff;font-weight:700">\ud83d\udd04 renvoy\u00e9 '+_rv+' fois</span>'):'')
+        +'<span style="color:'+e[1]+';font-weight:700">'+e[0]+'</span></div>'
         +'<div class="sub" style="margin:3px 0 0">'+(mien?('à '+esc(t.pourRole||t.pourUser||'—')):('de '+esc(t.deNom||'—')))+' · '+dt
           +(mien?(t.vuAt?(' · <span style="color:#1a9e5c">\u2705 vu le '+(function(){var v=new Date(t.vuAt);return ('0'+v.getDate()).slice(-2)+'/'+('0'+(v.getMonth()+1)).slice(-2)+' à '+('0'+v.getHours()).slice(-2)+' h '+('0'+v.getMinutes()).slice(-2);})()+(t.vuPar?(' par '+esc(t.vuPar)):'')+'</span>')
                      :' · <span style="color:#e0a13b">\u23F3 pas encore ouvert</span>'):'')
@@ -6189,12 +6192,30 @@ button.big:active{transform:translateY(1px)}
       }
       h+='<div class="acts" style="margin-top:8px;gap:6px;flex-wrap:wrap">'
         +Object.keys(TK_ETATS).map(function(k){ return '<button type="button" class="tkx-e" data-id="'+esc(t.id)+'" data-e="'+k+'" style="font-size:12px'+(t.etat===k?';border-color:'+TK_ETATS[k][1]:'')+'">'+TK_ETATS[k][0]+'</button>'; }).join('')
-        +'<button type="button" class="tkx-r" data-id="'+esc(t.id)+'" style="font-size:12px">💬 Répondre</button></div>';
+        +'<button type="button" class="tkx-r" data-id="'+esc(t.id)+'" style="font-size:12px">💬 Répondre</button>'
+        /* b366 : une fois clos, le demandeur peut RENVOYER le ticket avec un point en plus. Il
+           repart chez la meme personne, avec tout l'historique — on ne repart pas de zero. */
+        +((mien&&t.etat==='fait')?('<button type="button" class="tkx-renv" data-id="'+esc(t.id)+'" style="font-size:12px;border-color:#7b61ff;color:#a99bff">\ud83d\udd04 Renvoyer — il reste un point</button>'):'')
+        +'</div>';
       return h+'</div>';
     }
     var out='';
-    if(recus.length)out+='<div class="lab" style="margin:10px 0 5px">📥 Ce qu’on me demande ('+recus.length+')</div>'+recus.map(function(t){return carte(t,false);}).join('');
-    if(envoyes.length)out+='<div class="lab" style="margin:14px 0 5px">📤 Ce que j’ai demandé ('+envoyes.length+')</div>'+envoyes.map(function(t){return carte(t,true);}).join('');
+    /* ===== b366 : CE QUI EST CLOS NE POLLUE PLUS CE QUI RESTE A FAIRE =====
+       Tout etait empile dans la meme liste : un ticket regle la semaine derniere se lisait comme un
+       ticket en attente. Les clos descendent donc dans un depliant — consultables quand on les
+       cherche, invisibles quand on travaille. Rien n'est perdu : l'historique complet reste dans
+       la carte, et le demandeur peut la renvoyer d'un clic. */
+    function ouvert(t){ return t.etat!=='fait'; }
+    var recusO=recus.filter(ouvert), recusC=recus.filter(function(t){return !ouvert(t);});
+    var envO=envoyes.filter(ouvert), envC=envoyes.filter(function(t){return !ouvert(t);});
+    if(recusO.length)out+='<div class="lab" style="margin:10px 0 5px">📥 Ce qu’on me demande ('+recusO.length+')</div>'+recusO.map(function(t){return carte(t,false);}).join('');
+    if(envO.length)out+='<div class="lab" style="margin:14px 0 5px">📤 Ce que j’ai demandé ('+envO.length+')</div>'+envO.map(function(t){return carte(t,true);}).join('');
+    if(recusC.length||envC.length){   /* b366 : la consultation des tickets traites */
+      out+='<details style="margin-top:14px"><summary style="cursor:pointer;font-weight:700;color:#1a9e5c">\u2705 Traités ('+(recusC.length+envC.length)+') — tout l’historique</summary><div style="margin-top:8px">'
+        +(recusC.length?('<div class="lab" style="margin:4px 0">📥 qu’on m’avait demandé</div>'+recusC.map(function(t){return carte(t,false);}).join('')):'')
+        +(envC.length?('<div class="lab" style="margin:10px 0 4px">📤 que j’avais demandé</div>'+envC.map(function(t){return carte(t,true);}).join('')):'')
+        +'</div></details>';
+    }
     return out;
   }
   /* ===== b275 : ACCUSE DE RECEPTION =====
@@ -6213,6 +6234,20 @@ button.big:active{transform:translateY(1px)}
   function tkxWire(wrap){
     wrap.querySelectorAll('.tkx-e').forEach(function(b){ b.onclick=function(){ tkxRepondre(b.getAttribute('data-id'),b.getAttribute('data-e'),''); }; });
     wrap.querySelectorAll('.tkx-r').forEach(function(b){ b.onclick=function(){ var m=prompt('Ta réponse :'); if(m)tkxRepondre(b.getAttribute('data-id'),'',m); }; });
+    /* b366 : RENVOYER — le ticket repart chez la meme personne, avec un point en plus et tout
+       son historique. On ne recree pas un ticket : c'est le meme dossier qui continue, sinon on
+       perdrait le fil de ce qui a deja ete fait. */
+    wrap.querySelectorAll('.tkx-renv').forEach(function(b){ b.onclick=function(){
+      var m=prompt('Qu\u2019est-ce qu\u2019il reste \u00e0 faire ?\n\nLe ticket repart chez la m\u00eame personne, avec tout l\u2019historique.');
+      if(!m)return;
+      var id=b.getAttribute('data-id'), arr=tkxLoad();
+      for(var i=0;i<arr.length;i++){ if(arr[i].id!==id)continue;
+        arr[i].renvois=(arr[i].renvois||0)+1; arr[i].renvoyeAt=Date.now();
+        delete arr[i].autoFait; delete arr[i].autoDe;   /* il redevient un ticket vivant */
+        break; }
+      tkxSave(arr);
+      tkxRepondre(id,'a_faire','\ud83d\udd04 Renvoy\u00e9 : '+m);
+    }; });
   }
   function renderTickets(){
     var wrap=byId('tk-body'); if(!wrap)return; var T=tkLoad();

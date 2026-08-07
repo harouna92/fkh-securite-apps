@@ -880,6 +880,14 @@
       "theme": "Tickets",
       "pourquoipas": "Envoie un ticket depuis une pastille (« 🎫 Demander un point »). Il affiche désormais son avancement RÉEL, relu dans la file : « 12 sur 25 réglées · 13 restantes » avec une barre. Quand les lignes visées ont toutes disparu, il passe en ✅ Fait tout seul, avec la trace « 🤖 Fermé automatiquement — les 25 lignes visées ont quitté la file ». Un ticket écrit à la main, sans contexte, continue de se fermer à la main.",
       "local": true
+    },
+    {
+      "b": 366,
+      "titre": "La boucle complète d'un ticket : traité, consultable, renvoyable",
+      "source": "Zeus — 07/08",
+      "theme": "Tickets",
+      "pourquoipas": "Tu envoies un ticket au superviseur, il le traite, tu vois son avancement. Une fois clos, il descend dans « ✅ Traités — tout l'historique » : consultable quand tu le cherches, invisible quand tu travailles. Et « 🔄 Renvoyer — il reste un point » le fait repartir chez la même personne avec tout le fil, sans repartir de zéro. Le nombre de renvois s'affiche sur la carte.",
+      "local": true
     }
   ],
   "attente": [
