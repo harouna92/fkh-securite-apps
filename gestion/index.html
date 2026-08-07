@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b363</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b364</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -7774,7 +7774,21 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     alert('📎 Photo rattachée (étape « '+(PH_STEP_LBL[sk]||sk)+' »).'); phRender(); }
   // ===== 📸 Photos à rattacher (remontées #7/#14/#19) : lien UNIQUE (u/) ou lien agent (agent/) → association à une étape de vacation → le ticket de la file est RÉGLÉ avec preuve photo. =====
   var SA_PH=null;
-  var SA_PH_ALL=[], SA_PH_EC=[], SA_PH_PAS=40, SA_PH_N=40;   /* b354 : la file complète, les écartées, la tranche affichée */
+  var SA_PH_ALL=[], SA_PH_EC=[], SA_PH_PAS=40, SA_PH_N=40;
+  var SA_PH_FAIT=[], SA_PH_VUE='arat', SA_PH_JOUR=null;   /* b364 : vue courante (à rattacher / rattachées) et palier de jour */
+  /* b364 : à QUELLE vacation cette photo est-elle rattachée ? On le dit, sinon « rattachée » ne veut rien dire. */
+  function phOuEstElle(key){
+    try{ var S=ssLoad();
+      for(var mid in S){ var st=S[mid]||{};
+        for(var k in st){ if(st[k]&&st[k].photoKey===key){
+          var m=null; for(var i=0;i<(SUIVI||[]).length;i++)if(String(SUIVI[i].id)===String(mid)){m=SUIVI[i];break;}
+          return {mid:mid, cle:k, site:(m&&(m.siteAgent||m.titre))||'(vacation supprimée)', mdate:(m&&m.mdate)||'',
+                  etape:(typeof PH_STEP_LBL!=='undefined'&&PH_STEP_LBL[k])||k,
+                  par:(st[k].by||''), man:!!st[k].man, at:st[k].at||0};
+        } } }
+    }catch(e){}
+    return null;
+  }   /* b354 : la file complète, les écartées, la tranche affichée */
   /* b354 : une photo traitée (rattachée, supprimée) quitte la file COMPLÈTE, pas seulement la tranche
      visible — sinon elle réapparaissait au « voir plus » suivant. */
   function _phSortirDeLaFile(it){
@@ -7834,7 +7848,17 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     box.innerHTML=head;
     if(byId('sa-ph-scan'))byId('sa-ph-scan').onclick=function(){ var b=this; if(typeof CLOUD==='undefined'||!CLOUD.on){ alert('Connecte-toi (en ligne) : les photos sont dans le cloud.'); return; } b.disabled=true; b.textContent='⏳ …';
       photoList('u/',function(k1){ photoList('agent/',function(k2){ b.disabled=false; b.textContent='🔄 Charger les photos reçues';
-        var items=[].concat((k1||[]).map(function(o){return _phParseU((o&&o.key)||o);}),(k2||[]).map(function(o){return phParseKey((o&&o.key)||o);})).filter(Boolean).filter(function(it){ return !phIsAttached(it.key); });
+        var _tous=[].concat((k1||[]).map(function(o){return _phParseU((o&&o.key)||o);}),(k2||[]).map(function(o){return phParseKey((o&&o.key)||o);})).filter(Boolean);
+        /* ===== b364 : DEUX VUES — CE QUI RESTE À FAIRE, ET CE QUI EST FAIT =====
+           POURQUOI (Zeus, 07/08) : le bloc ne montrait QUE les photos non rattachées. Une fois rattachée,
+           une photo disparaissait — impossible de vérifier ce qu'on avait fait, ni de se rendre compte
+           qu'on s'était trompé de vacation. Et tout était mélangé dans le temps : une photo de ce matin,
+           qu'on peut encore corriger à chaud, se noyait dans celles de la semaine.
+           DÉSORMAIS : deux vues — 📎 à rattacher / ✅ rattachées — et dans chacune, 📅 aujourd'hui et
+           🕓 jours passés, comme partout ailleurs dans l'appli. */
+        SA_PH_FAIT=_tous.filter(function(it){ return phIsAttached(it.key); }).map(function(it){ it.vac=phOuEstElle(it.key); return it; });
+        SA_PH_FAIT.sort(function(a,b2){return (b2.ts||0)-(a.ts||0);});
+        var items=_tous.filter(function(it){ return !phIsAttached(it.key); });
         items.sort(function(a,b2){return (b2.ts||0)-(a.ts||0);});
         /* ===== b354 : LA GALERIE NE S'ARRÊTE PLUS AU 25e =====
            POURQUOI (Zeus, 06/08 : « la galerie s'arrête au 5 août ») : mesuré sur les vraies photos —
@@ -8134,8 +8158,74 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     out.sort(function(a,b){ var sa=(a.m.siteAgent||a.m.titre||''),sb=(b.m.siteAgent||b.m.titre||''); return sa<sb?-1:sa>sb?1:(a.t-b.t); });
     return out;
   }
+  /* b364 : les deux vues + les deux paliers de jour, en tete du bloc. */
+  function _phBarre(){
+    var ajd=(typeof impTodayISO==='function')?impTodayISO():'';
+    function jourDe(it){ try{ return (typeof phDateISO==='function')?phDateISO(it.ts):''; }catch(e){ return ''; } }
+    var arat=(SA_PH_ALL||[]), fait=(SA_PH_FAIT||[]);
+    var src=(SA_PH_VUE==='fait')?fait:arat;
+    var duJour=src.filter(function(it){ return jourDe(it)===ajd; });
+    var avant=src.filter(function(it){ return jourDe(it)!==ajd; });
+    var h='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      +'<button type="button" class="ph-vue" data-v="arat" style="font-size:12.5px'+(SA_PH_VUE==='arat'?';border-color:#e0a13b;color:#e0a13b;font-weight:700':'')+'">📎 À rattacher ('+arat.length+')</button>'
+      +'<button type="button" class="ph-vue" data-v="fait" style="font-size:12.5px'+(SA_PH_VUE==='fait'?';border-color:var(--ok);color:var(--ok);font-weight:700':'')+'">✅ Rattachées ('+fait.length+')</button>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      +'<button type="button" class="ph-jour" data-j="j" style="font-size:12.5px'+(SA_PH_JOUR==='j'?';border-color:#6ea8fe;color:#6ea8fe;font-weight:700':'')+'">📅 Aujourd\u2019hui ('+duJour.length+')</button>'
+      +'<button type="button" class="ph-jour" data-j="p" style="font-size:12.5px'+(SA_PH_JOUR==='p'?';border-color:#e0a13b;color:#e0a13b;font-weight:700':'')+'">🕓 Jours passés ('+avant.length+')</button>'
+      +(SA_PH_JOUR?('<button type="button" class="ph-jour" data-j="" style="font-size:12.5px">↺ Les deux</button>'):'')
+      +'</div>';
+    return {html:h, duJour:duJour, avant:avant, liste:(SA_PH_JOUR==='j'?duJour:(SA_PH_JOUR==='p'?avant:src))};
+  }
+  function _phWireBarre(list){
+    list.querySelectorAll('.ph-vue').forEach(function(b){ b.onclick=function(){ SA_PH_VUE=b.getAttribute('data-v'); SA_PH_N=SA_PH_PAS; _phFillList(); }; });
+    list.querySelectorAll('.ph-jour').forEach(function(b){ b.onclick=function(){ SA_PH_JOUR=b.getAttribute('data-j')||null; SA_PH_N=SA_PH_PAS; _phFillList(); }; });
+  }
+  /* b364 : la vue « rattachees » — on ne propose plus de rattacher, on montre OU c'est parti et on
+     laisse defaire si on s'est trompe de vacation. */
+  function _phFillFait(list){
+    var B=_phBarre(), L=B.liste.slice(0,SA_PH_N);
+    var h=B.html;
+    if(!L.length){ h+='<div class="sub" style="margin:0">Aucune photo rattachée sur cette période.</div>'; }
+    else h+=L.map(function(it){
+      var v=it.vac||{}, d=it.ts?new Date(it.ts):null;
+      var quand=(d?(('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' à '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)):'?');
+      return '<div style="border:1px solid var(--line);border-left:3px solid var(--ok);border-radius:9px;padding:7px;margin-bottom:6px;background:var(--panel2)">'
+        +'<div style="display:flex;gap:8px;align-items:flex-start">'
+        +'<div style="flex:0 0 auto">'+((typeof photoThumbTag==='function')?photoThumbTag(it.key):'')+'</div>'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:12px"><b>🕐 '+esc(quand)+'</b>'+(it.city?(' · 📍 '+esc(String(it.city).replace(/_/g,' '))):'')+'</div>'
+        +'<div class="fa-d" style="margin-top:3px">✅ rattachée à <b>'+esc(v.site||'—')+'</b>'+(v.mdate?(' <span class="sub" style="margin:0">'+esc(String(v.mdate).split('-').reverse().join('/'))+'</span>'):'')+'</div>'
+        +'<div class="sub" style="margin:2px 0 0;font-size:11.5px">'+esc(v.etape||'')+(v.man?' · 📎 rattachée par l\u2019agence':' · 📲 envoyée par l\u2019agent')+(v.par?(' — '+esc(v.par)):'')+'</div>'
+        +'<div class="acts" style="margin-top:6px"><button type="button" class="ph-defaire" data-k="'+esc(it.key)+'" data-mid="'+esc(v.mid||'')+'" data-cle="'+esc(v.cle||'')+'" style="font-size:11.5px;color:#e0a13b;border-color:#e0a13b">↩️ Détacher (erreur de vacation)</button></div>'
+        +'</div></div></div>';
+    }).join('');
+    var reste=Math.max(0,B.liste.length-L.length);
+    h+='<div class="acts" style="margin-top:8px;gap:8px;align-items:center;flex-wrap:wrap"><span class="sub" style="margin:0;font-size:11.5px">'+L.length+' affichée(s) sur <b>'+B.liste.length+'</b>'+(reste?(' · <b style="color:#e0a13b">'+reste+' encore à voir</b>'):' · tout est affiché')+'</span>'
+      +(reste?('<button type="button" id="ph-fait-plus" class="ok" style="font-size:11.5px">⬇️ Voir '+Math.min(reste,SA_PH_PAS)+' de plus</button>'):'')+'</div>';
+    list.innerHTML=h;
+    if(typeof photoHydrate==='function')photoHydrate(list);
+    _phWireBarre(list);
+    var bp=byId('ph-fait-plus'); if(bp)bp.onclick=function(){ SA_PH_N+=SA_PH_PAS; _phFillList(); };
+    list.querySelectorAll('.ph-defaire').forEach(function(b){ b.onclick=function(){
+      var mid=b.getAttribute('data-mid'), cle=b.getAttribute('data-cle'), k=b.getAttribute('data-k');
+      if(!mid||!cle){ alert('Impossible de retrouver l\u2019étape : la vacation a peut-être été supprimée.'); return; }
+      if(!confirm('Détacher cette photo ?\n\nElle revient dans « À rattacher ». Rien n\u2019est supprimé.'))return;
+      try{ var S=ssLoad(); if(S[mid]&&S[mid][cle]){ delete S[mid][cle].photoKey; delete S[mid][cle].man; ssSave(S); } }catch(e){}
+      SA_PH_FAIT=(SA_PH_FAIT||[]).filter(function(x){return x.key!==k;});
+      SA_PH_ALL.unshift({key:k, ts:(typeof phTsDeCle==='function')?phTsDeCle(k):0, city:'', fmt:(String(k).indexOf('u/')===0?'uni':'agent')});
+      SA_PH_ALL.sort(function(a,b2){return (b2.ts||0)-(a.ts||0);});
+      SA_PH=SA_PH_ALL.slice(0,SA_PH_N);
+      renderSaPhotosIn(); _phFillList();
+      if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
+      if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
+    }; });
+  }
   function _phFillList(){ var list=byId('sa-ph-list'); if(!list||!SA_PH)return;
-    list.innerHTML=SA_PH.map(function(it,i){ var when=(phDateISO(it.ts)?phDateISO(it.ts).split('-').reverse().join('/'):'?')+' à '+phHM(it.ts); var city=(it.city||'').replace(/_/g,' ');
+    if(SA_PH_VUE==='fait'){ _phFillFait(list); return; }   /* b364 */
+    var _B=_phBarre();                                  /* b364 : meme barre dans les deux vues */
+    SA_PH=_B.liste.slice(0,SA_PH_N);
+    list.innerHTML=_B.html+SA_PH.map(function(it,i){ var when=(phDateISO(it.ts)?phDateISO(it.ts).split('-').reverse().join('/'):'?')+' à '+phHM(it.ts); var city=(it.city||'').replace(/_/g,' ');
       var cands=_phCandidates(it);
       var btns=cands.length?cands.map(function(c){ var site=c.m.siteAgent||c.m.titre||'—'; var ag=(c.m.agentId&&typeof faById==='function'&&faById(c.m.agentId))?faById(c.m.agentId).nom:''; return '<button type="button" class="sa-ph-att" data-i="'+i+'" data-mid="'+esc(c.m.id)+'" data-step="'+esc(c.step)+'" style="font-size:11.5px;margin:2px 4px 0 0;'+(c.done?'opacity:.55;':'')+(c.cityMatch?'border-color:var(--ok);':'')+(c.late?'border-color:#e0a13b;':'')+'">'+_phStepLbl(c.step)+' '+esc(site)+' '+esc(c.hm||'')+(ag?' · '+esc(ag):'')+(c.cityMatch?' 📍':'')+(c.late?' (décalé)':'')+(c.done?' (déjà coché)':'')+'</button>'+'<button type="button" class="sa-ph-att" data-i="'+i+'" data-mid="'+esc(c.m.id)+'" data-step="tenue" title="Associer comme CONTRÔLE TENUE de '+esc(site)+' (part en validation superviseur — 🧭 Terrain)" style="font-size:11.5px;margin:2px 6px 0 0;border-color:#7b61ff;color:#a99bff">🦺</button>'; }).join(''):'<span class="sub" style="font-size:11.5px">aucune vacation proche trouvée ce jour-là (±3 h)</span>';
       var _dlid='sa-ph-dl-'+i;
@@ -8189,6 +8279,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
           SA_PH=SA_PH_ALL.slice(0,SA_PH_N); renderSaPhotosIn(); _phFillList(); }); }; });
     })();
     if(typeof photoHydrate==='function')photoHydrate(list);
+    _phWireBarre(list);   /* b364 */
     /* b353 : écarter — la photo sort de la file, reste sur le serveur, revient d'un clic. */
     list.querySelectorAll('.sa-ph-ec').forEach(function(b){ b.onclick=function(){
       var i=+b.getAttribute('data-i'), it=SA_PH&&SA_PH[i]; if(!it)return;
