@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b372</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b374</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -8925,6 +8925,17 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
         n.textContent=Lp.length?Lp.length:'!'; n.style.display='';
         b.title=Lp.length?('Au PC : '+Lp.map(function(x){return x.agent;}).join(', ')):'PERSONNE AU PC';
         return; }
+      /* b373 (choix B de Zeus) : le badge de 📷 ne compte QUE ce qui demande une action
+         maintenant — le manque du JOUR et les refus (un refus ne se perime pas). Les jours
+         passes et les « hors delai » restent lisibles dans les tuiles. Un compteur qui ne peut
+         que monter finit par ne plus etre regarde. */
+      if(!hide&&k==='ph'){ var _aj=(typeof impTodayISO==='function')?impTodayISO():'';
+        var _n=(sc.ph||[]).filter(function(x){
+          if(x.sousvue==='refus')return true;
+          return (x.sousvue||'manq')==='manq'&&(x.mdate||'')===_aj; }).length;
+        n.textContent=_n; n.style.display=_n?'block':'none';
+        b.title=_n?(_n+' photo(s) à obtenir aujourd’hui (refus compris) — le retard est dans les tuiles')
+                 :'Rien à obtenir aujourd’hui'; return; }
       if(!hide){ var L=sc[k]; n.textContent=L.length; n.style.display=L.length?'block':'none'; } });
     if(!any)return;
     if(hide){ if(PP_VIEW.mode)ppClose(); return; }
@@ -9276,7 +9287,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       var _ajd369=(typeof impTodayISO==='function')?impTodayISO():'';
       function _nj(a2,k){ return a2.filter(function(x){return x.key===k&&(x.mdate||'')===_ajd369;}).length; }
       function _retard(a2,k){ var r=a2.filter(function(x){return x.key===k&&(x.mdate||'')!==_ajd369;}).length;
-        return r?('<br><span style="color:#e0a13b">+ '+r+' jour(s) pass\u00e9(s)</span>'):''; }
+        return r?('<br><span class="pp-retard" data-k="'+k+'" style="color:#e0a13b;text-decoration:underline;cursor:pointer" title="Voir les jours passes">+ '+r+' jour(s) pass\u00e9(s)</span>'):''; }   /* b374 : ce qu'on lit doit etre ce qu'on touche */
       function _tuile(sub,nb,titre,soustitre,couleur){
         return '<div class="pp-tile" data-sub="'+sub+'"'+(couleur?(' style="border-color:'+couleur+'"'):'')+'><b>'+nb+'</b>'+titre
           +'<br><span class="sub" style="margin:0;font-size:11.5px">'+soustitre+'</span></div>';
@@ -9430,6 +9441,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     box.querySelectorAll('.an-ko').forEach(function(b){ b.onclick=function(){ annulTrancher(b.getAttribute('data-id'),false); }; });
     var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitter():pcPrendre(); ppRender(); };
         var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.jour!=null){PP_VIEW.jour=null;} else if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };   /* b332 */
+    box.querySelectorAll('.pp-retard').forEach(function(r){ r.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); PP_VIEW.sub=r.getAttribute('data-k'); PP_VIEW.jour='p'; ppRender(); }; });   /* b374 : intercepte AVANT la tuile, sinon on ouvre le jour */
     box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else if(t.getAttribute('data-sub')!=null){PP_VIEW.sub=t.getAttribute('data-sub'); PP_VIEW.jour=null;} ppRender(); }; });   /* b332 : on repart du palier */
     box.querySelectorAll('.pp-jr').forEach(function(b){ b.onclick=function(){ PP_VIEW.jour=b.getAttribute('data-j'); ppRender(); }; });
     /* b336 : ouvrir le rapprochement sur la photo choisie */

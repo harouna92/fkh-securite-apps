@@ -936,6 +936,22 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Pastille 🌙 : 1140 → 279. L'appli fabriquait un créneau photo toutes les 2 h dès qu'une vacation commençait, même sans aucun contrôle planifié — d'où des lignes « Aucun appel contrôle pointé » incompréhensibles. Pire, tous partageaient la même clé c2syn : une photo rattachée à l'un se collait aux quatre sans en solder aucun. Elle ne réclame plus une photo que là où un contrôle existe vraiment. Contrepartie assumée : une vacation longue sans contrôle planifié ne réclame plus rien — on ajoute les contrôles depuis le Planning.",
       "local": true
+    },
+    {
+      "b": 373,
+      "titre": "Le badge 📷 ne compte plus que ce qui demande une action maintenant",
+      "source": "Zeus — 07/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Badge de la pastille 📷 : 178 → 14. Il compte les prises/fins sans photo D'AUJOURD'HUI + tous les refus (un refus ne se périme pas). Le retard et les « hors délai » restent lisibles dans les tuiles. Avant, les tuiles disaient 9 et 1 pendant que le badge disait 178 — deux chiffres pour la même pastille.",
+      "local": true
+    },
+    {
+      "b": 374,
+      "titre": "« + 38 jour(s) passé(s) » devient cliquable",
+      "source": "Zeus — 07/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Sous chaque tuile « sans photo », la mention du retard s'ouvre d'un clic sur les lignes concernées (vérifié : 38 lignes). Avant il fallait cliquer la tuile puis le palier. Ce qu'on lit doit être ce qu'on touche.",
+      "local": true
     }
   ],
   "attente": [
