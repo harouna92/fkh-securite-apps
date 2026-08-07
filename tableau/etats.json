@@ -856,6 +856,14 @@
       "theme": "Planning & import",
       "pourquoipas": "Planning → « ☐ Multi-créer » → clique plusieurs cases vides → « ➕ Créer N vacations » ouvre un FORMULAIRE UNIQUE : client, ville, heures début/fin, agent, qualification, appliqués aux N d'un coup. Pré-rempli avec ce que l'appli sait déjà du site (client, ville, horaires de la dernière vacation). Un agent inconnu est refusé, jamais créé à l'aveugle. Avant, les vacations naissaient nues et il fallait repasser sur chacune.",
       "local": true
+    },
+    {
+      "b": 363,
+      "titre": "Les 4 gestes de la fiche vacation que j'avais oubliés",
+      "source": "Zeus — 07/08",
+      "theme": "Planning & import",
+      "pourquoipas": "Ouvre une vacation affectée au Planning et clique « ❌ Retirer » à côté de l'agent : il part vraiment. Idem pour le statut de la vacation, la date de fin et la suppression définitive. b360 avait protégé 10 gestes contre la copie orpheline — il en restait 4, dont celui-là. 15 gestes protégés au total, balayage exhaustif cette fois.",
+      "local": true
     }
   ],
   "attente": [
