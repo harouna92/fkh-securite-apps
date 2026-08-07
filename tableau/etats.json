@@ -952,6 +952,14 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Sous chaque tuile « sans photo », la mention du retard s'ouvre d'un clic sur les lignes concernées (vérifié : 38 lignes). Avant il fallait cliquer la tuile puis le palier. Ce qu'on lit doit être ce qu'on touche.",
       "local": true
+    },
+    {
+      "b": 375,
+      "titre": "Les cinq dernières vues qui ignoraient les photos rattachées",
+      "source": "audit du 07/08 — signalé par Zeus",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Fiche agent (stats prises/fins), contrôles sans photo, compteur de photos d'une vacation, anomalie « contrôle tenue fait SANS photo », et supervision : ces cinq vues gardaient leur propre test et rataient les photos rattachées par l'agence, retrouvées dans l'archive ou désignées comme tenue. Elles interrogent désormais phAUnePhoto, comme le reste. C'était le symptôme de Zeus : « des photos rattachées qui ne sont pas prises en compte par certaines vues ».",
+      "local": true
     }
   ],
   "attente": [
