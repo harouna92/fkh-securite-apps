@@ -864,6 +864,14 @@
       "theme": "Planning & import",
       "pourquoipas": "Ouvre une vacation affectée au Planning et clique « ❌ Retirer » à côté de l'agent : il part vraiment. Idem pour le statut de la vacation, la date de fin et la suppression définitive. b360 avait protégé 10 gestes contre la copie orpheline — il en restait 4, dont celui-là. 15 gestes protégés au total, balayage exhaustif cette fois.",
       "local": true
+    },
+    {
+      "b": 364,
+      "titre": "Photos terrain : deux vues (à rattacher / rattachées), chacune Aujourd'hui et Jours passés",
+      "source": "Zeus — 07/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Suivi des appels → « 📸 Photos terrain à rattacher » : deux boutons « 📎 À rattacher (171) » et « ✅ Rattachées (57) », et dans chacun « 📅 Aujourd'hui » / « 🕓 Jours passés ». La vue rattachées dit à QUELLE vacation et à quelle étape chaque photo est partie, qui l'a rattachée, et permet de « ↩️ Détacher » en cas d'erreur de vacation. Avant, une photo rattachée disparaissait : impossible de vérifier ni de corriger.",
+      "local": true
     }
   ],
   "attente": [
