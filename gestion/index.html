@@ -17,7 +17,7 @@
 @media (prefers-color-scheme:dark){:root{--bg:#0c1017;--panel:#151b26;--panel2:#1b2330;--line:#2a3444;--ink:#e8ecf3;--muted:#94a0b3;--brand:#5b8bff;--brand-ink:#0c1017;--ok:#43c777;--okbg:#12281b;--bad:#ff6b6b;--badbg:#2a1515;--warn:#f0b34a;--warnbg:#2a2010;}}
 *{box-sizing:border-box}html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-.top{position:sticky;top:0;z-index:30;background:var(--panel);border-bottom:1px solid var(--line);padding:10px 12px}
+.top{position:sticky;top:var(--bandeau-h,0px);z-index:30;background:var(--panel);border-bottom:1px solid var(--line);padding:10px 12px}
 .brand{max-width:44rem;margin:0 auto 8px;font-weight:700;font-size:14px;display:flex;align-items:center;gap:7px}
 .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--brand)}
 .tabs{max-width:44rem;margin:0 auto;display:flex;flex-wrap:wrap;gap:6px}
@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b368</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b372</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2023,7 +2023,11 @@ button.big:active{transform:translateY(1px)}
     var out=[], vus={}; if(!m)return out;
     function lbl(k){ if(k==='prise')return 'Prise de service'; if(k==='fin')return 'Fin de service'; if(k==='tenue')return 'Contrôle tenue';
       if(k==='route')return 'Appel route'; if(k==='j15')return 'Pré-prise';
-      if(String(k).indexOf('ctrl')===0){ var h=(typeof ctrlKeyHM==='function')?ctrlKeyHM(k):''; return 'Contrôle'+(h?' '+h:''); } return k; }
+      if(String(k).indexOf('ctrl')===0){ var h=(typeof ctrlKeyHM==='function')?ctrlKeyHM(k):''; return 'Contrôle'+(h?' '+h:''); }
+      /* b371 : « c2syn » s'affichait tel quel sous la photo. C'est la cle interne d'un creneau
+         de controle des 2 h genere automatiquement (b175) — pas un mot destine a etre lu. */
+      if(k==='c2syn')return 'Contrôle des 2 h';
+      return k; }
     try{
       /* b347 : on part de CE QUI EST ENREGISTRÉ, pas de ce qui est encore attendu. Une étape peut avoir
          disparu des tickets une fois faite — le contrôle tenue, par exemple, ne réapparaît plus une fois
@@ -3674,6 +3678,7 @@ button.big:active{transform:translateY(1px)}
     /* b240 : le bandeau est en position fixe — sans compensation il recouvre le haut de la barre d'onglets.
        On decale la page de sa hauteur reelle (elle varie selon que le texte tient sur une ou deux lignes). */
     try{ setTimeout(function(){ var h=el.offsetHeight||0; document.body.style.paddingTop=h?(h+'px'):'';
+         document.documentElement.style.setProperty('--bandeau-h',(h||0)+'px');   /* b370 : le tampon reste visible sous le bandeau */
          document.querySelectorAll('.pp-btn,#notif-bell').forEach(function(b){ b.style.top=(7+h)+'px'; }); },60); }catch(e){}
     var _rv=byId('rv-open'); if(_rv)_rv.onclick=function(){
       if(drRole()===drRoleReel()){ alert('Bascule d’abord sur un autre rôle : c’est sa vue que l’on règle.'); return; }
@@ -8514,31 +8519,14 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
           sc.c2.push(it); } }
     });
     ['op','cli','ph','te','c2'].forEach(function(k){ sc[k].sort(function(x,y){return x.due-y.due;}); });
-    // b175 (remontee #40) : des qu'une vacation COMMENCE, un creneau photo est attendu toutes les 2 h ;
-    // s'il n'est couvert par aucune photo recue (archive photos de la mission, marge +-70 min), il COMPTE dans la pastille LUNE.
-    try{
-      var _PA=[]; try{_PA=JSON.parse(localStorage.getItem('fkh_photo_archive')||'[]')||[];}catch(_e){}
-      var _seen2={}; sc.c2.forEach(function(x){ _seen2[String(x.mid)+'|'+x.due]=1; });
-      (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.deleted)return;/* b311 */ if(m.statut!=='validee'||m.mailPending||m.retiree)return; if(!m.mdate||!m.mheure)return;
-        var _st=frMs(m.mdate,toMin(m.mheure)); if(_st==null||now<_st)return;
-        var _sm=toMin(m.mheure), _em=missEndMin(m);
-        var _df6=(m.mdateFin&&m.mdateFin>m.mdate)?m.mdateFin:null; /* b206 : vacation sur plusieurs jours */
-        var _en=_df6?frMs(_df6,(_em!=null?_em:0)):((_em!=null)?frMs(m.mdate,(_em<=_sm?_em+1440:_em)):null);
-        var _enX=_en||(_st+86400000); /* b185 + b206 : H24 sans date de fin = toujours en cours */
-        var _stop=Math.min(now,_enX);
-        var _pts=_PA.filter(function(ph){return String(ph.mid)===String(m.id);}).map(function(ph){ var mm2=/(\d{10,})/.exec(String(ph.key||'')); return mm2?+mm2[1]:null; }).filter(Boolean);
-        var _ag=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):'';
-        for(var _t=_st+7200000;_t<=_stop;_t+=7200000){
-          if(_pts.some(function(pt){ return Math.abs(pt-_t)<=4200000; }))continue;
-          var _k2=String(m.id)+'|'+_t; if(_seen2[_k2])continue; _seen2[_k2]=1;
-          var _d2=new Date(_t), _h2=('0'+_d2.getHours()).slice(-2)+':'+('0'+_d2.getMinutes()).slice(-2);
-          var _cr=null; (_ctlMap[m.id]||[]).forEach(function(c9){ var d9=Math.abs(c9.t-_t); if(d9<=4200000&&(!_cr||d9<Math.abs(_cr.t-_t)))_cr=c9; });
-          var _ci=_cr?(_cr.inj?'📵 Agent INJOIGNABLE — l’opérateur a tenté de joindre':(_cr.done?('☎ Appel contrôle ✅ FAIT'+(_cr.hm?(' à '+_cr.hm):'')+' — mais pas de photo'):'☎ Appel contrôle ❌ NON pointé')):'☎ Aucun appel contrôle pointé sur ce créneau';
-          sc.c2.push({c2info:_ci,phase:((now>_enX)?'passee':'encours'),mid:m.id,key:'c2syn',label:'🌙 Photo des 2 h — créneau '+_h2,site:(m.siteAgent||m.titre||'—'),client:m.client||'',ville:m.ville||'',agent:_ag,mdate:m.mdate,heure:_h2,due:_t,since:now-_t});
-        }
-      });
-      sc.c2.sort(function(x,y){return x.due-y.due;});
-    }catch(_e){}
+      /* b372 (choix Zeus, 07/08) : les creneaux de controle INVENTES sont supprimes.
+         La pastille 🌙 ne reclame une photo que la ou un controle existe VRAIMENT dans la
+         vacation. Avant, elle en fabriquait un toutes les 2 h des le debut du service : la fiche
+         de la vacation n'affichait aucun ticket, la pastille en reclamait quatre, et personne ne
+         pouvait comprendre d'ou ils sortaient. Et comme ils partageaient tous la meme cle
+         (`c2syn`), une photo rattachee a l'un se collait aux quatre sans en solder aucun.
+         Pour surveiller une vacation longue : ajouter les controles depuis le Planning
+         (« 🌙 Toutes les 2 h » sur la fiche) — ils deviennent alors de vrais tickets. */
     // b177 : vacations validees SANS agent, d'aujourd'hui vers le futur (classees par site au rendu)
     // b210 : retards de prise signales par l'operateur (case Agent en retard du ticket)
     // b219 : agents ayant envoye des photos SANS position (cle u/ville_inconnue) - via l'archive de rattachement
@@ -9284,6 +9272,11 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       var _rf=L.filter(function(x){return x.sousvue==='refus';});
       var _dl=L.filter(function(x){return x.sousvue==='delai';});
       function _n(a2,k){ return a2.filter(function(x){return x.key===k;}).length; }
+      /* b369 : le compte DU JOUR, et la mention du retard. */
+      var _ajd369=(typeof impTodayISO==='function')?impTodayISO():'';
+      function _nj(a2,k){ return a2.filter(function(x){return x.key===k&&(x.mdate||'')===_ajd369;}).length; }
+      function _retard(a2,k){ var r=a2.filter(function(x){return x.key===k&&(x.mdate||'')!==_ajd369;}).length;
+        return r?('<br><span style="color:#e0a13b">+ '+r+' jour(s) pass\u00e9(s)</span>'):''; }
       function _tuile(sub,nb,titre,soustitre,couleur){
         return '<div class="pp-tile" data-sub="'+sub+'"'+(couleur?(' style="border-color:'+couleur+'"'):'')+'><b>'+nb+'</b>'+titre
           +'<br><span class="sub" style="margin:0;font-size:11.5px">'+soustitre+'</span></div>';
@@ -9295,8 +9288,13 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
            les contient pas : elles affichaient zero pour toujours, quel que soit le nombre de photos
            en retard. Constate par Zeus le 05/08. On ne montre plus un compteur qui ne peut pas bouger.
            Le sous-titre des deux premieres suit la pastille au lieu de dire « sans photo » partout. */
-        +_tuile('prise',_n(_mq,'prise'),'🟢 Prises de service',(D.verb||'sans photo'),'')
-        +_tuile('fin',_n(_mq,'fin'),'🔚 Fins de service',(D.verb||'sans photo'),'')
+        /* ===== b369 : LA REGLE DU JOUR (Zeus, 07/08) =====
+           Le chiffre couvrait tout depuis le 01/08 : une prise sans photo du 1er y restait pour
+           toujours. Un compteur qui ne peut que monter ne se regarde plus — c'est ce qui est arrive
+           a la cloche, figee a 47. La tuile montre donc le travail DU JOUR, celui qui se rattrape
+           encore ; le retard est ecrit juste dessous et reste a un clic. */
+        +_tuile('prise',_nj(_mq,'prise'),'🟢 Prises de service','sans photo \u00b7 aujourd\u2019hui'+_retard(_mq,'prise'),'')
+        +_tuile('fin',_nj(_mq,'fin'),'🔚 Fins de service','sans photo \u00b7 aujourd\u2019hui'+_retard(_mq,'fin'),'')
         /* ===== b368 : CINQ TUILES AU LIEU DE HUIT (mesure du 07/08) =====
            Les tuiles « Agent à contacter » (107) et « Client à aviser » (106) etaient ENTIEREMENT
            incluses dans « Hors delai » (108) — et 106 des 108 etaient dans les deux a la fois. Trois
@@ -9308,7 +9306,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
         /* b367 : l'autre bout du meme trou — les photos arrivees qui n'ont trouve aucune vacation. */
         +_tuile('pnr',((sc._pnJour||[]).length),'📥 Photos reçues','non rattachées — aujourd’hui','#e0a13b')):'')
         +'</div>';
-      h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+' · une échéance entre ici 1 min après son heure prévue. Clique sur une tuile pour le détail par vacation (durée écoulée).</p>';
+      h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+((PP_VIEW.mode==='ph')?'<b>Les tuiles « sans photo » comptent AUJOURD\u2019HUI</b> \u2014 ce qui se rattrape encore. Rien n\u2019a disparu : les jours pr\u00e9c\u00e9dents sont dans le palier « \ud83d\udd53 Jours pass\u00e9s », \u00e0 un clic.<br>':'')+D.depuis+' · une échéance entre ici 1 min après son heure prévue. Clique sur une tuile pour le détail par vacation (durée écoulée).</p>';
     } else if(D.tiles&&PP_VIEW.sub){
       /* b272 : chaque tuile ouvre sa propre famille. */
       var _sv=PP_VIEW.sub, LL;

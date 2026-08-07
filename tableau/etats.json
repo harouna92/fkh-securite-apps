@@ -904,6 +904,38 @@
       "theme": "Tenues & photos",
       "pourquoipas": "Pastille 📷 : « 🚫 Prises » et « 🚫 Fins » fusionnées en une seule « 🚫 Refus (2) » ; « 🗣️ Agent à contacter » (107) et « 🏢 Client à aviser » (106) supprimées — mesuré : elles étaient ENTIÈREMENT incluses dans « ⏱ Hors délai » (108), et 106 des 108 étaient dans les deux à la fois. Les deux cases d'action restent sur CHAQUE LIGNE (131 boutons sur 67 lignes vérifiés) : aucun geste perdu.",
       "local": true
+    },
+    {
+      "b": 369,
+      "titre": "La règle du jour sur les tuiles « sans photo »",
+      "source": "Zeus — 07/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Pastille 📷 : les tuiles « Prises » et « Fins » comptent AUJOURD'HUI (9 et 1) au lieu de tout depuis le 01/08 (47 et 61), avec « + 38 jour(s) passé(s) » écrit dessous. Un mot sous les tuiles prévient que rien n'a disparu. ⚠️ Le BADGE de la pastille compte toujours tout (178) — il n'a pas été changé.",
+      "local": true
+    },
+    {
+      "b": 370,
+      "titre": "Le tampon de version redevient visible",
+      "source": "Zeus — 07/08",
+      "theme": "Divers",
+      "pourquoipas": "L'en-tête « GESTION v07-08·bNNN » était collé en haut de l'ÉCRAN, donc sous le bandeau de rôle en position fixe : il disparaissait. Il se cale maintenant juste sous le bandeau (vérifié : 66 px du haut). C'est la preuve visuelle qu'un déploiement est passé.",
+      "local": true
+    },
+    {
+      "b": 371,
+      "titre": "« c2syn » devient « Contrôle des 2 h »",
+      "source": "Zeus — 07/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Sous une photo rattachée, la fiche affichait la clé interne « c2syn » au lieu du nom de l'étape. On lit maintenant « Contrôle des 2 h » — et on voit donc immédiatement quand une photo est partie sur le mauvais ticket.",
+      "local": true
+    },
+    {
+      "b": 372,
+      "titre": "Plus de créneaux de contrôle inventés (choix A de Zeus)",
+      "source": "Zeus — 07/08",
+      "theme": "Tenues & photos",
+      "pourquoipas": "Pastille 🌙 : 1140 → 279. L'appli fabriquait un créneau photo toutes les 2 h dès qu'une vacation commençait, même sans aucun contrôle planifié — d'où des lignes « Aucun appel contrôle pointé » incompréhensibles. Pire, tous partageaient la même clé c2syn : une photo rattachée à l'un se collait aux quatre sans en solder aucun. Elle ne réclame plus une photo que là où un contrôle existe vraiment. Contrepartie assumée : une vacation longue sans contrôle planifié ne réclame plus rien — on ajoute les contrôles depuis le Planning.",
+      "local": true
     }
   ],
   "attente": [
