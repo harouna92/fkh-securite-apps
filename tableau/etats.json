@@ -1,6 +1,6 @@
 {
   "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
-  "maj": "2026-08-06",
+  "maj": "2026-08-07",
   "items": [
     {
       "b": 349,
@@ -847,6 +847,14 @@
       "source": "Zeus — 06/08",
       "theme": "Planning & import",
       "pourquoipas": "Ouvre une vacation au Planning, laisse la fiche ouverte le temps qu'une synchro passe, puis change l'heure de « Route (renseignements) » ou de « Pré-prise (J-15) » : la valeur tient. Avant, elle revenait toute seule au bout de quelques secondes — la fiche écrivait dans une copie orpheline, remplacée par l'arrivée du classeur commun. Les 10 gestes de la fiche sont protégés, pas seulement les heures.",
+      "local": true
+    },
+    {
+      "b": 361,
+      "titre": "Multi-création : on saisit une seule fois pour toutes les cases",
+      "source": "Zeus — 07/08",
+      "theme": "Planning & import",
+      "pourquoipas": "Planning → « ☐ Multi-créer » → clique plusieurs cases vides → « ➕ Créer N vacations » ouvre un FORMULAIRE UNIQUE : client, ville, heures début/fin, agent, qualification, appliqués aux N d'un coup. Pré-rempli avec ce que l'appli sait déjà du site (client, ville, horaires de la dernière vacation). Un agent inconnu est refusé, jamais créé à l'aveugle. Avant, les vacations naissaient nues et il fallait repasser sur chacune.",
       "local": true
     }
   ],

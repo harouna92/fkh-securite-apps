@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v06-08·b360</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b361</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -5937,6 +5937,98 @@ button.big:active{transform:translateY(1px)}
       +esc(p.n+' photo(s) sur '+p.total+' attendue(s)'+(p.complet?' — complet':(p.retard?' — une échéance est passée sans photo':' — en cours')))
       +'">'+ic+' '+p.n+'/'+p.total+'</div>';
   }
+  /* ===== b361 : ON SAISIT UNE FOIS POUR TOUTES LES CASES =====
+     POURQUOI (Zeus, 07/08) : la multi-sélection existait (b297) mais elle créait des vacations NUES —
+     site et date, rien d'autre. Le message final le disait lui-même : « clique sur chaque chip pour
+     affecter un agent ». On gagnait la création et on repassait quand même sur chacune : la promesse
+     n'était pas tenue.
+     DÉSORMAIS : un seul formulaire avant création — client, horaires, agent, qualification — appliqué
+     aux N cases d'un coup. Ce qui est PROPRE à chaque case (son site, son jour) reste à elle ; ce qui
+     est COMMUN se saisit une fois.
+     PRÉ-REMPLISSAGE : on ne demande pas ce que l'application sait déjà. Le client et la ville sont
+     repris de la dernière vacation connue sur ce site ; les horaires, de la ligne d'heure cliquée.
+     Tout reste modifiable — c'est une proposition, pas une contrainte. */
+  function plMultiForm(){
+    var cells=(plMultiCells||[]).map(function(k){ var p=String(k).split('|');
+      return {date:p[0]||'', site:(p[1]&&p[1]!=='—')?p[1]:'', h1:p[2]||'', h2:p[3]||''}; });
+    if(!cells.length)return;
+    /* ce que l'appli sait déjà du site : on reprend la vacation la plus récente qui le porte */
+    function connuDuSite(site){
+      var out={client:'',ville:'',h1:'',h2:'',qual:''}; if(!site)return out;
+      var n=(typeof siteNorm==='function')?siteNorm(site):String(site).toLowerCase(), best=null;
+      (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){
+        if(!m||m.deleted)return;
+        var s2=(typeof siteNorm==='function')?siteNorm(m.siteAgent||m.titre||''):String(m.siteAgent||m.titre||'').toLowerCase();
+        if(s2!==n)return;
+        var t=Math.max(+(m.valide||0),+(m.creeAt||0));
+        if(!best||t>best.t)best={t:t,m:m};
+      });
+      if(best){ out.client=best.m.client||''; out.ville=best.m.ville||''; out.h1=best.m.mheure||''; out.h2=best.m.mfin||''; out.qual=best.m.qual||''; }
+      return out;
+    }
+    var pre=connuDuSite(cells[0].site);
+    var h1=cells[0].h1||pre.h1||'', h2=cells[0].h2||pre.h2||'';
+    /* récapitulatif : on montre ce qu'on va créer AVANT de le créer, groupé par site */
+    var parSite={}; cells.forEach(function(c){ (parSite[c.site||'(sans site)']=parSite[c.site||'(sans site)']||[]).push(c.date); });
+    var recap=Object.keys(parSite).map(function(s){
+      var ds=parSite[s].slice().sort().map(function(d){ return d.split('-').reverse().slice(0,2).join('/'); });
+      return '<div style="font-size:12.5px;margin-bottom:3px"><b>'+esc(s)+'</b> <span class="sub" style="margin:0">— '+ds.length+' jour(s) : '+esc(ds.join(' · '))+'</span></div>';
+    }).join('');
+    var clients={}; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m&&m.client)clients[m.client]=1; });
+    try{ (load('fkh_clients')||[]).forEach(function(c){ if(c)clients[c]=1; }); }catch(e){}
+    var old=byId('plmf-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='plmf-pop';
+    pop.style.cssText='position:fixed;inset:5% 5%;max-width:560px;margin:auto;height:max-content;max-height:88vh;z-index:280;background:var(--panel);border:1.5px solid #4a9eff;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+    pop.innerHTML='<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">➕ Créer '+cells.length+' vacation'+(cells.length>1?'s':'')+' d’un coup</b><button type="button" id="plmf-x">✕</button></div>'
+      +'<div class="meta" style="margin:8px 0"><div class="lab" style="margin:0 0 4px">Ce qui sera créé</div>'+recap+'</div>'
+      +'<p class="sub" style="margin:0 0 8px;font-size:11.5px">Le site et le jour viennent de chaque case. Tout ce qui suit est <b>commun aux '+cells.length+'</b> — saisi une seule fois.</p>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+      +'<label class="f" style="margin:0"><div class="lab" style="font-size:10px;margin:0 0 2px">🏢 Client</div><input id="plmf-client" list="plmf-dl-cli" value="'+esc(pre.client)+'" placeholder="ex. AQUILA" autocomplete="off"></label>'
+      +'<label class="f" style="margin:0"><div class="lab" style="font-size:10px;margin:0 0 2px">📍 Ville</div><input id="plmf-ville" value="'+esc(pre.ville)+'" placeholder="ex. Niort" autocomplete="off"></label>'
+      +'<label class="f" style="margin:0"><div class="lab" style="font-size:10px;margin:0 0 2px">🕐 Heure DÉBUT</div><input type="time" id="plmf-h1" value="'+esc(_plNormHM(h1))+'"></label>'
+      +'<label class="f" style="margin:0"><div class="lab" style="font-size:10px;margin:0 0 2px">🕐 Heure FIN</div><input type="time" id="plmf-h2" value="'+esc(_plNormHM(h2))+'"></label>'
+      +'</div>'
+      +'<label class="f" style="margin:8px 0 0"><div class="lab" style="font-size:10px;margin:0 0 2px">👤 Agent (facultatif — laisse vide pour « à affecter »)</div><input id="plmf-agent" list="plmf-dl-ag" placeholder="nom de l’agent…" autocomplete="off"></label>'
+      +'<label class="f" style="margin:8px 0 0"><div class="lab" style="font-size:10px;margin:0 0 2px">🎖️ Qualification (facultatif)</div><input id="plmf-qual" value="'+esc(pre.qual)+'" placeholder="ex. Agent de sécurité confirmé" autocomplete="off"></label>'
+      +'<datalist id="plmf-dl-cli">'+Object.keys(clients).sort().map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist>'
+      +'<datalist id="plmf-dl-ag">'+((typeof FA!=='undefined'&&FA)?FA.slice().sort(function(a,b){return String(a.nom||'').localeCompare(String(b.nom||''));}).map(function(a){return '<option value="'+esc(a.nom||'')+'">';}).join(''):'')+'</datalist>'
+      +'<div id="plmf-err" class="sub" style="margin:8px 0 0;color:var(--bad)"></div>'
+      +'<div class="acts" style="margin-top:10px"><button type="button" id="plmf-go" class="ok">✅ Créer les '+cells.length+'</button><button type="button" id="plmf-cancel">Annuler</button></div>';
+    document.body.appendChild(pop);
+    function fermer(){ var q=byId('plmf-pop'); if(q)q.parentNode.removeChild(q); }
+    byId('plmf-x').onclick=fermer; byId('plmf-cancel').onclick=fermer;
+    byId('plmf-go').onclick=function(){
+      var cli=(byId('plmf-client').value||'').trim(), vil=(byId('plmf-ville').value||'').trim();
+      var a1=_plNormHM(byId('plmf-h1').value), a2=_plNormHM(byId('plmf-h2').value);
+      var agN=(byId('plmf-agent').value||'').trim(), qual=(byId('plmf-qual').value||'').trim();
+      if(!a1){ byId('plmf-err').textContent='L’heure de début est obligatoire — sans elle, la vacation n’a ni tickets ni contrôles.'; return; }
+      /* l'agent se rattache par son IDENTIFIANT, jamais par son nom : deux agents peuvent porter le
+         même nom de famille (règle du 30/07). Un nom inconnu est refusé plutôt que créé à l'aveugle. */
+      var agId=''; if(agN){
+        var trouve=null; try{ (FA||[]).forEach(function(a){ if(String(a.nom||'').trim().toLowerCase()===agN.toLowerCase())trouve=a; }); }catch(e){}
+        if(!trouve){ byId('plmf-err').textContent='Agent « '+agN+' » introuvable dans les fiches. Laisse vide pour créer « à affecter », ou choisis un nom proposé par la liste.'; return; }
+        agId=trouve.id;
+      }
+      var now=Date.now(), k=0, faits=0;
+      cells.forEach(function(c){
+        var o={id:'pl'+now+'_m'+(k++)+'_'+Math.round(Math.random()*9999),
+          titre:c.site||'', siteAgent:c.site||'', client:cli, statut:'validee', motif:'',
+          pris:now, valide:now, ville:vil, la:null, lo:null, assoc:[],
+          mdate:c.date, mheure:a1, mfin:a2||'', src:'planning'};
+        if(qual)o.qual=qual;
+        if(agId){ o.agentId=agId; o.planifie=true; }
+        SUIVI.unshift((typeof signerVac==='function')?signerVac(o):o); faits++;
+      });
+      if(typeof saveSuivi==='function')saveSuivi();
+      plMultiSel=false; plMultiCells=[];
+      fermer(); renderPlanning();
+      if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
+      if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
+      alert('✅ '+faits+' vacation'+(faits>1?'s':'')+' créée'+(faits>1?'s':'')
+        +(agId?(' — agent affecté : '+agN+'.'):' — reste à affecter un agent.')
+        +(a2?'':'\n\n⚠️ Sans heure de fin, elles n’auront ni fin de service à pointer ni contrôles.'));
+    };
+  }
   function _plMatch(m){ var F=PL_F;
     if(F.aff==='avec'&&!m.agentId)return false; // b186 : filtre affectation / verification
     if(F.aff==='sans'&&m.agentId)return false;
@@ -6059,13 +6151,7 @@ button.big:active{transform:translateY(1px)}
     if(byId('pl-multi-cancel'))byId('pl-multi-cancel').onclick=function(){ plMultiSel=false; plMultiCells=[]; renderPlanning(); };
     if(byId('pl-multi-go'))byId('pl-multi-go').onclick=function(){
       if(!plMultiCells.length){alert('Sélectionne au moins une case vide.');return;}
-      if(!confirm('Créer '+plMultiCells.length+' vacation'+(plMultiCells.length>1?'s':'')+' sur les cases sélectionnées ?'))return;
-      var _mn=Date.now(),_mk=0;
-      plMultiCells.forEach(function(k){ var p=k.split('|'); var _mid='pl'+_mn+'_m'+(_mk++)+'_'+Math.round(Math.random()*9999); SUIVI.unshift(signerVac({id:_mid,titre:(p[1]&&p[1]!=='—'?p[1]:''),siteAgent:(p[1]&&p[1]!=='—'?p[1]:''),client:'',statut:'validee',motif:'',pris:_mn,valide:_mn,ville:'',la:null,lo:null,assoc:[],mdate:p[0],mheure:p[2]||'',mfin:p[3]||'',src:'planning'})); });
-      if(typeof saveSuivi==='function')saveSuivi();
-      var _n=plMultiCells.length; plMultiSel=false; plMultiCells=[];
-      renderPlanning();
-      alert('✅ '+_n+' vacation'+(_n>1?'s':'')+' créée'+(_n>1?'s':'')+' — clique sur chaque chip pour affecter un agent.');
+      plMultiForm();   /* b361 : on saisit UNE fois pour toutes les cases */
     }; // b297
   }
   function tkxBloc(){
