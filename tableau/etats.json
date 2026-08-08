@@ -1002,6 +1002,24 @@
    "pourquoipas": "Trois tickets posés d'un coup — un pour les superviseurs, un pour les administrateurs, un pour le super-admin — pour voir de ses yeux lequel est « à moi », lesquels sont « à surveiller », et jouer le cycle À faire → En cours → Fait sans quitter la section.",
    "local": true,
    "demo": "ticket"
+  },
+  {
+   "b": 381,
+   "titre": "Le délai d'un ticket : ouvert après…, agi après…, clos après…",
+   "source": "demande de Zeus, 08/08",
+   "theme": "Tickets",
+   "pourquoipas": "Sur chaque ticket qu'on a envoyé : combien de temps pour l'ouvrir, pour la première action, pour le clore. Tant qu'il n'est pas ouvert, c'est le compteur d'attente qui tourne — « pas encore ouvert, 5 h d'attente » — parce que c'est ce chiffre-là qui dit s'il faut relancer. Un renvoi archive le tour précédent et repart à zéro, sinon le délai d'un ticket renvoyé trois fois ne voudrait plus rien dire.",
+   "local": true,
+   "demo": "ticket"
+  },
+  {
+   "b": 382,
+   "titre": "La démo montre aussi les délais, côté émetteur",
+   "source": "demande de Zeus, 08/08",
+   "theme": "Tickets",
+   "pourquoipas": "Deux tickets partis de Zeus s'ajoutent au scénario : un ouvert en 7 min et agi à 22 min, un parti il y a 5 h que personne n'a ouvert. Au passage, deux scories d'affichage corrigées avant toute mise en ligne — « à aux superviseurs » et « pas encore ouvert » écrit deux fois.",
+   "local": true,
+   "demo": "ticket"
   }
  ],
  "attente": [

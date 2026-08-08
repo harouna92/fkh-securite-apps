@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v08-08·b380</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v08-08·b382</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3367,7 +3367,7 @@ button.big:active{transform:translateY(1px)}
       } },
     ticket:{ titre:'🎫 Un ticket arrive dans 📨 Remontées terrain',
       quoi:'Trois tickets viennent d\u2019arriver : un pour les superviseurs, un pour les administrateurs, un pour le super-admin. Tu es connect\u00e9 en super-admin.',
-      aFaire:'Ouvre \u00ab \ud83d\udce8 Remont\u00e9es terrain \u00bb. En haut : \u00ab \ud83c\udfab Tickets qui m\u2019attendent \u00bb \u2014 seul celui du super-admin est \u00ab \u00e0 toi \u00bb. D\u00e9plie \u00ab \ud83d\udc41 Ce que je surveille \u00bb : les deux autres sont l\u00e0, avec \u00e0 qui ils sont adress\u00e9s. Traite le tien : \ud83d\udd04 En cours, puis \u2705 Fait \u2014 le badge de l\u2019onglet s\u2019\u00e9teint et le ticket descend dans \u00ab \u2705 Trait\u00e9s \u00bb, sans que tu aies quitt\u00e9 la section.',
+      aFaire:'Ouvre \u00ab \ud83d\udce8 Remont\u00e9es terrain \u00bb. En haut : \u00ab \ud83c\udfab Tickets qui m\u2019attendent \u00bb \u2014 seul celui du super-admin est \u00ab \u00e0 toi \u00bb. D\u00e9plie \u00ab \ud83d\udc41 Ce que je surveille \u00bb : les deux autres sont l\u00e0, avec \u00e0 qui ils sont adress\u00e9s. Traite le tien : \ud83d\udd04 En cours, puis \u2705 Fait \u2014 le badge de l\u2019onglet s\u2019\u00e9teint et le ticket descend dans \u00ab \u2705 Trait\u00e9s \u00bb, sans que tu aies quitt\u00e9 la section. Puis regarde \u00ab \ud83d\udce4 Ce que j\u2019ai demand\u00e9 \u00bb : un ticket ouvert en 7 min et agi \u00e0 22 min, et un autre parti il y a 5 h que personne n\u2019a ouvert \u2014 c\u2019est ce compteur-l\u00e0 qui dit s\u2019il faut relancer.',
       monter:function(){
         var arr=[]; try{ arr=tkxLoad()||[]; }catch(e){ arr=[]; }
         arr=arr.filter(function(t){ return !t||String(t.id).indexOf('demo_tk')!==0; });
@@ -3386,6 +3386,20 @@ button.big:active{transform:translateY(1px)}
           message:'Il faut trancher : on annule la r\u00e9currence ou on la garde ?',
           contexte:['Leclerc Niort \u00b7 r\u00e9currence quotidienne'],
           source:'',deUser:'demo_sup',deNom:'Superviseur',pourRole:'superadmin',pourUser:'',etat:'a_faire',cree:Date.now()-h,fil:[]});
+        /* b382 : deux tickets partis DE MOI — c'est la qu'on lit les delais. */
+        var moi=tkxMoi(), nom=tkxMonNom();
+        var t4=Date.now()-4*h;
+        arr.push({id:'demo_tk4',kind:'echange',objet:'Photos de contr\u00f4le tenue \u2014 Carrefour St Andre',
+          message:'Il me manque la photo de TELLA Manfiou, tu peux lui demander ?',
+          contexte:['Carrefour St Andre Les Vergers Fra100 \u00b7 TELLA Manfiou'],
+          source:'',deUser:moi,deNom:nom,pourRole:'superviseur',pourUser:'',etat:'en_cours',
+          cree:t4,vuAt:t4+7*60000,vuPar:'Superviseur',agiAt:t4+22*60000,
+          fil:[{qui:'Superviseur',at:t4+22*60000,txt:'Je l\u2019appelle tout de suite.',etat:'en_cours'}]});
+        arr.push({id:'demo_tk5',kind:'echange',objet:'Bon de commande SECURITAS \u2014 Duc Chailley',
+          message:'Tu peux me confirmer le num\u00e9ro de bon ?',
+          contexte:['Duc (Chailley) \u00b7 20:00 \u2192 08:00'],
+          source:'',deUser:moi,deNom:nom,pourRole:'admin',pourUser:'',etat:'a_faire',
+          cree:Date.now()-5*h,fil:[]});
         try{ tkxSave(arr); }catch(e){}
         try{ if(typeof terrainBadge==='function')terrainBadge(); }catch(e){}
       } },
@@ -6222,10 +6236,9 @@ button.big:active{transform:translateY(1px)}
         +'<b style="flex:1;min-width:140px">'+esc(t.objet)+'</b>'
         +(_rv?('<span class="sub" style="margin:0;color:#a99bff;font-weight:700">\ud83d\udd04 renvoy\u00e9 '+_rv+' fois</span>'):'')
         +'<span style="color:'+e[1]+';font-weight:700">'+e[0]+'</span></div>'
-        +'<div class="sub" style="margin:3px 0 0">'+(mien?('à '+esc(tkxPourQui(t))):('de '+esc(t.deNom||'—')))+' · '+dt
+        +'<div class="sub" style="margin:3px 0 0">'+(mien?esc(tkxPourQui(t)):('de '+esc(t.deNom||'—')))+' · '+dt
           +((!mien&&!tkxPourMoi(t))?(' · <span style="color:#a99bff">\ud83d\udc41 adress\u00e9 '+esc(tkxPourQui(t))+'</span>'):'')   /* b379 */
-          +(mien?(t.vuAt?(' · <span style="color:#1a9e5c">\u2705 vu le '+(function(){var v=new Date(t.vuAt);return ('0'+v.getDate()).slice(-2)+'/'+('0'+(v.getMonth()+1)).slice(-2)+' à '+('0'+v.getHours()).slice(-2)+' h '+('0'+v.getMinutes()).slice(-2);})()+(t.vuPar?(' par '+esc(t.vuPar)):'')+'</span>')
-                     :' · <span style="color:#e0a13b">\u23F3 pas encore ouvert</span>'):'')
+          +(mien?tkxDelais(t):'')   /* b381 : le temps qu'il a fallu, a chaque etape */
           +'</div>'
         +(t.message?('<div style="margin-top:6px">'+esc(t.message)+'</div>'):'')
         /* b365 : l'avancement REEL, relu dans la file — pas ce que quelqu'un a declare. */
@@ -6291,6 +6304,19 @@ button.big:active{transform:translateY(1px)}
      COMMENT : a l'ouverture de la section Tickets, tout ticket qui m'est adresse est marque VU, une seule
      fois, avec l'heure et le nom. L'emetteur le lit sur sa carte. C'est un accuse de LECTURE, pas une
      reponse : « vu » ne veut pas dire « fait », et les deux restent distincts. */
+  /* b381 : les trois delais, du point de vue de celui qui a envoye. Tant que ce n'est pas
+     ouvert, on affiche le temps qui COURT — c'est lui qui dit s'il faut relancer. */
+  function tkxDelais(t){
+    if(!t)return '';
+    var d0=tkxDepart(t); if(!d0)return '';
+    var out=[];
+    if(t.vuAt)out.push('<span style="color:#1a9e5c">\ud83d\udc41 ouvert apr\u00e8s '+tkxDuree(t.vuAt-d0)+(t.vuPar?(' par '+esc(t.vuPar)):'')+'</span>');
+    else out.push('<span style="color:#e0a13b;font-weight:700">\u23f3 pas encore ouvert \u2014 '+tkxDuree(Date.now()-d0)+' d\u2019attente</span>');
+    if(t.agiAt)out.push('<span style="color:#6ea8fe">\ud83d\udd04 1re action apr\u00e8s '+tkxDuree(t.agiAt-d0)+'</span>');
+    if(t.closAt)out.push('<span style="color:#1a9e5c">\u2705 clos apr\u00e8s '+tkxDuree(t.closAt-d0)+'</span>');
+    var anc=(t.rounds&&t.rounds.length)?('<span class="sub" style="margin:0">\u00b7 '+t.rounds.length+' tour(s) pr\u00e9c\u00e9dent(s)</span>'):'';
+    return '<div class="sub" style="margin:4px 0 0;display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px">'+out.join('')+anc+'</div>';
+  }
   function tkxMarquerVus(){
     var arr=tkxLoad(), ch=false, qui=tkxMonNom();
     arr.forEach(function(t){ if(t&&t.kind==='echange'&&tkxPourMoi(t)&&!t.vuAt){ t.vuAt=Date.now(); t.vuPar=qui; ch=true; } });
@@ -6308,6 +6334,11 @@ button.big:active{transform:translateY(1px)}
       if(!m)return;
       var id=b.getAttribute('data-id'), arr=tkxLoad();
       for(var i=0;i<arr.length;i++){ if(arr[i].id!==id)continue;
+        /* b381 : le tour qui s'acheve est archive, puis les horloges repartent — sinon le delai
+           d'un ticket renvoye trois fois ne veut plus rien dire. */
+        arr[i].rounds=arr[i].rounds||[];
+        arr[i].rounds.push({de:tkxDepart(arr[i]),vuAt:arr[i].vuAt||0,agiAt:arr[i].agiAt||0,closAt:arr[i].closAt||0});
+        arr[i].vuAt=0; arr[i].vuPar=''; arr[i].agiAt=0; arr[i].closAt=0;
         arr[i].renvois=(arr[i].renvois||0)+1; arr[i].renvoyeAt=Date.now();
         delete arr[i].autoFait; delete arr[i].autoDe;   /* il redevient un ticket vivant */
         break; }
@@ -8754,6 +8785,17 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
   var TK_ETATS={a_faire:['\u23f3 À faire','#e0a13b'],en_cours:['🔄 En cours','#6ea8fe'],fait:['\u2705 Fait','#1a9e5c'],bloque:['\u26d4 Bloqué','#e5322d']};
   function tkxLoad(){ var a=load('fkh_tickets'); return Array.isArray(a)?a:[]; }
   function tkxSave(a){ save('fkh_tickets',a); }
+  /* b381 : un ecart de temps en francais lisible. « 4 min », « 2 h 10 », « 3 j 5 h ». */
+  function tkxDuree(ms){
+    if(!(ms>0))return '0 min';
+    var mn=Math.round(ms/60000);
+    if(mn<60)return mn+' min';
+    var h=Math.floor(mn/60), r=mn%60;
+    if(h<24)return h+' h'+(r?(' '+('0'+r).slice(-2)):'');
+    var j=Math.floor(h/24); return j+' j'+((h%24)?(' '+(h%24)+' h'):'');
+  }
+  /* Le point de depart du tour en cours : la creation, ou le dernier renvoi. */
+  function tkxDepart(t){ return (t&&t.renvoyeAt)||(t&&t.cree)||0; }
   function tkxMoi(){ try{ return (typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'moi'; }catch(e){ return 'moi'; } }
   function tkxMonNom(){ try{ return (typeof opNow==='function'&&opNow())||tkxMoi(); }catch(e){ return tkxMoi(); } }
   /* b379 : l'echelle des rangs. On voit un ticket si on est au moins au niveau vise. */
@@ -8835,6 +8877,9 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
   function tkxRepondre(id,etat,mot){
     var arr=tkxLoad();
     for(var i=0;i<arr.length;i++){ if(arr[i].id!==id)continue;
+      /* b381 : la PREMIERE action du tour en cours — on ne l'ecrase pas aux suivantes. */
+      if(!arr[i].agiAt)arr[i].agiAt=Date.now();
+      if(etat==='fait'&&!arr[i].closAt)arr[i].closAt=Date.now();
       if(etat)arr[i].etat=etat;
       if(mot)arr[i].fil.push({qui:tkxMonNom(),at:Date.now(),txt:mot,etat:etat||''});
       arr[i].maj=Date.now(); arr[i].luPar=''; break; }
