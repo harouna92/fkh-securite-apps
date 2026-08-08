@@ -1038,6 +1038,15 @@
    "pourquoipas": "En b378 je les avais mis dans la mauvaise des deux sections. La logique est le sens : 📨 Remontées, c'est ce qui MONTE (un humain alerte au-dessus de lui) ; 🧭 Terrain, c'est ce qui LUI TOMBE DESSUS et demande son action. Un ticket descend et demande une action : sa place est dans 🧭 Terrain. Le badge de 🧭 Terrain compte les tickets reçus, celui de Remontées retrouve son compte d'origine, la notification et la visite guidée suivent.",
    "local": true,
    "demo": "ticket"
+  },
+  {
+   "b": 385,
+   "titre": "Les appels « à vérifier » s'affichent, et on peut trancher",
+   "source": "suite du Worker déployé le 09/08",
+   "theme": "Demandes & appels",
+   "pourquoipas": "Le Worker marque désormais un appel entrant dont l'analyse est vide alors qu'il parle du métier. Côté appli, ces appels n'apparaissaient nulle part : le bloc IA ne rendait que les appels portant au moins une demande. Ils ont maintenant leur encadré orange dans Supervision, avec le numéro, l'heure et ce qui a été entendu — et deux issues : relancer l'analyse sur le texte, ou dire que ce n'en était pas une. Rien n'est deviné, rien n'est déposé tant que personne n'a tranché.",
+   "local": true,
+   "demo": "verif"
   }
  ],
  "attente": [
