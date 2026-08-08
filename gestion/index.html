@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v08-08·b378</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v08-08·b380</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3365,6 +3365,30 @@ button.big:active{transform:translateY(1px)}
         photoThumbTag=function(){ return '<div style="width:64px;height:64px;border-radius:8px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:22px">🖼️</div>'; };
         photoDelete=function(k,cb){ window.__DEMO_PHOTOS=(window.__DEMO_PHOTOS||[]).filter(function(o){return o.key!==k;}); cb({ok:true}); };
       } },
+    ticket:{ titre:'🎫 Un ticket arrive dans 📨 Remontées terrain',
+      quoi:'Trois tickets viennent d\u2019arriver : un pour les superviseurs, un pour les administrateurs, un pour le super-admin. Tu es connect\u00e9 en super-admin.',
+      aFaire:'Ouvre \u00ab \ud83d\udce8 Remont\u00e9es terrain \u00bb. En haut : \u00ab \ud83c\udfab Tickets qui m\u2019attendent \u00bb \u2014 seul celui du super-admin est \u00ab \u00e0 toi \u00bb. D\u00e9plie \u00ab \ud83d\udc41 Ce que je surveille \u00bb : les deux autres sont l\u00e0, avec \u00e0 qui ils sont adress\u00e9s. Traite le tien : \ud83d\udd04 En cours, puis \u2705 Fait \u2014 le badge de l\u2019onglet s\u2019\u00e9teint et le ticket descend dans \u00ab \u2705 Trait\u00e9s \u00bb, sans que tu aies quitt\u00e9 la section.',
+      monter:function(){
+        var arr=[]; try{ arr=tkxLoad()||[]; }catch(e){ arr=[]; }
+        arr=arr.filter(function(t){ return !t||String(t.id).indexOf('demo_tk')!==0; });
+        var h=3600000;
+        /* source vide = ticket ecrit a la main : la fermeture automatique (b365) n'y touche pas. */
+        arr.push({id:'demo_tk1',kind:'echange',objet:'3 prises de service sans photo \u2014 Folschviller',
+          message:'Tu peux rappeler les agents et r\u00e9cup\u00e9rer les photos ?',
+          contexte:['Cmcee Folschviller N \u00b7 08:00','Decathlon/Houdemont \u00b7 13:00','BASIC FIT/Varennes-Vauzelles \u00b7 13:00'],
+          source:'',deUser:'demo_zeus',deNom:'Harouna (super-admin)',pourRole:'superviseur',pourUser:'',etat:'a_faire',cree:Date.now()-2*h,fil:[]});
+        arr.push({id:'demo_tk2',kind:'echange',objet:'Facturation AQUILA \u2014 juillet \u00e0 recouper',
+          message:'Les heures du planning ne collent pas avec le BDC. Tu regardes ?',
+          contexte:['AQUILA \u00b7 juillet 2026'],
+          source:'',deUser:'demo_zeus',deNom:'Harouna (super-admin)',pourRole:'admin',pourUser:'',etat:'en_cours',cree:Date.now()-26*h,
+          fil:[{qui:'Administrateur',at:Date.now()-3*h,txt:'Je reprends les bons de commande, retour demain.',etat:'en_cours'}]});
+        arr.push({id:'demo_tk3',kind:'echange',objet:'Leclerc Niort \u2014 vacation qui revient chaque jour',
+          message:'Il faut trancher : on annule la r\u00e9currence ou on la garde ?',
+          contexte:['Leclerc Niort \u00b7 r\u00e9currence quotidienne'],
+          source:'',deUser:'demo_sup',deNom:'Superviseur',pourRole:'superadmin',pourUser:'',etat:'a_faire',cree:Date.now()-h,fil:[]});
+        try{ tkxSave(arr); }catch(e){}
+        try{ if(typeof terrainBadge==='function')terrainBadge(); }catch(e){}
+      } },
     coches:{ titre:'🎛️ Une coche de contrôle ne bouge plus',
       quoi:'Une vacation de nuit d’hier, 20 h → 6 h, avec trois appels de contrôle : 23:00, 01:00 et 03:00.',
       aFaire:'Va dans « Suivi des appels » (période : hier → aujourd’hui) et coche les trois contrôles « Fait ». Reviens au 📅 Planning, ouvre la vacation SITE ÉTALON, et dans « 🎫 Tickets de cette vacation » ajoute un contrôle à 21:00. Retourne au Suivi des appels : les trois coches doivent être exactement là où tu les as mises, et 21:00 doit arriver vierge. (Avant, 23:00 revenait dans la file et 21:00 arrivait déjà coché.) Essaie aussi de changer l’heure d’un contrôle déjà coché : sa coche le suit.',
@@ -3739,6 +3763,8 @@ button.big:active{transform:translateY(1px)}
     },400);
   }
   function demoNettoyer(){
+    /* b380 : les tickets de demo partent avec le reste — une demo ne laisse pas de trace. */
+    try{ if(typeof tkxLoad==='function')tkxSave(tkxLoad().filter(function(t){ return !t||String(t.id).indexOf('demo_tk')!==0; })); }catch(e){}
     try{ SUIVI=(SUIVI||[]).filter(function(m){ return String(m.id||'').indexOf('demo_')!==0; }); save('fkh_suivi',SUIVI); }catch(e){}
     try{ localStorage.removeItem('fkh_pc_poste'); localStorage.removeItem('fkh_mail_hb'); }catch(e){}
     location.href=location.pathname+'?sandbox=1';
@@ -6185,7 +6211,9 @@ button.big:active{transform:translateY(1px)}
     try{ if(typeof tkxAutoScan==='function')tkxAutoScan(); }catch(e){}   /* b365 : on relit la file avant d'afficher */
     var arr=tkxLoad().filter(function(t){return t&&t.kind==='echange';});
     var recus=arr.filter(tkxPourMoi), envoyes=(quoi==='recus')?[]:arr.filter(tkxDeMoi);   /* b378 */
-    if(!recus.length&&!envoyes.length)return '';
+    /* b379 : ce que je vois sans que ce soit a moi — je suis au-dessus du destinataire. */
+    var dessus=arr.filter(function(t){ return !tkxPourMoi(t)&&!tkxDeMoi(t)&&tkxVisible(t); });
+    if(!recus.length&&!envoyes.length&&!dessus.length)return '';
     function carte(t,mien){
       var e=TK_ETATS[t.etat]||TK_ETATS.a_faire;
       var d=new Date(t.cree), dt=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' '+('0'+d.getHours()).slice(-2)+'h'+('0'+d.getMinutes()).slice(-2);
@@ -6194,7 +6222,8 @@ button.big:active{transform:translateY(1px)}
         +'<b style="flex:1;min-width:140px">'+esc(t.objet)+'</b>'
         +(_rv?('<span class="sub" style="margin:0;color:#a99bff;font-weight:700">\ud83d\udd04 renvoy\u00e9 '+_rv+' fois</span>'):'')
         +'<span style="color:'+e[1]+';font-weight:700">'+e[0]+'</span></div>'
-        +'<div class="sub" style="margin:3px 0 0">'+(mien?('à '+esc(t.pourRole||t.pourUser||'—')):('de '+esc(t.deNom||'—')))+' · '+dt
+        +'<div class="sub" style="margin:3px 0 0">'+(mien?('à '+esc(tkxPourQui(t))):('de '+esc(t.deNom||'—')))+' · '+dt
+          +((!mien&&!tkxPourMoi(t))?(' · <span style="color:#a99bff">\ud83d\udc41 adress\u00e9 '+esc(tkxPourQui(t))+'</span>'):'')   /* b379 */
           +(mien?(t.vuAt?(' · <span style="color:#1a9e5c">\u2705 vu le '+(function(){var v=new Date(t.vuAt);return ('0'+v.getDate()).slice(-2)+'/'+('0'+(v.getMonth()+1)).slice(-2)+' à '+('0'+v.getHours()).slice(-2)+' h '+('0'+v.getMinutes()).slice(-2);})()+(t.vuPar?(' par '+esc(t.vuPar)):'')+'</span>')
                      :' · <span style="color:#e0a13b">\u23F3 pas encore ouvert</span>'):'')
           +'</div>'
@@ -6237,6 +6266,16 @@ button.big:active{transform:translateY(1px)}
     var envO=envoyes.filter(ouvert), envC=envoyes.filter(function(t){return !ouvert(t);});
     if(recusO.length)out+='<div class="lab" style="margin:10px 0 5px">📥 Ce qu’on me demande ('+recusO.length+')</div>'+recusO.map(function(t){return carte(t,false);}).join('');
     if(envO.length)out+='<div class="lab" style="margin:14px 0 5px">📤 Ce que j’ai demandé ('+envO.length+')</div>'+envO.map(function(t){return carte(t,true);}).join('');
+    /* b379 : ce que je surveille d'en haut vient APRES ce qu'on me demande — sinon le travail
+       des autres passe devant le mien. Repliable : c'est de la surveillance, pas une file. */
+    if(dessus.length){
+      var dO=dessus.filter(ouvert), dC=dessus.filter(function(t){return !ouvert(t);});
+      out+='<details style="margin-top:14px"'+(dO.length?' open':'')+'><summary style="cursor:pointer;font-weight:700;color:#a99bff">\ud83d\udc41 Ce que je surveille ('+dO.length+' en cours'+(dC.length?(' \u00b7 '+dC.length+' clos'):'')+')</summary>'
+        +'<div class="sub" style="margin:4px 0 6px">Adress\u00e9s \u00e0 quelqu\u2019un d\u2019autre. Tu les vois parce que tu es au-dessus ; ton passage ne compte pas comme accus\u00e9 de lecture.</div>'
+        +dO.map(function(t){return carte(t,false);}).join('')
+        +(dC.length?('<div class="lab" style="margin:10px 0 4px">\u2705 clos</div>'+dC.map(function(t){return carte(t,false);}).join('')):'')
+        +'</details>';
+    }
     if(recusC.length||envC.length){   /* b366 : la consultation des tickets traites */
       out+='<details style="margin-top:14px"><summary style="cursor:pointer;font-weight:700;color:#1a9e5c">\u2705 Traités ('+(recusC.length+envC.length)+') — tout l’historique</summary><div style="margin-top:8px">'
         +(recusC.length?('<div class="lab" style="margin:4px 0">📥 qu’on m’avait demandé</div>'+recusC.map(function(t){return carte(t,false);}).join('')):'')
@@ -8717,6 +8756,21 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
   function tkxSave(a){ save('fkh_tickets',a); }
   function tkxMoi(){ try{ return (typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'moi'; }catch(e){ return 'moi'; } }
   function tkxMonNom(){ try{ return (typeof opNow==='function'&&opNow())||tkxMoi(); }catch(e){ return tkxMoi(); } }
+  /* b379 : l'echelle des rangs. On voit un ticket si on est au moins au niveau vise. */
+  var TKX_RANGS={operateur:1,superviseur:2,admin:3,superadmin:4,full:4};
+  function tkxRang(r){ return TKX_RANGS[r||'']||0; }
+  function tkxVisible(t){
+    if(!t||t.kind!=='echange')return false;
+    if(tkxPourMoi(t)||tkxDeMoi(t))return true;
+    if(!t.pourRole)return false;
+    var moi=tkxRang(drRole()), cible=tkxRang(t.pourRole);
+    /* un operateur ne voit jamais par le dessus : il n'y a rien au-dessus de lui a voir. */
+    if(moi<=1)return false;
+    return cible>0&&moi>cible;
+  }
+  /* Le libelle du destinataire, pour que celui qui regarde d'en haut sache a qui c'est adresse. */
+  var TKX_ROLE_TXT={operateur:'aux op\u00e9rateurs',superviseur:'aux superviseurs',admin:'aux administrateurs',superadmin:'au super-admin',full:'au super-admin'};
+  function tkxPourQui(t){ return (t&&t.pourUser)?t.pourUser:((t&&TKX_ROLE_TXT[t.pourRole])||'\u2014'); }
   function tkxPourMoi(t){
     if(!t||t.kind!=='echange')return false;
     var r=drRole(); if(t.pourUser&&t.pourUser===tkxMoi())return true;
