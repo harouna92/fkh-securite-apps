@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v08-08·b377</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v08-08·b378</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -989,6 +989,7 @@ button.big:active{transform:translateY(1px)}
   </section>
   <section id="sec-terrain" class="hidden">
     <div><h1>📨 Remontées terrain</h1><p class="sub">Une info reçue par téléphone à faire remonter (prolongation, modif, incident…). Écris + Envoyer. En cas d'urgence, clique 🆘. Les responsables sont alertés (cloche + badge) et accusent réception.</p></div>
+    <div id="terrain-tickets"></div>   <!-- b378 : ce qu'on me demande passe avant ce que j'ecris -->
     <div id="terrain-write"></div>
     <div id="terrain-inbox"></div>
   </section>
@@ -5229,7 +5230,15 @@ button.big:active{transform:translateY(1px)}
   function terrainPending(){ return terrainLoad().filter(function(x){return !x.pris;}); }
   function _terrainWhen(iso){ try{var d=new Date(iso);return (''+d.getDate()).padStart(2,'0')+'/'+(''+(d.getMonth()+1)).padStart(2,'0')+' '+(''+d.getHours()).padStart(2,'0')+':'+(''+d.getMinutes()).padStart(2,'0');}catch(e){return '';} }
   // Badge compteur sur l'onglet (superviseur+ seulement) : nb en attente, ROUGE si au moins un 🆘 SOS.
-  function terrainBadge(){ var el=byId('terrain-cnt'); if(!el)return; if(!terrainCanManage()){ el.style.display='none'; return; } var p=terrainPending(), sos=p.filter(function(x){return x.sos;}).length; if(!p.length){ el.style.display='none'; el.textContent=''; return; } el.style.display=''; el.textContent=p.length; el.style.background=sos?'#c02626':''; el.style.color=sos?'#fff':''; }
+  function terrainBadge(){ var el=byId('terrain-cnt'); if(!el)return; if(!terrainCanManage()){ el.style.display='none'; return; }
+    var p=terrainPending(), sos=p.filter(function(x){return x.sos;}).length;
+    /* b378 : un ticket recu et non clos compte dans le badge, sinon il arrive dans Terrain sans
+       que rien ne le signale — et un ticket qu'on ne voit pas est un ticket qui attend. */
+    var tk=0; try{ if(typeof tkxLoad==='function')tk=tkxLoad().filter(function(t){ return t&&t.kind==='echange'&&t.etat!=='fait'&&tkxPourMoi(t); }).length; }catch(_e){}
+    var tot=p.length+tk;
+    if(!tot){ el.style.display='none'; el.textContent=''; return; }
+    el.style.display=''; el.textContent=tot; el.style.background=sos?'#c02626':''; el.style.color=sos?'#fff':'';
+    el.title=(p.length?(p.length+' remont\u00e9e(s) \u00e0 traiter'):'')+((p.length&&tk)?' \u00b7 ':'')+(tk?(tk+' ticket(s) re\u00e7u(s)'):''); }
   // Notification (cloche + son) dès qu'une nouvelle remontée arrive (superviseur+). 🆘 = urgent.
   var TERRAIN_SEEN=null;
   function terrainNotify(){ if(!terrainCanManage()){ terrainBadge(); return; } var p=terrainPending(); if(TERRAIN_SEEN===null){ TERRAIN_SEEN={}; p.forEach(function(x){TERRAIN_SEEN[x.id]=1;}); terrainBadge(); return; } p.forEach(function(x){ if(!TERRAIN_SEEN[x.id]){ TERRAIN_SEEN[x.id]=1; if(typeof terrainToast==='function')terrainToast(x); if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on&&(typeof notifCanFire!=='function'||notifCanFire())){ notifFire({cat:'nouvelle_demande',key:'terrain'+x.id,title:(x.sos?'🆘 URGENT — un opérateur demande un rappel':'📨 Nouvelle remontée terrain'),body:(x.auteur||'')+(x.texte?' : '+String(x.texte).slice(0,70):''),go:'terrain'}); } else if(typeof notifBeep==='function'){ try{notifBeep();}catch(e){} } } }); terrainBadge(); }
@@ -5243,6 +5252,15 @@ button.big:active{transform:translateY(1px)}
   function terrainReply(id){ var inp=document.querySelector('.terrain-reply[data-id="'+id+'"]'); var t=inp?(inp.value||'').trim():''; if(!t)return; var a=terrainLoad(),i; for(i=0;i<a.length;i++){ if(a[i].id===id){ a[i].reponse=t; a[i].reponduPar=terrainWho(); a[i].reponduAt=new Date().toISOString(); break; } } terrainSave(a); renderTerrain(); }
   function renderTerrain(){
     terrainBadge();
+    /* b378 : les tickets qui me sont adresses, traitables ici meme. L'accuse de lecture part
+       a l'ouverture de Terrain, comme il partait a l'ouverture de Tickets. */
+    try{ var _tkb=byId('terrain-tickets');
+      if(_tkb&&typeof tkxBloc==='function'){
+        if(typeof tkxMarquerVus==='function')tkxMarquerVus();
+        var _h=tkxBloc('recus');
+        _tkb.innerHTML=_h?('<div class="lab" style="margin:0 0 4px;color:#6ea8fe">\ud83c\udfab Tickets qui m\u2019attendent</div>'+_h):'';
+        if(_h&&typeof tkxWire==='function')tkxWire(_tkb);
+      } }catch(_e){}
     var w=byId('terrain-write'); if(!w)return;
     w.innerHTML='<div class="card"><div class="lab" style="margin:0 0 6px">✍️ Une info à faire remonter</div><textarea id="terrain-txt" placeholder="Ex. le client X a appelé pour prolonger la mission jusqu\'à vendredi…" style="width:100%;min-height:70px"></textarea><div class="acts" style="margin-top:8px;gap:8px;flex-wrap:wrap"><button class="ok" id="terrain-send">📨 Envoyer</button><button id="terrain-sos" style="background:#c02626;border-color:#c02626;color:#fff;font-weight:700">🆘 URGENT — me rappeler</button></div><div class="sub" id="terrain-status" style="margin-top:6px"></div></div>';
     if(byId('terrain-send'))byId('terrain-send').onclick=function(){ terrainAdd(false); };
@@ -6161,10 +6179,12 @@ button.big:active{transform:translateY(1px)}
       plMultiForm();   /* b361 : on saisit UNE fois pour toutes les cases */
     }; // b297
   }
-  function tkxBloc(){
+  /* b378 : « recus » = la vue du destinataire (Terrain). Sans argument, rien ne change pour
+     la section Tickets, qui montre les deux sens. */
+  function tkxBloc(quoi){
     try{ if(typeof tkxAutoScan==='function')tkxAutoScan(); }catch(e){}   /* b365 : on relit la file avant d'afficher */
     var arr=tkxLoad().filter(function(t){return t&&t.kind==='echange';});
-    var recus=arr.filter(tkxPourMoi), envoyes=arr.filter(tkxDeMoi);
+    var recus=arr.filter(tkxPourMoi), envoyes=(quoi==='recus')?[]:arr.filter(tkxDeMoi);   /* b378 */
     if(!recus.length&&!envoyes.length)return '';
     function carte(t,mien){
       var e=TK_ETATS[t.etat]||TK_ETATS.a_faire;
@@ -8755,6 +8775,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       etat:'a_faire', cree:Date.now(), fil:[]});
     tkxSave(arr);
     try{ if(typeof notifScan==='function')notifScan(); }catch(e){}
+    try{ if(typeof terrainBadge==='function')terrainBadge(); }catch(e){}   /* b378 */
     return true;
   }
   function tkxRepondre(id,etat,mot){
@@ -8763,7 +8784,11 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       if(etat)arr[i].etat=etat;
       if(mot)arr[i].fil.push({qui:tkxMonNom(),at:Date.now(),txt:mot,etat:etat||''});
       arr[i].maj=Date.now(); arr[i].luPar=''; break; }
-    tkxSave(arr); if(typeof renderTickets==='function')renderTickets(); if(typeof ppRefresh==='function')ppRefresh();
+    tkxSave(arr); if(typeof renderTickets==='function')renderTickets();
+    /* b378 : le ticket vit maintenant dans Terrain aussi — les deux vues doivent bouger ensemble. */
+    if(typeof renderTerrain==='function'&&byId('sec-terrain')&&!byId('sec-terrain').classList.contains('hidden'))try{renderTerrain();}catch(_e){}
+    else if(typeof terrainBadge==='function')try{terrainBadge();}catch(_e){}
+    if(typeof ppRefresh==='function')ppRefresh();
   }
   /* Le formulaire de demande, ouvert depuis la pastille : on ne quitte pas la vue. */
   function tkxDemander(source,titre,lignes){
@@ -8783,7 +8808,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     byId('tkx-go').onclick=function(){
       tkxCreer({objet:byId('tkx-obj').value||titre, message:byId('tkx-msg').value||'', contexte:lignes, source:source, pourRole:byId('tkx-pour').value});
       pop.parentNode.removeChild(pop);
-      alert('Ticket envoyé. Tu verras sa réponse dans 🎫 Tickets, et la cloche te préviendra.');
+      alert('Ticket envoy\u00e9.\n\n\ud83d\udce8 Il arrive dans « Remont\u00e9es terrain » chez le destinataire.\n\ud83c\udfab Tu suis sa r\u00e9ponse dans Tickets, et la cloche te pr\u00e9viendra.');   /* b378 */
     };
   }
   /* ===== b245 : TENUES ENVOYEES, RECEPTION NON CONFIRMEE =====
@@ -10302,7 +10327,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     /* b242 : un ticket qui m'est adresse et qui n'est pas clos est une alerte ; une reponse a mon ticket aussi. */
     try{ tkxLoad().forEach(function(t){
       if(t.kind!=='echange')return;
-      if(tkxPourMoi(t)&&t.etat!=='fait'){ out.push({cat:'ticket_recu',key:'tkr'+t.id,title:'🎫 '+t.objet,body:(t.deNom||'')+' attend un retour de toi.',when:(typeof impTodayISO==='function'?impTodayISO():'')}); }
+      if(tkxPourMoi(t)&&t.etat!=='fait'){ out.push({cat:'ticket_recu',key:'tkr'+t.id,title:'🎫 '+t.objet,body:(t.deNom||'')+' attend un retour de toi.',go:'terrain',when:(typeof impTodayISO==='function'?impTodayISO():'')}); }   /* b378 : la notification ouvre Terrain, la ou le ticket se traite */
       else if(tkxDeMoi(t)&&t.fil&&t.fil.length&&t.etat!=='a_faire'){ out.push({cat:'ticket_reponse',key:'tkp'+t.id+'_'+t.fil.length,title:'💬 Retour — '+t.objet,body:(TK_ETATS[t.etat]||['',''])[0]+' · '+(t.fil[t.fil.length-1].txt||''),when:(typeof impTodayISO==='function'?impTodayISO():'')}); }
     }); }catch(_e){}
     /* b229 : une annulation non tranchee est une alerte — elle part aussi en notification telephone. */
