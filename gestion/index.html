@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v08-08·b382</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v08-08·b383</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3402,7 +3402,23 @@ button.big:active{transform:translateY(1px)}
           cree:Date.now()-5*h,fil:[]});
         try{ tkxSave(arr); }catch(e){}
         try{ if(typeof terrainBadge==='function')terrainBadge(); }catch(e){}
-      } },
+      },
+      /* b383 : la visite guidee — chaque « Suivant » fait le geste pour de vrai.
+         On pilote demo_tk3 : c'est le seul des trois qui soit ADRESSE a Zeus, donc le seul dont
+         le badge et l'accuse de lecture le concernent. Les deux autres illustrent la surveillance. */
+      guide:function(){ return [
+        {sel:'#tabs button[data-s="terrain"]', txt:'<b>8 h 01.</b> Un superviseur vient de t\u2019envoyer un ticket. Cet onglet porte un <b>badge</b> \u2014 c\u2019est le seul signal n\u00e9cessaire. Ouvrons la page.', btn:'Ouvrir', attendre:800,
+         fait:function(){ var b=document.querySelector('#tabs button[data-s="terrain"]'); if(b)b.click(); }},
+        {sel:'#terrain-tickets', txt:'<b>Tu n\u2019as rien cliqu\u00e9 d\u2019autre.</b> Le simple fait d\u2019ouvrir cette page pose l\u2019<b>accus\u00e9 de lecture</b> : celui qui te l\u2019a envoy\u00e9 lit d\u00e9j\u00e0 \u00ab \ud83d\udc41 ouvert apr\u00e8s\u2026 \u00bb sur sa carte. En haut : <b>ce qu\u2019on te demande</b>.', btn:'Je le prends'},
+        {sel:'#terrain-tickets', txt:'<b>8 h 05.</b> Tu cliques <b>\ud83d\udd04 En cours</b>. La carte change de couleur, et l\u2019exp\u00e9diteur voit exactement la m\u00eame chose de son c\u00f4t\u00e9.', btn:'Cliquer En cours', attendre:800,
+         fait:function(){ var b=document.querySelector('#terrain-tickets .tkx-e[data-id="demo_tk3"][data-e="en_cours"]'); if(b)b.click(); }},
+        {sel:'#terrain-cnt', txt:'<b>9 h 30.</b> C\u2019est r\u00e9gl\u00e9 : <b>\u2705 Fait</b>. Regarde le badge de l\u2019onglet <b>s\u2019\u00e9teindre</b>, et le ticket <b>descendre dans \u2705 Trait\u00e9s</b> \u2014 consultable quand tu le cherches, invisible quand tu travailles.', btn:'Cliquer Fait', attendre:900,
+         fait:function(){ var b=document.querySelector('#terrain-tickets .tkx-e[data-id="demo_tk3"][data-e="fait"]'); if(b)b.click(); }},
+        {sel:'#terrain-tickets', txt:'Plus bas, <b>\ud83d\udc41 Ce que je surveille</b> : deux tickets adress\u00e9s \u00e0 <b>quelqu\u2019un d\u2019autre</b> \u2014 aux superviseurs, aux administrateurs. Tu les vois parce que tu es au-dessus, chaque carte le dit. Mais ils <b>ne comptent pas dans ton badge</b>, et les ouvrir <b>ne pose aucun accus\u00e9 de lecture</b> : sinon l\u2019exp\u00e9diteur croirait que le destinataire a ouvert.', btn:'Passer c\u00f4t\u00e9 \u00e9metteur', attendre:800,
+         fait:function(){ var b=document.querySelector('#tabs button[data-s="tickets"]'); if(b)b.click(); }},
+        {sel:'#tk-body', txt:'Sous <b>\ud83d\udce4 Ce que j\u2019ai demand\u00e9</b>, chaque ticket porte ses <b>trois d\u00e9lais</b> : ouvert apr\u00e8s\u2026, 1re action apr\u00e8s\u2026, clos apr\u00e8s\u2026. Celui que <b>personne n\u2019a ouvert</b> affiche son attente qui tourne \u2014 c\u2019est lui qui te dit de relancer.', btn:'Et s\u2019il manque un point ?'},
+        {sel:'#tk-body', txt:'<b>9 h 32.</b> Il reste Houdemont. Tu ne recr\u00e9es pas un ticket : <b>\ud83d\udd04 Renvoyer</b> sur le ticket clos. Il repart chez <b>la m\u00eame personne</b> avec tout l\u2019historique \u2014 m\u00eame dossier, et les d\u00e9lais repartent \u00e0 z\u00e9ro pour ce nouveau tour.', btn:'Terminer'},
+      ]; } },
     coches:{ titre:'🎛️ Une coche de contrôle ne bouge plus',
       quoi:'Une vacation de nuit d’hier, 20 h → 6 h, avec trois appels de contrôle : 23:00, 01:00 et 03:00.',
       aFaire:'Va dans « Suivi des appels » (période : hier → aujourd’hui) et coche les trois contrôles « Fait ». Reviens au 📅 Planning, ouvre la vacation SITE ÉTALON, et dans « 🎫 Tickets de cette vacation » ajoute un contrôle à 21:00. Retourne au Suivi des appels : les trois coches doivent être exactement là où tu les as mises, et 21:00 doit arriver vierge. (Avant, 23:00 revenait dans la file et 21:00 arrivait déjà coché.) Essaie aussi de changer l’heure d’un contrôle déjà coché : sa coche le suit.',
@@ -3776,6 +3792,16 @@ button.big:active{transform:translateY(1px)}
       if(D.guide)setTimeout(function(){ try{ guideDemarrer(D.guide()); }catch(e){} },700);   /* b253 */
     },400);
   }
+  /* b383 : rejouer = effacer ce que la demo avait pose, puis tout remonter et relancer la
+     visite guidee a l'etape 1. Sans l'effacement prealable, un second passage poserait une
+     deuxieme vacation « SITE ETALON » et on ne saurait plus laquelle on regarde. */
+  function demoRejouer(k){
+    try{ if(typeof guideStop==='function')guideStop(); }catch(e){}
+    try{ SUIVI=(SUIVI||[]).filter(function(m){ return String(m.id||'').indexOf('demo_')!==0; }); save('fkh_suivi',SUIVI); }catch(e){}
+    try{ if(typeof tkxLoad==='function')tkxSave(tkxLoad().filter(function(t){ return !t||String(t.id).indexOf('demo_tk')!==0; })); }catch(e){}
+    try{ var q=byId('tn-pop')||byId('pph-pop')||byId('tkx-pop'); if(q)q.parentNode.removeChild(q); }catch(e){}
+    demoMonter(k);
+  }
   function demoNettoyer(){
     /* b380 : les tickets de demo partent avec le reste — une demo ne laisse pas de trace. */
     try{ if(typeof tkxLoad==='function')tkxSave(tkxLoad().filter(function(t){ return !t||String(t.id).indexOf('demo_tk')!==0; })); }catch(e){}
@@ -3790,9 +3816,11 @@ button.big:active{transform:translateY(1px)}
     el.innerHTML='<b style="color:#a68bff">🧪 DÉMO — '+esc(D.titre)+'</b> <span class="sub" style="margin:0">'+esc(D.quoi)+'</span>'
       +'<div style="margin-top:4px"><b>À toi :</b> '+esc(D.aFaire)+'</div>'
       +'<div style="margin-top:7px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="demo-clean" style="font-size:12px">🧹 Effacer la démo</button>'
+      +(D.guide?'<button type="button" id="demo-replay" style="font-size:12px;border-color:#7b61ff;color:#a68bff">🔁 Rejouer la démo</button>':'')   /* b383 */
       +'<button type="button" id="demo-hide" style="font-size:12px">Masquer ce bandeau</button></div>';
     document.body.appendChild(el);
     byId('demo-clean').onclick=demoNettoyer;
+    var _rp=byId('demo-replay'); if(_rp)_rp.onclick=function(){ demoRejouer(k); };   /* b383 */
     byId('demo-hide').onclick=function(){ el.style.display='none'; };
   }
   /* b237 : la cloche suit la meme regle que les pastilles — reglable dans la grille des droits.

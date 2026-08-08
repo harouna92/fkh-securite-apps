@@ -1020,6 +1020,15 @@
    "pourquoipas": "Deux tickets partis de Zeus s'ajoutent au scénario : un ouvert en 7 min et agi à 22 min, un parti il y a 5 h que personne n'a ouvert. Au passage, deux scories d'affichage corrigées avant toute mise en ligne — « à aux superviseurs » et « pas encore ouvert » écrit deux fois.",
    "local": true,
    "demo": "ticket"
+  },
+  {
+   "b": 383,
+   "titre": "Visite guidée du ticket + bouton « Rejouer la démo »",
+   "source": "demande de Zeus, 08/08 — « une démo dynamique »",
+   "theme": "Tickets",
+   "pourquoipas": "Sept étapes qui font les gestes pour de vrai : le badge, l'accusé de lecture posé par la simple ouverture, En cours, Fait, le badge qui s'éteint, le bloc de surveillance, les délais côté émetteur, le renvoi. Un bouton « Rejouer la démo » remet tout à zéro et relance à l'étape 1 — il efface d'abord le décor précédent, sinon deux passages empileraient deux fois la même vacation.",
+   "local": true,
+   "demo": "ticket"
   }
  ],
  "attente": [
