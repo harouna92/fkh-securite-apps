@@ -1,6 +1,6 @@
 {
  "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
- "maj": "2026-08-07",
+ "maj": "2026-08-08",
  "items": [
   {
    "b": 222,
@@ -967,6 +967,14 @@
    "source": "capture de Zeus, 07/08 — « c'est limité au 5 août »",
    "theme": "Tenues & photos",
    "pourquoipas": "La liste montrait les 60 photos les plus récentes, quelle que soit la vacation : un ticket du 04/08 ne voyait AUCUNE de ses 32 photos, un ticket du 26/07 aucune de ses 8. La liste s'ouvre désormais sur le jour du ticket, avec un sélecteur de date pour élargir et un bouton « Toutes les dates » pour tout revoir. Sans ticket (photo de tenue), rien ne change.",
+   "local": true
+  },
+  {
+   "b": 377,
+   "titre": "La vue tenue nomme les sites comme le Planning, et donne les horaires",
+   "source": "capture de Zeus, 08/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "La vue écrivait « Basic Fit » là où le Planning écrit « Basic Fit (Parthenay) ». Pire : elle groupait sur le seul nom, donc Parthenay, Lexy, Mayenne et Niort ne faisaient qu'une ligne — un site non couvert pouvait se cacher derrière un site couvert (5 lignes concernées sur le dump). Elle affiche désormais SITE (ville) + le client, groupe sur site+ville, et chaque agent porte l'horaire de sa mission (240 agent-site sur 240).",
    "local": true
   }
  ],
