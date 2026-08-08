@@ -976,6 +976,14 @@
    "theme": "Tenues & photos",
    "pourquoipas": "La vue écrivait « Basic Fit » là où le Planning écrit « Basic Fit (Parthenay) ». Pire : elle groupait sur le seul nom, donc Parthenay, Lexy, Mayenne et Niort ne faisaient qu'une ligne — un site non couvert pouvait se cacher derrière un site couvert (5 lignes concernées sur le dump). Elle affiche désormais SITE (ville) + le client, groupe sur site+ville, et chaque agent porte l'horaire de sa mission (240 agent-site sur 240).",
    "local": true
+  },
+  {
+   "b": 378,
+   "titre": "Les tickets arrivent dans 📨 Remontées terrain",
+   "source": "décision de Zeus, 08/08",
+   "theme": "Tickets",
+   "pourquoipas": "Un ticket envoyé au superviseur atterrissait dans 🎫 Tickets, une section qu'il n'ouvre pas. Il arrive maintenant en tête de Remontées terrain, là où il travaille, avec les quatre états et la réponse sur place — sans sortir vers une autre section. Le badge de l'onglet compte les tickets reçus non clos, la notification téléphone ouvre Terrain, et l'accusé de lecture part à l'ouverture. 🎫 Tickets reste la section de celui qui envoie : Zeus y suit le traitement, consulte les clos et renvoie un point.",
+   "local": true
   }
  ],
  "attente": [
