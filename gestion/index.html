@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v07-08·b376</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v08-08·b377</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -7984,6 +7984,10 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
      dans la base, une photo de tenue ?
      COMMENT : trois entrees — les agents sans photo (avec de quoi en designer une tout de suite), les
      sites couverts, les sites non couverts. On descend jusqu'a l'action sans quitter la pastille. */
+  /* b377 : le MEME libelle que le Planning — « SITE (ville) ». Le Planning ecrit la ville entre
+     parentheses a cote du nom ; la vue tenue doit dire la meme chose, sinon on croit lire deux
+     sites differents. */
+  function tnLabel(site,ville){ var s=String(site||'\u2014'); return (ville&&s.toLowerCase().indexOf(String(ville).toLowerCase())<0)?(s+' ('+ville+')'):s; }
   function tnCalc(){
     var jour=(typeof impTodayISO==='function')?impTodayISO():'';
     var parAgent={}, parSite={};
@@ -7994,10 +7998,17 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       if(!m.agentId)return;
       var a=(typeof faById==='function')?faById(m.agentId):null; if(!a)return;
       var nom=a.nom||'', site=m.siteAgent||m.titre||'—';
+      /* b377 : « Basic Fit » tout court est a Parthenay, Lexy, Mayenne, Niort... Grouper sur le
+         seul nom fondait ces sites en une ligne — et un site non couvert se cachait derriere un
+         couvert. La ville fait partie de l'identite du site, comme dans le Planning. */
+      var ville=m.ville||'', cleSite=site+'\u0001'+ville;
       if(!parAgent[nom])parAgent[nom]={nom:nom,sites:{},aPhoto:(typeof agentAPhotoTenue==='function')?agentAPhotoTenue(nom):false};
-      parAgent[nom].sites[site]=1;
-      if(!parSite[site])parSite[site]={site:site,agents:{}};
-      parSite[site].agents[nom]=1;
+      parAgent[nom].sites[tnLabel(site,ville)]=1;
+      if(!parSite[cleSite])parSite[cleSite]={site:site,ville:ville,client:m.client||'',agents:{},horaires:{}};
+      parSite[cleSite].agents[nom]=1;
+      /* b377 : l'horaire de CHAQUE mission de cet agent sur ce site aujourd'hui. */
+      if(m.mheure||m.mfin){ var _h=(m.mheure||'—')+' \u2192 '+(m.mfin||'—');
+        parSite[cleSite].horaires[nom]=parSite[cleSite].horaires[nom]||{}; parSite[cleSite].horaires[nom][_h]=1; }
     });
     var sans=[], avec=[];
     Object.keys(parAgent).forEach(function(n){ var o=parAgent[n];
@@ -8006,10 +8017,12 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     Object.keys(parSite).forEach(function(s){ var o=parSite[s];
       var ags=Object.keys(o.agents);
       var manquants=ags.filter(function(n){ return parAgent[n]&&!parAgent[n].aPhoto; });
-      (manquants.length?sitesKO:sitesOK).push({site:s,agents:ags,manquants:manquants}); });
+      /* b377 : on transporte de quoi nommer le site comme le Planning et d'afficher les horaires. */
+      (manquants.length?sitesKO:sitesOK).push({site:o.site,ville:o.ville,client:o.client,horaires:o.horaires,agents:ags,manquants:manquants}); });
     sans.sort(function(a,b){return String(a.nom).localeCompare(String(b.nom));});
-    sitesOK.sort(function(a,b){return String(a.site).localeCompare(String(b.site));});
-    sitesKO.sort(function(a,b){return String(a.site).localeCompare(String(b.site));});
+    function _tri(a,b){ return tnLabel(a.site,a.ville).localeCompare(tnLabel(b.site,b.ville)); }   /* b377 */
+    sitesOK.sort(_tri);
+    sitesKO.sort(_tri);
     return {jour:jour, sans:sans, avec:avec, sitesOK:sitesOK, sitesKO:sitesKO};
   }
   function tnRefresh(){
@@ -8027,7 +8040,11 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
      tout de suite. (Demande Zeus 05/08.) */
   /* b344 : depuis un agent sans photo, deux issues — associer une photo déjà reçue, OU créer le ticket
      de contrôle tenue rattaché à son site. Le ticket part chez le SUPERVISEUR (🧭 Terrain). */
-  function _tnLigneAgent(n,site){
+  function _tnLigneAgent(n,site,horaires){
+    /* b377 : « a-t-il une photo » ne suffit pas — il faut savoir QUAND il est sur place pour
+       decider si on peut encore l'appeler. L'horaire de sa mission du jour vient donc avec. */
+    var _hs=(horaires&&horaires[n])?Object.keys(horaires[n]):[];
+    var _htxt=_hs.length?('<span class="sub" style="margin:0;font-size:11.5px">\ud83d\udd50 '+esc(_hs.join(' \u00b7 '))+'</span>'):'';
     var ph=(typeof agentPhotosTenue==='function')?agentPhotosTenue(n):[];
     var vign=ph.length
       ? (ph.slice(0,2).map(function(p){ return '<span class="tn-ph" data-k="'+esc(p.key)+'" style="cursor:zoom-in">'+((typeof photoThumbTag==='function')?photoThumbTag(p.key):'')+'</span>'; }).join('')
@@ -8036,7 +8053,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
          +'<button type="button" class="tn-portail" data-nom="'+esc(n)+'" style="font-size:11.5px;margin-left:6px;border-color:#6ea8fe;color:#6ea8fe">\ud83d\udcf7 Choisir une photo re\u00e7ue</button>'
          +'<button type="button" class="tn-ticket" data-nom="'+esc(n)+'" data-site="'+esc(site||'')+'" title="Cr\u00e9er le ticket de contr\u00f4le tenue \u2014 il part chez le superviseur (\ud83e\udded Terrain)" style="font-size:11.5px;margin-left:6px;border-color:#e0a13b;color:#e0a13b">\ud83c\udfab Ticket contr\u00f4le tenue</button>');
     return '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:4px 0;border-bottom:1px dashed var(--line)">'
-      +'<span style="flex:1;min-width:140px">\ud83d\udc64 '+esc(n)+'</span>'+vign+'</div>';
+      +'<span style="flex:1;min-width:140px">\ud83d\udc64 '+esc(n)+'</span>'+_htxt+vign+'</div>';   /* b377 */
   }
   function tnOuvrir(vue){
     var d=tnCalc();
@@ -8062,15 +8079,17 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     } else if(vue==='ko'){
       htm+=d.sitesKO.length?d.sitesKO.map(function(o){
         return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)">'
-          +'<b>'+esc(o.site)+'</b> <span class="sub" style="margin:0">— '+o.manquants.length+' agent(s) sans photo sur '+o.agents.length+'</span>'
-          +'<div style="margin-top:6px">'+o.agents.map(function(_n){return _tnLigneAgent(_n,o.site);}).join('')
+          +'<b>'+esc(tnLabel(o.site,o.ville))+'</b> <span class="sub" style="margin:0">— '+o.manquants.length+' agent(s) sans photo sur '+o.agents.length+'</span>'   /* b377 */
+          +(o.client?('<div class="sub" style="margin:2px 0 0;font-size:11.5px">\ud83c\udfe2 '+esc(o.client)+'</div>'):'')
+          +'<div style="margin-top:6px">'+o.agents.map(function(_n){return _tnLigneAgent(_n,o.site,o.horaires);}).join('')
           +'</div></div>';
       }).join(''):'<div class="sub">Aucun site en manque : tous les agents du jour ont une photo.</div>';
     } else {
       htm+=d.sitesOK.length?d.sitesOK.map(function(o){
         return '<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:6px;background:var(--panel2)">'
-          +'<b>'+esc(o.site)+'</b> <span class="sub" style="margin:0">— '+o.agents.length+' agent(s), tous avec photo</span>'
-          +'<div style="margin-top:6px">'+o.agents.map(function(_n){return _tnLigneAgent(_n,o.site);}).join('')+'</div></div>';   /* b339 */
+          +'<b>'+esc(tnLabel(o.site,o.ville))+'</b> <span class="sub" style="margin:0">— '+o.agents.length+' agent(s), tous avec photo</span>'   /* b377 */
+          +(o.client?('<div class="sub" style="margin:2px 0 0;font-size:11.5px">\ud83c\udfe2 '+esc(o.client)+'</div>'):'')
+          +'<div style="margin-top:6px">'+o.agents.map(function(_n){return _tnLigneAgent(_n,o.site,o.horaires);}).join('')+'</div></div>';   /* b339 */
       }).join(''):'<div class="sub">Aucun site entièrement couvert pour le moment.</div>';
     }
     pop.innerHTML=htm; document.body.appendChild(pop);
