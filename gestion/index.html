@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v08-08·b383</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b384</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -989,12 +989,12 @@ button.big:active{transform:translateY(1px)}
   </section>
   <section id="sec-terrain" class="hidden">
     <div><h1>📨 Remontées terrain</h1><p class="sub">Une info reçue par téléphone à faire remonter (prolongation, modif, incident…). Écris + Envoyer. En cas d'urgence, clique 🆘. Les responsables sont alertés (cloche + badge) et accusent réception.</p></div>
-    <div id="terrain-tickets"></div>   <!-- b378 : ce qu'on me demande passe avant ce que j'ecris -->
     <div id="terrain-write"></div>
     <div id="terrain-inbox"></div>
   </section>
   <section id="sec-supterrain" class="hidden">
     <div><h1>🧭 Terrain (superviseur)</h1><p class="sub">Ce que les opérateurs font remonter du terrain et qui demande une <b>action superviseur</b> : agents injoignables (10 min pour réagir avant escalade), photos de contrôle tenue à valider. L'admin et le super-admin voient les escalades.</p></div>
+    <div id="supterrain-tickets"></div>   <!-- b384 : ce qu'on me demande passe avant le reste -->
     <div id="supterrain-body"></div>
   </section>
   <section id="sec-planning" class="hidden">
@@ -3401,20 +3401,20 @@ button.big:active{transform:translateY(1px)}
           source:'',deUser:moi,deNom:nom,pourRole:'admin',pourUser:'',etat:'a_faire',
           cree:Date.now()-5*h,fil:[]});
         try{ tkxSave(arr); }catch(e){}
-        try{ if(typeof terrainBadge==='function')terrainBadge(); }catch(e){}
+        try{ if(typeof supTerrainBadge==='function')supTerrainBadge(); }catch(e){}   /* b384 : le decor allume le badge de la bonne section */
       },
       /* b383 : la visite guidee — chaque « Suivant » fait le geste pour de vrai.
          On pilote demo_tk3 : c'est le seul des trois qui soit ADRESSE a Zeus, donc le seul dont
          le badge et l'accuse de lecture le concernent. Les deux autres illustrent la surveillance. */
       guide:function(){ return [
-        {sel:'#tabs button[data-s="terrain"]', txt:'<b>8 h 01.</b> Un superviseur vient de t\u2019envoyer un ticket. Cet onglet porte un <b>badge</b> \u2014 c\u2019est le seul signal n\u00e9cessaire. Ouvrons la page.', btn:'Ouvrir', attendre:800,
-         fait:function(){ var b=document.querySelector('#tabs button[data-s="terrain"]'); if(b)b.click(); }},
-        {sel:'#terrain-tickets', txt:'<b>Tu n\u2019as rien cliqu\u00e9 d\u2019autre.</b> Le simple fait d\u2019ouvrir cette page pose l\u2019<b>accus\u00e9 de lecture</b> : celui qui te l\u2019a envoy\u00e9 lit d\u00e9j\u00e0 \u00ab \ud83d\udc41 ouvert apr\u00e8s\u2026 \u00bb sur sa carte. En haut : <b>ce qu\u2019on te demande</b>.', btn:'Je le prends'},
-        {sel:'#terrain-tickets', txt:'<b>8 h 05.</b> Tu cliques <b>\ud83d\udd04 En cours</b>. La carte change de couleur, et l\u2019exp\u00e9diteur voit exactement la m\u00eame chose de son c\u00f4t\u00e9.', btn:'Cliquer En cours', attendre:800,
-         fait:function(){ var b=document.querySelector('#terrain-tickets .tkx-e[data-id="demo_tk3"][data-e="en_cours"]'); if(b)b.click(); }},
-        {sel:'#terrain-cnt', txt:'<b>9 h 30.</b> C\u2019est r\u00e9gl\u00e9 : <b>\u2705 Fait</b>. Regarde le badge de l\u2019onglet <b>s\u2019\u00e9teindre</b>, et le ticket <b>descendre dans \u2705 Trait\u00e9s</b> \u2014 consultable quand tu le cherches, invisible quand tu travailles.', btn:'Cliquer Fait', attendre:900,
-         fait:function(){ var b=document.querySelector('#terrain-tickets .tkx-e[data-id="demo_tk3"][data-e="fait"]'); if(b)b.click(); }},
-        {sel:'#terrain-tickets', txt:'Plus bas, <b>\ud83d\udc41 Ce que je surveille</b> : deux tickets adress\u00e9s \u00e0 <b>quelqu\u2019un d\u2019autre</b> \u2014 aux superviseurs, aux administrateurs. Tu les vois parce que tu es au-dessus, chaque carte le dit. Mais ils <b>ne comptent pas dans ton badge</b>, et les ouvrir <b>ne pose aucun accus\u00e9 de lecture</b> : sinon l\u2019exp\u00e9diteur croirait que le destinataire a ouvert.', btn:'Passer c\u00f4t\u00e9 \u00e9metteur', attendre:800,
+        {sel:'#tabs button[data-s="supterrain"]', txt:'<b>8 h 01.</b> Un superviseur vient de t\u2019envoyer un ticket. Cet onglet porte un <b>badge</b> \u2014 c\u2019est le seul signal n\u00e9cessaire. Ouvrons la page.', btn:'Ouvrir', attendre:800,
+         fait:function(){ var b=document.querySelector('#tabs button[data-s="supterrain"]'); if(b)b.click(); }},
+        {sel:'#supterrain-tickets', txt:'<b>Tu n\u2019as rien cliqu\u00e9 d\u2019autre.</b> Le simple fait d\u2019ouvrir cette page pose l\u2019<b>accus\u00e9 de lecture</b> : celui qui te l\u2019a envoy\u00e9 lit d\u00e9j\u00e0 \u00ab \ud83d\udc41 ouvert apr\u00e8s\u2026 \u00bb sur sa carte. En haut : <b>ce qu\u2019on te demande</b>.', btn:'Je le prends'},
+        {sel:'#supterrain-tickets', txt:'<b>8 h 05.</b> Tu cliques <b>\ud83d\udd04 En cours</b>. La carte change de couleur, et l\u2019exp\u00e9diteur voit exactement la m\u00eame chose de son c\u00f4t\u00e9.', btn:'Cliquer En cours', attendre:800,
+         fait:function(){ var b=document.querySelector('#supterrain-tickets .tkx-e[data-id="demo_tk3"][data-e="en_cours"]'); if(b)b.click(); }},
+        {sel:'#supterrain-cnt', txt:'<b>9 h 30.</b> C\u2019est r\u00e9gl\u00e9 : <b>\u2705 Fait</b>. Regarde le badge de l\u2019onglet <b>s\u2019\u00e9teindre</b>, et le ticket <b>descendre dans \u2705 Trait\u00e9s</b> \u2014 consultable quand tu le cherches, invisible quand tu travailles.', btn:'Cliquer Fait', attendre:900,
+         fait:function(){ var b=document.querySelector('#supterrain-tickets .tkx-e[data-id="demo_tk3"][data-e="fait"]'); if(b)b.click(); }},
+        {sel:'#supterrain-tickets', txt:'Plus bas, <b>\ud83d\udc41 Ce que je surveille</b> : deux tickets adress\u00e9s \u00e0 <b>quelqu\u2019un d\u2019autre</b> \u2014 aux superviseurs, aux administrateurs. Tu les vois parce que tu es au-dessus, chaque carte le dit. Mais ils <b>ne comptent pas dans ton badge</b>, et les ouvrir <b>ne pose aucun accus\u00e9 de lecture</b> : sinon l\u2019exp\u00e9diteur croirait que le destinataire a ouvert.', btn:'Passer c\u00f4t\u00e9 \u00e9metteur', attendre:800,
          fait:function(){ var b=document.querySelector('#tabs button[data-s="tickets"]'); if(b)b.click(); }},
         {sel:'#tk-body', txt:'Sous <b>\ud83d\udce4 Ce que j\u2019ai demand\u00e9</b>, chaque ticket porte ses <b>trois d\u00e9lais</b> : ouvert apr\u00e8s\u2026, 1re action apr\u00e8s\u2026, clos apr\u00e8s\u2026. Celui que <b>personne n\u2019a ouvert</b> affiche son attente qui tourne \u2014 c\u2019est lui qui te dit de relancer.', btn:'Et s\u2019il manque un point ?'},
         {sel:'#tk-body', txt:'<b>9 h 32.</b> Il reste Houdemont. Tu ne recr\u00e9es pas un ticket : <b>\ud83d\udd04 Renvoyer</b> sur le ticket clos. Il repart chez <b>la m\u00eame personne</b> avec tout l\u2019historique \u2014 m\u00eame dossier, et les d\u00e9lais repartent \u00e0 z\u00e9ro pour ce nouveau tour.', btn:'Terminer'},
@@ -5300,13 +5300,9 @@ button.big:active{transform:translateY(1px)}
   // Badge compteur sur l'onglet (superviseur+ seulement) : nb en attente, ROUGE si au moins un 🆘 SOS.
   function terrainBadge(){ var el=byId('terrain-cnt'); if(!el)return; if(!terrainCanManage()){ el.style.display='none'; return; }
     var p=terrainPending(), sos=p.filter(function(x){return x.sos;}).length;
-    /* b378 : un ticket recu et non clos compte dans le badge, sinon il arrive dans Terrain sans
-       que rien ne le signale — et un ticket qu'on ne voit pas est un ticket qui attend. */
-    var tk=0; try{ if(typeof tkxLoad==='function')tk=tkxLoad().filter(function(t){ return t&&t.kind==='echange'&&t.etat!=='fait'&&tkxPourMoi(t); }).length; }catch(_e){}
-    var tot=p.length+tk;
-    if(!tot){ el.style.display='none'; el.textContent=''; return; }
-    el.style.display=''; el.textContent=tot; el.style.background=sos?'#c02626':''; el.style.color=sos?'#fff':'';
-    el.title=(p.length?(p.length+' remont\u00e9e(s) \u00e0 traiter'):'')+((p.length&&tk)?' \u00b7 ':'')+(tk?(tk+' ticket(s) re\u00e7u(s)'):''); }
+    if(!p.length){ el.style.display='none'; el.textContent=''; return; }
+    el.style.display=''; el.textContent=p.length; el.style.background=sos?'#c02626':''; el.style.color=sos?'#fff':'';
+    el.title=p.length+' remont\u00e9e(s) \u00e0 traiter'; }
   // Notification (cloche + son) dès qu'une nouvelle remontée arrive (superviseur+). 🆘 = urgent.
   var TERRAIN_SEEN=null;
   function terrainNotify(){ if(!terrainCanManage()){ terrainBadge(); return; } var p=terrainPending(); if(TERRAIN_SEEN===null){ TERRAIN_SEEN={}; p.forEach(function(x){TERRAIN_SEEN[x.id]=1;}); terrainBadge(); return; } p.forEach(function(x){ if(!TERRAIN_SEEN[x.id]){ TERRAIN_SEEN[x.id]=1; if(typeof terrainToast==='function')terrainToast(x); if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on&&(typeof notifCanFire!=='function'||notifCanFire())){ notifFire({cat:'nouvelle_demande',key:'terrain'+x.id,title:(x.sos?'🆘 URGENT — un opérateur demande un rappel':'📨 Nouvelle remontée terrain'),body:(x.auteur||'')+(x.texte?' : '+String(x.texte).slice(0,70):''),go:'terrain'}); } else if(typeof notifBeep==='function'){ try{notifBeep();}catch(e){} } } }); terrainBadge(); }
@@ -5320,15 +5316,6 @@ button.big:active{transform:translateY(1px)}
   function terrainReply(id){ var inp=document.querySelector('.terrain-reply[data-id="'+id+'"]'); var t=inp?(inp.value||'').trim():''; if(!t)return; var a=terrainLoad(),i; for(i=0;i<a.length;i++){ if(a[i].id===id){ a[i].reponse=t; a[i].reponduPar=terrainWho(); a[i].reponduAt=new Date().toISOString(); break; } } terrainSave(a); renderTerrain(); }
   function renderTerrain(){
     terrainBadge();
-    /* b378 : les tickets qui me sont adresses, traitables ici meme. L'accuse de lecture part
-       a l'ouverture de Terrain, comme il partait a l'ouverture de Tickets. */
-    try{ var _tkb=byId('terrain-tickets');
-      if(_tkb&&typeof tkxBloc==='function'){
-        if(typeof tkxMarquerVus==='function')tkxMarquerVus();
-        var _h=tkxBloc('recus');
-        _tkb.innerHTML=_h?('<div class="lab" style="margin:0 0 4px;color:#6ea8fe">\ud83c\udfab Tickets qui m\u2019attendent</div>'+_h):'';
-        if(_h&&typeof tkxWire==='function')tkxWire(_tkb);
-      } }catch(_e){}
     var w=byId('terrain-write'); if(!w)return;
     w.innerHTML='<div class="card"><div class="lab" style="margin:0 0 6px">✍️ Une info à faire remonter</div><textarea id="terrain-txt" placeholder="Ex. le client X a appelé pour prolonger la mission jusqu\'à vendredi…" style="width:100%;min-height:70px"></textarea><div class="acts" style="margin-top:8px;gap:8px;flex-wrap:wrap"><button class="ok" id="terrain-send">📨 Envoyer</button><button id="terrain-sos" style="background:#c02626;border-color:#c02626;color:#fff;font-weight:700">🆘 URGENT — me rappeler</button></div><div class="sub" id="terrain-status" style="margin-top:6px"></div></div>';
     if(byId('terrain-send'))byId('terrain-send').onclick=function(){ terrainAdd(false); };
@@ -5425,7 +5412,7 @@ button.big:active{transform:translateY(1px)}
   function stLoad2(){ var a=load('fkh_supterrain'); return Array.isArray(a)?a:[]; }
   function stSave2(a){ save('fkh_supterrain',a); }
   function supTerrainAdd(o){ var a=stLoad2(); o.id='st'+Date.now()+'_'+Math.round(Math.random()*99999); o.at=Date.now(); o.statut=o.statut||'attente'; if(o.type==='injoignable'&&!o.deadline)o.deadline=o.at+10*60000; a.unshift(o); if(a.length>500)a=a.slice(0,500); stSave2(a); supTerrainBadge(); return o.id; }
-  function supTerrainBadge(){ var el=byId('supterrain-cnt'); if(!el)return; if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'){ el.style.display='none'; return; } var a=stLoad2(), p=a.filter(function(x){return x.statut==='attente';}), esc2=a.filter(function(x){return x.statut==='escalade';}); var n=p.length+esc2.length; if(!n){ el.style.display='none'; el.textContent=''; return; } el.style.display=''; el.textContent=n; el.style.background=esc2.length?'#c02626':''; el.style.color=esc2.length?'#fff':''; }
+  function supTerrainBadge(){ var el=byId('supterrain-cnt'); if(!el)return; if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'){ el.style.display='none'; return; } var a=stLoad2(), p=a.filter(function(x){return x.statut==='attente';}), esc2=a.filter(function(x){return x.statut==='escalade';}); /* b384 : un ticket recu et non clos compte dans ce badge — sinon il arrive ici sans que rien ne le signale, et un ticket qu'on ne voit pas est un ticket qui attend. */ var tk=0; try{ if(typeof tkxLoad==='function')tk=tkxLoad().filter(function(t){ return t&&t.kind==='echange'&&t.etat!=='fait'&&tkxPourMoi(t); }).length; }catch(_e){} var n=p.length+esc2.length+tk; if(!n){ el.style.display='none'; el.textContent=''; return; } el.style.display=''; el.textContent=n; el.style.background=esc2.length?'#c02626':''; el.style.color=esc2.length?'#fff':''; el.title=[(p.length+esc2.length)?((p.length+esc2.length)+' cas terrain'):'', tk?(tk+' ticket(s) reçu(s)'):''].filter(Boolean).join(' · '); }
   // Escalade : deadline dépassée sans réaction superviseur → visible admin/super-admin + notif (routage fin par rôle = remontée #15b, à trancher).
   function supTerrainTick(){ var a=stLoad2(), chg=false, now=Date.now(); a.forEach(function(x){ if((x.type==='injoignable'||x.type==='anomalie')&&x.statut==='attente'&&x.deadline&&now>x.deadline){ x.statut='escalade'; x.escAt=now; chg=true; if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'stesc'+x.id,title:'🔴 ESCALADE — injoignable sans réaction superviseur (10 min)',body:(x.agent||'')+' · '+(x.site||''),go:'supterrain'}); } }); if(chg){ stSave2(a); supTerrainBadge(); var sec=byId('sec-supterrain'); if(sec&&!sec.classList.contains('hidden'))renderSupTerrain(); } }
   setInterval(supTerrainTick,30000); try{supTerrainBadge();}catch(e){}
@@ -5455,7 +5442,18 @@ button.big:active{transform:translateY(1px)}
     return '<div class="acts" style="gap:6px;flex-wrap:wrap;margin-top:5px">'
       + b.join('').replace('class="st2-close"','class="ok st2-close"') + '</div>';
   }
-  function renderSupTerrain(){ supTerrainBadge(); var box=byId('supterrain-body'); if(!box)return;
+  function renderSupTerrain(){ supTerrainBadge();
+    /* b384 : les tickets qui me sont adresses, traitables ici meme (regle du drill jusqu'a
+       l'action : on ne renvoie jamais vers une autre section). L'accuse de lecture part a
+       l'ouverture de la section, comme il partait a l'ouverture de Tickets. */
+    try{ var _tkb=byId('supterrain-tickets');
+      if(_tkb&&typeof tkxBloc==='function'){
+        if(typeof tkxMarquerVus==='function')tkxMarquerVus();
+        var _h=tkxBloc('recus');
+        _tkb.innerHTML=_h?('<div class="lab" style="margin:0 0 4px;color:#6ea8fe">\ud83c\udfab Tickets qui m\u2019attendent</div>'+_h):'';
+        if(_h&&typeof tkxWire==='function')tkxWire(_tkb);
+      } }catch(_e){}
+    var box=byId('supterrain-body'); if(!box)return;
     if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'){ box.innerHTML='<div class="sub">Section réservée aux responsables.</div>'; return; }
     var a=stLoad2(); if(!a.length){ box.innerHTML='<div class="card"><div class="sub" style="margin:0">Rien à traiter. Les alertes « 📵 Injoignable » des opérateurs et les contrôles tenue photo arrivent ici.</div></div>'; return; }
     var esc2=a.filter(function(x){return x.statut==='escalade';}), att=a.filter(function(x){return x.statut==='attente';}), res=a.filter(function(x){return x.statut==='resolu';}).slice(0,20);
@@ -8899,7 +8897,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       etat:'a_faire', cree:Date.now(), fil:[]});
     tkxSave(arr);
     try{ if(typeof notifScan==='function')notifScan(); }catch(e){}
-    try{ if(typeof terrainBadge==='function')terrainBadge(); }catch(e){}   /* b378 */
+    try{ if(typeof supTerrainBadge==='function')supTerrainBadge(); }catch(e){}   /* b384 */
     return true;
   }
   function tkxRepondre(id,etat,mot){
@@ -8912,9 +8910,9 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       if(mot)arr[i].fil.push({qui:tkxMonNom(),at:Date.now(),txt:mot,etat:etat||''});
       arr[i].maj=Date.now(); arr[i].luPar=''; break; }
     tkxSave(arr); if(typeof renderTickets==='function')renderTickets();
-    /* b378 : le ticket vit maintenant dans Terrain aussi — les deux vues doivent bouger ensemble. */
-    if(typeof renderTerrain==='function'&&byId('sec-terrain')&&!byId('sec-terrain').classList.contains('hidden'))try{renderTerrain();}catch(_e){}
-    else if(typeof terrainBadge==='function')try{terrainBadge();}catch(_e){}
+    /* b384 : le ticket vit aussi dans 🧭 Terrain — les deux vues doivent bouger ensemble. */
+    if(typeof renderSupTerrain==='function'&&byId('sec-supterrain')&&!byId('sec-supterrain').classList.contains('hidden'))try{renderSupTerrain();}catch(_e){}
+    else if(typeof supTerrainBadge==='function')try{supTerrainBadge();}catch(_e){}
     if(typeof ppRefresh==='function')ppRefresh();
   }
   /* Le formulaire de demande, ouvert depuis la pastille : on ne quitte pas la vue. */
@@ -8935,7 +8933,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     byId('tkx-go').onclick=function(){
       tkxCreer({objet:byId('tkx-obj').value||titre, message:byId('tkx-msg').value||'', contexte:lignes, source:source, pourRole:byId('tkx-pour').value});
       pop.parentNode.removeChild(pop);
-      alert('Ticket envoy\u00e9.\n\n\ud83d\udce8 Il arrive dans « Remont\u00e9es terrain » chez le destinataire.\n\ud83c\udfab Tu suis sa r\u00e9ponse dans Tickets, et la cloche te pr\u00e9viendra.');   /* b378 */
+      alert('Ticket envoy\u00e9.\n\n\ud83e\udded Il arrive dans « Terrain » chez le destinataire.\n\ud83c\udfab Tu suis sa r\u00e9ponse dans Tickets, et la cloche te pr\u00e9viendra.');   /* b378 */
     };
   }
   /* ===== b245 : TENUES ENVOYEES, RECEPTION NON CONFIRMEE =====
@@ -10454,7 +10452,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     /* b242 : un ticket qui m'est adresse et qui n'est pas clos est une alerte ; une reponse a mon ticket aussi. */
     try{ tkxLoad().forEach(function(t){
       if(t.kind!=='echange')return;
-      if(tkxPourMoi(t)&&t.etat!=='fait'){ out.push({cat:'ticket_recu',key:'tkr'+t.id,title:'🎫 '+t.objet,body:(t.deNom||'')+' attend un retour de toi.',go:'terrain',when:(typeof impTodayISO==='function'?impTodayISO():'')}); }   /* b378 : la notification ouvre Terrain, la ou le ticket se traite */
+      if(tkxPourMoi(t)&&t.etat!=='fait'){ out.push({cat:'ticket_recu',key:'tkr'+t.id,title:'🎫 '+t.objet,body:(t.deNom||'')+' attend un retour de toi.',go:'supterrain',when:(typeof impTodayISO==='function'?impTodayISO():'')}); }   /* b378 : la notification ouvre Terrain, la ou le ticket se traite */
       else if(tkxDeMoi(t)&&t.fil&&t.fil.length&&t.etat!=='a_faire'){ out.push({cat:'ticket_reponse',key:'tkp'+t.id+'_'+t.fil.length,title:'💬 Retour — '+t.objet,body:(TK_ETATS[t.etat]||['',''])[0]+' · '+(t.fil[t.fil.length-1].txt||''),when:(typeof impTodayISO==='function'?impTodayISO():'')}); }
     }); }catch(_e){}
     /* b229 : une annulation non tranchee est une alerte — elle part aussi en notification telephone. */
