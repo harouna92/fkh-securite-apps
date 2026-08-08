@@ -97,7 +97,11 @@ async function planifierDepuisMail(env, cdr, texte, data) {
        repondre « qui l'a mise la » pour n'importe quelle ligne — y compris quand la reponse est « personne ». */
     creePar: "Système — mail reçu", creeUser: "worker", creeAt: Date.now(),
     client: bdc.client, siteAgent: bdc.site, ville: pdf.ville || "", cp: pdf.cp || "",
-    adresse: pdf.adresse || "", mdate: bdc.mdate, mheure: bdc.heure, mfin: "",
+    adresse: pdf.adresse || "", mdate: bdc.mdate, mheure: bdc.heure,
+    /* 09/08 : l heure de FIN etait laissee vide alors que le prompt du bon de commande la demande
+       depuis toujours (champ "fin"). Elle etait extraite du PDF puis jetee — la vacation naissait
+       sans fin, et il fallait la ressaisir a la main. */
+    mfin: pdf.fin || "",
     ref: bdc.ref, titre: bdc.sujet.slice(0, 90), src: "mail",
   };
   /* b343 : elle avait ete supprimee. On la recree (elle a pu etre re-commandee) mais JAMAIS en silence :
@@ -200,6 +204,19 @@ function demandeNotif(m) {
   return { title: "🆕 Nouvelle demande — " + String(head).slice(0, 40), body: (body || "Une demande vient de passer en recherche.").slice(0, 1600), url: "/fkh-securite-apps/gestion/", tag: "fkh-" + (m.id || Date.now()) };
 }
 // Notification pour une (ou plusieurs) demande(s) détectée(s) automatiquement par l'IA dans un appel.
+/* 09/08 : le doute a sa propre notification. Elle ne promet rien — elle dit ce qui a ete
+   entendu et laisse l'humain trancher. */
+function aiVerifNotif(call, data) {
+  const t = String((data && data.transcript) || "").replace(/\s+/g, " ").trim();
+  return {
+    title: "\u2753 Appel entrant \u00e0 v\u00e9rifier — l'IA n'a pas su lire",
+    body: ("\ud83d\udcde " + ((call && call.number) || "num\u00e9ro inconnu")
+      + "\n\n\u00ab " + t.slice(0, 220) + (t.length > 220 ? "\u2026 \u00bb" : " \u00bb")
+      + "\n\n\ud83d\udc49 Rien n'a \u00e9t\u00e9 d\u00e9pos\u00e9. \u00c0 lire et \u00e0 trancher dans Suivi des demandes.").slice(0, 1600),
+    url: "/fkh-securite-apps/gestion/",
+    tag: "fkh-ai-verif-" + ((call && call.cdr_id) || Date.now()),
+  };
+}
 function aiDemandeNotif(call, demandes) {
   const dir = call && call.direction === "out" ? "sortant" : "entrant";
   let head, L = [];
@@ -312,7 +329,11 @@ async function aiAnalyze(env, transcript, direction) {
      transcription, appel sortant de validation avec bavardage). Sonnet est ~3-4x plus cher sur ces
      appels-la, mais recuperer une commande perdue vaut plus que quelques centimes.
      Seuil : 1500 caracteres = appel court et net → Haiku suffit. Au-dela → Sonnet. */
-  const _model = transcript.length > 1500 ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001";
+  /* 09/08 : les appels ENTRANTS passent tous par Sonnet, meme courts. C'est par la que les
+     commandes arrivent, et le faux negatif du 09/08 a 00h14 (404 caracteres, transcription
+     abimee par Whisper) a montre qu'une demande claire pouvait etre perdue. Mesure sur 12
+     jours reels : 9 entrants par jour, surcout 1,34 EUR par mois. */
+  const _model = (direction === "in" || transcript.length > 1500) ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001";
   const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: _model, max_tokens: 4000, messages: [{ role: "user", content: prompt }] }) });
   if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
   const parsed = aiParseJson(await r.json());
@@ -350,6 +371,10 @@ async function aiCheckPhoto(env, b64, media) {
   if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 120));
   return aiParseJson(await r.json());
 }
+/* Les mots qui disent qu'un appel parle de notre metier. Volontairement larges : le filet doit
+   attraper trop plutot que pas assez — un appel marque a tort se balaie en un clic, un appel
+   perdu ne se rattrape jamais. */
+const MOTS_METIER = /gardien|agent de s|agent dispo|disponib|vacation|renfort|surveillan|ma[iî]tre.?chien|adr\b|ssiap|rondier|ronde|interven|gardiennage|poste de nuit|remplac/i;
 async function aiScan(env, maxCalls, force) {
   if (!env.RINGOVER_API_KEY || !env.OPENAI_API_KEY || !env.ANTHROPIC_API_KEY) return { error: "keys_missing" };
   // Liste blanche stricte : on n'analyse QUE les numéros suivis (avec leur règle entrant/sortant)
@@ -385,12 +410,25 @@ async function aiScan(env, maxCalls, force) {
     let data = {}, isDem = 0;
     try {
       const transcript = await aiTranscribe(env, c.record);
-      if (transcript) { const utile = nettoyerAttente(transcript); const an = await aiAnalyze(env, utile || transcript, c.direction); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [], transcript: transcript.slice(0, 12000), number: c.contact_number, direction: c.direction, start: c.start_time }; isDem = (data.demandes.length || data.arrets.length) ? 1 : 0; }
+      if (transcript) { const utile = nettoyerAttente(transcript); const an = await aiAnalyze(env, utile || transcript, c.direction); data = { resume: an.resume || "", demandes: Array.isArray(an.demandes) ? an.demandes : [], arrets: Array.isArray(an.arrets) ? an.arrets : [], transcript: transcript.slice(0, 12000), number: c.contact_number, direction: c.direction, start: c.start_time }; isDem = (data.demandes.length || data.arrets.length) ? 1 : 0;
+        /* 09/08 : le filet. Analyse vide + mots du metier dans la transcription = on ne jette
+           pas. L'appel ressort marque « a verifier » : c'est un humain qui tranche, pas un
+           silence. On ne fabrique aucune demande — data.demandes reste vide. */
+        /* Le filet ne vaut QUE pour les appels ENTRANTS. Mesure sur 12 jours reels : applique a
+           tout, il marquerait 17 appels par jour — une liste que personne ne lirait. Les sortants
+           sont NOS appels de controle, pleins de « agent » et « gardien » : ils n'apportent aucune
+           demande. Restreint aux entrants : 1,2 par jour. */
+        if (!isDem && c.direction === "in" && MOTS_METIER.test(transcript)) { data.aVerifier = 1; isDem = 1; }
+      }
       else data = { skip: "no_transcript" };
     } catch (e) { data = { error: String((e && e.message) || e) }; }
     await env.DB.prepare("INSERT OR REPLACE INTO ai_calls (cdr_id, at, is_demande, dismissed, created, data) VALUES (?, ?, ?, 0, 0, ?)").bind(id, Date.now(), isDem, JSON.stringify(data)).run();
     processed++;
-    if (isDem) { detected++; try { await pushAll(env, aiDemandeNotif({ cdr_id: id, direction: c.direction }, data.demandes)); } catch (e) {} }
+    if (isDem) { detected++;
+      /* 09/08 : ne JAMAIS annoncer « deja depose » quand rien ne l'a ete. */
+      const _call = { cdr_id: id, direction: c.direction, number: c.contact_number };
+      try { await pushAll(env, data.aVerifier ? aiVerifNotif(_call, data) : aiDemandeNotif(_call, data.demandes)); } catch (e) {}
+    }
   }
   return { ok: true, processed, detected, total_in: calls.length, window_h: lookbackH, diag };
 }
