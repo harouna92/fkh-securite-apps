@@ -984,6 +984,24 @@
    "theme": "Tickets",
    "pourquoipas": "Un ticket envoyé au superviseur atterrissait dans 🎫 Tickets, une section qu'il n'ouvre pas. Il arrive maintenant en tête de Remontées terrain, là où il travaille, avec les quatre états et la réponse sur place — sans sortir vers une autre section. Le badge de l'onglet compte les tickets reçus non clos, la notification téléphone ouvre Terrain, et l'accusé de lecture part à l'ouverture. 🎫 Tickets reste la section de celui qui envoie : Zeus y suit le traitement, consulte les clos et renvoie un point.",
    "local": true
+  },
+  {
+   "b": 379,
+   "titre": "Un ticket ne se lit que vers le haut de la hiérarchie",
+   "source": "règle de Zeus, 08/08",
+   "theme": "Tickets",
+   "pourquoipas": "Un ticket adressé au super-admin n'est visible que de lui ; à l'administrateur, de l'administrateur et du super-admin ; au superviseur, de tout le monde sauf les opérateurs. « À moi » et « je vois » restent deux choses distinctes : regarder d'en haut ne pose pas l'accusé de lecture, sinon l'émetteur lirait « vu » alors que le destinataire n'a rien ouvert. Ce qu'on surveille arrive dans un dépliant à part, chaque carte disant à qui elle s'adresse.",
+   "local": true,
+   "demo": "ticket"
+  },
+  {
+   "b": 380,
+   "titre": "Démo jouable : le ticket qui arrive dans Terrain",
+   "source": "demande de Zeus, 08/08 — « donne un cas d'école »",
+   "theme": "Tickets",
+   "pourquoipas": "Trois tickets posés d'un coup — un pour les superviseurs, un pour les administrateurs, un pour le super-admin — pour voir de ses yeux lequel est « à moi », lesquels sont « à surveiller », et jouer le cycle À faire → En cours → Fait sans quitter la section.",
+   "local": true,
+   "demo": "ticket"
   }
  ],
  "attente": [
