@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b389</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b392</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -8720,7 +8720,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     gp:{title:'📵 Photos envoyées SANS géolocalisation',verb:'photo(s) sans position',tiles:0,byAgent:1,depuis:'Par agent · à rappeler pour les sensibiliser (une photo sans position ne prouve pas la présence sur site)'},
     rt:{title:'🐢 Agents EN RETARD à la prise de service',verb:'retard signalé',tiles:0,bySite2:1,depuis:'Depuis le 01/08 · classés par site · retard saisi par l’opérateur sur le ticket de prise'},
     af:{title:'🧍 Vacations NON AFFECTÉES',verb:'sans agent',tiles:0,af3:1,depuis:'Tout l’historique · À venir / En cours / Passées, puis par site · ⚡ affectation en série'},
-    ro:{title:'🔌 Pointages SANS appel réel à ± 10 min (Ringover)',verb:'aucun appel à ± 10 min du pointage',tiles:0,roGrp:1,depuis:'Aujourd’hui · un pointage est validé si un appel du bon numéro existe à ± 10 min de l’HEURE DU POINTAGE (journal Ringover réel)'}
+    ro:{title:'🔌 Pointages SANS appel réel à ± 10 min (Ringover)',verb:'aucun appel à ± 10 min du pointage',tiles:0,roGrp:1,depuis:'Un pointage est validé si un appel du bon numéro existe à ± 10 min de l’HEURE DU POINTAGE (journal Ringover réel)'}
   };
   function ppSince(ms){ var m=Math.floor(ms/60000); if(m<1)m=1; if(m<60)return m+' min'; var h=Math.floor(m/60); if(h<24)return h+' h'+((m%60)?(' '+(m%60)+' min'):''); var j=Math.floor(h/24); return j+' j '+(h%24)+' h'; }
   function ppScan(){ var now=Date.now(),S=ssLoad(),sc={op:[],cli:[],ph:[],te:[],c2:[]};
@@ -9239,6 +9239,17 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
         n.textContent=_n; n.style.display=_n?'block':'none';
         b.title=_n?(_n+' photo(s) à obtenir aujourd’hui (refus compris) — le retard est dans les tuiles')
                  :'Rien à obtenir aujourd’hui'; return; }
+      /* b392 : 🌙 suit la meme regle que 📷 — le badge compte ce qui demande une action
+         AUJOURD'HUI. Le badge disait 304 pendant que les tuiles disaient 0, 0 et 1. */
+      if(!hide&&k==='c2'){ var _aj92=(typeof impTodayISO==='function')?impTodayISO():'';
+        var _l92=(sc.c2||[]).filter(function(x){ return (x.mdate||'')===_aj92; });
+        var _n92=_l92.length;
+        n.textContent=_n92; n.style.display=_n92?'block':'none';
+        var _d92={nonfait:0,inj:0,sansphoto:0};
+        _l92.forEach(function(x){ if(_d92[x.sousvue]!=null)_d92[x.sousvue]++; });
+        b.title=_n92?('Aujourd\u2019hui : '+_d92.nonfait+' appel(s) non fait(s) \u00b7 '+_d92.inj+' injoignable(s) \u00b7 '+_d92.sansphoto+' sans photo \u2014 le retard est dans les tuiles')
+                    :'Rien \u00e0 traiter aujourd\u2019hui sur les contr\u00f4les des 2 h';
+        return; }
       if(!hide){ var L=sc[k]; n.textContent=L.length; n.style.display=L.length?'block':'none'; } });
     if(!any)return;
     if(hide){ if(PP_VIEW.mode)ppClose(); return; }
@@ -9540,6 +9551,16 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       var Lr2=L.filter(function(x){return x.site===PP_VIEW.sub;});
       h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+esc(PP_VIEW.sub)+'</b><span class="sub" style="margin:0">'+Lr2.length+' retard(s)</span></div>'+rowsOf(Lr2);
     } else if(D.roGrp&&!PP_VIEW.sub){ // b190 : 2 groupes AUCUN appel / DECALAGE
+      /* b390 : la fenetre de verification, reglable et retenue. Le croisement Ringover ne
+         s'arretait qu'a aujourd'hui : impossible de verifier hier sans passer par Supervision. */
+      var _rj=(typeof roJours==='function')?roJours():1;
+      h+='<div class="acts" style="gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center">'
+        +'<span class="sub" style="margin:0">\ud83d\udcc5 V\u00e9rifier sur</span>'
+        +[[1,'Aujourd\u2019hui'],[3,'3 jours'],[7,'7 jours']].map(function(o){
+          return '<button type="button" class="ro-j" data-j="'+o[0]+'" style="font-size:12px'+((_rj===o[0])?';border-color:#6ea8fe;color:#6ea8fe;font-weight:700':'')+'">'+o[1]+'</button>';
+        }).join('')
+        +((PP_RO&&PP_RO.at)?('<span class="sub" style="margin:0">\u00b7 relev\u00e9 \u00e0 '+new Date(PP_RO.at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</span>'):'')
+        +'</div>';
       var rA=L.filter(function(x){return (x.grp||(x.callT?'ecart':'aucun'))==='aucun';}),rE=L.filter(function(x){return (x.grp||(x.callT?'ecart':'aucun'))==='ecart';});
       h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="aucun"><b>'+rA.length+'</b>📵 AUCUN appel<br><span class="sub" style="margin:0;font-size:11.5px">pas d’appel du numéro aujourd’hui</span></div><div class="pp-tile" data-sub="ecart"><b>'+rE.length+'</b>↔ DÉCALAGE<br><span class="sub" style="margin:0;font-size:11.5px">appel trouvé mais écart > 10 min</span></div></div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
@@ -9553,8 +9574,39 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     } else if(D.phaseSite&&PP_VIEW.sub&&PP_VIEW.sub2==null){ // b182 : niveau 2 = par SITE
       /* b387 : quand la pastille raisonne par CAS (🌙), le palier 2 filtre sur le cas. */
       var Lp=L.filter(function(x){ return D.c2vues?((x.sousvue||'')===PP_VIEW.sub):((PP_VIEW.sub==='passee')?(x.phase==='passee'):(x.phase!=='passee')); });
+      /* ===== b391 : LES JOURS PASSÉS SE COUPENT EN DEUX =====
+         Ce qui date d'hier se rattrape encore ; ce qui a trois semaines se constate. Deux gestes
+         differents, donc deux vues — et dans chacune, le plus recent en premier : on ouvre sur ce
+         qu'on peut encore corriger, pas sur ce qui est perdu. */
+      if(D.c2vues&&PP_VIEW.jour==='p'){
+        var _aj91=(typeof impTodayISO==='function')?impTodayISO():'';
+        var _l7=(function(){ var d=new Date(_aj91+'T12:00:00'); d.setDate(d.getDate()-7);
+          return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); })();
+        var _pas=Lp.filter(function(x){ return (x.mdate||'')!==_aj91; });
+        var _rec=_pas.filter(function(x){ return (x.mdate||'')>=_l7; });
+        var _vieux=_pas.filter(function(x){ return (x.mdate||'')<_l7; });
+        if(!PP_VIEW.tranche){
+          h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">\u2190 Retour</button>'
+            +'<span class="sub" style="margin:0">'+_pas.length+' \u00b7 jours pass\u00e9s</span></div>';
+          h+='<div style="display:flex;gap:10px;flex-wrap:wrap">'
+            +'<div class="pp-tile pp-tr" data-tr="r7" style="border-color:#e0a13b"><b>'+_rec.length+'</b>\ud83d\udd53 Les 7 derniers jours<br><span class="sub" style="margin:0;font-size:11.5px">depuis le '+esc(_l7.split('-').reverse().join('/'))+' \u00b7 \u00e7a se rattrape encore</span></div>'
+            +'<div class="pp-tile pp-tr" data-tr="old"><b>'+_vieux.length+'</b>\ud83d\uddc3 Au-del\u00e0 de 7 jours<br><span class="sub" style="margin:0;font-size:11.5px">plus ancien \u00b7 \u00e0 constater</span></div>'
+            +'</div>';
+          /* b391 : on sort ici, donc on pose les gestes MAINTENANT — le cablage general
+             qui vient plus bas ne sera jamais atteint. */
+          box.innerHTML=h;
+          box.querySelectorAll('.pp-tr').forEach(function(t){ t.onclick=function(){
+            PP_VIEW.tranche=t.getAttribute('data-tr'); ppRender(); }; });
+          var _bk91=byId('pp-back'); if(_bk91)_bk91.onclick=function(){
+            PP_VIEW.jour=null; PP_VIEW.tranche=null; ppRender(); };
+          return;
+        }
+        Lp=(PP_VIEW.tranche==='r7')?_rec:_vieux;
+      }
+      /* b391 : du plus recent au plus ancien. */
+      if(D.c2vues&&PP_VIEW.jour==='p')Lp=Lp.slice().sort(function(a,b){ return (b.due||0)-(a.due||0); });
       var _g2={}; Lp.forEach(function(x){ (_g2[x.site]=_g2[x.site]||[]).push(x); });
-      var _s2=Object.keys(_g2).sort(function(u,v2){return _g2[u][0].due-_g2[v2][0].due;});
+      var _s2=Object.keys(_g2).sort(function(u,v2){ return (D.c2vues&&PP_VIEW.jour==='p')?(_g2[v2][0].due-_g2[u][0].due):(_g2[u][0].due-_g2[v2][0].due); });   /* b391 */
       h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(D.c2vues?({nonfait:'\u260e Appels non faits',inj:'\ud83d\udcf5 Agents injoignables',sansphoto:'\ud83d\udcf7 Sans photo'}[PP_VIEW.sub]||''):(PP_VIEW.sub==='passee'?'⏳ Terminées':'🟢 En cours'))+'</b><span class="sub" style="margin:0">'+Lp.length+' créneau(x) '+(D.c2vues?({nonfait:'sans appel',inj:'agent injoignable',sansphoto:'sans photo'}[PP_VIEW.sub]||''):'sans photo')+'</span></div>';
       h+=_s2.length?_s2.map(function(st3){ var n3=_g2[st3].length,f3=_g2[st3][0]; return '<div class="pp-tile" data-sub2="'+esc(st3)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+n3+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st3)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f3.client?'🏢 '+esc(f3.client)+' · ':'')+'1er créneau : '+((f3.mdate||'').split('-').reverse().join('/'))+' '+esc(f3.heure||'')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Rien 🎉</div>';
     } else if(D.phaseSite&&PP_VIEW.sub&&PP_VIEW.sub2!=null){ // b182 : niveau 3 = creneaux du site + depot photo
@@ -9676,7 +9728,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
         h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">Une photo entre ici en arrivant et n\u2019en sort QUE rattach\u00e9e \u00b7 \u00e0 minuit le compteur repart sur le nouveau jour, le retard descend dans « jours pass\u00e9s ».</p>';
         box.innerHTML=h;
         if(typeof photoHydrate==='function')photoHydrate(box);
-        var _bk=byId('pp-back'); if(_bk)_bk.onclick=function(){ PP_VIEW.sub=null; PP_VIEW.jour=null; ppRender(); };
+        var _bk=byId('pp-back'); if(_bk)_bk.onclick=function(){ PP_VIEW.sub=null; PP_VIEW.jour=null; PP_VIEW.tranche=null; ppRender(); };
         box.querySelectorAll('.pp-pnj').forEach(function(b){ b.onclick=function(){ PP_VIEW.jour=(b.getAttribute('data-j')==='p')?'p':null; ppRender(); }; });
         box.querySelectorAll('.pp-pnr-go').forEach(function(b){ b.onclick=function(){
           if(typeof phmOuvrir!=='function'){ alert('Rapprochement indisponible.'); return; }
@@ -9769,7 +9821,20 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     var _pa=byId('pc-act'); if(_pa)_pa.onclick=function(){ pcJeSuisOuvert()?pcQuitter():pcPrendre(); ppRender(); };
         var bk=byId('pp-back'); if(bk)bk.onclick=function(){ if(PP_VIEW.jour!=null){PP_VIEW.jour=null;} else if(PP_VIEW.sub2!=null){PP_VIEW.sub2=null;} else {PP_VIEW.sub=null;} ppRender(); };   /* b332 */
     box.querySelectorAll('.pp-retard').forEach(function(r){ r.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); PP_VIEW.sub=r.getAttribute('data-k'); PP_VIEW.jour='p'; ppRender(); }; });   /* b374 : intercepte AVANT la tuile, sinon on ouvre le jour */
-    box.querySelectorAll('.pp-tile').forEach(function(t){ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else if(t.getAttribute('data-sub')!=null){PP_VIEW.sub=t.getAttribute('data-sub'); PP_VIEW.jour=null;} ppRender(); }; });   /* b332 : on repart du palier */
+    box.querySelectorAll('.pp-tr').forEach(function(t){ t.onclick=function(){
+      PP_VIEW.tranche=t.getAttribute('data-tr'); ppRender(); }; });   /* b391 */
+    box.querySelectorAll('.ro-j').forEach(function(b){ b.onclick=function(ev){ ev.stopPropagation();
+      if(typeof roJoursSet==='function')roJoursSet(+b.getAttribute('data-j'));
+      /* b390 : hors ligne, ppRoScan sort tout de suite — sans ce test le sablier tournerait
+         pour toujours. On le dit, et le reglage reste retenu pour la prochaine connexion. */
+      var n=byId('pp-box');
+      if(!(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)){
+        if(n)n.innerHTML='<div class="sub">\ud83d\udd0c Connexion en ligne requise pour interroger Ringover. La fen\u00eatre choisie est retenue.</div>';
+        return; }
+      if(n)n.innerHTML='<div class="sub">\u23f3 V\u00e9rification en cours aupr\u00e8s de Ringover\u2026</div>';
+      try{ ppRoScan(); }catch(e){}
+    }; });   /* b390 */
+    box.querySelectorAll('.pp-tile').forEach(function(t){ if(t.getAttribute('data-tr')!=null)return;   /* b391 : les tuiles de tranche ont leur propre geste */ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else if(t.getAttribute('data-sub')!=null){PP_VIEW.sub=t.getAttribute('data-sub'); PP_VIEW.jour=null;} ppRender(); }; });   /* b332 : on repart du palier */
     box.querySelectorAll('.pp-jr').forEach(function(b){ b.onclick=function(){ PP_VIEW.jour=b.getAttribute('data-j'); ppRender(); }; });
     /* b336 : ouvrir le rapprochement sur la photo choisie */
     box.querySelectorAll('.pp-act-rappro').forEach(function(b){ b.onclick=function(){
@@ -9849,14 +9914,21 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
   }
   // b153 : croisement pointages cochés ↔ appels réels Ringover (en ligne ; cache local pour consultation hors-ligne)
   var PP_RO=null; try{ PP_RO=JSON.parse(localStorage.getItem('fkh_ppro_cache')||'null'); }catch(_e){}
+  /* b390 : la fenetre de verification. 1 = aujourd'hui (comportement d'avant), 3 ou 7 jours.
+     Bornee a 7 : au-dela, on croise des pointages qu'on ne corrigera plus. */
+  function roJours(){ var v=parseInt(localStorage.getItem('fkh_ro_jours'),10); return (v===3||v===7)?v:1; }
+  function roJoursSet(v){ try{ localStorage.setItem('fkh_ro_jours',String(v)); }catch(e){} }
   function ppRoScan(){ if(typeof CLOUD==='undefined'||!CLOUD||!CLOUD.on)return;
     var today=(typeof impTodayISO==='function')?impTodayISO():'';
     if(!today)return;
-    fetch(CLOUD.base+'/ringover/calls?from='+encodeURIComponent(today)+'&to='+encodeURIComponent(today),{headers:cloudHdr()}).then(function(r){return r.json();}).then(function(j){
+    var _nj90=roJours();
+    var _dep90=(function(){ var d=new Date(today+'T12:00:00'); d.setDate(d.getDate()-(_nj90-1));
+      return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); })();
+    fetch(CLOUD.base+'/ringover/calls?from='+encodeURIComponent(_dep90)+'&to='+encodeURIComponent(today),{headers:cloudHdr()}).then(function(r){return r.json();}).then(function(j){
       if(!(j&&j.ok))return; var calls=j.calls||[]; var FEN=600000; // b162 : fourchette FIXE 5 min autour de l'HEURE DU POINTAGE
       function nearest(num,pAt){ var k=roKey(num); if(!k)return null; var best=null; calls.forEach(function(c){ if(roKey(c.number)!==k)return; var t=new Date(c.start).getTime(); if(isNaN(t))return; var d=Math.abs(t-pAt); if(!best||d<best.d)best={t:t,d:d}; }); return best; }
       var S=ssLoad(), now=Date.now(), out=[], ctm={}; try{ctm=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(_e){}
-      saEntries(today,today).forEach(function(e){ var r=(S[e.mid]&&S[e.mid][e.key])||{}; if(!r.done)return;
+      saEntries(_dep90,today).forEach(function(e){ var r=(S[e.mid]&&S[e.mid][e.key])||{}; if(!r.done)return;   /* b390 */
         var pAt=r.doneTs||r.at; if(!pAt)return; // pas d'heure de pointage exploitable
         var ct=frMs(e.mdate,e.abs); if(ct==null||(PP_START!=null&&ct<PP_START))return;
         if(r.viaPhoto||r.photoKey)return; // réglé par preuve photo : pas d’appel attendu
@@ -9865,7 +9937,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
         if((e.key==='prise'||e.key==='fin')&&r.avise&&e.client&&ctm[e.client])chk(ctm[e.client],'appel CLIENT');
       });
       out.sort(function(x,y){return x.due-y.due;});
-      PP_RO={at:Date.now(),items:out};
+      PP_RO={at:Date.now(),items:out,jours:_nj90,depuis:_dep90};   /* b390 */
       try{localStorage.setItem('fkh_ppro_cache',JSON.stringify(PP_RO));}catch(_e){}
       ppRefresh();
     }).catch(function(){});

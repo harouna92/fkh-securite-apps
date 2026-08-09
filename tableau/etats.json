@@ -1079,6 +1079,30 @@
    "theme": "Tenues & photos",
    "pourquoipas": "Les deux photos de TELLA Manfiou ne montrent que le bas du corps, et pourtant le site compte parmi les couverts : le compteur mesure la présence d'une photo, pas ce qu'elle prouve. Chaque ligne d'agent porte maintenant un bouton qui ouvre une liste à cocher — tenue entière de face, haut, pantalon, chaussures, gilet, badge — plus un champ libre. Le ticket part au superviseur avec cette liste écrite : « refais la photo » revient aussi flou qu'il est parti, une liste revient conforme.",
    "local": true
+  },
+  {
+   "b": 390,
+   "titre": "Le croisement Ringover ne s'arrête plus à aujourd'hui",
+   "source": "chantier B, demandé par Zeus le 09/08",
+   "theme": "Suivi des appels",
+   "pourquoipas": "La pastille 🔌 interrogeait Ringover avec from=aujourd'hui&to=aujourd'hui : impossible de vérifier hier sans passer par Supervision et y penser. La fenêtre devient réglable — aujourd'hui, 3 jours, 7 jours — et le réglage est retenu. Même fourchette de 5 min, même règle « réglé par preuve photo = pas d'appel attendu ». Une seule requête Ringover quelle que soit la fenêtre : le coût ne change pas.",
+   "local": true
+  },
+  {
+   "b": 391,
+   "titre": "« Jours passés » se coupe en deux, du plus récent au plus ancien",
+   "source": "demande de Zeus, 09/08",
+   "theme": "Suivi des appels",
+   "pourquoipas": "192 lignes mêlant hier et le 26 juillet ne se traitent pas : ce qui date d'hier se rattrape, ce qui a trois semaines se constate. Deux vues — les 7 derniers jours, au-delà de 7 jours — et dans chacune le plus récent en premier : on ouvre sur ce qu'on peut encore corriger, pas sur ce qui est perdu.",
+   "local": true
+  },
+  {
+   "b": 392,
+   "titre": "Le badge de 🌙 compte le jour J",
+   "source": "capture de Zeus, 09/08",
+   "theme": "Suivi des appels",
+   "pourquoipas": "Le badge disait 304 pendant que les tuiles disaient 0, 0 et 1 : deux chiffres pour la même pastille, c'est pire qu'un seul faux. Il compte désormais les trois cas d'aujourd'hui, comme 📷 depuis b373, et son infobulle détaille non fait / injoignable / sans photo. Le retard reste lisible dans les tuiles.",
+   "local": true
   }
  ],
  "attente": [
