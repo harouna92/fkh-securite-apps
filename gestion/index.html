@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b395</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b397</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -6169,8 +6169,22 @@ button.big:active{transform:translateY(1px)}
     var _plClients={}; missAll.forEach(function(m){ if(m.client)_plClients[m.client]=1; });
     var _plSites={}; missAll.forEach(function(m){ _plSites[m.siteAgent||m.titre||'—']=1; });
     var miss=missAll.filter(_plMatch);
-    var siteMap={}, order=[], siteInfo={};
-    miss.forEach(function(m){ var s=(m.siteAgent||m.titre||'—'); if(!siteMap[s]){siteMap[s]=[];order.push(s);siteInfo[s]={ville:m.ville||'',client:m.client||''};} siteMap[s].push(m); });
+    /* ===== b397 : DEUX ECRITURES D'UN MEME SITE NE FONT PLUS DEUX LIGNES =====
+       Le serveur normalise avant de comparer (worker.js, _norm) ; le Planning regroupait sur le
+       nom EXACT. Un double espace suffisait donc a creer une deuxieme ligne de site — c'est ce qui
+       a fait recreer a la main, le 09/08 a 01h00, une vacation SUNSET PIZZA que le serveur avait
+       deja posee la veille a 22h12. On regroupe sur le nom normalise et on affiche le premier nom
+       rencontre : rien n'est renomme dans la base, la cle reste un vrai nom de site. */
+    function _plNormSite(x){ return String(x||'').toUpperCase().replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+    var siteMap={}, order=[], siteInfo={}, _plCanon={};
+    miss.forEach(function(m){
+      var _brut=(m.siteAgent||m.titre||'—'), _nk=_plNormSite(_brut)||_brut;
+      var s=_plCanon[_nk]; if(s==null){ s=_plCanon[_nk]=_brut; }
+      if(!siteMap[s]){siteMap[s]=[];order.push(s);siteInfo[s]={ville:m.ville||'',client:m.client||''};}
+      /* la ville et le client viennent de la premiere vacation ; on complete si elle ne les portait pas. */
+      if(!siteInfo[s].ville&&m.ville)siteInfo[s].ville=m.ville;
+      if(!siteInfo[s].client&&m.client)siteInfo[s].client=m.client;
+      siteMap[s].push(m); });
     order.sort(function(a,b){return String(a).localeCompare(String(b));});
     var wl=days[0].split('-').reverse().join('/'), we=days[days.length-1].split('-').reverse().join('/');
     var _granOpts=['Jour','Semaine','Mois'].map(function(g){return '<option'+(PL_GRAN===g?' selected':'')+'>'+g+'</option>';}).join('');
@@ -7715,12 +7729,38 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       +'<div class="sub" style="margin:0 0 10px">Un ticket libre (rappel, tâche, consigne) dans Suivi des appels, à la date et l’heure que tu veux.</div>'
       +'<textarea id="tk-txt" placeholder="Objet du ticket (ex. Rappeler le client X pour la prolongation…)" style="width:100%;min-height:80px;margin-bottom:8px"></textarea>'
       +'<div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><span class="sub" style="margin:0">Le</span><input type="date" id="tk-date" value="'+esc(auj)+'" style="width:auto;padding:5px 8px"><span class="sub" style="margin:0">à</span><input type="time" id="tk-heure" value="09:00" style="width:auto;padding:5px 8px"></div>'
+      /* b396 : ce qu'il manquait pour qu'un ticket veuille dire quelque chose. */
+      +'<div class="acts" style="gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">'
+      +'<label class="chk" style="margin:0"><input type="checkbox" id="tk-urg"> \ud83d\udd34 URGENT</label>'
+      +'<span class="sub" style="margin:0">\u23f0 \u00e0 faire avant</span><input type="time" id="tk-avant" style="width:auto">'
+      +'</div>'
+      +'<div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px">'
+      +'<span class="sub" style="margin:0">\ud83d\udd01 R\u00e9p\u00e9ter</span>'
+      +'<select id="tk-rec" style="width:auto"><option value="">une seule fois</option><option value="j">chaque jour</option><option value="s">chaque semaine</option></select>'
+      +'<span class="sub" id="tk-recn-w" style="margin:0;display:none">pendant <input type="number" id="tk-recn" min="2" max="30" value="7" style="width:64px"> fois</span>'
+      +'</div>'
+      +'<div class="acts" style="gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:12px">'
+      +'<span class="sub" style="margin:0">\ud83d\udcce Pi\u00e8ce jointe</span>'
+      +'<input type="file" id="tk-file" style="font-size:12px;width:auto">'
+      +'<span class="sub" id="tk-file-msg" style="margin:0"></span>'
+      +'</div>'
       +'<div class="lab" style="margin:0 0 4px">Pour qui ?</div>'
       +'<div class="acts" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">'+TK_POUR.map(function(p,i){ return '<label style="display:flex;gap:5px;align-items:center;font-size:12.5px;text-transform:none;border:1px solid var(--line);border-radius:8px;padding:4px 9px"><input type="radio" name="tkpour" value="'+p.k+'"'+(i===0?' checked':'')+' style="flex:0 0 auto;width:auto;min-width:0;min-height:0;height:auto;margin:0">'+esc(p.t)+(p.d?' <span class="sub" style="margin:0;font-size:11px">('+esc(p.d)+')</span>':'')+'</label>'; }).join('')+'</div>'
       +'<div class="acts"><button type="button" class="ok" id="tk-go" style="flex:1">📨 Envoyer</button><button type="button" id="tk-no">Annuler</button></div>'
       +'<div class="sub" id="tk-ou" style="margin:6px 0 0"></div>'   /* b348 : on dit OU ca va, avant de cliquer */;
     document.body.appendChild(pop);
     byId('tk-txt').focus();
+    /* b396 : « pendant N fois » n'a de sens que si on repete. */
+    byId('tk-rec').onchange=function(){ var w=byId('tk-recn-w'); if(w)w.style.display=this.value?'':'none'; };
+    /* b396 : hors ligne, le champ le DIT — un envoi qui echoue en silence est pire que pas de champ. */
+    byId('tk-file').onchange=function(){ var m=byId('tk-file-msg'), f=this.files&&this.files[0];
+      if(!m)return;
+      if(!f){ m.textContent=''; return; }
+      if(typeof photoReady!=='function'||!photoReady()){ m.style.color='var(--bad)';
+        m.textContent='Connexion en ligne requise pour joindre un fichier.'; this.value=''; return; }
+      if(f.size>15*1024*1024){ m.style.color='var(--bad)'; m.textContent='Fichier trop lourd (15 Mo max).'; this.value=''; return; }
+      m.style.color='var(--muted)'; m.textContent=f.name+' \u00b7 '+Math.round(f.size/1024)+' Ko';
+    };
     /* b348 : la destination s'affiche AVANT le clic, et le bouton la nomme. */
     function tkOu(){ var v=(pop.querySelector('input[name="tkpour"]:checked')||{}).value||'operateur';
       var e=byId('tk-ou'); if(e)e.innerHTML=(v==='operateur')
@@ -7736,20 +7776,59 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       if(!txt){ alert('Écris l’objet du ticket.'); byId('tk-txt').focus(); return; }
       if(!d){ alert('Choisis une date.'); return; }
       var pk=(pop.querySelector('input[name="tkpour"]:checked')||{}).value||'operateur';
+      /* ===== b396 : urgence, échéance, récurrence, pièce jointe =====
+         Elles partent DANS le texte, là où celui qui reçoit le ticket les lit. La récurrence
+         crée vraiment N consignes : un réglage qu'il faudrait rejouer chaque matin n'en est pas un. */
+      var _urg=!!(byId('tk-urg')&&byId('tk-urg').checked);
+      var _av=(byId('tk-avant')&&byId('tk-avant').value)||'';
+      var _rec=(byId('tk-rec')&&byId('tk-rec').value)||'';
+      var _recn=Math.max(2,Math.min(30,parseInt((byId('tk-recn')&&byId('tk-recn').value)||'7',10)||7));
+      var _f=(byId('tk-file')&&byId('tk-file').files&&byId('tk-file').files[0])||null;
+      txt=(_urg?'\ud83d\udd34 URGENT \u2014 ':'')+txt+(_av?(' \u00b7 \u23f0 avant '+_av):'');
+      /* Le fichier part d'abord : un ticket qui pointe vers un fichier absent ne vaut rien. */
+      function _suite(cle){
+        if(cle)txt+=' \u00b7 \ud83d\udcce '+cle;
+        window.__TK_URG=_urg; window.__TK_AVANT=_av; window.__TK_PJ=cle||'';
+        window.__TK_REC=_rec; window.__TK_RECN=_recn;
+        _tkEnvoyer(txt,d,h,pk);
+      }
+      if(_f){
+        var _g=byId('tk-go'); if(_g){_g.disabled=true;_g.textContent='\u23f3 Envoi du fichier\u2026';}
+        var _cle='piece/'+Date.now()+'_'+String(_f.name||'fichier').replace(/[^A-Za-z0-9._-]/g,'_').slice(0,60);
+        photoUpload(_cle,_f,function(j){
+          if(_g){_g.disabled=false;}
+          if(!(j&&j.ok)){ alert('Le fichier n\u2019a pas pu \u00eatre envoy\u00e9. Le ticket n\u2019a pas \u00e9t\u00e9 cr\u00e9\u00e9.'); if(_g)_g.textContent='\ud83d\udce8 Envoyer'; return; }
+          _suite(_cle);
+        });
+        return;
+      }
+      _suite('');
+    };
+    /* b396 : l'envoi proprement dit, appelé une fois le fichier déposé (ou tout de suite). */
+    function _tkEnvoyer(txt,d,h,pk){
       /* b348 (regle Zeus) : UNE SEULE destination, celle de la personne visee. L'operateur travaille dans
          Suivi des appels — son ticket y va, et nulle part ailleurs. Le superviseur, l'administrateur et le
          super-admin travaillent dans Terrain — leur ticket y va, et n'encombre PAS la file des appels. */
+      /* b396 : les dates de la récurrence. Une seule si on ne répète pas. */
+      var _dates=[d];
+      if(window.__TK_REC){
+        var _pas=(window.__TK_REC==='s')?7:1, _b=new Date(d+'T12:00:00');
+        for(var _i=1;_i<(window.__TK_RECN||2);_i++){ _b.setDate(_b.getDate()+_pas);
+          _dates.push(_b.getFullYear()+'-'+pad2(_b.getMonth()+1)+'-'+pad2(_b.getDate())); }
+      }
       if(pk==='operateur'){
-        var cs=csgLoad(); cs.push({id:csgNewId(),texte:txt,client:'',site:'',ville:'',cp:'',mdate:d,heure:h||'',done:false,note:'',pour:pk,
-          par:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'')});
+        var cs=csgLoad();
+        _dates.forEach(function(_d){ cs.push({id:csgNewId(),texte:txt,client:'',site:'',ville:'',cp:'',mdate:_d,heure:h||'',done:false,note:'',pour:pk,
+          urgent:!!window.__TK_URG, avant:window.__TK_AVANT||'', pj:window.__TK_PJ||'',
+          par:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'')}); });
         csgSave(cs);
       } else if(typeof supTerrainAdd==='function'){
-        supTerrainAdd({type:'anomalie',motif:'ticket',motifLbl:'🎫 Ticket',pour:pk,texte:txt,etape:'Ticket envoyé',mdate:d,heure:h||'',by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||''),deadline:0});
+        _dates.forEach(function(_d){ supTerrainAdd({type:'anomalie',motif:'ticket',motifLbl:'🎫 Ticket',pour:pk,texte:txt,etape:'Ticket envoy\u00e9',mdate:_d,heure:h||'',urgent:!!window.__TK_URG,avant:window.__TK_AVANT||'',pj:window.__TK_PJ||'',by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||''),deadline:0}); });
       }
       if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'tkfab'+Date.now(),title:'🎫 Ticket pour '+(pk==='operateur'?'l’opérateur':pk==='superviseur'?'le superviseur':pk==='admin'?'l’administrateur':'le super-admin'),body:txt.slice(0,80),go:(pk==='operateur'?'suiviappels':'supterrain')});
       var q=byId('tk-pop'); if(q)q.parentNode.removeChild(q);
       var lbl=(TK_POUR.filter(function(x){return x.k===pk;})[0]||{}).t||pk;
-      alert('🎫 Ticket envoyé à '+lbl+'\n\nLe '+d.split('-').reverse().join('/')+(h?' à '+h:'')+(pk==='operateur'?'\n\nIl apparaît dans 📞 Suivi des appels ce jour-là.':'\n\nIl apparaît dans 🧭 Terrain — pas dans la file des appels.'));
+      alert('🎫 '+(_dates.length>1?(_dates.length+' tickets envoy\u00e9s \u00e0 '):'Ticket envoy\u00e9 \u00e0 ')+lbl+(window.__TK_URG?'  \ud83d\udd34 URGENT':'')+(window.__TK_PJ?'\n\ud83d\udcce Pi\u00e8ce jointe : '+window.__TK_PJ:'')+(_dates.length>1?('\n\nDu '+_dates[0].split('-').reverse().join('/')+' au '+_dates[_dates.length-1].split('-').reverse().join('/')):('\n\nLe '+d.split('-').reverse().join('/')+(h?' \u00e0 '+h:'')))+(pk==='operateur'?'\n\nIl apparaît dans 📞 Suivi des appels ce jour-là.':'\n\nIl apparaît dans 🧭 Terrain — pas dans la file des appels.'));
       if(typeof renderSuiviAppels==='function'&&byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')){try{renderSuiviAppels();}catch(e){}}
       if(typeof supTerrainBadge==='function')supTerrainBadge();
     };

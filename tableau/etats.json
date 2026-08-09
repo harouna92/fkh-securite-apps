@@ -1127,6 +1127,22 @@
    "theme": "Suivi des appels",
    "pourquoipas": "Defaut introduit en b387 : la tuile comptait le jour (regle b369/b392) mais le palier suivant ne filtrait que sur le cas. La tuile disait 1 et le clic ouvrait 193 creneaux depuis le 26 juillet. Cliquer une tuile ouvre desormais AUJOURD HUI, l en-tete le dit, et le retard reste sous « + N jour(s) passe(s) » avec ses deux tranches.",
    "local": true
+  },
+  {
+   "b": 396,
+   "titre": "Bulle 🎫 : urgence, échéance, récurrence, pièce jointe",
+   "source": "demande de Zeus, 09/08",
+   "theme": "Tickets",
+   "pourquoipas": "La bulle n avait que l objet, la date, l heure et le destinataire. Elle gagne 🔴 URGENT, ⏰ à faire avant, 🔁 répéter chaque jour/semaine pendant N fois — qui crée vraiment N tickets, pas un réglage à rejouer chaque matin — et 📎 une pièce jointe de n importe quel type. La pièce jointe n a demandé aucun déploiement : l endpoint /photo accepte déjà une clé et un type libres. Le fichier part AVANT le ticket : un ticket qui pointe vers un fichier absent ne vaut rien.",
+   "local": true
+  },
+  {
+   "b": 397,
+   "titre": "Le Planning regroupe les sites comme le serveur les compare",
+   "source": "incident SUNSET PIZZA, 09/08",
+   "theme": "Planning",
+   "pourquoipas": "Un double espace dans le nom du site suffisait à créer deux lignes distinctes dans le Planning : c est ce qui a fait recréer à la main une vacation que le serveur avait déjà posée la veille. Le serveur normalise avant de comparer, le Planning regroupait sur le nom exact. Il regroupe maintenant sur le nom normalisé et affiche le premier nom rencontré — 4 lignes en double disparaissent, et « Basic Fit » reste distinct de « BASIC FIT/Varennes-Vauzelles ».",
+   "local": true
   }
  ],
  "attente": [
