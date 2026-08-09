@@ -1071,6 +1071,14 @@
    "theme": "Tenues & photos",
    "pourquoipas": "Il n'existait qu'un « Demander un point à… » qui envoie la liste entière. Quand un seul agent est en service et qu'on veut sa photo maintenant, chaque ligne porte désormais son bouton : le ticket part au superviseur avec le nom, le site, l'heure de prise et depuis combien de temps il est en service — c'est ce délai qui rend la demande urgente, la photo ne pourra plus être prise une fois l'agent parti.",
    "local": true
+  },
+  {
+   "b": 389,
+   "titre": "Demander une photo de tenue COMPLÈTE, en disant ce qu'on veut voir",
+   "source": "capture de Zeus, 09/08 — « sites couverts »",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Les deux photos de TELLA Manfiou ne montrent que le bas du corps, et pourtant le site compte parmi les couverts : le compteur mesure la présence d'une photo, pas ce qu'elle prouve. Chaque ligne d'agent porte maintenant un bouton qui ouvre une liste à cocher — tenue entière de face, haut, pantalon, chaussures, gilet, badge — plus un champ libre. Le ticket part au superviseur avec cette liste écrite : « refais la photo » revient aussi flou qu'il est parti, une liste revient conforme.",
+   "local": true
   }
  ],
  "attente": [

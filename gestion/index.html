@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b388</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b389</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -8242,8 +8242,40 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       : ('<span style="color:var(--warn);font-size:12px">\u2014 pas de photo</span>'
          +'<button type="button" class="tn-portail" data-nom="'+esc(n)+'" style="font-size:11.5px;margin-left:6px;border-color:#6ea8fe;color:#6ea8fe">\ud83d\udcf7 Choisir une photo re\u00e7ue</button>'
          +'<button type="button" class="tn-ticket" data-nom="'+esc(n)+'" data-site="'+esc(site||'')+'" title="Cr\u00e9er le ticket de contr\u00f4le tenue \u2014 il part chez le superviseur (\ud83e\udded Terrain)" style="font-size:11.5px;margin-left:6px;border-color:#e0a13b;color:#e0a13b">\ud83c\udfab Ticket contr\u00f4le tenue</button>');
+    /* b389 : une photo peut exister et ne montrer que les chaussures. On peut donc TOUJOURS
+       redemander une photo complete, en disant ce qu'on veut voir. */
+    var _plus='<button type="button" class="tn-full" data-nom="'+esc(n)+'" data-site="'+esc(site||'')+'" title="Demander une photo compl\u00e8te au superviseur" style="font-size:11px;border-color:#7b61ff;color:#a99bff">\ud83c\udfab Photo compl\u00e8te\u2026</button>';
     return '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:4px 0;border-bottom:1px dashed var(--line)">'
-      +'<span style="flex:1;min-width:140px">\ud83d\udc64 '+esc(n)+'</span>'+_htxt+vign+'</div>';   /* b377 */
+      +'<span style="flex:1;min-width:140px">\ud83d\udc64 '+esc(n)+'</span>'+_htxt+vign+_plus+'</div>';   /* b377 · b389 */
+  }
+  /* b389 : on nomme ce qu'on veut voir. Une demande vague (« refais la photo ») revient
+     vague ; une liste ecrite revient conforme. */
+  var TN_EXIGE=[['face','\ud83e\uddcd Tenue enti\u00e8re, de face'],['haut','\ud83e\udde5 Haut / veste'],
+    ['pantalon','\ud83d\udc56 Pantalon'],['chaussures','\ud83d\udc5e Chaussures'],
+    ['gilet','\ud83e\uddba Gilet / EPI'],['badge','\ud83e\udeaa Badge visible']];
+  function tnPhotoComplete(nom,site){
+    var old=byId('tnf-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='tnf-pop';
+    pop.style.cssText='position:fixed;inset:12% 8%;z-index:270;background:var(--panel);border:1.5px solid #7b61ff;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+    pop.innerHTML='<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">\ud83c\udfab Photo de tenue \u2014 '+esc(nom)+'</b><button type="button" id="tnf-x">\u2715</button></div>'
+      +'<div class="sub" style="margin:4px 0 10px">'+(site?('\ud83d\udccd '+esc(site)+' \u00b7 '):'')+'Coche ce que la photo doit montrer. La liste part telle quelle au superviseur.</div>'
+      +'<div class="list">'+TN_EXIGE.map(function(e){ return '<label class="it" style="cursor:pointer"><input type="checkbox" class="tnf-c" value="'+e[0]+'" data-lbl="'+esc(e[1])+'"'+((e[0]==='face')?' checked':'')+'> '+e[1]+'</label>'; }).join('')+'</div>'
+      +'<label class="f" style="margin-top:8px"><div class="lab">Autre pr\u00e9cision (facultatif)</div><input id="tnf-mot" placeholder="Ex. la photo actuelle ne montre que les chaussures"></label>'
+      +'<div class="acts" style="margin-top:12px"><button type="button" id="tnf-go" class="ok">\ud83d\udce4 Envoyer au superviseur</button></div>';
+    document.body.appendChild(pop);
+    byId('tnf-x').onclick=function(){ pop.parentNode.removeChild(pop); };
+    byId('tnf-go').onclick=function(){
+      var L=[].slice.call(pop.querySelectorAll('.tnf-c:checked')).map(function(c){ return c.getAttribute('data-lbl'); });
+      if(!L.length){ alert('Coche au moins un \u00e9l\u00e9ment \u00e0 montrer.'); return; }
+      var mot=(byId('tnf-mot').value||'').trim();
+      if(typeof tkxCreer!=='function'){ alert('Fonction indisponible.'); return; }
+      tkxCreer({objet:'\ud83e\uddba Photo de tenue \u00e0 refaire \u2014 '+nom,
+        message:'\u00c0 montrer : '+L.join(', ')+(mot?('\n'+mot):''),
+        contexte:[nom+(site?(' \u00b7 '+site):'')].concat(L.map(function(x){ return '\u2192 '+x; })),
+        source:'', pourRole:'superviseur'});
+      pop.parentNode.removeChild(pop);
+      alert('\ud83c\udfab Ticket envoy\u00e9 au superviseur.\n\n\u00c0 montrer : '+L.join(', ')+'\n\n\ud83e\udded Il arrive dans \u00ab Terrain \u00bb chez lui.');
+    };
   }
   function tnOuvrir(vue){
     var d=tnCalc();
@@ -8286,6 +8318,8 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     byId('tn-x').onclick=function(){ var q=byId('tn-pop'); if(q)q.parentNode.removeChild(q); };
     pop.querySelectorAll('.tn-tile').forEach(function(t){ t.onclick=function(){ tnOuvrir(t.getAttribute('data-v')); }; });
     if(typeof photoHydrate==='function'){try{photoHydrate(pop);}catch(e){}}   /* b339 */
+    pop.querySelectorAll('.tn-full').forEach(function(b){ b.onclick=function(){
+      tnPhotoComplete(b.getAttribute('data-nom')||'', b.getAttribute('data-site')||''); }; });   /* b389 */
     pop.querySelectorAll('.tn-ph').forEach(function(sp){ sp.onclick=function(){
       var k=sp.getAttribute('data-k');
       if(typeof photoOpen==='function'){ photoOpen(k); return; }
