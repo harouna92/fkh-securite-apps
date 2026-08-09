@@ -1143,6 +1143,14 @@
    "theme": "Planning",
    "pourquoipas": "Un double espace dans le nom du site suffisait à créer deux lignes distinctes dans le Planning : c est ce qui a fait recréer à la main une vacation que le serveur avait déjà posée la veille. Le serveur normalise avant de comparer, le Planning regroupait sur le nom exact. Il regroupe maintenant sur le nom normalisé et affiche le premier nom rencontré — 4 lignes en double disparaissent, et « Basic Fit » reste distinct de « BASIC FIT/Varennes-Vauzelles ».",
    "local": true
+  },
+  {
+   "b": 398,
+   "titre": "Corriger la ville recalcule les villes proches, et « dès que possible » existe",
+   "source": "capture de Zeus, 09/08 — Saint-Lyé",
+   "theme": "Demandes & appels",
+   "pourquoipas": "Les lignes « Toulouse à 30 km » etaient fabriquees a la creation et jamais recalculees : corriger la ville en Saint-Lye (Aube) laissait Toulouse et Perpignan dans le texte. Credible, et faux de 500 km — un operateur pouvait appeler un agent a l autre bout du pays. Elles se recalculent maintenant des que la ville ou le code postal change, sans toucher au reste du texte. Et « des que possible » devient une case a cocher : c est une reponse, pas une absence de reponse.",
+   "local": true
   }
  ],
  "attente": [
