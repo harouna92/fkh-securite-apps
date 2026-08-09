@@ -1055,6 +1055,22 @@
    "theme": "Suivi des appels",
    "pourquoipas": "Le bouton existait déjà mais il écrasait la liste : m.ctrls = out9. Tout créneau hors grille disparaissait, y compris ceux qui portaient une coche ou une photo — le pointage restait en base mais son créneau n'existait plus, donc la preuve devenait invisible. Mesuré sur le dump du 09/08 : 196 contrôles prouvés auraient été effacés, dont le 07:10 photographié de la vacation MAAF 20:00→09:00. Il conserve désormais les créneaux prouvés, ne retire que ceux où rien n'a été enregistré, et annonce les trois listes avant d'agir.",
    "local": true
+  },
+  {
+   "b": 387,
+   "titre": "🌙 devient « Contrôles des 2 h » — appel non fait · injoignable · sans photo",
+   "source": "chantier A, demandé par Zeus le 09/08",
+   "theme": "Suivi des appels",
+   "pourquoipas": "La pastille ne collectait que les contrôles sans photo, et son titre parlait de photos : un appel jamais passé s'y cachait sans être nommé. Elle sépare maintenant les trois cas, chacun avec son compte du jour et son retard à un clic, et le drill par site puis par créneau est conservé. Chaque ligne dit QUI a coché et à quelle heure — le champ existait (rempli 199 fois sur 199), il ne sortait nulle part.",
+   "local": true
+  },
+  {
+   "b": 388,
+   "titre": "Demander la photo de tenue au superviseur, agent par agent",
+   "source": "capture de Zeus, 09/08",
+   "theme": "Tenues & photos",
+   "pourquoipas": "Il n'existait qu'un « Demander un point à… » qui envoie la liste entière. Quand un seul agent est en service et qu'on veut sa photo maintenant, chaque ligne porte désormais son bouton : le ticket part au superviseur avec le nom, le site, l'heure de prise et depuis combien de temps il est en service — c'est ce délai qui rend la demande urgente, la photo ne pourra plus être prise une fois l'agent parti.",
+   "local": true
   }
  ],
  "attente": [

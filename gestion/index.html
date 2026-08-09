@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b386</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b388</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -8678,7 +8678,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     cli:{title:'🏢 Prises / fins — CLIENT NON AVISÉ',verb:'client non avisé',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     ph:{title:'📷 Photos de PRISE / FIN manquantes',verb:'sans photo',tiles:1,depuis:'Depuis le 01/08 08:00, en continu'},
     te:{title:'🦺 Agents planifiés SANS photo de contrôle tenue',verb:'photo de contrôle manquante',tiles:3,depuis:'Visés dès 12 h AVANT la prise de service, tant que la photo n’est pas déposée'},
-    c2:{title:'🌙 Photos de contrôle (toutes les 2 h) manquantes',verb:'sans photo',tiles:0,phaseSite:1,depuis:'Tout l’historique · classées Terminées / En cours puis PAR SITE · dépôt de la photo sur chaque créneau'},
+    c2:{title:'🌙 Contrôles des 2 h',verb:'à traiter',tiles:0,c2vues:1,phaseSite:1,depuis:'Tout l’historique · classées Terminées / En cours puis PAR SITE · dépôt de la photo sur chaque créneau'},
     an2:{title:'\u26a0\uFE0F Anomalies signalées',verb:'anomalie(s) ouverte(s)',tiles:0,anov:1,depuis:'Ce que le terrain remonte et qui n’est pas une demande : lien non reçu, numéro manquant, consigne fausse — un défaut non résolu se reproduira'},
     td:{title:'📦 Tenues envoyées — réception NON confirmée',verb:'agent(s) à rappeler',tiles:0,tdv:1,depuis:'Un colis parti n’est pas un colis reçu : tant que l’agent n’a pas confirmé, il n’a peut-être pas de tenue'},
     an:{title:'🔴 Annulations à confirmer',verb:'annulation(s) signalée(s)',tiles:0,anv:1,depuis:'Une annulation reçue par mail ne supprime jamais une vacation : elle la signale. Confirme, ou écarte la fausse alerte'},
@@ -8739,13 +8739,18 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
         var _fd=_finMap[e.mid]; if(_fd==null)_fd=due+86400000; /* b185 : sans fin connue = terminee 24h apres la prise */ it.phase=(now<due)?'avant':((now>_fd)?'apres':'pendant'); it.since=now-(due-43200000);
         sc.te.push(it); }
       else { var _inj=!!(r.statut&&String(r.statut).indexOf('Injoignable')>=0);
+        /* b387 : trois cas, pas un seul. Un appel jamais passe est au moins aussi grave
+           qu'une photo manquante — il n'avait jusqu'ici aucune vue a lui. */
         (_ctlMap[e.mid]=_ctlMap[e.mid]||[]).push({t:due,done:!!r.done,inj:_inj,hm:r.hm||''});
         /* b350 : idem pour les contrôles des 2 h. Au passage, « Pas de photo » / « Photo non horodatée »
            ne comptent plus comme une photo : c'était un libellé qui disait l'ABSENCE et qui éteignait
            quand même la ligne. */
         var _apC=(typeof phAUnePhoto==='function')?phAUnePhoto(e.mid,e.key):!!(r.photoKey||r.photo);
-        if(!_apC){ var _fd2=_finMap[e.mid]; if(_fd2==null)_fd2=due+86400000; it.phase=(now>_fd2)?'passee':'encours';
-          it.c2info=_inj?'📵 Agent INJOIGNABLE — l’opérateur a tenté de joindre':(r.done?('☎ Appel contrôle ✅ FAIT'+(r.hm?(' à '+r.hm):'')+' — mais pas de photo'):'☎ Appel contrôle ❌ NON pointé par l’opérateur');
+        /* b387 : qui a coche, et dans quel cas on range la ligne. */
+        it.par=r.by||''; it.hmFait=r.hm||''; it.statutTxt=r.statut||''; it.tries=+r.tries||0;
+        it.sousvue=(!r.done&&now>due)?'nonfait':(_inj?'inj':(!_apC?'sansphoto':''));
+        if(it.sousvue){ var _fd2=_finMap[e.mid]; if(_fd2==null)_fd2=due+86400000; it.phase=(now>_fd2)?'passee':'encours';
+          /* b387 : on dit QUI a coche — le champ existait, il ne sortait nulle part. */ var _par7=r.by?(' \u00b7 \ud83d\udc64 '+r.by):''; var _try7=(+r.tries)?(' \u00b7 \u260e '+(+r.tries)+' tentative(s)'):''; it.c2info=_inj?('📵 Agent INJOIGNABLE \u2014 d\u00e9clar\u00e9'+(r.hm?(' \u00e0 '+r.hm):'')+_par7+_try7):(r.done?('☎ Appel contr\u00f4le ✅ FAIT'+(r.hm?(' \u00e0 '+r.hm):'')+_par7+_try7+' \u2014 mais pas de photo'):('☎ Appel contr\u00f4le ❌ JAMAIS COCH\u00c9'+_try7));
           sc.c2.push(it); } }
     });
     ['op','cli','ph','te','c2'].forEach(function(k){ sc[k].sort(function(x,y){return x.due-y.due;}); });
@@ -9329,6 +9334,11 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       if(!x||!x.mid)return '';
       return '<button type="button" class="pp-act-retirer" data-mid="'+esc(x.mid)+'" data-key="'+esc(x.key||'prise')+'" title="Retirer cette échéance du suivi (réversible depuis la vacation)" style="font-size:12px;margin-left:6px;color:var(--muted);border-color:var(--line)">🗑 Retirer</button>';
     }
+    /* b388 : sur une ligne de 🦺, demander LA photo de CET agent au superviseur. */
+    function rowTenueTicket(x){
+      if(PP_VIEW.mode!=='te'||!x||!x.agent)return '';
+      return '<button type="button" class="pp-tn-tk" data-nom="'+esc(x.agent)+'" data-site="'+esc(x.site||'')+'" data-hm="'+esc(x.heure||'')+'" data-mdate="'+esc(x.mdate||'')+'" data-depuis="'+esc(((typeof ppSince==='function'&&x.since)?ppSince(x.since):''))+'" title="Demander au superviseur la photo de contr\u00f4le tenue de cet agent" style="font-size:12px;border-color:#7b61ff;color:#a99bff">\ud83c\udfab Demander la photo au superviseur</button>';
+    }
     function rowAct(x){ var md=PP_VIEW.mode;
       /* b336 : une photo sans position et sans rattachement — le seul geste utile est de la rapprocher. */
       if(md==='gp'&&x&&x.libre)return '<button type="button" class="pp-act-rappro ok" data-k="'+esc(x.key||'')+'" data-ts="'+esc(String(x.due||0))+'" style="font-size:12px">📎 Rapprocher cette photo</button>'; // b160 : corriger l'info manquante DIRECTEMENT depuis la ligne
@@ -9349,7 +9359,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       return '';
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
-      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+(rowAct(x)?'<div class="acts" style="margin-top:5px;gap:6px">'+rowAct(x)+rowRetirer(x)+'</div>':'')+ecartPhoto(x.mid,(x.key||'prise'),x.heure,x.mdate)+((typeof phOrigineTxt==='function'&&x.mid&&x.key)?phOrigineTxt(x.mid,x.key):'')/* b351 */+hdBloc(x)+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+((rowAct(x)+rowTenueTicket(x))?'<div class="acts" style="margin-top:5px;gap:6px;flex-wrap:wrap">'+rowAct(x)+rowTenueTicket(x)+rowRetirer(x)+'</div>':'')+ecartPhoto(x.mid,(x.key||'prise'),x.heure,x.mdate)+((typeof phOrigineTxt==='function'&&x.mid&&x.key)?phOrigineTxt(x.mid,x.key):'')/* b351 */+hdBloc(x)+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
     if(D.anov){
       h+='<div class="acts" style="margin-bottom:10px"><button type="button" id="ano-new" class="ok" style="font-size:13px">\u2795 Signaler une anomalie</button></div>';
       var _lib={}; ANO_CATS.forEach(function(c){_lib[c[0]]=c[1];});
@@ -9502,18 +9512,19 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     } else if(D.roGrp&&PP_VIEW.sub){
       var Lr=L.filter(function(x){return (x.grp||(x.callT?'ecart':'aucun'))===PP_VIEW.sub;});
       h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(PP_VIEW.sub==='aucun'?'📵 Aucun appel':'↔ Décalage pointé↔appel')+'</b><span class="sub" style="margin:0">'+Lr.length+' pointage(s)</span></div>'+rowsOf(Lr);
-    } else if(D.phaseSite&&!PP_VIEW.sub){ // b182 : niveau 1 = Terminees / En cours
+    } else if(D.phaseSite&&!D.c2vues&&!PP_VIEW.sub){ // b182 : niveau 1 = Terminees / En cours
       var cP=L.filter(function(x){return x.phase==='passee';}),cE=L.filter(function(x){return x.phase!=='passee';});
       h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="passee"><b>'+cP.length+'</b>⏳ Vacations TERMINÉES<br><span class="sub" style="margin:0;font-size:11.5px">photos manquantes</span></div><div class="pp-tile" data-sub="encours"><b>'+cE.length+'</b>🟢 Vacations EN COURS<br><span class="sub" style="margin:0;font-size:11.5px">photos manquantes</span></div></div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
     } else if(D.phaseSite&&PP_VIEW.sub&&PP_VIEW.sub2==null){ // b182 : niveau 2 = par SITE
-      var Lp=L.filter(function(x){return (PP_VIEW.sub==='passee')?(x.phase==='passee'):(x.phase!=='passee');});
+      /* b387 : quand la pastille raisonne par CAS (🌙), le palier 2 filtre sur le cas. */
+      var Lp=L.filter(function(x){ return D.c2vues?((x.sousvue||'')===PP_VIEW.sub):((PP_VIEW.sub==='passee')?(x.phase==='passee'):(x.phase!=='passee')); });
       var _g2={}; Lp.forEach(function(x){ (_g2[x.site]=_g2[x.site]||[]).push(x); });
       var _s2=Object.keys(_g2).sort(function(u,v2){return _g2[u][0].due-_g2[v2][0].due;});
-      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(PP_VIEW.sub==='passee'?'⏳ Terminées':'🟢 En cours')+'</b><span class="sub" style="margin:0">'+Lp.length+' créneau(x) sans photo</span></div>';
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(D.c2vues?({nonfait:'\u260e Appels non faits',inj:'\ud83d\udcf5 Agents injoignables',sansphoto:'\ud83d\udcf7 Sans photo'}[PP_VIEW.sub]||''):(PP_VIEW.sub==='passee'?'⏳ Terminées':'🟢 En cours'))+'</b><span class="sub" style="margin:0">'+Lp.length+' créneau(x) '+(D.c2vues?({nonfait:'sans appel',inj:'agent injoignable',sansphoto:'sans photo'}[PP_VIEW.sub]||''):'sans photo')+'</span></div>';
       h+=_s2.length?_s2.map(function(st3){ var n3=_g2[st3].length,f3=_g2[st3][0]; return '<div class="pp-tile" data-sub2="'+esc(st3)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+n3+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st3)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f3.client?'🏢 '+esc(f3.client)+' · ':'')+'1er créneau : '+((f3.mdate||'').split('-').reverse().join('/'))+' '+esc(f3.heure||'')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Rien 🎉</div>';
     } else if(D.phaseSite&&PP_VIEW.sub&&PP_VIEW.sub2!=null){ // b182 : niveau 3 = creneaux du site + depot photo
-      var Ls=L.filter(function(x){ return ((PP_VIEW.sub==='passee')?(x.phase==='passee'):(x.phase!=='passee'))&&x.site===PP_VIEW.sub2; });
+      var Ls=L.filter(function(x){ return (D.c2vues?((x.sousvue||'')===PP_VIEW.sub):((PP_VIEW.sub==='passee')?(x.phase==='passee'):(x.phase!=='passee')))&&x.site===PP_VIEW.sub2; });
       h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+esc(PP_VIEW.sub2)+'</b><span class="sub" style="margin:0">'+Ls.length+' créneau(x) · dépose la photo sur la ligne</span></div>'+rowsOf(Ls);
     } else if(D.af3&&!PP_VIEW.sub){ // b189 : niveau 1 = A venir / En cours / Passees
       var aJ7=L.filter(function(x){return x.phase==='j7';});var aJ1=L.filter(function(x){return x.phase==='j1';}),aAv=L.filter(function(x){return x.phase==='avenir';}),aEn=L.filter(function(x){return x.phase==='encours';}),aPa=L.filter(function(x){return x.phase==='passee';});
@@ -9538,6 +9549,24 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       var tAv=L.filter(function(x){return x.phase==='avant';}),tPe=L.filter(function(x){return x.phase==='pendant';}),tAp=L.filter(function(x){return x.phase==='apres';});
       h+='<div style="display:flex;gap:10px"><div class="pp-tile" data-sub="avant"><b>'+tAv.length+'</b>⏳ AVANT la prise<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div><div class="pp-tile" data-sub="pendant"><b>'+tPe.length+'</b>🟢 PENDANT le service<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div><div class="pp-tile" data-sub="apres"><b>'+tAp.length+'</b>🔚 APRÈS le service<br><span class="sub" style="margin:0;font-size:11.5px">'+D.verb+'</span></div></div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+' · la photo déposée (ici même, bouton 📷 sur la ligne) retire l’agent de la liste.</p>';
+    } else if(D.c2vues&&!PP_VIEW.sub){
+      /* b387 : les trois questions qu'on se pose sur un contrôle des 2 h. Meme regle du jour
+         qu'en b369 : la tuile compte AUJOURD'HUI, le retard est ecrit dessous et reste a un clic. */
+      var _aj7=(typeof impTodayISO==='function')?impTodayISO():'';
+      function _c2f(sv){ return L.filter(function(x){ return (x.sousvue||'')===sv; }); }
+      function _c2j(sv){ return _c2f(sv).filter(function(x){ return (x.mdate||'')===_aj7; }).length; }
+      function _c2r(sv){ var r=_c2f(sv).filter(function(x){ return (x.mdate||'')!==_aj7; }).length;
+        return r?('<br><span class="pp-retard" data-k="'+sv+'" style="color:#e0a13b;text-decoration:underline;cursor:pointer" title="Voir les jours pass\u00e9s">+ '+r+' jour(s) pass\u00e9(s)</span>'):''; }
+      function _c2t(sv,ico,titre,sous,coul){
+        return '<div class="pp-tile" data-sub="'+sv+'"'+(coul?(' style="border-color:'+coul+'"'):'')+'><b>'+_c2j(sv)+'</b>'+ico+' '+titre
+          +'<br><span class="sub" style="margin:0;font-size:11.5px">'+sous+_c2r(sv)+'</span></div>';
+      }
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap">'
+        +_c2t('nonfait','\u260e','Appel non fait','l\u2019heure est pass\u00e9e, rien n\u2019a \u00e9t\u00e9 coch\u00e9 \u00b7 aujourd\u2019hui','#e5322d')
+        +_c2t('inj','\ud83d\udcf5','Agent injoignable','d\u00e9clar\u00e9 par l\u2019op\u00e9rateur \u00b7 aujourd\u2019hui','#e0a13b')
+        +_c2t('sansphoto','\ud83d\udcf7','Sans photo','l\u2019appel est fait, la photo manque \u00b7 aujourd\u2019hui','')
+        +'</div>';
+      h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px"><b>La photo est due \u00e0 chaque contr\u00f4le</b> \u2014 un appel fait sans photo reste un manquement. Les tuiles comptent AUJOURD\u2019HUI ; le retard est juste dessous, \u00e0 un clic.</p>';
     } else if(D.tiles===3&&PP_VIEW.sub){
       var LL3=L.filter(function(x){return x.phase===PP_VIEW.sub;});
       h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><span class="sub" style="margin:0">'+LL3.length+' agent(s) · '+(PP_VIEW.sub==='avant'?'avant la prise':PP_VIEW.sub==='pendant'?'en service':'service terminé')+' · '+D.verb+'</span></div>'+rowsOf(LL3);
@@ -9715,6 +9744,20 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
       ppClose(); phmOuvrir(null,{key:k,ts:ts,city:'ville_inconnue',fmt:'uni'});
     }; });
     /* b335 */
+    /* b388 : demander LA photo de CET agent, tout de suite. */
+    box.querySelectorAll('.pp-tn-tk').forEach(function(b){ b.onclick=function(){
+      var nom=b.getAttribute('data-nom')||'', site=b.getAttribute('data-site')||'';
+      var hm=b.getAttribute('data-hm')||'', dt=b.getAttribute('data-mdate')||'', dep=b.getAttribute('data-depuis')||'';
+      var jj=dt?dt.split('-').reverse().join('/'):'';
+      var ctx=nom+(site?(' \u00b7 '+site):'')+(jj?(' \u00b7 '+jj):'')+(hm?(' \u00e0 '+hm):'')+(dep?(' \u00b7 en service depuis '+dep):'');
+      var mot=prompt('\ud83e\uddba Demander au superviseur la photo de contr\u00f4le tenue de :\n\n'+ctx
+        +'\n\nUn mot pour lui (facultatif) :', 'Il est en service maintenant \u2014 peux-tu r\u00e9cup\u00e9rer la photo avant la fin de sa vacation ?');
+      if(mot===null)return;
+      if(typeof tkxCreer!=='function'){ alert('Fonction indisponible.'); return; }
+      tkxCreer({objet:'\ud83e\uddba Photo de contr\u00f4le tenue \u2014 '+nom, message:mot||'', contexte:[ctx], source:'', pourRole:'superviseur'});
+      alert('\ud83c\udfab Ticket envoy\u00e9 au superviseur.\n\n\ud83e\udded Il arrive dans \u00ab Terrain \u00bb chez lui.\n\ud83c\udfab Tu suis sa r\u00e9ponse dans Tickets.');
+      if(typeof ppRefresh==='function')try{ppRefresh();}catch(e){}
+    }; });
     box.querySelectorAll('.pp-act-retirer').forEach(function(b){ b.onclick=function(){
       if(!rowPeutRetirer())return;   /* b352 : même droit que l'affichage du bouton, pas un second test divergent */
       var mid=b.getAttribute('data-mid'), key=b.getAttribute('data-key')||'prise';
