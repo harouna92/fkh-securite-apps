@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b394</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b395</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -9641,6 +9641,11 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
          Ce qui date d'hier se rattrape encore ; ce qui a trois semaines se constate. Deux gestes
          differents, donc deux vues — et dans chacune, le plus recent en premier : on ouvre sur ce
          qu'on peut encore corriger, pas sur ce qui est perdu. */
+      /* b395 : venu d'une tuile, on ne montre QUE le jour annonce. */
+      if(D.c2vues&&PP_VIEW.jour==='j'){
+        var _aj95=(typeof impTodayISO==='function')?impTodayISO():'';
+        Lp=Lp.filter(function(x){ return (x.mdate||'')===_aj95; });
+      }
       if(D.c2vues&&PP_VIEW.jour==='p'){
         var _aj91=(typeof impTodayISO==='function')?impTodayISO():'';
         var _l7=(function(){ var d=new Date(_aj91+'T12:00:00'); d.setDate(d.getDate()-7);
@@ -9670,7 +9675,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       if(D.c2vues&&PP_VIEW.jour==='p')Lp=Lp.slice().sort(function(a,b){ return (b.due||0)-(a.due||0); });
       var _g2={}; Lp.forEach(function(x){ (_g2[x.site]=_g2[x.site]||[]).push(x); });
       var _s2=Object.keys(_g2).sort(function(u,v2){ return (D.c2vues&&PP_VIEW.jour==='p')?(_g2[v2][0].due-_g2[u][0].due):(_g2[u][0].due-_g2[v2][0].due); });   /* b391 */
-      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(D.c2vues?({nonfait:'\u260e Appels non faits',inj:'\ud83d\udcf5 Agents injoignables',sansphoto:'\ud83d\udcf7 Sans photo'}[PP_VIEW.sub]||''):(PP_VIEW.sub==='passee'?'⏳ Terminées':'🟢 En cours'))+'</b><span class="sub" style="margin:0">'+Lp.length+' créneau(x) '+(D.c2vues?({nonfait:'sans appel',inj:'agent injoignable',sansphoto:'sans photo'}[PP_VIEW.sub]||''):'sans photo')+'</span></div>';
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(D.c2vues?(({nonfait:'\u260e Appels non faits',inj:'\ud83d\udcf5 Agents injoignables',sansphoto:'\ud83d\udcf7 Sans photo'}[PP_VIEW.sub]||'')+(PP_VIEW.jour==='j'?' \u00b7 aujourd\u2019hui':(PP_VIEW.jour==='p'?(' \u00b7 '+(PP_VIEW.tranche==='old'?'au-del\u00e0 de 7 jours':'les 7 derniers jours')):''))):(PP_VIEW.sub==='passee'?'⏳ Terminées':'🟢 En cours'))+   /* b395 */'</b><span class="sub" style="margin:0">'+Lp.length+' créneau(x) '+(D.c2vues?({nonfait:'sans appel',inj:'agent injoignable',sansphoto:'sans photo'}[PP_VIEW.sub]||''):'sans photo')+'</span></div>';
       h+=_s2.length?_s2.map(function(st3){ var n3=_g2[st3].length,f3=_g2[st3][0]; return '<div class="pp-tile" data-sub2="'+esc(st3)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+n3+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st3)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f3.client?'🏢 '+esc(f3.client)+' · ':'')+'1er créneau : '+((f3.mdate||'').split('-').reverse().join('/'))+' '+esc(f3.heure||'')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Rien 🎉</div>';
     } else if(D.phaseSite&&PP_VIEW.sub&&PP_VIEW.sub2!=null){ // b182 : niveau 3 = creneaux du site + depot photo
       var Ls=L.filter(function(x){ return (D.c2vues?((x.sousvue||'')===PP_VIEW.sub):((PP_VIEW.sub==='passee')?(x.phase==='passee'):(x.phase!=='passee')))&&x.site===PP_VIEW.sub2; });
@@ -9897,7 +9902,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
       if(n)n.innerHTML='<div class="sub">\u23f3 V\u00e9rification en cours aupr\u00e8s de Ringover\u2026</div>';
       try{ ppRoScan(); }catch(e){}
     }; });   /* b390 */
-    box.querySelectorAll('.pp-tile').forEach(function(t){ if(t.getAttribute('data-tr')!=null)return;   /* b391 : les tuiles de tranche ont leur propre geste */ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else if(t.getAttribute('data-sub')!=null){PP_VIEW.sub=t.getAttribute('data-sub'); PP_VIEW.jour=null;} ppRender(); }; });   /* b332 : on repart du palier */
+    box.querySelectorAll('.pp-tile').forEach(function(t){ if(t.getAttribute('data-tr')!=null)return;   /* b391 : les tuiles de tranche ont leur propre geste */ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else if(t.getAttribute('data-sub')!=null){PP_VIEW.sub=t.getAttribute('data-sub'); /* b395 : la tuile de 🌙 compte AUJOURD'HUI — le clic doit montrer aujourd'hui, pas tout l'historique. */ PP_VIEW.jour=(PP_VIEW.mode==='c2')?'j':null; PP_VIEW.tranche=null;} ppRender(); }; });   /* b332 : on repart du palier */
     box.querySelectorAll('.pp-jr').forEach(function(b){ b.onclick=function(){ PP_VIEW.jour=b.getAttribute('data-j'); ppRender(); }; });
     /* b336 : ouvrir le rapprochement sur la photo choisie */
     box.querySelectorAll('.pp-act-rappro').forEach(function(b){ b.onclick=function(){

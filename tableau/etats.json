@@ -1119,6 +1119,14 @@
    "theme": "Suivi des appels",
    "pourquoipas": "32 contrôles cochés « fait » sans aucun statut en 7 jours : on savait que quelqu'un avait cliqué, pas ce qui s'était dit. La coche n'est pas bloquée — elle part, puis la question arrive avec trois réponses : RAS, injoignable, autre + un mot. Fermer sans répondre laisse la ligne « sans statut », qui ressort dans la vue : rien ne disparaît en silence, mais rien n'empêche l'opérateur de travailler. Si la réponse est « injoignable », l'alerte part dans la foulée.",
    "local": true
+  },
+  {
+   "b": 395,
+   "titre": "La tuile annonce aujourd hui, le clic montre aujourd hui",
+   "source": "captures de Zeus, 09/08",
+   "theme": "Suivi des appels",
+   "pourquoipas": "Defaut introduit en b387 : la tuile comptait le jour (regle b369/b392) mais le palier suivant ne filtrait que sur le cas. La tuile disait 1 et le clic ouvrait 193 creneaux depuis le 26 juillet. Cliquer une tuile ouvre desormais AUJOURD HUI, l en-tete le dit, et le retard reste sous « + N jour(s) passe(s) » avec ses deux tranches.",
+   "local": true
   }
  ],
  "attente": [
