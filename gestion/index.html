@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b398</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b399</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -7536,6 +7536,14 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     }).catch(function(){ if(btn){ btn.disabled=false; btn.textContent='🔌 Vérifier les appels'; } if(box)box.innerHTML='<div class="sub" style="color:var(--bad);margin:0">Ringover injoignable.</div>'; }); }
   function saTypeMatch(key){ if(saType==='all')return true; if(saType==='avant')return key==='j15'||key==='route'; if(saType==='prise')return key==='prise'; if(saType==='pendant')return key.indexOf('ctrl')===0; if(saType==='fin')return key==='fin'; return true; }
   function saSliceMatch(e){ if(saSlice==='all')return true; var m=toMin(e.mheure); if(m==null)return true; var h=Math.floor(m/60), day=(h>=8&&h<20); return saSlice==='jour'?day:!day; }
+  /* b399 : le nom d'un site dit OU il est. « Basic Fit » designe cinq villes dans la base ;
+     sans la ville, deux lignes identiques a l'ecran sont deux sites a 400 km l'un de l'autre.
+     On n'ajoute la ville que si le nom ne la porte pas deja (meme regle qu'en b377). */
+  function svLabel(site, ville){
+    var s0=String(site||'');
+    if(!ville)return s0;
+    return (s0.toLowerCase().indexOf(String(ville).toLowerCase())<0)?(s0+' ('+ville+')'):s0;
+  }
   function saEntries(from,to,inclExcl){
     // #13 On inclut aussi les missions démarrant la VEILLE de `from` : leurs appels d'après-minuit tombent dans la période demandée (continuité de nuit à travers minuit).
     var fromV=from?svcAddDays(from,-1):'';
@@ -7546,7 +7554,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     missions.forEach(function(m){ var start=toMin(m.mheure); var _ag=(m.agentId&&faById(m.agentId))?faById(m.agentId):null; var _tels=(_ag&&_ag.tels&&_ag.tels.length)?_ag.tels.filter(function(t){return !!t;}):[]; var _tel=_tels[0]||''; ssSteps(m).forEach(function(s){ if(!s.heure)return; var mn=toMin(s.heure),abs=(mn==null?0:mn); if(s.key!=='j15'&&s.key!=='route'&&start!=null&&mn!=null&&mn<start)abs=mn+1440;
       var edate=(m.mdate?svcAddDays(m.mdate,Math.floor(abs/1440)):''); // date RÉELLE de l'appel (report après minuit)
       if(from&&edate&&edate<from)return; if(to&&edate&&edate>to)return; // filtre sur la date réelle -> l'appel de 01h d'une nuit du 27 apparaît dans la vue du 28
-      out.push({mid:m.id,mdate:m.mdate||'',edate:edate,site:m.siteAgent||m.titre||'—',siteBDC:m.siteBDC||'',client:m.client||'',ville:m.ville||'',cp:m.cp||'',mheure:m.mheure||'',agent:_ag?(_ag.nom||''):'',agentTel:_tel,agentTels:_tels,agentId:m.agentId||'',key:s.key,label:s.label,heure:s.heure,abs:abs,type:s.type}); }); });
+      out.push({mid:m.id,mdate:m.mdate||'',edate:edate,site:svLabel(m.siteAgent||m.titre||'—',m.ville||''),siteBrut:(m.siteAgent||m.titre||'—'),siteBDC:m.siteBDC||'',client:m.client||'',ville:m.ville||'',   /* b399 */cp:m.cp||'',mheure:m.mheure||'',agent:_ag?(_ag.nom||''):'',agentTel:_tel,agentTels:_tels,agentId:m.agentId||'',key:s.key,label:s.label,heure:s.heure,abs:abs,type:s.type}); }); });
     out.sort(function(a,b){ var da=a.edate||a.mdate||'',db=b.edate||b.mdate||''; if(da!==db)return da<db?-1:1; return (a.abs%1440)-(b.abs%1440); }); // tri sur l'heure RÉELLE de la journée (00:00 avant 07:30)
     // #3 : les appels RETIRÉS par le superviseur (fkh_sa_excl) disparaissent partout (agenda + anomalies + opérationnel), sauf si on demande explicitement de les inclure.
     if(!inclExcl){ var _ex=(typeof saExclLoad==='function')?saExclLoad():{}; out=out.filter(function(e){ return !_ex[String(e.mid)+'|'+e.key]; }); }

@@ -1151,6 +1151,14 @@
    "theme": "Demandes & appels",
    "pourquoipas": "Les lignes « Toulouse à 30 km » etaient fabriquees a la creation et jamais recalculees : corriger la ville en Saint-Lye (Aube) laissait Toulouse et Perpignan dans le texte. Credible, et faux de 500 km — un operateur pouvait appeler un agent a l autre bout du pays. Elles se recalculent maintenant des que la ville ou le code postal change, sans toucher au reste du texte. Et « des que possible » devient une case a cocher : c est une reponse, pas une absence de reponse.",
    "local": true
+  },
+  {
+   "b": 399,
+   "titre": "Le nom du site porte sa ville, partout",
+   "source": "demande de Zeus, 09/08",
+   "theme": "Planning",
+   "pourquoipas": "Ce n est pas du confort : « Basic Fit » tout court designe Parthenay, Lexy, Mayenne, Niort et Annecy. Deux lignes identiques a l ecran etaient deux sites a 400 km l un de l autre — et on appelle le mauvais agent en croyant bien faire. La ville est ajoutee dans saEntries(), la fonction qui fabrique chaque ligne d etape : un seul endroit, et toutes les vues suivent (Suivi des appels, pastilles, tickets, signalements Terrain). La ville n est ajoutee que si le nom ne la porte pas deja.",
+   "local": true
   }
  ],
  "attente": [
