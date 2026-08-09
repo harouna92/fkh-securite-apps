@@ -1211,6 +1211,56 @@
    "titre": "Chemin complet : par où un opérateur signale une anomalie",
    "source": "Zeus — 05/08",
    "note": "L'opérateur ne voit pas la pastille ⚠️ Anomalies (prévu depuis l'origine). Vérifier par quel chemin il signale une anomalie (bulle Assistant ? SOS de Suivi des appels ?) et que cela remonte bien jusqu'au superviseur, de bout en bout."
+  },
+  {
+   "titre": "📅 Sans date — sous-section dans 🧍 Vacations non affectées",
+   "source": "Zeus 09/08, décidé : en tête, dépliée",
+   "note": "32 vacations validées, sans agent et SANS DATE : invisibles au Planning (pas de colonne) et absentes de la pastille (`if(!m.mdate)return;` à la collecte). Le pire des trois états. Patch écrit dans tmp/patch_b400.py, NON appliqué."
+  },
+  {
+   "titre": "Worker : le serveur dépose lui-même les demandes d'appel",
+   "source": "Zeus 09/08, validé — reste à déployer",
+   "note": "CODÉ et VÉRIFIÉ dans backend/worker.js (non commité). Rejeu à blanc : 26 demandes sur 12 jours, zéro doublon (même identifiant que l'appli), « demain » résolu sur la date de l'appel — 10 des 26 gagnent leur date. Aujourd'hui la demande n'est déposée que par le navigateur : la nuit, elle attend des heures."
+  },
+  {
+   "titre": "Worker : lire les PÉRIODES du bon de commande (prolongations)",
+   "source": "Zeus 09/08 — bloqué",
+   "note": "CODÉ dans backend/worker.js (non commité). On ne demandait qu'UNE date au PDF : une prolongation sur plusieurs nuits n'était pas lue, d'où la vacation SUNSET PIZZA recréée à la main. BLOQUÉ : j'attends 5289214.pdf dans Téléchargements pour vérifier ce que le document contient avant tout déploiement."
+  },
+  {
+   "titre": "« En recherche depuis : aN/aN aN:aN »",
+   "source": "capture de Zeus, 09/08",
+   "note": "Calcul de date qui échoue (NaN) sur les demandes nées d'un mail. Illisible, et ça fait douter du reste de l'écran."
+  },
+  {
+   "titre": "Bulle 🎫 : produire aussi un VRAI ticket suivi",
+   "source": "Zeus 09/08 — « fais les deux »",
+   "note": "b396 a livré urgence, échéance, récurrence réelle et pièce jointe. Reste la seconde moitié : que la bulle puisse produire le même objet que « Demander un point à… » (4 états, accusé de lecture, délais, renvoi) au lieu d'une simple consigne."
+  },
+  {
+   "titre": "Trace de l'heure d'ENVOI des mails",
+   "source": "Zeus 09/08",
+   "note": "On ne sait pas si le retard se perd chez Gmail, dans le script qui nous les transmet, ou chez nous. Deux lignes, aucun coût — à poser en même temps que les autres changements Worker."
+  },
+  {
+   "titre": "Rattacher les photos DEPUIS la vacation (Planning)",
+   "source": "Zeus 08/08 — jamais commencé",
+   "note": "Ouvrir une vacation et voir chaque créneau (prise, contrôles des 2 h, fin) en pastille, rouge quand la photo manque, cliquable pour attacher une photo de la base ou en déposer une."
+  },
+  {
+   "titre": "Heure de fin réelle : l'opérateur propose, l'encadrement approuve",
+   "source": "Zeus 08/08 — jamais commencé",
+   "note": "Champ facultatif dans le ticket de fin. Ce que l'opérateur saisit ne modifie PAS la vacation : ça devient une proposition, que seuls superviseur / admin / super-admin approuvent."
+  },
+  {
+   "titre": "« Duc (Chailley) » et « Duc Chailley » : deux fiches, un site ?",
+   "source": "constat b377, 09/08 — décision de Zeus attendue",
+   "note": "À fusionner ou pas. Je ne touche pas sans son accord."
+  },
+  {
+   "titre": "Webhook Ringover — à clore",
+   "source": "Zeus 09/08",
+   "note": "La page trouvée est celle des CLÉS API, pas des webhooks. Gain maximal de toute façon ≤ 1 min sur 3 min 36. À abandonner sauf si un événement « call ended » ou « recording available » existe vraiment."
   }
  ],
  "decide": [
