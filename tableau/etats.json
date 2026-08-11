@@ -1241,14 +1241,25 @@
    "theme": "Doublons",
    "pourquoipas": "En allant rendre les tuiles cliquables, j'ai trouvé pire. Le bouton « Nettoyer les N paires sans perte » — celui que je lui avais dit de cliquer — aurait retiré ONZE paires dont les deux lignes n'ont pas le même horaire. Dont Duc Chailley du 15/08 : 20:00→08:00 ET 08:00→20:00, deux agents affectés. Un service de jour et un service de nuit, pas une copie. « Sans perte » ne regarde que les POINTAGES, jamais les horaires. Ces paires ont maintenant leur tuile ⚠️ en tête, sont ÉCARTÉES du nettoyage en masse (le bouton passe de 52 à 46 paires) et se traitent une par une : aucune règle automatique ne sait séparer « fin réajustée de 15 min » de « jour + nuit ». Et les quatre tuiles filtrent la liste — avec 65 paires, une liste unique ne se lit pas. Vérifié en bac à sable : 65 → 13 → 6 → 65 au clic.",
    "local": true
+  },
+  {
+   "b": 410,
+   "titre": "L'import cesse d'écraser un horaire qui n'a rien à voir — et le dit",
+   "source": "Zeus 11/08",
+   "theme": "Import CSV",
+   "pourquoipas": "Les deux chantiers en file étaient déjà faits : reprendre l'agent quand le CSV en apporte un (`if(agentId&&!_exist.agentId)`) et ne pas recréer quand la vacation existe (b343, vacDejaLa). C'est pourquoi aucun doublon d'import n'est né depuis le 06/08. Ce qui restait est PIRE qu'un doublon : vacDejaLa rapproche sur la Référence sans regarder l'heure — voulu, un horaire réajusté ne change pas la référence — et l'import écrasait alors l'horaire en place. Duc Chailley 15/08 (20:00→08:00 et 08:00→20:00, deux agents) et Épicerie chez Sandra 09/08 (9 h 30 d'écart) sont deux VRAIS services partageant une référence : le fichier remplaçait la nuit par le jour, en silence. Au-delà de 2 h d'écart l'import ne touche plus aux horaires, complète le reste, et écrit le conflit dans le compte rendu. Banc `tmp/banc_b410.js` : avant, la nuit devenait 08:00→20:00 ; après, elle reste 20:00→08:00 et le conflit est annoncé. Contre-épreuve : une fin réajustée (08:45→17:00 puis 18:30) passe toujours.",
+   "local": true
+  },
+  {
+   "b": 411,
+   "titre": "Le pont Domaines → Tickets, avec la porte fermée à clé",
+   "source": "Zeus 11/08 : « pose le bloc »",
+   "theme": "Tickets / Domaines",
+   "pourquoipas": "Le bloc proposé par la session Domaines avait trois défauts, tous vérifiés dans le code avant d'écrire. (1) AUCUN contrôle d'origine : `postMessage` est reçu de n'importe quelle page du web, et le test `d.fkh!==1` vérifie la forme, pas l'expéditeur — n'importe quel site ouvrant l'appli aurait écrit dans les tickets de production. On refuse tout ce qui ne vient pas de notre origine. (2) Les champs n'étaient pas les bons : un seul commun avec la vraie structure. (3) Deux systèmes partagent fkh_tickets — `tk*` (tâches sur les agents, rendu via TK_TYPES[type]) et `tkx*` (échanges entre rôles) ; un ticket de cockpit est un ÉCHANGE, il va chez tkx. En plus : textes bornés, rôle destinataire vérifié contre les 4 rôles connus. Vérifié en bac à sable : message d'origine étrangère IGNORÉ (0 ticket), message légitime → ticket créé et affiché dans 🎫 (« Écart de CA sur GARIS — août · ⏳ À faire · aux administrateurs · 3 élément(s) concerné(s) »).",
+   "local": true
   }
  ],
  "attente": [
-  {
-   "titre": "📥 Import CSV : le garde-fou existe DÉJÀ (b357) — le stock est historique",
-   "source": "mesuré le 11/08 sur la base réelle",
-   "note": "Correction de mon analyse d'hier. Les 54 doublons d'import viennent tous d'imports faits entre le 26/07 et le 05/08 (le plus gros bloc : « import du 26/07 + import du 04/08 → 32 »). Or le garde-fou par Référence à l'import (vacDejaLa, b357) date du 06/08. J'ai cru voir un doublon créé le 10/08 (réf aXn7i9r8) : c'est faux — son `pris` est du 26/07, seuls `creeAt` et `valide` ont été réécrits le 10/08 quand un agent a été affecté (b304 réestampille `valide`). MESURE : ZÉRO doublon d'import créé depuis le 06/08. Rien à construire pour le cas de la Référence : c'est un stock historique, à nettoyer une fois. Restent les DEUX trous déjà en file (quasi-doublons même site/date/horaires différents, et reprise de l'affectation quand le CSV apporte un agent) — eux ne sont pas couverts par b357. ⚠️ DANGER AU NETTOYAGE : 13 paires ont des horaires différents, dont 2 qui sont DEUX VRAIS SERVICES portant la même Référence — Duc Chailley 15/08 (20:00→08:00 ET 08:00→20:00, deux agents) et Épicerie chez Sandra 09/08 (22:00→11:00 ET 12:30→22:00). Les nettoyer supprimerait une vacation réelle."
-  },
   {
    "titre": "🔚 Un ticket coché par une PHOTO quitte la file de l'opératrice sans qu'elle le sache",
    "source": "Zeus 10/08 — fin de service Lons-le-Saunier",
