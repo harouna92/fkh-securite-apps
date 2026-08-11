@@ -1225,9 +1225,22 @@
    "theme": "Notifications",
    "pourquoipas": "Deux causes. Chaque alerte fabriquait SA notification, étiquetée `catégorie:identifiant` : trois étiquettes = trois notifications qui s'EMPILENT — elles étaient déjà toutes là, en fermer une découvrait la suivante. Et aucun plafond : `notifCanFire()` ne testait que « activées » et « autorisées », avec un scan déclenché depuis dix endroits. L'étiquette devient la CATÉGORIE SEULE : la nouvelle remplace la précédente, il y a toujours UNE seule chose à fermer, et son compteur est juste. Elle porte le compte et les noms. Un délai de silence par catégorie (2 min, réglable dans le panneau 🔔) : pendant ce délai une alerte de plus met le compteur à jour EN PLACE sans re-sonner. Banc `tmp/banc_b407.js` : 5 alertes en 2 min 30 → 3 notifications d'une seule étiquette, 2 sons au lieu de 5 ; la 4e arrive en silence, la 5e resonne le délai écoulé.",
    "local": true
+  },
+  {
+   "b": 408,
+   "titre": "🌐 Domaines devient une porte, plus un morceau d'index.html",
+   "source": "Zeus 11/08, coordination inter-sessions",
+   "theme": "Domaines",
+   "pourquoipas": "Deux sessions travaillaient le même fichier et se marchaient dessus — le dossier gestion/domaines/ avait déjà sauté une fois lors d'un reset. Domaines vit désormais dans ses propres fichiers (hub.html + les 4 applis FKH/GARIS/DAHLIA/PERSO) et index.html se contente de l'ouvrir : deux div remplacés par une iframe. La section peut évoluer sans qu'on rouvre index.html, et l'inverse. Vérifié : l'iframe charge bien le hub (« 🌐 Domaines — Choisis un domaine pour ouvrir son cockpit complet »). renderCockpitFKH et les CFKH_* deviennent inactifs, laissés en place pour ce build — les retirer est un autre geste. Non-régression b407→b408 : Planning identique, Fiche agent identique, aucun badge ne bouge.",
+   "local": true
   }
  ],
  "attente": [
+  {
+   "titre": "📥 Import CSV : la vraie usine à doublons — 49 sur 54",
+   "source": "mesuré le 11/08 sur la base réelle",
+   "note": "Réponse chiffrée à « qu'est-ce qui provoque ces doublons ». Sur les 60 grappes de 🧹 Doublons : 54 sont import+import, 109 lignes sur 122 portent src=import ; le mail n'en explique que 4 (et sa cause est fermée depuis b401). Surtout : 49 des 54 viennent de DEUX IMPORTS FAITS À DES JOURS DIFFÉRENTS — le plus gros bloc est « import du 26/07 + import du 04/08 → 32 doublons ». Seulement 3 viennent d'un même import. Et 55 grappes sur 60 ont la MÊME heure des deux côtés : ce sont des copies exactes, pas des variantes. Conclusion : la dédup par Référence ne franchit pas la frontière entre deux imports — recharger un CSV qui recouvre une période déjà importée recrée tout. À TRANCHER : refuser à l'import une Référence déjà présente (et signaler ce qui a changé plutôt que de créer une seconde ligne). Se recoupe avec les deux décisions déjà en file sur l'import CSV."
+  },
   {
    "titre": "🔚 Un ticket coché par une PHOTO quitte la file de l'opératrice sans qu'elle le sache",
    "source": "Zeus 10/08 — fin de service Lons-le-Saunier",
