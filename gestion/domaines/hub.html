@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Domaines</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0b0e13;color:#e6edf3;font-family:-apple-system,'Segoe UI',Roboto,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:18px 16px 40px}
+h1{font-size:19px;margin:0 0 2px}.sub{font-size:12px;color:#8b98a5;margin:0 0 16px}
+.dgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}@media(max-width:640px){.dgrid{grid-template-columns:1fr}}
+.dcard{background:#161b22;border:1px solid #232a33;border-left-width:4px;border-radius:14px;padding:18px;cursor:pointer;transition:.15s}
+.dcard:hover{background:#1c232d;transform:translateY(-1px)}
+.dcard .e{font-size:26px}.dcard .n{font-size:17px;font-weight:800;margin-top:6px}.dcard .t{font-size:11.5px;color:#8b98a5;margin-top:8px}
+#viewer{position:fixed;inset:0;background:#0b0e13;display:none;flex-direction:column;z-index:5}
+#vtop{display:flex;align-items:center;gap:12px;padding:9px 14px;background:#0e1116;border-bottom:1px solid #2a313c}
+.back{font-family:inherit;font-size:13px;font-weight:700;background:#7c93ff;color:#0b0e13;border:none;border-radius:8px;padding:8px 14px;cursor:pointer}
+#vttl{font-size:14px;font-weight:700}
+#vframe{flex:1;border:0;width:100%;background:#0e1116}
+</style></head>
+<body>
+<div class="wrap">
+ <h1>🌐 Domaines</h1>
+ <div class="sub">Choisis un domaine pour ouvrir son cockpit complet.</div>
+ <div class="dgrid" id="grid"></div>
+</div>
+<div id="viewer">
+ <div id="vtop"><button class="back" onclick="closeDom()">← Domaines</button><span id="vttl"></span></div>
+ <iframe id="vframe" title="cockpit"></iframe>
+</div>
+<script>
+var DOMS=[
+ {k:"FKH",   e:"🧭", c:"#7c93ff", t:"Cockpit complet · 31+ vues live", f:"APPLI_FKH.html"},
+ {k:"GARIS", e:"🛡️", c:"#f0997b", t:"CA hors FKH · alerte Indy", f:"APPLI_GARIS.html"},
+ {k:"DAHLIA",e:"🌸", c:"#f0abfc", t:"RSI · reconstruction CA", f:"APPLI_DAHLIA.html"},
+ {k:"PERSO", e:"🧑", c:"#34d399", t:"Dépenses · santé · juridique", f:"APPLI_PERSO.html"}
+];
+var grid=document.getElementById('grid');
+DOMS.forEach(function(d){
+ var el=document.createElement('div');
+ el.className='dcard'; el.style.borderLeftColor=d.c;
+ el.innerHTML='<div class="e">'+d.e+'</div><div class="n" style="color:'+d.c+'">'+d.k+'</div><div class="t">'+d.t+'</div>';
+ el.onclick=function(){openDom(d);};
+ grid.appendChild(el);
+});
+function openDom(d){
+ document.getElementById('vttl').innerHTML='<span style="color:'+d.c+'">'+d.e+' '+d.k+'</span>';
+ document.getElementById('vframe').src=d.f;
+ document.getElementById('viewer').style.display='flex';
+}
+function closeDom(){
+ document.getElementById('viewer').style.display='none';
+ document.getElementById('vframe').src='about:blank';
+}
+</script>
+</body></html>
