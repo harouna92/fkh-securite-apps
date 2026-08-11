@@ -1,6 +1,6 @@
 {
  "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
- "maj": "2026-08-09",
+ "maj": "2026-08-10",
  "items": [
   {
    "b": 222,
@@ -1159,9 +1159,47 @@
    "theme": "Planning",
    "pourquoipas": "Ce n est pas du confort : « Basic Fit » tout court designe Parthenay, Lexy, Mayenne, Niort et Annecy. Deux lignes identiques a l ecran etaient deux sites a 400 km l un de l autre — et on appelle le mauvais agent en croyant bien faire. La ville est ajoutee dans saEntries(), la fonction qui fabrique chaque ligne d etape : un seul endroit, et toutes les vues suivent (Suivi des appels, pastilles, tickets, signalements Terrain). La ville n est ajoutee que si le nom ne la porte pas deja.",
    "local": true
+  },
+  {
+   "b": 400,
+   "titre": "📅 Sans date — les vacations que plus personne ne voyait",
+   "source": "Zeus 09/08 : « en tête, dépliée »",
+   "theme": "Vacations non affectées",
+   "pourquoipas": "C'était le pire des trois états. Une demande en recherche se voit dans Suivi des demandes ; une validée datée se voit au Planning. Celles-ci étaient validées, sans agent et SANS DATE : le Planning est un calendrier, donc aucune colonne où les poser, et la pastille 🧍 les jetait à la collecte (`if(!m.mdate)return;`). Elles n'existaient nulle part. Mesuré sur la base du 09/08 : 29 vacations sur 23 sites (le badge 🧍 passe de 177 à 206). Elles reçoivent une phase à elles et un bloc rouge EN TÊTE, DÉPLIÉ — la liste des sites se lit sans un clic. Six retouches en aval, parce que les niveaux 2 et 3 n'avaient jamais vu de vacation sans date : le titre affichait « 🕓 Passées », la date s'affichait vide, et l'affectation en série y trouvait zéro cible. Poser la date (ligne → ✏️ Modifier) les fait basculer dans la file normale et apparaître au Planning — boucle jouée en entier sur les vraies données.",
+   "demo": "?sandbox=1&demo=sansdate",
+   "local": true
+  },
+  {
+   "b": 401,
+   "titre": "Un mail, un seul producteur de vacation",
+   "source": "Zeus 10/08 : « fais l'option a »",
+   "theme": "Mails missions / Planning",
+   "pourquoipas": "8 mails avaient produit 20 vacations : 12 lignes en trop, toutes vivantes au Planning (PILAOUT en triplon). Le worker et l'appli ont chacun le bon garde-fou sur `mailSrc`, mais chacun le teste sur SA liste : le worker écrit direct en D1, l'appli interroge un SUIVI pas encore rafraîchi, ne voit rien, et crée — 13 s plus tard. C'est une course, pas une erreur de logique ; c'est pourquoi b304, b305, b324 et b343 n'ont jamais tenu. On ne corrige plus la course, on la supprime : le mail dont le serveur sait lire le bon de commande appartient au serveur, l'appli s'efface. Le partage se décide sur le SUJET (test déterministe), pas sur qui a vu la liste en premier. Le test est la copie exacte de `lireBonDeCommande` (worker.js) — banc de preuve sur les 53 sujets réels : accord parfait, 46 au serveur, 7 à l'appli. Les mails hors format AQUILA (P2S, Smyths Toys, Casino, Hyper U, Kiabi, LIDL — 8 vacations mesurées) restent produits par l'appli : le serveur ne sait pas les lire. Non-régression Planning / Suivi des appels / Fiche agent : identique, aucun badge ne bouge.",
+   "local": true
+  },
+  {
+   "b": 402,
+   "titre": "« 🗑 Refuser (supprimer) » supprimait dans le vide",
+   "source": "Zeus 10/08 : « je clique depuis la fiche du planning »",
+   "theme": "Planning",
+   "pourquoipas": "Zeus était obligé de VALIDER une vacation créée automatiquement pour arriver à la supprimer. La fiche du Planning garde en mémoire l'objet de la vacation qu'elle affiche ; quand le classeur commun arrive, `cloudApply` remplace toutes les vacations par de NOUVEAUX objets et celui de la fiche devient orphelin. Lui écrire `deleted=true` n'écrit nulle part. C'est le diagnostic de b360, corrigé par `_plLive(m)` — b360 puis b363 ont équipé les boutons un par un et ont oublié celui-là. Relevé sur les 8 boutons de la fiche : `pl-mail-ref` était le SEUL à écrire sans repasser par `_plLive`. Et « ✅ Valider », lui, l'appelait : d'où le contournement que Zeus avait trouvé seul. Banc `tmp/banc_b402.js` : cas exact rejoué, bug reproduit sur b401 (non supprimée), corrigé sur b402 (supprimée).",
+   "local": true
+  },
+  {
+   "b": 403,
+   "titre": "🧹 Doublons ne voyait aucun des doublons",
+   "source": "trouvé en allant nettoyer les 12 lignes",
+   "theme": "Doublons",
+   "pourquoipas": "Troisième face de la même cause. `dblGroupes()` regroupait sur la seule RÉFÉRENCE et jetait tout ce qui n'en a pas — or les copies nées d'un mail n'en ont justement pas, c'est leur signature (13 copies mesurées, zéro `ref`). Tout l'outillage anti-doublon reposait sur la seule clé que les doublons ne portent pas : la section était structurellement aveugle à eux, et le ménage ne pouvait pas se faire. On propage maintenant la référence portée par la ligne du serveur aux autres lignes du même mail (`mailSrc`, identique sur toutes les copies, aussi stable que la référence). Banc sur les vraies données : 58 grappes / 58 lignes AVANT, 66 grappes / 70 lignes APRÈS — soit exactement les 8 grappes et 12 lignes mesurées, et 0 grappe existante cassée. PILAOUT apparaît avec ses 3 lignes sous la réf 5291552. Le nettoyage se fait ensuite par le geste réversible de la section (report des pointages puis soft-delete).",
+   "local": true
   }
  ],
  "attente": [
+  {
+   "titre": "🔚 Un ticket coché par une PHOTO quitte la file de l'opératrice sans qu'elle le sache",
+   "source": "Zeus 10/08 — fin de service Lons-le-Saunier",
+   "note": "Diagnostic fait sur la base réelle du 10/08. Le ticket n'a PAS été retiré : `pl1786321056366_6323|fin` n'est pas dans fkh_sa_excl (le superviseur y a retiré route, j15 et le contrôle de 19:00, jamais la fin). Il a été COCHÉ à 18:18:05 par le rattachement d'une photo, sous le compte superviseur-1 (`viaPhoto:true`) — geste fait dans « 📸 Photos terrain à rattacher », dont le dialogue annonce « le ticket sera RÉGLÉ ». Coché = replié dans l'accordéon « ✅ 99 appels faits — masqués ». L'opératrice, qui n'a rien fait, ne voit plus rien. Le 10/08 : 11 tickets prise/fin cochés par photo, 9 sous superviseur-1 ; elle-même n'en a coché que 2 sur 17. Et comme `avise` est un drapeau SÉPARÉ de `done`, la ligne reste allumée dans 📞 Clients non avisés — d'où « présent dans la pastille, absent de ma file ». À trancher : est-ce qu'une photo rattachée par l'agence doit vider le ticket de la file de l'opératrice, ou seulement le marquer ?"
+  },
   {
    "titre": "Bloc « flux demande propre » b138–b146 : test guidé par Zeus",
    "source": "file ancienne",
@@ -1211,11 +1249,6 @@
    "titre": "Chemin complet : par où un opérateur signale une anomalie",
    "source": "Zeus — 05/08",
    "note": "L'opérateur ne voit pas la pastille ⚠️ Anomalies (prévu depuis l'origine). Vérifier par quel chemin il signale une anomalie (bulle Assistant ? SOS de Suivi des appels ?) et que cela remonte bien jusqu'au superviseur, de bout en bout."
-  },
-  {
-   "titre": "📅 Sans date — sous-section dans 🧍 Vacations non affectées",
-   "source": "Zeus 09/08, décidé : en tête, dépliée",
-   "note": "32 vacations validées, sans agent et SANS DATE : invisibles au Planning (pas de colonne) et absentes de la pastille (`if(!m.mdate)return;` à la collecte). Le pire des trois états. Patch écrit dans tmp/patch_b400.py, NON appliqué."
   },
   {
    "titre": "Worker : le serveur dépose lui-même les demandes d'appel",

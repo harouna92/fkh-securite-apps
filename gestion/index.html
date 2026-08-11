@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v09-08·b399</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v10-08·b403</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3064,8 +3064,21 @@ button.big:active{transform:translateY(1px)}
   }
   function dblGroupes(){
     var par={}, out=[];
+    /* ===== b403 : LA CLÉ NE PEUT PAS ÊTRE CELLE QUI MANQUE AUX DOUBLONS =====
+       On regroupait sur la seule `ref`. Les copies nées d'un mail n'en ont pas : elles passaient
+       toutes à travers. Premier passage : on relève, pour chaque mail, la référence portée par
+       celle de ses vacations qui en a une (c'est celle que le serveur a écrite). Second passage :
+       une copie sans référence hérite de celle de son mail — et rejoint la bonne grappe. Une
+       vacation sans référence ET sans mail reste hors sujet, comme avant. */
+    var refDuMail={};
     (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){
-      if(!m||m.deleted)return; var r=String(m.ref||'').trim(); if(!r)return;
+      if(!m||m.deleted)return; var r0=String(m.ref||'').trim(), ms0=String(m.mailSrc||'').trim();
+      if(r0&&ms0&&!refDuMail[ms0])refDuMail[ms0]=r0;
+    });
+    (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){
+      if(!m||m.deleted)return;
+      var ms=String(m.mailSrc||'').trim();
+      var r=String(m.ref||'').trim()||(ms?(refDuMail[ms]||ms):''); if(!r)return;
       (par[r]=par[r]||[]).push(m);
     });
     Object.keys(par).forEach(function(r){
@@ -3469,6 +3482,15 @@ button.big:active{transform:translateY(1px)}
         var d=new Date(Date.now()-86400000), iso=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
         SUIVI.unshift({id:'demo_coches',statut:'validee',motif:'',client:'CLIENT ÉTALON',titre:'SITE ÉTALON',siteAgent:'SITE ÉTALON',ville:'Villetest',assoc:[],
                        mdate:iso,mheure:'20:00',mfin:'06:00',ctrls:['23:00','01:00','03:00'],src:'planning',creeAt:Date.now(),pris:Date.now(),valide:Date.now()});
+      } },
+    sansdate:{ titre:'📅 Les vacations sans date sortent de l’ombre',
+      quoi:'Trois vacations validées, sans agent — et sans date. C’est l’état qu’on ne voyait NULLE PART : le Planning est un calendrier (pas de date, pas de colonne), et Suivi des demandes les a déjà laissées passer puisqu’elles sont validées.',
+      aFaire:'Ouvre la pastille 🧍 « Vacations non affectées ». Le bloc rouge « 📅 Sans date » est EN TÊTE et déjà DÉPLIÉ : tu lis les sites sans avoir à cliquer. Ouvre « SITE SANS DATE » (2 vacations), puis « ✏️ Modifier » sur une ligne et pose une date de début. Reviens : la vacation a quitté le bloc rouge, elle est passée dans la file normale — et elle apparaît au 📅 Planning. Le compte du bloc rouge a baissé d’un.',
+      monter:function(){
+        ['SITE SANS DATE','SITE SANS DATE','ENTREPÔT SANS DATE'].forEach(function(s0,i0){
+          SUIVI.unshift({id:'demo_sd'+i0,statut:'validee',client:'CLIENT ÉTALON',titre:s0,siteAgent:s0,ville:'Villetest',assoc:[],
+                         mdate:'',mheure:(i0===1?'19:00':''),mfin:'',src:'planning',creeAt:Date.now(),pris:Date.now(),valide:Date.now()});
+        });
       } },
     annulation:{ titre:'🔴 Annulation signalée',
       quoi:'Une vacation AQUILA demain soir, sur laquelle un mail d’annulation vient d’arriver.',
@@ -5899,7 +5921,7 @@ button.big:active{transform:translateY(1px)}
     card.querySelectorAll('.pl-tk-del').forEach(function(b9){ b9.onclick=function(){ m=_plLive(m); /* b360 */ var h9=b9.getAttribute('data-h'); if(!Array.isArray(m.ctrls))return; m.ctrls=m.ctrls.filter(function(x9){return x9!==h9;}); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
     var tka=card.querySelector('.pl-tk-add'); if(tka)tka.onclick=function(){ m=_plLive(m); /* b360 */ var h9=(card.querySelector('.pl-tk-add-h').value||'').trim(); if(!h9){alert('Choisis une heure de contrôle.');return;} if(!Array.isArray(m.ctrls)||!m.ctrls.length)m.ctrls=(apControls(m)||[]).slice(); if(m.ctrls.indexOf(h9)<0)m.ctrls.push(h9); m.ctrls.sort(); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
     var tk2=card.querySelector('.pl-tk-add2h'); if(tk2)tk2.onclick=function(){ m=_plLive(m); /* b360 */ var s9=toMin(m.mheure||''); if(s9==null){alert('Heure de début requise.');return;} var e9m=missEndMin(m); if(e9m==null){alert('Heure de fin requise (ou ajoute les contrôles un par un).');return;} if(e9m<=s9)e9m+=1440; var out9=[]; for(var t9=s9+120;t9<e9m;t9+=120){ out9.push(pad2(Math.floor((t9%1440)/60))+':'+pad2(t9%60)); } if(!out9.length){alert('Vacation trop courte pour des contrôles 2 h.');return;} /* b386 : un contrôle déjà pointé ou photographié est une PREUVE — on ne l'efface pas. */ var _act9=(Array.isArray(m.ctrls)&&m.ctrls.length)?m.ctrls.slice():((apControls(m)||[]).slice()); var _S9=(typeof ssLoad==='function')?ssLoad():{}, _r9=(_S9[m.id]||{}); function _prv9(h){ var r=_r9['ctrl@'+String(h).replace(/:/g,'')]; return !!(r&&(r.done||r.photoKey)); } var _gard9=_act9.filter(function(h){ return out9.indexOf(h)<0&&_prv9(h); }); var _ret9=_act9.filter(function(h){ return out9.indexOf(h)<0&&!_prv9(h); }); var _add9=out9.filter(function(h){ return _act9.indexOf(h)<0; }); var _fin9=_act9.filter(function(h){ return toMin(h)===toMin(m.mfin||''); }); var _txt9='\ud83c\udf19 Contr\u00f4les toutes les 2 h \u2014 de '+(m.mheure||'?')+' \u00e0 '+(m.mfin||'?')+'\n\n'+'\u2705 '+out9.length+' cr\u00e9neau(x) : '+out9.join(', ')+'\n'+(_add9.length?('\u2795 '+_add9.length+' ajout\u00e9(s) : '+_add9.join(', ')+'\n'):'')+(_gard9.length?('\ud83d\udd12 '+_gard9.length+' conserv\u00e9(s) hors grille \u2014 D\u00c9J\u00c0 POINT\u00c9(s) ou PHOTOGRAPHI\u00c9(s) : '+_gard9.join(', ')+'\n'):'')+(_ret9.length?('\u2796 '+_ret9.length+' retir\u00e9(s), rien n\u2019y \u00e9tait enregistr\u00e9 : '+_ret9.join(', ')+'\n'):'')+(_fin9.length?('\n\u26a0 '+_fin9.join(', ')+' tombait sur la FIN DE SERVICE : c\u2019est la fin qui compte, pas un contr\u00f4le.\n'):'')+'\nOn applique ?'; if(!confirm(_txt9))return; var _dep9=toMin(m.mheure||'00:00')||0; m.ctrls=out9.concat(_gard9).sort(function(a,b){ var x=toMin(a),y=toMin(b); if(x<_dep9)x+=1440; if(y<_dep9)y+=1440; return x-y; }); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
-    var mok=card.querySelector('.pl-mail-ok'); if(mok)mok.onclick=function(){ m=_plLive(m); /* b360 */ delete m.mailPending; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; var mrf=card.querySelector('.pl-mail-ref'); if(mrf)mrf.onclick=function(){ if(!confirm('Refuser cette vacation issue d'+String.fromCharCode(8217)+'un mail ? Elle sera supprimée du Planning.'))return; m.deleted=true; m.creeAt=Date.now(); /* b303 : soft-delete */ try{ var rf=JSON.parse(localStorage.getItem('fkh_mail_refuse')||'[]')||[]; if(m.mailSrc&&rf.indexOf(m.mailSrc)<0){rf.push(m.mailSrc);localStorage.setItem('fkh_mail_refuse',JSON.stringify(rf));} }catch(e){} if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); };
+    var mok=card.querySelector('.pl-mail-ok'); if(mok)mok.onclick=function(){ m=_plLive(m); /* b360 */ delete m.mailPending; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; var mrf=card.querySelector('.pl-mail-ref'); if(mrf)mrf.onclick=function(){ m=_plLive(m); /* b402 : le seul bouton de la fiche qui écrivait encore sur l'objet d'origine — orphelin dès que le classeur commun arrive (b360). On refusait dans le vide, et il fallait valider d'abord pour que la suppression prenne. */ if(!confirm('Refuser cette vacation issue d'+String.fromCharCode(8217)+'un mail ? Elle sera supprimée du Planning.'))return; m.deleted=true; m.creeAt=Date.now(); /* b303 : soft-delete */ try{ var rf=JSON.parse(localStorage.getItem('fkh_mail_refuse')||'[]')||[]; if(m.mailSrc&&rf.indexOf(m.mailSrc)<0){rf.push(m.mailSrc);localStorage.setItem('fkh_mail_refuse',JSON.stringify(rf));} }catch(e){} if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); };
     var tn=card.querySelector('.pl-tenue'); if(tn)tn.onclick=function(){ var agNom=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):''; if(!agNom&&!confirm('Aucun agent affecté sur cette vacation — créer quand même le ticket contrôle tenue ?'))return; var ok=(typeof tenueCtrlDemand==='function')&&tenueCtrlDemand(agNom,m.id,(m.siteAgent||m.titre||''),m.mdate||'',m.mheure||'','demande manuelle (Planning)'); alert(ok?'🦺 Ticket contrôle tenue créé dans Suivi des appels.':'Un contrôle tenue est déjà en attente pour cet agent à cette date.'); };
     var badd=card.querySelector('.pl-brk-add'); if(badd)badd.onclick=function(){ m=_plLive(m); /* b360 */ var h1=_plNormHM(card.querySelector('.pl-brk-h1').value), h2=_plNormHM(card.querySelector('.pl-brk-h2').value); if(!h1||!h2){ alert('Heures de début et fin de pause obligatoires.'); return; } if(!Array.isArray(m.breaks))m.breaks=[]; m.breaks.push({h1:h1,h2:h2,type:(card.querySelector('.pl-brk-type').value||'').trim(),notWork:card.querySelector('.pl-brk-nw').checked,notCharge:card.querySelector('.pl-brk-nc').checked}); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); };
     card.querySelectorAll('.pl-brkdel').forEach(function(b){ b.onclick=function(){ m=_plLive(m); /* b360 */ if(!Array.isArray(m.breaks))return; m.breaks.splice(+b.getAttribute('data-i'),1); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); }; });
@@ -9032,14 +9054,15 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     }catch(_e){}
     sc.af=[];
     try{ var _tdA=(typeof impTodayISO==='function')?impTodayISO():'';
-      (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.deleted)return;/* b311 */ if(m.statut!=='validee'||m.mailPending||m.retiree||m.aDecouper)return; if(!m.mdate)return; if(m.agentId)return; /* b189 : tout l'historique */
+      (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.deleted)return;/* b311 */ if(m.statut!=='validee'||m.mailPending||m.retiree||m.aDecouper)return; if(m.agentId)return; /* b189 : tout l'historique */
         var _sm9=toMin(m.mheure||'')||0, _du=frMs(m.mdate,_sm9)||now;
         var _em9=missEndMin(m), _en9=null;
         if(_em9!=null){ _en9=frMs((m.mdateFin&&m.mdateFin>m.mdate)?m.mdateFin:m.mdate,(_em9<=_sm9&&!(m.mdateFin&&m.mdateFin>m.mdate))?_em9+1440:_em9); }
         if(_en9==null)_en9=_du+86400000;
         /* b222 : 24 h -> 7 jours -> le reste. Le compte des 7 jours DEMARRE apres les 24 h, et le reste demarre apres le 7e jour : aucune vacation comptee deux fois. */
         var _dl9=_du-now;
-        var _ph9=(now<_du)?((_dl9<=86400000)?'j1':(_dl9<=604800000?'j7':'avenir')):((now>_en9)?'passee':'encours');
+        /* b400 : sans date, aucune des cinq phases n'a de sens — elle a la sienne. */
+        var _ph9=(!m.mdate)?'sansdate':((now<_du)?((_dl9<=86400000)?'j1':(_dl9<=604800000?'j7':'avenir')):((now>_en9)?'passee':'encours'));
         sc.af.push({mid:m.id,key:'af',af:1,phase:_ph9,site:(m.siteAgent||m.titre||'—'),client:m.client||'',ville:m.ville||'',agent:'',mdate:m.mdate,heure:m.mheure||'',due:_du,since:0}); });
       sc.af.sort(function(x,y){return x.due-y.due;});
     }catch(_e){}
@@ -9575,7 +9598,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       return '';
     }
     function rowsOf(LL){ return LL.length?LL.map(function(x){ var d=(x.mdate||'').split('-').reverse().join('/');
-      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?('🕐 prévu le '+d+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+((rowAct(x)+rowTenueTicket(x))?'<div class="acts" style="margin-top:5px;gap:6px;flex-wrap:wrap">'+rowAct(x)+rowTenueTicket(x)+rowRetirer(x)+'</div>':'')+ecartPhoto(x.mid,(x.key||'prise'),x.heure,x.mdate)+((typeof phOrigineTxt==='function'&&x.mid&&x.key)?phOrigineTxt(x.mid,x.key):'')/* b351 */+hdBloc(x)+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
+      return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(x.site||'—')+'</b><span class="sub" style="margin:0">'+(x.client?'🏢 '+esc(x.client):'')+(x.ville?' · '+esc(x.ville):'')+((D.tiles===0&&x.label)?' · '+esc(x.label):'')+'</span></div><div style="font-size:12.5px;margin-top:3px">'+(x.agent?'👤 <a href="#" class="agf" data-nom="'+esc(x.agent)+'" title="Ouvrir la fiche agent" style="color:var(--brand,#6ea8fe);text-decoration:underline">'+esc(x.agent)+'</a>'+(x.tel?' · 📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a>':'')+' · ':(x.tel?'📞 <a class="call" href="tel:'+esc(String(x.tel).replace(/\s+/g,''))+'">'+esc(x.tel)+'</a> · ':''))+(x.rt?('🕐 prévu à '+esc(x.heure||'')+' le '+d+(x.arrivee?(' · 🏃 arrivé à '+esc(x.arrivee)):'')+' · <b style="color:var(--bad)">⏰ retard '+(x.retardMin?(x.retardMin+' min'):'signalé')+'</b>'):(x.af?((x.mdate?('🕐 prévu le '+d):'<b style="color:#e5322d">📅 DATE À POSER</b>')+(x.heure?' à '+esc(x.heure):'')+' · <b style="color:var(--bad)">⚠ SANS AGENT</b>'):(x.ro?('🕐 prévu le '+d+' à '+esc(x.heure||'')+' · 🖊 pointé à '+fmtDT(x.pAt)+' · '+(x.callT?('📞 appel à '+fmtDT(x.callT)+' · <b style="color:var(--bad)">Δ pointé↔appel : '+x.deltaMin+' min</b>'):'<b style="color:var(--bad)">📞 AUCUN appel de ce numéro aujourd’hui</b>')):('prévu le '+d+' à '+esc(x.heure||'')+' · <b style="color:var(--bad)">⏱ depuis '+ppSince(x.since)+'</b>'))))+'</div>'+(x.c2info?'<div style="font-size:11.5px;margin-top:2px;color:var(--muted)">'+x.c2info+'</div>':'')+((rowAct(x)+rowTenueTicket(x))?'<div class="acts" style="margin-top:5px;gap:6px;flex-wrap:wrap">'+rowAct(x)+rowTenueTicket(x)+rowRetirer(x)+'</div>':'')+ecartPhoto(x.mid,(x.key||'prise'),x.heure,x.mdate)+((typeof phOrigineTxt==='function'&&x.mid&&x.key)?phOrigineTxt(x.mid,x.key):'')/* b351 */+hdBloc(x)+'</div>'; }).join(''):'<div class="sub">Rien en attente 🎉</div>'; }
     if(D.anov){
       h+='<div class="acts" style="margin-bottom:10px"><button type="button" id="ano-new" class="ok" style="font-size:13px">\u2795 Signaler une anomalie</button></div>';
       var _lib={}; ANO_CATS.forEach(function(c){_lib[c[0]]=c[1];});
@@ -9790,21 +9813,36 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+esc(PP_VIEW.sub2)+'</b><span class="sub" style="margin:0">'+Ls.length+' créneau(x) · dépose la photo sur la ligne</span></div>'+rowsOf(Ls);
     } else if(D.af3&&!PP_VIEW.sub){ // b189 : niveau 1 = A venir / En cours / Passees
       var aJ7=L.filter(function(x){return x.phase==='j7';});var aJ1=L.filter(function(x){return x.phase==='j1';}),aAv=L.filter(function(x){return x.phase==='avenir';}),aEn=L.filter(function(x){return x.phase==='encours';}),aPa=L.filter(function(x){return x.phase==='passee';});
+      /* b400 : les SANS DATE passent devant, et DÉPLIÉES. Ce sont les seules vacations qui
+         ne se voient nulle part ailleurs : pas de colonne au Planning (il est daté), et déjà
+         validées donc sorties de Suivi des demandes. Une tuile fermée les aurait laissées à
+         un clic de distance — Zeus les veut ouvertes, la liste des sites lisible tout de suite. */
+      var _sd0=L.filter(function(x){ return x.phase==='sansdate'; });
+      if(_sd0.length){
+        var _sdg={}; _sd0.forEach(function(x){ (_sdg[x.site]=_sdg[x.site]||[]).push(x); });
+        var _sdk=Object.keys(_sdg).sort(function(u0,v0){ return (_sdg[v0].length-_sdg[u0].length)||(u0<v0?-1:1); });
+        h+='<div style="border:1.5px solid #e5322d;border-radius:12px;padding:10px;margin-bottom:12px;background:rgba(229,50,45,.07)">'
+          +'<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><b style="font-size:20px">'+_sd0.length+'</b><b>📅 Sans date</b></div>'
+          +'<div class="sub" style="margin:2px 0 8px;font-size:11.5px">Validées, sans agent et <b>sans date</b> : invisibles au Planning (il est daté) comme dans les tuiles ci-dessous. Poser la date les y remet — ouvre le site, puis <b>✏️ Modifier</b> sur la ligne.</div>'
+          +_sdk.map(function(st0){ var n0=_sdg[st0].length,f0=_sdg[st0][0];
+              return '<div class="pp-tile" data-sub="sansdate" data-sub2="'+esc(st0)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:6px"><b style="font-size:20px;min-width:34px;text-align:center">'+n0+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st0)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f0.client?'🏢 '+esc(f0.client)+' · ':'')+'<b style="color:#e5322d">📅 date à poser</b>'+(f0.heure?(' · 🕐 '+esc(f0.heure)):'')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join('')
+          +'</div>';
+      }
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap"><div class="pp-tile" data-sub="j1" style="border-color:#e0a13b"><b>'+aJ1.length+'</b>🚨 DANS LES 24 H<br><span class="sub" style="margin:0;font-size:11.5px">sans agent — urgent</span></div><div class="pp-tile" data-sub="j7" style="border-color:#c9a227"><b>'+aJ7.length+'</b>📅 DANS LES 7 JOURS<br><span class="sub" style="margin:0;font-size:11.5px">après les 24 h — sans agent</span></div><div class="pp-tile" data-sub="avenir"><b>'+aAv.length+'</b>⏳ LE RESTE À VENIR<br><span class="sub" style="margin:0;font-size:11.5px">au-delà de 7 jours — sans agent</span></div><div class="pp-tile" data-sub="encours"><b>'+aEn.length+'</b>🟢 EN COURS<br><span class="sub" style="margin:0;font-size:11.5px">sans agent</span></div><div class="pp-tile" data-sub="passee"><b>'+aPa.length+'</b>🕓 PASSÉES<br><span class="sub" style="margin:0;font-size:11.5px">jamais affectées</span></div></div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px">'+D.depuis+'.</p>';
     } else if(D.af3&&PP_VIEW.sub&&PP_VIEW.sub2==null){ // b189 : niveau 2 = par SITE
       var Lp9=L.filter(function(x){return x.phase===PP_VIEW.sub;});
       var _g9={}; Lp9.forEach(function(x){ (_g9[x.site]=_g9[x.site]||[]).push(x); });
       var _s9=Object.keys(_g9).sort(function(u,v9){return _g9[u][0].due-_g9[v9][0].due;});
-      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(PP_VIEW.sub==='j1'?'🚨 Dans les 24 h':PP_VIEW.sub==='j7'?'📅 Dans les 7 jours':PP_VIEW.sub==='avenir'?'⏳ Le reste à venir':PP_VIEW.sub==='encours'?'🟢 En cours':'🕓 Passées')+'</b><span class="sub" style="margin:0">'+Lp9.length+' vacation(s) sans agent</span></div>';
-      h+=_s9.length?_s9.map(function(st9b){ var n9=_g9[st9b].length,f9=_g9[st9b][0]; return '<div class="pp-tile" data-sub2="'+esc(st9b)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+n9+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st9b)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f9.client?'🏢 '+esc(f9.client)+' · ':'')+'1re échéance : '+((f9.mdate||'').split('-').reverse().join('/'))+(f9.heure?' '+esc(f9.heure):'')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Rien 🎉</div>';
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(PP_VIEW.sub==='sansdate'?'📅 Sans date':PP_VIEW.sub==='j1'?'🚨 Dans les 24 h':PP_VIEW.sub==='j7'?'📅 Dans les 7 jours':PP_VIEW.sub==='avenir'?'⏳ Le reste à venir':PP_VIEW.sub==='encours'?'🟢 En cours':'🕓 Passées')+'</b><span class="sub" style="margin:0">'+Lp9.length+' vacation(s) sans agent</span></div>';
+      h+=_s9.length?_s9.map(function(st9b){ var n9=_g9[st9b].length,f9=_g9[st9b][0]; return '<div class="pp-tile" data-sub2="'+esc(st9b)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+n9+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st9b)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f9.client?'🏢 '+esc(f9.client)+' · ':'')+(f9.mdate?('1re échéance : '+f9.mdate.split('-').reverse().join('/')):'<b style="color:#e5322d">📅 date à poser</b>')+(f9.heure?' · '+esc(f9.heure):'')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Rien 🎉</div>';
     } else if(D.af3&&PP_VIEW.sub&&PP_VIEW.sub2!=null){ // b189 : niveau 3 = vacations du site + affectation en serie (b184)
       var LLs=L.filter(function(x){return x.phase===PP_VIEW.sub&&x.site===PP_VIEW.sub2;});
       var _hs=[]; LLs.forEach(function(x){ if(x.heure&&_hs.indexOf(x.heure)<0)_hs.push(x.heure); }); _hs.sort();
       var _dmin='',_dmax=''; LLs.forEach(function(x){ var d3=x.mdate||''; if(!d3)return; if(!_dmin||d3<_dmin)_dmin=d3; if(!_dmax||d3>_dmax)_dmax=d3; });
       var mass='<div class="meta" style="border:1.5px solid #e0a13b;border-radius:10px;padding:8px;margin:0 0 8px"><div class="lab" style="margin:0 0 4px">⚡ Affectation en série — même agent sur plusieurs vacations</div>'
         +'<input class="pp-mass-ag" list="pp-mass-dl" placeholder="Agent (nom)…" autocomplete="off" style="width:100%"><datalist id="pp-mass-dl">'+((typeof FA!=='undefined'&&FA)?FA.map(function(a2){return '<option value="'+esc(a2.nom||'')+'">';}).join(''):'')+'</datalist>'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px"><input type="date" class="pp-mass-d1" value="'+esc(_dmin)+'" title="Du"><input type="date" class="pp-mass-d2" value="'+esc(_dmax)+'" title="Au"><select class="pp-mass-h"><option value="">Toutes heures</option>'+_hs.map(function(x2){return '<option>'+esc(x2)+'</option>';}).join('')+'</select></div>'
+        +(PP_VIEW.sub==='sansdate'?'<div style="margin-top:6px"><input type="hidden" class="pp-mass-d1"><input type="hidden" class="pp-mass-d2"><select class="pp-mass-h"><option value="">Toutes heures</option>':'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px"><input type="date" class="pp-mass-d1" value="'+esc(_dmin)+'" title="Du"><input type="date" class="pp-mass-d2" value="'+esc(_dmax)+'" title="Au"><select class="pp-mass-h"><option value="">Toutes heures</option>')+_hs.map(function(x2){return '<option>'+esc(x2)+'</option>';}).join('')+'</select></div>'
         +'<div class="acts" style="margin-top:6px"><button type="button" class="ok pp-mass-go" style="font-size:12px">⚡ Affecter à toute la série</button></div></div>';
       h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+esc(PP_VIEW.sub2)+'</b><span class="sub" style="margin:0">'+LLs.length+' vacation(s) sans agent</span></div>'+mass+rowsOf(LLs);
     } else if(D.tiles===3&&!PP_VIEW.sub){ // b167 : 3 parties avant / pendant / apres service
@@ -10010,7 +10048,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
       if(n)n.innerHTML='<div class="sub">\u23f3 V\u00e9rification en cours aupr\u00e8s de Ringover\u2026</div>';
       try{ ppRoScan(); }catch(e){}
     }; });   /* b390 */
-    box.querySelectorAll('.pp-tile').forEach(function(t){ if(t.getAttribute('data-tr')!=null)return;   /* b391 : les tuiles de tranche ont leur propre geste */ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){PP_VIEW.sub2=s2;} else if(t.getAttribute('data-sub')!=null){PP_VIEW.sub=t.getAttribute('data-sub'); /* b395 : la tuile de 🌙 compte AUJOURD'HUI — le clic doit montrer aujourd'hui, pas tout l'historique. */ PP_VIEW.jour=(PP_VIEW.mode==='c2')?'j':null; PP_VIEW.tranche=null;} ppRender(); }; });   /* b332 : on repart du palier */
+    box.querySelectorAll('.pp-tile').forEach(function(t){ if(t.getAttribute('data-tr')!=null)return;   /* b391 : les tuiles de tranche ont leur propre geste */ t.onclick=function(){ var s2=t.getAttribute('data-sub2'); if(s2!=null){ var s1b=t.getAttribute('data-sub'); if(s1b!=null)PP_VIEW.sub=s1b; /* b400 : le bloc déplié saute le niveau 1 — la tuile porte sa phase avec elle */ PP_VIEW.sub2=s2;} else if(t.getAttribute('data-sub')!=null){PP_VIEW.sub=t.getAttribute('data-sub'); /* b395 : la tuile de 🌙 compte AUJOURD'HUI — le clic doit montrer aujourd'hui, pas tout l'historique. */ PP_VIEW.jour=(PP_VIEW.mode==='c2')?'j':null; PP_VIEW.tranche=null;} ppRender(); }; });   /* b332 : on repart du palier */
     box.querySelectorAll('.pp-jr').forEach(function(b){ b.onclick=function(){ PP_VIEW.jour=b.getAttribute('data-j'); ppRender(); }; });
     /* b336 : ouvrir le rapprochement sur la photo choisie */
     box.querySelectorAll('.pp-act-rappro').forEach(function(b){ b.onclick=function(){
@@ -10077,7 +10115,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
       if(!ag)(typeof FA!=='undefined'&&FA?FA:[]).forEach(function(a3){ if(!ag&&typeof tnorm==='function'&&tnorm(a3.nom||'').indexOf(tnorm(nm))>=0)ag=a3; });
       if(!ag){alert('Agent introuvable dans les fiches agents.');return;}
       var d1=box.querySelector('.pp-mass-d1').value||'', d2=box.querySelector('.pp-mass-d2').value||'', hh=box.querySelector('.pp-mass-h').value||'';
-      var cibles=[]; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.statut!=='validee'||m.agentId||m.mailPending||m.retiree||m.aDecouper)return; if((m.siteAgent||m.titre||'—')!==PP_VIEW.sub2)return; var d4=m.mdate||''; if(!d4)return; if(d1&&d4<d1)return; if(d2&&d4>d2)return; if(hh&&(m.mheure||'')!==hh)return; cibles.push(m); });
+      var cibles=[]; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ if(m.statut!=='validee'||m.agentId||m.mailPending||m.retiree||m.aDecouper)return; if((m.siteAgent||m.titre||'—')!==PP_VIEW.sub2)return; var d4=m.mdate||''; if(!d4){ if(PP_VIEW.sub!=='sansdate')return; } else { if(PP_VIEW.sub==='sansdate')return; } /* b400 : dans « Sans date » la série ne vise QUE les sans-date, et le filtre de dates n'a rien à filtrer */ if(d1&&d4<d1)return; if(d2&&d4>d2)return; if(hh&&(m.mheure||'')!==hh)return; cibles.push(m); });
       if(!cibles.length){alert('Aucune vacation ne correspond aux critères.');return;}
       if(!confirm('Affecter '+(ag.nom||'')+' à '+cibles.length+' vacation(s) de « '+PP_VIEW.sub2+' »'+(hh?(' à '+hh):'')+' ?'))return;
       cibles.forEach(function(m){ m.agentId=ag.id; });
@@ -10131,6 +10169,18 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
   // ===== b151 : 📧 Mails missions (super-admin) — remontée des mails BDC + comparaison entrants ↔ planifié =====
   var MAILS_CACHE_KEY='fkh_mails_cache'; var mailsFilter='tous'; var MAILS_TOUT=false;   /* b358 : false = on ne montre que les mails de gardiennage / intervention */
   function mailsCache(){ try{return JSON.parse(localStorage.getItem(MAILS_CACHE_KEY)||'[]')||[];}catch(e){return [];} }
+  /* ===== b401 : LA FRONTIÈRE ENTRE LE SERVEUR ET L'APPLI =====
+     Copie EXACTE de `lireBonDeCommande` (backend/worker.js) : mêmes trois conditions, dans le
+     même ordre, sur la même chaîne (la première ligne du mail — `mailsParse` la découpe déjà
+     pareil). Vrai = le serveur sait lire ce bon de commande et écrit la vacation lui-même,
+     avec la référence, la ville, l'adresse et les VRAIES heures du PDF. L'appli s'efface.
+     Faux = le serveur ne sait pas le lire (P2S, Smyths Toys, Casino, Hyper U, Kiabi, LIDL…),
+     et l'appli reste le seul producteur : elle continue comme avant. */
+  function bdcPourLeServeur(sujet){
+    var s0=String(sujet||'').split(String.fromCharCode(10))[0].trim(), up0=s0.toUpperCase();
+    if(!/(DEMANDE|MISSION|GARDIENNAGE)/.test(up0)||/ANNULATION/.test(up0))return false;
+    return /AQUILA\s+\d+\s+le\s+\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}\s+chez\s+.+/i.test(s0);
+  }
   function mailsParse(it){
     var txt=String(it.transcript||''), subject=(txt.split(String.fromCharCode(10))[0]||'').trim(), from=String(it.number||'');
     var up=subject.toUpperCase();
@@ -10300,6 +10350,10 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
         if(pp.kind!=='demande'||!pp.site||!pp.mdate)return;
         if(_ref.indexOf(it.cdr_id)>=0)return;
         if((SUIVI||[]).some(function(m){return m.mailSrc===it.cdr_id;}))return; // b305 : skip TOUJOURS même si deleted (suppression définitive — Zeus 05/08)
+        /* b401 : ce mail appartient au serveur. Ne pas créer ici — même si notre liste ne montre
+           encore rien, c'est justement le cas où on doublonnait. Le mail reste visible dans
+           📧 Mails missions, avec ou sans sa vacation : rien ne disparaît en silence. */
+        if(bdcPourLeServeur(pp.subject))return;
         if(mailsMatchMission(pp))return;
         /* ===== b343 : LE MAIL EST LA PREMIERE SOURCE DE DOUBLONS =====
            Mesure du 05/08 : 15 des 20 vacations issues d'un mail doublonnaient une autre vacation du
