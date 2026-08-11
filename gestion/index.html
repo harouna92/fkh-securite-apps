@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v10-08·b403</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v11-08·b407</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -315,6 +315,8 @@ button.big:active{transform:translateY(1px)}
     <div class="lab" style="margin:12px 0 6px">Quelles actions me notifient ?</div>
     <div id="notif-cats"></div>
     <div id="notif-sound-wrap"><label class="chk" style="margin-top:4px"><input type="checkbox" id="notif-sound"><span>🔊 Petit son à chaque notification</span></label></div>
+    <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="sub" style="margin:0">Ne pas resonner avant</span><input type="number" id="notif-silence" min="0" max="120" style="width:64px;text-align:center"><span class="sub" style="margin:0">minute(s)</span></div>
+    <div class="sub" style="margin:4px 0 0;font-size:11.5px">Les alertes d’une même famille tiennent dans <b>une seule</b> notification, qui se met à jour toute seule. Pendant ce délai le compteur monte <b>sans re-sonner</b> — rien n’est perdu, on est juste moins interrompu.</div>
     <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">
       <div class="lab" style="margin:0 0 4px">📴 Recevoir même quand l'appli est fermée (Niveau 2)</div>
       <p class="sub" id="notif-n2-status" style="margin:0 0 8px;font-size:12.5px">—</p>
@@ -3491,6 +3493,26 @@ button.big:active{transform:translateY(1px)}
           SUIVI.unshift({id:'demo_sd'+i0,statut:'validee',client:'CLIENT ÉTALON',titre:s0,siteAgent:s0,ville:'Villetest',assoc:[],
                          mdate:'',mheure:(i0===1?'19:00':''),mfin:'',src:'planning',creeAt:Date.now(),pris:Date.now(),valide:Date.now()});
         });
+      } },
+    finattente:{ titre:'\u23f3 L\u2019agent n\u2019a pas encore fini',
+      quoi:'Deux vacations d\u2019hier soir dont l\u2019heure de fin est pass\u00e9e : SITE QUI TRAINE (fin pr\u00e9vue il y a 3 h) et SITE QUI TRAINE 2 (fin pr\u00e9vue il y a 2 h). Aucune des deux n\u2019est point\u00e9e.',
+      aFaire:'Ouvre la pastille \u23f0 « Prises / fins NON POINT\u00c9ES ». Les deux sont dans la liste, indistinctes de n\u2019importe quel oubli. Sur SITE QUI TRAINE, clique <b>\u23f3 Pas encore fini</b> : la ligne quitte la file et remonte dans le bloc orange <b>en t\u00eate</b>, avec l\u2019heure du constat et ton nom. La seconde reste en bas, dans les non point\u00e9es \u2014 on ne sait toujours rien d\u2019elle. Rappelle, puis <b>\u2714 Agent appel\u00e9 \u2014 pointer</b> : elle dispara\u00eet, le service est termin\u00e9. <b>\u21a9\ufe0f Annuler l\u2019attente</b> revient en arri\u00e8re si tu t\u2019es tromp\u00e9.',
+      monter:function(){
+        /* la fin doit être PASSÉE : on part de l'instant de fin et on remonte. */
+        function dt(dec){ var d=new Date(Date.now()-dec*3600000);
+          return {iso:d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),
+                  hm:('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}; }
+        /* rejouer le lien ne doit pas empiler une deuxieme fois le meme decor. */
+        SUIVI=(SUIVI||[]).filter(function(m){ return String(m.id||'').indexOf('demo_pf')!==0; });
+        [['demo_pf1','SITE QUI TRAINE',3],['demo_pf2','SITE QUI TRAINE 2',2]].forEach(function(v){
+          var f=dt(v[2]), d0=dt(v[2]+8);
+          SUIVI.unshift({id:v[0],statut:'validee',client:'CLIENT ÉTALON',titre:v[1],siteAgent:v[1],ville:'Villetest',assoc:[],
+            mdate:d0.iso,mheure:d0.hm,mfin:f.hm,src:'planning',creeAt:Date.now(),pris:Date.now(),valide:Date.now()});
+        });
+        /* la première est DÉJÀ constatée : le bloc se voit dès l'ouverture, on compare. */
+        try{ var S6=ssLoad(); S6['demo_pf1']=S6['demo_pf1']||{};
+          S6['demo_pf1'].fin={pasFini:true,pasFiniAt:Date.now(),pasFiniHm:dt(1).hm,pasFiniPar:'demo'};
+          ssSave(S6); }catch(_e){}
       } },
     annulation:{ titre:'🔴 Annulation signalée',
       quoi:'Une vacation AQUILA demain soir, sur laquelle un mail d’annulation vient d’arriver.',
@@ -7632,6 +7654,14 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
          rien su. Desormais chacun a sa case, et le ticket n'est complet que quand les deux sont cochees :
          tant qu'il en manque une, la ligne affiche ce qu'il reste a faire. */
       var avise='<label class="chk" style="margin:0;'+(done&&!r.avise?'color:var(--bad)':'')+'"><input type="checkbox" class="sa-f" data-f="avise" '+d0+(r.avise?' checked':'')+'><span>✅ Fait — client avisé</span></label>';
+      /* ===== b406 : LE TROISIÈME ÉTAT D'UNE FIN DE SERVICE (Zeus, 11/08) =====
+         « Un agent censé terminer à 8 h ; finalement on l'appelle, il dit qu'il n'a pas encore
+         fini. » Cocher « ✅ Fait » serait faux, le service n'est pas terminé. Ne rien cocher fait
+         passer la ligne pour un oubli d'appel — alors qu'on a appelé, et qu'on SAIT où on en est.
+         Cette connaissance n'avait nulle part où se poser et se perdait entre deux opérateurs.
+         Elle a maintenant sa case, ici, sur le ticket, et sa vue en tête de la pastille ⏰. */
+      var pasFiniBox=(e.key==='fin')?('<label class="chk" style="margin:0;'+(r.pasFini?'color:#e0a13b;font-weight:700':'')+'"><input type="checkbox" class="sa-f" data-f="pasFini" '+d0+(r.pasFini?' checked':'')+'><span>⏳ L’agent n’a pas encore fini</span></label>'
+        +(r.pasFini?('<div style="margin-top:4px;font-size:12px;color:#e0a13b;font-weight:700">⏳ On attend sa fin réelle'+(r.pasFiniHm?(' — constaté à '+esc(r.pasFiniHm)):'')+(r.pasFiniPar?(' · 👤 '+esc(r.pasFiniPar)):'')+'. Rappelle, puis coche « ✅ Fait ».</div>'):'')):'';
       /* b277 : le rappel de ce qui manque — visible sans avoir a comparer deux cases. */
       var _reste='';
       if(e.key==='prise'||e.key==='fin'){
@@ -7663,7 +7693,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
          le plus souvent. Un seul bouton partout, avec le MOTIF et le DESTINATAIRE au choix. Ce que
          portait l'ancien bouton n'est pas perdu : c'est le meme envoi vers 🧭 Terrain, meme escalade. */
       var unreachBtn='<button type="button" class="sa-signal" '+d0+' data-ctx="'+esc((e.client?e.client+' · ':'')+(e.site||''))+'" data-agent="'+esc(e.agent||'')+'" data-tel="'+esc(e.agentTel||'')+'" data-site="'+esc(e.site||'')+'" data-lbl="'+esc(e.label||'')+'" data-heure="'+esc(e.heure||'')+'" title="Signaler une anomalie au superviseur (ou à l’administrateur)" style="font-size:12px;border-color:#e0a13b;color:#e0a13b;font-weight:700">⚠️ Signaler</button>';
-      var fields=(e.key==='prise')?(fait+agret+photoSel+photoUp+photoSug+avise+_reste+tryBtn+unreachBtn+alertBtn+note):(e.key==='fin')?(fait+photoSel+photoUp+photoSug+avise+tryBtn+unreachBtn+alertBtn+note):(e.key==='route')?(fait+prisRoute+tryBtn+unreachBtn+alertBtn+note):(e.key==='j15')?(fait+ponctuel+tryBtn+unreachBtn+alertBtn+note):(e.key==='tenue')?(fait+tenueSel+tenuePh+photoUp+tryBtn+unreachBtn+alertBtn+note):(fait+statut+photoSel+photoUp+photoSug+tryBtn+unreachBtn+alertBtn+note);
+      var fields=(e.key==='prise')?(fait+agret+photoSel+photoUp+photoSug+avise+_reste+tryBtn+unreachBtn+alertBtn+note):(e.key==='fin')?(fait+pasFiniBox+photoSel+photoUp+photoSug+avise+tryBtn+unreachBtn+alertBtn+note)   /* b406 */:(e.key==='route')?(fait+prisRoute+tryBtn+unreachBtn+alertBtn+note):(e.key==='j15')?(fait+ponctuel+tryBtn+unreachBtn+alertBtn+note):(e.key==='tenue')?(fait+tenueSel+tenuePh+photoUp+tryBtn+unreachBtn+alertBtn+note):(fait+statut+photoSel+photoUp+photoSug+tryBtn+unreachBtn+alertBtn+note);
       var cl=[]; if(e.client)cl.push('🏢 Client : '+esc(e.client)); cl.push('📍 Site : '+esc(e.site)+(e.siteBDC&&e.siteBDC!==e.site?' <span style="color:var(--muted)">(BDC : '+esc(e.siteBDC)+')</span>':'')); if(e.ville||e.cp)cl.push('Ville : '+[esc(e.ville),esc(e.cp)].filter(Boolean).join(' ')); if(e.mheure)cl.push('🕐 Heure prévue : '+esc(e.mheure)); cl.push('👤 Agent : '+(e.agent?esc(e.agent):'<span style="color:var(--warn)">⚠ à affecter</span>')); var _ats=(e.agentTels&&e.agentTels.length)?e.agentTels:(e.agentTel?[e.agentTel]:[]); if(_ats.length)cl.push('📞 Numéro'+(_ats.length>1?'s':'')+' : '+_ats.map(function(t){return '<a class="call" href="tel:'+esc(String(t).replace(/\s/g,''))+'">'+esc(t)+'</a>';}).join(' · '));
       var roLine='';
       if(roCalls&&done){ var parts=[]; if(e.agentTel)parts.push('👤 agent : '+roBadge(e.agentTel,ct)); if((e.key==='prise'||e.key==='fin')&&r.avise){ var ctm={}; try{ctm=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(_){} var ctel=e.client?ctm[e.client]:''; if(ctel)parts.push('🏢 client : '+roBadge(ctel,ct)); } if(parts.length)roLine='<div class="fa-d" style="margin:3px 0 0;line-height:1.6">🔌 '+parts.join(' &nbsp;·&nbsp; ')+'</div>'; }
@@ -7963,9 +7993,14 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
           saSet(mid,key,{done:true,hm:now,at:Date.now(),doneTs:Date.now(),retard:(rt==null?null:rt),by:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'')}); 
           /* b394 : sur un contrôle des 2 h, on demande ce qui s'est passé — 32 coches muettes
              en 7 jours. La coche est déjà partie : on ne bloque pas l'opérateur. */
+          if(key==='fin')saSet(mid,key,{pasFini:false,pasFiniAt:0,pasFiniHm:'',pasFiniPar:''});   /* b406 : le service est enfin terminé, l'attente n'a plus lieu d'être */
           if(String(key||'').indexOf('ctrl')===0)try{ saDemandeStatut(mid,key); }catch(_e){}
         } else { saSet(mid,key,{done:false}); } renderSuiviAppels(); }
-      else if(t.classList.contains('sa-f')){ var f=t.getAttribute('data-f'),v=(t.type==='checkbox')?t.checked:t.value,p={}; p[f]=v; saSet(mid,key,p);
+      else if(t.classList.contains('sa-f')){ var f=t.getAttribute('data-f'),v=(t.type==='checkbox')?t.checked:t.value,p={}; p[f]=v;
+        /* b406 : un constat se date et se signe — sinon, deux heures plus tard, personne ne sait
+           ni quand on l'a appelé ni qui a eu l'agent au téléphone. */
+        if(f==='pasFini'){ if(v){ var _dz=new Date(); p.pasFiniAt=Date.now(); p.pasFiniHm=('0'+_dz.getHours()).slice(-2)+':'+('0'+_dz.getMinutes()).slice(-2); p.pasFiniPar=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||''; } else { p.pasFiniAt=0; p.pasFiniHm=''; p.pasFiniPar=''; } }
+        saSet(mid,key,p);
         /* ===== b393 (C) : « Injoignable » n'est plus une ligne morte dans un menu =====
            31 contrôles déclarés injoignables en 7 jours, 4 signalements arrivés chez le
            superviseur. Le menu enregistrait et n'alertait personne. Choisir « Injoignable »
@@ -8928,8 +8963,10 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       var due=frMs(e.mdate,e.abs); if(due==null)return;
       if(!isTe){ if(now<due+60000)return; var start=isC2?0:PP_START; if(start==null||due<start)return; } // b166 : photos controle = tout l'historique ; b167 : la tenue gere sa propre fenetre
       var r=(S[e.mid]&&S[e.mid][e.key])||{};
-      var it={tel:e.agentTel||'',mid:e.mid,key:e.key,label:e.label,site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,heure:e.heure,due:due,since:now-due};
-      if(isPF){ if(!r.done)sc.op.push(it);
+      var it={tel:e.agentTel||'',mid:e.mid,key:e.key,label:e.label,site:e.site,client:e.client,ville:e.ville,agent:e.agent,mdate:e.mdate,/* b404 : `edate` = le jour où l'appel tombe VRAIMENT (report après minuit). `mdate` reste le jour de la vacation — c'est son identité, on n'y touche pas. */edate:e.edate||e.mdate,heure:e.heure,due:due,since:now-due};
+      if(isPF){ /* b406 : ce qu'on a constaté au téléphone se lit sur la ligne, daté et signé. */
+        if(e.key==='fin'&&r.pasFini){ it.pasFini=1; it.c2info='\u23f3 <b>Agent PAS ENCORE FINI</b> \u2014 constat\u00e9'+(r.pasFiniHm?(' \u00e0 '+r.pasFiniHm):'')+(r.pasFiniPar?(' \u00b7 \ud83d\udc64 '+r.pasFiniPar):'')+' \u2014 on attend sa fin r\u00e9elle'; }
+        if(!r.done)sc.op.push(it);
         /* b329 : « Client non avise » ne regarde que LE JOUR MEME. Aviser un client d'un depassement
            d'avant-hier n'a plus de sens : on encombrait la liste de lignes qu'on ne traiterait jamais,
            et le vrai retard du jour s'y perdait. Les autres pastilles gardent leur historique. */
@@ -8975,7 +9012,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
         var _apC=(typeof phAUnePhoto==='function')?phAUnePhoto(e.mid,e.key):!!(r.photoKey||r.photo);
         /* b387 : qui a coche, et dans quel cas on range la ligne. */
         it.par=r.by||''; it.hmFait=r.hm||''; it.statutTxt=r.statut||''; it.tries=+r.tries||0;
-        it.sousvue=(!r.done&&now>due)?'nonfait':(_inj?'inj':(!_apC?'sansphoto':''));
+        /* b405 : le REFUS d'abord, comme en b347 pour prise/fin. Sans ça un contrôle refusé n'a pas de photo, donc il retombait dans « sans photo » : on relançait un agent qui avait déjà dit non, et le refus ne se voyait nulle part. */it.sousvue=r.refusPhoto?'refus':((!r.done&&now>due)?'nonfait':(_inj?'inj':(!_apC?'sansphoto':'')));
         if(it.sousvue){ var _fd2=_finMap[e.mid]; if(_fd2==null)_fd2=due+86400000; it.phase=(now>_fd2)?'passee':'encours';
           /* b387 : on dit QUI a coche — le champ existait, il ne sortait nulle part. */ var _par7=r.by?(' \u00b7 \ud83d\udc64 '+r.by):''; var _try7=(+r.tries)?(' \u00b7 \u260e '+(+r.tries)+' tentative(s)'):''; it.c2info=_inj?('📵 Agent INJOIGNABLE \u2014 d\u00e9clar\u00e9'+(r.hm?(' \u00e0 '+r.hm):'')+_par7+_try7):(r.done?('☎ Appel contr\u00f4le ✅ FAIT'+(r.hm?(' \u00e0 '+r.hm):'')+_par7+_try7+' \u2014 mais pas de photo'):('☎ Appel contr\u00f4le ❌ JAMAIS COCH\u00c9'+_try7));
           sc.c2.push(it); } }
@@ -9588,7 +9625,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       /* b334 : cette pastille ne parle PAS de photo — elle demande si l'operateur a pointe qu'il a
          appele l'agent. Le bouton « choisir une photo » ajoute en b316 n'avait donc rien a y faire :
          il melangeait deux dimensions. Le pointage se declare, il ne se prouve pas par une image. */
-      if(md==='op')return '<button type="button" class="pp-act-fait" data-mid="'+esc(x.mid||'')+'" data-key="'+esc(x.key)+'" style="font-size:12px">✔ Agent appelé — pointer</button>';
+      if(md==='op')return '<button type="button" class="pp-act-fait" data-mid="'+esc(x.mid||'')+'" data-key="'+esc(x.key)+'" style="font-size:12px">✔ Agent appelé — pointer</button>'/* b406 : seulement sur la FIN — une prise de service ne se « pas encore finit » pas. */+((x.key==='fin')?(x.pasFini?'<button type="button" class="pp-act-fini-x" data-mid="'+esc(x.mid||'')+'" style="font-size:12px;margin-left:6px">↩️ Annuler l\u2019attente</button>':'<button type="button" class="pp-act-pasfini" data-mid="'+esc(x.mid||'')+'" style="font-size:12px;margin-left:6px;border-color:#e0a13b;color:#e0a13b;font-weight:700">\u23f3 Pas encore fini</button>'):'');
       if(md==='cli')return '<button type="button" class="pp-act-avise" data-mid="'+esc(x.mid||'')+'" data-key="'+esc(x.key)+'" style="font-size:12px">📞 Client avisé ✔</button>';
       /* b313 : la photo est peut-etre deja arrivee — on va la chercher au lieu d'en redemander une. */
       if(md==='ph'||md==='c2'||md==='te')return refusBtn(x,md)
@@ -9775,15 +9812,17 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       /* b395 : venu d'une tuile, on ne montre QUE le jour annonce. */
       if(D.c2vues&&PP_VIEW.jour==='j'){
         var _aj95=(typeof impTodayISO==='function')?impTodayISO():'';
-        Lp=Lp.filter(function(x){ return (x.mdate||'')===_aj95; });
+        Lp=Lp.filter(function(x){ return String(x.edate||x.mdate||'')===_aj95; });   /* b404 */
       }
       if(D.c2vues&&PP_VIEW.jour==='p'){
         var _aj91=(typeof impTodayISO==='function')?impTodayISO():'';
         var _l7=(function(){ var d=new Date(_aj91+'T12:00:00'); d.setDate(d.getDate()-7);
           return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); })();
-        var _pas=Lp.filter(function(x){ return (x.mdate||'')!==_aj91; });
-        var _rec=_pas.filter(function(x){ return (x.mdate||'')>=_l7; });
-        var _vieux=_pas.filter(function(x){ return (x.mdate||'')<_l7; });
+        /* b404 : même règle que la tuile — sinon la tuile annonce N et la liste en montre un autre. */
+        function _jr91(x){ return String(x.edate||x.mdate||''); }
+        var _pas=Lp.filter(function(x){ return _jr91(x)!==_aj91; });
+        var _rec=_pas.filter(function(x){ return _jr91(x)>=_l7; });
+        var _vieux=_pas.filter(function(x){ return _jr91(x)<_l7; });
         if(!PP_VIEW.tranche){
           h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">\u2190 Retour</button>'
             +'<span class="sub" style="margin:0">'+_pas.length+' \u00b7 jours pass\u00e9s</span></div>';
@@ -9806,7 +9845,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       if(D.c2vues&&PP_VIEW.jour==='p')Lp=Lp.slice().sort(function(a,b){ return (b.due||0)-(a.due||0); });
       var _g2={}; Lp.forEach(function(x){ (_g2[x.site]=_g2[x.site]||[]).push(x); });
       var _s2=Object.keys(_g2).sort(function(u,v2){ return (D.c2vues&&PP_VIEW.jour==='p')?(_g2[v2][0].due-_g2[u][0].due):(_g2[u][0].due-_g2[v2][0].due); });   /* b391 */
-      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(D.c2vues?(({nonfait:'\u260e Appels non faits',inj:'\ud83d\udcf5 Agents injoignables',sansphoto:'\ud83d\udcf7 Sans photo'}[PP_VIEW.sub]||'')+(PP_VIEW.jour==='j'?' \u00b7 aujourd\u2019hui':(PP_VIEW.jour==='p'?(' \u00b7 '+(PP_VIEW.tranche==='old'?'au-del\u00e0 de 7 jours':'les 7 derniers jours')):''))):(PP_VIEW.sub==='passee'?'⏳ Terminées':'🟢 En cours'))+   /* b395 */'</b><span class="sub" style="margin:0">'+Lp.length+' créneau(x) '+(D.c2vues?({nonfait:'sans appel',inj:'agent injoignable',sansphoto:'sans photo'}[PP_VIEW.sub]||''):'sans photo')+'</span></div>';
+      h+='<div class="acts" style="margin-bottom:8px"><button type="button" id="pp-back">← Retour</button><b style="margin:0">'+(D.c2vues?(({nonfait:'\u260e Appels non faits',inj:'\ud83d\udcf5 Agents injoignables',sansphoto:'\ud83d\udcf7 Sans photo',refus:'\ud83d\udeab Photos refus\u00e9es'}[PP_VIEW.sub]||'')+(PP_VIEW.jour==='j'?' \u00b7 aujourd\u2019hui':(PP_VIEW.jour==='p'?(' \u00b7 '+(PP_VIEW.tranche==='old'?'au-del\u00e0 de 7 jours':'les 7 derniers jours')):''))):(PP_VIEW.sub==='passee'?'⏳ Terminées':'🟢 En cours'))+   /* b395 */'</b><span class="sub" style="margin:0">'+Lp.length+' créneau(x) '+(D.c2vues?({nonfait:'sans appel',inj:'agent injoignable',sansphoto:'sans photo',refus:'photo refus\u00e9e'}[PP_VIEW.sub]||''):'sans photo')+'</span></div>';
       h+=_s2.length?_s2.map(function(st3){ var n3=_g2[st3].length,f3=_g2[st3][0]; return '<div class="pp-tile" data-sub2="'+esc(st3)+'" style="display:flex;align-items:center;gap:10px;text-align:left;margin-bottom:8px"><b style="font-size:20px;min-width:34px;text-align:center">'+n3+'</b><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(st3)+'</div><div class="sub" style="margin:0;font-size:11.5px">'+(f3.client?'🏢 '+esc(f3.client)+' · ':'')+'1er créneau : '+((f3.mdate||'').split('-').reverse().join('/'))+' '+esc(f3.heure||'')+'</div></div><span style="color:var(--muted)">›</span></div>'; }).join(''):'<div class="sub">Rien 🎉</div>';
     } else if(D.phaseSite&&PP_VIEW.sub&&PP_VIEW.sub2!=null){ // b182 : niveau 3 = creneaux du site + depot photo
       var Ls=L.filter(function(x){ return (D.c2vues?((x.sousvue||'')===PP_VIEW.sub):((PP_VIEW.sub==='passee')?(x.phase==='passee'):(x.phase!=='passee')))&&x.site===PP_VIEW.sub2; });
@@ -9853,9 +9892,12 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       /* b387 : les trois questions qu'on se pose sur un contrôle des 2 h. Meme regle du jour
          qu'en b369 : la tuile compte AUJOURD'HUI, le retard est ecrit dessous et reste a un clic. */
       var _aj7=(typeof impTodayISO==='function')?impTodayISO():'';
+      /* b404 : une seule fonction répond à « quel jour est cet appel ? », et toutes les vues
+         la consultent — sinon la tuile et la liste qu'elle ouvre se contredisent. */
+      function _c2jour(x){ return String((x&&(x.edate||x.mdate))||''); }
       function _c2f(sv){ return L.filter(function(x){ return (x.sousvue||'')===sv; }); }
-      function _c2j(sv){ return _c2f(sv).filter(function(x){ return (x.mdate||'')===_aj7; }).length; }
-      function _c2r(sv){ var r=_c2f(sv).filter(function(x){ return (x.mdate||'')!==_aj7; }).length;
+      function _c2j(sv){ return _c2f(sv).filter(function(x){ return _c2jour(x)===_aj7; }).length; }
+      function _c2r(sv){ var r=_c2f(sv).filter(function(x){ return _c2jour(x)!==_aj7; }).length;
         return r?('<br><span class="pp-retard" data-k="'+sv+'" style="color:#e0a13b;text-decoration:underline;cursor:pointer" title="Voir les jours pass\u00e9s">+ '+r+' jour(s) pass\u00e9(s)</span>'):''; }
       function _c2t(sv,ico,titre,sous,coul){
         return '<div class="pp-tile" data-sub="'+sv+'"'+(coul?(' style="border-color:'+coul+'"'):'')+'><b>'+_c2j(sv)+'</b>'+ico+' '+titre
@@ -9864,7 +9906,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap">'
         +_c2t('nonfait','\u260e','Appel non fait','l\u2019heure est pass\u00e9e, rien n\u2019a \u00e9t\u00e9 coch\u00e9 \u00b7 aujourd\u2019hui','#e5322d')
         +_c2t('inj','\ud83d\udcf5','Agent injoignable','d\u00e9clar\u00e9 par l\u2019op\u00e9rateur \u00b7 aujourd\u2019hui','#e0a13b')
-        +_c2t('sansphoto','\ud83d\udcf7','Sans photo','l\u2019appel est fait, la photo manque \u00b7 aujourd\u2019hui','')
+        +_c2t('sansphoto','\ud83d\udcf7','Sans photo','l\u2019appel est fait, la photo manque \u00b7 aujourd\u2019hui','')+_c2t('refus','\ud83d\udeab','Photo REFUS\u00c9E','l\u2019agent a dit non \u2014 on ne le relance plus, c\u2019est trac\u00e9 \u00b7 aujourd\u2019hui','#7b61ff')
         +'</div>';
       h+='<p class="sub" style="margin:10px 0 0;font-size:11.5px"><b>La photo est due \u00e0 chaque contr\u00f4le</b> \u2014 un appel fait sans photo reste un manquement. Les tuiles comptent AUJOURD\u2019HUI ; le retard est juste dessous, \u00e0 un clic.</p>';
     } else if(D.tiles===3&&PP_VIEW.sub){
@@ -9884,6 +9926,19 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       function _tuile(sub,nb,titre,soustitre,couleur){
         return '<div class="pp-tile" data-sub="'+sub+'"'+(couleur?(' style="border-color:'+couleur+'"'):'')+'><b>'+nb+'</b>'+titre
           +'<br><span class="sub" style="margin:0;font-size:11.5px">'+soustitre+'</span></div>';
+      }
+      /* b406 : ce qu'on SAIT ne doit pas se lire comme ce qu'on IGNORE. Les fins dont on a
+         constaté au téléphone que l'agent n'avait pas terminé sortent de la file des oubliés
+         et prennent la tête, dépliées — même forme que 📅 Sans date (b400). Uniquement ici :
+         c'est la pastille où l'opérateur pointe la fin de service. */
+      if(PP_VIEW.mode==='op'){
+        var _pf6=L.filter(function(x){ return x.pasFini; });
+        if(_pf6.length){
+          h+='<div style="border:1.5px solid #e0a13b;border-radius:12px;padding:10px;margin-bottom:12px;background:rgba(224,161,59,.09)">'
+            +'<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><b style="font-size:20px">'+_pf6.length+'</b><b>⏳ Agent pas encore fini</b></div>'
+            +'<div class="sub" style="margin:2px 0 8px;font-size:11.5px">On a appelé, il n’avait pas terminé. Ce n’est pas un oubli de pointage : <b>on attend sa fin réelle</b>. Rappelle, puis <b>✔ Agent appelé — pointer</b> quand c’est fait.</div>'
+            +rowsOf(_pf6)+'</div>';
+        }
       }
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap">'
         /* b330 : les cinq tuiles « photo » (refus, hors delai, agent/client a prevenir) ne vivent
@@ -10122,7 +10177,17 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
       if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
       ppRender(); alert('✅ '+cibles.length+' vacation(s) affectée(s) à '+(ag.nom||'')+'.');
     };
-    box.querySelectorAll('.pp-act-fait').forEach(function(b){ b.onclick=function(){ saSet(b.getAttribute('data-mid'),b.getAttribute('data-key'),{done:true}); if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
+    /* b406 : constater qu'il n'a pas fini — et pouvoir revenir dessus si on s'est trompé. */
+    box.querySelectorAll('.pp-act-pasfini').forEach(function(b){ b.onclick=function(){
+      var _q=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'';
+      var _d=new Date(), _hm=('0'+_d.getHours()).slice(-2)+':'+('0'+_d.getMinutes()).slice(-2);
+      saSet(b.getAttribute('data-mid'),'fin',{pasFini:true,pasFiniAt:Date.now(),pasFiniHm:_hm,pasFiniPar:_q});
+      if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
+    box.querySelectorAll('.pp-act-fini-x').forEach(function(b){ b.onclick=function(){
+      saSet(b.getAttribute('data-mid'),'fin',{pasFini:false,pasFiniAt:0,pasFiniHm:'',pasFiniPar:''});
+      if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
+    /* b406 : le service est enfin terminé — l'attente n'a plus lieu d'être. */
+    box.querySelectorAll('.pp-act-fait').forEach(function(b){ b.onclick=function(){ saSet(b.getAttribute('data-mid'),b.getAttribute('data-key'),{done:true,pasFini:false}); if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
     box.querySelectorAll('.pp-act-avise').forEach(function(b){ b.onclick=function(){ saSet(b.getAttribute('data-mid'),b.getAttribute('data-key'),{avise:true}); if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }; });
     if(PP_VIEW.mode==='ph'||PP_VIEW.mode==='c2'||PP_VIEW.mode==='te'){ L.forEach(function(x){ var uid='ppph-'+String(x.mid||'').replace(/[^a-zA-Z0-9]/g,'')+'-'+x.key; if(typeof photoWire==='function')photoWire(uid,function(f){ var ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg'; return 'appel/'+x.mid+'/'+x.key+'/'+Date.now()+'.'+ext; },function(key){ if(x.key==='tenue')saSet(x.mid,x.key,{done:true,tenuePhoto:true,photoKey:key}); else saSet(x.mid,x.key,{photo:'Photo horodatée',photoKey:key}); if(typeof photoArchiveAdd==='function')photoArchiveAdd({key:key,mid:x.mid,step:x.key,site:x.site,agent:x.agent,mdate:x.mdate||'',sk:String(x.mid)+'|'+x.key+'|'+key}); /* b175 : la photo couvre le creneau des 2 h */ if(typeof renderSuiviAppels==='function')try{renderSuiviAppels();}catch(e){} ppRender(); }); }); }
   }
@@ -10890,6 +10955,27 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
   function notifPerm(){ return ('Notification' in window)?Notification.permission:'unsupported'; }
   function notifCanFire(){ return NOTIF.cfg && NOTIF.cfg.on && notifPerm()==='granted'; }
   function notifBeep(){ if(!NOTIF.cfg||!NOTIF.cfg.sound)return; try{ var C=window.AudioContext||window.webkitAudioContext; if(!C)return; NOTIF.audio=NOTIF.audio||new C(); var a=NOTIF.audio; if(a.state==='suspended')a.resume(); var o=a.createOscillator(),g=a.createGain(); o.type='sine'; o.frequency.value=880; g.gain.value=0.08; o.connect(g); g.connect(a.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+0.35); o.stop(a.currentTime+0.36); }catch(e){} }
+  /* b407 : le délai de silence, en minutes. 2 par défaut (choix de Zeus, 11/08). */
+  function notifSilence(){ var v=NOTIF.cfg&&+NOTIF.cfg.silence; return (v>=0&&v<=120)?v:2; }
+  var NOTIF_LAST={};   /* dernière fois qu'une catégorie a SONNÉ */
+  /* ===== b407 : UNE NOTIFICATION PAR CATÉGORIE =====
+     L'étiquette est la catégorie SEULE : la nouvelle remplace la précédente au lieu de s'empiler.
+     Une seule chose à fermer, toujours, et son compteur est à jour. Le son, lui, respecte le
+     délai de silence : entre deux, le compteur monte sans interrompre. */
+  function notifGroupe(cat,liste){
+    if(!liste||!liste.length)return;
+    var t=null; (NOTIF_CATS||[]).forEach(function(c){ if(c.k===cat)t=c; });
+    var titre,corps;
+    if(liste.length===1){ titre=liste[0].title; corps=liste[0].body||''; }
+    else { titre=((t&&t.ic)?t.ic+' ':'')+liste.length+' \u00d7 '+((t&&t.lbl)||'alertes');
+           corps=liste.map(function(x){ return String(x.body||'').split('\n')[0]; }).filter(Boolean).join(' \u00b7 ').slice(0,220); }
+    var muet=false, ms=notifSilence()*60000;
+    if(ms>0&&NOTIF_LAST[cat]&&(Date.now()-NOTIF_LAST[cat])<ms)muet=true;   /* on met à jour en place, sans re-sonner */
+    try{ var nn=new Notification(titre,{body:corps,tag:'fkh-'+cat,renotify:!muet,silent:muet});
+      nn.onclick=function(){ try{window.focus();}catch(e){} var btn=document.querySelector('#tabs button[data-s="'+(liste[0].go||'suivi')+'"]'); if(btn)btn.click(); try{nn.close();}catch(e){} };
+    }catch(e){}
+    if(!muet){ NOTIF_LAST[cat]=Date.now(); notifBeep(); }
+  }
   function notifFire(a){ try{ var n=new Notification(a.title,{body:a.body,tag:a.cat+':'+a.key}); n.onclick=function(){ try{window.focus();}catch(e){} var btn=document.querySelector('#tabs button[data-s="'+a.go+'"]'); if(btn)btn.click(); try{n.close();}catch(e){} }; }catch(e){} notifBeep(); }
   function notifThresholdAlerts(){
     var now=Date.now(), out=[];
@@ -10956,20 +11042,22 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
   }
   function notifScan(){
     if(!NOTIF.cfg)return;
-    var active=notifThresholdAlerts(), activeKeys={}, badge=0;
+    var active=notifThresholdAlerts(), activeKeys={}, badge=0, _nv7={};   /* b407 : ce qui est nouveau, rangé par catégorie */
     // b221 : la cloche ne compte QUE les alertes du JOUR (avant, elle cumulait tout l'historique -> badge fige a 47, plus personne ne le regardait)
     var _tdN=(typeof impTodayISO==='function')?impTodayISO():'';
     // b299 : persist seen journalier en localStorage pour ne pas re-notifier au rechargement de page
     if(_tdN&&NOTIF.seenDay!==_tdN){ NOTIF.seenDay=_tdN; try{NOTIF.seen=JSON.parse(localStorage.getItem('fkh_notif_seen_'+_tdN)||'{}');}catch(_n){NOTIF.seen={};} }
     active=active.filter(function(a2){ var w=String(a2.when||''); if(!w)return true; var d2=(w.match(/(\d{4}-\d{2}-\d{2})/)||[])[1]; return !d2||d2===_tdN; });
     active.forEach(function(a){ var kk=a.cat+':'+a.key; activeKeys[kk]=1; if(NOTIF.cfg.cats[a.cat])badge++;
-      if(NOTIF.cfg.cats[a.cat]&&!NOTIF.seen[kk]){ if(NOTIF.primed&&notifCanFire())notifFire(a); NOTIF.seen[kk]=1; } });
+      if(NOTIF.cfg.cats[a.cat]&&!NOTIF.seen[kk]){ if(NOTIF.primed&&notifCanFire()){ (_nv7[a.cat]=_nv7[a.cat]||[]).push(a); } NOTIF.seen[kk]=1; }   /* b407 : mises de côté, envoyées groupées plus bas */ });
     Object.keys(NOTIF.seen).forEach(function(kk){ if(!activeKeys[kk])delete NOTIF.seen[kk]; });
     if(_tdN)try{localStorage.setItem('fkh_notif_seen_'+_tdN,JSON.stringify(NOTIF.seen));}catch(_n){}
     var rechIds=[]; try{ SUIVI.forEach(function(m){ if(m.statut==='recherche')rechIds.push(m.id); }); }catch(_){}
     if(NOTIF.knownRech===null){ NOTIF.knownRech={}; rechIds.forEach(function(id){NOTIF.knownRech[id]=1;}); }
-    else rechIds.forEach(function(id){ if(!NOTIF.knownRech[id]){ NOTIF.knownRech[id]=1; if(NOTIF.cfg.cats.nouvelle_demande&&notifCanFire()){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){m=SUIVI[i];break;} notifFire({cat:'nouvelle_demande',key:id,title:'🆕 Nouvelle demande',body:(m&&m.titre?m.titre.slice(0,60):'Nouvelle demande')+((m&&m.client)?' — '+m.client:''),go:'suivi'}); } } });
+    else rechIds.forEach(function(id){ if(!NOTIF.knownRech[id]){ NOTIF.knownRech[id]=1; if(NOTIF.cfg.cats.nouvelle_demande&&notifCanFire()&&NOTIF.primed){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){m=SUIVI[i];break;} (_nv7.nouvelle_demande=_nv7.nouvelle_demande||[]).push({cat:'nouvelle_demande',key:id,title:'🆕 Nouvelle demande',body:(m&&m.titre?m.titre.slice(0,60):'Nouvelle demande')+((m&&m.client)?' — '+m.client:''),go:'suivi'});   /* b407 */ } } });
     Object.keys(NOTIF.knownRech).forEach(function(id){ if(rechIds.indexOf(id)<0)delete NOTIF.knownRech[id]; });
+    /* b407 : UN envoi par catégorie, à la fin du scan — pas un par alerte pendant. */
+    Object.keys(_nv7).forEach(function(c7){ notifGroupe(c7,_nv7[c7]); });
     NOTIF.primed=true; notifBadge(badge); rechBar();
   }
   function notifBadge(n){ var b=byId('notif-badge'); if(!b)return; b.classList.remove('nb-g','nb-o','nb-r'); if(n>0){ b.textContent=n>99?'99+':n; b.style.display='block'; b.classList.add(n>=40?'nb-r':(n>=10?'nb-o':'nb-g')); } else b.style.display='none'; }
@@ -10980,6 +11068,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     if(en)en.style.display=(p==='granted'||p==='unsupported')?'none':'block';
     if(on)on.checked=!!NOTIF.cfg.on;
     if(snd)snd.checked=!!NOTIF.cfg.sound;
+    var sil=byId('notif-silence'); if(sil){ sil.value=notifSilence(); sil.onchange=function(){ var v=parseInt(this.value,10); if(!(v>=0&&v<=120))v=2; NOTIF.cfg.silence=v; this.value=v; notifSaveCfg(); }; }   /* b407 */
     if(box)box.classList.toggle('notif-off',!NOTIF.cfg.on);
     var wrap=byId('notif-cats'); if(wrap)wrap.innerHTML=NOTIF_CATS.map(function(t){ return '<label><input type="checkbox" class="notif-cat" data-k="'+t.k+'"'+(NOTIF.cfg.cats[t.k]?' checked':'')+'><span>'+t.ic+' '+t.lbl+'</span></label>'; }).join('');
     if(wrap)wrap.querySelectorAll('.notif-cat').forEach(function(c){ c.addEventListener('change',function(){ NOTIF.cfg.cats[this.getAttribute('data-k')]=this.checked; notifSaveCfg(); notifScan(); }); });

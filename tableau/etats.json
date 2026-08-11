@@ -1,6 +1,6 @@
 {
  "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
- "maj": "2026-08-10",
+ "maj": "2026-08-11",
  "items": [
   {
    "b": 222,
@@ -1191,6 +1191,39 @@
    "source": "trouvé en allant nettoyer les 12 lignes",
    "theme": "Doublons",
    "pourquoipas": "Troisième face de la même cause. `dblGroupes()` regroupait sur la seule RÉFÉRENCE et jetait tout ce qui n'en a pas — or les copies nées d'un mail n'en ont justement pas, c'est leur signature (13 copies mesurées, zéro `ref`). Tout l'outillage anti-doublon reposait sur la seule clé que les doublons ne portent pas : la section était structurellement aveugle à eux, et le ménage ne pouvait pas se faire. On propage maintenant la référence portée par la ligne du serveur aux autres lignes du même mail (`mailSrc`, identique sur toutes les copies, aussi stable que la référence). Banc sur les vraies données : 58 grappes / 58 lignes AVANT, 66 grappes / 70 lignes APRÈS — soit exactement les 8 grappes et 12 lignes mesurées, et 0 grappe existante cassée. PILAOUT apparaît avec ses 3 lignes sous la réf 5291552. Le nettoyage se fait ensuite par le geste réversible de la section (report des pointages puis soft-delete).",
+   "local": true
+  },
+  {
+   "b": 404,
+   "titre": "La nuit ne quitte plus la vue au moment où on arrive le matin",
+   "source": "Zeus 11/08 — Épicerie chez Sandra",
+   "theme": "Pastille 🌙",
+   "pourquoipas": "Les tuiles comptaient AUJOURD'HUI sur la date de la VACATION, pas sur la date réelle de l'appel. Une nuit du 10 au 11 porte la date du 10 : le 11 au matin ses contrôles d'après minuit — réellement DU 11 — basculaient sous « + N jour(s) passé(s) », un petit lien orange. La vacation qu'on surveille le plus quittait l'écran à l'heure où l'encadrement prend son poste. `saEntries` calculait déjà `edate` (la date réelle, report après minuit) et la jetait avant les pastilles : on la transporte. `mdate` n'est pas touché (identité de la vacation : dépôt photo, coches, regroupements). Une seule fonction `_c2jour()` répond à « quel jour est cet appel », et la tuile comme la liste qu'elle ouvre la consultent — sinon elles se contredisent.",
+   "local": false
+  },
+  {
+   "b": 405,
+   "titre": "Le refus d'une photo de contrôle 2 h a enfin sa place",
+   "source": "Zeus 11/08",
+   "theme": "Pastille 🌙",
+   "pourquoipas": "Le bouton « 🚫 A refusé d'envoyer » existait déjà sur les lignes de contrôle (`refusBtn` accepte md==='c2'). Ce qui manquait est pire qu'une vue absente : le tri n'avait pas de branche refus. Un contrôle refusé n'a pas de photo — il retombait dans « 📷 Sans photo », mélangé à ceux qu'on attend encore. On relançait un agent qui avait déjà dit non, et le refus ne se voyait nulle part. Leçon du 06/08 (un état d'exception l'emporte sur l'état nominal), appliquée à prise/fin en b347 et jamais aux contrôles. Le refus passe en premier, et il a sa tuile 🚫.",
+   "local": false
+  },
+  {
+   "b": 406,
+   "titre": "« L'agent n'a pas encore fini » — le troisième état d'une fin de service",
+   "source": "Zeus 11/08",
+   "theme": "Suivi des appels / Pastille ⏰",
+   "pourquoipas": "Devant un ticket de fin dont l'heure est passée, l'opérateur n'avait que deux gestes, tous les deux faux : cocher « ✅ Fait » — le service n'est pas terminé — ou ne rien cocher, et sa ligne passe pour un oubli d'appel alors qu'il a appelé. On SAIT où on en est, et cette connaissance n'avait nulle part où se poser : elle se perdait entre deux opérateurs. La case est sur le TICKET, dans Suivi des appels, là où l'opérateur raccroche ; le constat est daté et signé de son nom. Le résultat se lit en tête de la pastille ⏰, dans un bloc orange déplié (même forme que 📅 Sans date, b400) : ce qu'on sait ne doit pas se lire comme ce qu'on ignore. Cocher « ✅ Fait » plus tard lève l'attente. Démo jouable : ?sandbox=1&demo=finattente. Cas d'école joué en entier : 1 constat posé d'avance → bloc à 1 ; second posé à la main → 2 ; pointage → 1 ; et la coche posée depuis la pastille se lit sur le ticket (une seule vérité, deux vues).",
+   "demo": "?sandbox=1&demo=finattente",
+   "local": true
+  },
+  {
+   "b": 407,
+   "titre": "Une notification par catégorie, plus une par demande",
+   "source": "Zeus 10/08 (capture : 3 d'un coup) · délai choisi le 11/08 : 2 min",
+   "theme": "Notifications",
+   "pourquoipas": "Deux causes. Chaque alerte fabriquait SA notification, étiquetée `catégorie:identifiant` : trois étiquettes = trois notifications qui s'EMPILENT — elles étaient déjà toutes là, en fermer une découvrait la suivante. Et aucun plafond : `notifCanFire()` ne testait que « activées » et « autorisées », avec un scan déclenché depuis dix endroits. L'étiquette devient la CATÉGORIE SEULE : la nouvelle remplace la précédente, il y a toujours UNE seule chose à fermer, et son compteur est juste. Elle porte le compte et les noms. Un délai de silence par catégorie (2 min, réglable dans le panneau 🔔) : pendant ce délai une alerte de plus met le compteur à jour EN PLACE sans re-sonner. Banc `tmp/banc_b407.js` : 5 alertes en 2 min 30 → 3 notifications d'une seule étiquette, 2 sons au lieu de 5 ; la 4e arrive en silence, la 5e resonne le délai écoulé.",
    "local": true
   }
  ],
