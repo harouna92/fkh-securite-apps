@@ -14,6 +14,17 @@ h1{font-size:19px;margin:0 0 2px}.sub{font-size:12px;color:#8b98a5;margin:0 0 16
 .back{font-family:inherit;font-size:13px;font-weight:700;background:#7c93ff;color:#0b0e13;border:none;border-radius:8px;padding:8px 14px;cursor:pointer}
 #vttl{font-size:14px;font-weight:700}
 #vframe{flex:1;border:0;width:100%;background:#0e1116}
+/* bouton Signaler + formulaire */
+#sig-btn{margin-left:auto;font-family:inherit;font-size:12.5px;font-weight:700;background:#12241a;color:#8ef0b6;border:1px solid #2f6b46;border-radius:9px;padding:8px 13px;cursor:pointer}
+#sig-btn:hover{background:#173123}
+#sig-panel{position:fixed;right:14px;bottom:14px;width:340px;max-width:calc(100% - 28px);background:#0e1116;border:1px solid #2f6b46;border-radius:14px;padding:14px;z-index:9;display:none;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+#sig-panel h3{margin:0 0 2px;font-size:14px}#sig-panel .h{font-size:11px;color:#8b98a5;margin-bottom:10px}
+#sig-panel label{display:block;font-size:11px;color:#9aa7b4;margin:8px 0 3px}
+#sig-panel input,#sig-panel textarea,#sig-panel select{width:100%;background:#0b0f15;border:1px solid #2a313c;color:#e6edf3;border-radius:8px;padding:8px;font-family:inherit;font-size:13px}
+#sig-panel .row{display:flex;gap:8px;margin-top:12px}
+#sig-panel .send{flex:1;background:#12241a;color:#8ef0b6;border:1px solid #2f6b46;border-radius:8px;padding:9px;font-weight:700;cursor:pointer;font-family:inherit}
+#sig-panel .cancel{background:transparent;color:#9aa7b4;border:1px solid #2a313c;border-radius:8px;padding:9px 12px;cursor:pointer;font-family:inherit}
+#sig-ok{color:#8ef0b6;font-size:12px;margin-top:8px;min-height:15px}
 </style></head>
 <body>
 <div class="wrap">
@@ -22,9 +33,33 @@ h1{font-size:19px;margin:0 0 2px}.sub{font-size:12px;color:#8b98a5;margin:0 0 16
  <div class="dgrid" id="grid"></div>
 </div>
 <div id="viewer">
- <div id="vtop"><button class="back" onclick="closeDom()">← Domaines</button><span id="vttl"></span></div>
+ <div id="vtop">
+   <button class="back" onclick="closeDom()">← Domaines</button>
+   <span id="vttl"></span>
+   <button id="sig-btn" onclick="openSig()">🎫 Signaler</button>
+ </div>
  <iframe id="vframe" title="cockpit"></iframe>
 </div>
+
+<!-- formulaire de signalement -> crée un vrai ticket via le pont (index.html) -->
+<div id="sig-panel">
+ <h3>🎫 Signaler au responsable</h3>
+ <div class="h" id="sig-ctx"></div>
+ <label>Objet</label>
+ <input id="sig-objet" maxlength="120" placeholder="Ex : Titre de séjour manquant — agent X">
+ <label>Détail</label>
+ <textarea id="sig-msg" rows="3" maxlength="600" placeholder="Décris ce qui manque / ce qu'il faut faire…"></textarea>
+ <label>Destinataire</label>
+ <select id="sig-pour">
+  <option value="superviseur">Superviseur</option>
+  <option value="admin">Administrateur</option>
+  <option value="operateur">Opérateur</option>
+  <option value="superadmin">Super-admin</option>
+ </select>
+ <div class="row"><button class="send" onclick="sendSig()">Envoyer</button><button class="cancel" onclick="closeSig()">Annuler</button></div>
+ <div id="sig-ok"></div>
+</div>
+
 <script>
 var DOMS=[
  {k:"FKH",   e:"🧭", c:"#7c93ff", t:"Cockpit complet · 31+ vues live", f:"APPLI_FKH.html"},
@@ -32,6 +67,7 @@ var DOMS=[
  {k:"DAHLIA",e:"🌸", c:"#f0abfc", t:"RSI · reconstruction CA", f:"APPLI_DAHLIA.html"},
  {k:"PERSO", e:"🧑", c:"#34d399", t:"Dépenses · santé · juridique", f:"APPLI_PERSO.html"}
 ];
+var curDom=null;
 var grid=document.getElementById('grid');
 DOMS.forEach(function(d){
  var el=document.createElement('div');
@@ -41,13 +77,45 @@ DOMS.forEach(function(d){
  grid.appendChild(el);
 });
 function openDom(d){
+ curDom=d;
  document.getElementById('vttl').innerHTML='<span style="color:'+d.c+'">'+d.e+' '+d.k+'</span>';
  document.getElementById('vframe').src=d.f;
  document.getElementById('viewer').style.display='flex';
 }
 function closeDom(){
+ closeSig();
  document.getElementById('viewer').style.display='none';
  document.getElementById('vframe').src='about:blank';
+ curDom=null;
+}
+/* --- Signalement : crée un vrai ticket via le pont posé dans index.html --- */
+function openSig(){
+ if(!curDom)return;
+ document.getElementById('sig-ctx').textContent='Domaine : '+curDom.k+' — crée un ticket adressé à un responsable.';
+ document.getElementById('sig-ok').textContent='';
+ document.getElementById('sig-panel').style.display='block';
+ document.getElementById('sig-objet').focus();
+}
+function closeSig(){ document.getElementById('sig-panel').style.display='none'; }
+function sendSig(){
+ var objet=(document.getElementById('sig-objet').value||'').trim();
+ if(!objet){ document.getElementById('sig-ok').textContent='⚠️ Mets au moins un objet.'; return; }
+ var msg=(document.getElementById('sig-msg').value||'').trim();
+ var pour=document.getElementById('sig-pour').value;
+ var k=curDom?curDom.k:'Domaines';
+ var payload={
+   objet: objet,
+   message: msg,
+   pour: pour,
+   source: '🌐 Domaines · '+k,
+   contexte: ['Cockpit '+k],
+   ref: k+':'+objet.slice(0,40)
+ };
+ // le pont vit dans index.html = parent direct de ce hub
+ try{ parent.postMessage({fkh:1, action:'ticket.create', payload:payload}, location.origin); }catch(e){}
+ document.getElementById('sig-ok').textContent='✅ Ticket envoyé au '+pour+'.';
+ document.getElementById('sig-objet').value=''; document.getElementById('sig-msg').value='';
+ setTimeout(closeSig, 1200);
 }
 </script>
 </body></html>
