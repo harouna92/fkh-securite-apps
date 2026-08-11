@@ -1233,13 +1233,21 @@
    "theme": "Domaines",
    "pourquoipas": "Deux sessions travaillaient le même fichier et se marchaient dessus — le dossier gestion/domaines/ avait déjà sauté une fois lors d'un reset. Domaines vit désormais dans ses propres fichiers (hub.html + les 4 applis FKH/GARIS/DAHLIA/PERSO) et index.html se contente de l'ouvrir : deux div remplacés par une iframe. La section peut évoluer sans qu'on rouvre index.html, et l'inverse. Vérifié : l'iframe charge bien le hub (« 🌐 Domaines — Choisis un domaine pour ouvrir son cockpit complet »). renderCockpitFKH et les CFKH_* deviennent inactifs, laissés en place pour ce build — les retirer est un autre geste. Non-régression b407→b408 : Planning identique, Fiche agent identique, aucun badge ne bouge.",
    "local": true
+  },
+  {
+   "b": 409,
+   "titre": "🧹 Doublons : les tuiles se cliquent, et le bouton en masse cesse d'être dangereux",
+   "source": "Zeus 11/08 : « les vues ne sont pas cliquables »",
+   "theme": "Doublons",
+   "pourquoipas": "En allant rendre les tuiles cliquables, j'ai trouvé pire. Le bouton « Nettoyer les N paires sans perte » — celui que je lui avais dit de cliquer — aurait retiré ONZE paires dont les deux lignes n'ont pas le même horaire. Dont Duc Chailley du 15/08 : 20:00→08:00 ET 08:00→20:00, deux agents affectés. Un service de jour et un service de nuit, pas une copie. « Sans perte » ne regarde que les POINTAGES, jamais les horaires. Ces paires ont maintenant leur tuile ⚠️ en tête, sont ÉCARTÉES du nettoyage en masse (le bouton passe de 52 à 46 paires) et se traitent une par une : aucune règle automatique ne sait séparer « fin réajustée de 15 min » de « jour + nuit ». Et les quatre tuiles filtrent la liste — avec 65 paires, une liste unique ne se lit pas. Vérifié en bac à sable : 65 → 13 → 6 → 65 au clic.",
+   "local": true
   }
  ],
  "attente": [
   {
-   "titre": "📥 Import CSV : la vraie usine à doublons — 49 sur 54",
+   "titre": "📥 Import CSV : le garde-fou existe DÉJÀ (b357) — le stock est historique",
    "source": "mesuré le 11/08 sur la base réelle",
-   "note": "Réponse chiffrée à « qu'est-ce qui provoque ces doublons ». Sur les 60 grappes de 🧹 Doublons : 54 sont import+import, 109 lignes sur 122 portent src=import ; le mail n'en explique que 4 (et sa cause est fermée depuis b401). Surtout : 49 des 54 viennent de DEUX IMPORTS FAITS À DES JOURS DIFFÉRENTS — le plus gros bloc est « import du 26/07 + import du 04/08 → 32 doublons ». Seulement 3 viennent d'un même import. Et 55 grappes sur 60 ont la MÊME heure des deux côtés : ce sont des copies exactes, pas des variantes. Conclusion : la dédup par Référence ne franchit pas la frontière entre deux imports — recharger un CSV qui recouvre une période déjà importée recrée tout. À TRANCHER : refuser à l'import une Référence déjà présente (et signaler ce qui a changé plutôt que de créer une seconde ligne). Se recoupe avec les deux décisions déjà en file sur l'import CSV."
+   "note": "Correction de mon analyse d'hier. Les 54 doublons d'import viennent tous d'imports faits entre le 26/07 et le 05/08 (le plus gros bloc : « import du 26/07 + import du 04/08 → 32 »). Or le garde-fou par Référence à l'import (vacDejaLa, b357) date du 06/08. J'ai cru voir un doublon créé le 10/08 (réf aXn7i9r8) : c'est faux — son `pris` est du 26/07, seuls `creeAt` et `valide` ont été réécrits le 10/08 quand un agent a été affecté (b304 réestampille `valide`). MESURE : ZÉRO doublon d'import créé depuis le 06/08. Rien à construire pour le cas de la Référence : c'est un stock historique, à nettoyer une fois. Restent les DEUX trous déjà en file (quasi-doublons même site/date/horaires différents, et reprise de l'affectation quand le CSV apporte un agent) — eux ne sont pas couverts par b357. ⚠️ DANGER AU NETTOYAGE : 13 paires ont des horaires différents, dont 2 qui sont DEUX VRAIS SERVICES portant la même Référence — Duc Chailley 15/08 (20:00→08:00 ET 08:00→20:00, deux agents) et Épicerie chez Sandra 09/08 (22:00→11:00 ET 12:30→22:00). Les nettoyer supprimerait une vacation réelle."
   },
   {
    "titre": "🔚 Un ticket coché par une PHOTO quitte la file de l'opératrice sans qu'elle le sache",

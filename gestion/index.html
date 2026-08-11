@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v11-08·b408</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v11-08·b409</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3137,12 +3137,24 @@ button.big:active{transform:translateY(1px)}
     if(typeof saveSuivi==='function')saveSuivi(); else { save('fkh_suivi',SUIVI); if(typeof cloudPush==='function')cloudPush('fkh_suivi'); }
     renderDoublons(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
   }
+  var DBL_VUE='tout';   /* b409 : la famille affichée */
   function renderDoublons(){
     var box=byId('dbl-body'); if(!box)return;
     if(typeof isSuperAdmin==='function'&&!isSuperAdmin()){ box.innerHTML='<div class="card"><div class="sub" style="margin:0">Réservé au super-administrateur.</div></div>'; return; }
     var G=dblGroupes();
-    var sansPerte=G.filter(function(g){ return !g.aFusionner; });
-    var aFus=G.filter(function(g){ return g.aFusionner; });
+    /* ===== b409 : « SANS PERTE » NE REGARDAIT QUE LES POINTAGES =====
+       Deux lignes peuvent ne rien porter et n'être pas des copies pour autant. Mesuré le 11/08 :
+       onze paires « sans perte » ont des horaires différents, dont Duc Chailley du 15/08 —
+       20:00→08:00 ET 08:00→20:00, deux agents affectés. Un jour et une nuit, pas un doublon.
+       Le bouton en masse en aurait supprimé une sans rien demander. Aucune règle automatique ne
+       sait séparer « fin réajustée de 15 min » de « jour + nuit » : celles-là se voient à l'œil. */
+    function dblHoraireDiff(g){ var v={}, n0=0;
+      [g.garde].concat(g.jeter.map(function(l){return l.m;})).forEach(function(m){
+        var k=(m.mheure||'')+'>'+(m.mfin||''); if(!v[k]){v[k]=1;n0++;} });
+      return n0>1; }
+    var aVoir=G.filter(dblHoraireDiff);
+    var sansPerte=G.filter(function(g){ return !g.aFusionner&&!dblHoraireDiff(g); });
+    var aFus=G.filter(function(g){ return g.aFusionner&&!dblHoraireDiff(g); });
     var nJeter=G.reduce(function(a,g){ return a+g.jeter.length; },0);
     var faits=(typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){ return m&&m.deleted&&m.dblDe; });
     function ag(m){ try{ var a=m.agentId?faById(m.agentId):null; return (a&&a.nom)||''; }catch(e){ return ''; } }
@@ -3163,17 +3175,28 @@ button.big:active{transform:translateY(1px)}
       h+='<div class="acts" style="margin-top:6px"><button type="button" class="dbl-go ok" data-ref="'+esc(g.ref)+'" style="font-size:12px">🧹 Nettoyer cette paire</button></div></div>';
       return h;
     }
+    /* b409 : une tuile = un filtre ; celle qui est active se voit. */
+    function _dblT(v,nb,titre,sous,coul){ var on=(DBL_VUE===v);
+      return '<div class="pp-tile dbl-t" data-dv="'+v+'" style="cursor:pointer'+(coul?(';border-color:'+coul):'')+(on?';outline:2px solid #6ea8fe;outline-offset:-2px':'')+'"><b>'+nb+'</b>'+titre
+        +'<br><span class="sub" style="margin:0;font-size:11.5px">'+sous+'</span></div>'; }
     var h='<div class="card"><div style="display:flex;gap:10px;flex-wrap:wrap">'
-      +'<div class="pp-tile" style="cursor:default"><b>'+nJeter+'</b>vacations en trop<br><span class="sub" style="margin:0;font-size:11.5px">'+G.length+' Référence(s) en double</span></div>'
-      +'<div class="pp-tile" style="cursor:default;border-color:var(--ok)"><b>'+sansPerte.length+'</b>✅ Sans perte<br><span class="sub" style="margin:0;font-size:11.5px">rien à reporter</span></div>'
-      +'<div class="pp-tile" style="cursor:default;border-color:#e0a13b"><b>'+aFus.length+'</b>🔀 À reporter d’abord<br><span class="sub" style="margin:0;font-size:11.5px">des pointages n’existent que sur la copie</span></div>'
+      /* b409 : de vrais filtres. Avec 54 paires, une liste unique ne se lit pas. */
+      +_dblT('tout',nJeter,'vacations en trop',G.length+' Référence(s) en double','')
+      +_dblT('sansperte',sansPerte.length,'✅ Sans perte','rien à reporter · nettoyage en masse possible','var(--ok)')
+      +_dblT('areporter',aFus.length,'🔀 À reporter d’abord','des pointages n’existent que sur la copie','#e0a13b')
+      +(aVoir.length?_dblT('avoir',aVoir.length,'⚠️ Horaires différents','à regarder à l’œil — <b>pas forcément des copies</b>','#e5322d'):'')
       +'</div>';
     if(sansPerte.length)h+='<div class="acts" style="margin-top:10px"><button type="button" id="dbl-tout" class="ok" style="font-size:13px">🧹 Nettoyer les '+sansPerte.length+' paires sans perte</button></div>';
     h+='<p class="sub" style="margin:8px 0 0;font-size:11.5px">Rien n’est détruit : la copie est retirée du Planning et de Suivi des appels, et se rétablit ici même.</p></div>';
-    if(aFus.length){ h+='<div class="lab" style="margin:14px 0 5px">🔀 À reporter d’abord ('+aFus.length+')</div>'
+    /* b409 : la famille qui demande un œil humain passe devant, et chaque tuile filtre. */
+    var _vu=function(v){ return DBL_VUE==='tout'||DBL_VUE===v; };
+    if(aVoir.length&&_vu('avoir')){ h+='<div class="lab" style="margin:14px 0 5px">⚠️ Horaires différents ('+aVoir.length+')</div>'
+      +'<p class="sub" style="margin:0 0 7px;font-size:11.5px">Les deux lignes ne couvrent <b>pas le même créneau</b>. Le plus souvent c’est une heure de fin réajustée — mais parfois ce sont <b>deux vrais services</b> (un jour et une nuit) qui portent la même Référence. <b>Elles sont écartées du nettoyage en masse</b> : regarde les horaires avant de retirer quoi que ce soit.</p>'
+      +aVoir.map(ligne).join(''); }
+    if(aFus.length&&_vu('areporter')){ h+='<div class="lab" style="margin:14px 0 5px">🔀 À reporter d’abord ('+aFus.length+')</div>'
       +'<p class="sub" style="margin:0 0 7px;font-size:11.5px">Ces copies portent des pointages que celle qu’on garde n’a pas. Le nettoyage les reporte sur le contrôle équivalent — l’anti-collision décale les heures d’une copie à l’autre.</p>'
       +aFus.map(ligne).join(''); }
-    if(sansPerte.length){ h+='<div class="lab" style="margin:14px 0 5px">✅ Sans perte ('+sansPerte.length+')</div>'+sansPerte.map(ligne).join(''); }
+    if(sansPerte.length&&_vu('sansperte')){ h+='<div class="lab" style="margin:14px 0 5px">✅ Sans perte ('+sansPerte.length+')</div>'+sansPerte.map(ligne).join(''); }
     if(!G.length)h+='<div class="card"><div class="sub" style="margin:0">✅ Aucune Référence en double. La base est propre.</div></div>';
     if(faits.length){ h+='<div class="lab" style="margin:16px 0 5px">↩️ Retirées par ce nettoyage ('+faits.length+')</div>'
       +faits.map(function(m){ var d=m.dblAt?new Date(m.dblAt):null;
@@ -3189,8 +3212,11 @@ button.big:active{transform:translateY(1px)}
         +(rep?('\n🔀 '+rep+' pointage(s) seront d’abord reportés sur la vacation gardée.'):'')
         +'\n\nRéversible : la copie se rétablit depuis cet écran.'))return;
       dblNettoyerGroupe(g); }; });
+    box.querySelectorAll('.dbl-t').forEach(function(b9){ b9.onclick=function(){ var v=b9.getAttribute('data-dv'); DBL_VUE=(DBL_VUE===v&&v!=='tout')?'tout':v; renderDoublons(); }; });   /* b409 */
     var t=byId('dbl-tout'); if(t)t.onclick=function(){
-      var L=dblGroupes().filter(function(g){ return !g.aFusionner; });
+      /* b409 : les horaires différents sont écartés du nettoyage en masse — une d'elles était
+         un service de jour et un service de nuit, pas une copie. */
+      var L=dblGroupes().filter(function(g){ return !g.aFusionner&&!dblHoraireDiff(g); });
       if(!confirm('Nettoyer '+L.length+' paire(s) sans perte ?\n\nAucun pointage n’est concerné : les copies retirées ne portent rien que la vacation gardée n’ait déjà.\n\nRéversible depuis cet écran.'))return;
       var n=0; L.forEach(function(g){ n+=dblNettoyerGroupe(g,true); });
       renderDoublons(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
