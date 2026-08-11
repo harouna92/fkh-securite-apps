@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v11-08·b410</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v11-08·b411</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -9201,6 +9201,40 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
   var TK_ETATS={a_faire:['\u23f3 À faire','#e0a13b'],en_cours:['🔄 En cours','#6ea8fe'],fait:['\u2705 Fait','#1a9e5c'],bloque:['\u26d4 Bloqué','#e5322d']};
   function tkxLoad(){ var a=load('fkh_tickets'); return Array.isArray(a)?a:[]; }
   function tkxSave(a){ save('fkh_tickets',a); }
+  /* ===== b411 : LE PONT DOMAINES -> TICKETS =====
+     Les cockpits de 🌐 Domaines vivent dans une iframe (b408). Quand l'un d'eux a besoin qu'on
+     agisse ici, il envoie un message ; on en fait un vrai ticket d'échange, celui que la section
+     🎫 sait déjà afficher, notifier et suivre.
+     LA PORTE EST FERMÉE : `postMessage` est reçu de n'importe quelle page du web. On refuse tout
+     ce qui ne vient pas de notre propre origine — sans ça, n'importe quel site ouvrant l'appli
+     écrirait dans les tickets de production. Le reste est borné : textes coupés, rôle vérifié.
+     Ce que le cockpit envoie :
+       {fkh:1, action:'ticket.create', payload:{objet, message, contexte, source, ref, pour}} */
+  (function(){
+    if(window.__pontDomaines)return; window.__pontDomaines=1;
+    var ROLES={superviseur:1,admin:1,operateur:1,superadmin:1};
+    function cut(v,n){ return String(v==null?'':v).slice(0,n); }
+    window.addEventListener('message',function(e){
+      if(e.origin!==location.origin)return;                    /* b411 : la porte */
+      var d=e.data||{}; if(d.fkh!==1||d.action!=='ticket.create')return;
+      var p=d.payload||{};
+      var objet=cut(p.objet||p.titre,120).trim(); if(!objet)return;   /* un ticket sans objet n'existe pas */
+      var pour=ROLES[String(p.pour||'')]?String(p.pour):'admin';
+      var ctx=[]; if(p.ref)ctx.push('\ud83d\udd11 '+cut(p.ref,60));
+      if(p.contexte)[].concat(p.contexte).slice(0,6).forEach(function(x){ var v=cut(x,140).trim(); if(v)ctx.push(v); });
+      var moi=(typeof tkxMoi==='function')?tkxMoi():'';
+      var t={id:'tkd'+Date.now()+'_'+Math.round(Math.random()*9999),kind:'echange',
+             objet:objet,message:cut(p.message||p.detail,600).trim(),
+             contexte:ctx,source:cut(p.source,40)||'\ud83c\udf10 Domaines',
+             deUser:moi,deNom:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||'Domaines'),
+             pourRole:pour,pourUser:'',etat:'a_faire',cree:Date.now(),fil:[]};
+      try{ var arr=tkxLoad(); arr.push(t); tkxSave(arr); }catch(_e){ return; }
+      /* il doit se VOIR : la section, le badge, et la notification comme n'importe quel ticket. */
+      try{ if(typeof renderTickets==='function')renderTickets(); }catch(_e){}
+      try{ if(typeof tkxBadge==='function')tkxBadge(); }catch(_e){}
+      try{ if(typeof notifScan==='function')notifScan(); }catch(_e){}
+    });
+  })();
   /* b381 : un ecart de temps en francais lisible. « 4 min », « 2 h 10 », « 3 j 5 h ». */
   function tkxDuree(ms){
     if(!(ms>0))return '0 min';
