@@ -1257,6 +1257,14 @@
    "theme": "Tickets / Domaines",
    "pourquoipas": "Le bloc proposé par la session Domaines avait trois défauts, tous vérifiés dans le code avant d'écrire. (1) AUCUN contrôle d'origine : `postMessage` est reçu de n'importe quelle page du web, et le test `d.fkh!==1` vérifie la forme, pas l'expéditeur — n'importe quel site ouvrant l'appli aurait écrit dans les tickets de production. On refuse tout ce qui ne vient pas de notre origine. (2) Les champs n'étaient pas les bons : un seul commun avec la vraie structure. (3) Deux systèmes partagent fkh_tickets — `tk*` (tâches sur les agents, rendu via TK_TYPES[type]) et `tkx*` (échanges entre rôles) ; un ticket de cockpit est un ÉCHANGE, il va chez tkx. En plus : textes bornés, rôle destinataire vérifié contre les 4 rôles connus. Vérifié en bac à sable : message d'origine étrangère IGNORÉ (0 ticket), message légitime → ticket créé et affiché dans 🎫 (« Écart de CA sur GARIS — août · ⏳ À faire · aux administrateurs · 3 élément(s) concerné(s) »).",
    "local": true
+  },
+  {
+   "b": 412,
+   "titre": "🧍 : les cinq échéances d'abord, « Sans date » juste en dessous",
+   "source": "Zeus 11/08",
+   "theme": "Vacations non affectées",
+   "pourquoipas": "En b400 le bloc rouge était en tête parce que c'était l'urgence du jour : ces 29 vacations ne se voyaient nulle part. Maintenant qu'elles se voient, elles reprennent leur rang — la première chose à lire en ouvrant la pastille, c'est ce qui tombe dans les 24 h, pas ce qui n'a pas encore de date. Le bloc ne change ni de contenu ni de comportement (toujours déplié, 23 sites cliquables) : il descend, et sa phrase dit « ci-dessus » au lieu de « ci-dessous ». Vérifié : 24 H · 7 JOURS · RESTE À VENIR · EN COURS · PASSÉES, puis 29 Sans date ; le drill fonctionne toujours (Varennes-Vauzelles → 3 vacations). Non-régression b411→b412 : Planning, Fiche agent et Suivi des appels identiques, aucun badge ne bouge.",
+   "local": true
   }
  ],
  "attente": [
