@@ -1447,6 +1447,14 @@
    "theme": "Domaines",
    "pourquoipas": "GARIS n'était surveillé nulle part : le robot ne connaissait que FKH et PERSO, donc pas de fiches_GARIS.json. Trois dossiers ajoutés à la carte (MODE A respecté : le bloc de carnet et la vue existent depuis début août) — les factures du classement mensuel, celles rangées hors classement, et les relevés. Résultat : 20 factures lues, carnet GARIS de 19 à 63 fiches. Les relevés partaient d'abord en quarantaine (11) et le robot avait raison : le gabarit ne retenait que les débits vers GARIS ou VIGICORE, les sous-traitants de FKH, qui n'existent pas dans le relevé de GARIS. Nouveau gabarit lisant les ENTRÉES — 44 encaissements, quarantaine 11 → 3. Scan du même passage : trois relevés Indy DAHLIA (mai, juin, juillet) identifiés et rangés ; celui de mai était un doublon strict du fichier déjà présent, supprimé après comparaison d'empreinte. ÉCHEC ASSUMÉ : j'ai voulu faire entrer ces 44 encaissements dans le carnet GARIS, une fiche sur 44 portait 20 260 889 641 € — l'analyseur avait collé « 2026 » à un montant sur une ligne coupée. Bloc retiré : le cockpit garde son « 0 encaissement tracé », qui est un manque honnête, plutôt qu'un total faux. Le gabarit reste à corriger avant de rebrancher.",
    "local": true
+  },
+  {
+   "b": "d13",
+   "titre": "Les encaissements GARIS entrent — et les deux domaines se confirment",
+   "source": "Zeus 12/08 : « corrige le gabarit et rebranche les encaissements GARIS »",
+   "theme": "Domaines",
+   "pourquoipas": "Deux défauts corrigés, tous deux du même genre : un chiffre faux mais crédible. (1) La regex des montants acceptait n'importe quelle suite de chiffres séparés d'espaces : sur « Virement FACTURE GS-2026-078 5 635,98 0,00 » elle démarrait à « 2026 » et lisait 20 260 785 635,98 €. Le vrai groupement français est imposé — 1 à 3 chiffres puis des tranches de 3 — donc « 2026 » ne peut plus amorcer un montant. (2) Le dossier des relevés GARIS contient AUSSI 2025 : filtrer sur le seul mois rangeait des mouvements de septembre 2025 dans « Septembre 2026 ». On filtre désormais sur la date complète, et tout montant hors bornes est écarté plutôt qu'additionné en silence. Résultat : 44 encaissements, 558 473,17 € sur 5 mois, contreparties cohérentes (FKH, DAHLIA, I.G.S-21, ADN). CONTRÔLE CROISÉ qui vaut mieux qu'une relecture : FKH déclare avoir versé 270 037,50 € à GARIS de janvier à mai ; GARIS déclare avoir reçu de FKH 270 037 € sur les mêmes mois. Les deux carnets, construits séparément depuis deux sources différentes, tombent d'accord au centime près.",
+   "local": true
   }
  ],
  "attente": [
