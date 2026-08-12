@@ -1920,14 +1920,47 @@ nav();grid();
 <script>
 function go(p){try{sendPrompt(p)}catch(e){}}
 // nav interne retirée (2026-07-24) : la coque de l'appli navigue — plus de doublon.
-const R=[['janv',75113.38,71013.38,4100,0],['févr',35484.33,35484.33,0,0],['mars',51261.53,51261.53,0,0],['avr',57782.62,57782.62,0,0],['mai',null],['juin',null],['juil',null],['août',null],['sept',null],['oct',null],['nov',null],['déc',null]];
+/* 2026-08-12 : littéral devenu repli. La source est allocation_st (onglet
+   Allocation_ST_2026), transporté par le carnet depuis d19 : montant alloué par
+   mois de PRESTATION, viré / non viré. La note disait « mai-déc à brancher quand
+   la cascade avance » — elle avance, et personne n'y revenait. G-65. */
+let R=[['janv',75113.38,71013.38,4100,0],['févr',35484.33,35484.33,0,0],['mars',51261.53,51261.53,0,0],['avr',57782.62,57782.62,0,0],['mai',null],['juin',null],['juil',null],['août',null],['sept',null],['oct',null],['nov',null],['déc',null]];
 const f=n=>n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2});
+function rendR(){
 let h='',tCA=0,tG=0,tV=0;
-R.forEach(r=>{if(r[1]===null){h+='<tr class=&quot;fut&quot;><td class=&quot;mo&quot;>'+r[0]+'-26</td><td>à venir</td><td>—</td><td>—</td><td>—</td></tr>';return;}tCA+=r[1];tG+=r[2];tV+=r[3];h+='<tr><td class=&quot;mo&quot;>'+r[0]+'-26</td><td>'+f(r[1])+'</td><td>'+f(r[2])+'</td><td>'+(r[3]?f(r[3]):'—')+'</td><td class=&quot;na0&quot;>0,00 ✓</td></tr>';});
-h+='<tr class=&quot;tot&quot;><td class=&quot;mo&quot;>Total janv-avr</td><td>'+f(tCA)+'</td><td>'+f(tG)+'</td><td>'+f(tV)+'</td><td class=&quot;na0&quot;>0,00 ✓</td></tr>';
+R.forEach(r=>{if(r[1]===null){h+='<tr class=&quot;fut&quot;><td class=&quot;mo&quot;>'+r[0]+'-26</td><td>à venir</td><td>—</td><td>—</td><td>—</td></tr>';return;}tCA+=r[1];tG+=r[2];tV+=r[3];h+='<tr><td class=&quot;mo&quot;>'+r[0]+'-26</td><td>'+f(r[1])+'</td><td>'+f(r[2])+'</td><td>'+(r[3]?f(r[3]):'—')+'</td><td'+((r[4]||0)>0?' style=&quot;color:#fbbf24;font-weight:600&quot;>'+f(r[4]):' class=&quot;na0&quot;>0,00 ✓')+'</td></tr>';});
+var tN=R.reduce(function(a,r){return a+((r[1]!==null&amp;&amp;r[4])?r[4]:0);},0);
+h+='<tr class=&quot;tot&quot;><td class=&quot;mo&quot;>Total</td><td>'+f(tCA)+'</td><td>'+f(tG)+'</td><td>'+f(tV)+'</td><td class=&quot;na0&quot;>'+(tN>0?f(tN):'0,00 ✓')+'</td></tr>';
 document.getElementById('rows').innerHTML=h;
+}
+rendR();
 document.querySelectorAll('.act').forEach(b=>b.onclick=()=>go(b.dataset.p));
 document.getElementById('note').innerHTML='<span class=&quot;ico&quot;>ⓘ</span> Non affecté = 0 (soldé → GARIS « à virer »). mai-déc à brancher quand la cascade avance. Actions : affecter · rattacher · réaffecter/dissocier (à créer).';
+
+/* ---- branchement carnet ---- */
+const _M3={'janv':'Janvier','févr':'Février','mars':'Mars','avr':'Avril','mai':'Mai','juin':'Juin',
+ 'juil':'Juillet','août':'Août','sept':'Septembre','oct':'Octobre','nov':'Novembre','déc':'Décembre'};
+function carnetCascade(d){
+  const A=d&amp;&amp;d.allocation_st;
+  if(!A||!A.length)return false;
+  const par={};
+  A.forEach(a=>{ const p=String(a.mois_prestation).split('-'); if(p[1]!=='26')return;
+    const st=a.par_sous_traitant||{};
+    const autres=(st.VIGILENCE||0)+(st.HIS||0)+(st.GALOIS||0)+(st.DAHLIA||0);
+    const gv=a.garis_vire||0, nv=a.garis_non_vire||0;
+    const vig=Math.max(0,Math.round(((a.ca_disponible_ttc||0)-gv-nv-autres)*100)/100);
+    par[p[0]]=[a.ca_disponible_ttc||0, gv, vig, nv];
+  });
+  const ordre=['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+  const neuf=ordre.map(k=> par[k] ? [k, par[k][0], par[k][1], par[k][2], par[k][3]] : [k, null]);
+  if(!Object.keys(par).length)return false;
+  R=neuf; rendR();
+  const n=document.getElementById('note');
+  if(n)n.innerHTML='<span class=&quot;ico&quot;>ⓘ</span> Lu dans le carnet (Allocation_ST_2026), '
+    +'par mois de PRESTATION. La 5ᵉ colonne est le montant alloué à GARIS et pas encore viré.';
+  return true;
+}
+try{window.CARNET.onData(function(s){ if(s&amp;&amp;s.data) carnetCascade(s.data); });}catch(e){}
 </script>
 <script>(function(){var id=&quot;cascade&quot;;function r(){try{parent.postMessage({__id:id,__h:document.documentElement.scrollHeight||document.body.scrollHeight},&quot;*&quot;)}catch(e){}}window.addEventListener(&quot;load&quot;,function(){r();setTimeout(r,300);try{new MutationObserver(r).observe(document.body,{subtree:true,childList:true,attributes:true})}catch(e){}});document.addEventListener(&quot;click&quot;,function(){setTimeout(r,60);setTimeout(r,250)});window.addEventListener(&quot;message&quot;,function(e){if(e&amp;&amp;e.data&amp;&amp;e.data.__ask){r();setTimeout(r,150);setTimeout(r,400)}});setTimeout(r,900);setTimeout(r,1800);})();</script></body>
 </html>
