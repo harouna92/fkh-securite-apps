@@ -241,11 +241,9 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
 <div id=&quot;panel&quot;></div>
 <div id=&quot;stbox&quot;></div>
 <div class=&quot;leg&quot;><span style=&quot;color:var(--ok)&quot;>● présent / réel</span><span style=&quot;color:var(--dang)&quot;>● manquant / à faire</span><span style=&quot;color:var(--warn)&quot;>● partiel</span><span style=&quot;color:var(--tt)&quot;>— à brancher · · à venir</span><span style=&quot;color:var(--info)&quot;>▌ mois courant</span></div>
-<div style=&quot;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)&quot;><button class=&quot;eb&quot; style=&quot;background:var(--info);color:#0e1116;border:none;font-weight:600&quot; onclick=&quot;partager()&quot;><span class=&quot;ico&quot;>⇪</span> Mettre en miroir dans SUIVI_DEPOT (<span id=&quot;cnt&quot;>0</span>)</button> <button class=&quot;eb&quot; onclick=&quot;go('OUVRIR SUIVI_DEPOT FKH')&quot;><span class=&quot;ico&quot;>↗</span> Ouvrir le fichier partagé</button> <span style=&quot;font-size:11px;color:var(--tt);margin-left:8px&quot;>coche les lignes à partager (puis clique avant de changer de mois)</span></div>
+
 <script>
 function go(p){try{sendPrompt(p)}catch(e){}}
-function majCnt(){var n=document.querySelectorAll('.shchk:checked').length;var e=document.getElementById('cnt');if(e)e.textContent=n;}
-function partager(){var ls=[].slice.call(document.querySelectorAll('.shchk:checked')).map(function(c){return c.dataset.v+' · '+c.dataset.l;});go(ls.length?'MIROIR SUIVI_DEPOT : '+ls.join(' || '):'Aucune ligne cochée pour le miroir');}
 const VIEWS=[['Hub','ti-compass',0],['ÉTAT','ti-calendar-stats',1],['RADAR','ti-radar',0],['PILOTAGE','ti-chart-dots',0],['Promenade','ti-compass',0],['Cockpit dossiers','ti-folders',0]];
 const NOW=5;
 const MO=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
@@ -317,7 +315,7 @@ function lvl1(){
   const tag=r.nv?' <span style=&quot;font-size:9.5px;color:var(--info);border:1px solid #36406b;border-radius:4px;padding:0 5px;margin-left:4px&quot;>nouveau</span>':'';
   const eb=r.ech?' <span class=&quot;ico&quot; style=&quot;font-size:12px;color:var(--tt)&quot;>⏱</span>':'';
   const di=(r.frac||r.caf||r.cast||r.src||r.pay||r.do||r.ag)?' <span class=&quot;ico&quot; style=&quot;font-size:12px;color:var(--tt)&quot;>⊕</span>':'';
-  const cb=(r.caf||r.cast||r.plain||r.pay||r.do||r.ag)?'':'<input type=&quot;checkbox&quot; class=&quot;shchk&quot; data-l=&quot;'+r.k.replace(/&quot;/g,'&amp;quot;')+'&quot; data-v=&quot;ÉTAT&quot; onchange=&quot;majCnt()&quot; style=&quot;width:13px;height:13px;margin-right:4px;vertical-align:middle;accent-color:var(--info)&quot;>';
+  const cb=(r.caf||r.cast||r.plain||r.pay||r.do||r.ag)?'':'';
   return '<tr class=&quot;g'+gi+'&quot;><td class=&quot;rk&quot;>'+cb+'<span style=&quot;color:'+dot(r)+';font-size:9px&quot;>●</span> '+r.k+tag+eb+di+'</td>'+cells+'</tr>';
  }).join('');
  document.getElementById('lvl1').innerHTML=h+'</table>';
