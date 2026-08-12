@@ -1,7 +1,7 @@
 {
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-12 23:24",
+  "lu_le": "2026-08-12 23:39",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
@@ -308,6 +308,227 @@
   "dette_tva_note": "DOUBLON confirmé 03/07 (majoration réelle 217 €), payée 07/07 ; mainlevée SATD OLINDA à confirmer",
   "contentieux": "JEX Reims ×2 (RG 25/00045 + 25/00044, saisie SHINE) ouverts",
   "regularisation_tva_2025": {
+   "mensuel": [
+    {
+     "mois": "2025-01",
+     "ca_encaisse_ttc": 4000.0,
+     "tva_collectee": 666.67,
+     "achats_deductibles": 6528.5,
+     "tva_deductible": 1088.08,
+     "tva_nette_mois": -421.41,
+     "tva_nette_cumulee": -421.41
+    },
+    {
+     "mois": "2025-02",
+     "ca_encaisse_ttc": 11230.91,
+     "tva_collectee": 1871.82,
+     "achats_deductibles": 6842.2,
+     "tva_deductible": 1140.37,
+     "tva_nette_mois": 731.45,
+     "tva_nette_cumulee": 310.04
+    },
+    {
+     "mois": "2025-03",
+     "ca_encaisse_ttc": 6286.38,
+     "tva_collectee": 1047.73,
+     "achats_deductibles": 3645.3,
+     "tva_deductible": 607.55,
+     "tva_nette_mois": 440.18,
+     "tva_nette_cumulee": 750.22
+    },
+    {
+     "mois": "2025-04",
+     "ca_encaisse_ttc": 3607.4,
+     "tva_collectee": 601.23,
+     "achats_deductibles": 720.99,
+     "tva_deductible": 120.17,
+     "tva_nette_mois": 481.06,
+     "tva_nette_cumulee": 1231.28
+    },
+    {
+     "mois": "2025-05",
+     "ca_encaisse_ttc": 2000.0,
+     "tva_collectee": 333.33,
+     "achats_deductibles": 94.8,
+     "tva_deductible": 15.8,
+     "tva_nette_mois": 317.53,
+     "tva_nette_cumulee": 1548.81
+    },
+    {
+     "mois": "2025-06",
+     "ca_encaisse_ttc": 8205.25,
+     "tva_collectee": 1367.54,
+     "achats_deductibles": 5733.44,
+     "tva_deductible": 955.57,
+     "tva_nette_mois": 411.97,
+     "tva_nette_cumulee": 1960.78
+    },
+    {
+     "mois": "2025-07",
+     "ca_encaisse_ttc": 7180.6,
+     "tva_collectee": 1196.77,
+     "achats_deductibles": 5711.52,
+     "tva_deductible": 951.92,
+     "tva_nette_mois": 244.85,
+     "tva_nette_cumulee": 2205.63
+    },
+    {
+     "mois": "2025-08",
+     "ca_encaisse_ttc": 128854.25,
+     "tva_collectee": 21475.71,
+     "achats_deductibles": 69330.53,
+     "tva_deductible": 11555.09,
+     "tva_nette_mois": 9920.62,
+     "tva_nette_cumulee": 12126.25
+    },
+    {
+     "mois": "2025-09",
+     "ca_encaisse_ttc": 157908.2,
+     "tva_collectee": 26318.03,
+     "achats_deductibles": 144111.49,
+     "tva_deductible": 24018.58,
+     "tva_nette_mois": 2299.45,
+     "tva_nette_cumulee": 14425.7
+    },
+    {
+     "mois": "2025-10",
+     "ca_encaisse_ttc": 108101.6,
+     "tva_collectee": 18016.93,
+     "achats_deductibles": 82103.3,
+     "tva_deductible": 13683.88,
+     "tva_nette_mois": 4333.05,
+     "tva_nette_cumulee": 18758.75
+    },
+    {
+     "mois": "2025-11",
+     "ca_encaisse_ttc": 80142.6,
+     "tva_collectee": 13357.1,
+     "achats_deductibles": 81950.71,
+     "tva_deductible": 13658.45,
+     "tva_nette_mois": -301.35,
+     "tva_nette_cumulee": 18457.4
+    },
+    {
+     "mois": "2025-12",
+     "ca_encaisse_ttc": 60757.4,
+     "tva_collectee": 10126.23,
+     "achats_deductibles": 60712.83,
+     "tva_deductible": 10118.81,
+     "tva_nette_mois": 7.42,
+     "tva_nette_cumulee": 18464.82
+    },
+    {
+     "mois": "2026-05",
+     "ca_encaisse_ttc": 0.0,
+     "tva_collectee": 10.51,
+     "achats_deductibles": 10544.83,
+     "tva_deductible": 1759.04,
+     "tva_nette_mois": -1748.53,
+     "tva_nette_cumulee": -1748.53
+    }
+   ],
+   "fournisseurs": [
+    {
+     "date_virement": "2026-05-07",
+     "mois_facture": "Avril 2026",
+     "fournisseur": "SAMBROU INTERNATIONAL",
+     "facture": "SBR-2026-001",
+     "designation": "Fourniture de matériels et équipements",
+     "ht": 8297.18,
+     "tva": 1659.44,
+     "ttc": 9956.62
+    },
+    {
+     "date_virement": "2026-05-21",
+     "mois_facture": "Mai 2026",
+     "fournisseur": "KANDBAZ",
+     "facture": "FZ-670762",
+     "designation": "Domiciliation + numérisation courrier — Mai 2026",
+     "ht": 46.0,
+     "tva": 9.2,
+     "ttc": 55.2
+    },
+    {
+     "date_virement": "2026-05-27",
+     "mois_facture": "Mai 2026",
+     "fournisseur": "VET SECURITE SAS",
+     "facture": "VEN/2026/71027",
+     "designation": "Équipement (tenues, rangers, ceinturons)",
+     "ht": 219.95,
+     "tva": 43.99,
+     "ttc": 263.94
+    },
+    {
+     "date_virement": "2026-05-19",
+     "mois_facture": "Mai 2026",
+     "fournisseur": "TELEDEC (LPI CONSEIL)",
+     "facture": "T334810",
+     "designation": "Télédéclaration liasse fiscale 2025",
+     "ht": 99.0,
+     "tva": 19.8,
+     "ttc": 118.8
+    },
+    {
+     "date_virement": "2026-05-27",
+     "mois_facture": "Mai 2026",
+     "fournisseur": "StackBlitz Inc (US)",
+     "facture": "KJRFWTWB-0002",
+     "designation": "Abonnement Pro — autoliquidation TVA",
+     "ht": 21.5,
+     "tva": 4.3,
+     "ttc": 21.5
+    },
+    {
+     "date_virement": "2026-05-21",
+     "mois_facture": "Mai 2026",
+     "fournisseur": "Appest Ltd (US)",
+     "facture": "2026050659",
+     "designation": "TickTick Premium annuel — autoliquidation TVA",
+     "ht": 31.05,
+     "tva": 6.21,
+     "ttc": 31.05
+    },
+    {
+     "date_virement": "2026-05-20",
+     "mois_facture": "Mai 2026",
+     "fournisseur": "Indy (Georges SAS)",
+     "facture": "(à fournir)",
+     "designation": "Abonnement logiciel comptable",
+     "ht": 59.0,
+     "tva": 11.8,
+     "ttc": 70.8
+    },
+    {
+     "date_virement": "2026-05-24",
+     "mois_facture": "Mai 2026",
+     "fournisseur": "Lyca Mobile",
+     "facture": "(à fournir)",
+     "designation": "Forfait télécom",
+     "ht": 8.32,
+     "tva": 1.67,
+     "ttc": 9.99
+    },
+    {
+     "date_virement": "2026-05-27",
+     "mois_facture": "Mai 2026",
+     "fournisseur": "Onoff",
+     "facture": "(à fournir)",
+     "designation": "Téléphonie (2 lignes)",
+     "ht": 11.98,
+     "tva": 2.4,
+     "ttc": 14.38
+    },
+    {
+     "date_virement": "2026-05-31",
+     "mois_facture": "Mai 2026",
+     "fournisseur": "Navigo / IDFM",
+     "facture": "(à fournir)",
+     "designation": "Transport voyageurs (TVA 10 %)",
+     "ht": 2.32,
+     "tva": 0.23,
+     "ttc": 2.55
+    }
+   ],
    "tva_nette_2025_eur": 18464.82,
    "avoir_fkh_eur": -3333.33,
    "tva_nette_due_eur": 15131.49,

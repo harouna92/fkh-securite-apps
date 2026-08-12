@@ -1,7 +1,20 @@
 {
+ "charges_fournisseurs": [
+  {
+   "facture": "PRO-2603-031",
+   "date_emission": "31/03/2026",
+   "fournisseur": "Pro Rénovation",
+   "type": "Fournisseur",
+   "designation": "Prestations de services — Mars 2026",
+   "ht": 10266.67,
+   "taux": 0.2,
+   "tva": 2053.33,
+   "ttc": 12320.0
+  }
+ ],
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-12 23:24",
+  "lu_le": "2026-08-12 23:39",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
