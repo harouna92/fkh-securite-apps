@@ -1,0 +1,728 @@
+{
+ "domaine": "FKH",
+ "genere_par": "SCRIPTS/build_data_fkh.py",
+ "source": "maître TB2026_v23 · onglets BASE_Factures (1925 lignes) + Cascade_ST_2026 + BASE_Paie",
+ "methode": "recompute depuis les données brutes — les onglets d'agrégats du maître n'ont pas de valeur en cache (G-34)",
+ "avertissement": "CA client + cascade ST (facturé) + virements ST (payé, cat. Sous-traitant) + masse salariale + reste à payer salaires (par agent). Le rapprochement bancaire des AUTRES natures (fournisseurs, fiscal) N'EST PAS encore recomputé.",
+ "ca_client_2026": [
+  {
+   "mois": "Janvier 2026",
+   "ca_brut_ht": 73692.87,
+   "avoirs_ht": -10426.61,
+   "ca_net_ht": 63266.26,
+   "ca_net_ttc": 75919.51,
+   "nb_factures": 108,
+   "nb_avoirs": 5,
+   "nb_documents": 14
+  },
+  {
+   "mois": "Février 2026",
+   "ca_brut_ht": 50907.07,
+   "avoirs_ht": -797.8,
+   "ca_net_ht": 50109.27,
+   "ca_net_ttc": 60131.13,
+   "nb_factures": 95,
+   "nb_avoirs": 3,
+   "nb_documents": 14
+  },
+  {
+   "mois": "Mars 2026",
+   "ca_brut_ht": 46738.66,
+   "avoirs_ht": -411.3,
+   "ca_net_ht": 46327.36,
+   "ca_net_ttc": 55592.83,
+   "nb_factures": 97,
+   "nb_avoirs": 2,
+   "nb_documents": 11
+  },
+  {
+   "mois": "Avril 2026",
+   "ca_brut_ht": 65301.03,
+   "avoirs_ht": -11319.68,
+   "ca_net_ht": 53981.35,
+   "ca_net_ttc": 64777.62,
+   "nb_factures": 106,
+   "nb_avoirs": 4,
+   "nb_documents": 14
+  },
+  {
+   "mois": "Mai 2026",
+   "ca_brut_ht": 68830.53,
+   "avoirs_ht": -300.32,
+   "ca_net_ht": 68530.21,
+   "ca_net_ttc": 82236.25,
+   "nb_factures": 104,
+   "nb_avoirs": 1,
+   "nb_documents": 7
+  },
+  {
+   "mois": "Juin 2026",
+   "ca_net_ht": 31862.32,
+   "ca_net_ttc": 38234.78,
+   "nb_factures": 4,
+   "nb_avoirs": 0,
+   "nb_documents": 4,
+   "source": "👁️ surveillant — pièces rangées dans le dossier, PAS ENCORE saisies au maître TB2026",
+   "a_saisir_au_maitre": true
+  },
+  {
+   "mois": "Juillet 2026",
+   "ca_net_ht": 58806.72,
+   "ca_net_ttc": 70568.06,
+   "nb_factures": 5,
+   "nb_avoirs": 0,
+   "nb_documents": 5,
+   "source": "👁️ surveillant — pièces rangées dans le dossier, PAS ENCORE saisies au maître TB2026",
+   "a_saisir_au_maitre": true
+  },
+  {
+   "mois": "Août 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Septembre 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Octobre 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Novembre 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Décembre 2026",
+   "statut": "aucune donnée"
+  }
+ ],
+ "ca_par_client_2026": {
+  "Janvier 2026": [
+   {
+    "client": "SECURITAS 10017",
+    "ht": 32751.57,
+    "ttc": 39301.88
+   },
+   {
+    "client": "SECURITAS 10228",
+    "ht": 10621.04,
+    "ttc": 12745.25
+   },
+   {
+    "client": "AQUILA",
+    "ht": 5694.49,
+    "ttc": 6833.39
+   },
+   {
+    "client": "SECURITAS Retail GE 10385",
+    "ht": 5590.0,
+    "ttc": 6708.0
+   },
+   {
+    "client": "RANC DEVELOPPEMENT",
+    "ht": 4009.15,
+    "ttc": 4810.98
+   },
+   {
+    "client": "GAMBRINUS",
+    "ht": 2300.0,
+    "ttc": 2760.0
+   },
+   {
+    "client": "SAS BULLION",
+    "ht": 2300.0,
+    "ttc": 2760.0
+   }
+  ],
+  "Février 2026": [
+   {
+    "client": "SECURITAS 10228",
+    "ht": 17805.25,
+    "ttc": 21366.31
+   },
+   {
+    "client": "SECURITAS 10017",
+    "ht": 14447.57,
+    "ttc": 17337.08
+   },
+   {
+    "client": "AQUILA",
+    "ht": 4832.25,
+    "ttc": 5798.7
+   },
+   {
+    "client": "SECURITAS Retail GE 10385",
+    "ht": 4128.0,
+    "ttc": 4953.6
+   },
+   {
+    "client": "RANC DEVELOPPEMENT",
+    "ht": 3263.3,
+    "ttc": 3915.96
+   },
+   {
+    "client": "SOTEL",
+    "ht": 2365.9,
+    "ttc": 2839.08
+   },
+   {
+    "client": "GAMBRINUS",
+    "ht": 1807.5,
+    "ttc": 2169.0
+   },
+   {
+    "client": "SAS BULLION",
+    "ht": 1257.5,
+    "ttc": 1509.0
+   },
+   {
+    "client": "NEW ANGEL'S",
+    "ht": 202.0,
+    "ttc": 242.4
+   }
+  ],
+  "Mars 2026": [
+   {
+    "client": "SECURITAS 10017",
+    "ht": 16694.32,
+    "ttc": 20033.18
+   },
+   {
+    "client": "SECURITAS 10228",
+    "ht": 16558.14,
+    "ttc": 19869.77
+   },
+   {
+    "client": "RANC DEVELOPPEMENT",
+    "ht": 4714.27,
+    "ttc": 5657.13
+   },
+   {
+    "client": "AQUILA",
+    "ht": 4610.63,
+    "ttc": 5532.75
+   },
+   {
+    "client": "GAMBRINUS",
+    "ht": 1807.5,
+    "ttc": 2169.0
+   },
+   {
+    "client": "SAS BULLION",
+    "ht": 1807.5,
+    "ttc": 2169.0
+   },
+   {
+    "client": "SOTEL",
+    "ht": 135.0,
+    "ttc": 162.0
+   }
+  ],
+  "Avril 2026": [
+   {
+    "client": "SECURITAS 10017",
+    "ht": 16946.94,
+    "ttc": 20336.33
+   },
+   {
+    "client": "SECURITAS 10228",
+    "ht": 16831.92,
+    "ttc": 20198.3
+   },
+   {
+    "client": "RANC DEVELOPPEMENT",
+    "ht": 10795.0,
+    "ttc": 12953.99
+   },
+   {
+    "client": "AQUILA",
+    "ht": 4512.74,
+    "ttc": 5415.29
+   },
+   {
+    "client": "SOTEL",
+    "ht": 3706.9,
+    "ttc": 4448.28
+   },
+   {
+    "client": "P2S",
+    "ht": 1187.85,
+    "ttc": 1425.42
+   }
+  ],
+  "Mai 2026": [
+   {
+    "client": "SECURITAS 10228",
+    "ht": 35813.66,
+    "ttc": 42976.39
+   },
+   {
+    "client": "AQUILA",
+    "ht": 11244.62,
+    "ttc": 13493.55
+   },
+   {
+    "client": "SECURITAS 10017",
+    "ht": 10707.0,
+    "ttc": 12848.4
+   },
+   {
+    "client": "RANC DEVELOPPEMENT",
+    "ht": 9120.86,
+    "ttc": 10945.03
+   },
+   {
+    "client": "SOTEL",
+    "ht": 1644.06,
+    "ttc": 1972.87
+   }
+  ]
+ },
+ "cascade_st_2026": [
+  {
+   "mois": "Janvier 2026",
+   "ca_st_theorique_ht": 61786.5,
+   "interne_heures": 213,
+   "interne_eur": 4472.8,
+   "ca_st_net_ht": 57313.71,
+   "ca_st_net_ttc": 68776.45,
+   "st_affecte": "GARIS",
+   "niveau": "heures = ttes catégories, Magasin Normal ×1 (note off.)"
+  },
+  {
+   "mois": "Février 2026",
+   "ca_st_theorique_ht": 48934.15,
+   "interne_heures": 982,
+   "interne_eur": 20621.07,
+   "ca_st_net_ht": 28313.08,
+   "ca_st_net_ttc": 33975.7,
+   "st_affecte": "GARIS",
+   "niveau": "heures = ttes catégories, Magasin Normal ×1 (note off.)"
+  },
+  {
+   "mois": "Mars 2026",
+   "ca_st_theorique_ht": 45238.47,
+   "interne_heures": 158,
+   "interne_eur": 3317.85,
+   "ca_st_net_ht": 41920.62,
+   "ca_st_net_ttc": 50304.75,
+   "st_affecte": "GARIS",
+   "niveau": "heures = ttes catégories, Magasin Normal ×1 (note off.)"
+  },
+  {
+   "mois": "Avril 2026",
+   "ca_st_theorique_ht": 52676.32,
+   "interne_heures": 263.5,
+   "interne_eur": 5533.25,
+   "ca_st_net_ht": 47143.07,
+   "ca_st_net_ttc": 56571.69,
+   "st_affecte": "GARIS",
+   "niveau": "heures = ttes catégories, Magasin Normal ×1 (note off.)"
+  },
+  {
+   "mois": "Mai 2026",
+   "ca_st_theorique_ht": 66873.34,
+   "interne_heures": 343.67,
+   "interne_eur": 7216.74,
+   "ca_st_net_ht": 59656.6,
+   "ca_st_net_ttc": 71587.92,
+   "st_affecte": "GARIS",
+   "niveau": "heures = ttes catégories, Magasin Normal ×1 (note off.)"
+  }
+ ],
+ "virements_st_2026": [
+  {
+   "mois": "Janvier 2026",
+   "verse_total": 15075.8,
+   "verse_garis": 13075.8,
+   "verse_vigicore": 2000.0,
+   "nb_virements": 3
+  },
+  {
+   "mois": "Février 2026",
+   "verse_total": 81720.2,
+   "verse_garis": 79720.2,
+   "verse_vigicore": 2000.0,
+   "nb_virements": 7
+  },
+  {
+   "mois": "Mars 2026",
+   "verse_total": 82225.2,
+   "verse_garis": 80125.2,
+   "verse_vigicore": 2100.0,
+   "nb_virements": 8
+  },
+  {
+   "mois": "Avril 2026",
+   "verse_total": 29972.0,
+   "verse_garis": 27972.0,
+   "verse_vigicore": 2000.0,
+   "nb_virements": 3
+  },
+  {
+   "mois": "Mai 2026",
+   "verse_total": 69144.3,
+   "verse_garis": 69144.3,
+   "verse_vigicore": 0,
+   "nb_virements": 4
+  },
+  {
+   "mois": "Juin 2026",
+   "verse_total": 34878.6,
+   "verse_garis": 32478.6,
+   "verse_vigicore": 2400.0,
+   "nb_virements": 3
+  },
+  {
+   "mois": "Juillet 2026",
+   "verse_total": 27400.0,
+   "verse_garis": 25000.0,
+   "verse_vigicore": 2400.0,
+   "nb_virements": 2,
+   "source": "👁️ surveillant — relevé rangé dans le dossier, PAS ENCORE saisi au maître TB2026"
+  }
+ ],
+ "encaissements_client_2026": [
+  {
+   "mois": "Janvier 2026",
+   "encaisse_ttc": 17184.53,
+   "nb_encaissements": 7,
+   "par_client": {
+    "AQUILA SA": 6570.13,
+    "SECURITAS FRANCE SARL": 2838.0,
+    "RANC DEVELOPPEMENT": 2465.38,
+    "SAS GAMBRI": 2229.0,
+    "BULLION": 2229.0,
+    "SOTEL TELESURVEILLANCE": 496.5,
+    "P2S": 356.52
+   },
+   "factures_rapprochees": []
+  },
+  {
+   "mois": "Février 2026",
+   "encaisse_ttc": 88755.61,
+   "nb_encaissements": 7,
+   "par_client": {
+    "SECURITAS FRANCE SARL": 68111.25,
+    "AQUILA SA": 6833.39,
+    "RANC DEVELOPPEMENT": 6738.89,
+    "SAS GAMBRI": 2760.0,
+    "BULLION": 2760.0,
+    "SOTEL TELESURVEILLANCE": 1552.08
+   },
+   "factures_rapprochees": [
+    "F-000965 A-000239",
+    "F-000972",
+    "F-000973"
+   ]
+  },
+  {
+   "mois": "Mars 2026",
+   "encaisse_ttc": 100095.51,
+   "nb_encaissements": 8,
+   "par_client": {
+    "SECURITAS FRANCE SARL": 90376.41,
+    "AQUILA SA": 5798.7,
+    "SAS GAMBRI": 2169.0,
+    "BULLION": 1509.0,
+    "NEW ANGEL'S": 242.4
+   },
+   "factures_rapprochees": [
+    "F-000979",
+    "F-000980",
+    "F-000981 A-000244",
+    "F-000982 A-000240",
+    "F-000985"
+   ]
+  },
+  {
+   "mois": "Avril 2026",
+   "encaisse_ttc": 57279.58,
+   "nb_encaissements": 6,
+   "par_client": {
+    "SECURITAS FRANCE SARL": 43657.02,
+    "AQUILA SA": 5532.76,
+    "RANC DEVELOPPEMENT": 3751.8,
+    "SAS GAMBRI": 2169.0,
+    "BULLION": 2169.0
+   },
+   "factures_rapprochees": [
+    "F-000975",
+    "F-000976 F-000977",
+    "F-000986",
+    "F987",
+    "F988",
+    "FA 000989"
+   ]
+  },
+  {
+   "mois": "Mai 2026",
+   "encaisse_ttc": 60451.66,
+   "nb_encaissements": 8,
+   "par_client": {
+    "SECURITAS FRANCE SARL": 39322.47,
+    "RANC DEVELOPPEMENT": 10680.26,
+    "AQUILA SA": 5415.29,
+    "SOTEL TELESURVEILLANCE": 2839.08,
+    "P2S": 2194.56
+   },
+   "factures_rapprochees": [
+    "F-000916",
+    "F-000922",
+    "F-000966",
+    "F-000978",
+    "F-000993",
+    "F-000994 F-000992",
+    "FA 001000"
+   ]
+  },
+  {
+   "mois": "Juin 2026",
+   "encaisse_ttc": 44813.0,
+   "nb_encaissements": 4,
+   "par_client": {
+    "SECURITAS FRANCE SARL": 18251.45,
+    "AQUILA SA": 13493.55,
+    "RANC DEVELOPPEMENT": 12906.0,
+    "SOTEL TELESURVEILLANCE": 162.0
+   },
+   "factures_rapprochees": [
+    "A-000258 F-001013",
+    "F-000990"
+   ]
+  },
+  {
+   "mois": "Juillet 2026",
+   "encaisse_ttc": 4448.28,
+   "nb_encaissements": 1,
+   "par_client": {
+    "SOTEL TELESURVEILLANCE": 4448.28
+   },
+   "factures_rapprochees": [
+    "F-000998"
+   ]
+  },
+  {
+   "mois": "Août 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Septembre 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Octobre 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Novembre 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Décembre 2026",
+   "statut": "aucune donnée"
+  }
+ ],
+ "presence_factures_client": {
+  "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
+  "lu_le": "2026-08-12 18:09",
+  "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
+  "mois": [
+   "2026-01",
+   "2026-02",
+   "2026-03",
+   "2026-04",
+   "2026-05",
+   "2026-06",
+   "2026-07"
+  ],
+  "clients": {
+   "AQUILA": {
+    "2026-01": 1,
+    "2026-02": 1,
+    "2026-03": 1,
+    "2026-04": 1,
+    "2026-05": 1,
+    "2026-06": 0,
+    "2026-07": 1
+   },
+   "GAMBRINUS": {
+    "2026-01": 1,
+    "2026-02": 1,
+    "2026-03": 1,
+    "2026-04": 0,
+    "2026-05": 0,
+    "2026-06": 0,
+    "2026-07": 0
+   },
+   "NEW ANGEL'S": {
+    "2026-01": 0,
+    "2026-02": 1,
+    "2026-03": 0,
+    "2026-04": 0,
+    "2026-05": 0,
+    "2026-06": 0,
+    "2026-07": 0
+   },
+   "P2S": {
+    "2026-01": 0,
+    "2026-02": 0,
+    "2026-03": 0,
+    "2026-04": 1,
+    "2026-05": 0,
+    "2026-06": 1,
+    "2026-07": 0
+   },
+   "RANC DÉV.": {
+    "2026-01": 1,
+    "2026-02": 1,
+    "2026-03": 1,
+    "2026-04": 1,
+    "2026-05": 1,
+    "2026-06": 1,
+    "2026-07": 1
+   },
+   "SAS BULLION": {
+    "2026-01": 1,
+    "2026-02": 1,
+    "2026-03": 1,
+    "2026-04": 0,
+    "2026-05": 0,
+    "2026-06": 0,
+    "2026-07": 0
+   },
+   "SECURITAS 10017": {
+    "2026-01": 1,
+    "2026-02": 1,
+    "2026-03": 1,
+    "2026-04": 1,
+    "2026-05": 1,
+    "2026-06": 0,
+    "2026-07": 1
+   },
+   "SECURITAS 10228": {
+    "2026-01": 1,
+    "2026-02": 1,
+    "2026-03": 1,
+    "2026-04": 1,
+    "2026-05": 1,
+    "2026-06": 1,
+    "2026-07": 1
+   },
+   "SECURITAS Retail GE": {
+    "2026-01": 1,
+    "2026-02": 1,
+    "2026-03": 0,
+    "2026-04": 0,
+    "2026-05": 0,
+    "2026-06": 0,
+    "2026-07": 0
+   },
+   "SOTEL": {
+    "2026-01": 0,
+    "2026-02": 1,
+    "2026-03": 1,
+    "2026-04": 1,
+    "2026-05": 1,
+    "2026-06": 1,
+    "2026-07": 1
+   }
+  }
+ },
+ "paie_2026": [
+  {
+   "mois": "Janvier",
+   "masse_brute": 2741.71,
+   "masse_nette": 2144.1,
+   "heures_internes": 213.0,
+   "nb_agents": 13
+  },
+  {
+   "mois": "Février",
+   "masse_brute": 19362.12,
+   "masse_nette": 14988.98,
+   "heures_internes": 982.0,
+   "nb_agents": 15
+  },
+  {
+   "mois": "Mars",
+   "masse_brute": 2270.81,
+   "masse_nette": 1726.47,
+   "heures_internes": 158.0,
+   "nb_agents": 7
+  },
+  {
+   "mois": "Avril",
+   "masse_brute": 3462.27,
+   "masse_nette": 2453.09,
+   "heures_internes": 263.5,
+   "nb_agents": 8
+  },
+  {
+   "mois": "Mai",
+   "masse_brute": 6226.8,
+   "masse_nette": 4836.9,
+   "heures_internes": 343.67,
+   "nb_agents": 9
+  },
+  {
+   "mois": "Juin",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Juillet",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Août",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Septembre",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Octobre",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Novembre",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Décembre",
+   "statut": "aucune donnée"
+  }
+ ],
+ "salaires_reste_a_payer": {
+  "total": 816.62,
+  "nb_agents": 4,
+  "detail": [
+   {
+    "agent": "Frejus ADJIBODOU",
+    "du": 158.89,
+    "verse": 0,
+    "reste": 158.89
+   },
+   {
+    "agent": "Roustam KIMIEV",
+    "du": 1537.21,
+    "verse": 1164.14,
+    "reste": 373.07
+   },
+   {
+    "agent": "Ndiouma SARR",
+    "du": 2912.19,
+    "verse": 2684.06,
+    "reste": 228.13
+   },
+   {
+    "agent": "Rizvan TSAKACHEV",
+    "du": 360.68,
+    "verse": 304.15,
+    "reste": 56.53
+   }
+  ]
+ },
+ "lignes_sans_montant_ignorees": 363
+}
