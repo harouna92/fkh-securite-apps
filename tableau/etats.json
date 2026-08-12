@@ -1391,6 +1391,14 @@
    "theme": "Domaines",
    "pourquoipas": "Le surveillant lit les dossiers depuis le 31/07 et produit fiches_FKH.json — il voyait les 4 factures de juin depuis des semaines. Personne ne les lisait : seul build_data_perso.py consommait les fiches. Le carnet FKH ne connaissait que le maître TB2026, qui s'arrête à mai, d'où un cockpit affichant un juin vide alors que les PDF étaient rangés. Branché : build_data_fkh.py lit désormais les fiches et ne remplit QUE le silence du maître — là où le maître parle il fait foi (il connaît les avoirs et le net), et la ligne venue du dossier le dit : « pièces rangées, PAS ENCORE saisies au maître ». Carnet : 5 → 7 mois, CA 2026 338 657 → 447 460 €. Les 5 factures de juillet trouvées dans À TRAITER SOCIÉTÉ ont été rangées au standard dans 2026/juillet 2026 et la boîte d'entrée est vide. Enfin la ligne « Factures clients émises » de la matrice ÉTAT, qui était écrite en dur (10·11·9·10·6 puis des points), se met à jour à la réception du carnet — un « · » collé au nombre signale une valeur venue du dossier. Deux erreurs corrigées en route : une première version lisait un carnet pas encore arrivé et ne faisait rien en silence ; la seconde écrasait janvier-mai avec des comptages de LIGNES de facture (108 au lieu de 10). Vérifié à l'écran : 10 11 9 10 6 4· 5·. Audit du reste du mois de juin : relevé bancaire, bulletins, DSN et facture ST sont réellement absents — ces points-là disent vrai.",
    "local": true
+  },
+  {
+   "b": "d8",
+   "titre": "La chaîne du dépôt déroulée en entier — TRI → surveillant → quarantaine",
+   "source": "Zeus 12/08 : « à chaque dépôt, regarde la succession d’événements inhérente et exécute-la comme indiqué dans le système »",
+   "theme": "Domaines",
+   "pourquoipas": "Le système décrit la chaîne dans CARTE_SURVEILLANT.md : TRI (ranger les boîtes d'entrée) → surveillant (le robot lit les rangés) → QUARANTAINE (Claude finit l'illisible), et la règle dit que TRI finit TOUJOURS par le robot et le traitement de la quarantaine. Déroulée sur un dépôt réel : deux relevés Indy déposés à 16h38 dans À TRAITER SOCIÉTÉ. Identifiés comme FKH (compte Swan, IBAN …9987 450), rangés au standard en 2026-06_releve_Indy.pdf et 2026-07_releve_Indy.pdf. Le robot les a mis en QUARANTAINE : le gabarit releve-bancaire ne connaissait que Qonto. Cas (a) de R-QUARANTAINE-BOUCLE-01 — gabarit Swan/Indy ajouté, aiguillage automatique par le CONTENU du fichier et non par son nom. Résultat immédiat : F3 passe de 25 à 29 pièces, quarantaine 2 → 0, et quatre virements ST entrent (juin GARIS 13 986 + VIGICORE 2 400 ; juillet GARIS 25 000 + VIGICORE 2 400). Puis le bloc virements_st_2026 du carnet a été branché sur le surveillant, même principe que le CA : le dossier ne remplit que le SILENCE du maître, et la ligne le dit. Versé GARIS 2026 : 302 516,10 → 327 516,10 €. Juillet apparaît pour la première fois.",
+   "local": true
   }
  ],
  "attente": [
