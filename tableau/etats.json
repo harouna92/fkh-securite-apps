@@ -1415,6 +1415,14 @@
    "theme": "Worker / Appels",
    "pourquoipas": "Premier déploiement du worker depuis son gel. Le filtre ne regardait QUE l'interlocuteur (liste blanche de 7 numéros) ; la ligne appelée n'entrait pas dans la décision, donc un donneur d'ordre qui appelle POUR LA PREMIÈRE FOIS était ignoré — le cas du 07 56 92 88 63 aujourd'hui. La ligne dédiée devient un second laissez-passer, à égalité avec la liste blanche : si l'une des deux extrémités de l'appel est 07 57 95 38 49, on analyse, quel que soit le numéro d'en face. Le diagnostic API de Zeus a confirmé que Ringover fournit from_number et to_number. Conditions dures inchangées : décroché + enregistrement (un appel manqué remonte dans 🧭 Terrain, b419). Réglable sans redéployer : clé `fkh_ligne_do`. PÉRIODES DU BDC : mesuré avant de déployer — sur 169 bons de commande lus, `periodes` n'est apparu ZÉRO fois, le code n'a jamais tourné ; on leur a quand même posé un interrupteur fermé par défaut (`fkh_bdc_periodes`=1 pour ouvrir) pour que le gel de Zeus soit explicite. Banc tmp/banc_w1.js : seuls 2 cas changent, ceux qu'on veut. Version déployée 6be3c03a (précédente d073c091).",
    "local": true
+  },
+  {
+   "b": "d10",
+   "titre": "Les encaissements clients entrent dans le carnet FKH",
+   "source": "Zeus 12/08 : « branche les vues figées de FKH sur le carnet »",
+   "theme": "Domaines",
+   "pourquoipas": "Le carnet FKH savait ce qu'on facture, pas ce qu'on reçoit : aucun bloc d'encaissement client. C'est pour ça que la vue Facturation portait « Encaissé 227 209 € » et « Reste dû 111 446 € » écrits dans la page, impossibles à rafraîchir. Le maître les avait pourtant — TB_2026_Mvts, catégorie « Encaissement client/DO », 40 lignes avec le n° de facture rapproché. Le bloc encaissements_client_2026 est ajouté au carnet : par mois, par client, avec les factures rapprochées. Le cumul réel devient facturé 447 460,18 − encaissé 373 028,17 = 74 432,01 € de reste dû, contre 111 446 € affichés par la vue figée qui ignore juin et juillet. ÉCHEC ASSUMÉ sur la seconde moitié : j'ai tenté de brancher la vue Facturation elle-même (MT/MO écrits dans la page, totaux tf/te calculés une seule fois au chargement). Le ré-échappement du srcdoc a cassé la vue — son script s'affichait en texte au lieu de s'exécuter. Constaté à l'écran, revenu à la version saine par git checkout, vérifié. La vue reste donc figée : la brancher demande de reprendre sa construction, pas un correctif ponctuel.",
+   "local": true
   }
  ],
  "attente": [
