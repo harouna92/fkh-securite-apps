@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b419</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b420</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -978,8 +978,6 @@ button.big:active{transform:translateY(1px)}
   </section>
   <section id="sec-tickets" class="hidden">
     <div><h1>🎫 Tickets</h1><p class="sub">Confie une tâche à traiter. La personne fait le travail <b>directement depuis le ticket</b> (champ à renseigner + lien vers la fiche), et le <b>suivi se met à jour tout seul</b> (ex. 3/11 renseignées).</p></div>
-    <div id="mq-body"></div>
-    <div id="aq-body"></div>
     <div id="tk-body"></div>
   </section>
   <section id="sec-numeros" class="hidden">
@@ -1000,6 +998,8 @@ button.big:active{transform:translateY(1px)}
   </section>
   <section id="sec-supterrain" class="hidden">
     <div><h1>🧭 Terrain (superviseur)</h1><p class="sub">Ce que les opérateurs font remonter du terrain et qui demande une <b>action superviseur</b> : agents injoignables (10 min pour réagir avant escalade), photos de contrôle tenue à valider. L'admin et le super-admin voient les escalades.</p></div>
+    <div id="mq-body"></div>   <!-- b420 : le donneur d'ordre qu'on n'a pas rappelé passe avant le reste -->
+    <div id="aq-body"></div>   <!-- b420 : et ce qu'AQUILA annonce ou n'annonce plus juste après -->
     <div id="supterrain-tickets"></div>   <!-- b384 : ce qu'on me demande passe avant le reste -->
     <div id="supterrain-body"></div>
   </section>
@@ -4136,6 +4136,10 @@ button.big:active{transform:translateY(1px)}
   function photoReady(){ return !!(CLOUD.on && CLOUD.base && CLOUD.pass); }
   function photoKeyEnc(key){ return String(key).split('/').map(encodeURIComponent).join('/'); }
   function photoUpload(key,file,cb){ if(!photoReady()){ if(cb)cb({error:'offline'}); return; } fetch(CLOUD.base+'/photo?key='+encodeURIComponent(key),{method:'POST',headers:{'X-App-Password':CLOUD.pass,'Content-Type':file.type||'application/octet-stream'},body:file}).then(function(r){return r.json();}).then(function(j){ if(cb)cb(j||{}); }).catch(function(){ if(cb)cb({error:'net'}); }); }
+  /* 12/08 : seule ouverture faite pour 🌐 Domaines. Tout le reste de la fonction dépôt
+     vit dans gestion/domaines/hub.html, pour que deux sessions ne s'écrivent pas dessus.
+     Sans cette ligne, l'iframe ne peut rien téléverser : le fichier est en closure. */
+  window.fkhUpload=photoUpload; window.fkhPret=photoReady;
   function photoBlobUrl(key,cb){ if(!photoReady()||!key){ if(cb)cb(null); return; } fetch(CLOUD.base+'/photo/'+photoKeyEnc(key),{headers:{'X-App-Password':CLOUD.pass}}).then(function(r){ if(!r.ok)throw 0; return r.blob(); }).then(function(b){ if(cb)cb(URL.createObjectURL(b)); }).catch(function(){ if(cb)cb(null); }); }
   function photoOpen(key){ photoBlobUrl(key,function(u){ if(u)window.open(u,'_blank'); else alert('Photo introuvable (ou hors-ligne).'); }); }
   function photoList(prefix,cb){ if(!photoReady()){ if(cb)cb([]); return; } fetch(CLOUD.base+'/photos?prefix='+encodeURIComponent(prefix||''),{headers:{'X-App-Password':CLOUD.pass}}).then(function(r){return r.json();}).then(function(j){ if(cb)cb((j&&j.keys)||[]); }).catch(function(){ if(cb)cb([]); }); }
@@ -5548,7 +5552,20 @@ button.big:active{transform:translateY(1px)}
     return '<div class="acts" style="gap:6px;flex-wrap:wrap;margin-top:5px">'
       + b.join('').replace('class="st2-close"','class="ok st2-close"') + '</div>';
   }
-  function renderSupTerrain(){ supTerrainBadge();
+  function renderSupTerrain(){
+    /* b420 : le bloc des appels manqués vit ici depuis que Zeus l'a demandé — c'est la section
+       des choses qui demandent une action du superviseur MAINTENANT. Et on va rechercher les
+       mails : une notification d'appel manqué peut être arrivée depuis le dernier passage. */
+    try{ renderMqManques(); }catch(_e){}
+    try{ renderAqRappel(); }catch(_e){}
+    /* b420 : la liste des mails pèse ~250 Ko. Aucun coût d'IA — on relit ce qui est déjà rangé —
+       mais 250 Ko à chaque aller-retour, c'est 5 Mo par jour de données mobiles pour rien. Les
+       notifications arrivent au rythme des appels, pas des clics : deux minutes suffisent. */
+    try{ var _fr=0; try{ _fr=+localStorage.getItem('fkh_mails_at')||0; }catch(_g){}
+      if(typeof mailsFetch==='function'&&typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on&&(Date.now()-_fr)>120000){
+        try{ localStorage.setItem('fkh_mails_at',String(Date.now())); }catch(_g){}
+        mailsFetch(function(){ try{ renderMqManques(); }catch(_f){} try{ renderAqRappel(); }catch(_f){} });
+      } }catch(_e){} supTerrainBadge();
     /* b384 : les tickets qui me sont adresses, traitables ici meme (regle du drill jusqu'a
        l'action : on ne renvoie jamais vers une autre section). L'accuse de lecture part a
        l'ouverture de la section, comme il partait a l'ouverture de Tickets. */
@@ -6493,10 +6510,6 @@ button.big:active{transform:translateY(1px)}
     }; });
   }
   function renderTickets(){
-    try{ renderMqManques(); }catch(_e){}   /* b419 */
-    try{ renderAqRappel(); }catch(_e){}   /* b413 */
-    /* le classeur des mails peut dater : on le rafraîchit, et on redessine quand il arrive. */
-    try{ if(typeof mailsFetch==='function'&&typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)mailsFetch(function(){ try{ renderMqManques(); }catch(_f){} try{ renderAqRappel(); }catch(_f){} }); }catch(_e){}
     var wrap=byId('tk-body'); if(!wrap)return; var T=tkLoad();
     var typeOpts=Object.keys(TK_TYPES).map(function(k){ var n=(typeof FA!=='undefined'?FA:[]).filter(function(a){return TK_TYPES[k].missing(a);}).length; return '<option value="'+k+'">'+TK_TYPES[k].lbl+' ('+n+' agents concernés)</option>'; }).join('');
     var create='<div class="card"><div class="lab" style="margin:0 0 6px">➕ Nouveau ticket <span class="sub" style="font-weight:400">— la cible est détectée automatiquement</span></div>'

@@ -1353,6 +1353,14 @@
    "theme": "Tickets / Appels",
    "pourquoipas": "Personne n'avait décroché : pas de conversation, pas d'enregistrement, pas de transcription — rien à analyser, et c'est IRRÉPARABLE de ce côté (même en analysant toute la ligne, un appel sans réponse n'aura jamais de contenu). Mais Ringover envoie une notification par mail à chaque appel manqué, et ces mails sont DÉJÀ dans la base — simplement marqués `skip:1`, donc invisibles. Un donneur d'ordre qui tombe dans le vide appelle le confrère suivant. Les appels manqués de la ligne dédiée (07 57 95 38 49, réglable via `fkh_ligne_do` sans toucher au code) remontent maintenant en tête de 🎫 Tickets avec l'heure, le numéro, le nom du client s'il est connu (svCallerName) et un lien d'appel. Ringover envoie 2 ou 3 notifications par appel : on n'affiche qu'une ligne, dédupliquée par (numéro, minute). « ✔ Rappelé » range, et la décision est partagée entre postes. Visible superviseur+. Vérifié sur le vrai cas : 1 ligne, « 07 56 92 88 63 · aujourd'hui à 14:18 · sans message », les manqués du STANDARD correctement ignorés, et le rangement fonctionne.",
    "local": true
+  },
+  {
+   "b": 420,
+   "titre": "🧭 Terrain accueille ce qui demande une action tout de suite",
+   "source": "Zeus 12/08 : « toutes les informations de ce type plutôt dans Terrain et non dans Tickets »",
+   "theme": "Terrain",
+   "pourquoipas": "Zeus cherchait le bloc des appels manqués dans 🎫 Tickets et ne le trouvait pas. La règle qu'il pose est juste : 🎫 Tickets, c'est ce qu'on se CONFIE entre nous — une tâche adressée à quelqu'un, qui attend sa réponse. 🧭 Terrain, c'est ce que la journée IMPOSE et qui demande une action maintenant : agent injoignable, photo de tenue à valider, donneur d'ordre qu'on n'a pas rappelé, vacation qu'AQUILA n'annonce plus. Les deux blocs (📞 appels manqués b419, 📧 rappel AQUILA b413) déménagent donc dans 🧭 Terrain, en tête, du plus coûteux au moins coûteux : quelqu'un qui attend qu'on le rappelle passe avant une prestation à vérifier. Et ils vont rechercher les mails à l'ouverture de la section — une notification peut être arrivée depuis le dernier passage, ce qui explique probablement pourquoi Zeus ne voyait rien. Vérifié : ordre mq-body → aq-body → supterrain-tickets → supterrain-body, plus rien dans Tickets. Non-régression b419→b420 : Planning, Fiche agent, Suivi des appels et la liste des tickets identiques, aucun badge ne bouge.",
+   "local": true
   }
  ],
  "attente": [
