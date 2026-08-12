@@ -1439,6 +1439,14 @@
    "theme": "Planning",
    "pourquoipas": "Le Planning regroupait sur le seul nom du site. Mesure du 10 au 31/08 : la ligne « BASIC FIT » portait SIX villes et onze vacations — Biscarrosse, Chartres, Chauvigny, Cherreau, Lucé, Neuville-de-Poitou. Biscarrosse et Chartres, 600 km. Pire que l'absence : la ligne affichait bien UNE ville entre parenthèses, celle de la première vacation rencontrée — les onze étaient donc annoncées à Chartres. Le correctif b399 « le nom du site porte sa ville » n'avait été posé que sur Suivi des appels et les pastilles. La ville entre maintenant dans la clé de regroupement, et le titre de la fiche la porte. Le banc a montré un effet que ma première mesure ne voyait pas : la clé brute scindait aussi sur le VIDE (Duc coupé en deux, « sans ville » 2 vacations + « CHAILLEY » 35). Règle ajoutée : une vacation sans ville rejoint la ville de son site quand il n'en a qu'une. Preuves : 159 vacations rangées avant comme après, 0 ligne à plusieurs villes, 0 site coupé par un champ vide, 31 lignes sur 32 inchangées. Non-régression : Suivi des appels identique à l'horloge près, Fiche agent identique au caractère près, Planning 79 vacations avant comme après (29 → 32 sites). La clé interne ne sort jamais vers les données : le ＋ reçoit data-site=\"BASIC FIT\" et data-ville=\"BISCARROSSE\" séparément, vérifié en créant une vacation depuis la ligne.",
    "local": true
+  },
+  {
+   "b": "d12",
+   "titre": "Le surveillant surveille GARIS — 20 factures et 44 encaissements lus",
+   "source": "Zeus 12/08 : « branche le surveillant sur GARIS » · « scan »",
+   "theme": "Domaines",
+   "pourquoipas": "GARIS n'était surveillé nulle part : le robot ne connaissait que FKH et PERSO, donc pas de fiches_GARIS.json. Trois dossiers ajoutés à la carte (MODE A respecté : le bloc de carnet et la vue existent depuis début août) — les factures du classement mensuel, celles rangées hors classement, et les relevés. Résultat : 20 factures lues, carnet GARIS de 19 à 63 fiches. Les relevés partaient d'abord en quarantaine (11) et le robot avait raison : le gabarit ne retenait que les débits vers GARIS ou VIGICORE, les sous-traitants de FKH, qui n'existent pas dans le relevé de GARIS. Nouveau gabarit lisant les ENTRÉES — 44 encaissements, quarantaine 11 → 3. Scan du même passage : trois relevés Indy DAHLIA (mai, juin, juillet) identifiés et rangés ; celui de mai était un doublon strict du fichier déjà présent, supprimé après comparaison d'empreinte. ÉCHEC ASSUMÉ : j'ai voulu faire entrer ces 44 encaissements dans le carnet GARIS, une fiche sur 44 portait 20 260 889 641 € — l'analyseur avait collé « 2026 » à un montant sur une ligne coupée. Bloc retiré : le cockpit garde son « 0 encaissement tracé », qui est un manque honnête, plutôt qu'un total faux. Le gabarit reste à corriger avant de rebrancher.",
+   "local": true
   }
  ],
  "attente": [
