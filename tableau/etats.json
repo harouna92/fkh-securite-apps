@@ -1313,6 +1313,14 @@
    "theme": "Villes / demandes",
    "pourquoipas": "Zeus : « on n'a pas besoin de la population, le client nous appelle pour nous proposer une mission, on se fie uniquement à ce qu'il nous donne » — puis « affiche les deux ». Il avait raison et la mesure le prouve : sur les 67 demandes où le client a donné son code postal, le nom entendu ne concorde que 26 fois. Les 41 autres ne sont pas des codes faux, ce sont des noms mal entendus (Guissan/Gruissan 11430, Sars-Union/Sarre-Union 67260, Montmaraud/Montmarault 03390, Minot/Millau 12100) : les chiffres traversent la transcription, les noms propres se déforment. Or `aiBuildDemande` cherchait par le NOM d'abord et ne regardait le code qu'en secours — elle croyait le fragile et jetait le solide. Pire cas : un nom PLAUSIBLE (Minot existe en Côte-d'Or) battait un code exact, et l'incohérence ne se voyait pas. Et sans code donné elle en INVENTAIT un — origine du « Valence (16460) », alors que la transcription ne contient aucun code postal. Désormais : le code fait foi ; le nom ne sert qu'à départager quand un code couvre plusieurs communes ; les deux s'affichent quand ils diffèrent ; sans code et avec un nom ambigu on ne choisit pas — « À PRÉCISER », aucune coordonnée, donc aucune distance. La population est retirée de toute décision (le tri de b414 ne sert plus qu'à ordonner une liste offerte à un humain). Banc sur 6 cas réels : Guissan→Gruissan, Minot→Millau, Valence sans CP→À PRÉCISER sans distances, Monéteau→inchangé.",
    "local": true
+  },
+  {
+   "b": 417,
+   "titre": "Le hub Domaines mort quitte index.html",
+   "source": "Zeus 12/08 : « retire le code mort »",
+   "theme": "Domaines",
+   "pourquoipas": "Depuis b408 la section n'est qu'une iframe vers domaines/hub.html, mais le hub d'origine dormait encore dans index.html : 92 lignes (13 Ko) que plus rien n'appelait. Le laisser n'était pas gratuit — CFKH_DEFAULT portait une COPIE des chiffres FKH (CA client, cascade ST, paie) figée au 23/07, et deux sources pour un même chiffre sans dire laquelle fait foi, c'est pire qu'une donnée absente. Pire encore : `stFeedCarnet` s'en servait ENCORE de socle quand un dépôt ST arrivait sur un carnet vide — on empilait du réel sur du périmé. Le carnet part maintenant vide, et les applis de gestion/domaines/ en sont la seule lecture. Retirés aussi : l'appel dans la bascule d'onglet et celui de stLoadCarnet, tous deux sans destinataire. Vérifié : l'iframe charge toujours le hub (« Choisis un domaine… FKH · GARIS · DAHLIA »). index.html : 1505 -> 1493 Ko. Non-régression b416→b417 : Planning, Fiche agent, Suivi des appels ET Dépôts identiques, aucun badge ne bouge.",
+   "local": true
   }
  ],
  "attente": [
