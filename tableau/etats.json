@@ -1423,6 +1423,14 @@
    "theme": "Domaines",
    "pourquoipas": "Le carnet FKH savait ce qu'on facture, pas ce qu'on reçoit : aucun bloc d'encaissement client. C'est pour ça que la vue Facturation portait « Encaissé 227 209 € » et « Reste dû 111 446 € » écrits dans la page, impossibles à rafraîchir. Le maître les avait pourtant — TB_2026_Mvts, catégorie « Encaissement client/DO », 40 lignes avec le n° de facture rapproché. Le bloc encaissements_client_2026 est ajouté au carnet : par mois, par client, avec les factures rapprochées. Le cumul réel devient facturé 447 460,18 − encaissé 373 028,17 = 74 432,01 € de reste dû, contre 111 446 € affichés par la vue figée qui ignore juin et juillet. ÉCHEC ASSUMÉ sur la seconde moitié : j'ai tenté de brancher la vue Facturation elle-même (MT/MO écrits dans la page, totaux tf/te calculés une seule fois au chargement). Le ré-échappement du srcdoc a cassé la vue — son script s'affichait en texte au lieu de s'exécuter. Constaté à l'écran, revenu à la version saine par git checkout, vérifié. La vue reste donc figée : la brancher demande de reprendre sa construction, pas un correctif ponctuel.",
    "local": true
+  },
+  {
+   "b": "d11",
+   "titre": "Audit complet des 3 cockpits — deux défauts trouvés et réparés",
+   "source": "Zeus 12/08 : « fais l’audit complet, vérifie la tuyauterie de toutes les dimensions qu’on a traitées »",
+   "theme": "Domaines",
+   "pourquoipas": "Passage systématique sur chaque dimension travaillée aujourd'hui, fichier par fichier puis dans l'appli. Deux défauts que seul l'audit pouvait montrer : (1) le contrôle du mois avait DISPARU du RADAR GARIS — il y était en fin d'après-midi, une régénération ultérieure du radar l'a écrasé, parce que le générateur et la pose du contrôle sont deux scripts séparés et que je n'avais rejoué que le premier ; (2) l'instantané embarqué de GARIS était plus ancien que son carnet régénéré à 15h40, donc le cockpit montrait des chiffres périmés sans le dire. Les deux sont réparés et revérifiés. Le reste tient : RADAR régénéré dans les 3 cockpits, miroir SUIVI_DEPOT absent partout, badge à 3 états dans la coque ET les vues, instantanés désormais identiques aux carnets du disque, pont de dépôt actif (hub + crochet fkhUpload), carnet FKH à 7 mois de CA dont 2 venus du dossier, 7 mois de virements ST et le bloc encaissements. Leçon : deux scripts qui construisent la même page doivent être rejoués ensemble — sinon le second efface le premier en silence.",
+   "local": true
   }
  ],
  "attente": [
