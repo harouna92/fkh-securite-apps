@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b420</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b430</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -5756,12 +5756,12 @@ button.big:active{transform:translateY(1px)}
     };
   }
   if(byId('pl-dbl-open'))byId('pl-dbl-open').onclick=function(){ var box=byId('pl-dbl-panel'); box.classList.toggle('hidden'); if(!box.classList.contains('hidden'))plDblRender(); };
-  function planningAddVac(day,site){
+  function planningAddVac(day,site,ville){   /* b430 : la ville vient de la ligne cliquee */
     if(typeof vacDejaLa==='function'&&site&&site!=='—'){   /* b343 */
       var _v=vacDejaLa({site:site,mdate:day||impTodayISO()}), _e=_v.exact||_v.proche;
       if(_e&&!confirm('⚠️ Ce site a déjà une vacation le '+String(day||impTodayISO()).split('-').reverse().join('/')+((_e.mheure)?' à '+_e.mheure:'')+'.\n\nEn créer une SECONDE quand même ?'))return;
     }
-    _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift(signerVac({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day||impTodayISO(),mheure:'',mfin:'',src:'planning'})); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
+    _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift(signerVac({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:String(ville||''),la:null,lo:null,assoc:[],mdate:day||impTodayISO(),mheure:'',mfin:'',src:'planning'})); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
   // ===== Statuts de vacation (calqués sur Sekur : 9 codes) — voir releve-sekur/services-vacations.md =====
   function _plStatusMap(){ return {100:{l:'En attente',c:'#8a8f98'},110:{l:'En retard',c:'#e0562d'},120:{l:'Non réalisé',c:'#7a1f1f'},200:{l:'En cours',c:'#2563eb'},250:{l:'Prolongation',c:'#7b61ff'},300:{l:'Terminé',c:'#1a9e5c'},400:{l:'Interrompu',c:'#c02626'},500:{l:'En pause',c:'#e0a13b'},800:{l:'Non terminé',c:'#8a6d00'}}; }
   // État affiché : statut MANUEL prioritaire (m.vacStatus), sinon DÉRIVÉ de l'agent + l'heure (zéro ressaisie).
@@ -5849,7 +5849,7 @@ button.big:active{transform:translateY(1px)}
   function _plAgentMonthHours(aid,refISO){ if(!aid||!refISO)return 0; var mo=refISO.slice(0,7),tot=0; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(x){ if(x.agentId!==aid||x.statut!=='validee'||!x.mdate||x.mdate.slice(0,7)!==mo)return; var r=(typeof missRange==='function')?missRange(x):null; if(r)tot+=(r[1]-r[0]); }); return Math.round(tot/60*10)/10; }
   function _plAgentResults(m){ var q=(_plAffQ||'').toLowerCase().trim(); if(typeof FA==='undefined'||!FA||!FA.length)return '<div class="hint" style="padding:4px 2px">Aucun agent en base.</div>'; if(q.length<2)return '<div class="hint" style="padding:4px 2px">✍️ Tape au moins 2 lettres (nom · n° · ville) — les propositions se filtrent au fur et à mesure.</div>'; /* b199 : plus de liste complete, autocompletion seulement */ var arr=FA.filter(function(a){ return !q||(((a.nom||'')+' '+((a.tels||[]).join(' '))+' '+(a.ville||'')).toLowerCase().indexOf(q)>=0); }).slice(0,8); if(!arr.length)return '<div class="hint" style="padding:4px 2px">Aucun agent trouvé.</div>'; return arr.map(function(a){ var cur=(a.id===m.agentId); var ind=(typeof agentIndispoOn==='function')?agentIndispoOn(a.id,m.mdate):null; if(ind){ return '<div class="fa" style="opacity:.6;background:repeating-linear-gradient(45deg,rgba(110,168,254,.10) 0 6px,transparent 6px 12px)"><div><div class="fa-n">'+esc(a.nom||'—')+' <span style="color:#6ea8fe">🏖 indisponible</span></div><div class="fa-d">'+(ind.motif?esc(ind.motif)+' · ':'')+'jusqu\'au '+esc((ind.fin||'').split('-').reverse().join('/'))+'</div></div></div>'; } var cf=(typeof agentTimeConflicts==='function')?agentTimeConflicts(a.id,m):[]; var dispo=cf.length?'<span style="color:#c02626">🔴 déjà en mission</span>':'<span style="color:#1a9e5c">🟢 dispo</span>'; var hm=_plAgentMonthHours(a.id,m.mdate||impTodayISO()); var note=(a.fiab?(' · ⭐ '+esc(a.fiab)):''); return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+(cur?' <span style="color:var(--ok)">✓</span>':'')+note+'</div><div class="fa-d">'+esc((a.tels||[]).join(' / ')||'—')+(a.ville?' · '+esc(a.ville):'')+' · '+dispo+' · <b>['+hm+'h]</b> ce mois</div></div><div class="fa-a"><button class="ok pl-affpick" data-aid="'+esc(a.id)+'">Choisir</button></div></div>'; }).join(''); }
   function _plWirePicks(card,m){ card.querySelectorAll('.pl-affpick').forEach(function(b){ b.onclick=function(){ var aid=b.getAttribute('data-aid'); if(typeof affpickWithCheck==='function'&&!affpickWithCheck(m,aid))return; m.agentId=aid; m.valide=Date.now(); /* b304 */ if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; }); }
-  function _plRenderModal(){ var m=_plMissById(_plAffId); if(!m){planningAffectClose();return;} var card=byId('pl-modal-card'); if(!card)return; var M=_plStatusMap(); var site=m.siteAgent||m.titre||'—'; var cur=m.agentId?(typeof faById==='function'?faById(m.agentId):null):null; var when=(m.mdate?m.mdate.split('-').reverse().join('/'):'')+(m.mheure?' · '+m.mheure:'')+((typeof missEndTxt==='function'&&missEndTxt(m))?'→'+missEndTxt(m):''); var st=_plVacState(m);
+  function _plRenderModal(){ var m=_plMissById(_plAffId); if(!m){planningAffectClose();return;} var card=byId('pl-modal-card'); if(!card)return; var M=_plStatusMap(); /* b430 : le titre porte la ville — c'est ce que Zeus cherchait sur BASIC FIT du 13/08. */ var site=(typeof svLabel==='function')?svLabel(m.siteAgent||m.titre||'—',m.ville||''):(m.siteAgent||m.titre||'—'); var cur=m.agentId?(typeof faById==='function'?faById(m.agentId):null):null; var when=(m.mdate?m.mdate.split('-').reverse().join('/'):'')+(m.mheure?' · '+m.mheure:'')+((typeof missEndTxt==='function'&&missEndTxt(m))?'→'+missEndTxt(m):''); var st=_plVacState(m);
     var opts='<option value="">Auto ('+esc(st.l)+')</option>'+Object.keys(M).map(function(code){ return '<option value="'+code+'"'+(String(m.vacStatus||'')===code?' selected':'')+'>'+esc(M[code].l)+'</option>'; }).join('');
     card.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><b style="font-size:15px;flex:1">📅 '+esc(site)+'</b><button class="pl-close" style="font-size:18px;background:none;border:none;color:var(--muted);cursor:pointer">✕</button></div>'
       +'<div class="sub" style="margin:0 0 10px">'+esc((m.client?m.client+' · ':'')+when)+' &nbsp;<span style="background:'+st.c+';color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">'+esc(st.l)+'</span></div>'
@@ -6040,16 +6040,19 @@ button.big:active{transform:translateY(1px)}
   function siteMetaSet(site,patch){ var o=siteMetaLoad(),k=(typeof tnorm==='function'?tnorm(site):String(site||'')); o[k]=Object.assign({},o[k]||{},patch); save('fkh_sites_meta',o); }
   function _plDurTxt(h1,h2){ var s=toMin(h1),e=toMin(h2); if(s==null||e==null)return ''; var d=e-s; if(d<=0)d+=1440; var hh=Math.floor(d/60),mm=d%60; return hh+'h'+(mm?('0'+mm).slice(-2):''); }
   // Ajouter une vacation sur un site+horaire+jour (clic case vide d'une ligne d'horaire) puis ouvrir la modale (affecter).
-  function planningAddVacH(day,site,h1,h2){
+  function planningAddVacH(day,site,h1,h2,ville){   /* b430 */
     /* b343 : troisieme porte — la creation a la main. On previent AVANT de creer un doublon. */
     if(typeof vacDejaLa==='function'){
       var _v=vacDejaLa({site:site,mdate:day,mheure:h1}), _e=_v.exact||_v.proche;
       if(_e&&!confirm('⚠️ Une vacation existe déjà pour ce site le '+(day||'').split('-').reverse().join('/')+' à '+((_e.mheure||'?'))+' :\n\n'+((_e.siteAgent||_e.titre||'—'))+(_e.client?' · '+_e.client:'')+'\n\nEn créer une SECONDE quand même ?'))return;
       if(!_e&&_v.supprimee&&!confirm('⚠️ Tu avais supprimé une vacation identique (le '+vacQuand(_v.supprimee)+').\n\nLa recréer ?'))return;
     }
-    _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift(signerVac({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:'',la:null,lo:null,assoc:[],mdate:day,mheure:h1||'',mfin:h2||'',src:'planning'})); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
+    _plJourCible=day||''; var now=Date.now(); var id='pl'+now+'_'+Math.round(Math.random()*9999); SUIVI.unshift(signerVac({id:id,titre:(site&&site!=='—'?site:''),siteAgent:(site&&site!=='—'?site:''),client:'',statut:'validee',motif:'',pris:now,valide:now,ville:String(ville||''),la:null,lo:null,assoc:[],mdate:day,mheure:h1||'',mfin:h2||'',src:'planning'})); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); planningAffect(id); }
   // Copier un site : duplique toutes ses vacations de la semaine affichée vers la semaine SUIVANTE (mêmes horaires, agents à réaffecter).
-  function planningCopySite(site){ var wk=[],i; for(i=0;i<7;i++)wk.push(svcAddDays(plWeek,i)); var src=SUIVI.filter(function(m){ return !m.deleted&&m.statut==='validee'&&(m.siteAgent||m.titre||'—')===site&&m.mdate&&wk.indexOf(m.mdate)>=0; }); if(!src.length){ alert('Aucune vacation à copier pour ce site cette semaine.'); return; } if(!confirm('Copier les '+src.length+' vacation(s) de « '+site+' » vers la semaine suivante ?\n(Mêmes horaires, agents à réaffecter.)'))return; var now=Date.now(),n=0; src.forEach(function(m,k){ var nextDate=svcAddDays(m.mdate,7); if((SUIVI||[]).some(function(x){return !x.deleted&&x.statut==='validee'&&x.mdate===nextDate&&(x.siteAgent||x.titre||'—')===site;}))return; /* b305 : anti-doublon double-clic */ var c={}; for(var key in m){ if(key.charAt(0)!=='_')c[key]=m[key]; } c.id='pl'+now+'_'+k+'_'+Math.round(Math.random()*9999); c.mdate=nextDate; delete c.agentId; delete c.vacStatus; c.valide=now; c.pris=now; SUIVI.unshift(c); n++; }); if(typeof saveSuivi==='function')saveSuivi(); plWeek=svcAddDays(plWeek,7); renderPlanning(); alert('✅ '+n+' vacation(s) copiée(s) sur la semaine suivante (à affecter).'); }
+  /* b430 : la ville fait partie du site. Sans ce filtre, copier « BASIC FIT » emporterait les six
+   villes vers la semaine suivante d'un seul clic. */
+  function _plMemeVille(m,ville){ return String(m.ville||'').trim().toLowerCase()===String(ville||'').trim().toLowerCase(); }
+  function planningCopySite(site,ville){ var wk=[],i; for(i=0;i<7;i++)wk.push(svcAddDays(plWeek,i)); var src=SUIVI.filter(function(m){ return !m.deleted&&m.statut==='validee'&&(m.siteAgent||m.titre||'—')===site&&_plMemeVille(m,ville)&&m.mdate&&wk.indexOf(m.mdate)>=0; }); if(!src.length){ alert('Aucune vacation à copier pour ce site cette semaine.'); return; } if(!confirm('Copier les '+src.length+' vacation(s) de « '+site+(ville?(' ('+ville+')'):'')+' » vers la semaine suivante ?\n(Mêmes horaires, agents à réaffecter.)'))return; var now=Date.now(),n=0; src.forEach(function(m,k){ var nextDate=svcAddDays(m.mdate,7); if((SUIVI||[]).some(function(x){return !x.deleted&&x.statut==='validee'&&x.mdate===nextDate&&(x.siteAgent||x.titre||'—')===site&&_plMemeVille(x,ville);}))return; /* b305 : anti-doublon double-clic */ var c={}; for(var key in m){ if(key.charAt(0)!=='_')c[key]=m[key]; } c.id='pl'+now+'_'+k+'_'+Math.round(Math.random()*9999); c.mdate=nextDate; delete c.agentId; delete c.vacStatus; c.valide=now; c.pris=now; SUIVI.unshift(c); n++; }); if(typeof saveSuivi==='function')saveSuivi(); plWeek=svcAddDays(plWeek,7); renderPlanning(); alert('✅ '+n+' vacation(s) copiée(s) sur la semaine suivante (à affecter).'); }
   // ===== Tableau des heures (calque Sekur) : Hj/Hn/Hjf/Hnf, colonnes Semaine/Dimanche — nuit 21h→06h, fériés FR calculés, découpage à la minute =====
   function _plEaster(y){ var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,mm=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*mm+114)/31),da=((h+l-7*mm+114)%31)+1; return new Date(y,mo-1,da); }
   function _plFerie(iso){ var p=iso.split('-'),y=+p[0],mmdd=p[1]+'-'+p[2]; if(['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'].indexOf(mmdd)>=0)return true; var E=_plEaster(y); function off(n){ var d=new Date(E.getFullYear(),E.getMonth(),E.getDate()+n); return ('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); } return mmdd===off(1)||mmdd===off(39)||mmdd===off(50); }
@@ -6275,16 +6278,36 @@ button.big:active{transform:translateY(1px)}
        deja posee la veille a 22h12. On regroupe sur le nom normalise et on affiche le premier nom
        rencontre : rien n'est renomme dans la base, la cle reste un vrai nom de site. */
     function _plNormSite(x){ return String(x||'').toUpperCase().replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
-    var siteMap={}, order=[], siteInfo={}, _plCanon={};
+    var siteMap={}, order=[], siteInfo={};
+    /* b430 : premier passage — quelles villes chaque site porte-t-il vraiment ? Il sert au
+       second : une vacation dont le champ ville est vide ne doit PAS ouvrir sa propre ligne.
+       Le banc du 12/08 l'a montre — Duc se coupait en deux, « (sans ville) » 2 vacations et
+       « CHAILLEY » 35, pour un simple champ pas rempli. */
+    var _plVilles={};
+    miss.forEach(function(m){ var _b=(m.siteAgent||m.titre||'—'), _v=String(m.ville||'').trim();
+      if(!_v)return; var _k=_plNormSite(_b)||_b; (_plVilles[_k]=_plVilles[_k]||{})[_v.toLowerCase()]=_v; });
     miss.forEach(function(m){
-      var _brut=(m.siteAgent||m.titre||'—'), _nk=_plNormSite(_brut)||_brut;
-      var s=_plCanon[_nk]; if(s==null){ s=_plCanon[_nk]=_brut; }
-      if(!siteMap[s]){siteMap[s]=[];order.push(s);siteInfo[s]={ville:m.ville||'',client:m.client||''};}
-      /* la ville et le client viennent de la premiere vacation ; on complete si elle ne les portait pas. */
-      if(!siteInfo[s].ville&&m.ville)siteInfo[s].ville=m.ville;
+      /* b430 : un site, c'est un NOM ET UNE VILLE. « BASIC FIT » seul portait six villes et
+         onze vacations sur trois semaines, de Biscarrosse a Chartres — 600 km — sur une seule
+         ligne, annoncees a la ville de la premiere d'entre elles. La ville entre donc dans la
+         cle. Le regroupement des orthographes (b397) survit : on normalise toujours le nom.
+         `brut` garde l'orthographe rencontree la premiere — c'est elle, jamais la cle, qui
+         ressort vers les donnees. */
+      var _brut=(m.siteAgent||m.titre||'—'), _vl=String(m.ville||'').trim();
+      var _nk0=_plNormSite(_brut)||_brut;
+      /* Champ ville vide : on rejoint la ville du site s'il n'en a qu'une. S'il en porte
+         plusieurs — BASIC FIT — on reste a part : deviner serait pire que montrer le trou. */
+      if(!_vl){ var _kn=Object.keys(_plVilles[_nk0]||{}); if(_kn.length===1)_vl=_plVilles[_nk0][_kn[0]]; }
+      var s=_nk0+'\u0000'+_vl.toLowerCase();
+      if(!siteMap[s]){siteMap[s]=[];order.push(s);siteInfo[s]={brut:_brut,ville:_vl,client:m.client||''};}
+      /* le client vient de la premiere vacation ; on complete si elle ne le portait pas.
+         La ville, elle, ne se complete plus : elle EST la cle, elle ne peut plus changer. */
       if(!siteInfo[s].client&&m.client)siteInfo[s].client=m.client;
       siteMap[s].push(m); });
-    order.sort(function(a,b){return String(a).localeCompare(String(b));});
+    /* b430 : on trie sur ce que Zeus lit — nom puis ville — et non sur la cle interne, qui est
+       normalisee (minuscules, accents retires) et rangerait autrement. */
+    order.sort(function(a,b){ var A=siteInfo[a]||{}, B=siteInfo[b]||{};
+      return String((A.brut||a)+' '+(A.ville||'')).localeCompare(String((B.brut||b)+' '+(B.ville||''))); });
     var wl=days[0].split('-').reverse().join('/'), we=days[days.length-1].split('-').reverse().join('/');
     var _granOpts=['Jour','Semaine','Mois'].map(function(g){return '<option'+(PL_GRAN===g?' selected':'')+'>'+g+'</option>';}).join('');
     _plDaysCur=days.slice();
@@ -6318,12 +6341,15 @@ button.big:active{transform:translateY(1px)}
     } } }catch(e){}
     if(!order.length){ bodyR+='<tr><td colspan="99" style="padding:20px;text-align:center;border:1px solid var(--line)"><span class="sub">Aucune vacation validée cette semaine. Clique ＋ sur un site (ou une case) pour ajouter une vacation.</span></td></tr>'; }
     else { order.forEach(function(s){ var info=siteInfo[s]||{};
-      var _meta=(typeof siteMetaGet==='function')?siteMetaGet(s):{}; var _noFormel=!(_meta.nomClient&&_meta.nomClient.trim()); var _shStyle=_noFormel?'background:#2456c7!important':''; // bleu = nom formel client MANQUANT (remontée #20) · navy = complet
-      bodyR+='<tr class="pl-sitehead"><td class="pl-sh-lbl" style="position:sticky;left:0;z-index:2;'+_shStyle+'"'+(_noFormel?' title="Nom formel du site (donné par le client) pas encore renseigné — clique une vacation pour le saisir"':'')+'><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;min-width:0;overflow:hidden"><b>'+esc(s)+'</b>'+(info.ville?' <span style="opacity:.85;font-weight:400">('+esc(info.ville)+')</span>':'')+'<div style="font-size:10.5px;opacity:.85">'+(info.client?esc(info.client):'<span style="color:#ffd28a">⚠ sans client</span>')+(_meta.nomClient?' · 🏷️ '+esc(_meta.nomClient):'')+'</div></div><span class="pl-siteadd" data-site="'+esc(s)+'" title="Ajouter une vacation" style="cursor:pointer;font-size:16px">＋</span><span class="pl-sitecopy" data-site="'+esc(s)+'" title="Copier le site → semaine suivante" style="cursor:pointer;font-size:14px">⧉</span></div></td>'+days.map(function(){return '<td class="pl-sitefill"'+(_noFormel?' style="background:#2456c7!important"':'')+'></td>';}).join('')+'</tr>';
+      /* b430 : `s` est une cle interne (nom normalise + ville). Tout ce qui sort d'ici — nom
+         formel, « + », copier-semaine — recoit le nom BRUT. La cle ne touche jamais aux donnees. */
+      var _sb=info.brut||s, _sv=info.ville||'';
+      var _meta=(typeof siteMetaGet==='function')?siteMetaGet(_sb):{}; var _noFormel=!(_meta.nomClient&&_meta.nomClient.trim()); var _shStyle=_noFormel?'background:#2456c7!important':''; // bleu = nom formel client MANQUANT (remontée #20) · navy = complet
+      bodyR+='<tr class="pl-sitehead"><td class="pl-sh-lbl" style="position:sticky;left:0;z-index:2;'+_shStyle+'"'+(_noFormel?' title="Nom formel du site (donné par le client) pas encore renseigné — clique une vacation pour le saisir"':'')+'><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;min-width:0;overflow:hidden"><b>'+esc(_sb)+'</b>'+(_sv?' <span style="opacity:.85;font-weight:400">('+esc(_sv)+')</span>':'')+'<div style="font-size:10.5px;opacity:.85">'+(info.client?esc(info.client):'<span style="color:#ffd28a">⚠ sans client</span>')+(_meta.nomClient?' · 🏷️ '+esc(_meta.nomClient):'')+'</div></div><span class="pl-siteadd" data-site="'+esc(_sb)+'" data-ville="'+esc(_sv)+'" title="Ajouter une vacation" style="cursor:pointer;font-size:16px">＋</span><span class="pl-sitecopy" data-site="'+esc(_sb)+'" data-ville="'+esc(_sv)+'" title="Copier le site → semaine suivante" style="cursor:pointer;font-size:14px">⧉</span></div></td>'+days.map(function(){return '<td class="pl-sitefill"'+(_noFormel?' style="background:#2456c7!important"':'')+'></td>';}).join('')+'</tr>';
       var byH={},hOrder=[]; siteMap[s].forEach(function(m){ var hk=(m.mheure||'')+'-'+(m.mfin||''); if(!byH[hk]){byH[hk]=[];hOrder.push(hk);} byH[hk].push(m); });
       hOrder.sort();
       hOrder.forEach(function(hk){ var sample=byH[hk][0]; var durt=_plDurTxt(sample.mheure,sample.mfin); var lbl=(sample.mheure||'—')+(sample.mfin?('-'+sample.mfin):'')+(durt?(' ('+durt+')'):''); var qual=sample.qual||sample.specialite||'';
-        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); var hach=(aff&&!m.planifie); var bgS=hach?('background:repeating-linear-gradient(45deg,'+st.c+' 0 6px,rgba(0,0,0,.32) 6px 10px)'):('background:'+st.c); if(m.mailPending){ bgS='background:repeating-linear-gradient(45deg,#7b61ff 0 7px,#3d2f99 7px 12px);outline:2px dashed #fff;outline-offset:-2px'; } return '<div class="pl-chip'+((m.annul&&annulVisible())?' annul':'')+'" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l+(aff?(m.planifie?' · planifié':' · NON planifié (hachuré)'):'')+(m.saOff?' · SANS TICKETS (retiree du Suivi des appels)':''))+'" style="'+bgS+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.annul&&annulVisible()?'🔴 ':'')+(m.saOff?'🔕 ':'')+(m.isCircuit?'🚐 ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+(m.mailPending?'<div style="font-size:9px;font-weight:800">📧 À VALIDER</div>':'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div>')+plPhotosTag(m)/* b359 */+'</div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc(s)+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
+        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); var hach=(aff&&!m.planifie); var bgS=hach?('background:repeating-linear-gradient(45deg,'+st.c+' 0 6px,rgba(0,0,0,.32) 6px 10px)'):('background:'+st.c); if(m.mailPending){ bgS='background:repeating-linear-gradient(45deg,#7b61ff 0 7px,#3d2f99 7px 12px);outline:2px dashed #fff;outline-offset:-2px'; } return '<div class="pl-chip'+((m.annul&&annulVisible())?' annul':'')+'" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l+(aff?(m.planifie?' · planifié':' · NON planifié (hachuré)'):'')+(m.saOff?' · SANS TICKETS (retiree du Suivi des appels)':''))+'" style="'+bgS+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.annul&&annulVisible()?'🔴 ':'')+(m.saOff?'🔕 ':'')+(m.isCircuit?'🚐 ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+(m.mailPending?'<div style="font-size:9px;font-weight:800">📧 À VALIDER</div>':'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div>')+plPhotosTag(m)/* b359 */+'</div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc((siteInfo[s]||{}).brut||s)+'" data-ville="'+esc((siteInfo[s]||{}).ville||'')+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
         bodyR+='<tr><td class="pl-hlabel" style="position:sticky;left:0;z-index:1"><b>'+esc(lbl)+'</b>'+(qual?'<div style="font-size:10px;opacity:.8">'+esc(qual)+'</div>':'')+'</td>'+cells+'</tr>';
       });
     }); }
@@ -6369,11 +6395,11 @@ button.big:active{transform:translateY(1px)}
           var go=byId('pl-multi-go'); if(go)go.textContent='➕ Créer '+plMultiCells.length+' vacation'+(plMultiCells.length>1?'s':'');
           return;
         }
-        planningAddVacH(t3.getAttribute('data-day'),t3.getAttribute('data-site'),t3.getAttribute('data-h1'),t3.getAttribute('data-h2'));
+        planningAddVacH(t3.getAttribute('data-day'),t3.getAttribute('data-site'),t3.getAttribute('data-h1'),t3.getAttribute('data-h2'),t3.getAttribute('data-ville')||'');
       };
     });
-    box.querySelectorAll('.pl-siteadd').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); planningAddVac(plWeek,b.getAttribute('data-site')); }; });
-    box.querySelectorAll('.pl-sitecopy').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); planningCopySite(b.getAttribute('data-site')); }; });
+    box.querySelectorAll('.pl-siteadd').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); planningAddVac(plWeek,b.getAttribute('data-site'),b.getAttribute('data-ville')||''); }; });
+    box.querySelectorAll('.pl-sitecopy').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); planningCopySite(b.getAttribute('data-site'),b.getAttribute('data-ville')||''); }; });
     box.querySelectorAll('.pl-ivchip').forEach(function(c){ c.onclick=function(e){ e.stopPropagation(); var tb=document.querySelector('#tabs button[data-s="interv"]'); if(tb)tb.click(); }; });
     if(byId('pl-multi-toggle'))byId('pl-multi-toggle').onclick=function(){ plMultiSel=!plMultiSel; if(!plMultiSel)plMultiCells=[]; renderPlanning(); };
     if(byId('pl-multi-cancel'))byId('pl-multi-cancel').onclick=function(){ plMultiSel=false; plMultiCells=[]; renderPlanning(); };
