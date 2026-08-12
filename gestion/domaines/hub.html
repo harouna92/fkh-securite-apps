@@ -117,5 +117,74 @@ function sendSig(){
  document.getElementById('sig-objet').value=''; document.getElementById('sig-msg').value='';
  setTimeout(closeSig, 1200);
 }
+
+/* ===== 12/08 : LE DÉPÔT PART DE L'ENDROIT, PAS DU FICHIER =====
+   Une vue de 🌐 Domaines sait déjà CE QUI manque et OÙ ça va — domaine, casier,
+   mois, tiers. Elle demande ici l'ouverture du sélecteur ; la clé de dépôt est
+   calculée depuis ce contexte, jamais devinée depuis le fichier.
+
+   Ce pont vit dans hub.html et NON dans index.html : ce dernier est écrit par
+   une autre session, et deux sessions sur un même fichier se défont. Le hub est
+   chargé en iframe dès l'ouverture, de même origine : il peut écouter la fenêtre
+   parente et appeler ses fonctions. Rien à changer chez le voisin.
+
+   La porte est celle de b411 : on refuse tout ce qui ne vient pas de notre origine. */
+(function(){
+  var top_ = (function(){ try{ return window.parent && window.parent!==window ? window.parent : window; }catch(e){ return window; } })();
+  if(top_.__pontDepot) return; top_.__pontDepot = 1;
+
+  function propre(t){ return String(t==null?'':t)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^A-Za-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60); }
+
+  function toast(m, ok){
+    var d=document.createElement('div');
+    d.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:99;'
+      +'padding:11px 18px;border-radius:10px;font-size:13px;font-weight:600;max-width:90%;'
+      +'box-shadow:0 8px 30px rgba(0,0,0,.5);white-space:pre-line;'
+      +(ok?'background:#12241a;color:#8ef0b6;border:1px solid #2f6b46'
+          :'background:#2a1416;color:#ffb4b0;border:1px solid #6b2f2f');
+    d.textContent=m; document.body.appendChild(d);
+    setTimeout(function(){ try{document.body.removeChild(d);}catch(e){} }, 5000);
+  }
+
+  top_.addEventListener('message', function(e){
+    if(e.origin!==location.origin) return;
+    var d=e.data||{}; if(d.fkh!==1 || d.action!=='depot.attach') return;
+    var p=d.payload||{};
+    var dom=propre(p.domaine||'FKH'), casier=propre(p.casier||'_A_CLASSER');
+    var mois=propre(p.mois||''), tiers=propre(p.tiers||''), nature=propre(p.nature||'PIECE');
+
+    var up = top_.fkhUpload, pret = top_.fkhPret;
+    if(typeof up!=='function' || typeof pret!=='function' || !pret()){
+      toast('Connexion en ligne requise pour déposer un fichier.', false); return; }
+
+    var inp=document.createElement('input');
+    inp.type='file'; inp.style.display='none'; document.body.appendChild(inp);
+    inp.onchange=function(){
+      var f=this.files&&this.files[0];
+      try{ document.body.removeChild(inp); }catch(_e){}
+      if(!f) return;
+      if(f.size>15*1024*1024){ toast('Fichier trop lourd (15 Mo max).', false); return; }
+      var ext=(f.name.match(/\.[A-Za-z0-9]{1,6}$/)||[''])[0].toLowerCase();
+      var nom=[mois,nature,tiers].filter(Boolean).join('_')+ext;
+      var cle='depot/'+dom+'/'+casier+'/'+(mois||'sans-date')+'/'+nom;
+      toast('Envoi de « '+f.name+' »…', true);
+      up(cle, f, function(j){
+        if(!(j&&j.ok)){ toast("Le fichier n'a pas pu être envoyé.", false); return; }
+        /* Un dépôt sans trace est un dépôt qu'on croit fait : il ouvre un ticket. */
+        try{ top_.postMessage({fkh:1, action:'ticket.create', payload:{
+          objet:'📎 Déposé : '+nature+' '+tiers+' ('+(mois||'sans date')+')',
+          message:'Fichier « '+f.name+' » déposé depuis '+(p.source||'Domaines')+'.\n'
+                 +'Clé : '+cle+'\nÀ ranger en local dans le dossier du domaine '+dom+'.',
+          pour:'admin', source:'📎 Dépôt', contexte:['Dépôt '+dom, casier, cle],
+          ref:dom+':depot:'+nom }}, location.origin); }catch(_e){}
+        toast('✅ Déposé — '+cle+'\nIl sera rangé dans le dossier local au prochain passage.', true);
+      });
+    };
+    inp.click();
+  });
+})();
+
 </script>
 </body></html>
