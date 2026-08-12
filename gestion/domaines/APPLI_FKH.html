@@ -115,6 +115,41 @@ function render(){
  document.getElementById('body').innerHTML=GROUPS.map(g=>'<div class=&quot;grp&quot;><div class=&quot;gh&quot;><i class=&quot;ti '+g.i+'&quot;></i> '+g.t+'</div><div class=&quot;tiles&quot;>'+g.tiles.map(t=>'<div class=&quot;tile&quot; onclick=&quot;go(this.dataset.p)&quot; data-p=&quot;'+t.p.replace(/&quot;/g,'&amp;quot;')+'&quot;><i class=&quot;ti '+t.i+'&quot;></i><div><div class=&quot;t&quot;>'+t.t+'</div>'+(t.d?'<div class=&quot;d&quot;>'+t.d+'</div>':'')+'</div></div>').join('')+'</div></div>').join('');
 }
 render();
+
+/* ---- branchement carnet — 2026-08-12 --------------------------------------
+   Deux des six compteurs se calculent : le reste dû clients et les charges du
+   dernier mois. Les quatre autres (courriers, cascade, conformité ST, tâches auto)
+   ne sont pas dans le carnet — ils restent tels quels, et le bandeau de la vue dit
+   d'où viennent les chiffres.
+   Le compteur « Impayés clients » est renommé « Reste dû clients » : c'est ce que
+   le calcul donne réellement (facturé TTC − encaissé). Garder l'ancien nom sur une
+   nouvelle définition, c'est mettre un chiffre juste au mauvais endroit. */
+const _HORSH=['Sous-traitant','Salaire agent','Charge sociale','Charge fiscale','Encaissement client/DO','Encaissement client'];
+const _eurh=n=>Math.round(n).toLocaleString('fr-FR')+' €';
+function carnetHub(d){
+  if(!d)return false;
+  let bouge=false;
+  const ca=d.ca_client_2026||[], enc=d.encaissements_client_2026||[];
+  if(ca.length&amp;&amp;enc.length){
+    const f=ca.reduce((a,x)=>a+(x.ca_net_ttc||0),0);
+    const e=enc.reduce((a,x)=>a+(x.encaisse_ttc||0),0);
+    const k=KPIS.filter(x=>/Impay|Reste d/.test(x.l))[0];
+    if(k){ k.l='Reste dû clients'; k.n=_eurh(f-e); bouge=true; }
+  }
+  const M=d.mouvements_2026||[];
+  if(M.length){
+    const mois=M[M.length-1].mois, court=String(mois).split(' ')[0];
+    const t=M.filter(x=>x.mois===mois&amp;&amp;String(x.sens).toUpperCase().indexOf('SORT')===0
+                        &amp;&amp;_HORSH.indexOf(x.categorie)<0)
+             .reduce((a,x)=>a+(x.ttc||0),0);
+    const k=KPIS.filter(x=>/À régler|Charges du mois/.test(x.l))[0];
+    if(k){ k.l='Charges '+court.toLowerCase(); k.n=_eurh(t); bouge=true; }
+  }
+  if(!bouge)return false;
+  document.getElementById('kpis').innerHTML=KPIS.map(k=>'<div class=&quot;kpi&quot; onclick=&quot;go(this.dataset.p)&quot; data-p=&quot;'+k.p+'&quot;><div class=&quot;l&quot;>'+k.l+'</div><div class=&quot;n&quot; style=&quot;color:'+k.c+'&quot;>'+k.n+'</div></div>').join('');
+  return true;
+}
+try{window.CARNET.onData(function(s){ if(s&amp;&amp;s.data) carnetHub(s.data); });}catch(e){}
 </script>
 <script>(function(){var id=&quot;hub&quot;;function r(){try{parent.postMessage({__id:id,__h:document.documentElement.scrollHeight||document.body.scrollHeight},&quot;*&quot;)}catch(e){}}window.addEventListener(&quot;load&quot;,function(){r();setTimeout(r,300);try{new MutationObserver(r).observe(document.body,{subtree:true,childList:true,attributes:true})}catch(e){}});document.addEventListener(&quot;click&quot;,function(){setTimeout(r,60);setTimeout(r,250)});window.addEventListener(&quot;message&quot;,function(e){if(e&amp;&amp;e.data&amp;&amp;e.data.__ask){r();setTimeout(r,150);setTimeout(r,400)}});setTimeout(r,900);setTimeout(r,1800);})();</script></body>
 </html>
@@ -1008,6 +1043,55 @@ function render(){
   }
 }
 render();
+
+/* ---- branchement carnet — 2026-08-12 --------------------------------------
+   « Justificatifs charges fournisseurs » n'avait que janvier câblé ; février à
+   décembre affichaient « Lignes à câbler depuis la source ». La source existe
+   pourtant : le carnet transporte TB_2026_Mvts ligne à ligne depuis d17, avec le
+   statut de la pièce. On recalcule donc les mois, leurs lignes et leurs compteurs
+   à l'affichage — plus rien n'est « à câbler ». G-65. */
+const _MOISP=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const _HORS=['Sous-traitant','Salaire agent','Charge sociale','Charge fiscale','Encaissement client/DO','Encaissement client'];
+const _eurp=n=>n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+function _noeud(t,lab){                 /* retrouve un noeud de l'arbre par son libellé */
+  for(const n of t){ if(n.l&amp;&amp;n.l.indexOf(lab)===0)return n;
+    if(n.c){ const r=_noeud(n.c,lab); if(r)return r; } }
+  return null;
+}
+function carnetPilotage(d){
+  const M=d&amp;&amp;d.mouvements_2026;
+  if(!M||!M.length)return false;
+  const noeud=_noeud(TREE,'Justificatifs charges fournisseurs');
+  if(!noeud)return false;
+  let tot=0, okTot=0;
+  const mois=[];
+  _MOISP.forEach(mo=>{
+    const L=M.filter(x=>String(x.mois).split(' ')[0]===mo
+                     &amp;&amp; String(x.sens).toUpperCase().indexOf('SORT')===0
+                     &amp;&amp; _HORS.indexOf(x.categorie)<0);
+    if(!L.length)return;
+    const lignes=L.map(x=>{
+      const piece=(String(x.statut||'').indexOf('✅')===0);
+      return {l:(x.contrepartie||x.libelle||'—'), v:_eurp(x.ttc),
+              s:(piece?'ok':'warn'), src:'TB_2026_Mvts · '+mo,
+              act:piece?['Ouvrir la pièce','Source']:['Rattacher une pièce','Créer tâche']};
+    });
+    const ok=lignes.filter(x=>x.s==='ok').length;
+    tot+=L.length; okTot+=ok;
+    mois.push({l:mo, v:ok+' / '+L.length, s:(ok===L.length?'ok':'warn'), c:lignes});
+  });
+  if(!mois.length)return false;
+  noeud.c=mois;
+  noeud.v=okTot+' / '+tot+' ('+Math.round(okTot*100/tot)+' %)';
+  noeud.s=(okTot===tot?'ok':'warn');
+  /* trace de contrôle : ce que la vue a réellement recalculé, lisible de l'extérieur.
+     Sans elle, impossible de vérifier un noeud d'arbre replié autrement qu'à l'oeil. */
+  window.__PILOTAGE_CARNET__={mois:mois.length, lignes:tot, avec_piece:okTot,
+                              detail:mois.map(function(m){return m.l+' '+m.v;})};
+  render();
+  return true;
+}
+try{window.CARNET.onData(function(s){ if(s&amp;&amp;s.data) carnetPilotage(s.data); });}catch(e){}
 </script>
 <script>(function(){var id=&quot;pilotage&quot;;function r(){try{parent.postMessage({__id:id,__h:document.documentElement.scrollHeight||document.body.scrollHeight},&quot;*&quot;)}catch(e){}}window.addEventListener(&quot;load&quot;,function(){r();setTimeout(r,300);try{new MutationObserver(r).observe(document.body,{subtree:true,childList:true,attributes:true})}catch(e){}});document.addEventListener(&quot;click&quot;,function(){setTimeout(r,60);setTimeout(r,250)});window.addEventListener(&quot;message&quot;,function(e){if(e&amp;&amp;e.data&amp;&amp;e.data.__ask){r();setTimeout(r,150);setTimeout(r,400)}});setTimeout(r,900);setTimeout(r,1800);})();</script></body>
 </html>
