@@ -1337,6 +1337,14 @@
    "theme": "Suivi des demandes",
    "pourquoipas": "b415 a corrigé le CALCUL, pas ce qui était DÉJÀ ÉCRIT. Les lignes « ↦ ville à N km » sont du texte rangé dans la demande, pas un calcul refait à l'affichage. Celle de Valence a été réécrite quand Zeus a corrigé le code postal — mais avant b415, donc avec « ↦ Valence à 2 km » dedans — et depuis plus rien ne la touche : svRecalcProches ne part que si la ville ou le CP CHANGE. Ré-enregistrer sans rien modifier ne suffit pas ; il aurait fallu mettre un faux code postal puis remettre le bon. Au chargement, on repère désormais les demandes dont les « ↦ » citent LEUR PROPRE ville — la signature exacte du défaut — et on les recalcule une fois. Ciblé (une demande saine n'est pas touchée) et ça s'éteint tout seul. Vérifié sur le cas de Zeus, sans un clic : avant « ↦ Valence 2 km · Grenoble 70 km », après « ↦ Grenoble 70 km · Saint-Étienne 71 km ». LEÇON : corriger un calcul ne corrige pas ce qu'il a déjà écrit — il faut prévoir la reprise du stock.",
    "local": true
+  },
+  {
+   "b": 419,
+   "titre": "Le badge du carnet dit la vérité jusque DANS les vues",
+   "source": "Zeus 12/08 : « oui corrige le dans les vues aussi »",
+   "theme": "Domaines",
+   "pourquoipas": "La coque affichait « carnet ○ instantané embarqué » depuis b418, mais chaque vue porte son propre badge, resté à « carnet ✓ » : le cadre disait la vérité, le contenu mentait un étage plus bas. La vue ne pouvait pas faire mieux — la coque lui envoyait {__data, __err, __at} sans jamais lui dire d'où venaient les chiffres. La coque joint désormais __src, le pont de la vue le conserve, et les badges s'en servent. Deux variantes de code coexistaient (texte composé par l'appelant, ou par setSt lui-même) : les deux sont traitées, 8 setSt réécrits et 26 points de réception marqués sur les 4 cockpits. Vérifié après vidage du cache : sur GARIS, les vues ST/CA/ÉTAT affichent toutes « carnet ○ instantané embarqué », comme la coque. Au passage, question cascade ST GARIS : il n'y a rien à construire. La vue existe, elle fonctionne, et elle dit l'état réel — aucun sous-traitant propre à GARIS, l'onglet Sous_Traitance du classeur est « À renseigner », et la cascade où GARIS figure vit dans DATA_FKH.json parce que GARIS EST le sous-traitant. R-MAITRE-PAR-SOCIETE-01 interdit de rapatrier le chiffre FKH ici. Reste une décision pour Zeus : GARIS aura-t-il ses propres ST ?",
+   "local": true
   }
  ],
  "attente": [
