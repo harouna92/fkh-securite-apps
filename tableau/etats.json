@@ -1297,14 +1297,25 @@
    "theme": "Domaines",
    "pourquoipas": "En b415 les RADAR régénérés avaient été posés A COTE : trois fichiers RADAR_<DOM>.html et un bouton 📡 sur la carte du hub. Or chaque cockpit a DEJA son onglet RADAR, dont le contenu est un radar embarqué en srcdoc. Il y avait donc deux RADAR par domaine en production — le neuf derrière le bouton du hub, le vieux figé en juillet dans le cockpit — et c'est le vieux qu'on atteignait en ouvrant un cockpit normalement. Rien n'indiquait lequel faisait foi. Corrigé : le contenu régénéré remplace celui de <iframe id=\"if-radar\"> dans APPLI_FKH / APPLI_DAHLIA / APPLI_GARIS, en conservant les deux enveloppes que le cockpit pose autour de chaque vue (sendPrompt + le script qui remonte la hauteur, var id=radar) ; sans elles la vue perdrait le carnet et garderait une hauteur figée. Le bouton du hub et les trois fichiers séparés sont supprimés, hub.html revient à sa version d'origine. APPLI_PERSO n'a pas d'onglet RADAR : ce n'est pas un domaine société, rien à y faire. Vérifié en ouvrant les trois cockpits : DAHLIA 5 sections dont 💶 Facturation 2026, GARIS 6 sections avec 576 827,14 € TTC réels, FKH la ligne Agathe sous 📞 Appels & mails. Deux faux positifs écartés au passage : « showV is not defined » venait d'une lecture faite pendant le chargement, et l'erreur console « Unexpected string » est présente à l'identique sur la sauvegarde d'avant — antérieure, sans effet fonctionnel.",
    "local": true
+  },
+  {
+   "b": 415,
+   "titre": "La ville de la demande ne figure plus parmi ses propres villes proches",
+   "source": "Zeus 12/08",
+   "theme": "Villes / demandes",
+   "pourquoipas": "Zeus, après avoir corrigé la demande en Valence 26000 : « pourquoi dans les deux villes les plus proches ça me met Valence dedans ? ». Les villes proches disent d'où un agent peut venir ; y mettre la ville elle-même occupait une des deux places avec ce qu'on sait déjà — une piste perdue sur deux, sur une demande urgente. `nearBig` écartait les villes à moins d'UN kilomètre : un garde-fou de distance, pas d'identité. Il y a 2 km entre le centre de Valence et son point dans la liste des grandes villes, elle passait au travers — et ça valait pour toute grande ville où on cherche un agent SUR PLACE. L'exclusion se fait maintenant sur le NOM. Banc : avant « Valence 2 km · Grenoble 70 km », après « Grenoble 70 km · Saint-Étienne 71 km » — la deuxième place est rendue.",
+   "local": true
+  },
+  {
+   "b": 416,
+   "titre": "Le code postal fait foi, le nom entendu reste écrit à côté",
+   "source": "Zeus 12/08",
+   "theme": "Villes / demandes",
+   "pourquoipas": "Zeus : « on n'a pas besoin de la population, le client nous appelle pour nous proposer une mission, on se fie uniquement à ce qu'il nous donne » — puis « affiche les deux ». Il avait raison et la mesure le prouve : sur les 67 demandes où le client a donné son code postal, le nom entendu ne concorde que 26 fois. Les 41 autres ne sont pas des codes faux, ce sont des noms mal entendus (Guissan/Gruissan 11430, Sars-Union/Sarre-Union 67260, Montmaraud/Montmarault 03390, Minot/Millau 12100) : les chiffres traversent la transcription, les noms propres se déforment. Or `aiBuildDemande` cherchait par le NOM d'abord et ne regardait le code qu'en secours — elle croyait le fragile et jetait le solide. Pire cas : un nom PLAUSIBLE (Minot existe en Côte-d'Or) battait un code exact, et l'incohérence ne se voyait pas. Et sans code donné elle en INVENTAIT un — origine du « Valence (16460) », alors que la transcription ne contient aucun code postal. Désormais : le code fait foi ; le nom ne sert qu'à départager quand un code couvre plusieurs communes ; les deux s'affichent quand ils diffèrent ; sans code et avec un nom ambigu on ne choisit pas — « À PRÉCISER », aucune coordonnée, donc aucune distance. La population est retirée de toute décision (le tri de b414 ne sert plus qu'à ordonner une liste offerte à un humain). Banc sur 6 cas réels : Guissan→Gruissan, Minot→Millau, Valence sans CP→À PRÉCISER sans distances, Monéteau→inchangé.",
+   "local": true
   }
  ],
  "attente": [
-  {
-   "titre": "🗺️ Trouver la bonne commune : d'abord CE QUE L'APPELANT A DIT, la population en dernier",
-   "source": "Zeus 12/08 — recadrage, et il a raison",
-   "note": "J'étais parti sur un départage par population (b414). Zeus : « ce n'est pas un rapport avec le nombre de personnes dans la ville, c'est un rapport avec ce que l'interlocuteur a dit ». La preuve est dans l'audio d'Enelis (appel 1856070675) : l'appelant dit TROIS FOIS « dans les 10 » — le département, l'Aube — et parle de « Total Troy » (Troyes). La transcription a écrit « Saint-Savin » pour Sainte-Savine et « Enelis » pour ENEDIS. L'appli a résolu Saint-Savin -> Gironde 33920, à 500 km ; ma correction par population l'aurait envoyé en Isère 38300, ENCORE PLUS LOIN. La vraie réponse est Sainte-Savine 10300 — et FKH y a déjà « Enedis Sainte Savine Dr Champagne Ardenne » au Planning (AQUILA, 31/07 et 01/08). MESURE : sur 99 demandes détectées, 67 (68 %) portent un CP dit à l'appel, 32 non, et 0 cas où le CP était dans l'audio sans être repris. TROIS LEVIERS, dans cet ordre : (1) le CP ou le DÉPARTEMENT dit à l'appel — « dans les 10 » n'est aujourd'hui pas capté du tout ; (2) les SITES DÉJÀ CONNUS du Planning — « Enedis Sainte Savine » existe, le rapprochement aurait donné la bonne ville malgré la transcription approximative ; (3) la population, en dernier recours ET en le disant. b414 (le tri) reste valable comme filet, pas comme méthode."
-  },
   {
    "titre": "🔚 Un ticket coché par une PHOTO quitte la file de l'opératrice sans qu'elle le sache",
    "source": "Zeus 10/08 — fin de service Lons-le-Saunier",

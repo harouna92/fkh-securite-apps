@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b414</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b416</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1335,10 +1335,12 @@ button.big:active{transform:translateY(1px)}
        tombait en Charente (192 hab.) au lieu de la Drôme (64 458). 1 482 noms sont dans ce cas.
        On départage comme l'API officielle : à la POPULATION. Et un nom exact passe devant un
        nom qui commence pareil — « Valence » ne se fait pas doubler par « Valence-d'Albigeois ». */
-    /* b414 : la population seule mettait Saint-Denis de La Réunion (153 000) devant celui de
-       Seine-Saint-Denis (113 000). Exact, et faux pour FKH — les prestations sont en métropole.
-       Alors : nom exact d'abord, métropole ensuite, population enfin. Une commune d'outre-mer
-       reste proposée, simplement pas en tête. À revoir le jour où FKH travaille outre-mer. */
+    /* ===== b416 : LA POPULATION N'EST PLUS UN ARBITRE (Zeus, 12/08) =====
+       « On n'a pas besoin de la population. Le client nous appelle pour nous proposer une
+       mission, on se fie uniquement à ce qu'il nous donne. » Il a raison, et Enelis le prouve :
+       l'appelant avait dit « dans les 10 » (l'Aube, Sainte-Savine) ; la population aurait
+       envoyé l'agent en Isère, à 500 km. Ce tri ne sert plus qu'à ORDONNER une liste proposée
+       à un humain — jamais à trancher à sa place (voir aiBuildDemande, b416). */
     function _dom(i9){ var c9=String((COMMUNES[i9]&&COMMUNES[i9][1])||'').slice(0,2); return (c9==='97'||c9==='98')?1:0; }
     pref.sort(function(a,b){
       var ea=(COMMUNES_IDX[a]===nq)?0:1, eb=(COMMUNES_IDX[b]===nq)?0:1;
@@ -2137,7 +2139,16 @@ button.big:active{transform:translateY(1px)}
     if(!b.length)return '';
     return '<div class="fa-d" style="color:var(--bad);margin-top:2px;font-weight:600">📊 Anomalies agent ('+s.missions+' mission'+(s.missions>1?'s':'')+' suivie'+(s.missions>1?'s':'')+') : '+b.join(' · ')+'</div>'; }
   function missCountdown(x){ if(!x.mdate)return ''; var t=new Date(x.mdate+'T'+((x.mheure||'00:00'))+':00'); if(isNaN(t.getTime()))return ''; var diff=t.getTime()-Date.now(); if(diff<=0)return '🟢 mission commencée / passée'; var mins=Math.floor(diff/60000),d=Math.floor(mins/1440),h=Math.floor((mins%1440)/60),mm=mins%60,p=[]; if(d)p.push(d+' j'); if(h||d)p.push(h+' h'); if(!d)p.push(mm+' min'); return '⏳ commence dans '+p.join(' '); }
-  function nearBig(la,lo,n){ if(la==null||lo==null||typeof BIG==='undefined'||!BIG)return []; return BIG.map(function(b){return {n:b[0],d:km(la,lo,b[1],b[2])};}).filter(function(x){return x.d>1;}).sort(function(a,b){return a.d-b.d;}).slice(0,n||2); }
+  /* b415 : `sauf` = la ville de la demande. On l'écarte par son NOM, pas par sa distance :
+   le seuil d'un kilomètre ne l'attrapait pas (2 km entre le centre de Valence et le point de
+   la liste des grandes villes), et elle mangeait une des deux places. */
+  function nearBig(la,lo,n,sauf){ if(la==null||lo==null||typeof BIG==='undefined'||!BIG)return [];
+    var _sf=(typeof commNorm==='function')?commNorm(sauf||''):String(sauf||'').toLowerCase();
+    return BIG.map(function(b){return {n:b[0],d:km(la,lo,b[1],b[2])};})
+      .filter(function(x){ if(x.d<=1)return false;
+        if(_sf){ var _xn=(typeof commNorm==='function')?commNorm(x.n):String(x.n).toLowerCase(); if(_xn===_sf)return false; }
+        return true; })
+      .sort(function(a,b){return a.d-b.d;}).slice(0,n||2); }
   var _geoDeb; function geoScheduleSave(){ clearTimeout(_geoDeb); _geoDeb=setTimeout(function(){ if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); },900); }
   /* ===== b398 : LES VILLES PROCHES SUIVENT LA VILLE =====
      Elles etaient calculees a la creation et jamais recalculees. Corriger « Toulouse » en
@@ -2148,7 +2159,7 @@ button.big:active{transform:translateY(1px)}
     var sans=lignes.filter(function(l){ return l.indexOf('\u21a6 ')!==0; });
     var neuf=[];
     if(it.la!=null&&it.lo!=null&&typeof nearBig==='function'){
-      neuf=(nearBig(it.la,it.lo,2)||[]).map(function(b){ return '\u21a6 '+b.n+' \u00e0 '+Math.round(b.d)+' km'; });
+      neuf=(nearBig(it.la,it.lo,2,it.ville||'')||[]).map(function(b){ return '\u21a6 '+b.n+' \u00e0 '+Math.round(b.d)+' km'; });   /* b415 */
     }
     var avant=it.texte;
     /* on remet les nouvelles lignes la ou etaient les anciennes : juste apres la ville. */
@@ -2157,7 +2168,7 @@ button.big:active{transform:translateY(1px)}
     it.texte=sans.slice(0,i+1).concat(neuf).concat(sans.slice(i+1)).join('\n');
     return it.texte!==avant;
   }
-  function bigCitiesLine(x){ if(x.statut!=='validee')return ''; if(x.la!=null&&x.lo!=null){ var nb=nearBig(x.la,x.lo,2); return nb.length?'<div class="meta"><span>🏙️ Grandes villes proches : '+nb.map(function(c){return esc(c.n)+' ('+c.d+' km)';}).join(' · ')+'</span></div>':''; } if(!x._nogeo&&!x._geotried&&(x.ville||extractVille(x.texte))){ x._geotried=true; ensureGeo(x,function(){ geoScheduleSave(); }); } return ''; }
+  function bigCitiesLine(x){ if(x.statut!=='validee')return ''; if(x.la!=null&&x.lo!=null){ var nb=nearBig(x.la,x.lo,2,x.ville||'');   /* b415 */ return nb.length?'<div class="meta"><span>🏙️ Grandes villes proches : '+nb.map(function(c){return esc(c.n)+' ('+c.d+' km)';}).join(' · ')+'</span></div>':''; } if(!x._nogeo&&!x._geotried&&(x.ville||extractVille(x.texte))){ x._geotried=true; ensureGeo(x,function(){ geoScheduleSave(); }); } return ''; }
   function afResults(x){ var q=(x._afq||'').toLowerCase().trim(); if(!q)return '<div class="hint" style="padding:4px 2px">Tape un nom, un numéro ou une ville.</div>'; if(!FA)return ''; var arr=FA.filter(function(a){return (((a.nom||'')+' '+((a.tels||[]).join(' '))+' '+(a.ville||'')).toLowerCase().indexOf(q)>=0);}).slice(0,8); if(!arr.length)return '<div class="hint" style="padding:4px 2px">Aucun agent trouvé — crée-le ci-dessous.</div>'; return arr.map(function(a){var miss=agentMissing(a),bd=miss.length?' <span style="color:var(--warn)">⚠ '+miss.map(esc).join(' · ')+'</span>':'';return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+'</div><div class="fa-d">'+esc((a.tels||[]).join(' / ')||'—')+(a.ville?' · '+esc(a.ville):'')+bd+tenueBadge(a)+'</div></div><div class="fa-a"><button class="ok" data-act="affpick" data-id="'+x.id+'" data-aid="'+a.id+'">Choisir</button></div></div>';}).join(''); }
   // Extrait date + heure de début depuis le texte de la mission (pré-remplissage de l'affectation)
   function deriveMissionDT(txt){ txt=String(txt||''); var d='',h='',m;
@@ -7545,10 +7556,44 @@ button.big:active{transform:translateY(1px)}
   // Règle Zeus 01-08 : FKH n'est JAMAIS le client (c'est nous). Toute détection « client=FKH » est ignorée.
   function _edClientChips(card,flt){ var box=card&&card.querySelector('.ed-clsugg'); if(!box)return; var dl=document.getElementById('edclients-dl'); var names=dl?[].slice.call(dl.children).map(function(o){return o.value;}):[]; var f=(flt||'').toLowerCase(); var list=names.filter(function(n){return !f||n.toLowerCase().indexOf(f)>=0;}).slice(0,10); box.innerHTML=list.map(function(n){return '<button type="button" class="ed-cl" data-n="'+esc(n)+'" style="font-size:11.5px">'+esc(n)+'</button>';}).join('')||'<span class="sub" style="font-size:11px;margin:0">aucun client connu ne correspond</span>'; }
   function notFKH(c){ return /^\s*fkh/i.test(String(c||''))?'':String(c||'').trim(); }
-  function aiBuildDemande(call,d){ var sel=(d.ville&&typeof commSearch==='function')?(commSearch(d.ville,1)||[])[0]:null; if(!sel&&d.cp&&typeof commByCP==='function')sel=(commByCP(d.cp,1)||[])[0];
-    var cp=d.cp||(sel&&sel.codesPostaux?sel.codesPostaux[0]:''), vn=sel?sel.nom:(d.ville||''); var la=(sel&&sel.centre)?sel.centre.coordinates[1]:null, lo=(sel&&sel.centre)?sel.centre.coordinates[0]:null;
+  function aiBuildDemande(call,d){
+    /* ===== b416 : LE CODE POSTAL FAIT FOI, LE NOM SE DÉFORME =====
+       Le nom passait avant le code. Sur les 67 demandes où le client a donné son code postal,
+       le nom entendu ne concorde que 26 fois : « Guissan » pour Gruissan (11430), « Minot »
+       pour Millau (12100)… Ce ne sont pas les codes qui sont faux, ce sont les noms.
+       Et « Minot » existe vraiment ailleurs : un nom plausible battait un code exact. */
+    var _cpDit=String(d.cp||'').replace(/\D/g,''); if(_cpDit.length!==5)_cpDit='';
+    var _vDit=String(d.ville||'').trim(), sel=null, _aPreciser=false, _redresse='';
+    if(_cpDit&&typeof commByCP==='function'){
+      var _lc=commByCP(_cpDit,25)||[];
+      if(_lc.length===1)sel=_lc[0];
+      else if(_lc.length>1){   /* plusieurs communes sous ce code : le nom entendu départage */
+        if(_vDit&&typeof commNorm==='function'){ var _nv=commNorm(_vDit);
+          for(var _i=0;_i<_lc.length&&!sel;_i++) if(commNorm(_lc[_i].nom)===_nv)sel=_lc[_i]; }
+        if(!sel)sel=_lc[0];
+      }
+      if(sel&&_vDit&&typeof commNorm==='function'&&commNorm(sel.nom)!==commNorm(_vDit))_redresse=_vDit;
+    }
+    /* Pas de code postal donné : on ne l'invente pas. Si le nom ne désigne qu'une commune on la
+       prend ; s'il en désigne plusieurs, on ne choisit pas — mieux vaut rien qu'un chiffre faux. */
+    if(!sel&&_vDit&&typeof commSearch==='function'){
+      var _ln=commSearch(_vDit,25)||[], _ex=[];
+      if(typeof commNorm==='function'){ var _n2=commNorm(_vDit);
+        _ex=_ln.filter(function(c){ return commNorm(c.nom)===_n2; }); }
+      if(_ex.length===1)sel=_ex[0];
+      else if(_ex.length>1)_aPreciser=true;
+      else if(_ln.length===1)sel=_ln[0];
+      else if(_ln.length>1)_aPreciser=true;
+    }
+    var cp=_cpDit||(sel&&!_aPreciser&&sel.codesPostaux?sel.codesPostaux[0]:'');
+    var vn=(sel&&!_aPreciser)?sel.nom:_vDit;
+    var la=(sel&&!_aPreciser&&sel.centre)?sel.centre.coordinates[1]:null, lo=(sel&&!_aPreciser&&sel.centre)?sel.centre.coordinates[0]:null;
     var near=(la!=null&&typeof BIG!=='undefined')?BIG.map(function(b){return {n:b[0],la:b[1],lo:b[2],d:Math.round(km(la,lo,b[1],b[2]))};}).filter(function(x){return x.d>1&&x.n!==vn;}).sort(function(a,b){return a.d-b.d;}).slice(0,2):[];
-    var L=['Prestation : Gardiennage','Type d\'agent : ADS']; var _dc=notFKH(d.client); if(_dc)L.push('Client : '+_dc); if(d.type_site)L.push('Type de site : '+d.type_site); if(d.site)L.push('Site : '+d.site); if(vn||cp)L.push('Ville : '+vn+(cp?' ('+cp+')':'')); near.forEach(function(x){ L.push('↦ '+x.n+' à '+x.d+' km'); });
+    var L=['Prestation : Gardiennage','Type d\'agent : ADS']; var _dc=notFKH(d.client); if(_dc)L.push('Client : '+_dc); if(d.type_site)L.push('Type de site : '+d.type_site); if(d.site)L.push('Site : '+d.site); /* b416 : on écrit ce qu'on a retenu ET ce qui a été entendu, quand les deux diffèrent.
+       Et quand rien ne permet de trancher, on le dit au lieu d'inscrire un code inventé. */
+    if(vn||cp)L.push('Ville : '+vn+(cp?' ('+cp+')':'')
+      +(_redresse?(' \u00b7 entendu : \u00ab '+_redresse+' \u00bb'):'')
+      +(_aPreciser?' \u2014 \u26a0\uFE0F \u00c0 PR\u00c9CISER : aucun code postal donn\u00e9 et plusieurs communes portent ce nom':'')); near.forEach(function(x){ L.push('↦ '+x.n+' à '+x.d+' km'); });
     var vacs=d.vacations||[], totMin=0;
     vacs.forEach(function(v,i){ L.push(vacs.length>1?('Vacation '+(i+1)+'/'+vacs.length+' :'):'Vacation :'); if(v.date)L.push('   📅 Date : '+v.date); if(v.horaires)L.push('   🕐 Créneau : '+v.horaires); var mn=vacDurMin(v.horaires); if(mn){ L.push('   ⏱ Plage : '+fmtDurMin(mn)); totMin+=mn; } });
     if(d.nb_agents)L.push('Agents : '+d.nb_agents); if(d.urgent)L.push('🔴 URGENT'); if(call.resume)L.push('Notes : '+call.resume);
