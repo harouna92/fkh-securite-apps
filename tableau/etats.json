@@ -1283,20 +1283,22 @@
    "local": true
   },
   {
-   "b": 415,
+   "b": "d1",
    "titre": "📡 Les RADAR des 3 domaines dans 🌐 Domaines, et le contrôle du mois",
    "source": "Zeus 12/08 : « insérer dans Domaines pour qu'on les ouvre depuis l'appli » + « avec quels clients on a travaillé le mois M-1 »",
    "theme": "Domaines / Facturation",
    "pourquoipas": "Les RADAR de DAHLIA et GARIS étaient des listes plates écrites à la main, figées en juillet, sans facturation ni drill : 5,8 et 4,7 Ko contre 48 Ko pour celui de FKH. Ils sont maintenant générés en clonant la coquille FKH — même moteur, même drill à deux niveaux, même bouton d'action — avec les données lues à la source (dossiers de factures pour DAHLIA, classeur maître pour GARIS, jamais recopiées à la main). Chaque carte de 🌐 Domaines gagne un bouton 📡 RADAR et le viewer une bascule Cockpit/RADAR ; PERSO n'en a pas, ce n'est pas un domaine société. Défaut réparé au passage : les boutons d'action du RADAR appelaient sendPrompt, qui n'existe pas dans l'appli — hors session Claude ils ne faisaient rien, en silence. Ils passent par le pont b411 : un clic crée un vrai ticket 🎫, avec accusé à l'écran. Ajout de CONTROLE_MOIS.html, le contrôle demandé par Zeus : mois passés lus dans les factures présentes (continuité par client, trous signalés), juillet et après par les clients avec qui on a travaillé, proposés depuis les mails séparés par boîte (fkhsecurite/dahliasecurite/garissecurite) et validés par Zeus ; les confirmés sans facture partent au RADAR de LEUR domaine, un ticket par domaine ET par mois pour que le rattrapage de juin ne se noie pas dans juillet. Plus la section 🏦 qui applique enfin R-RELEVE-M-1-01 (gravée le 12/07, jamais appliquée hors DAHLIA) : 7 relevés manquants côté société, avec le retard en jours. Vérifié dans l'appli en bac à sable : dépliage, compteurs cohérents avec ce qu'ils ouvrent, 3 puis 4 tickets réellement créés et retirés après contrôle. Deux compteurs menteurs corrigés avant livraison — une alerte GARIS qui survivait à sa réparation, et un décompte de relevés à 7 pendant que 14 pastilles rouges s'affichaient.",
-   "local": true
+   "local": true,
+   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
   },
   {
-   "b": 416,
+   "b": "d2",
    "titre": "Le RADAR revient DANS le cockpit — fin du doublon",
    "source": "Zeus 12/08 : « quand je parle de radar je parle de la section radar qui se trouve dans le cockpit » · « je ne vois pas pourquoi tu es sortie de la section domaines »",
    "theme": "Domaines",
    "pourquoipas": "En b415 les RADAR régénérés avaient été posés A COTE : trois fichiers RADAR_<DOM>.html et un bouton 📡 sur la carte du hub. Or chaque cockpit a DEJA son onglet RADAR, dont le contenu est un radar embarqué en srcdoc. Il y avait donc deux RADAR par domaine en production — le neuf derrière le bouton du hub, le vieux figé en juillet dans le cockpit — et c'est le vieux qu'on atteignait en ouvrant un cockpit normalement. Rien n'indiquait lequel faisait foi. Corrigé : le contenu régénéré remplace celui de <iframe id=\"if-radar\"> dans APPLI_FKH / APPLI_DAHLIA / APPLI_GARIS, en conservant les deux enveloppes que le cockpit pose autour de chaque vue (sendPrompt + le script qui remonte la hauteur, var id=radar) ; sans elles la vue perdrait le carnet et garderait une hauteur figée. Le bouton du hub et les trois fichiers séparés sont supprimés, hub.html revient à sa version d'origine. APPLI_PERSO n'a pas d'onglet RADAR : ce n'est pas un domaine société, rien à y faire. Vérifié en ouvrant les trois cockpits : DAHLIA 5 sections dont 💶 Facturation 2026, GARIS 6 sections avec 576 827,14 € TTC réels, FKH la ligne Agathe sous 📞 Appels & mails. Deux faux positifs écartés au passage : « showV is not defined » venait d'une lecture faite pendant le chargement, et l'erreur console « Unexpected string » est présente à l'identique sur la sauvegarde d'avant — antérieure, sans effet fonctionnel.",
-   "local": true
+   "local": true,
+   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
   },
   {
    "b": 415,
@@ -1323,12 +1325,13 @@
    "local": true
   },
   {
-   "b": 418,
+   "b": "d3",
    "titre": "Le contrôle du mois dans les 3 cockpits · le carnet dit d’où viennent ses chiffres",
    "source": "Zeus 12/08 : « découpe le contrôle du mois » · « retire le [pied SUIVI_DEPOT] aussi pour fkh » · « regénère les carnets pour qu’ils soient à jour »",
    "theme": "Domaines",
    "pourquoipas": "Trois choses, toutes dans la section Domaines. (1) Le contrôle du mois est découpé par domaine et posé en tête du RADAR de chaque cockpit — FKH 4 lignes dont le rattrapage AQUILA juin, DAHLIA 3 lignes (juillet complet), GARIS 3 lignes avec la mise en garde écrite que ses lignes viennent de la continuité de facturation et non d'une preuve mail, sa boîte étant vide en juillet. PERSO est hors sujet, ce n'est pas un domaine société. (2) Le pied « Mettre en miroir dans SUIVI_DEPOT » est retiré des trois radars, avec ses cases à cocher et ses deux fonctions : le système dit que le présent/manquant est régénéré depuis le maître COCKPIT_FKH.html, donc le bouton était un second chemin manuel vers la même destination — et en clonant la coquille FKH je l'avais recopié chez DAHLIA et GARIS où SUIVI_DEPOT n'existe pas. (3) Le badge du carnet distingue enfin trois états. Il affichait « carnet ✓ » avec l'heure courante alors que CARNET était littéralement window.__CARNET_DEMO__, et le court-circuit « si un instantané est embarqué, prends-le » empêchait toute lecture du Drive : les cockpits n'étaient jamais vivants, nulle part. GARIS était le seul honnête. Désormais : ✓ Drive / ○ instantané embarqué / — figé, l'instantané n'est plus qu'un repli, et GARIS affiche enfin ses chiffres. Les quatre carnets ont été régénérés (build_data_*.py) et le bloc de chiffres remplacé dans les pages sans repasser par build_appli_*.py, qui aurait effacé le RADAR régénéré. Preuve : la vue Facturation DAHLIA passe de « juillet 1 facture, 2 000 € » à « 3 factures, 5 268,48 € », total 13 → 15 factures. Deux lignes perdues en régénérant ont été remises : Appels JEX Reims (DAHLIA) et Classer GS-2026-108 (GARIS).",
-   "local": true
+   "local": true,
+   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
   },
   {
    "b": 418,
@@ -1339,12 +1342,13 @@
    "local": true
   },
   {
-   "b": 419,
+   "b": "d4",
    "titre": "Le badge du carnet dit la vérité jusque DANS les vues",
    "source": "Zeus 12/08 : « oui corrige le dans les vues aussi »",
    "theme": "Domaines",
    "pourquoipas": "La coque affichait « carnet ○ instantané embarqué » depuis b418, mais chaque vue porte son propre badge, resté à « carnet ✓ » : le cadre disait la vérité, le contenu mentait un étage plus bas. La vue ne pouvait pas faire mieux — la coque lui envoyait {__data, __err, __at} sans jamais lui dire d'où venaient les chiffres. La coque joint désormais __src, le pont de la vue le conserve, et les badges s'en servent. Deux variantes de code coexistaient (texte composé par l'appelant, ou par setSt lui-même) : les deux sont traitées, 8 setSt réécrits et 26 points de réception marqués sur les 4 cockpits. Vérifié après vidage du cache : sur GARIS, les vues ST/CA/ÉTAT affichent toutes « carnet ○ instantané embarqué », comme la coque. Au passage, question cascade ST GARIS : il n'y a rien à construire. La vue existe, elle fonctionne, et elle dit l'état réel — aucun sous-traitant propre à GARIS, l'onglet Sous_Traitance du classeur est « À renseigner », et la cascade où GARIS figure vit dans DATA_FKH.json parce que GARIS EST le sous-traitant. R-MAITRE-PAR-SOCIETE-01 interdit de rapatrier le chiffre FKH ici. Reste une décision pour Zeus : GARIS aura-t-il ses propres ST ?",
-   "local": true
+   "local": true,
+   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
   },
   {
    "b": 419,
@@ -1363,20 +1367,22 @@
    "local": true
   },
   {
-   "b": 421,
+   "b": "d5",
    "titre": "Le pont de dépôt — joindre une facture depuis la ligne qui la réclame",
    "source": "Zeus 12/08 : « je veux que les fichiers déposés dans l’application se retrouvent dans le dossier du domaine » · « tout ce que tu peux mettre en iframe, mets-le, pour qu’on travaille en autonomie »",
    "theme": "Domaines",
    "pourquoipas": "Le dépôt part de L'ENDROIT, pas du fichier. Sur les 7 clients FKH travaillés en juillet sans facture, chaque ligne porte « 📎 joindre la facture » : la ligne sait déjà le domaine, le casier, le mois et le client, donc la destination est connue avant que le fichier existe et rien n'est deviné. La clé de dépôt EST la destination : depot/<DOMAINE>/<casier>/<AAAA-MM>/<AAAA-MM_NATURE_TIERS.ext>, au nommage standard d'EMPLACEMENTS.md. Le pont vit dans gestion/domaines/hub.html et non dans index.html : ce dernier est écrit par une autre session et deux sessions sur un même fichier se défont — constaté aujourd'hui, CONTROLE_MOIS.html supprimé puis rétabli par erreur. Le hub étant chargé en iframe dès l'ouverture et de même origine, il pose son écouteur sur la fenêtre parente. Seule concession : une ligne dans index.html (window.fkhUpload / window.fkhPret), parce que toute l'appli est en closure et qu'aucune de ses fonctions n'est atteignable de l'extérieur ; l'alternative aurait été de dupliquer le chemin du mot de passe dans un second morceau de code. Le radar réutilise son go() existant avec un préfixe DEPOT: — un seul chemin, pas un second mécanisme. Un dépôt réussi ouvre un ticket 🎫 : un dépôt sans trace est un dépôt qu'on croit fait. Vérifié dans l'appli : le message atteint le pont, qui refuse proprement et le dit à l'écran quand la connexion manque (cas du bac à sable). L'envoi réel reste à jouer connecté, ainsi que le script local qui redescendra depot/... dans le dossier du domaine.",
-   "local": true
+   "local": true,
+   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
   },
   {
-   "b": 422,
+   "b": "d6",
    "titre": "Établir OU déposer — la ligne propose les deux gestes",
    "source": "Zeus 12/08 : « au lieu de mettre établir il faut donner la possibilité de pouvoir déposer également en plus d’établir »",
    "theme": "Domaines",
    "pourquoipas": "Une ligne de facturation manquante appelle deux gestes selon le cas : faire la facture, ou déposer celle qui existe déjà. Le RADAR n'en proposait qu'un. Le rendu accepte désormais une seconde action (a2) et les lignes « Juillet 2026 — 7 clients » et « RATTRAPAGE AQUILA juin » portent Établir + 📎 Déposer. Piège écarté au passage : deux boutons « Déposer » côte à côte faisaient des choses différentes — l'un ouvrait un ticket, l'autre téléverse vraiment. La ligne des relevés dit maintenant « Réclamer » (c'est une demande), et le vrai dépôt descend au niveau du mois manquant, où la destination est exacte : « 📎 déposer le relevé de juin », « … de juillet ». Même mot, même geste, partout. Vérifié dans le cockpit : 2 lignes à deux boutons, 14 actions dans le détail des 7 clients (établir + joindre pour chacun), 2 dépôts de relevé datés.",
-   "local": true
+   "local": true,
+   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
   }
  ],
  "attente": [
