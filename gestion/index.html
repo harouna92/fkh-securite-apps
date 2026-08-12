@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b430</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b431</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1324,7 +1324,11 @@ button.big:active{transform:translateY(1px)}
   // ===== Liste EXHAUSTIVE des communes de France (embarquée communes.json, recherche locale) =====
   var COMMUNES=null, COMMUNES_IDX=null;
   function commNorm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,' ').replace(/\bste\b/g,'sainte').replace(/\bst\b/g,'saint').replace(/\s+/g,' ').trim(); }
-  (function loadCommunes(){ try{ /* b414 : le repère de version force le navigateur à reprendre le fichier. Sans lui, la base de communes reste celle qu'il a en cache depuis des semaines — et le tri par population lit une colonne qui n'existe pas encore chez lui. À changer à chaque régénération de communes.json. */ fetch('communes.json?v=b414').then(function(r){return r.json();}).then(function(a){ if(Array.isArray(a)&&a.length){ COMMUNES=a; COMMUNES_IDX=a.map(function(row){return commNorm(row[0]);}); } }).catch(function(){}); }catch(e){} })();
+  (function loadCommunes(){ try{ /* b414 : le repère de version force le navigateur à reprendre le fichier. Sans lui, la base de communes reste celle qu'il a en cache depuis des semaines — et le tri par population lit une colonne qui n'existe pas encore chez lui. À changer à chaque régénération de communes.json. */ fetch('communes.json?v=b414').then(function(r){return r.json();}).then(function(a){ if(Array.isArray(a)&&a.length){ COMMUNES=a; COMMUNES_IDX=a.map(function(row){return commNorm(row[0]);});
+    /* b431 : la table arrive APRES le demarrage. C'est ici, et pas plus tot, qu'on peut completer
+       les demandes que le serveur a deposees sans coordonnees. */
+    try{ if(typeof svGeoCompleter==='function'&&svGeoCompleter()&&typeof renderSuivi==='function')renderSuivi(); }catch(_e){}
+  } }).catch(function(){}); }catch(e){} })();
   function commToDept(cp){ cp=String(cp||'').replace(/\D/g,''); if(cp.length>=2){ return (cp.slice(0,2)==='97'||cp.slice(0,2)==='98')?cp.slice(0,3):cp.slice(0,2); } return ''; }
   function commDeptNom(code){ if(typeof DEPTS!=='undefined'&&DEPTS){ for(var i=0;i<DEPTS.length;i++)if(DEPTS[i].code===code)return DEPTS[i].nom; } return ''; }
   function commObj(row){ var cp=row[1]||'',dep=commToDept(cp); return { nom:row[0], codesPostaux:[cp], centre:{coordinates:[row[3],row[2]]}, population:(+row[4]||0),   /* b414 */ departement:{code:dep,nom:commDeptNom(dep)} }; }
@@ -1563,6 +1567,58 @@ button.big:active{transform:translateY(1px)}
      On répare donc une fois, au chargement, celles qui portent la signature du défaut : leurs
      villes proches citent LEUR PROPRE ville. Une demande saine n'est pas touchée, et le ménage
      s'éteint de lui-même une fois fait. */
+  /* ===== b431 : L'APPLI FINIT CE QUE LE SERVEUR DEPOSE =====
+     Le worker ecrit les demandes venues d'un appel sans coordonnees : les 34 969 communes sont
+     ici, dans le navigateur, pas sur le serveur. Sans coordonnees, ni villes proches ni agents
+     proches — le panneau s'arrete avant meme de chercher. On resout donc sur place.
+     La regle est celle de b416, sans exception : LE CODE POSTAL FAIT FOI, le nom departage. */
+  function svGeoLocal(it){
+    if(!it||it.la!=null)return false;
+    if(typeof COMMUNES==='undefined'||!COMMUNES)return false;   /* table pas encore arrivee */
+    /* le code postal : dans son champ, sinon dans la ligne « Ville : X (12345) » que le worker ecrit. */
+    var cp=String(it.cp||'').replace(/\D/g,'');
+    if(cp.length!==5){ var _mt=/Ville\s*:[^\n]*?\((\d{5})\)/.exec(String(it.texte||'')); cp=_mt?_mt[1]:''; }
+    if(cp.length!==5)cp='';
+    var v=String(it.ville||'').trim(), sel=null;
+    if(cp&&typeof commByCP==='function'){
+      var _lc=commByCP(cp,25)||[];
+      if(_lc.length===1)sel=_lc[0];
+      else if(_lc.length>1){   /* plusieurs communes sous ce code : le nom entendu departage */
+        if(v&&typeof commNorm==='function'){ var _nv=commNorm(v);
+          for(var _i=0;_i<_lc.length&&!sel;_i++) if(commNorm(_lc[_i].nom)===_nv)sel=_lc[_i]; }
+        if(!sel)sel=_lc[0];
+      }
+    }
+    /* Pas de code postal : on prend le nom s'il ne designe qu'une commune. S'il en designe
+       plusieurs, on ne choisit pas — un trou visible vaut mieux qu'une position fausse. */
+    if(!sel&&v&&typeof commSearch==='function'){
+      var _ln=commSearch(v,25)||[], _ex=[];
+      if(typeof commNorm==='function'){ var _n2=commNorm(v);
+        _ex=_ln.filter(function(c){ return commNorm(c.nom)===_n2; }); }
+      if(_ex.length===1)sel=_ex[0];
+      else if(_ex.length>1)return false;
+      else if(_ln.length===1)sel=_ln[0];
+      else return false;
+    }
+    if(!sel||!sel.centre||!sel.centre.coordinates)return false;
+    it.la=sel.centre.coordinates[1]; it.lo=sel.centre.coordinates[0];
+    if(!it.ville)it.ville=sel.nom;
+    if(String(it.cp||'').replace(/\D/g,'').length!==5)it.cp=cp||((sel.codesPostaux&&sel.codesPostaux[0])||'');
+    /* La table locale vient de trancher : un echec reseau d'il y a une heure ne doit plus bloquer.
+       `_nogeo` survivait aux synchronisations — il gelait la demande pour de bon. */
+    delete it._nogeo; delete it._geotried;
+    if(typeof svRecalcProches==='function')svRecalcProches(it);   /* et les villes proches suivent */
+    return true;
+  }
+  function svGeoCompleter(){ try{
+    if(typeof COMMUNES==='undefined'||!COMMUNES)return 0;
+    if(typeof SUIVI==='undefined'||!SUIVI)return 0;
+    var ch=0; SUIVI.forEach(function(m){ if(!m||m.deleted)return; if(m.statut!=='recherche')return;
+      if(svGeoLocal(m))ch++; });
+    if(ch&&typeof saveSuivi==='function')saveSuivi();
+    return ch;
+  }catch(e){ return 0; } }
+
   function svProchesMigrate(){ try{
     if(typeof svRecalcProches!=='function')return; var ch=0;
     (SUIVI||[]).forEach(function(m){
@@ -1760,7 +1816,7 @@ button.big:active{transform:translateY(1px)}
   function createTestCall(minutes){ minutes=parseInt(minutes,10); if(isNaN(minutes))minutes=8; var today=impTodayISO(); var mn=toMin(ssNowHM())+minutes; var addD=Math.floor(mn/1440); mn=((mn%1440)+1440)%1440; var mheure=pad2(Math.floor(mn/60))+':'+pad2(mn%60); var mdate=addD>0?svcAddDays(today,addD):today; var fmn=(mn+60)%1440, mfin=pad2(Math.floor(fmn/60))+':'+pad2(fmn%60); var frd=mdate.split('-').reverse().join('/'); var finTxt=frd+' '+mfin; var it={id:'test'+Date.now(),texte:'Client : TEST\nSite : APPEL TEST\nDébut : '+frd+' '+mheure+'\nFin : '+finTxt,titre:'APPEL TEST',statut:'validee',motif:'',pris:Date.now(),valide:Date.now(),ville:'',la:null,lo:null,assoc:[],mdate:mdate,mheure:mheure,mfin:finTxt,client:'TEST',siteAgent:'APPEL TEST',siteBDC:'',poste:'',ref:'',src:'test'}; SUIVI.push(it); if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderSuiviAppels==='function')renderSuiviAppels(); return {mheure:mheure,mdate:frd,mdateISO:mdate}; }
   function ctcMark(it,agId,kind){ if(!agId)return; if(!it.contacts)it.contacts={}; var c=it.contacts[agId]||{}; if(kind==='call')c.c=!c.c; if(kind==='msg'){ c.m=true; if(!c.stMsg)c.stMsg='envoye'; } c.by=opNow()||c.by||''; c.at=Date.now(); it.contacts[agId]=c; if(typeof saveSuivi==='function')saveSuivi(); }
   function renderNear(it){
-    if(it.la==null){ return '<div class="pickp"><div class="hint">'+(it._nogeo?'📍 Ville non géolocalisée — distances indisponibles.':'⏳ Localisation de '+esc(it.ville||extractVille(it.texte)||'la ville')+'…')+'</div><div class="acts" style="margin-top:6px"><button data-act="nearclose" data-id="'+it.id+'">Fermer</button></div></div>'; }
+    if(it.la==null){ return '<div class="pickp"><div class="hint">'+(it._nogeo?'📍 Ville non située — ni code postal ni nom de commune exploitable. Renseigne le code postal par ✏️ Modifier : les agents proches et les distances reviennent aussitôt.':'⏳ Localisation de '+esc(it.ville||extractVille(it.texte)||'la ville')+'…')+'</div><div class="acts" style="margin-top:6px"><button data-act="nearclose" data-id="'+it.id+'">Fermer</button></div></div>'; }
     var _vac=(typeof svExtractVacations==='function')?svExtractVacations(it):[], _v0=_vac[0]||null, nearTarget=null;
     if(_v0&&_v0.mdate&&_v0.mheure){ var _ts=toMin(_v0.mheure), _te=_v0.mfin?toMin(_v0.mfin):null; if(_ts!=null){ if(_te==null)_te=_ts+720; if(_te<=_ts)_te+=1440; nearTarget={date:_v0.mdate,start:_ts,end:_te}; } }
     var rad=it._rad||100, list=nearAgents(it);
@@ -2611,7 +2667,12 @@ button.big:active{transform:translateY(1px)}
     }
     else if(act==='pick'){var o=it._pick;delete it._pick2;it._pick=!o;}
     else if(act==='pick2'){var o2=it._pick2;delete it._pick;it._pick2=!o2;}
-    else if(act==='near'){ if(it._near){delete it._near;} else { delete it._pick;delete it._pick2; it._near=true; if(it.la==null&&!it._nogeo){ ensureGeo(it,function(){ if(it._near){saveSuivi();renderSuivi();} }); } } saveSuivi(); renderSuivi(); return; }
+    else if(act==='near'){ if(it._near){delete it._near;} else { delete it._pick;delete it._pick2; it._near=true;
+        /* b431 : la table des communes d'abord — sans reseau, code postal faisant foi. Le
+           geocodeur par le NOM SEUL ne sert plus que de dernier recours, et `_nogeo` ne gele
+           plus rien : une resolution locale reussie l'efface. */
+        if(it.la==null){ var _fl=(typeof svGeoLocal==='function')&&svGeoLocal(it);
+          if(!_fl&&!it._nogeo){ ensureGeo(it,function(){ if(it._near){saveSuivi();renderSuivi();} }); } } } saveSuivi(); renderSuivi(); return; }
     else if(act==='nearclose'){ delete it._near; saveSuivi(); renderSuivi(); return; }
     else if(act==='edit'){ if(it._edit){delete it._edit;} else { delete it._pick;delete it._pick2;delete it._near; it._edit=true; } saveSuivi(); renderSuivi(); if(it._edit)setTimeout(function(){ var _e=document.querySelector('#suiviList .ed-client[data-id="'+it.id+'"]'); if(_e&&_e.scrollIntoView)_e.scrollIntoView({behavior:'smooth',block:'center'}); },60); return; }
     else if(act==='editcancel'){ delete it._edit; saveSuivi(); renderSuivi(); return; }
@@ -4432,6 +4493,9 @@ button.big:active{transform:translateY(1px)}
       (SUIVI||[]).forEach(function(x){var f={};for(var _k in x)if(_k.charAt(0)==='_'&&_k!=='_pending'&&_k!=='_pick'&&_k!=='_pick2')f[_k]=x[_k];if(Object.keys(f).length)_tr[String(x.id)]=f;});
       SUIVI=load('fkh_suivi'); if(_sims.length)SUIVI=_sims.concat(SUIVI);
       SUIVI.forEach(function(x){delete x._pending;delete x._pick;delete x._pick2;var _f=_tr[String(x.id)];if(_f)for(var _k2 in _f)x[_k2]=_f[_k2];});
+      /* b431 : une demande deposee par le serveur arrive sans coordonnees. On la complete des
+         qu'elle descend, pas seulement au prochain demarrage. */
+      try{ if(typeof svGeoCompleter==='function')svGeoCompleter(); }catch(_eg){}
       if(typeof svSigReset==='function')svSigReset();   /* b310 : ce qui vient du classeur commun devient la reference — sinon on le prendrait pour une modification locale */
       if(typeof suiviCleanFins==='function')suiviCleanFins(); if(typeof suiviHeriteSite==='function')suiviHeriteSite(); if(typeof saOffMigrate==='function')saOffMigrate();
       if(typeof apDcInvalidate==='function')apDcInvalidate(); if(typeof ssMigrateCtrl==='function')ssMigrateCtrl();   /* b341 : les vacations sont connues -> les coches restees en attente de traduction sont traitees */
