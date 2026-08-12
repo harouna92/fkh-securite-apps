@@ -1,4 +1,71 @@
 {
+ "presence_factures_client": {
+  "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
+  "lu_le": "2026-08-12 23:24",
+  "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
+  "mois": [
+   "2026-01",
+   "2026-02",
+   "2026-03",
+   "2026-04",
+   "2026-05",
+   "2026-06",
+   "2026-07",
+   "2026-08"
+  ],
+  "clients": {
+   "ADN SÉCURITÉ": {
+    "2026-01": 1,
+    "2026-02": 0,
+    "2026-03": 0,
+    "2026-04": 0,
+    "2026-05": 0,
+    "2026-06": 0,
+    "2026-07": 0,
+    "2026-08": 0
+   },
+   "AGIR SÉCURITÉ": {
+    "2026-01": 0,
+    "2026-02": 0,
+    "2026-03": 1,
+    "2026-04": 1,
+    "2026-05": 0,
+    "2026-06": 0,
+    "2026-07": 1,
+    "2026-08": 0
+   },
+   "C.O.P.S": {
+    "2026-01": 0,
+    "2026-02": 0,
+    "2026-03": 0,
+    "2026-04": 1,
+    "2026-05": 0,
+    "2026-06": 0,
+    "2026-07": 0,
+    "2026-08": 1
+   },
+   "IGS-21": {
+    "2026-01": 1,
+    "2026-02": 1,
+    "2026-03": 0,
+    "2026-04": 0,
+    "2026-05": 0,
+    "2026-06": 0,
+    "2026-07": 0,
+    "2026-08": 0
+   },
+   "SELAS HAUTE POMPIGNANE": {
+    "2026-01": 1,
+    "2026-02": 1,
+    "2026-03": 1,
+    "2026-04": 1,
+    "2026-05": 1,
+    "2026-06": 1,
+    "2026-07": 1,
+    "2026-08": 0
+   }
+  }
+ },
  "domaine": "DAHLIA",
  "genere_par": "SCRIPTS/build_data_dahlia.py",
  "source": "CA client 2026 = RECONSTRUIT depuis les factures réelles (5_DONNEURS_ORDRE/factures clients dahlia/2026) ; autres blocs = snapshots sourcés (SUIVI DAHLIA.xlsx · paie 2025 · vues hand-vérifiées)",

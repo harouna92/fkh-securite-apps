@@ -1,4 +1,29 @@
 {
+ "presence_factures_client": {
+  "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
+  "lu_le": "2026-08-12 23:24",
+  "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
+  "mois": [
+   "2026-01",
+   "2026-02",
+   "2026-03",
+   "2026-04",
+   "2026-05",
+   "2026-06",
+   "2026-07"
+  ],
+  "clients": {
+   "GARIS": {
+    "2026-01": 1,
+    "2026-02": 1,
+    "2026-03": 1,
+    "2026-04": 1,
+    "2026-05": 1,
+    "2026-06": 1,
+    "2026-07": 0
+   }
+  }
+ },
  "domaine": "GARIS",
  "genere_par": "SCRIPTS/build_data_garis.py",
  "source": "Garis_Securite_Suivi_Facturation_v2.xlsx › onglet « Suivi Facturation » (21 factures, recompute TTC=HT×1,2)",
