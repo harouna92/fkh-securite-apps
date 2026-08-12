@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>📡 RADAR — à résoudre · à faire · échéances (DAHLIA)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.30.0/tabler-icons.min.css">
+<style>
+  :root{--bg:#0e1116;--card:#161b22;--card2:#1c232d;--line:#2a313c;--info:#7c93ff;--tp:#e6edf3;--ts:#9aa7b4;--tt:#6b7480;--dang:#f87171;--warn:#fbbf24;--ok:#34d399;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tp);padding:20px;}
+  .nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .nav .v{cursor:pointer;font-size:12.5px;padding:5px 11px;border-radius:8px;border:1px solid var(--line);color:var(--ts)}
+  .nav .v.on{background:var(--card);color:var(--tp);border-color:var(--info);font-weight:600}
+  .hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  h1{font-size:18px;font-weight:600;margin:0}
+  .eb{font-family:inherit;background:var(--card2);color:var(--tp);border:1px solid var(--line);border-radius:8px;height:32px;padding:0 12px;cursor:pointer;font-size:12.5px}
+  .sub{font-size:12px;color:var(--tt);margin-bottom:14px}
+  .intake{background:var(--card);border:1px dashed var(--info);border-radius:12px;padding:12px 14px;margin-bottom:18px}
+  .intake .t{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--info)}
+  .intake textarea{width:100%;background:var(--card2);color:var(--tp);border:1px solid var(--line);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;resize:vertical;min-height:46px}
+  .intake button{margin-top:8px;font-family:inherit;background:var(--info);color:#0e1116;border:none;border-radius:8px;height:34px;padding:0 14px;cursor:pointer;font-size:13px;font-weight:600}
+  .sec{margin-bottom:18px}
+  .sh{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+  .pill{font-size:11px;padding:1px 8px;border-radius:999px;font-weight:600}
+  .item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:6px;flex-wrap:wrap}
+  .item.drill{cursor:pointer}
+  .item.drill:hover{border-color:var(--info)}
+  .main{flex:1;min-width:180px}
+  .l{font-size:13.5px;font-weight:600}
+  .w{font-size:11.5px;color:var(--tt);margin-top:1px}
+  .chev{color:var(--tt);transition:transform .15s}
+  .chev.open{transform:rotate(180deg)}
+  .act{font-family:inherit;background:var(--card2);color:var(--tp);border:1px solid var(--info);border-radius:8px;height:34px;padding:0 12px;cursor:pointer;font-size:12.5px}
+  .due{font-size:12px;color:var(--ts);min-width:120px;text-align:right}
+  .det{flex-basis:100%;margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
+  .detrow{font-size:12px;color:var(--ts);padding:3px 0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .detrow.drill{cursor:pointer}
+  .detrow.drill:hover{color:var(--tp)}
+  .detrow b{color:var(--tp);font-weight:500;font-variant-numeric:tabular-nums}
+  .det2{flex-basis:100%;margin-top:5px;padding-left:12px;border-left:2px solid var(--line)}
+  .det2 .detrow{font-size:11.5px}
+  .strip{display:flex;gap:3px;flex-wrap:wrap;margin-top:6px}
+  .mcell{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#0b3d2c}
+</style>
+</head>
+<body>
+
+<div class="hdr"><h1>📡 RADAR — 🌸 DAHLIA</h1><button class="eb" id="editBtn"><i class="ti ti-pencil"></i> Modifier</button></div>
+<div class="sub">Le système unique de suivi : à résoudre · à faire · échéances · suivis récurrents — chaque ligne s'agit sur place ; clic = déplie le détail (jusqu'à 2 niveaux). Dépose un nouveau besoin métier ci-dessous. <b style="color:#f0abfc">Même moteur que le RADAR FKH</b> — seules les données changent.</div>
+
+<div class="intake">
+  <div class="t"><i class="ti ti-plus"></i> Déposer un besoin métier</div>
+  <textarea id="besoin" placeholder="ex. : les fiches de paie doivent être déposées au plus tard le 10 de chaque mois"></textarea>
+  <button id="addBesoin"><i class="ti ti-send"></i> Proposer un suivi</button>
+  <span style="font-size:11px;color:var(--tt);margin-left:8px;">≡ mot d'appel : <code>+ BESOIN : …</code></span>
+</div>
+
+<div id="body"></div>
+<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--line)"><button class="eb" style="background:var(--info);color:#0e1116;border:none;font-weight:600" onclick="partager()"><i class="ti ti-share"></i> Mettre en miroir dans SUIVI_DEPOT (<span id="cnt">0</span>)</button> <button class="eb" onclick="go('OUVRIR SUIVI_DEPOT DAHLIA')"><i class="ti ti-external-link"></i> Ouvrir le fichier partagé</button> <span style="font-size:11px;color:var(--tt);margin-left:8px">coche les lignes à partager avec l'externe</span></div>
+<script>
+function go(p){
+  /* En session Claude, on parle a Claude. Dans l'appli, il n'y a personne au bout :
+     le bouton doit produire un TICKET, pas un silence. Pont b411, meme origine. */
+  try{ if(typeof sendPrompt==='function'){ sendPrompt(p); rdToast('\u2192 envoye'); return; } }catch(e){}
+  var txt=String(p||'').trim(); if(!txt)return;
+  try{
+    (window.top||parent).postMessage({fkh:1,action:'ticket.create',payload:{
+      objet: txt.slice(0,120), message: txt, pour:'admin',
+      source:'\uD83D\uDCE1 RADAR DAHLIA', contexte:['RADAR DAHLIA'],
+      ref:'DAHLIA:'+txt.slice(0,40)
+    }}, location.origin);
+    rdToast('\uD83C\uDFAB Ticket cree');
+  }catch(e){ rdToast('\u26A0\uFE0F non transmis'); }
+}
+function rdToast(m){
+  var t=document.getElementById('rdtoast');
+  if(!t){ t=document.createElement('div'); t.id='rdtoast';
+    t.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#12241a;color:#8ef0b6;border:1px solid #2f6b46;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600;z-index:99;box-shadow:0 8px 30px rgba(0,0,0,.5)'; document.body.appendChild(t); }
+  t.textContent=m; t.style.display='block';
+  clearTimeout(window.__rdt); window.__rdt=setTimeout(function(){ t.style.display='none'; },1800);
+}
+function majCnt(){var n=document.querySelectorAll('.shchk:checked').length;var e=document.getElementById('cnt');if(e)e.textContent=n;}
+function partager(){var ls=[].slice.call(document.querySelectorAll('.shchk:checked')).map(function(c){return c.dataset.v+' · '+c.dataset.l;});go(ls.length?'MIROIR SUIVI_DEPOT : '+ls.join(' || '):'Aucune ligne cochée pour le miroir');}
+function tog(id){var d=document.getElementById('det_'+id),c=document.getElementById('chev_'+id);if(!d)return;var o=d.style.display==='none';d.style.display=o?'block':'none';if(c)c.className='chev ti ti-chevron-down'+(o?' open':'');}
+function detHTML(det,pid){return det.map(function(d,j){
+  if(Array.isArray(d))return '<div class="detrow"><span>'+d[0]+'</span><b>'+(d[1]||'')+'</b></div>';
+  if(d.a)return '<div class="detrow"><span>'+(d.l||'')+'</span><button class="act" style="height:26px;font-size:11px;padding:0 10px" onclick="event.stopPropagation();go(this.dataset.p)" data-p="'+d.p.replace(/"/g,'&quot;')+'"><i class="ti ti-arrow-up-right"></i> ouvrir</button></div>';
+  var sid=pid+'_'+j;
+  var chev='<i class="chev ti ti-chevron-down" id="chev_'+sid+'" style="font-size:11px"></i>';
+  var sub='<div class="det2" id="det_'+sid+'" style="display:none;">'+d.sub.map(function(s){if(s.a)return '<div class="detrow"><span>'+s.a+'</span><button class="act" style="height:26px;font-size:11px;padding:0 10px" onclick="event.stopPropagation();go(this.dataset.p)" data-p="'+s.p.replace(/"/g,'&quot;')+'"><i class="ti ti-arrow-up-right"></i> ouvrir</button></div>';return '<div class="detrow"><span>'+s[0]+'</span><b>'+(s[1]||'')+'</b></div>';}).join('')+'</div>';
+  return '<div class="detrow drill" onclick="event.stopPropagation();tog(\''+sid+'\')"><span>'+d.l+' '+chev+'</span><b>'+(d.v||'')+'</b>'+sub+'</div>';
+}).join('');}
+const VIEWS=[["Hub", "ti-compass", 0], ["RADAR", "ti-radar", 1], ["Cockpit DAHLIA", "ti-chart-dots", 0], ["Cockpit financier DAHLIA", "ti-cash", 0], ["Facturation", "ti-file-invoice", 0], ["Carnet DAHLIA", "ti-notebook", 0]];
+const PAIE=[1,1,1,1,1,1,2,0,0,0,0,0];
+const PC={1:'var(--ok)',2:'var(--warn)',3:'var(--dang)',0:'var(--line)'};
+const SECS=[{"t": "À résoudre — en attente d’une info / décision", "c": "var(--dang)", "bg": "rgba(248,113,113,.16)", "items": [{"l": "Relevés de compte 2026 — avril · juin · juillet ABSENTS", "w": "le paiement se recoupe au relevé (règle système) : sans eux, 5 factures restent à recouper et aucun impayé de juin/juillet ne peut être vu", "a": ["Déposer", "Dépose les relevés de compte DAHLIA avril, juin et juillet 2026 dans DAHLIA/2_COMPTA_FISCAL/BANQUE/relevé de compte/2026/"], "det": [["Présents", "janvier · février · mars (Qonto) · mai (Indy)"], ["❌ Avril 2026", "absent"], ["❌ Juin 2026", "absent"], ["❌ Juillet 2026", "absent"], ["Conséquence", "5 factures bloquées en « à recouper »"], {"l": "Ouvrir le dossier des relevés", "a": 1, "p": "Ouvre DAHLIA/2_COMPTA_FISCAL/BANQUE/relevé de compte/2026/"}]}, {"l": "AGIR SÉCURITÉ avril — F-000182 · 892,16 € IMPAYÉE", "w": "seul impayé confirmé au relevé — échéance largement dépassée, et on refacture AGIR 3 053,38 € en juillet", "a": ["Relancer", "Prépare la relance AGIR SÉCURITÉ pour la facture DAHLIA F-000182 (avril 2026, 892,16 € impayée)"], "det": [["Facture", "F-000182 · avril 2026"], ["Montant", "892,16 €"], ["Constat", "absente du relevé — pas un doute, une absence"], ["À savoir", "mission suspendue mai/juin, reprise en juillet (F-000199 · 3 053,38 €)"]]}, {"l": "COPS — mai et juin : aucune facture. Suspension ou oubli ?", "w": "avril F-000183 existe, juillet F-000198 existe, entre les deux le dossier est vide. Le dossier ne dit pas pourquoi — seul toi le sais", "a": ["Trancher", "COPS DAHLIA : mai et juin 2026 n'ont aucune facture alors qu'avril et juillet en ont. Prestation suspendue ou facture oubliée ?"], "det": [["Avril", "F-000183 · 1 678,64 €"], ["Mai", "— rien"], ["Juin", "— rien"], ["Juillet", "F-000198 · 215,10 €"]]}, {"l": "Doublon TVA 4 576 € (gate cockpits)", "w": "🎛️ en traitement au poste", "a": ["Traiter", "TRAITER : doublon TVA 4576 DAHLIA"]}, {"l": "Maître v62_D53 à caler dans _PILOTAGE_DAHLIA", "w": "le registre de facturation doit se lire depuis le dossier, pas depuis un instantané", "a": ["Caler", "TRAITER : maître v62 DAHLIA"]}]}, {"t": "💶 Facturation 2026 — présente · envoyée · payée", "c": "#f0abfc", "bg": "rgba(240,171,252,.16)", "items": [{"l": "4 factures prêtes mais NON ENVOYÉES — 7 268,48 €", "w": "juin F-000193 · juillet F-000197 / F-000198 / F-000199 — éditées et rangées, l'argent n'est pas demandé", "a": ["Envoyer", "Envoie les 4 factures DAHLIA de juin et juillet 2026 (F-000193, F-000197, F-000198, F-000199)"], "det": [["Juin · F-000193 SELAS", "2 000,00 €"], ["Juillet · F-000197 SELAS", "2 000,00 €"], ["Juillet · F-000198 COPS", "215,10 €"], ["Juillet · F-000199 AGIR", "3 053,38 €"], ["Total à encaisser", "7 268,48 €"]]}, {"l": "En attente de paiement — 8 570,80 € (+ 1 montant inconnu)", "w": "envoyées, pas encore payées — dont 892,16 € d'impayé confirmé et 5 lignes que le relevé manquant empêche de trancher", "det": [["🔴 AGIR avril F-000182", "892,16 €  —  impayée confirmée"], ["🟡 IGS-21 février F-000168", "—  ·  relevé manquant"], ["🟡 SELAS mars F-000170", "2 000,00 €"], ["🟡 SELAS avril F-000181", "2 000,00 €"], ["🟡 COPS avril F-000183", "1 678,64 €"], ["🟡 SELAS mai F-000189", "2 000,00 €"]]}, {"l": "Janvier 2026 — 3 factures · 3 payées", "w": "présente = scan du dossier · payée = recoupée au relevé", "det": [["F-000152 · I.G.S-21", "—  —  ✅ payée · janv."], ["F-000158 · ADN SÉCURITÉ", "—  —  ✅ payée · 02/01"], ["F-000159 · SELAS Haute Pompignane", "2 000,00 €  —  ✅ payée · 13/01"], ["Total du mois", "2 000,00 €"], {"l": "Ouvrir le dossier du mois", "a": 1, "p": "Ouvre DAHLIA/5_DONNEURS_ORDRE/factures clients dahlia/2026/janvier 2026/"}]}, {"l": "Février 2026 — 2 factures · 1 payée · 1 à recouper", "w": "présente = scan du dossier · payée = recoupée au relevé", "det": [["F-000165 · SELAS Haute Pompignane", "2 000,00 €  —  ✅ payée · 17/02"], ["F-000168 · I.G.S-21", "—  —  🟡 à recouper (relevé manquant)"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture DAHLIA F-000168 (I.G.S-21) au relevé de compte du mois"}, ["Total du mois", "2 000,00 €"], {"l": "Ouvrir le dossier du mois", "a": 1, "p": "Ouvre DAHLIA/5_DONNEURS_ORDRE/factures clients dahlia/2026/février 2026/"}]}, {"l": "Mars 2026 — 2 factures · 1 payée · 1 à recouper", "w": "présente = scan du dossier · payée = recoupée au relevé", "det": [["F-000170 · SELAS Haute Pompignane", "2 000,00 €  —  🟡 à recouper (relevé manquant)"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture DAHLIA F-000170 (SELAS Haute Pompignane) au relevé de compte du mois"}, ["F-000171 · AGIR Sécurité", "474,92 €  —  ✅ payée · 30/04"], ["Total du mois", "2 474,92 €"], {"l": "Ouvrir le dossier du mois", "a": 1, "p": "Ouvre DAHLIA/5_DONNEURS_ORDRE/factures clients dahlia/2026/mars 2026/"}]}, {"l": "Avril 2026 — 3 factures · 1 IMPAYÉE · 2 à recouper", "w": "présente = scan du dossier · payée = recoupée au relevé", "det": [["F-000181 · SELAS Haute Pompignane", "2 000,00 €  —  🟡 à recouper (relevé manquant)"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture DAHLIA F-000181 (SELAS Haute Pompignane) au relevé de compte du mois"}, ["F-000182 · AGIR Sécurité", "892,16 €  —  🔴 IMPAYÉE"], {"l": "   → relancer le client", "a": 1, "p": "Prépare la relance DAHLIA pour la facture F-000182 (AGIR Sécurité, 892,16 €) restée impayée"}, ["F-000183 · COPS (Centre Orléanais)", "1 678,64 €  —  🟡 à recouper (relevé manquant)"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture DAHLIA F-000183 (COPS (Centre Orléanais)) au relevé de compte du mois"}, ["Total du mois", "4 570,80 €"], {"l": "Ouvrir le dossier du mois", "a": 1, "p": "Ouvre DAHLIA/5_DONNEURS_ORDRE/factures clients dahlia/2026/avril 2026/"}], "a": ["Relancer", "Relance le client sur la facture DAHLIA impayée de avril 2026"]}, {"l": "Mai 2026 — 1 facture · 1 à recouper", "w": "présente = scan du dossier · payée = recoupée au relevé", "det": [["F-000189 · SELAS Haute Pompignane", "2 000,00 €  —  🟡 à recouper (relevé manquant)"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture DAHLIA F-000189 (SELAS Haute Pompignane) au relevé de compte du mois"}, ["Total du mois", "2 000,00 €"], {"l": "Ouvrir le dossier du mois", "a": 1, "p": "Ouvre DAHLIA/5_DONNEURS_ORDRE/factures clients dahlia/2026/mai 2026/"}]}, {"l": "Juin 2026 — 1 facture · 1 à envoyer", "w": "présente = scan du dossier · payée = recoupée au relevé", "det": [["F-000193 · SELAS Haute Pompignane", "2 000,00 €  —  ⚪ à envoyer"], {"l": "   → marquer envoyée", "a": 1, "p": "Marque la facture DAHLIA F-000193 (SELAS Haute Pompignane) comme ENVOYÉE dans le registre de facturation"}, ["Total du mois", "2 000,00 €"], {"l": "Ouvrir le dossier du mois", "a": 1, "p": "Ouvre DAHLIA/5_DONNEURS_ORDRE/factures clients dahlia/2026/juin 2026/"}], "a": ["Envoyer", "Envoie les factures DAHLIA de juin 2026 aux clients (F-000193)"]}, {"l": "Juillet 2026 — 3 factures · 3 à envoyer", "w": "présente = scan du dossier · payée = recoupée au relevé", "det": [["F-000197 · SELAS Haute Pompignane", "2 000,00 €  —  ⚪ à envoyer"], {"l": "   → marquer envoyée", "a": 1, "p": "Marque la facture DAHLIA F-000197 (SELAS Haute Pompignane) comme ENVOYÉE dans le registre de facturation"}, ["F-000198 · COPS (Centre Orléanais)", "215,10 €  —  ⚪ à envoyer"], {"l": "   → marquer envoyée", "a": 1, "p": "Marque la facture DAHLIA F-000198 (COPS (Centre Orléanais)) comme ENVOYÉE dans le registre de facturation"}, ["F-000199 · AGIR Sécurité", "3 053,38 €  —  ⚪ à envoyer"], {"l": "   → marquer envoyée", "a": 1, "p": "Marque la facture DAHLIA F-000199 (AGIR Sécurité) comme ENVOYÉE dans le registre de facturation"}, ["Total du mois", "5 268,48 €"], {"l": "Ouvrir le dossier du mois", "a": 1, "p": "Ouvre DAHLIA/5_DONNEURS_ORDRE/factures clients dahlia/2026/juillet 2026/"}], "a": ["Envoyer", "Envoie les factures DAHLIA de juillet 2026 aux clients (F-000197, F-000198, F-000199)"]}]}, {"t": "À faire", "c": "var(--warn)", "bg": "rgba(251,191,36,.16)", "items": [{"l": "Acompte TVA juillet — solde CA12 + avis + télépaiement 8 322 €", "w": "🎛️ en traitement", "a": ["Traiter", "CHARGE : acompte TVA juillet DAHLIA"]}, {"l": "Relancer les clients (trésorerie) → télépayer URSSAF 337 €", "w": "la trésorerie de la relance paie la charge — les deux lignes sont liées", "a": ["Traiter", "CHARGE : URSSAF DAHLIA"]}, {"l": "Vérifier que la MED de mars (303 €) est soldée", "w": "à faire", "a": ["Vérifier", "Vérifie que la mise en demeure DAHLIA de mars (303 €) est soldée"]}, {"l": "Débloquer l’accès PayFit", "w": "à dater", "a": ["Traiter", "TRAITER : accès PayFit DAHLIA"]}, {"l": "Lister les donneurs d’ordre DAHLIA", "w": "à dater", "a": ["Lister", "TRAITER : DO DAHLIA"]}, {"l": "Conformité DAHLIA comme sous-traitant de FKH — 3/9 pièces OK", "w": "miroir exact du RADAR FKH (Atelier 11) : ce que FKH réclame à DAHLIA doit se voir aussi côté DAHLIA", "a": ["Fournir", "Prépare les 6 pièces de conformité manquantes que FKH réclame à DAHLIA"], "det": [["Vigilance URSSAF", "✓"], ["Régularité fiscale", "✓"], ["AUT CNAPS", "✓"], {"l": "Kbis — ✗ à fournir", "a": 1, "p": "Fournis la pièce « Kbis » de DAHLIA à FKH (conformité sous-traitant)"}, {"l": "RC Pro — ✗ à fournir", "a": 1, "p": "Fournis la pièce « RC Pro » de DAHLIA à FKH (conformité sous-traitant)"}, {"l": "Attestation honneur — ✗ à fournir", "a": 1, "p": "Fournis la pièce « Attestation honneur » de DAHLIA à FKH"}, {"l": "RIB — ✗ à fournir", "a": 1, "p": "Fournis le RIB Shine de DAHLIA à FKH (conformité sous-traitant)"}, {"l": "Liste salariés détachés — ✗ à fournir", "a": 1, "p": "Fournis la liste des salariés détachés DAHLIA à FKH"}, {"l": "Contrat FKH↔DAHLIA — à classer", "a": 1, "p": "Retrouve et classe le contrat FKH↔DAHLIA"}]}]}, {"t": "Suivis récurrents (mensuels)", "c": "var(--info)", "bg": "rgba(124,147,255,.18)", "recur": [{"l": "Dépôt des relevés de compte", "w": "Qonto → SWAN → Indy/Shine · c’est la source du recoupement paiement", "now": "Août : 3 mois manquants derrière (avril · juin · juillet)", "strip": [1, 1, 1, 3, 1, 3, 3, 0, 0, 0, 0, 0]}]}, {"t": "⏳ Échéances", "c": "#f59e0b", "bg": "rgba(245,158,11,.16)", "items": [{"l": "URSSAF — 337 €", "w": "à télépayer", "due": "03/07 · dépassée", "det": [{"l": "Traiter la charge URSSAF", "a": 1, "p": "CHARGE : URSSAF DAHLIA"}]}, {"l": "Retour URSSAF sur les remises", "w": "réponse attendue", "due": "11/07 · dépassée", "det": [{"l": "Relancer l’URSSAF", "a": 1, "p": "Relance l'URSSAF sur la demande de remise DAHLIA"}]}, {"l": "Acompte TVA juillet — 8 322 €", "w": "télépaiement", "due": "juillet", "det": [{"l": "Traiter l’acompte", "a": 1, "p": "TRAITER : acompte TVA juillet DAHLIA"}]}]}];
+function render(){
+ document.getElementById('body').innerHTML=SECS.map((s,si)=>{
+   let inner='';
+   if(s.items)inner=s.items.map((it,i)=>{
+     const id=si+'_'+i, hasDet=it.det&&it.det.length;
+     const chev=hasDet?'<i class="chev ti ti-chevron-down" id="chev_'+id+'"></i>':'';
+     const right=it.a?'<button class="act" onclick="event.stopPropagation();go(this.dataset.p)" data-p="'+it.a[1].replace(/"/g,'&quot;')+'"><i class="ti ti-player-play"></i> '+it.a[0]+'</button>':(it.due?'<div class="due">'+it.due+'</div>':'');
+     var cbr=/(\bCA\b|cascade|salaire|virement|impay|montant|TTC|affect|Reste à|€)/i.test(it.l)?'':'<input type="checkbox" class="shchk" data-l="'+it.l.replace(/"/g,'&quot;')+'" data-v="RADAR DAHLIA" onclick="event.stopPropagation()" onchange="majCnt()" style="width:15px;height:15px;flex:none;accent-color:var(--info)">';
+     const det=hasDet?'<div class="det" id="det_'+id+'" style="display:none;">'+detHTML(it.det,id)+'</div>':'';
+     return '<div class="item'+(hasDet?' drill':'')+'"'+(hasDet?' onclick="tog(\''+id+'\')"':'')+'>'+cbr+'<i class="ti ti-point-filled" style="color:'+s.c+'"></i><div class="main"><div class="l">'+it.l+'</div><div class="w">'+it.w+'</div></div>'+chev+right+det+'</div>';
+   }).join('');
+   if(s.recur)inner=s.recur.map(r=>'<div class="item" style="align-items:flex-start"><i class="ti ti-repeat" style="color:'+s.c+'"></i><div class="main"><div class="l">'+r.l+'</div><div class="w">'+r.w+' · '+r.now+'</div><div class="strip">'+r.strip.map(v=>'<div class="mcell" style="background:'+PC[v]+(v===0?';opacity:.5':'')+'">'+(v===1?'✓':(v===2?'·':(v===3?'✗':'')))+'</div>').join('')+'</div></div></div>').join('');
+   return '<div class="sec"><div class="sh"><span class="pill" style="background:'+s.bg+';color:'+s.c+'">'+((s.items||s.recur).length)+'</span> '+s.t+'</div>'+inner+'</div>';
+ }).join('');
+}
+render();
+document.getElementById('editBtn').onclick=()=>go('MODIFIER VUE : RADAR DAHLIA');
+document.getElementById('addBesoin').onclick=()=>{const v=document.getElementById('besoin').value.trim();if(v)go('+ BESOIN : '+v);};
+</script></body></html>

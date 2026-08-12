@@ -1,0 +1,286 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contrôle du mois — clients travaillés → facturés</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}
+body{margin:0;background:#0b0e13;color:#e6edf3;font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:13.5px;padding:16px}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-size:19px;margin:0 0 2px}.sub{color:#8b98a5;font-size:12px;margin:0 0 4px}
+.regle{font-size:11.5px;color:#8b98a5;background:#0e1116;border-left:2px solid #7c93ff;border-radius:4px;padding:9px 12px;margin:12px 0 18px;line-height:1.6}
+.dom{margin-bottom:26px;border:1px solid #232a33;border-left-width:4px;border-radius:14px;background:#12161d;overflow:hidden}
+.dh{padding:13px 16px;background:#161b22;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dn{font-size:16px;font-weight:800}.dm{font-size:11.5px;color:#8b98a5;margin-left:auto;text-align:right}
+.note{font-size:11.5px;color:#c9a227;background:rgba(251,191,36,.08);padding:9px 16px;border-top:1px solid #232a33;line-height:1.55}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;padding:11px 16px;border-top:1px solid #1c222b}
+.row:hover{background:#161b22}
+.cli{font-weight:700;font-size:13.5px}
+.pr{font-size:11.5px;color:#8b98a5;margin-top:3px;line-height:1.5}
+.st{font-size:11px;font-weight:700;border-radius:7px;padding:4px 9px;white-space:nowrap;align-self:center}
+.s-ok{background:rgba(52,211,153,.14);color:#34d399}
+.s-no{background:rgba(240,113,110,.16);color:#f0716e}
+.s-rien{background:rgba(148,163,180,.12);color:#8b98a5}
+input[type=checkbox]{width:19px;height:19px;accent-color:#34d399;margin-top:2px;cursor:pointer}
+.bar{position:sticky;bottom:0;background:#0e1116;border:1px solid #2f6b46;border-radius:14px;padding:13px 16px;margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 -6px 24px rgba(0,0,0,.4)}
+.cnt{font-size:12.5px;color:#8b98a5}.cnt b{color:#e6edf3}
+.go{margin-left:auto;font-family:inherit;font-size:13px;font-weight:700;background:#12241a;color:#8ef0b6;border:1px solid #2f6b46;border-radius:9px;padding:10px 16px;cursor:pointer}
+.go:hover{background:#173123}.go:disabled{opacity:.4;cursor:default}
+#ok{font-size:12px;color:#8ef0b6;min-height:16px;margin-top:8px}
+</style></head><body><div class="wrap">
+<h1>🗓️ Contrôle du mois — <span style="color:#7c93ff">juillet 2026</span></h1>
+<div class="sub">Avec quels clients a-t-on travaillé ? Toi seul décides. Je ne fais que proposer et vérifier la facture.</div>
+<div class="regle"><b>Le contrôle se déclenche au passage d'un mois</b> — le 1<sup>er</sup> septembre pour août, etc. Juillet est en retard depuis le 1<sup>er</sup> août.<br>
+Sources de la proposition : <b>mails de juillet</b>, séparés par boîte (fkhsecurite · dahliasecurite · garissecurite) pour ne jamais mélanger les domaines. Le planning GESTION est protégé par mot de passe : je ne m'en sers pas.<br>
+Coche les clients confirmés → <b>ceux qui n'ont pas de facture partent en manquant dans le RADAR de LEUR domaine</b>.</div>
+<div id="doms"></div>
+
+<h1 style="margin-top:34px">📚 Mois passés — <span style="color:#7c93ff">janvier → juin 2026</span></h1>
+<div class="sub">Ici on ne devine pas : on lit les factures réellement présentes dans les dossiers du domaine (et le classeur maître pour GARIS).</div>
+<div class="regle">✓ facturé · ✗ <b>trou</b> (mois sans facture entre deux mois facturés) · · plus rien après cette date.<br>
+Un « plus rien depuis » n'est pas une faute en soi — ça peut être une fin de relation. <b>Ça le devient quand les mails montrent qu'on travaillait encore.</b> Ces cas-là sont signalés en rouge.</div>
+<div id="hist"></div>
+
+<h1 style="margin-top:34px">🏦 Relevés de compte — <span style="color:#7c93ff">R-RELEVE-M-1-01</span></h1>
+<div class="sub">Le relevé du mois M−1 doit être là au plus tard le 1<sup>er</sup> du mois M. Sinon : manquant au RADAR du domaine.</div>
+<div class="regle"><b>Règle gravée le 12/07/2026</b> dans <code>_SYSTEME/2026-07-12_NOTE_REPRISE_cloture.md</code> : « Les relevés de compte doivent toujours être dispo à M−1. Les manquants → vue RADAR du domaine en statut MANQUANT. Appliqué à TOUS les domaines. »<br>
+La même note portait déjà la tâche n°6 : « <i>Audit relevés M−1 FKH (+ GARIS + PERSO) → marquer manquants en RADAR</i> ». Elle n'a jamais été faite — la voici.<br>
+Relevé au 12/08/2026 par scan des dossiers bancaires de chaque domaine.</div>
+<div id="rel"></div>
+<div class="bar">
+  <div class="cnt"><b id="nv">0</b> client(s) confirmé(s) · <b id="nm" style="color:#f0716e">0</b> sans facture</div>
+  <button class="go" id="go" onclick="envoyer()" disabled>📡 Envoyer les manquants au RADAR</button>
+  <div id="ok" style="flex-basis:100%"></div>
+</div>
+</div>
+<script>
+/* Chaque preuve est une observation datee, pas une deduction. « aucune trace » n'est
+   PAS « pas travaille » : c'est l'absence d'indice, et c'est Zeus qui tranche. */
+var DOMS=[
+ {k:"FKH", e:"🧭", c:"#7c93ff", boite:"fkhsecurite@gmail.com",
+  factures:"aucune — le dossier « juillet 2026 » n'existe même pas dans factures clients fkh (dernière émise : F-001018, juin)",
+  clients:[
+   {n:"AQUILA", p:"Gardiennages en flux continu tout juillet (permanence@reseau-aquila.fr) + rappels quotidiens", f:0, pre:1},
+   {n:"AQUILA — RATTRAPAGE juin 2026", p:"Rappels de gardiennage quotidiens jusqu'au 30/06 inclus. Dernière facture AQUILA : mai (F-001013). Juin n'a jamais été facturé.", f:0, pre:1, mois:"juin 2026"},
+   {n:"SECURITAS — Réponse Nantes", p:"Demandes de prestation en continu (CRI2026…), prolongations, annulations", f:0, pre:1},
+   {n:"SOTEL", p:"« Préfacturation SOTEL juillet 2026 » le 03/08, puis le 10/08 : « Nous prenons en compte votre validation. Dans l'attente de votre facture »", f:0, pre:1},
+   {n:"RANC DÉVELOPPEMENT", p:"Demandes d'intervention et de gardiennage (pc.securite@ranc-developpement.fr)", f:0, pre:1},
+   {n:"P2S SÉCURITÉ", p:"Demandes de prestation : OKAIDI 25/07, LIDL Chalon-sur-Saône 26/07", f:0, pre:1},
+   {n:"NEW ANGEL'S", p:"Bons de commande : Les Ulmes 23/07, Launaguet 23/07, Sauvigny-les-Bois 24/07", f:0, pre:1},
+   {n:"Restaurant Au XVI", p:"Open Air du 04/07 à Gevrey-Chambertin · 2 agents 17h→23h · devis signé le 03/07 par Agathe", f:0, pre:1},
+   {n:"GAMBRINUS", p:"Aucune trace en juillet (facturé jan · fév · mars)", f:0, pre:0},
+   {n:"SAS BULLION KRAFT POINT", p:"Aucune trace en juillet (facturé jan · fév · mars)", f:0, pre:0}
+  ]},
+ {k:"DAHLIA", e:"🌸", c:"#f0abfc", boite:"dahliasecurite@gmail.com",
+  factures:"3 présentes — F-000197 SELAS · F-000198 COPS · F-000199 AGIR",
+  clients:[
+   {n:"AGIR SÉCURITÉ", p:"Planning de juillet Carrefour Beaune reçu le 21/07 + échanges agents tout le mois", f:1, pre:1, num:"F-000199"},
+   {n:"COPS (Centre Orléanais)", p:"Appel entrant le 31/07 sur la ligne DAHLIA", f:1, pre:1, num:"F-000198"},
+   {n:"SELAS Haute Pompignane", p:"Aucun mail en juillet — prestation récurrente à 2 000 € par mois", f:1, pre:1, num:"F-000197"},
+   {n:"I.G.S-21", p:"Aucune trace en juillet (dernière facture : février)", f:0, pre:0},
+   {n:"ADN SÉCURITÉ", p:"Aucune trace en juillet (dernière facture : janvier)", f:0, pre:0}
+  ]},
+ {k:"GARIS", e:"🛡️", c:"#f0997b", boite:"garissecurite@gmail.com",
+  factures:"aucune — dernière émise : GS-2026-109 (IGS21, juin)",
+  alerte:"Zéro mail sur la boîte GARIS en juillet. Ce n'est pas un signe d'inactivité : les clients de GARIS sont intragroupe et l'activité passe par la cascade d'heures sous-traitées, pas par la messagerie. Pour GARIS, le mail n'est pas la bonne source — il faut les heures de juillet.",
+  clients:[
+   {n:"FKH SÉCURITÉ", p:"Facturé chaque mois de janvier à avril (GS-2026-108). Mai, juin ET juillet manquent", f:0, pre:1},
+   {n:"IGS21", p:"Facturé sans interruption jusqu'à juin (GS-2026-109). Juillet manque", f:0, pre:1},
+   {n:"ADN SÉCURITÉ", p:"Facturé jusqu'à mai (GS-2026-103). Juin et juillet manquent", f:0, pre:0},
+   {n:"DAHLIA SÉCURITÉ", p:"Facturé jusqu'à avril (GS-2026-085). Mai, juin et juillet manquent", f:0, pre:0},
+   {n:"GROUPE A SÉCURITÉ", p:"Une seule facture, en mars (GS-2026-078)", f:0, pre:0}
+  ]}
+];
+
+var box=document.getElementById('doms'), h='';
+DOMS.forEach(function(d,di){
+ h+='<div class="dom" style="border-left-color:'+d.c+'">'+
+    '<div class="dh"><span style="font-size:20px">'+d.e+'</span><span class="dn" style="color:'+d.c+'">'+d.k+'</span>'+
+    '<span class="dm">boîte '+d.boite+'<br>factures juillet : '+d.factures+'</span></div>';
+ if(d.alerte)h+='<div class="note">⚠️ '+d.alerte+'</div>';
+ d.clients.forEach(function(c,ci){
+  var st=c.f?'<span class="st s-ok">✅ '+c.num+'</span>'
+            :(c.pre?'<span class="st s-no">❌ pas de facture</span>':'<span class="st s-rien">— aucune trace</span>');
+  h+='<div class="row"><input type="checkbox" id="c'+di+'_'+ci+'" data-d="'+di+'" data-c="'+ci+'"'+(c.pre?' checked':'')+' onchange="maj()">'+
+     '<label for="c'+di+'_'+ci+'" style="cursor:pointer"><div class="cli">'+c.n+'</div><div class="pr">'+c.p+'</div></label>'+st+'</div>';
+ });
+ h+='</div>';
+});
+box.innerHTML=h;
+
+/* ===== MOIS PASSÉS — continuité de facturation =====
+   Relevé le 12/08/2026 par scan des dossiers de factures (FKH, DAHLIA) et du
+   classeur maître réparé (GARIS). `actif` = preuve, dans les mails, qu'on
+   travaillait encore APRÈS la dernière facture. C'est le croisement des deux
+   qui accuse : une facturation qui s'arrête pendant que l'activité continue. */
+var MOIS6=["Jan","Fév","Mar","Avr","Mai","Juin"];
+var HIST=[
+ {k:"FKH", e:"🧭", c:"#7c93ff", l:[
+  {n:"RANC DÉVELOPPEMENT", m:[1,1,1,1,1,1]},
+  {n:"SECURITAS", m:[1,1,1,1,1,1]},
+  {n:"SOTEL", m:[0,1,1,1,1,1]},
+  {n:"AQUILA", m:[1,1,1,1,1,0], fin:4, actif:"rappels de gardiennage quotidiens jusqu'au 30/06, et encore en juillet et en août — le plus gros donneur d'ordre"},
+  {n:"P2S", m:[0,0,0,1,0,1], trou:[4], ok:"aucune demande de prestation en mai dans les mails, le trou s'explique"},
+  {n:"NEW ANGEL'S", m:[0,1,0,0,0,0], fin:1, ok:"aucune commande de mars à juin dans les mails ; ils reviennent en juillet avec 3 bons de commande"},
+  {n:"GAMBRINUS", m:[1,1,1,0,0,0], fin:2},
+  {n:"SAS BULLION KRAFT POINT", m:[1,1,1,0,0,0], fin:2}
+ ]},
+ {k:"DAHLIA", e:"🌸", c:"#f0abfc", l:[
+  {n:"SELAS Haute Pompignane", m:[1,1,1,1,1,1]},
+  {n:"AGIR SÉCURITÉ", m:[0,0,1,1,0,0], fin:3, ok:"mission suspendue mai-juin, confirmé par mail, reprise en juillet"},
+  {n:"COPS (Centre Orléanais)", m:[0,0,0,1,0,0], fin:3, quest:"avril puis juillet, rien entre les deux — suspension ou oubli ?"},
+  {n:"I.G.S-21", m:[1,1,0,0,0,0], fin:1},
+  {n:"ADN SÉCURITÉ", m:[1,0,0,0,0,0], fin:0}
+ ]},
+ {k:"GARIS", e:"🛡️", c:"#f0997b", l:[
+  {n:"IGS21", m:[0,0,1,1,1,1]},
+  {n:"ADN SÉCURITÉ", m:[0,1,1,1,1,0], fin:4},
+  {n:"FKH SÉCURITÉ", m:[1,1,1,1,0,0], fin:3, actif:"le RADAR FKH réclame lui-même la facture de mai"},
+  {n:"DAHLIA SÉCURITÉ", m:[1,1,1,1,0,0], fin:3},
+  {n:"GROUPE A SÉCURITÉ", m:[0,1,0,0,0,0], fin:1}
+ ]}
+];
+(function(){
+ var h='';
+ HIST.forEach(function(d){
+  h+='<div class="dom" style="border-left-color:'+d.c+'"><div class="dh"><span style="font-size:20px">'+d.e+
+     '</span><span class="dn" style="color:'+d.c+'">'+d.k+'</span>'+
+     '<span class="dm">'+MOIS6.map(function(m){return '<span style="display:inline-block;width:34px;text-align:center">'+m+'</span>';}).join('')+'</span></div>';
+  d.l.forEach(function(c){
+   var cases=c.m.map(function(v,i){
+     var t=v?'✓':((c.trou&&c.trou.indexOf(i)>=0)?'✗':((c.fin!=null&&i>c.fin)?'·':''));
+     var col=v?'#34d399':(t==='✗'?(c.ok?'#8b98a5':'#f0716e'):'#3a424e');
+     return '<span style="display:inline-block;width:34px;text-align:center;color:'+col+';font-weight:700">'+t+'</span>';
+   }).join('');
+   /* L'explication prime sur l'alerte. Une facture absente n'accuse personne
+      tant qu'on n'a pas regardé s'il y avait du travail derrière : sans ça,
+      l'alerte ne dit pas « il manque quelque chose », elle dit « je n'ai pas
+      regardé ». Deux de ces lignes étaient rouges avant vérification. */
+   var alerte='';
+   if(c.ok) alerte='<div class="pr" style="color:#8b98a5">✅ vérifié, rien à facturer — '+c.ok+'</div>';
+   else if(c.actif) alerte='<div class="pr" style="color:#f0716e">🔴 facturation arrêtée après '+MOIS6[c.fin]+', mais '+c.actif+'</div>';
+   else if(c.trou) alerte='<div class="pr" style="color:#f0716e">🔴 trou en '+c.trou.map(function(i){return MOIS6[i];}).join(', ')+' — facturé avant ET après</div>';
+   else if(c.quest) alerte='<div class="pr" style="color:#fbbf24">🟡 '+c.quest+'</div>';
+   else if(c.fin!=null) alerte='<div class="pr">plus rien depuis '+MOIS6[c.fin]+'</div>';
+   h+='<div class="row" style="grid-template-columns:1fr auto"><div><div class="cli">'+c.n+'</div>'+alerte+'</div><div style="white-space:nowrap">'+cases+'</div></div>';
+  });
+  h+='</div>';
+ });
+ document.getElementById('hist').innerHTML=h;
+})();
+
+/* ===== RELEVÉS DE COMPTE — R-RELEVE-M-1-01 =====
+   Le retard n'est pas décoratif : il classe. Un relevé dû le 1er mai et toujours
+   absent le 12 août ne se rattrape pas comme celui d'il y a onze jours — surtout
+   quand la banque qui l'a émis est fermée depuis. */
+var MOIS7=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet"];
+var DU=["01/02","01/03","01/04","01/05","01/06","01/07","01/08"];
+var JOURS=[192,164,133,103,72,42,11];   /* retard au 12/08/2026, en jours */
+var REL=[
+ {k:"FKH", e:"🧭", c:"#7c93ff", d:"2_COMPTA_FISCAL/BANQUE/relevé de compte/2026/",
+  m:["Qonto","Qonto","Qonto","Qonto","Qonto",0,0]},
+ {k:"DAHLIA", e:"🌸", c:"#f0abfc", d:"2_COMPTA_FISCAL/BANQUE/relevé de compte/2026/",
+  m:["Qonto","Qonto","Qonto",0,"Indy",0,0],
+  notes:{3:"la banque de cette période est SWAN, aujourd'hui FERMÉE — à récupérer avant de perdre l'accès",
+         5:"depuis juin, la banque est Shine (nouveau RIB)", 6:"Shine"}},
+ {k:"GARIS", e:"🛡️", c:"#f0997b", d:"RELEVE DE COMPTE/",
+  m:["Qonto","Qonto","Qonto","Qonto + Indy","Qonto + Indy",0,0]},
+ {k:"PERSO", e:"🧑", c:"#34d399", d:"— aucun dossier de relevés",
+  m:[0,0,0,0,0,0,0],
+  alerte:"PERSO est nommément visé par la règle (tâche n°6 du 12/07) mais n'a AUCUN dossier de relevés : seulement deux PDF isolés dans PERSO SCAN/COURRIER RECU/🏦 Banques. Il n'y a pas encore d'endroit où les ranger — c'est la première chose à créer."}
+];
+(function(){
+ var h='', total=0, perso=0;
+ REL.forEach(function(d){
+  var manq=[];
+  d.m.forEach(function(v,i){ if(!v)manq.push(i); });
+  if(d.k==='PERSO')perso=manq.length; else total+=manq.length;
+  h+='<div class="dom" style="border-left-color:'+d.c+'"><div class="dh"><span style="font-size:20px">'+d.e+
+     '</span><span class="dn" style="color:'+d.c+'">'+d.k+'</span>'+
+     '<span class="dm">'+(manq.length?('<b style="color:#f0716e">'+manq.length+' manquant'+(manq.length>1?'s':'')+'</b>'):'<b style="color:#34d399">complet</b>')+
+     '<br>'+d.d+'</span></div>';
+  if(d.alerte)h+='<div class="note">⚠️ '+d.alerte+'</div>';
+  d.m.forEach(function(v,i){
+   if(v){
+    h+='<div class="row" style="grid-template-columns:1fr auto"><div><div class="cli" style="font-weight:600">'+MOIS7[i]+' 2026</div>'+
+       '<div class="pr">'+v+'</div></div><span class="st s-ok">✅ présent</span></div>';
+   }else{
+    var n=d.notes&&d.notes[i]?'<div class="pr" style="color:#fbbf24">⚠️ '+d.notes[i]+'</div>':'';
+    h+='<div class="row" style="grid-template-columns:1fr auto"><div><div class="cli">'+MOIS7[i]+' 2026</div>'+
+       '<div class="pr">dû le '+DU[i]+'/2026 — <b style="color:#f0716e">'+JOURS[i]+' jours de retard</b></div>'+n+
+       '</div><span class="st s-no">❌ manquant</span></div>';
+   }
+  });
+  h+='</div>';
+ });
+ /* Le compteur doit couvrir TOUT ce que la page affiche en rouge. 14 pastilles
+    rouges et un compteur à 7, c'est un écart que personne n'ira vérifier. */
+ h+='<div class="bar"><div class="cnt"><b style="color:#f0716e">'+(total+perso)+'</b> relevés manquants au total — <b>'+total+
+    '</b> sur les 3 domaines société, <b>'+perso+'</b> côté PERSO (qui n\'a pas encore de dossier)'+
+    '</div><button class="go" onclick="envoyerReleves()">🏦 Envoyer les manquants au RADAR</button><div id="okr" style="flex-basis:100%;font-size:12px;color:#8ef0b6;min-height:16px;margin-top:8px"></div></div>';
+ document.getElementById('rel').innerHTML=h;
+})();
+function envoyerReleves(){
+ var n=0;
+ REL.forEach(function(d){
+  var manq=[]; d.m.forEach(function(v,i){ if(!v)manq.push(MOIS7[i]); });
+  if(!manq.length)return;
+  var txt='RADAR '+d.k+' — R-RELEVE-M-1-01 : relevés de compte MANQUANTS pour '+manq.join(' · ')+
+          ' 2026. Chaque relevé était dû le 1er du mois suivant. Sans eux, aucun paiement ne peut être recoupé.'+
+          (d.k==='DAHLIA'?' Attention : avril relève de SWAN, banque fermée — à récupérer en priorité.':'')+
+          (d.k==='PERSO'?' PERSO n\'a aucun dossier de relevés : le créer d\'abord.':'');
+  try{
+   (window.top||parent).postMessage({fkh:1,action:'ticket.create',payload:{
+     objet:'Relevés de compte manquants — '+manq.length+' mois ('+d.k+')',
+     message:txt, pour:'admin', source:'🏦 R-RELEVE-M-1',
+     contexte:['RADAR '+d.k,'R-RELEVE-M-1-01', manq.join(' · ')+' 2026'], ref:d.k+':releves'
+   }}, location.origin);
+   n++;
+  }catch(e){}
+  try{ if(typeof sendPrompt==='function')sendPrompt(txt); }catch(e){}
+ });
+ document.getElementById('okr').textContent = n
+   ? '✅ '+n+' ticket(s) créé(s) — un par domaine, visibles dans 🎫 Tickets.'
+   : '⚠️ Rien transmis : ouvre cette page depuis l\'appli (🌐 Domaines).';
+}
+
+function coches(){
+ return [].slice.call(document.querySelectorAll('input[type=checkbox]:checked')).map(function(i){
+   return {d:DOMS[+i.dataset.d], c:DOMS[+i.dataset.d].clients[+i.dataset.c]}; });
+}
+function maj(){
+ var v=coches(), m=v.filter(function(x){return !x.c.f;});
+ document.getElementById('nv').textContent=v.length;
+ document.getElementById('nm').textContent=m.length;
+ document.getElementById('go').disabled=!m.length;
+ document.getElementById('go').textContent='📡 Envoyer les '+m.length+' manquants au RADAR';
+}
+function envoyer(){
+ var m=coches().filter(function(x){return !x.c.f;});
+ /* Un ticket par domaine ET par mois : le rattrapage de juin ne doit pas se
+    noyer dans celui de juillet, sinon on traitera l'un en croyant faire l'autre. */
+ var par={};
+ m.forEach(function(x){
+   var mois=x.c.mois||'juillet 2026';
+   var cle=x.d.k+'|'+mois;
+   (par[cle]=par[cle]||[]).push(x.c.n.replace(/ — RATTRAPAGE.*$/,''));
+ });
+ var envoyes=0;
+ Object.keys(par).forEach(function(cle){
+   var k=cle.split('|')[0], mois=cle.split('|')[1];
+   var liste=par[cle].join(' · ');
+   var txt='RADAR '+k+' — facturation '+mois+' manquante pour : '+liste+
+           '. Clients confirmés par Zeus au contrôle du mois ; aucune facture dans le dossier de '+mois.split(' ')[0]+'.';
+   try{
+     (window.top||parent).postMessage({fkh:1,action:'ticket.create',payload:{
+       objet:mois.charAt(0).toUpperCase()+mois.slice(1)+' — '+par[cle].length+' facture(s) à établir ('+k+')',
+       message:txt, pour:'admin', source:'🗓️ Contrôle du mois',
+       contexte:['RADAR '+k, mois, liste], ref:k+':'+mois.replace(' ','')
+     }}, location.origin);
+     envoyes++;
+   }catch(e){}
+   try{ if(typeof sendPrompt==='function')sendPrompt(txt); }catch(e){}
+ });
+ document.getElementById('ok').textContent = envoyes
+   ? '✅ '+envoyes+' ticket(s) créé(s) — un par domaine et par mois, visibles dans 🎫 Tickets.'
+   : '⚠️ Rien n\'a pu être transmis : ouvre cette page depuis l\'appli (🌐 Domaines), pas en fichier isolé.';
+}
+maj();
+</script></body></html>

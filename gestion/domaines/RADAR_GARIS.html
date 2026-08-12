@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>📡 RADAR — à résoudre · à faire · échéances (GARIS)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.30.0/tabler-icons.min.css">
+<style>
+  :root{--bg:#0e1116;--card:#161b22;--card2:#1c232d;--line:#2a313c;--info:#7c93ff;--tp:#e6edf3;--ts:#9aa7b4;--tt:#6b7480;--dang:#f87171;--warn:#fbbf24;--ok:#34d399;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tp);padding:20px;}
+  .nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .nav .v{cursor:pointer;font-size:12.5px;padding:5px 11px;border-radius:8px;border:1px solid var(--line);color:var(--ts)}
+  .nav .v.on{background:var(--card);color:var(--tp);border-color:var(--info);font-weight:600}
+  .hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  h1{font-size:18px;font-weight:600;margin:0}
+  .eb{font-family:inherit;background:var(--card2);color:var(--tp);border:1px solid var(--line);border-radius:8px;height:32px;padding:0 12px;cursor:pointer;font-size:12.5px}
+  .sub{font-size:12px;color:var(--tt);margin-bottom:14px}
+  .intake{background:var(--card);border:1px dashed var(--info);border-radius:12px;padding:12px 14px;margin-bottom:18px}
+  .intake .t{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--info)}
+  .intake textarea{width:100%;background:var(--card2);color:var(--tp);border:1px solid var(--line);border-radius:8px;padding:9px;font-family:inherit;font-size:13px;resize:vertical;min-height:46px}
+  .intake button{margin-top:8px;font-family:inherit;background:var(--info);color:#0e1116;border:none;border-radius:8px;height:34px;padding:0 14px;cursor:pointer;font-size:13px;font-weight:600}
+  .sec{margin-bottom:18px}
+  .sh{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+  .pill{font-size:11px;padding:1px 8px;border-radius:999px;font-weight:600}
+  .item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:6px;flex-wrap:wrap}
+  .item.drill{cursor:pointer}
+  .item.drill:hover{border-color:var(--info)}
+  .main{flex:1;min-width:180px}
+  .l{font-size:13.5px;font-weight:600}
+  .w{font-size:11.5px;color:var(--tt);margin-top:1px}
+  .chev{color:var(--tt);transition:transform .15s}
+  .chev.open{transform:rotate(180deg)}
+  .act{font-family:inherit;background:var(--card2);color:var(--tp);border:1px solid var(--info);border-radius:8px;height:34px;padding:0 12px;cursor:pointer;font-size:12.5px}
+  .due{font-size:12px;color:var(--ts);min-width:120px;text-align:right}
+  .det{flex-basis:100%;margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
+  .detrow{font-size:12px;color:var(--ts);padding:3px 0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .detrow.drill{cursor:pointer}
+  .detrow.drill:hover{color:var(--tp)}
+  .detrow b{color:var(--tp);font-weight:500;font-variant-numeric:tabular-nums}
+  .det2{flex-basis:100%;margin-top:5px;padding-left:12px;border-left:2px solid var(--line)}
+  .det2 .detrow{font-size:11.5px}
+  .strip{display:flex;gap:3px;flex-wrap:wrap;margin-top:6px}
+  .mcell{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#0b3d2c}
+</style>
+</head>
+<body>
+
+<div class="hdr"><h1>📡 RADAR — 🛡️ GARIS</h1><button class="eb" id="editBtn"><i class="ti ti-pencil"></i> Modifier</button></div>
+<div class="sub">Le système unique de suivi : à résoudre · à faire · échéances · suivis récurrents — chaque ligne s'agit sur place ; clic = déplie le détail (jusqu'à 2 niveaux). Dépose un nouveau besoin métier ci-dessous. <b style="color:#7dd3fc">Même moteur que le RADAR FKH</b> — chiffres lus dans <code>Garis_Securite_Suivi_Facturation_v2.xlsx</code>.</div>
+
+<div class="intake">
+  <div class="t"><i class="ti ti-plus"></i> Déposer un besoin métier</div>
+  <textarea id="besoin" placeholder="ex. : les fiches de paie doivent être déposées au plus tard le 10 de chaque mois"></textarea>
+  <button id="addBesoin"><i class="ti ti-send"></i> Proposer un suivi</button>
+  <span style="font-size:11px;color:var(--tt);margin-left:8px;">≡ mot d'appel : <code>+ BESOIN : …</code></span>
+</div>
+
+<div id="body"></div>
+<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--line)"><button class="eb" style="background:var(--info);color:#0e1116;border:none;font-weight:600" onclick="partager()"><i class="ti ti-share"></i> Mettre en miroir dans SUIVI_DEPOT (<span id="cnt">0</span>)</button> <button class="eb" onclick="go('OUVRIR SUIVI_DEPOT GARIS')"><i class="ti ti-external-link"></i> Ouvrir le fichier partagé</button> <span style="font-size:11px;color:var(--tt);margin-left:8px">coche les lignes à partager avec l'externe</span></div>
+<script>
+function go(p){
+  /* En session Claude, on parle a Claude. Dans l'appli, il n'y a personne au bout :
+     le bouton doit produire un TICKET, pas un silence. Pont b411, meme origine. */
+  try{ if(typeof sendPrompt==='function'){ sendPrompt(p); rdToast('\u2192 envoye'); return; } }catch(e){}
+  var txt=String(p||'').trim(); if(!txt)return;
+  try{
+    (window.top||parent).postMessage({fkh:1,action:'ticket.create',payload:{
+      objet: txt.slice(0,120), message: txt, pour:'admin',
+      source:'\uD83D\uDCE1 RADAR GARIS', contexte:['RADAR GARIS'],
+      ref:'GARIS:'+txt.slice(0,40)
+    }}, location.origin);
+    rdToast('\uD83C\uDFAB Ticket cree');
+  }catch(e){ rdToast('\u26A0\uFE0F non transmis'); }
+}
+function rdToast(m){
+  var t=document.getElementById('rdtoast');
+  if(!t){ t=document.createElement('div'); t.id='rdtoast';
+    t.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#12241a;color:#8ef0b6;border:1px solid #2f6b46;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600;z-index:99;box-shadow:0 8px 30px rgba(0,0,0,.5)'; document.body.appendChild(t); }
+  t.textContent=m; t.style.display='block';
+  clearTimeout(window.__rdt); window.__rdt=setTimeout(function(){ t.style.display='none'; },1800);
+}
+function majCnt(){var n=document.querySelectorAll('.shchk:checked').length;var e=document.getElementById('cnt');if(e)e.textContent=n;}
+function partager(){var ls=[].slice.call(document.querySelectorAll('.shchk:checked')).map(function(c){return c.dataset.v+' · '+c.dataset.l;});go(ls.length?'MIROIR SUIVI_DEPOT : '+ls.join(' || '):'Aucune ligne cochée pour le miroir');}
+function tog(id){var d=document.getElementById('det_'+id),c=document.getElementById('chev_'+id);if(!d)return;var o=d.style.display==='none';d.style.display=o?'block':'none';if(c)c.className='chev ti ti-chevron-down'+(o?' open':'');}
+function detHTML(det,pid){return det.map(function(d,j){
+  if(Array.isArray(d))return '<div class="detrow"><span>'+d[0]+'</span><b>'+(d[1]||'')+'</b></div>';
+  if(d.a)return '<div class="detrow"><span>'+(d.l||'')+'</span><button class="act" style="height:26px;font-size:11px;padding:0 10px" onclick="event.stopPropagation();go(this.dataset.p)" data-p="'+d.p.replace(/"/g,'&quot;')+'"><i class="ti ti-arrow-up-right"></i> ouvrir</button></div>';
+  var sid=pid+'_'+j;
+  var chev='<i class="chev ti ti-chevron-down" id="chev_'+sid+'" style="font-size:11px"></i>';
+  var sub='<div class="det2" id="det_'+sid+'" style="display:none;">'+d.sub.map(function(s){if(s.a)return '<div class="detrow"><span>'+s.a+'</span><button class="act" style="height:26px;font-size:11px;padding:0 10px" onclick="event.stopPropagation();go(this.dataset.p)" data-p="'+s.p.replace(/"/g,'&quot;')+'"><i class="ti ti-arrow-up-right"></i> ouvrir</button></div>';return '<div class="detrow"><span>'+s[0]+'</span><b>'+(s[1]||'')+'</b></div>';}).join('')+'</div>';
+  return '<div class="detrow drill" onclick="event.stopPropagation();tog(\''+sid+'\')"><span>'+d.l+' '+chev+'</span><b>'+(d.v||'')+'</b>'+sub+'</div>';
+}).join('');}
+const VIEWS=[["Hub", "ti-compass", 0], ["RADAR", "ti-radar", 1], ["Cockpit GARIS", "ti-chart-dots", 0], ["Cockpit financier GARIS", "ti-cash", 0], ["Facturation", "ti-file-invoice", 0], ["Cascade ST", "ti-affiliate", 0]];
+const PAIE=[1,1,1,1,1,1,2,0,0,0,0,0];
+const PC={1:'var(--ok)',2:'var(--warn)',3:'var(--dang)',0:'var(--line)'};
+const SECS=[{"t": "À résoudre — en attente d’une info / décision", "c": "var(--dang)", "bg": "rgba(248,113,113,.16)", "items": [{"l": "Aucun paiement n’est renseigné — 21 factures sur 21", "w": "Date Paiement, Montant Payé, Reste Dû et Statut sont vides sur toute la colonne : impossible de dire ce qui est encaissé, ce qui est en retard, ce qu’il faut relancer. DAHLIA a ce suivi, GARIS ne l’a pas.", "a": ["Recouper", "Recoupe les paiements GARIS au relevé de compte et renseigne Date Paiement / Montant Payé / Statut pour les 20 factures"], "det": [["Factures émises", "21"], ["Avec une date de paiement", "0"], ["Conséquence", "aucun impayé ne peut être vu, aucune relance déclenchée"], ["Bloquant", "relevés juin et juillet 2026 absents"], {"l": "Ouvrir le dossier des relevés", "a": 1, "p": "Ouvre GARIS SECURITE/RELEVE DE COMPTE/"}]}, {"l": "Relevés de compte 2026 — juin · juillet ABSENTS", "w": "Qonto janvier→mai + Indy avril/mai sont là ; juin et juillet manquent — même trou que FKH et DAHLIA", "a": ["Déposer", "Dépose les relevés de compte GARIS juin et juillet 2026 dans GARIS SECURITE/RELEVE DE COMPTE/"], "det": [["Présents (Qonto)", "janvier → mai 2026"], ["Présents (Indy)", "avril · mai 2026"], ["❌ Juin 2026", "absent"], ["❌ Juillet 2026", "absent"]]}, {"l": "Juillet 2026 — aucune facture émise", "w": "la dernière est GS-2026-109 (IGS21, juin). On est le 12/08 : un mois entier n’est pas facturé.", "a": ["Établir", "Établis la facturation GARIS de juillet 2026 — aucune facture n'existe pour ce mois"]}, {"l": "Mai 2026 — FKH n’est pas facturé", "w": "avril existe bien (GS-2026-108, 56 571,70 € TTC), contrairement à ce qu’affiche le RADAR FKH ; mai, lui, manque réellement", "a": ["Émettre", "Émets la facture GARIS → FKH de mai 2026 (avril GS-2026-108 existe déjà)"], "det": [["Janvier", "GS-2026-091 · 64 676,45 €"], ["Février", "GS-2026-095 · 33 975,70 €"], ["Mars", "GS-2026-099 · 50 304,74 €"], ["Avril", "GS-2026-108 · 56 571,70 €  —  émise, mais ni classée ni inscrite"], ["❌ Mai", "manquante"], ["À corriger aussi", "le RADAR FKH réclame avril + mai ; seul mai est vrai"]]}, {"l": "GARIS a-t-il ses propres sous-traitants ?", "w": "décision jamais tranchée", "a": ["Trancher", "TRAITER : ST propres GARIS"]}, {"l": "Outil de paie + agents à établir", "w": "décision jamais tranchée", "a": ["Trancher", "TRAITER : paie GARIS"]}]}, {"t": "💶 Facturation 2026 — 576 827,14 € TTC réels · 0 encaissement tracé", "c": "#7dd3fc", "bg": "rgba(125,211,252,.16)", "items": [{"l": "Janvier 2026 — 82 737,25 € TTC · 2 factures", "w": "aucun encaissement tracé sur ce mois", "det": [["GS-2026-082 · Dahlia Sécurité", "18 060,80 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-082 (Dahlia Sécurité, 18 060,80 €) au relevé de compte"}, ["GS-2026-091 · FKH Sécurité", "64 676,45 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-091 (FKH Sécurité, 64 676,45 €) au relevé de compte"}, ["CA réel du mois", "82 737,25 € TTC · 2 factures"]]}, {"l": "Février 2026 — 53 216,64 € TTC · 3 factures", "w": "aucun encaissement tracé sur ce mois", "det": [["GS-2026-051 · ADN Sécurité", "9 240,00 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-051 (ADN Sécurité, 9 240,00 €) au relevé de compte"}, ["GS-2026-083 · Dahlia Sécurité", "10 000,94 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-083 (Dahlia Sécurité, 10 000,94 €) au relevé de compte"}, ["GS-2026-095 · FKH Sécurité", "33 975,70 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-095 (FKH Sécurité, 33 975,70 €) au relevé de compte"}, ["CA réel du mois", "53 216,64 € TTC · 3 factures"]]}, {"l": "Mars 2026 — 129 534,37 € TTC · 5 factures", "w": "aucun encaissement tracé sur ce mois", "det": [["GS-2026-062 · ADN Sécurité", "13 200,00 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-062 (ADN Sécurité, 13 200,00 €) au relevé de compte"}, ["GS-2026-078 · Groupe A Sécurité", "5 635,98 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-078 (Groupe A Sécurité, 5 635,98 €) au relevé de compte"}, ["GS-2026-079 · IGS21", "58 348,80 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-079 (IGS21, 58 348,80 €) au relevé de compte"}, ["GS-2026-084 · Dahlia Sécurité", "2 044,85 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-084 (Dahlia Sécurité, 2 044,85 €) au relevé de compte"}, ["GS-2026-099 · FKH Sécurité", "50 304,74 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-099 (FKH Sécurité, 50 304,74 €) au relevé de compte"}, ["CA réel du mois", "129 534,37 € TTC · 5 factures"]]}, {"l": "Avril 2026 — 141 570,41 € TTC · 4 factures", "w": "aucun encaissement tracé sur ce mois", "det": [["GS-2026-085 · Dahlia Sécurité", "3 598,15 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-085 (Dahlia Sécurité, 3 598,15 €) au relevé de compte"}, ["GS-2026-089 · IGS21", "64 240,56 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-089 (IGS21, 64 240,56 €) au relevé de compte"}, ["GS-2026-100 · ADN Sécurité", "17 160,00 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-100 (ADN Sécurité, 17 160,00 €) au relevé de compte"}, ["GS-2026-108 · FKH Sécurité", "56 571,70 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-108 (FKH Sécurité, 56 571,70 €) au relevé de compte"}, ["CA réel du mois", "141 570,41 € TTC · 4 factures"]]}, {"l": "Mai 2026 — 94 997,33 € TTC · 2 factures", "w": "aucun encaissement tracé sur ce mois", "det": [["GS-2026-107 · IGS21", "78 497,33 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-107 (IGS21, 78 497,33 €) au relevé de compte"}, ["GS-2026-103 · ADN Sécurité", "16 500,00 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-103 (ADN Sécurité, 16 500,00 €) au relevé de compte"}, ["CA réel du mois", "94 997,33 € TTC · 2 factures"]]}, {"l": "Juin 2026 — 74 771,14 € TTC · 1 facture", "w": "aucun encaissement tracé sur ce mois", "det": [["GS-2026-109 · IGS21", "74 771,14 € TTC  —  ❓ paiement non renseigné"], {"l": "   → recouper au relevé", "a": 1, "p": "Recoupe le paiement de la facture GARIS GS-2026-109 (IGS21, 74 771,14 €) au relevé de compte"}, ["CA réel du mois", "74 771,14 € TTC · 1 factures"]]}, {"l": "Juillet 2026 — AUCUNE FACTURE", "w": "rien d'édité pour ce mois alors que les mois précédents tournent", "a": ["Établir", "Établis la facturation GARIS de juillet 2026 (aucune facture n'existe)"], "det": [["Dernière facture émise", "GS-2026-109 · IGS21 · juin 2026"]]}]}, {"t": "📁 Rangement — les factures ne sont pas où on les cherche", "c": "#a78bfa", "bg": "rgba(167,139,250,.16)", "items": [{"l": "8 factures hors du classement mensuel", "w": "elles sont dans « FACTURE SOUS TRAITANT GARSIS », pas dans 2026/<mois> garis/. DAHLIA range tout par mois ; GARIS a deux dépôts et on ne sait jamais lequel fait foi.", "a": ["Ranger", "Range les factures GARIS hors classement dans 2026/<mois> garis/ et unifie le dépôt"], "det": [["GS-2025-085 · FKH Sécurité · 30/11/2025", "FACTURE SOUS TRAITANT"], ["GS-2025-086 · FKH Sécurité · 31/12/2025", "FACTURE SOUS TRAITANT"], ["GS-2026-091 · FKH Sécurité · 31/01/2026", "FACTURE SOUS TRAITANT"], ["GS-2026-099 · FKH Sécurité · 31/03/2026", "FACTURE SOUS TRAITANT"], ["GS-2026-100 · ADN Sécurité · 30/04/2026", "FACTURE SOUS TRAITANT"], ["GS-2026-103 · ADN Sécurité · 31/05/2026", "FACTURE SOUS TRAITANT"], ["GS-2026-107 · IGS21 · 31/05/2026", "FACTURE SOUS TRAITANT"], ["GS-2026-109 · IGS21 · 30/06/2026", "FACTURE SOUS TRAITANT"]]}, {"l": "0 facture(s) émise(s) que le classeur maître ignore", "w": "le PDF existe, le numéro est consommé, mais aucune ligne au maître : ce CA n’existe nulle part dans les comptes et le numéro peut être réattribué à une autre facture", "a": ["Inscrire", "Inscris au classeur maître GARIS les factures émises absentes du suivi : "], "det": []}, {"l": "Mai et juin ne sont dans aucun dossier mensuel", "w": "le dossier 2026/ s’arrête à avril — les mois récents n’ont pas de case où tomber", "a": ["Créer", "Crée les dossiers 'mai 2026 garis' et 'juin 2026 garis' et y range GS-2026-103, GS-2026-107 et GS-2026-109"], "det": [["Mai", "GS-2026-103 (ADN) · GS-2026-107 (IGS21)"], ["Juin", "GS-2026-109 (IGS21)"]]}, {"l": "GS-2026-095 est rangée en double", "w": "présente dans le dossier de février ET dans FACTURE SOUS TRAITANT — un jour l’une des deux sera modifiée sans l’autre", "a": ["Dédoublonner", "Dédoublonne les factures GARIS présentes dans deux dossiers à la fois"], "det": [["GS-2026-095", "FACTURE SOUS TRAITANT + dossier du mois"]]}, {"l": "2 factures du maître n’ont aucun PDF retrouvé", "w": "inscrites au classeur mais introuvables sur le disque — à retrouver ou à rééditer avant tout contrôle", "a": ["Retrouver", "Retrouve ou réédite les PDF des factures GARIS inscrites au maître mais absentes du disque"], "det": [["GS-2025-080 · Dahlia Sécurité", "30/11/2025 · 28 149,60 €"], ["GS-2025-081 · Dahlia Sécurité", "31/12/2025 · 34 965,00 €"]]}]}, {"t": "À faire", "c": "var(--warn)", "bg": "rgba(251,191,36,.16)", "items": [{"l": "Conformité GARIS comme sous-traitant de FKH — 3/9 pièces OK", "w": "miroir exact du RADAR FKH (Atelier 11) : ce que FKH réclame à GARIS doit se voir aussi côté GARIS", "a": ["Fournir", "Prépare les pièces de conformité manquantes que FKH réclame à GARIS"], "det": [["Kbis", "✓"], ["Vigilance URSSAF", "✓"], ["RC Pro", "✓"], {"l": "Régularité fiscale — ✗ à fournir", "a": 1, "p": "Fournis la pièce « Régularité fiscale » de GARIS à FKH"}, {"l": "AUT CNAPS — ✗ à fournir", "a": 1, "p": "Fournis l'AUT CNAPS de GARIS à FKH"}, {"l": "Attestation honneur — ✗ à fournir", "a": 1, "p": "Fournis l'attestation sur l'honneur de GARIS à FKH"}, {"l": "RIB — ✗ à fournir", "a": 1, "p": "Fournis le RIB de GARIS à FKH"}, {"l": "Liste salariés détachés — ✗ à fournir", "a": 1, "p": "Fournis la liste des salariés détachés GARIS à FKH"}, {"l": "Contrat FKH↔GARIS — à classer", "a": 1, "p": "Retrouve et classe le contrat FKH↔GARIS"}]}, {"l": "Courrier SeDomicilier — rangement manuel", "w": "récurrent, jamais automatisé", "a": ["Traiter", "TRAITER : rangement courrier GARIS"]}, {"l": "Récolte GARIS → skill (factures, DO, cascade)", "w": "à dater", "a": ["Lancer", "TRAITER : récolte GARIS skill"]}]}, {"t": "Suivis récurrents (mensuels)", "c": "var(--info)", "bg": "rgba(124,147,255,.18)", "recur": [{"l": "Dépôt des relevés de compte", "w": "Qonto + Indy · source du recoupement paiement", "now": "Août : juin et juillet manquants", "strip": [1, 1, 1, 1, 1, 3, 3, 0, 0, 0, 0, 0]}, {"l": "Facturation des donneurs d’ordre", "w": "une facture par DO et par mois", "now": "Juillet : rien d’émis", "strip": [1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0]}]}, {"t": "⏳ Échéances", "c": "#f59e0b", "bg": "rgba(245,158,11,.16)", "items": [{"l": "Kbis GARIS — à renouveler", "w": "pièce de conformité", "due": "17/08 · J-5", "det": [{"l": "Traiter le Kbis", "a": 1, "p": "TRAITER : Kbis GARIS"}]}, {"l": "RC Pro — échéance", "w": "pièce de conformité", "due": "12/11", "det": [{"l": "Traiter la RC Pro", "a": 1, "p": "TRAITER : RC Pro GARIS"}]}]}];
+function render(){
+ document.getElementById('body').innerHTML=SECS.map((s,si)=>{
+   let inner='';
+   if(s.items)inner=s.items.map((it,i)=>{
+     const id=si+'_'+i, hasDet=it.det&&it.det.length;
+     const chev=hasDet?'<i class="chev ti ti-chevron-down" id="chev_'+id+'"></i>':'';
+     const right=it.a?'<button class="act" onclick="event.stopPropagation();go(this.dataset.p)" data-p="'+it.a[1].replace(/"/g,'&quot;')+'"><i class="ti ti-player-play"></i> '+it.a[0]+'</button>':(it.due?'<div class="due">'+it.due+'</div>':'');
+     var cbr=/(\bCA\b|cascade|salaire|virement|impay|montant|TTC|affect|Reste à|€)/i.test(it.l)?'':'<input type="checkbox" class="shchk" data-l="'+it.l.replace(/"/g,'&quot;')+'" data-v="RADAR GARIS" onclick="event.stopPropagation()" onchange="majCnt()" style="width:15px;height:15px;flex:none;accent-color:var(--info)">';
+     const det=hasDet?'<div class="det" id="det_'+id+'" style="display:none;">'+detHTML(it.det,id)+'</div>':'';
+     return '<div class="item'+(hasDet?' drill':'')+'"'+(hasDet?' onclick="tog(\''+id+'\')"':'')+'>'+cbr+'<i class="ti ti-point-filled" style="color:'+s.c+'"></i><div class="main"><div class="l">'+it.l+'</div><div class="w">'+it.w+'</div></div>'+chev+right+det+'</div>';
+   }).join('');
+   if(s.recur)inner=s.recur.map(r=>'<div class="item" style="align-items:flex-start"><i class="ti ti-repeat" style="color:'+s.c+'"></i><div class="main"><div class="l">'+r.l+'</div><div class="w">'+r.w+' · '+r.now+'</div><div class="strip">'+r.strip.map(v=>'<div class="mcell" style="background:'+PC[v]+(v===0?';opacity:.5':'')+'">'+(v===1?'✓':(v===2?'·':(v===3?'✗':'')))+'</div>').join('')+'</div></div></div>').join('');
+   return '<div class="sec"><div class="sh"><span class="pill" style="background:'+s.bg+';color:'+s.c+'">'+((s.items||s.recur).length)+'</span> '+s.t+'</div>'+inner+'</div>';
+ }).join('');
+}
+render();
+document.getElementById('editBtn').onclick=()=>go('MODIFIER VUE : RADAR GARIS');
+document.getElementById('addBesoin').onclick=()=>{const v=document.getElementById('besoin').value.trim();if(v)go('+ BESOIN : '+v);};
+</script></body></html>

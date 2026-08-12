@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b413</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b414</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1323,14 +1323,36 @@ button.big:active{transform:translateY(1px)}
   // ===== Liste EXHAUSTIVE des communes de France (embarquée communes.json, recherche locale) =====
   var COMMUNES=null, COMMUNES_IDX=null;
   function commNorm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,' ').replace(/\bste\b/g,'sainte').replace(/\bst\b/g,'saint').replace(/\s+/g,' ').trim(); }
-  (function loadCommunes(){ try{ fetch('communes.json').then(function(r){return r.json();}).then(function(a){ if(Array.isArray(a)&&a.length){ COMMUNES=a; COMMUNES_IDX=a.map(function(row){return commNorm(row[0]);}); } }).catch(function(){}); }catch(e){} })();
+  (function loadCommunes(){ try{ /* b414 : le repère de version force le navigateur à reprendre le fichier. Sans lui, la base de communes reste celle qu'il a en cache depuis des semaines — et le tri par population lit une colonne qui n'existe pas encore chez lui. À changer à chaque régénération de communes.json. */ fetch('communes.json?v=b414').then(function(r){return r.json();}).then(function(a){ if(Array.isArray(a)&&a.length){ COMMUNES=a; COMMUNES_IDX=a.map(function(row){return commNorm(row[0]);}); } }).catch(function(){}); }catch(e){} })();
   function commToDept(cp){ cp=String(cp||'').replace(/\D/g,''); if(cp.length>=2){ return (cp.slice(0,2)==='97'||cp.slice(0,2)==='98')?cp.slice(0,3):cp.slice(0,2); } return ''; }
   function commDeptNom(code){ if(typeof DEPTS!=='undefined'&&DEPTS){ for(var i=0;i<DEPTS.length;i++)if(DEPTS[i].code===code)return DEPTS[i].nom; } return ''; }
-  function commObj(row){ var cp=row[1]||'',dep=commToDept(cp); return { nom:row[0], codesPostaux:[cp], centre:{coordinates:[row[3],row[2]]}, departement:{code:dep,nom:commDeptNom(dep)} }; }
+  function commObj(row){ var cp=row[1]||'',dep=commToDept(cp); return { nom:row[0], codesPostaux:[cp], centre:{coordinates:[row[3],row[2]]}, population:(+row[4]||0),   /* b414 */ departement:{code:dep,nom:commDeptNom(dep)} }; }
   function commSearch(q,limit){ if(!COMMUNES)return null; var nq=commNorm(q); if(!nq)return []; limit=limit||25; var pref=[],sub=[]; for(var i=0;i<COMMUNES_IDX.length;i++){ var p=COMMUNES_IDX[i].indexOf(nq); if(p===0){ pref.push(i); } else if(p>0){ if(sub.length<300)sub.push(i); } if(pref.length>800)break; }
     if(!pref.length&&!sub.length){ var words=nq.split(' ').filter(Boolean); if(words.length){ for(var j=0;j<COMMUNES_IDX.length&&sub.length<limit;j++){ var ok=true; for(var w=0;w<words.length;w++){ if(COMMUNES_IDX[j].indexOf(words[w])<0){ ok=false; break; } } if(ok)sub.push(j); } } }
-    pref.sort(function(a,b){ return COMMUNES_IDX[a].length-COMMUNES_IDX[b].length; }); return pref.concat(sub).slice(0,limit).map(function(i){return commObj(COMMUNES[i]);}); }
-  function commByCP(cp,limit){ if(!COMMUNES)return null; cp=String(cp||'').replace(/\D/g,''); if(!cp)return []; limit=limit||25; var out=[]; for(var i=0;i<COMMUNES.length&&out.length<limit;i++){ if(String(COMMUNES[i][1]||'').indexOf(cp)===0)out.push(commObj(COMMUNES[i])); } return out; }
+    /* ===== b414 : DEUX COMMUNES DU MÊME NOM NE SE DÉPARTAGENT PAS PAR L'ORDRE DU FICHIER =====
+       Le tri par longueur de nom laissait les homonymes exacts à égalité : le tableau gardait
+       son ordre, celui des codes INSEE, et le plus petit département gagnait. « Valence »
+       tombait en Charente (192 hab.) au lieu de la Drôme (64 458). 1 482 noms sont dans ce cas.
+       On départage comme l'API officielle : à la POPULATION. Et un nom exact passe devant un
+       nom qui commence pareil — « Valence » ne se fait pas doubler par « Valence-d'Albigeois ». */
+    /* b414 : la population seule mettait Saint-Denis de La Réunion (153 000) devant celui de
+       Seine-Saint-Denis (113 000). Exact, et faux pour FKH — les prestations sont en métropole.
+       Alors : nom exact d'abord, métropole ensuite, population enfin. Une commune d'outre-mer
+       reste proposée, simplement pas en tête. À revoir le jour où FKH travaille outre-mer. */
+    function _dom(i9){ var c9=String((COMMUNES[i9]&&COMMUNES[i9][1])||'').slice(0,2); return (c9==='97'||c9==='98')?1:0; }
+    pref.sort(function(a,b){
+      var ea=(COMMUNES_IDX[a]===nq)?0:1, eb=(COMMUNES_IDX[b]===nq)?0:1;
+      if(ea!==eb)return ea-eb;
+      var da=_dom(a), db=_dom(b); if(da!==db)return da-db;
+      var pa=+(COMMUNES[a]&&COMMUNES[a][4])||0, pb=+(COMMUNES[b]&&COMMUNES[b][4])||0;
+      if(pa!==pb)return pb-pa;
+      return COMMUNES_IDX[a].length-COMMUNES_IDX[b].length; });
+    sub.sort(function(a,b){ var da=_dom(a), db=_dom(b); if(da!==db)return da-db;
+      return (+(COMMUNES[b]&&COMMUNES[b][4])||0)-(+(COMMUNES[a]&&COMMUNES[a][4])||0); });
+    return pref.concat(sub).slice(0,limit).map(function(i){return commObj(COMMUNES[i]);}); }
+  function commByCP(cp,limit){ if(!COMMUNES)return null; cp=String(cp||'').replace(/\D/g,''); if(!cp)return []; limit=limit||25; var out=[]; for(var i=0;i<COMMUNES.length&&out.length<limit;i++){ if(String(COMMUNES[i][1]||'').indexOf(cp)===0)out.push(commObj(COMMUNES[i])); }
+    /* b414 : à code postal égal, la plus peuplée d'abord — la même règle que par le nom. */
+    out.sort(function(x,y){ return (+y.population||0)-(+x.population||0); }); return out; }
 
   function search(q){var loc=commSearch(q,25); if(loc){var box=byId('sugg');if(!loc.length){box.classList.add('hidden');return;}box.innerHTML='';loc.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+esc(c.nom)+'</span> <span class="cp">'+esc(cp)+'</span>';d.onclick=function(){pick(c);};box.appendChild(d);});box.classList.remove('hidden');return;} fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(q)+'&fields=nom,code,departement,region,centre,codesPostaux,population&boost=population&limit=25').then(function(r){return r.json();}).then(function(list){if(!Array.isArray(list)||!list.length){byId('sugg').classList.add('hidden');return;}var box=byId('sugg');box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+c.nom+'</span> <span class="cp">'+cp+'</span>';d.onclick=function(){pick(c);};box.appendChild(d);});box.classList.remove('hidden');}).catch(function(){byId('sugg').classList.add('hidden');});}
   // Code postal → villes correspondantes

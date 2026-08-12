@@ -107,9 +107,31 @@ async function planifierDepuisMail(env, cdr, texte, data) {
   /* b343 : elle avait ete supprimee. On la recree (elle a pu etre re-commandee) mais JAMAIS en silence :
      l'appli affiche « tu avais supprime cette vacation » sur sa fiche Planning. */
   if (supprimee) vac.reCree = { quand: Date.now(), avant: String(supprimee.id || ""), supprLe: "" };
+  /* 09/08 : une prolongation = plusieurs journees. On cree une vacation par periode, en
+     bornant a 31 : un bon de commande mal lu ne doit pas remplir le planning pendant la nuit. */
+  const per = Array.isArray(pdf.periodes) && pdf.periodes.length
+    ? pdf.periodes.filter((p) => p && /^\d{4}-\d{2}-\d{2}$/.test(String(p.date || ""))).slice(0, 31)
+    : [];
   // json_insert ajoute en fin de tableau sans reecrire tout le document : pas de limite de taille atteinte.
-  await env.DB.prepare("UPDATE store SET v = json_insert(v, '$[#]', json(?)), updated_at = ? WHERE k = 'fkh_suivi'")
-    .bind(JSON.stringify(vac), Date.now()).run();
+  /* La premiere journee garde la vacation deja construite ; les suivantes la recopient avec
+     leur propre date et leurs propres heures, et leur propre identifiant. */
+  const aEcrire = per.length
+    ? per.map((p, i) => Object.assign({}, vac, {
+        id: vac.id + (i ? "_j" + (i + 1) : ""),
+        mdate: p.date,
+        mheure: p.debut || vac.mheure,
+        mfin: p.fin || vac.mfin,
+        prolongation: per.length > 1 ? { jour: i + 1, sur: per.length } : undefined,
+      }))
+    : [vac];
+  for (const v of aEcrire) {
+    /* Chaque journee repasse par la meme regle : jamais deux fois la meme date au meme site. */
+    if (v !== vac && liste.some((m) => m && !m.deleted && m.statut === "validee"
+        && (m.mdate || "") === v.mdate && _memeHeure(m.mheure, v.mheure)
+        && _memeSite(m.siteAgent || m.titre || "", v.siteAgent))) continue;
+    await env.DB.prepare("UPDATE store SET v = json_insert(v, '$[#]', json(?)), updated_at = ? WHERE k = 'fkh_suivi'")
+      .bind(JSON.stringify(v), Date.now()).run();
+  }
 }
 
 function corsHeaders(origin) {
@@ -344,7 +366,7 @@ async function aiAnalyze(env, transcript, direction) {
 async function aiReadPdf(env, pdfs) {
   const docs = (pdfs || []).slice(0, 2).map((p) => ({ type: "document", source: { type: "base64", media_type: "application/pdf", data: p.b64 } }));
   if (!docs.length) return null;
-  const q = { type: "text", text: "Ce sont des bons de commande / demandes de prestation de gardiennage adresses a FKH SECURITE (sous-traitant). Extrais UNIQUEMENT ce qui est ecrit, en JSON strict, sans commentaire : {\"site\":\"nom du site a garder\",\"adresse\":\"numero et rue\",\"cp\":\"code postal\",\"ville\":\"ville\",\"client\":\"donneur d'ordre\",\"ref\":\"reference de la commande\",\"date\":\"AAAA-MM-JJ\",\"debut\":\"HH:MM\",\"fin\":\"HH:MM\",\"consignes\":\"consignes en une phrase\"}. Mets une chaine vide pour tout champ absent. FKH SECURITE n'est JAMAIS le client." };
+  const q = { type: "text", text: "Ce sont des bons de commande / demandes de prestation de gardiennage adresses a FKH SECURITE (sous-traitant). Extrais UNIQUEMENT ce qui est ecrit, en JSON strict, sans commentaire : {\"site\":\"nom du site a garder\",\"adresse\":\"numero et rue\",\"cp\":\"code postal\",\"ville\":\"ville\",\"client\":\"donneur d'ordre\",\"ref\":\"reference de la commande\",\"date\":\"AAAA-MM-JJ\",\"debut\":\"HH:MM\",\"fin\":\"HH:MM\",\"periodes\":[{\"date\":\"AAAA-MM-JJ\",\"debut\":\"HH:MM\",\"fin\":\"HH:MM\"}],\"consignes\":\"consignes en une phrase\"}. Mets une chaine vide pour tout champ absent. FKH SECURITE n'est JAMAIS le client. IMPORTANT : si le document couvre PLUSIEURS journees (prolongation, periode du X au Y, plusieurs nuits), remplis 'periodes' avec UNE entree PAR JOURNEE, dans l'ordre. S'il n'y a qu'une journee, 'periodes' peut rester vide." };
   const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" }, body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 700, messages: [{ role: "user", content: docs.concat([q]) }] }) });
   if (!r.ok) return null;
   const j = await r.json();
@@ -375,6 +397,85 @@ async function aiCheckPhoto(env, b64, media) {
    attraper trop plutot que pas assez — un appel marque a tort se balaie en un clic, un appel
    perdu ne se rattrape jamais. */
 const MOTS_METIER = /gardien|agent de s|agent dispo|disponib|vacation|renfort|surveillan|ma[iî]tre.?chien|adr\b|ssiap|rondier|ronde|interven|gardiennage|poste de nuit|remplac/i;
+/* 09/08 : la demande nee d'un APPEL, ecrite cote serveur.
+   Meme identifiant que le navigateur ('ai_<cdr>_<i>') : les deux ne peuvent pas doublonner. */
+/* 09/08 : au telephone on dit « demain », pas « le 10/08/2026 ». On resout par rapport a la
+   date de L'APPEL, jamais par rapport a l'instant ou le serveur relit. Ce qui n'est pas certain
+   reste vide : une date inventee est pire qu'une date absente. */
+const JOURS_FR = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+function dateRelative(txt, baseISO) {
+  const t = String(txt || "").toLowerCase().trim();
+  if (!t || !/^\d{4}-\d{2}-\d{2}$/.test(String(baseISO || ""))) return "";
+  const base = new Date(baseISO + "T12:00:00");
+  const iso = (d) => d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
+  const plus = (n) => { const d = new Date(base); d.setDate(d.getDate() + n); return iso(d); };
+  if (/apr[eè]s[- ]demain/.test(t)) return plus(2);
+  if (/demain/.test(t)) return plus(1);
+  if (/aujourd|ce soir|cette nuit|ce matin|cet apr[eè]s|maintenant|imm[eé]diat|d[eè]s que possible/.test(t)) return plus(0);
+  for (let i = 0; i < 7; i++) {
+    if (new RegExp("\\b" + JOURS_FR[i] + "\\b").test(t)) {
+      /* « lundi » dit un mardi veut dire le lundi SUIVANT, jamais celui d'hier. */
+      let n = (i - base.getDay() + 7) % 7; if (n === 0) n = 7;
+      return plus(n);
+    }
+  }
+  return "";
+}
+async function deposerDemandesAppel(env, cdrId, data, direction, number) {
+  const dems = (data && Array.isArray(data.demandes) ? data.demandes : []).slice(0, 5);
+  if (!dems.length) return 0;
+  const row = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_suivi'").first();
+  if (!row || !row.v) return 0;
+  let liste = [];
+  try { liste = JSON.parse(row.v) || []; } catch (_) { return 0; }
+  let n = 0;
+  for (let i = 0; i < dems.length; i++) {
+    const d = dems[i] || {};
+    const id = "ai_" + cdrId + "_" + i;
+    if (liste.some((m) => m && String(m.id) === id)) continue;   // deja pose, ici ou par l'appli
+    const v0 = (Array.isArray(d.vacations) && d.vacations[0]) || {};
+    let mdate = "";
+    const md = String(v0.date || "").match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    if (md) mdate = md[3] + "-" + md[2] + "-" + md[1];
+    else if (/^\d{4}-\d{2}-\d{2}$/.test(String(v0.date || ""))) mdate = String(v0.date);
+    /* ni JJ/MM/AAAA ni AAAA-MM-JJ : c'est un mot. On le resout sur la date de l'appel. */
+    if (!mdate) mdate = dateRelative((v0.date || "") + " " + (v0.horaires || "") + " " + (data.resume || ""), String(data.start || "").slice(0, 10));
+    const hh = String(v0.horaires || "");
+    const h2 = hh.match(/(\d{1,2})[:hH](\d{2})\s*(?:-|–|—|à|au|\/)\s*(\d{1,2})[:hH](\d{2})/);
+    const h1 = hh.match(/(\d{1,2})[:hH](\d{2})/);
+    const pad = (x) => ("0" + x).slice(-2);
+    const mheure = h2 ? pad(+h2[1]) + ":" + h2[2] : (h1 ? pad(+h1[1]) + ":" + h1[2] : "");
+    const mfin = h2 ? pad(+h2[3]) + ":" + h2[4] : "";
+    const L = ["Prestation : Gardiennage"];
+    if (d.client && !/FKH/i.test(d.client)) L.push("Client : " + d.client);
+    if (d.type_site) L.push("Type de site : " + d.type_site);
+    if (d.site) L.push("Site : " + d.site);
+    if (d.ville || d.cp) L.push("Ville : " + [d.ville, d.cp ? "(" + d.cp + ")" : ""].filter(Boolean).join(" "));
+    if (mdate || hh) L.push("Vacation : " + [mdate, hh].filter(Boolean).join(" "));
+    if (d.nb_agents) L.push("Nombre d'agents : " + d.nb_agents);
+    if (d.urgent) L.push("URGENT");
+    if (data.resume) L.push("Notes : " + data.resume);
+    L.push("(deposee automatiquement depuis un appel " + (direction === "out" ? "sortant vers " : "entrant de ") + (number || "?") + ")");
+    const it = {
+      id, statut: "recherche", motif: "",
+      titre: (d.site || d.client || d.ville || "Demande"),
+      texte: L.join("\n"),
+      client: (d.client && !/FKH/i.test(d.client)) ? d.client : "",
+      ville: d.ville || "", cp: d.cp || "", site: d.site || "",
+      mdate, mheure, mfin, urgent: !!d.urgent, assoc: [],
+      la: null, lo: null,
+      /* meme trace que pour les mails : on doit pouvoir repondre « qui l'a mise la ». */
+      creePar: "Systeme — appel analyse", creeUser: "worker", creeAt: Date.now(),
+      srcAppel: cdrId, parAt: Date.now(), pris: Date.now(), valide: null,
+    };
+    await env.DB.prepare("UPDATE store SET v = json_insert(v, '$[#]', json(?)), updated_at = ? WHERE k = 'fkh_suivi'")
+      .bind(JSON.stringify(it), Date.now()).run();
+    liste.push(it);
+    n++;
+  }
+  if (n) await env.DB.prepare("UPDATE ai_calls SET created = 1 WHERE cdr_id = ?").bind(cdrId).run();
+  return n;
+}
 async function aiScan(env, maxCalls, force) {
   if (!env.RINGOVER_API_KEY || !env.OPENAI_API_KEY || !env.ANTHROPIC_API_KEY) return { error: "keys_missing" };
   // Liste blanche stricte : on n'analyse QUE les numéros suivis (avec leur règle entrant/sortant)
@@ -427,6 +528,9 @@ async function aiScan(env, maxCalls, force) {
     if (isDem) { detected++;
       /* 09/08 : ne JAMAIS annoncer « deja depose » quand rien ne l'a ete. */
       const _call = { cdr_id: id, direction: c.direction, number: c.contact_number };
+      /* 09/08 : le serveur depose la demande LUI-MEME. Avant, il fallait qu'un navigateur
+         ouvre l'appli : la nuit, la demande attendait des heures. */
+      if (!data.aVerifier) { try { await deposerDemandesAppel(env, id, data, c.direction, c.contact_number); } catch (e) {} }
       try { await pushAll(env, data.aVerifier ? aiVerifNotif(_call, data) : aiDemandeNotif(_call, data.demandes)); } catch (e) {}
     }
   }
