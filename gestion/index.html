@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b417</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b418</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1555,6 +1555,28 @@ button.big:active{transform:translateY(1px)}
   suiviHeriteSite();
   // b195 (JULES #43-49) : l'ancien flag retiree (b156) devient saOff = retrait REVERSIBLE du Suivi des appels (la vacation reste au Planning)
   function saOffMigrate(){ try{ var ch=false; (SUIVI||[]).forEach(function(m){ if(m.retiree){ delete m.retiree; delete m.retireeAt; m.saOff=true; ch=true; } }); if(ch)save('fkh_suivi',SUIVI); }catch(e){} }
+  /* ===== b418 : CE QUI EST DÉJÀ ÉCRIT NE SE RECALCULE PAS TOUT SEUL =====
+     Les lignes « ↦ ville à N km » sont du TEXTE rangé dans la demande, pas un calcul refait
+     à l'affichage. b415 a corrigé le calcul ; les demandes écrites avant gardent leur ancienne
+     version, et `svRecalcProches` ne se déclenche que si la ville ou le code postal change.
+     On répare donc une fois, au chargement, celles qui portent la signature du défaut : leurs
+     villes proches citent LEUR PROPRE ville. Une demande saine n'est pas touchée, et le ménage
+     s'éteint de lui-même une fois fait. */
+  function svProchesMigrate(){ try{
+    if(typeof svRecalcProches!=='function')return; var ch=0;
+    (SUIVI||[]).forEach(function(m){
+      if(!m||m.deleted||!m.texte||!m.ville)return;
+      if(String(m.texte).indexOf('\u21a6 ')<0)return;
+      var _n=(typeof commNorm==='function')?commNorm(m.ville):String(m.ville).toLowerCase(); if(!_n)return;
+      var soi=String(m.texte).split(String.fromCharCode(10)).some(function(l){
+        if(l.indexOf('\u21a6 ')!==0)return false;
+        var nom=l.slice(2).split(' \u00e0 ')[0];
+        return ((typeof commNorm==='function')?commNorm(nom):nom.toLowerCase())===_n; });
+      if(soi&&svRecalcProches(m))ch++;
+    });
+    if(ch&&typeof saveSuivi==='function')saveSuivi();
+  }catch(e){} }
+  svProchesMigrate();
   saOffMigrate();
   // Auto-nettoyage : purge toute simulation résiduelle (locale ET cloud) au chargement — une simulation ne doit jamais persister.
   (function(){ var hadSim=SUIVI.some(function(x){return x.sim;}); if(hadSim){ SUIVI=SUIVI.filter(function(x){return !x.sim;}); try{ localStorage.setItem('fkh_suivi',JSON.stringify(SUIVI)); }catch(e){} setTimeout(function(){ if(typeof CLOUD!=='undefined'&&CLOUD.on&&typeof cloudPush==='function')cloudPush('fkh_suivi'); },6000); } })();
