@@ -1455,6 +1455,14 @@
    "theme": "Domaines",
    "pourquoipas": "Deux défauts corrigés, tous deux du même genre : un chiffre faux mais crédible. (1) La regex des montants acceptait n'importe quelle suite de chiffres séparés d'espaces : sur « Virement FACTURE GS-2026-078 5 635,98 0,00 » elle démarrait à « 2026 » et lisait 20 260 785 635,98 €. Le vrai groupement français est imposé — 1 à 3 chiffres puis des tranches de 3 — donc « 2026 » ne peut plus amorcer un montant. (2) Le dossier des relevés GARIS contient AUSSI 2025 : filtrer sur le seul mois rangeait des mouvements de septembre 2025 dans « Septembre 2026 ». On filtre désormais sur la date complète, et tout montant hors bornes est écarté plutôt qu'additionné en silence. Résultat : 44 encaissements, 558 473,17 € sur 5 mois, contreparties cohérentes (FKH, DAHLIA, I.G.S-21, ADN). CONTRÔLE CROISÉ qui vaut mieux qu'une relecture : FKH déclare avoir versé 270 037,50 € à GARIS de janvier à mai ; GARIS déclare avoir reçu de FKH 270 037 € sur les mêmes mois. Les deux carnets, construits séparément depuis deux sources différentes, tombent d'accord au centime près.",
    "local": true
+  },
+  {
+   "b": "d14",
+   "titre": "Le relevé DAHLIA d’avril retrouvé — et une alerte de ma part démentie",
+   "source": "Zeus 12/08 : « récupère le relevé DAHLIA d’avril chez SWAN »",
+   "theme": "Domaines",
+   "pourquoipas": "J'avais présenté ce relevé comme le seul manquant PÉRISSABLE, au motif que SWAN serait fermée et l'accès sur le point de disparaître. C'était faux, deux fois. D'abord « Indy » et « SWAN » sont le même compte — Indy est l'interface, Swan la banque derrière (BIC SWNBFR22) ; le compte est vivant, il produit encore les relevés de juin et juillet. Ensuite le relevé d'avril n'était nulle part à récupérer : il était dans Downloads depuis le 1er mai, jamais rangé. Vérifié avant de bouger quoi que ce soit : IBAN [RETIRE], DAHLIA SÉCURITÉ, période 01→30/04/2026. Rangé au standard en 2026-04_releve_Indy.pdf. DAHLIA a désormais ses SEPT relevés de janvier à juillet, plus aucun trou. Le RADAR passe de « avril · juin · juillet ABSENTS » à « ✅ à jour jusqu'à juillet », détail compris. Leçon : avant d'annoncer qu'une pièce est en danger, vérifier qu'elle n'est pas simplement mal rangée — et vérifier que la banque est bien fermée avant de le dire.",
+   "local": true
   }
  ],
  "attente": [
