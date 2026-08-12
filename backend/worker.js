@@ -109,7 +109,14 @@ async function planifierDepuisMail(env, cdr, texte, data) {
   if (supprimee) vac.reCree = { quand: Date.now(), avant: String(supprimee.id || ""), supprLe: "" };
   /* 09/08 : une prolongation = plusieurs journees. On cree une vacation par periode, en
      bornant a 31 : un bon de commande mal lu ne doit pas remplir le planning pendant la nuit. */
-  const per = Array.isArray(pdf.periodes) && pdf.periodes.length
+  /* Gelé par Zeus tant qu'il n'a pas vérifié la lecture sur un vrai bon de commande à plusieurs
+     journées. Mesure du 12/08 : sur 169 bons de commande lus, `periodes` n'est jamais apparu —
+     le code n'a donc jamais tourné. L'interrupteur rend ce gel explicite au lieu de reposer sur
+     ce constat. Pour l'ouvrir : poser `fkh_bdc_periodes` à 1 dans le classeur. */
+  let perOn = false;
+  try { const pr = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_bdc_periodes'").first();
+        perOn = !!(pr && String(pr.v || "").replace(/["\s]/g, "") === "1"); } catch (e) {}
+  const per = perOn && Array.isArray(pdf.periodes) && pdf.periodes.length
     ? pdf.periodes.filter((p) => p && /^\d{4}-\d{2}-\d{2}$/.test(String(p.date || ""))).slice(0, 31)
     : [];
   // json_insert ajoute en fin de tableau sans reecrire tout le document : pas de limite de taille atteinte.
@@ -482,7 +489,14 @@ async function aiScan(env, maxCalls, force) {
   const numKey = (n) => { let d = String(n || "").replace(/\D/g, ""); if (d.length > 9) d = d.slice(-9); return d; };
   let watchMap = {};
   try { const wr = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_ai_numbers'").first(); const list = wr && wr.v ? JSON.parse(wr.v) : []; (Array.isArray(list) ? list : []).forEach((w) => { const k = numKey(w.n || w.number); if (k) watchMap[k] = w.dir || "both"; }); } catch (e) {}
-  if (!Object.keys(watchMap).length) return { ok: true, processed: 0, detected: 0, note: "aucun numéro suivi" };
+  /* La ligne dédiée aux donneurs d'ordre : tout ce qui y passe est analysé, quel que soit le
+     numéro d'en face. C'est ce qui rattrape le client qui appelle pour la première fois — la
+     liste blanche, elle, ne connaît que ceux qui ont déjà appelé. Réglable sans redéployer :
+     il suffit de poser `fkh_ligne_do` dans le classeur. */
+  let ligneDO = "";
+  try { const lr = await env.DB.prepare("SELECT v FROM store WHERE k = 'fkh_ligne_do'").first();
+        ligneDO = numKey(lr && lr.v ? String(lr.v).replace(/["\[\]\s]/g, "") : ""); } catch (e) {}
+  if (!Object.keys(watchMap).length && !ligneDO) return { ok: true, processed: 0, detected: 0, note: "aucun numéro suivi" };
   // Le cron regarde les 2 dernières heures (temps réel) ; une re-analyse manuelle (force) remonte à 24 h pour rattraper un appel plus ancien de la journée.
   const now = new Date(), lookbackH = force ? 24 : 2, from = new Date(now.getTime() - lookbackH * 3600 * 1000);
   const p = new URLSearchParams({ limit_count: force ? "100" : "50", start_date: from.toISOString(), end_date: now.toISOString() });
@@ -498,6 +512,9 @@ async function aiScan(env, maxCalls, force) {
     const rule = watchMap[numKey(c.contact_number)];
     if (rule && (rule === "both" || rule === c.direction)) diag.whitelisted++;
     if (!c.is_answered || !hasRec) return false;
+    /* Sur la ligne des donneurs d'ordre, on ne demande pas qui appelle. C'est le point de la
+       demande de Zeus : un nouveau client ne peut pas être dans une liste blanche. */
+    if (ligneDO && (numKey(c.to_number) === ligneDO || numKey(c.from_number) === ligneDO)) { diag.ligneDO = (diag.ligneDO || 0) + 1; return true; }
     if (!rule) return false;
     return rule === "both" || rule === c.direction;
   });
