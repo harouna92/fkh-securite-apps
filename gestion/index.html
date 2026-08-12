@@ -1579,7 +1579,7 @@ button.big:active{transform:translateY(1px)}
     var cp=String(it.cp||'').replace(/\D/g,'');
     if(cp.length!==5){ var _mt=/Ville\s*:[^\n]*?\((\d{5})\)/.exec(String(it.texte||'')); cp=_mt?_mt[1]:''; }
     if(cp.length!==5)cp='';
-    var v=String(it.ville||'').trim(), sel=null;
+    var v=String(it.ville||'').trim(), sel=null, _parCP=false;
     if(cp&&typeof commByCP==='function'){
       var _lc=commByCP(cp,25)||[];
       if(_lc.length===1)sel=_lc[0];
@@ -1588,6 +1588,7 @@ button.big:active{transform:translateY(1px)}
           for(var _i=0;_i<_lc.length&&!sel;_i++) if(commNorm(_lc[_i].nom)===_nv)sel=_lc[_i]; }
         if(!sel)sel=_lc[0];
       }
+      if(sel)_parCP=true;   /* b431 : c'est le CODE qui a tranche, pas le nom */
     }
     /* Pas de code postal : on prend le nom s'il ne designe qu'une commune. S'il en designe
        plusieurs, on ne choisit pas — un trou visible vaut mieux qu'une position fausse. */
@@ -1602,8 +1603,24 @@ button.big:active{transform:translateY(1px)}
     }
     if(!sel||!sel.centre||!sel.centre.coordinates)return false;
     it.la=sel.centre.coordinates[1]; it.lo=sel.centre.coordinates[0];
-    if(!it.ville)it.ville=sel.nom;
     if(String(it.cp||'').replace(/\D/g,'').length!==5)it.cp=cp||((sel.codesPostaux&&sel.codesPostaux[0])||'');
+    /* b431 : le code postal fait foi, donc le nom qu'il designe devient le nom affiche — mais
+       on n'efface pas ce que le client a dit, on l'ecrit a cote. C'est la regle de b416, celle
+       qui a redresse « Guissan » en Gruissan (11430). On ne redresse QUE si c'est le code qui
+       a tranche : une commune trouvee par son nom seul n'a rien redresse. */
+    var _redresse='';
+    if(_parCP&&v&&typeof commNorm==='function'&&commNorm(sel.nom)!==commNorm(v))_redresse=v;
+    if(!it.ville||_redresse)it.ville=sel.nom;
+    if(_redresse){
+      var _cpA=String(it.cp||'').replace(/\D/g,'');
+      /* la mention ne s'empile pas : une ligne qui porte deja « entendu » n'est pas reecrite. */
+      it.texte=String(it.texte||'').split('\n').map(function(l){
+        if(l.indexOf('Ville')!==0||l.indexOf('\u00b7 entendu :')>=0)return l;
+        return 'Ville : '+sel.nom+(_cpA?(' ('+_cpA+')'):'')+' \u00b7 entendu : \u00ab '+_redresse+' \u00bb'; }).join('\n');
+      /* le titre suit, mais seulement s'il ne portait que la ville : on ne touche pas a un
+         titre qui nomme un site ou un client. */
+      if(commNorm(String(it.titre||''))===commNorm(_redresse))it.titre=sel.nom;
+    }
     /* La table locale vient de trancher : un echec reseau d'il y a une heure ne doit plus bloquer.
        `_nogeo` survivait aux synchronisations — il gelait la demande pour de bon. */
     delete it._nogeo; delete it._geotried;
