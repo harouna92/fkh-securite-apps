@@ -534,7 +534,10 @@ function render(){
    if(s.items)inner=s.items.map((it,i)=>{
      const id=si+'_'+i, hasDet=it.det&amp;&amp;it.det.length;
      const chev=hasDet?'<i class=&quot;chev ti ti-chevron-down&quot; id=&quot;chev_'+id+'&quot;></i>':'';
-     const right=it.a?'<button class=&quot;act&quot; onclick=&quot;event.stopPropagation();go(this.dataset.p)&quot; data-p=&quot;'+it.a[1].replace(/&quot;/g,'&amp;quot;')+'&quot;><i class=&quot;ti ti-player-play&quot;></i> '+it.a[0]+'</button>':(it.due?'<div class=&quot;due&quot;>'+it.due+'</div>':'');
+     const b1=it.a?'<button class=&quot;act&quot; onclick=&quot;event.stopPropagation();go(this.dataset.p)&quot; data-p=&quot;'+it.a[1].replace(/&quot;/g,'&amp;quot;')+'&quot;><i class=&quot;ti ti-player-play&quot;></i> '+it.a[0]+'</button>':'';
+     /* 12/08 : une ligne peut demander DEUX gestes — faire la facture, ou deposer celle qui existe. */
+     const b2=it.a2?'<button class=&quot;act&quot; style=&quot;margin-left:6px&quot; onclick=&quot;event.stopPropagation();go(this.dataset.p)&quot; data-p=&quot;'+it.a2[1].replace(/&quot;/g,'&amp;quot;')+'&quot;>'+it.a2[0]+'</button>':'';
+     const right=(b1||b2)?(b1+b2):(it.due?'<div class=&quot;due&quot;>'+it.due+'</div>':'');
      var cbr='';   /* les cases ne servaient qu'au miroir SUIVI_DEPOT, retire */
      const det=hasDet?'<div class=&quot;det&quot; id=&quot;det_'+id+'&quot; style=&quot;display:none;&quot;>'+detHTML(it.det,id)+'</div>':'';
      return '<div class=&quot;item'+(hasDet?' drill':'')+'&quot;'+(hasDet?' onclick=&quot;tog(\''+id+'\')&quot;':'')+'>'+cbr+'<i class=&quot;ti ti-point-filled&quot; style=&quot;color:'+s.c+'&quot;></i><div class=&quot;main&quot;><div class=&quot;l&quot;>'+it.l+'</div><div class=&quot;w&quot;>'+it.w+'</div></div>'+chev+right+det+'</div>';

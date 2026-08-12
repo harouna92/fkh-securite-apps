@@ -1369,6 +1369,14 @@
    "theme": "Domaines",
    "pourquoipas": "Le dépôt part de L'ENDROIT, pas du fichier. Sur les 7 clients FKH travaillés en juillet sans facture, chaque ligne porte « 📎 joindre la facture » : la ligne sait déjà le domaine, le casier, le mois et le client, donc la destination est connue avant que le fichier existe et rien n'est deviné. La clé de dépôt EST la destination : depot/<DOMAINE>/<casier>/<AAAA-MM>/<AAAA-MM_NATURE_TIERS.ext>, au nommage standard d'EMPLACEMENTS.md. Le pont vit dans gestion/domaines/hub.html et non dans index.html : ce dernier est écrit par une autre session et deux sessions sur un même fichier se défont — constaté aujourd'hui, CONTROLE_MOIS.html supprimé puis rétabli par erreur. Le hub étant chargé en iframe dès l'ouverture et de même origine, il pose son écouteur sur la fenêtre parente. Seule concession : une ligne dans index.html (window.fkhUpload / window.fkhPret), parce que toute l'appli est en closure et qu'aucune de ses fonctions n'est atteignable de l'extérieur ; l'alternative aurait été de dupliquer le chemin du mot de passe dans un second morceau de code. Le radar réutilise son go() existant avec un préfixe DEPOT: — un seul chemin, pas un second mécanisme. Un dépôt réussi ouvre un ticket 🎫 : un dépôt sans trace est un dépôt qu'on croit fait. Vérifié dans l'appli : le message atteint le pont, qui refuse proprement et le dit à l'écran quand la connexion manque (cas du bac à sable). L'envoi réel reste à jouer connecté, ainsi que le script local qui redescendra depot/... dans le dossier du domaine.",
    "local": true
+  },
+  {
+   "b": 422,
+   "titre": "Établir OU déposer — la ligne propose les deux gestes",
+   "source": "Zeus 12/08 : « au lieu de mettre établir il faut donner la possibilité de pouvoir déposer également en plus d’établir »",
+   "theme": "Domaines",
+   "pourquoipas": "Une ligne de facturation manquante appelle deux gestes selon le cas : faire la facture, ou déposer celle qui existe déjà. Le RADAR n'en proposait qu'un. Le rendu accepte désormais une seconde action (a2) et les lignes « Juillet 2026 — 7 clients » et « RATTRAPAGE AQUILA juin » portent Établir + 📎 Déposer. Piège écarté au passage : deux boutons « Déposer » côte à côte faisaient des choses différentes — l'un ouvrait un ticket, l'autre téléverse vraiment. La ligne des relevés dit maintenant « Réclamer » (c'est une demande), et le vrai dépôt descend au niveau du mois manquant, où la destination est exacte : « 📎 déposer le relevé de juin », « … de juillet ». Même mot, même geste, partout. Vérifié dans le cockpit : 2 lignes à deux boutons, 14 actions dans le détail des 7 clients (établir + joindre pour chacun), 2 dépôts de relevé datés.",
+   "local": true
   }
  ],
  "attente": [
