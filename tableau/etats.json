@@ -1399,6 +1399,14 @@
    "theme": "Domaines",
    "pourquoipas": "Le système décrit la chaîne dans CARTE_SURVEILLANT.md : TRI (ranger les boîtes d'entrée) → surveillant (le robot lit les rangés) → QUARANTAINE (Claude finit l'illisible), et la règle dit que TRI finit TOUJOURS par le robot et le traitement de la quarantaine. Déroulée sur un dépôt réel : deux relevés Indy déposés à 16h38 dans À TRAITER SOCIÉTÉ. Identifiés comme FKH (compte Swan, IBAN …9987 450), rangés au standard en 2026-06_releve_Indy.pdf et 2026-07_releve_Indy.pdf. Le robot les a mis en QUARANTAINE : le gabarit releve-bancaire ne connaissait que Qonto. Cas (a) de R-QUARANTAINE-BOUCLE-01 — gabarit Swan/Indy ajouté, aiguillage automatique par le CONTENU du fichier et non par son nom. Résultat immédiat : F3 passe de 25 à 29 pièces, quarantaine 2 → 0, et quatre virements ST entrent (juin GARIS 13 986 + VIGICORE 2 400 ; juillet GARIS 25 000 + VIGICORE 2 400). Puis le bloc virements_st_2026 du carnet a été branché sur le surveillant, même principe que le CA : le dossier ne remplit que le SILENCE du maître, et la ligne le dit. Versé GARIS 2026 : 302 516,10 → 327 516,10 €. Juillet apparaît pour la première fois.",
    "local": true
+  },
+  {
+   "b": "d9",
+   "titre": "Les vues cessent d’annoncer manquant ce qui est rangé",
+   "source": "Zeus 12/08 : « as-tu mis à jour les vues qui indiquaient des manquants alors que les fichiers étaient présents »",
+   "theme": "Domaines",
+   "pourquoipas": "Après le dépôt des relevés Swan de juin et juillet, deux vues continuaient d'annoncer un manque que le disque démentait. La matrice ÉTAT affichait « Relevés bancaires ✓✓✓✓✓····· » avec la ligne écrite en dur ; elle est maintenant calculée sur le contenu réel du dossier — ✓✓✓✓✓✓✓. Et le RADAR affichait « Relevés de compte — 2 manquants » : l'item passe à « ✅ à jour jusqu'à juillet », détail compris (les deux ❌ deviennent « déposé le 12/08 »), pour que le titre et le drill ne disent pas deux choses différentes. Poursuite de la quarantaine dans le même mouvement : deux repères ajoutés au gabarit facture-fournisseur — « Montant TTC » seul (RingOver, que le gabarit ne connaissait pas), et un triplet auto-vérifié HT+TVA=TTC pour les factures qui séparent les libellés des valeurs (LeLegaliste). Cette dernière règle n'accepte un montant que s'il se vérifie : elle ne peut pas inventer. F4 : 21 → 23 pièces, quarantaine FKH 7 → 5. Restent 5 pièces, dont 3 scans images qui relèvent du cas (b) — lecture à la vue.",
+   "local": true
   }
  ],
  "attente": [
