@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b418</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b419</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -978,6 +978,7 @@ button.big:active{transform:translateY(1px)}
   </section>
   <section id="sec-tickets" class="hidden">
     <div><h1>🎫 Tickets</h1><p class="sub">Confie une tâche à traiter. La personne fait le travail <b>directement depuis le ticket</b> (champ à renseigner + lien vers la fiche), et le <b>suivi se met à jour tout seul</b> (ex. 3/11 renseignées).</p></div>
+    <div id="mq-body"></div>
     <div id="aq-body"></div>
     <div id="tk-body"></div>
   </section>
@@ -3051,7 +3052,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_pc_poste','fkh_droits','fkh_td_delai','fkh_ph_ecartees','fkh_aq_ecarte','fkh_data'];   /* b413 : écarter une ligne du rappel AQUILA est une décision d'agence, pas un réglage de poste */   /* b353 : les photos mises de côté sont une décision d'agence — elle doit se voir depuis tous les postes, pas rester sur le téléphone de celui qui l'a prise */
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_pc_poste','fkh_droits','fkh_td_delai','fkh_ph_ecartees','fkh_aq_ecarte','fkh_mq_vus','fkh_ligne_do','fkh_data'];   /* b419 */   /* b413 : écarter une ligne du rappel AQUILA est une décision d'agence, pas un réglage de poste */   /* b353 : les photos mises de côté sont une décision d'agence — elle doit se voir depuis tous les postes, pas rester sur le téléphone de celui qui l'a prise */
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','cockpitfkh','streste','depots','clientsf','corbeille','droits','doublons'];   /* b356 : 'doublons' — nettoyage de base, super-admin par defaut (regle Zeus 03/08 : toute nouveaute nait super-admin seul) */ // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)  /* b228 : 'mails' retire — la section Mails missions (et son temoin de vie) est desormais visible par le superviseur et l'administrateur, pas seulement le super-admin */
@@ -6492,9 +6493,10 @@ button.big:active{transform:translateY(1px)}
     }; });
   }
   function renderTickets(){
+    try{ renderMqManques(); }catch(_e){}   /* b419 */
     try{ renderAqRappel(); }catch(_e){}   /* b413 */
     /* le classeur des mails peut dater : on le rafraîchit, et on redessine quand il arrive. */
-    try{ if(typeof mailsFetch==='function'&&typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)mailsFetch(function(){ try{ renderAqRappel(); }catch(_f){} }); }catch(_e){}
+    try{ if(typeof mailsFetch==='function'&&typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)mailsFetch(function(){ try{ renderMqManques(); }catch(_f){} try{ renderAqRappel(); }catch(_f){} }); }catch(_e){}
     var wrap=byId('tk-body'); if(!wrap)return; var T=tkLoad();
     var typeOpts=Object.keys(TK_TYPES).map(function(k){ var n=(typeof FA!=='undefined'?FA:[]).filter(function(a){return TK_TYPES[k].missing(a);}).length; return '<option value="'+k+'">'+TK_TYPES[k].lbl+' ('+n+' agents concernés)</option>'; }).join('');
     var create='<div class="card"><div class="lab" style="margin:0 0 6px">➕ Nouveau ticket <span class="sub" style="font-weight:400">— la cible est détectée automatiquement</span></div>'
@@ -9212,6 +9214,59 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
      vérité ; le Planning est la nôtre. Les deux doivent dire la même chose, et l'écart se lit
      dans les DEUX SENS — ce qu'ils annoncent et qu'on n'a pas, ce qu'on a et qu'ils n'annoncent
      plus. Le second cas est le plus coûteux : un agent qui part pour une prestation annulée. */
+
+  /* ===== b419 : L'APPEL MANQUÉ SUR LA LIGNE DES DONNEURS D'ORDRE =====
+     Un appel sans réponse n'a ni enregistrement ni transcription : aucune analyse ne le
+     rattrapera jamais. Mais Ringover en envoie une notification par mail, et ces mails sont
+     déjà dans la base — marqués « à ignorer », donc invisibles. Un donneur d'ordre qui tombe
+     dans le vide, c'est une mission qui part chez un confrère. On les fait remonter. */
+  /* La ligne dédiée aux donneurs d'ordre. Réglable sans toucher au code : poser `fkh_ligne_do`. */
+  function mqLigneDO(){ var v=''; try{ v=(localStorage.getItem('fkh_ligne_do')||'').replace(/\D/g,''); }catch(e){}
+    return v||'0757953849'; }
+  function mqNum(x){ return String(x||'').replace(/\D/g,''); }
+  function mqVusLoad(){ try{ return JSON.parse(localStorage.getItem('fkh_mq_vus')||'{}')||{}; }catch(e){ return {}; } }
+  function mqVusSave(x){ try{ localStorage.setItem('fkh_mq_vus',JSON.stringify(x)); }catch(e){} if(typeof cloudPush==='function')cloudPush('fkh_mq_vus'); }
+  /* Une notification Ringover : « Appel manqué de <qui> sur <ligne> » puis « A tenté de vous
+     joindre le : **JJ/MM/AAAA à HH:MM** ». Ringover en envoie deux ou trois pour le même appel.
+     On garde une ligne par (numéro, minute). */
+  function mqListe(){
+    var lig=mqLigneDO(), par={}, out=[];
+    ((typeof mailsCache==='function')?mailsCache():[]).forEach(function(x){
+      var tx=String((x&&x.transcript)||''); if(tx.indexOf('Appel manqu')<0)return;
+      var m=/Appel manqu\S*\s+de\s+([^\n]+?)\s+sur\s+([^\n]+)/.exec(tx); if(!m)return;
+      var qui=m[1].trim(), surTxt=m[2].trim();
+      if(mqNum(surTxt).indexOf(lig)<0)return;              /* pas la ligne des donneurs d'ordre */
+      var q=/joindre le\s*:\s*\**\s*(\d{2})\/(\d{2})\/(\d{4})\s*\u00e0\s*(\d{1,2})[:hH](\d{2})/.exec(tx);
+      var iso=q?(q[3]+'-'+q[2]+'-'+q[1]):'', hm=q?((('0'+q[4]).slice(-2))+':'+q[5]):'';
+      var tel=mqNum(qui); if(tel.length>9)tel=tel.slice(-9);
+      var cle=tel+'|'+iso+'|'+hm; if(par[cle])return; par[cle]=1;
+      out.push({cle:cle,qui:qui,tel:mqNum(qui),mdate:iso,hm:hm,at:(x.at||0)});
+    });
+    out.sort(function(a,b){ return (b.at||0)-(a.at||0); });
+    return out; }
+  function renderMqManques(){
+    var box=byId('mq-body'); if(!box)return;
+    var r9=(typeof drRole==='function')?drRole():'full'; if(r9==='operateur'){ box.innerHTML=''; return; }
+    var L=mqListe(), vus=mqVusLoad();
+    var jour=(typeof impTodayISO==='function')?impTodayISO():'';
+    var att=L.filter(function(x){ return !vus[x.cle]; });
+    if(!att.length){ box.innerHTML=''; return; }
+    var h='<div class="card" style="margin-bottom:12px;border:1.5px solid #e5322d">'
+      +'<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><b style="font-size:20px">'+att.length+'</b><b>\ud83d\udcde Appel(s) manqu\u00e9(s) sur la ligne des donneurs d\u2019ordre</b></div>'
+      +'<div class="sub" style="margin:3px 0 8px;font-size:11.5px">Personne n\u2019a d\u00e9croch\u00e9 : il n\u2019y a ni enregistrement ni transcription, <b>rien ne remontera dans Suivi des demandes</b>. Un donneur d\u2019ordre qui tombe dans le vide appelle le confr\u00e8re suivant. <b>Rappelle.</b></div>';
+    att.forEach(function(x){
+      var nom=(typeof svCallerName==='function')?(svCallerName(x.tel)||''):'';
+      var quand=x.mdate?((x.mdate===jour?'aujourd\u2019hui':x.mdate.split('-').reverse().join('/'))+(x.hm?(' \u00e0 '+x.hm):'')):'';
+      h+='<div style="border:1px solid #e5322d;border-radius:10px;padding:9px;margin-bottom:6px;background:rgba(229,50,45,.08)">'
+        +'<div style="font-weight:700">'+esc(nom||x.qui)+(nom?(' <span class="sub" style="margin:0;font-weight:400">'+esc(x.qui)+'</span>'):'')+'</div>'
+        +'<div class="fa-d">\ud83d\udd50 '+esc(quand||'heure inconnue')+' \u00b7 sans message</div>'
+        +'<div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap">'
+        +(x.tel?('<a class="call" href="tel:'+esc(x.tel)+'" style="font-size:12.5px;font-weight:700">\ud83d\udcde Rappeler '+esc(x.qui)+'</a>'):'')
+        +'<button type="button" class="mq-ok" data-k="'+esc(x.cle)+'" style="font-size:12px">\u2714 Rappel\u00e9 \u2014 ranger</button></div></div>';
+    });
+    h+='</div>'; box.innerHTML=h;
+    box.querySelectorAll('.mq-ok').forEach(function(b){ b.onclick=function(){ var v=mqVusLoad(); v[b.getAttribute('data-k')]=Date.now(); mqVusSave(v); renderMqManques(); }; });
+  }
   function aqEcartLoad(){ try{ return JSON.parse(localStorage.getItem('fkh_aq_ecarte')||'{}')||{}; }catch(e){ return {}; } }
   function aqEcartSave(x){ try{ localStorage.setItem('fkh_aq_ecarte',JSON.stringify(x)); }catch(e){} if(typeof cloudPush==='function')cloudPush('fkh_aq_ecarte'); }
   /* Le dernier rappel qui parle d'AUJOURD'HUI. Celui « DE DEMAIN » ne compte pas : il annonce

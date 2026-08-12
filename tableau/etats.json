@@ -1345,9 +1345,22 @@
    "theme": "Domaines",
    "pourquoipas": "La coque affichait « carnet ○ instantané embarqué » depuis b418, mais chaque vue porte son propre badge, resté à « carnet ✓ » : le cadre disait la vérité, le contenu mentait un étage plus bas. La vue ne pouvait pas faire mieux — la coque lui envoyait {__data, __err, __at} sans jamais lui dire d'où venaient les chiffres. La coque joint désormais __src, le pont de la vue le conserve, et les badges s'en servent. Deux variantes de code coexistaient (texte composé par l'appelant, ou par setSt lui-même) : les deux sont traitées, 8 setSt réécrits et 26 points de réception marqués sur les 4 cockpits. Vérifié après vidage du cache : sur GARIS, les vues ST/CA/ÉTAT affichent toutes « carnet ○ instantané embarqué », comme la coque. Au passage, question cascade ST GARIS : il n'y a rien à construire. La vue existe, elle fonctionne, et elle dit l'état réel — aucun sous-traitant propre à GARIS, l'onglet Sous_Traitance du classeur est « À renseigner », et la cascade où GARIS figure vit dans DATA_FKH.json parce que GARIS EST le sous-traitant. R-MAITRE-PAR-SOCIETE-01 interdit de rapatrier le chiffre FKH ici. Reste une décision pour Zeus : GARIS aura-t-il ses propres ST ?",
    "local": true
+  },
+  {
+   "b": 419,
+   "titre": "📞 Un appel manqué sur la ligne des donneurs d'ordre ne se perd plus",
+   "source": "Zeus 12/08 : « j'ai reçu un appel à 14h30, pourquoi ça n'a pas atterri »",
+   "theme": "Tickets / Appels",
+   "pourquoipas": "Personne n'avait décroché : pas de conversation, pas d'enregistrement, pas de transcription — rien à analyser, et c'est IRRÉPARABLE de ce côté (même en analysant toute la ligne, un appel sans réponse n'aura jamais de contenu). Mais Ringover envoie une notification par mail à chaque appel manqué, et ces mails sont DÉJÀ dans la base — simplement marqués `skip:1`, donc invisibles. Un donneur d'ordre qui tombe dans le vide appelle le confrère suivant. Les appels manqués de la ligne dédiée (07 57 95 38 49, réglable via `fkh_ligne_do` sans toucher au code) remontent maintenant en tête de 🎫 Tickets avec l'heure, le numéro, le nom du client s'il est connu (svCallerName) et un lien d'appel. Ringover envoie 2 ou 3 notifications par appel : on n'affiche qu'une ligne, dédupliquée par (numéro, minute). « ✔ Rappelé » range, et la décision est partagée entre postes. Visible superviseur+. Vérifié sur le vrai cas : 1 ligne, « 07 56 92 88 63 · aujourd'hui à 14:18 · sans message », les manqués du STANDARD correctement ignorés, et le rangement fonctionne.",
+   "local": true
   }
  ],
  "attente": [
+  {
+   "titre": "📞 Analyser TOUT appel décroché sur la ligne des donneurs d'ordre",
+   "source": "Zeus 12/08 — « c'est une ligne dédiée aux donneurs d'ordre »",
+   "note": "Aujourd'hui le filtre du worker porte sur `c.contact_number` — QUI appelle — via la liste blanche `fkh_ai_numbers` (7 numéros : aquila, securitas ×2, sotel, cops, new angels). La LIGNE appelée n'entre pas du tout dans la décision : 04 65 84 25 84 et 07 57 95 38 49 sont traités pareil. Conséquence : un nouveau donneur d'ordre qui appelle pour la première fois est ignoré, décroché ou non. Zeus veut la règle inverse sur la ligne dédiée : tout appel, entrant ou sortant, analysé. BLOQUÉ SUR UNE VÉRIFICATION : est-ce que l'API Ringover expose la ligne appelée ? Le worker n'utilise que cinq champs (contact_number, start_time, is_answered, direction, record) et n'a jamais eu besoin de celui-là. La sonde existe (/ringover/probe) mais TOUTES les routes après le diagnostic R2 exigent X-App-Password, que je n'ai pas — Zeus doit cliquer « 🔍 Diagnostic API » dans 📊 Supervision et me montrer le détail brut. Et le changement est dans worker.js, gelé : déploiement à part."
+  },
   {
    "titre": "🔚 Un ticket coché par une PHOTO quitte la file de l'opératrice sans qu'elle le sache",
    "source": "Zeus 10/08 — fin de service Lons-le-Saunier",
