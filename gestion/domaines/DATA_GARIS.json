@@ -1,0 +1,314 @@
+{
+ "domaine": "GARIS",
+ "genere_par": "SCRIPTS/build_data_garis.py",
+ "source": "Garis_Securite_Suivi_Facturation_v2.xlsx › onglet « Suivi Facturation » (21 factures, recompute TTC=HT×1,2)",
+ "methode": "recompute par mois d'émission depuis les lignes de factures (G-34) — les onglets récap sont non fiables, non lus",
+ "avertissement": "GARIS = carnet de FACTURATION DO. DÉCISION ZEUS 2026-08-12 (remplace l'arbitrage du 01/08) : FKH, DAHLIA et GARIS sont des sociétés tout court ; le CA se compte sur les FACTURES ÉDITÉES, sans exception intra-groupe — comme pour FKH et Securitas. ca_ttc_hors_intragroupe reste en information. Cascade ST / paie / virements = À BLANC (état réel : pas de ST propre, paie non démarrée). Le « 64 317,62 € à recevoir de FKH » est cross-domaine (maître FKH) — EXCLU d'ici (R-MAITRE-PAR-SOCIETE-01).",
+ "ca_client_2026": [
+  {
+   "mois": "Janvier 2026",
+   "ca_ht": 68947.71,
+   "ca_ttc": 82737.25,
+   "ca_ttc_hors_intragroupe": 18060.8,
+   "nb_factures": 2,
+   "factures": "GS-2026-082, GS-2026-091"
+  },
+  {
+   "mois": "Février 2026",
+   "ca_ht": 44347.2,
+   "ca_ttc": 53216.64,
+   "ca_ttc_hors_intragroupe": 19240.94,
+   "nb_factures": 3,
+   "factures": "GS-2026-051, GS-2026-083, GS-2026-095"
+  },
+  {
+   "mois": "Mars 2026",
+   "ca_ht": 107945.31,
+   "ca_ttc": 129534.37,
+   "ca_ttc_hors_intragroupe": 79229.63,
+   "nb_factures": 5,
+   "factures": "GS-2026-062, GS-2026-078, GS-2026-079, GS-2026-084, GS-2026-099"
+  },
+  {
+   "mois": "Avril 2026",
+   "ca_ht": 117975.34,
+   "ca_ttc": 141570.41,
+   "ca_ttc_hors_intragroupe": 84998.71,
+   "nb_factures": 4,
+   "factures": "GS-2026-085, GS-2026-089, GS-2026-100, GS-2026-108"
+  },
+  {
+   "mois": "Mai 2026",
+   "ca_ht": 79164.44,
+   "ca_ttc": 94997.33,
+   "ca_ttc_hors_intragroupe": 94997.33,
+   "nb_factures": 2,
+   "factures": "GS-2026-103, GS-2026-107"
+  },
+  {
+   "mois": "Juin 2026",
+   "ca_ht": 62309.28,
+   "ca_ttc": 74771.14,
+   "ca_ttc_hors_intragroupe": 74771.14,
+   "nb_factures": 1,
+   "factures": "GS-2026-109"
+  },
+  {
+   "mois": "Juillet 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Août 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Septembre 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Octobre 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Novembre 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Décembre 2026",
+   "statut": "aucune donnée"
+  }
+ ],
+ "ca_par_client_2026": {
+  "Janvier 2026": [
+   {
+    "client": "FKH SÉCURITÉ",
+    "ht": 53897.04,
+    "ttc": 64676.45,
+    "factures": "GS-2026-091"
+   },
+   {
+    "client": "DAHLIA SÉCURITÉ",
+    "ht": 15050.67,
+    "ttc": 18060.8,
+    "factures": "GS-2026-082"
+   }
+  ],
+  "Février 2026": [
+   {
+    "client": "FKH SÉCURITÉ",
+    "ht": 28313.08,
+    "ttc": 33975.7,
+    "factures": "GS-2026-095"
+   },
+   {
+    "client": "DAHLIA SÉCURITÉ",
+    "ht": 8334.12,
+    "ttc": 10000.94,
+    "factures": "GS-2026-083"
+   },
+   {
+    "client": "ADN SÉCURITÉ",
+    "ht": 7700.0,
+    "ttc": 9240.0,
+    "factures": "GS-2026-051"
+   }
+  ],
+  "Mars 2026": [
+   {
+    "client": "IGS21",
+    "ht": 48624.0,
+    "ttc": 58348.8,
+    "factures": "GS-2026-079"
+   },
+   {
+    "client": "FKH SÉCURITÉ",
+    "ht": 41920.62,
+    "ttc": 50304.74,
+    "factures": "GS-2026-099"
+   },
+   {
+    "client": "ADN SÉCURITÉ",
+    "ht": 11000.0,
+    "ttc": 13200.0,
+    "factures": "GS-2026-062"
+   },
+   {
+    "client": "GROUPE A SÉCURITÉ",
+    "ht": 4696.65,
+    "ttc": 5635.98,
+    "factures": "GS-2026-078"
+   },
+   {
+    "client": "DAHLIA SÉCURITÉ",
+    "ht": 1704.04,
+    "ttc": 2044.85,
+    "factures": "GS-2026-084"
+   }
+  ],
+  "Avril 2026": [
+   {
+    "client": "IGS21",
+    "ht": 53533.8,
+    "ttc": 64240.56,
+    "factures": "GS-2026-089"
+   },
+   {
+    "client": "FKH SÉCURITÉ",
+    "ht": 47143.08,
+    "ttc": 56571.7,
+    "factures": "GS-2026-108"
+   },
+   {
+    "client": "ADN SÉCURITÉ",
+    "ht": 14300.0,
+    "ttc": 17160.0,
+    "factures": "GS-2026-100"
+   },
+   {
+    "client": "DAHLIA SÉCURITÉ",
+    "ht": 2998.46,
+    "ttc": 3598.15,
+    "factures": "GS-2026-085"
+   }
+  ],
+  "Mai 2026": [
+   {
+    "client": "IGS21",
+    "ht": 65414.44,
+    "ttc": 78497.33,
+    "factures": "GS-2026-107"
+   },
+   {
+    "client": "ADN SÉCURITÉ",
+    "ht": 13750.0,
+    "ttc": 16500.0,
+    "factures": "GS-2026-103"
+   }
+  ],
+  "Juin 2026": [
+   {
+    "client": "IGS21",
+    "ht": 62309.28,
+    "ttc": 74771.14,
+    "factures": "GS-2026-109"
+   }
+  ]
+ },
+ "totaux_par_client_toutes_periodes": [
+  {
+   "client": "FKH SÉCURITÉ",
+   "ttc_total": 328242.54,
+   "nb_factures": 6
+  },
+  {
+   "client": "IGS21",
+   "ttc_total": 275857.83,
+   "nb_factures": 4
+  },
+  {
+   "client": "DAHLIA SÉCURITÉ",
+   "ttc_total": 96819.34,
+   "nb_factures": 6
+  },
+  {
+   "client": "ADN SÉCURITÉ",
+   "ttc_total": 56100.0,
+   "nb_factures": 4
+  },
+  {
+   "client": "GROUPE A SÉCURITÉ",
+   "ttc_total": 5635.98,
+   "nb_factures": 1
+  }
+ ],
+ "cascade_st_2026": {
+  "statut": "à confirmer — À BLANC",
+  "detail": "aucun sous-traitant propre GARIS établi (onglet Sous_Traitance = « À renseigner »). La cascade où GARIS figure vit dans DATA_FKH.json. La lecture est en place : dès qu'une ligne portera des heures ou un ST désigné, elle apparaîtra ici sans autre intervention."
+ },
+ "cascade_st_anomalies": [],
+ "encaissements_2026": [
+  {
+   "mois": "Janvier 2026",
+   "encaisse": 41225.4,
+   "nb": 5,
+   "par_tiers": {
+    "DAHLIA SECURITE": 28149.6,
+    "FKH SECURITE": 13075.8
+   },
+   "source": "👁️ surveillant — relevés de compte"
+  },
+  {
+   "mois": "Février 2026",
+   "encaisse": 132746.0,
+   "nb": 11,
+   "par_tiers": {
+    "FKH SECURITE": 79720.2,
+    "DAHLIA SECURITE": 53025.8
+   },
+   "source": "👁️ surveillant — relevés de compte"
+  },
+  {
+   "mois": "Mars 2026",
+   "encaisse": 89365.2,
+   "nb": 8,
+   "par_tiers": {
+    "FKH SECURITE": 80125.2,
+    "ADN SECURITE": 9240.0
+   },
+   "source": "👁️ surveillant — relevés de compte"
+  },
+  {
+   "mois": "Avril 2026",
+   "encaisse": 109641.18,
+   "nb": 7,
+   "par_tiers": {
+    "I.G.S-21": 58348.8,
+    "FKH SECURITE": 27972.0,
+    "VIR SEPA ADN SECURITE": 13200.0,
+    "GS 2026 078": 5635.98,
+    "Virement vers GARIS SECURITE": 4484.4
+   },
+   "source": "👁️ surveillant — relevés de compte"
+  },
+  {
+   "mois": "Mai 2026",
+   "encaisse": 185495.39,
+   "nb": 11,
+   "par_tiers": {
+    "FKH SECURITE": 69144.3,
+    "I.G.S-21": 64241.09,
+    "SeDomicilier - Arsene Gnegnery **": 19950.0,
+    "VIREMENT INSTANTANE": 17160.0,
+    "CARZFLEET": 15000.0
+   },
+   "source": "👁️ surveillant — relevés de compte"
+  }
+ ],
+ "virements_st_2026": {
+  "statut": "à confirmer — quasi-vide",
+  "detail": "pas de virements GARIS→ST. Seul fournisseur tracé : Pro Rénovation PRO-2603-031, payé 12 320,00 € (avril 2026) — fournisseur, hors cascade ST."
+ },
+ "paie_2026": {
+  "statut": "à confirmer — non démarré",
+  "detail": "onglet BASE_Paie vide (« en attente des fiches de paie »). 1 seul bulletin combiné jan→avr 2026 au dossier."
+ },
+ "salaires_reste_a_payer": {
+  "statut": "à confirmer — vide",
+  "detail": "aucun agent GARIS suivi en paie à ce jour."
+ },
+ "facturation_meta": {
+  "source": "REGISTRE_FACTURATION_GARIS.md + SUIVIS.md",
+  "prochain_numero": "GS-2026-110",
+  "nb_donneurs_ordre": 5,
+  "tarif_st_h": 18.5,
+  "banques": "Qonto (FR76 1695…241) avant avril 2026, puis Swan (FR76 1732…068) à partir d'avril 2026 (R-IBAN-PAR-DATE)",
+  "anomalie": "GS-2025-086 (FKH déc. 2025) : registre 75 997,94 € canonique mais PDF au dossier faux — à réémettre.",
+  "banque_alerte": {
+   "niveau": "🔴 URGENT",
+   "objet": "Compte INDY de GARIS SÉCURITÉ en cours de FERMETURE",
+   "echeance": "2026-08-15",
+   "jours_restants_au_2026_08_03": 12,
+   "action": "Ouvrir de nouveaux comptes bancaires + rebrancher relevés / rapprochement (nouvel IBAN à consigner via R-IBAN-PAR-DATE)."
+  }
+ }
+}

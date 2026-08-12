@@ -1,0 +1,468 @@
+{
+ "domaine": "DAHLIA",
+ "genere_par": "SCRIPTS/build_data_dahlia.py",
+ "source": "CA client 2026 = RECONSTRUIT depuis les factures réelles (5_DONNEURS_ORDRE/factures clients dahlia/2026) ; autres blocs = snapshots sourcés (SUIVI DAHLIA.xlsx · paie 2025 · vues hand-vérifiées)",
+ "methode": "maître v62 absent -> CA 2026 recomputé depuis les PDF de factures (dédup par n°, réconcilié HT+TVA=TTC par pièce). Voir bloc reconstruction_ca (complétude par mois).",
+ "avertissement": "Cascade DAHLIA ≠ FKH (6 ST successifs, reliquats verrouillés). CA client 2026 = reconstruit factures présentes : Jan-Fév complets, Mars→Juillet PARTIELS (grosses IGS/ADN non classées dans le dossier). Données perso du gérant CAVIARDÉES. Écarts reliquats vs virements réels ouverts (voir cascade_st_2026.anomalies) — à caler en session dédiée.",
+ "reconstruction_ca": {
+  "source": "DAHLIA/5_DONNEURS_ORDRE/factures clients dahlia/2026/*.pdf",
+  "factures_scannees": 22,
+  "factures_retenues": 15,
+  "controle": "HT+TVA=TTC réconcilié par pièce (relation ×1,2)",
+  "doublons_ecartes": [
+   "F-000722 = doublon de F-000158 (ADN SÉCURITÉ Janvier 11880.00 €)"
+  ],
+  "exclues": [],
+  "non_reconciliees": [],
+  "cross_validation": "MAÎTRE D53 RETROUVÉ (2026-08-02) : Rapprochement_v56_par_mois_D53.xlsx (= le « v62 » cherché ; D53 fait foi), extrait de 'Chargement référentiel DAHLIA 50/55 files.zip', rapatrié dans _PILOTAGE_DAHLIA. Maître complet (20 onglets, snapshot 07/06/2026). Il CONFIRME la reconstruction PDF au centime : Jan 49 520 · Fév 34 451,36 · Mars 2 474,92 · Avril 4 570,80 (SELAS+AGIR 892,16+COPS 1678,64) · Mai 2 000. RÉSOUT l'écart Avril : AGIR = 743,47 € HT (la recon PDF avait raison ; le v19 D21 avait un trou). Le maître S'ARRÊTE à Mai (snapshot juin) → Juin-Juillet viennent des PDF (SELAS). SURTOUT : le maître ne contient AUCUNE facture IGS/ADN directe DAHLIA à partir de Mars → confirmé que ces mois sont réellement SELAS/AGIR/COPS seuls (IGS/ADN passés par GARIS), PAS un trou de classement.",
+  "note": "CA reconstruit depuis les factures (dossier 2026) + CONFIRMÉ par le maître D53 retrouvé (Rapprochement_v56_par_mois_D53) au centime pour Jan-Mai. Jan-Fév complets (IGS-21/ADN présents) ; Mars→Juillet = SELAS/AGIR/COPS seuls — le maître prouve que DAHLIA n'a PAS facturé IGS/ADN en direct ces mois-là (passés par GARIS), donc c'est le CA direct RÉEL, pas un trou."
+ },
+ "identite": {
+  "source": "MAINTENANCE_DAHLIA.md",
+  "forme": "SASU",
+  "siren": "951 932 730",
+  "tva_intra": "FR56 951 932 730",
+  "ccn": "3196 (prévention-sécurité)",
+  "regime": "IS / RSI",
+  "banque": "Shine [RETIRE] (BIC SNNNFR22XXX) depuis juin 2026 ; ancien SWAN [RETIRE] ferme (Qonto clos 31/03/2026)",
+  "domiciliation": "Kandbaz"
+ },
+ "cloture_2025": {
+  "source": "MAINTENANCE_DAHLIA.md r58-63",
+  "benefice_2025_eur": 27778.87,
+  "ran_eur": 9895.87,
+  "capital_eur": 10000,
+  "capital_note": "100 € → 10 000 € (incorporation 08/06/2026)",
+  "ca_2025_eur": 444239,
+  "total_bilan_eur": 79458,
+  "deficit_reportable_residuel_eur": 9103
+ },
+ "paie_2025": {
+  "source": "DAHLIA-...livreDePaie-sommeDesMois-2025.xlsx + Rapprochement_v19 BASE_Paie (concordent) + CONFIRMÉ maître D53 BASE_Paie",
+  "masse_brute_eur": 30686.01,
+  "masse_nette_eur": 26374.85,
+  "heures": 2286.36,
+  "nb_agents": 9
+ },
+ "paie_2026": {
+  "source": "maître D53 › BASE_Paie (recompute lignes agent)",
+  "masse_brute_eur": 1904.81,
+  "masse_nette_eur": 1529.66,
+  "heures": 98.5,
+  "note": "paie DIRECTE DAHLIA faible : la main-d'œuvre passe surtout par la sous-traitance"
+ },
+ "salaires_reste_a_payer": {
+  "statut": "à confirmer — pas de table dû/versé/reste par agent pour DAHLIA"
+ },
+ "cascade_st_2026": {
+  "source": "PILOTAGE/CASCADE_DAHLIA.html + ATELIERS_DATA_DAHLIA.html + MAINTENANCE_DAHLIA.md (hand-vérifiés) + maître D53 (Référentiel_ST : identités + décisions ouvertes, dont CG solde à trancher)",
+  "modele": "file de 6 sous-traitants SUCCESSIFS avec reliquats verrouillés (PAS un schéma mensuel comme FKH)",
+  "tarifs_st_h": {
+   "CG": 18.15,
+   "JADIS": 18.15,
+   "HIS": 18.15,
+   "GALOIS": 18.15,
+   "DIANTRA": 18.15,
+   "GARIS": 18.5
+  },
+  "sous_traitants": [
+   {
+    "st": "CG",
+    "periode": "oct-2023 → 17/06/2024",
+    "etat": "déficit 55 034,21 €"
+   },
+   {
+    "st": "JADIS",
+    "periode": "→ 28/02/2025",
+    "etat": "soldé"
+   },
+   {
+    "st": "HIS",
+    "periode": "28/02 → 25/06/2025",
+    "etat": "soldé (affiché 7 742,15 €)"
+   },
+   {
+    "st": "GALOIS",
+    "periode": "11/07/2024 → 15/09/2025",
+    "etat": "soldé (affiché 178 404,70 €)"
+   },
+   {
+    "st": "DIANTRA",
+    "periode": "27/09/2025 → 31/01/2026",
+    "etat": "soldé 36 474,60 €"
+   },
+   {
+    "st": "GARIS",
+    "periode": "13/11/2025 → actif",
+    "etat": "actif (en cours)"
+   }
+  ],
+  "anomalies": "Écarts reliquats affichés vs virements SUIVI DAHLIA (HIS 7 742,15 vs 9 545,16 ; GALOIS 178 404,70 vs ~188 394,70) ; sur-allocation DIANTRA jan-fév (26 974,52 + 21 638,42 non virés) ; divergences GARIS (96 819,39 / 86 282,43 / 85 659,80). À caler.",
+  "referentiel_st": [
+   {
+    "st": "CG SECURITE",
+    "siren": "980 592 125",
+    "gerant": "GNEGNERY ARSENE",
+    "autorisation": "AUT-021-2122-12-11-20230894454",
+    "capital_eur": 1000
+   },
+   {
+    "st": "GALOIS SECURITE",
+    "siren": "929 817 658",
+    "gerant": "GNEGNERY ARSENE",
+    "autorisation": "AUT-093-2123-07-10-20240939345",
+    "capital_eur": 1000
+   },
+   {
+    "st": "JADIS SECURITE",
+    "siren": "930 724 554",
+    "gerant": "CAMARA JOSEPH BONIFACE",
+    "autorisation": "AUT-094-2123-07-24-2024-0943987",
+    "capital_eur": 1000
+   },
+   {
+    "st": "HIS SECURITE",
+    "siren": "940 505 043",
+    "gerant": "GNEGNERY ARSENE",
+    "autorisation": "AUT-033-2124-02-27-20250973476",
+    "capital_eur": 100
+   },
+   {
+    "st": "DIANTRA SECURITY",
+    "siren": "950 742 304",
+    "gerant": "MALICK TRAORE",
+    "autorisation": "AUT-094-2122-09-27-20230861125",
+    "capital_eur": 1000
+   },
+   {
+    "st": "GARIS SECURITE",
+    "siren": "991 451 345",
+    "gerant": "GNEGNERY ARSENE",
+    "autorisation": "AUT-075-2124-11-12-20251007651",
+    "capital_eur": 100
+   }
+  ],
+  "decisions_ouvertes": [
+   {
+    "sujet": "HIS — date début",
+    "statut": "✅ ACTÉE D22",
+    "decision": "Période retenue : 28/02/2025 → 25/06/2025. Justification : autorisation d'exercer obtenue le 27/02/2025. Société créée le 03/02/2025 mais sans autorisation."
+   },
+   {
+    "sujet": "JADIS — extension à avril 2025",
+    "statut": "🟡 OUVERTE",
+    "decision": "Période officielle : 25/07/2024 → 28/02/2025. HANDOVER D21 mentionne extension jusqu'à avril 2025. À trancher lors du calcul cascade JADIS."
+   },
+   {
+    "sujet": "DIANTRA — période",
+    "statut": "🟡 OUVERTE",
+    "decision": "Zeus : 01/12/2025 → 31/12/2025 (1 seul mois). REGLES_METIER : 27/09/2025 → 31/01/2026. À trancher lors du calcul cascade DIANTRA."
+   },
+   {
+    "sujet": "CG — solde 180 663,60 € vs CA dispo",
+    "statut": "🟡 OUVERTE",
+    "decision": "Cumul CA cascade période CG (~56k) + tout FKH brut (100 499,40 €) = 156 779 €. Manque ~23 884 € pour solder. À trancher : ajustement solde initial ? Flux non identifiés ?"
+   }
+  ]
+ },
+ "virements_st_2026": {
+  "source": "SUIVI DAHLIA.xlsx › onglet SOUS TRAITANT (chrono, cumul vérifié) — FIABLE mais s'arrête au 21/01/2026",
+  "detail_janvier": [
+   {
+    "st": "GARIS",
+    "eur": 28149.6,
+    "detail": "07/01 16 494,60 + 16/01 8 258,40 + 21/01 3 396,60"
+   },
+   {
+    "st": "DIANTRA",
+    "eur": 36474.6,
+    "detail": "14/01 5 994,00 + 14/01 15 184,80 + 15/01 15 295,80"
+   }
+  ],
+  "apres_janvier": "à confirmer — non enregistré dans cette source (maître v62)",
+  "action_ouverte": "2ᵉ virement GARIS 5 516,54 € (solde GS-2026-083 fév 2026) NON FAIT (MAINTENANCE r79)"
+ },
+ "encaissements_do_toutes_periodes": {
+  "source": "SUIVI DAHLIA.xlsx › onglet DONNEUR D'ORDRE (encaissements BANCAIRES 2024→19/01/2026, PAS le CA facturé)",
+  "total_eur": 920692.77,
+  "detail": [
+   {
+    "do": "IGS-21",
+    "eur": 486108.32
+   },
+   {
+    "do": "ADN",
+    "eur": 199464.0
+   },
+   {
+    "do": "FKH",
+    "eur": 89998.8
+   },
+   {
+    "do": "AGIR",
+    "eur": 57266.75
+   },
+   {
+    "do": "SELAS",
+    "eur": 36000.0
+   },
+   {
+    "do": "SPIG",
+    "eur": 18982.14
+   },
+   {
+    "do": "NATIONAL FRANCE",
+    "eur": 8378.8
+   },
+   {
+    "do": "SINCOB",
+    "eur": 7560.0
+   },
+   {
+    "do": "CG",
+    "eur": 7170.6
+   }
+  ]
+ },
+ "fiscal_2026": {
+  "source": "maître D53 (SUIVI_TVA régularisation + ECHEANCIER_FISCAL) ; dette-doublon TVA déc + contentieux JEX hand-vérifiés",
+  "tva_ca12_2025": {
+   "base_ht_eur": 465229,
+   "net_tva_eur": 15131.49,
+   "solde_du_eur": 4779.49,
+   "echeance": "05/05/2026 (dépassée)"
+  },
+  "acomptes_tva_2026": {
+   "juillet_eur": 8322,
+   "decembre_eur": 6053
+  },
+  "urssaf_avr_mai_eur": 352,
+  "dette_tva_dec_2025_eur": 4576,
+  "dette_tva_note": "DOUBLON confirmé 03/07 (majoration réelle 217 €), payée 07/07 ; mainlevée SATD OLINDA à confirmer",
+  "contentieux": "JEX Reims ×2 (RG 25/00045 + 25/00044, saisie SHINE) ouverts",
+  "regularisation_tva_2025": {
+   "tva_nette_2025_eur": 18464.82,
+   "avoir_fkh_eur": -3333.33,
+   "tva_nette_due_eur": 15131.49,
+   "acompte_juillet_deja_paye_eur": -5993,
+   "acompte_decembre_deja_paye_eur": -4359,
+   "solde_a_payer_eur": 4779.49
+  },
+  "echeancier": [
+   {
+    "obligation": "CA12 exercice 2025",
+    "echeance": "2026-05-05",
+    "statut": "🔴 En retard",
+    "montant": "4 780 €"
+   },
+   {
+    "obligation": "Liasse 2025",
+    "echeance": "~mi-mai 20",
+    "statut": "✅ Fait",
+    "montant": "IS = 0 €"
+   },
+   {
+    "obligation": "Acomptes IS",
+    "echeance": "15/03·06·0",
+    "statut": "⚪ Futur",
+    "montant": "non dus"
+   },
+   {
+    "obligation": "Solde IS",
+    "echeance": "avec la li",
+    "statut": "✅ Fait",
+    "montant": "0 €"
+   },
+   {
+    "obligation": "CVAE",
+    "echeance": "avec la li",
+    "statut": "✅ Fait",
+    "montant": "dispensée"
+   }
+  ]
+ },
+ "ca_client_2026": [
+  {
+   "mois": "Janvier 2026",
+   "ca_ht": 41266.67,
+   "ca_ttc": 49520.0,
+   "nb_factures": 3,
+   "factures": "F-000152, F-000158, F-000159",
+   "completude": "complet (grands clients présents)"
+  },
+  {
+   "mois": "Février 2026",
+   "ca_ht": 28709.47,
+   "ca_ttc": 34451.36,
+   "nb_factures": 2,
+   "factures": "F-000165, F-000168",
+   "completude": "complet (grands clients présents)"
+  },
+  {
+   "mois": "Mars 2026",
+   "ca_ht": 2062.44,
+   "ca_ttc": 2474.92,
+   "nb_factures": 2,
+   "factures": "F-000170, F-000171",
+   "completude": "PARTIEL — seules petites factures présentes (grosses IGS/ADN absentes du dossier)"
+  },
+  {
+   "mois": "Avril 2026",
+   "ca_ht": 3809.01,
+   "ca_ttc": 4570.8,
+   "nb_factures": 3,
+   "factures": "F-000181, F-000182, F-000183",
+   "completude": "PARTIEL — seules petites factures présentes (grosses IGS/ADN absentes du dossier)"
+  },
+  {
+   "mois": "Mai 2026",
+   "ca_ht": 1666.67,
+   "ca_ttc": 2000.0,
+   "nb_factures": 1,
+   "factures": "F-000189",
+   "completude": "PARTIEL — seules petites factures présentes (grosses IGS/ADN absentes du dossier)"
+  },
+  {
+   "mois": "Juin 2026",
+   "ca_ht": 1666.67,
+   "ca_ttc": 2000.0,
+   "nb_factures": 1,
+   "factures": "F-000193",
+   "completude": "PARTIEL — seules petites factures présentes (grosses IGS/ADN absentes du dossier)"
+  },
+  {
+   "mois": "Juillet 2026",
+   "ca_ht": 4390.4,
+   "ca_ttc": 5268.48,
+   "nb_factures": 3,
+   "factures": "F-000197, F-000198, F-000199",
+   "completude": "PARTIEL — seules petites factures présentes (grosses IGS/ADN absentes du dossier)"
+  },
+  {
+   "mois": "Août 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Septembre 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Octobre 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Novembre 2026",
+   "statut": "aucune donnée"
+  },
+  {
+   "mois": "Décembre 2026",
+   "statut": "aucune donnée"
+  }
+ ],
+ "ca_par_client_2026": {
+  "Janvier 2026": [
+   {
+    "client": "IGS-21",
+    "ht": 29700.0,
+    "ttc": 35640.0,
+    "factures": "F-000152"
+   },
+   {
+    "client": "ADN SÉCURITÉ",
+    "ht": 9900.0,
+    "ttc": 11880.0,
+    "factures": "F-000158"
+   },
+   {
+    "client": "SELAS HAUTE POMPIGNANE",
+    "ht": 1666.67,
+    "ttc": 2000.0,
+    "factures": "F-000159"
+   }
+  ],
+  "Février 2026": [
+   {
+    "client": "IGS-21",
+    "ht": 27042.8,
+    "ttc": 32451.36,
+    "factures": "F-000168"
+   },
+   {
+    "client": "SELAS HAUTE POMPIGNANE",
+    "ht": 1666.67,
+    "ttc": 2000.0,
+    "factures": "F-000165"
+   }
+  ],
+  "Mars 2026": [
+   {
+    "client": "SELAS HAUTE POMPIGNANE",
+    "ht": 1666.67,
+    "ttc": 2000.0,
+    "factures": "F-000170"
+   },
+   {
+    "client": "AGIR SÉCURITÉ",
+    "ht": 395.77,
+    "ttc": 474.92,
+    "factures": "F-000171"
+   }
+  ],
+  "Avril 2026": [
+   {
+    "client": "SELAS HAUTE POMPIGNANE",
+    "ht": 1666.67,
+    "ttc": 2000.0,
+    "factures": "F-000181"
+   },
+   {
+    "client": "COPS",
+    "ht": 1398.87,
+    "ttc": 1678.64,
+    "factures": "F-000183"
+   },
+   {
+    "client": "AGIR SÉCURITÉ",
+    "ht": 743.47,
+    "ttc": 892.16,
+    "factures": "F-000182"
+   }
+  ],
+  "Mai 2026": [
+   {
+    "client": "SELAS HAUTE POMPIGNANE",
+    "ht": 1666.67,
+    "ttc": 2000.0,
+    "factures": "F-000189"
+   }
+  ],
+  "Juin 2026": [
+   {
+    "client": "SELAS HAUTE POMPIGNANE",
+    "ht": 1666.67,
+    "ttc": 2000.0,
+    "factures": "F-000193"
+   }
+  ],
+  "Juillet 2026": [
+   {
+    "client": "AGIR SÉCURITÉ",
+    "ht": 2544.48,
+    "ttc": 3053.38,
+    "factures": "F-000199"
+   },
+   {
+    "client": "SELAS HAUTE POMPIGNANE",
+    "ht": 1666.67,
+    "ttc": 2000.0,
+    "factures": "F-000197"
+   },
+   {
+    "client": "COPS",
+    "ht": 179.25,
+    "ttc": 215.1,
+    "factures": "F-000198"
+   }
+  ]
+ }
+}
