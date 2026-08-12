@@ -1,6 +1,6 @@
 {
  "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
- "maj": "2026-08-11",
+ "maj": "2026-08-12",
  "items": [
   {
    "b": 222,
@@ -1264,6 +1264,14 @@
    "source": "Zeus 11/08",
    "theme": "Vacations non affectées",
    "pourquoipas": "En b400 le bloc rouge était en tête parce que c'était l'urgence du jour : ces 29 vacations ne se voyaient nulle part. Maintenant qu'elles se voient, elles reprennent leur rang — la première chose à lire en ouvrant la pastille, c'est ce qui tombe dans les 24 h, pas ce qui n'a pas encore de date. Le bloc ne change ni de contenu ni de comportement (toujours déplié, 23 sites cliquables) : il descend, et sa phrase dit « ci-dessus » au lieu de « ci-dessous ». Vérifié : 24 H · 7 JOURS · RESTE À VENIR · EN COURS · PASSÉES, puis 29 Sans date ; le drill fonctionne toujours (Varennes-Vauzelles → 3 vacations). Non-régression b411→b412 : Planning, Fiche agent et Suivi des appels identiques, aucun badge ne bouge.",
+   "local": true
+  },
+  {
+   "b": 413,
+   "titre": "📧 Le rappel AQUILA du jour, confronté au Planning, dans 🎫 Tickets",
+   "source": "Zeus 12/08",
+   "theme": "Tickets / Mails",
+   "pourquoipas": "AQUILA envoie chaque matin la liste de ce qu'ils attendent de nous. C'est leur vérité, le Planning est la nôtre, et l'écart se lit DANS LES DEUX SENS — c'est le recoupement à la main du 12/08 qui l'a montré : les 3 gardiennages annoncés étaient bien au Planning (le contrôle « rien d'oublié » passe souvent), mais Decathlon Houdemont n°5278389, présent dans le rappel de la veille, avait disparu de celui du matin alors qu'un agent était dessus de 08:30 à 19:45. Un agent qui part pour une prestation annulée coûte plus cher qu'une prestation oubliée. Trois familles, le plus coûteux d'abord : ❌ annoncée et absente du Planning (→ ➕ créer la vacation avec LEUR numéro en référence) · ⚠️ au Planning et plus annoncée (→ 🔴 signaler comme annulation à confirmer, le même mécanisme que le 🔴 des mails ; ✏️ ouvrir ; ✔ écarter) · ✅ concordantes, dont celles SANS AGENT qui remontent quand même avec 👤 Affecter. L'écart d'heure de début est ÉCRIT mais n'alerte pas : Zeus le 12/08, « on décide volontairement de mettre la prise de service en avance » (Biscarrosse 10:30 chez nous contre 11:00 annoncé → « prise avancée de 30 min — voulu »). Le filtre client est STRICT : `vacMemeClient` est tolérant et faisait remonter Vingeanne (TERCA) et Duc (SECURITAS) comme « plus annoncées par AQUILA ». Visible superviseur/admin/super-admin ; l'opérateur n'a pas la section 🎫. Vérifié sur les vraies données du 12/08 : 2 orphelines (MME DALESSANDRO, Decathlon) et 3 concordantes dont Monéteau SANS AGENT à 3 h de son début. Non-régression b412→b413 : Planning, Fiche agent, Suivi des appels et les tickets existants identiques, aucun badge ne bouge.",
    "local": true
   }
  ],

@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v11-08·b412</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b413</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -978,6 +978,7 @@ button.big:active{transform:translateY(1px)}
   </section>
   <section id="sec-tickets" class="hidden">
     <div><h1>🎫 Tickets</h1><p class="sub">Confie une tâche à traiter. La personne fait le travail <b>directement depuis le ticket</b> (champ à renseigner + lien vers la fiche), et le <b>suivi se met à jour tout seul</b> (ex. 3/11 renseignées).</p></div>
+    <div id="aq-body"></div>
     <div id="tk-body"></div>
   </section>
   <section id="sec-numeros" class="hidden">
@@ -2995,7 +2996,7 @@ button.big:active{transform:translateY(1px)}
   /* ===== Synchro multi-appareils (Cloudflare Worker + D1) — ajouté 2026-07-26 ===== */
   // Rempli après déploiement du Worker (voir backend/DEPLOY.md). Vide = appli 100% locale (comportement d'origine).
   var BACKEND_URL = 'https://fkh-gestion-api.hacamara2.workers.dev';
-  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_pc_poste','fkh_droits','fkh_td_delai','fkh_ph_ecartees','fkh_data'];   /* b353 : les photos mises de côté sont une décision d'agence — elle doit se voir depuis tous les postes, pas rester sur le téléphone de celui qui l'a prise */
+  var SYNC_KEYS = ['fkh_clients','fkh_presta','fkh_agents','fkh_sites','fkh_site_noms','fkh_agent_noms','fkh_client_tel','fkh_suivi','fkh_fa','fkh_thiam','fkh_zones_diff','fkh_tenues_ctrl','fkh_tenues_stock','fkh_tenues_cats','fkh_services','fkh_site_map','fkh_zones_interv','fkh_appels','fkh_suivisite','fkh_ss_params','fkh_anom_done','fkh_tenues_dist','fkh_agent_calls','fkh_tenues_dist_log','fkh_consignes','fkh_oper_done','fkh_interv_dem','fkh_ai_numbers','fkh_sa_excl','fkh_photo_archive','fkh_operateurs','fkh_msg_tpl','fkh_msg_vars','fkh_remontees','fkh_saved_views','fkh_tickets','fkh_tenues_seuil','fkh_tenues_cmd','fkh_oper_names','fkh_ro_win','fkh_st_reste','fkh_st_depots','fkh_st_gabarits','fkh_numeros_utiles','fkh_terrain','fkh_supterrain','fkh_indispo','fkh_sites_meta','fkh_clients_meta','fkh_pc_poste','fkh_droits','fkh_td_delai','fkh_ph_ecartees','fkh_aq_ecarte','fkh_data'];   /* b413 : écarter une ligne du rappel AQUILA est une décision d'agence, pas un réglage de poste */   /* b353 : les photos mises de côté sont une décision d'agence — elle doit se voir depuis tous les postes, pas rester sur le téléphone de celui qui l'a prise */
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','cockpitfkh','streste','depots','clientsf','corbeille','droits','doublons'];   /* b356 : 'doublons' — nettoyage de base, super-admin par defaut (regle Zeus 03/08 : toute nouveaute nait super-admin seul) */ // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)  /* b228 : 'mails' retire — la section Mails missions (et son temoin de vie) est desormais visible par le superviseur et l'administrateur, pas seulement le super-admin */
@@ -6522,6 +6523,9 @@ button.big:active{transform:translateY(1px)}
     }; });
   }
   function renderTickets(){
+    try{ renderAqRappel(); }catch(_e){}   /* b413 */
+    /* le classeur des mails peut dater : on le rafraîchit, et on redessine quand il arrive. */
+    try{ if(typeof mailsFetch==='function'&&typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.on)mailsFetch(function(){ try{ renderAqRappel(); }catch(_f){} }); }catch(_e){}
     var wrap=byId('tk-body'); if(!wrap)return; var T=tkLoad();
     var typeOpts=Object.keys(TK_TYPES).map(function(k){ var n=(typeof FA!=='undefined'?FA:[]).filter(function(a){return TK_TYPES[k].missing(a);}).length; return '<option value="'+k+'">'+TK_TYPES[k].lbl+' ('+n+' agents concernés)</option>'; }).join('');
     var create='<div class="card"><div class="lab" style="margin:0 0 6px">➕ Nouveau ticket <span class="sub" style="font-weight:400">— la cible est détectée automatiquement</span></div>'
@@ -9199,6 +9203,139 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
      clics (Fait / En cours / Bloque + un mot), et l'emetteur est notifie du retour.
      Stockage : fkh_tickets, deja partage par le cloud. */
   var TK_ETATS={a_faire:['\u23f3 À faire','#e0a13b'],en_cours:['🔄 En cours','#6ea8fe'],fait:['\u2705 Fait','#1a9e5c'],bloque:['\u26d4 Bloqué','#e5322d']};
+
+  /* ===== b413 : LE RAPPEL AQUILA DU JOUR, CONFRONTÉ AU PLANNING =====
+     AQUILA envoie chaque matin la liste de ce qu'ils attendent de nous aujourd'hui. C'est leur
+     vérité ; le Planning est la nôtre. Les deux doivent dire la même chose, et l'écart se lit
+     dans les DEUX SENS — ce qu'ils annoncent et qu'on n'a pas, ce qu'on a et qu'ils n'annoncent
+     plus. Le second cas est le plus coûteux : un agent qui part pour une prestation annulée. */
+  function aqEcartLoad(){ try{ return JSON.parse(localStorage.getItem('fkh_aq_ecarte')||'{}')||{}; }catch(e){ return {}; } }
+  function aqEcartSave(x){ try{ localStorage.setItem('fkh_aq_ecarte',JSON.stringify(x)); }catch(e){} if(typeof cloudPush==='function')cloudPush('fkh_aq_ecarte'); }
+  /* Le dernier rappel qui parle d'AUJOURD'HUI. Celui « DE DEMAIN » ne compte pas : il annonce
+     un autre jour, et c'est justement en les comparant qu'on a vu Decathlon disparaître. */
+  function aqRappel(){ var it=null;
+    ((typeof mailsCache==='function')?mailsCache():[]).forEach(function(x){
+      var suj=String((x&&x.transcript)||'').split(String.fromCharCode(10))[0].toUpperCase();
+      if(suj.indexOf('RAPPEL')<0||suj.indexOf('GARDIENNAGE')<0)return;
+      if(suj.indexOf('AUJOURD')<0)return;
+      if(!it||(x.at||0)>(it.at||0))it=x; });
+    return it; }
+  /* Le site peut être coupé sur deux lignes et suivi d'un code entre parenthèses : on prend tout
+     ce qui sépare le numéro de la ligne « Du : », puis on nettoie. */
+  function aqLignes(it){ var tx=String((it&&it.transcript)||''), out=[];
+    var rx=/GARDIENNAGE\s+N[\u00b0\u00bao]?\s*(\d{5,})([\s\S]{0,200}?)Du\s*:\s*(\d{2})\/(\d{2})\/(\d{4})\s+(\d{1,2}:\d{2})\s+au\s+(\d{2})\/(\d{2})\/(\d{4})\s+(\d{1,2}:\d{2})/gi, m;
+    while((m=rx.exec(tx))){
+      var st=String(m[2]||'').replace(/[\r\n]+/g,' ').replace(/\([^)]*\)/g,' ').replace(/\s+/g,' ').trim();
+      out.push({num:m[1],site:st,mdate:m[5]+'-'+m[4]+'-'+m[3],h1:m[6],mdateFin:m[9]+'-'+m[8]+'-'+m[7],h2:m[10]}); }
+    return out; }
+  function aqCroise(){
+    var it=aqRappel(); if(!it)return null;
+    var L=aqLignes(it), jour=(typeof impTodayISO==='function')?impTodayISO():'';
+    L=L.filter(function(x){ return x.mdate===jour; });
+    var vac=(typeof SUIVI!=='undefined'?SUIVI:[]).filter(function(m){
+      return m&&!m.deleted&&m.statut==='validee'&&!m.aDecouper&&!m.mailPending&&(m.mdate||'')===jour
+          /* b413 : le client se lit STRICTEMENT. `vacMemeClient` est tolérant — il accepte un client
+             vide, et faisait remonter Vingeanne (TERCA) ou Duc (SECURITAS) comme « plus annoncées par
+             AQUILA ». Une vacation qui n'est pas à eux n'a jamais eu à figurer dans leur rappel. */
+          &&/aquila/i.test(String(m.client||'')); });
+    var pris={}, manquantes=[], concordantes=[];
+    L.forEach(function(x){
+      var v=null;
+      for(var i=0;i<vac.length&&!v;i++) if(String(vac[i].ref||'')===x.num&&!pris[vac[i].id])v=vac[i];   /* le numéro d'abord */
+      for(var j=0;j<vac.length&&!v;j++){ var m2=vac[j]; if(pris[m2.id])continue;
+        if(typeof vacMemeSite==='function'&&vacMemeSite(x.site,(m2.siteAgent||m2.titre||m2.siteBDC||'')))v=m2; }
+      if(v){ pris[v.id]=1; concordantes.push({l:x,m:v}); } else manquantes.push(x); });
+    var orphelines=vac.filter(function(m){ return !pris[m.id]; });
+    return {it:it,jour:jour,lignes:L,manquantes:manquantes,concordantes:concordantes,orphelines:orphelines}; }
+  function renderAqRappel(){
+    var box=byId('aq-body'); if(!box)return;
+    /* Le superviseur est celui qui agit tout de suite ; l'opérateur n'a pas la main sur le Planning. */
+    var r9=(typeof drRole==='function')?drRole():'full';
+    if(r9==='operateur'){ box.innerHTML=''; return; }
+    var R=aqCroise();
+    if(!R){ box.innerHTML='<div class="card" style="margin-bottom:12px"><div class="lab" style="margin:0 0 4px">\ud83d\udce7 Rappel AQUILA du jour</div><div class="sub" style="margin:0">Aucun rappel \u00ab\u00a0GARDIENNAGES D\u2019AUJOURD\u2019HUI\u00a0\u00bb re\u00e7u pour aujourd\u2019hui. Rien \u00e0 confronter.</div></div>'; return; }
+    var ec=aqEcartLoad(), h='';
+    var nMq=R.manquantes.filter(function(x){ return !ec['n'+x.num]; }).length;
+    var nOr=R.orphelines.filter(function(m){ return !ec['v'+m.id]; }).length;
+    var nSa=R.concordantes.filter(function(c){ return !c.m.agentId; }).length;
+    var alerte=(nMq+nOr+nSa)>0;
+    h+='<div class="card" style="margin-bottom:12px;border:1.5px solid '+(alerte?'#e5322d':'var(--ok)')+'">'
+      +'<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><b>\ud83d\udce7 Rappel AQUILA du jour</b>'
+      +'<span class="sub" style="margin:0">'+R.lignes.length+' gardiennage(s) annonc\u00e9(s) \u00b7 '+esc(String(R.jour).split('-').reverse().join('/'))+'</span></div>'
+      +'<div class="sub" style="margin:3px 0 8px;font-size:11.5px">C\u2019est <b>leur</b> liste de ce qu\u2019ils attendent de nous aujourd\u2019hui. On la confronte au Planning <b>dans les deux sens</b> : ce qu\u2019ils annoncent et qu\u2019on n\u2019a pas, ce qu\u2019on a et qu\u2019ils n\u2019annoncent plus.</div>';
+    if(!alerte)h+='<div class="sub" style="margin:0;color:var(--ok)">\u2705 Tout concorde, et chaque vacation a son agent.</div>';
+    /* 1 \u2014 annonc\u00e9e, absente du Planning : on va oublier la prestation. */
+    R.manquantes.forEach(function(x){ if(ec['n'+x.num])return;
+      h+='<div style="border:1.5px solid #e5322d;border-radius:10px;padding:9px;margin-top:8px;background:rgba(229,50,45,.08)">'
+        +'<div style="font-weight:700">\u274c Annonc\u00e9e par AQUILA, <b>absente du Planning</b></div>'
+        +'<div style="margin-top:3px">'+esc(x.site)+' <span class="sub" style="margin:0">\u00b7 n\u00b0'+esc(x.num)+'</span></div>'
+        +'<div class="fa-d">\ud83d\udd50 '+esc(x.h1)+' \u2192 '+esc(x.h2)+'</div>'
+        +'<div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap">'
+        +'<button type="button" class="ok aq-creer" data-num="'+esc(x.num)+'" style="font-size:12px">\u2795 Cr\u00e9er la vacation au Planning</button>'
+        +'<button type="button" class="aq-ecart" data-k="n'+esc(x.num)+'" style="font-size:12px">\u2714 D\u00e9j\u00e0 trait\u00e9 \u2014 \u00e9carter</button></div></div>'; });
+    /* 2 \u2014 au Planning, plus annonc\u00e9e : un agent risque de partir pour rien. */
+    R.orphelines.forEach(function(m){ if(ec['v'+m.id])return;
+      var ag=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):'';
+      h+='<div style="border:1.5px solid #e0a13b;border-radius:10px;padding:9px;margin-top:8px;background:rgba(224,161,59,.09)">'
+        +'<div style="font-weight:700">\u26a0\ufe0f Au Planning, <b>AQUILA ne l\u2019annonce plus</b></div>'
+        +'<div style="margin-top:3px">'+esc(m.siteAgent||m.titre||'\u2014')+(m.ref?(' <span class="sub" style="margin:0">\u00b7 r\u00e9f '+esc(m.ref)+'</span>'):'')+'</div>'
+        +'<div class="fa-d">\ud83d\udd50 '+esc(m.mheure||'\u2205')+' \u2192 '+esc(m.mfin||'\u2205')+(m.agentId?(' \u00b7 \ud83d\udc64 '+esc(ag||'agent affect\u00e9 (fiche introuvable)')):' \u00b7 <b style="color:#e5322d">sans agent</b>')+'</div>'
+        +'<div class="sub" style="margin:3px 0 0;font-size:11.5px">Annulation non dite, ou oubli de leur c\u00f4t\u00e9. '+(ag?'<b>Un agent est affect\u00e9</b> \u2014 appelle avant qu\u2019il parte.':'')+'</div>'
+        +'<div class="acts" style="margin-top:6px;gap:6px;flex-wrap:wrap">'
+        +'<button type="button" class="aq-annul" data-mid="'+esc(m.id)+'" style="font-size:12px;border-color:#e5322d;color:#e5322d;font-weight:700">\ud83d\udd34 Signaler comme annulation \u00e0 confirmer</button>'
+        +'<button type="button" class="aq-ouvrir" data-mid="'+esc(m.id)+'" style="font-size:12px">\u270f\ufe0f Ouvrir la vacation</button>'
+        +'<button type="button" class="aq-ecart" data-k="v'+esc(m.id)+'" style="font-size:12px">\u2714 C\u2019est normal \u2014 \u00e9carter</button></div></div>'; });
+    /* 3 \u2014 concordantes. L'\u00e9cart d'heure de d\u00e9but est VOULU (Zeus 12/08 : on met la prise en
+       avance sur certaines vacations) : il s'\u00e9crit, il n'alerte pas. Seul l'agent manquant alerte. */
+    if(R.concordantes.length){
+      h+='<div class="lab" style="margin:12px 0 4px">\u2705 Concordantes ('+R.concordantes.length+')</div>';
+      R.concordantes.forEach(function(c){
+        var d1=(typeof toMin==='function')?toMin(c.l.h1):null, d2=(typeof toMin==='function')?toMin(c.m.mheure||''):null;
+        var dm=(d1!=null&&d2!=null)?(d2-d1):0;
+        var ag=(c.m.agentId&&typeof faById==='function'&&faById(c.m.agentId))?(faById(c.m.agentId).nom||''):'';
+        h+='<div style="border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px;background:var(--panel2)'+(c.m.agentId?'':';border-color:#e5322d')+'">'
+          +'<div style="font-weight:700">'+esc(c.m.siteAgent||c.m.titre||c.l.site)+' <span class="sub" style="margin:0;font-weight:400">\u00b7 n\u00b0'+esc(c.l.num)+'</span></div>'
+          +'<div class="fa-d">annonc\u00e9 '+esc(c.l.h1)+' \u2192 '+esc(c.l.h2)+' \u00b7 chez nous '+esc(c.m.mheure||'\u2205')+' \u2192 '+esc(c.m.mfin||'\u2205')
+          +(dm?(' <span class="sub" style="margin:0">('+(dm<0?('prise avanc\u00e9e de '+(-dm)+' min \u2014 voulu'):('d\u00e9but plus tard de '+dm+' min'))+')</span>'):'')+'</div>'
+          +(c.m.agentId?('<div class="fa-d">\ud83d\udc64 '+esc(ag||'agent affect\u00e9 (fiche introuvable)')+'</div>')
+            :('<div class="fa-d" style="color:#e5322d;font-weight:700">\u26a0\ufe0f SANS AGENT \u2014 annonc\u00e9 \u00e0 '+esc(c.l.h1)+'</div>'
+              +'<div class="acts" style="margin-top:5px"><button type="button" class="aq-ouvrir" data-mid="'+esc(c.m.id)+'" style="font-size:12px;border-color:#e0a13b;color:#e0a13b;font-weight:700">\ud83d\udc64 Affecter un agent</button></div>'))
+          +'</div>'; }); }
+    h+='</div>';
+    box.innerHTML=h;
+    box.querySelectorAll('.aq-ecart').forEach(function(b){ b.onclick=function(){ var e=aqEcartLoad(); e[b.getAttribute('data-k')]=Date.now(); aqEcartSave(e); renderAqRappel(); }; });
+    box.querySelectorAll('.aq-ouvrir').forEach(function(b){ b.onclick=function(){ if(typeof planningAffect==='function')planningAffect(b.getAttribute('data-mid')); }; });
+    /* Le même mécanisme que le 🔴 des mails d'annulation : on ne supprime jamais, on signale.
+       La vacation reste au Planning et part dans la pastille des annulations à confirmer. */
+    box.querySelectorAll('.aq-annul').forEach(function(b){ b.onclick=function(){
+      var mid=b.getAttribute('data-mid'), m=null,i;
+      for(i=0;i<SUIVI.length;i++) if(SUIVI[i].id===mid){ m=SUIVI[i]; break; }
+      if(!m)return;
+      if(!confirm('Signaler \u00ab '+(m.siteAgent||m.titre||'')+' \u00bb comme ANNULATION \u00c0 CONFIRMER ?\n\nAQUILA ne l\u2019annonce plus dans son rappel du jour. La vacation reste au Planning \u2014 elle part dans la pastille \ud83d\udd34 pour \u00eatre confirm\u00e9e ou \u00e9cart\u00e9e.'))return;
+      m.annul={src:'rappel_aquila',at:Date.now(),sujet:'Absente du rappel AQUILA du '+String(aqCroise().jour).split('-').reverse().join('/'),vu:0};
+      if(typeof saveSuivi==='function')saveSuivi();
+      if(typeof renderPlanning==='function')try{renderPlanning();}catch(e){}
+      if(typeof ppRefresh==='function')try{ppRefresh();}catch(e){}
+      renderAqRappel(); }; });
+    /* Créer ce qu'AQUILA annonce et qu'on n'a pas : la vacation naît avec LEUR numéro, pour que
+       le prochain recoupement la retrouve par la référence et non par le nom du site. */
+    box.querySelectorAll('.aq-creer').forEach(function(b){ b.onclick=function(){
+      var R2=aqCroise(); if(!R2)return; var num=b.getAttribute('data-num'), x=null;
+      R2.lignes.forEach(function(y){ if(y.num===num)x=y; }); if(!x)return;
+      if(!confirm('Cr\u00e9er la vacation \u00ab '+x.site+' \u00bb du '+String(x.mdate).split('-').reverse().join('/')+' '+x.h1+' \u2192 '+x.h2+' ?\n\nElle na\u00eetra sans agent, avec la r\u00e9f\u00e9rence AQUILA n\u00b0'+num+'.'))return;
+      var t=Date.now();
+      SUIVI.unshift({id:'aq'+t+'_'+Math.round(Math.random()*9999),statut:'validee',client:'AQUILA',
+        titre:x.site,siteAgent:x.site,ville:'',assoc:[],mdate:x.mdate,mheure:x.h1,mfin:x.h2,
+        mdateFin:(x.mdateFin&&x.mdateFin!==x.mdate)?x.mdateFin:'',
+        ref:num,src:'rappel_aquila',creePar:'Rappel AQUILA du jour',
+        creeUser:((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.user)||''),
+        creeAt:t,pris:t,valide:t});
+      if(typeof saveSuivi==='function')saveSuivi();
+      if(typeof renderPlanning==='function')try{renderPlanning();}catch(e){}
+      if(typeof ppRefresh==='function')try{ppRefresh();}catch(e){}
+      renderAqRappel();
+      alert('\u2705 Vacation cr\u00e9\u00e9e au Planning \u2014 elle est SANS AGENT, pense \u00e0 l\u2019affecter.'); }; });
+  }
   function tkxLoad(){ var a=load('fkh_tickets'); return Array.isArray(a)?a:[]; }
   function tkxSave(a){ save('fkh_tickets',a); }
   /* ===== b411 : LE PONT DOMAINES -> TICKETS =====
