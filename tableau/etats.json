@@ -1383,6 +1383,14 @@
    "pourquoipas": "Une ligne de facturation manquante appelle deux gestes selon le cas : faire la facture, ou déposer celle qui existe déjà. Le RADAR n'en proposait qu'un. Le rendu accepte désormais une seconde action (a2) et les lignes « Juillet 2026 — 7 clients » et « RATTRAPAGE AQUILA juin » portent Établir + 📎 Déposer. Piège écarté au passage : deux boutons « Déposer » côte à côte faisaient des choses différentes — l'un ouvrait un ticket, l'autre téléverse vraiment. La ligne des relevés dit maintenant « Réclamer » (c'est une demande), et le vrai dépôt descend au niveau du mois manquant, où la destination est exacte : « 📎 déposer le relevé de juin », « … de juillet ». Même mot, même geste, partout. Vérifié dans le cockpit : 2 lignes à deux boutons, 14 actions dans le détail des 7 clients (établir + joindre pour chacun), 2 dépôts de relevé datés.",
    "local": true,
    "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
+  },
+  {
+   "b": "d7",
+   "titre": "Le surveillant branché au carnet FKH — juin et juillet cessent d’être vides",
+   "source": "Zeus 12/08 : « branche le surveillant au carnet » · « tout ce que ça indique en manquant alors que les fichiers sont présents, corrige »",
+   "theme": "Domaines",
+   "pourquoipas": "Le surveillant lit les dossiers depuis le 31/07 et produit fiches_FKH.json — il voyait les 4 factures de juin depuis des semaines. Personne ne les lisait : seul build_data_perso.py consommait les fiches. Le carnet FKH ne connaissait que le maître TB2026, qui s'arrête à mai, d'où un cockpit affichant un juin vide alors que les PDF étaient rangés. Branché : build_data_fkh.py lit désormais les fiches et ne remplit QUE le silence du maître — là où le maître parle il fait foi (il connaît les avoirs et le net), et la ligne venue du dossier le dit : « pièces rangées, PAS ENCORE saisies au maître ». Carnet : 5 → 7 mois, CA 2026 338 657 → 447 460 €. Les 5 factures de juillet trouvées dans À TRAITER SOCIÉTÉ ont été rangées au standard dans 2026/juillet 2026 et la boîte d'entrée est vide. Enfin la ligne « Factures clients émises » de la matrice ÉTAT, qui était écrite en dur (10·11·9·10·6 puis des points), se met à jour à la réception du carnet — un « · » collé au nombre signale une valeur venue du dossier. Deux erreurs corrigées en route : une première version lisait un carnet pas encore arrivé et ne faisait rien en silence ; la seconde écrasait janvier-mai avec des comptages de LIGNES de facture (108 au lieu de 10). Vérifié à l'écran : 10 11 9 10 6 4· 5·. Audit du reste du mois de juin : relevé bancaire, bulletins, DSN et facture ST sont réellement absents — ces points-là disent vrai.",
+   "local": true
   }
  ],
  "attente": [
