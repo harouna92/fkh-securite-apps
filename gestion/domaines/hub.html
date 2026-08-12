@@ -15,11 +15,7 @@ h1{font-size:19px;margin:0 0 2px}.sub{font-size:12px;color:#8b98a5;margin:0 0 16
 #vttl{font-size:14px;font-weight:700}
 #vframe{flex:1;border:0;width:100%;background:#0e1116}
 /* bouton Signaler + formulaire */
-.dcard .rbtn{margin-top:12px;font-family:inherit;font-size:11.5px;font-weight:700;background:transparent;border:1px solid;border-radius:8px;padding:6px 11px;cursor:pointer}
-.dcard .rbtn:hover{background:#0b0e13}
-#bascule{margin-left:auto;font-family:inherit;font-size:12.5px;font-weight:700;background:#141a2b;color:#9fb0ff;border:1px solid #33406b;border-radius:9px;padding:8px 13px;cursor:pointer}
-#bascule:hover{background:#1b2340}
-#sig-btn{margin-left:10px;font-family:inherit;font-size:12.5px;font-weight:700;background:#12241a;color:#8ef0b6;border:1px solid #2f6b46;border-radius:9px;padding:8px 13px;cursor:pointer}
+#sig-btn{margin-left:auto;font-family:inherit;font-size:12.5px;font-weight:700;background:#12241a;color:#8ef0b6;border:1px solid #2f6b46;border-radius:9px;padding:8px 13px;cursor:pointer}
 #sig-btn:hover{background:#173123}
 #sig-panel{position:fixed;right:14px;bottom:14px;width:340px;max-width:calc(100% - 28px);background:#0e1116;border:1px solid #2f6b46;border-radius:14px;padding:14px;z-index:9;display:none;box-shadow:0 10px 40px rgba(0,0,0,.5)}
 #sig-panel h3{margin:0 0 2px;font-size:14px}#sig-panel .h{font-size:11px;color:#8b98a5;margin-bottom:10px}
@@ -40,7 +36,6 @@ h1{font-size:19px;margin:0 0 2px}.sub{font-size:12px;color:#8b98a5;margin:0 0 16
  <div id="vtop">
    <button class="back" onclick="closeDom()">← Domaines</button>
    <span id="vttl"></span>
-   <button id="bascule" onclick="bascule()" style="display:none">📡 RADAR</button>
    <button id="sig-btn" onclick="openSig()">🎫 Signaler</button>
  </div>
  <iframe id="vframe" title="cockpit"></iframe>
@@ -67,41 +62,25 @@ h1{font-size:19px;margin:0 0 2px}.sub{font-size:12px;color:#8b98a5;margin:0 0 16
 
 <script>
 var DOMS=[
- {k:"FKH",   e:"🧭", c:"#7c93ff", t:"Cockpit complet · 31+ vues live", f:"APPLI_FKH.html", r:"RADAR_FKH.html"},
- {k:"GARIS", e:"🛡️", c:"#f0997b", t:"CA hors FKH · alerte Indy", f:"APPLI_GARIS.html", r:"RADAR_GARIS.html"},
- {k:"DAHLIA",e:"🌸", c:"#f0abfc", t:"RSI · reconstruction CA", f:"APPLI_DAHLIA.html", r:"RADAR_DAHLIA.html"},
+ {k:"FKH",   e:"🧭", c:"#7c93ff", t:"Cockpit complet · 31+ vues live", f:"APPLI_FKH.html"},
+ {k:"GARIS", e:"🛡️", c:"#f0997b", t:"CA hors FKH · alerte Indy", f:"APPLI_GARIS.html"},
+ {k:"DAHLIA",e:"🌸", c:"#f0abfc", t:"RSI · reconstruction CA", f:"APPLI_DAHLIA.html"},
  {k:"PERSO", e:"🧑", c:"#34d399", t:"Dépenses · santé · juridique", f:"APPLI_PERSO.html"}
 ];
-var curDom=null; var curFace='cockpit';
+var curDom=null;
 var grid=document.getElementById('grid');
 DOMS.forEach(function(d){
  var el=document.createElement('div');
  el.className='dcard'; el.style.borderLeftColor=d.c;
- el.innerHTML='<div class="e">'+d.e+'</div><div class="n" style="color:'+d.c+'">'+d.k+'</div><div class="t">'+d.t+'</div>'+(d.r?'<button class="rbtn" style="border-color:'+d.c+';color:'+d.c+'">\uD83D\uDCE1 RADAR</button>':'');
- el.onclick=function(){openDom(d,'cockpit');};
- if(d.r){ el.querySelector('.rbtn').onclick=function(ev){ ev.stopPropagation(); openDom(d,'radar'); }; }
+ el.innerHTML='<div class="e">'+d.e+'</div><div class="n" style="color:'+d.c+'">'+d.k+'</div><div class="t">'+d.t+'</div>';
+ el.onclick=function(){openDom(d);};
  grid.appendChild(el);
 });
-function openDom(d,face){
- curDom=d; curFace=(face==='radar'&&d.r)?'radar':'cockpit';
+function openDom(d){
+ curDom=d;
  document.getElementById('vttl').innerHTML='<span style="color:'+d.c+'">'+d.e+' '+d.k+'</span>';
- document.getElementById('vframe').src=(curFace==='radar')?d.r:d.f;
- majBascule();
+ document.getElementById('vframe').src=d.f;
  document.getElementById('viewer').style.display='flex';
-}
-/* Une seule bascule, qui dit toujours OU L'ON VA, jamais ou l'on est. */
-function majBascule(){
- var b=document.getElementById('bascule');
- if(!curDom||!curDom.r){ b.style.display='none'; return; }
- b.style.display='';
- b.textContent=(curFace==='radar')?'\uD83E\uDDED Cockpit':'\uD83D\uDCE1 RADAR';
- b.title=(curFace==='radar')?'Ouvrir le cockpit complet':'Ouvrir le RADAR : a resoudre, a faire, echeances';
-}
-function bascule(){
- if(!curDom||!curDom.r)return;
- curFace=(curFace==='radar')?'cockpit':'radar';
- document.getElementById('vframe').src=(curFace==='radar')?curDom.r:curDom.f;
- majBascule();
 }
 function closeDom(){
  closeSig();
