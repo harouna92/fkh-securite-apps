@@ -4623,6 +4623,223 @@
    "dates_virement": {}
   }
  ],
+ "cascade_heures_2026": [
+  {
+   "mois": "Janvier 2026",
+   "heures_facturees": 2964.28,
+   "heures_interne": 213.0,
+   "heures_sous_traitees": 2751.28,
+   "pu_interne": 21.5,
+   "par_client": [
+    {
+     "client": "AQUILA",
+     "heures": 260.17,
+     "k": 0.9737
+    },
+    {
+     "client": "GAMBRINUS",
+     "heures": 80.0,
+     "k": 0.9818
+    },
+    {
+     "client": "RANC DEVELOPPEMENT",
+     "heures": 144.5,
+     "k": 0.9737
+    },
+    {
+     "client": "SAS BULLION",
+     "heures": 80.0,
+     "k": 0.9818
+    },
+    {
+     "client": "SECURITAS 10017",
+     "heures": 1391.98,
+     "k": 0.9767
+    },
+    {
+     "client": "SECURITAS 10228",
+     "heures": 949.63,
+     "k": 0.9767
+    },
+    {
+     "client": "SECURITAS Retail GE 10385",
+     "heures": 0.0,
+     "k": 0.9767
+    }
+   ]
+  },
+  {
+   "mois": "Février 2026",
+   "heures_facturees": 2115.05,
+   "heures_interne": 982.0,
+   "heures_sous_traitees": 1133.05,
+   "pu_interne": 21.5,
+   "par_client": [
+    {
+     "client": "AQUILA",
+     "heures": 216.25,
+     "k": 0.9737
+    },
+    {
+     "client": "GAMBRINUS",
+     "heures": 65.0,
+     "k": 0.9818
+    },
+    {
+     "client": "NEW ANGEL'S",
+     "heures": 10.0,
+     "k": 0.975
+    },
+    {
+     "client": "RANC DEVELOPPEMENT",
+     "heures": 135.5,
+     "k": 0.9737
+    },
+    {
+     "client": "SAS BULLION",
+     "heures": 65.0,
+     "k": 0.9818
+    },
+    {
+     "client": "SECURITAS 10017",
+     "heures": 671.98,
+     "k": 0.9767
+    },
+    {
+     "client": "SECURITAS 10228",
+     "heures": 822.57,
+     "k": 0.9767
+    },
+    {
+     "client": "SECURITAS Retail GE 10385",
+     "heures": 0.0,
+     "k": 0.9767
+    },
+    {
+     "client": "SOTEL",
+     "heures": 94.75,
+     "k": 0.9773
+    }
+   ]
+  },
+  {
+   "mois": "Mars 2026",
+   "heures_facturees": 2126.3,
+   "heures_interne": 158.0,
+   "heures_sous_traitees": 1968.3,
+   "pu_interne": 21.5,
+   "par_client": [
+    {
+     "client": "AQUILA",
+     "heures": 213.83,
+     "k": 0.9737
+    },
+    {
+     "client": "GAMBRINUS",
+     "heures": 65.0,
+     "k": 0.9818
+    },
+    {
+     "client": "RANC DEVELOPPEMENT",
+     "heures": 192.61,
+     "k": 0.9737
+    },
+    {
+     "client": "SAS BULLION",
+     "heures": 65.0,
+     "k": 0.9818
+    },
+    {
+     "client": "SECURITAS 10017",
+     "heures": 776.9,
+     "k": 0.9767
+    },
+    {
+     "client": "SECURITAS 10228",
+     "heures": 765.96,
+     "k": 0.9767
+    },
+    {
+     "client": "SOTEL",
+     "heures": 0.0,
+     "k": 0.9773
+    }
+   ]
+  },
+  {
+   "mois": "Avril 2026",
+   "heures_facturees": 2961.67,
+   "heures_interne": 263.5,
+   "heures_sous_traitees": 2698.17,
+   "pu_interne": 21.5,
+   "par_client": [
+    {
+     "client": "AQUILA",
+     "heures": 206.5,
+     "k": 0.9737
+    },
+    {
+     "client": "P2S",
+     "heures": 55.0,
+     "k": 0.9737
+    },
+    {
+     "client": "RANC DEVELOPPEMENT",
+     "heures": 512.33,
+     "k": 0.9737
+    },
+    {
+     "client": "SECURITAS 10017",
+     "heures": 1274.21,
+     "k": 0.9767
+    },
+    {
+     "client": "SECURITAS 10228",
+     "heures": 731.38,
+     "k": 0.9767
+    },
+    {
+     "client": "SOTEL",
+     "heures": 153.25,
+     "k": 0.9773
+    }
+   ]
+  },
+  {
+   "mois": "Mai 2026",
+   "heures_facturees": 2875.86,
+   "heures_interne": 343.67,
+   "heures_sous_traitees": 2532.19,
+   "pu_interne": 21.5,
+   "par_client": [
+    {
+     "client": "AQUILA",
+     "heures": 519.98,
+     "k": 0.9737
+    },
+    {
+     "client": "RANC DEVELOPPEMENT",
+     "heures": 369.06,
+     "k": 0.9737
+    },
+    {
+     "client": "SECURITAS 10017",
+     "heures": 426.0,
+     "k": 0.9767
+    },
+    {
+     "client": "SECURITAS 10228",
+     "heures": 1473.49,
+     "k": 0.9767
+    },
+    {
+     "client": "SOTEL",
+     "heures": 69.33,
+     "k": 0.9773
+    }
+   ]
+  }
+ ],
  "heures_st": {
   "source": "onglet Sous_Traitance",
   "annees": [
@@ -21253,7 +21470,7 @@
  },
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-12 22:27",
+  "lu_le": "2026-08-12 22:37",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
