@@ -1802,10 +1802,59 @@
    }
   ]
  },
- "administratif_publications": [],
+ "administratif_publications": [
+  {
+   "cle": "Bulletins de paie",
+   "id": "etat|Bulletins de paie",
+   "par": "Zeus",
+   "publie_le": "2026-08-13T13:42:20.447Z",
+   "vue": "etat",
+   "vue_label": "ÉTAT"
+  },
+  {
+   "cle": "Agents ayant travaillé / mois",
+   "id": "etat|Agents ayant travaillé / mois",
+   "par": "Zeus",
+   "publie_le": "2026-08-13T13:43:52.879Z",
+   "vue": "etat",
+   "vue_label": "ÉTAT"
+  },
+  {
+   "cle": "Vigilance URSSAF",
+   "id": "etat|Vigilance URSSAF",
+   "par": "Zeus",
+   "publie_le": "2026-08-13T13:44:08.445Z",
+   "vue": "etat",
+   "vue_label": "ÉTAT"
+  },
+  {
+   "cle": "Régularité fiscale",
+   "id": "etat|Régularité fiscale",
+   "par": "Zeus",
+   "publie_le": "2026-08-13T13:44:10.198Z",
+   "vue": "etat",
+   "vue_label": "ÉTAT"
+  },
+  {
+   "cle": "Courriers / mails FKH",
+   "id": "etat|Courriers / mails FKH",
+   "par": "Zeus",
+   "publie_le": "2026-08-13T13:44:19.145Z",
+   "vue": "etat",
+   "vue_label": "ÉTAT"
+  },
+  {
+   "cle": "Justificatifs charges",
+   "id": "etat|Justificatifs charges",
+   "par": "Zeus",
+   "publie_le": "2026-08-13T13:44:24.296Z",
+   "vue": "etat",
+   "vue_label": "ÉTAT"
+  }
+ ],
  "conformite_2026": {
   "source": "👁️ fichiers RÉELLEMENT présents dans les dossiers de conformité du domaine",
-  "lu_le": "2026-08-13 15:26",
+  "lu_le": "2026-08-13 15:46",
   "dsn": {
    "2026-04": [
     "DSN11_Feedback_OK_6a06451ad9716355a8a094b1_04_2026.json"
@@ -1919,7 +1968,7 @@
  },
  "tenues_2026": {
   "source": "appli GESTION (Worker /state, lecture seule) — clés fkh_tenues_*",
-  "lu_le": "2026-08-13 15:26",
+  "lu_le": "2026-08-13 15:47",
   "statut": "non connecté — FKH_APP_PASSWORD absent de l'environnement (le veilleur l'a ; ce build non)"
  },
  "heures_par_site_2026": {
@@ -34003,7 +34052,7 @@
  },
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-13 15:26",
+  "lu_le": "2026-08-13 15:47",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
