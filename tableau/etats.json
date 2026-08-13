@@ -1471,9 +1471,142 @@
    "theme": "Suivi des demandes",
    "pourquoipas": "Cause : le worker déployé cet après-midi dépose lui-même les demandes venues d'un appel, mais il ne connaît pas les communes de France — les 34 969 sont chargées dans le navigateur, pas sur le serveur. Il écrit donc la:null, lo:null. Sans coordonnées : aucune ligne « ↦ ville à N km », et le panneau 👥 Agents proches s'arrête dès sa première ligne (renderNear rend « Localisation de… » et n'appelle jamais nearAgents). Le rattrapage existant (ensureGeo) ne suffisait pas : il interroge geo.api.gouv.fr par le NOM SEUL en ignorant le code postal — le défaut que b416 avait corrigé pour la création — il dépend du réseau, et au premier échec il pose _nogeo=true qui survit aux synchronisations et gèle la demande pour de bon. b431 résout la commune SUR PLACE dans la table déjà chargée, règle b416 : le code postal fait foi, le nom départage. Le code postal est lu dans son champ, à défaut dans la ligne « Ville : X (12345) » du texte. Trois moments : à l'arrivée de la table des communes, à chaque demande qui descend du cloud, et à l'ouverture du panneau. PREUVES sur trois témoins : Cerisé (CP en champ) → 48.4451 / 0.1314, ↦ Le Mans 49 km, ↦ Caen 90 km, panneau 17 agents ≤ 100 km avec distances réelles ; « Guissan (11430) » CP présent seulement dans le texte → résolu sur Gruissan, champ cp rempli ; « Wouzak » sans CP et nom introuvable → INTACT, rien d'inventé. Sur les 16 demandes en recherche déjà sans coordonnées, 0 réparée et 0 touchée : leurs noms sont déformés et leurs codes postaux absents ou inexistants (Génétine cp=03444) — b431 refuse de deviner, c'est la leçon Enelis. Le gain porte sur les demandes à venir. Non-régression : Planning identique, Fiche agent identique, Suivi des appels identique à l'horloge près. TRANCHÉ par Zeus le 12/08 (« oui fais pareil ») : quand c'est le CODE POSTAL qui a tranché et que le nom diffère, le nom affiché devient celui du code, et le mot entendu reste écrit à côté — exactement comme b416 à la création. « Ville : Guissan (11430) » devient « Ville : Gruissan (11430) · entendu : « Guissan » ». Deux garde-fous vérifiés au banc sur cinq témoins : (1) une commune trouvée par son NOM SEUL n'est jamais redressée, il n'y a rien à signaler ; (2) le titre de la carte ne suit que s'il ne portait que la ville — un titre « BASIC FIT » reste « BASIC FIT » alors que sa ville passe bien à Gruissan. Idempotent : après remise à zéro de la position, une seule mention « entendu » et deux lignes ↦, pas d'empilement. Témoins : Cerisé (nom juste) intact ; Guissan → Gruissan ; Minot (12100) → Millau, le cas exact de b416 ; Wouzak sans code postal → intact. EN LIGNE le 12/08 · confirmé par Zeus sur sa demande Cerisé : « maintenant ça marche ». Le sablier qu'il a vu quelques secondes avant, c'est la table des communes (1,55 Mo) qui n'était pas encore arrivée — svGeoLocal renvoie false tant que COMMUNES est vide, et le panneau se redessine tout seul dès que la table atterrit.",
    "enligne": true
+  },
+  {
+   "b": "d15",
+   "titre": "Le cockpit FKH lit le dossier au lieu d'en montrer une photo",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "« Attendues M-1 » affichait juin en l'appelant M-1, et annonçait manquantes 5 factures déposées deux heures plus tôt. La matrice était écrite en dur dans la page. Elle vient maintenant du carnet, qui la calcule depuis le dossier.",
+   "local": true
+  },
+  {
+   "b": "d16",
+   "titre": "DAHLIA, GARIS et PERSO lisent leur carnet pour de vrai",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Leur seul chemin de lecture passait par le Drive via une capacité qui n'existe pas dans l'appli : ils tombaient toujours sur leur instantané. Ils lisent désormais le fichier posé à côté du cockpit.",
+   "local": true
+  },
+  {
+   "b": "d17",
+   "titre": "Chaque vue dit d'où viennent ses chiffres — les 96, sans exception",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Bandeau en bas de chaque vue : « carnet lu HH:MM · cette vue s'en sert » ou « … ne s'en sert PAS ENCORE ». Une vue ne peut plus se faire passer pour fraîche.",
+   "local": true
+  },
+  {
+   "b": "d18",
+   "titre": "Le bandeau se détecte tout seul, et CASCADE VIREMENTS lit le carnet à moitié",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "La marque « se sert du carnet » se pose seule (le pont compte ses écouteurs). CASCADE ne recale que le CA : le carnet groupe les virements par mois de PAIEMENT, la vue par mois de PRESTATION — elle l'écrit à l'écran.",
+   "local": true
+  },
+  {
+   "b": "d19",
+   "titre": "La TVA et l'attribution des virements entrent dans le carnet — CA3 et CASCADE suivent",
+   "source": "Zeus",
+   "theme": "Domaines / Facturation",
+   "pourquoipas": "CA3 se recalcule depuis TB_2026_Mvts (validé au centime sur 6 mois sur 7 ; juin diffère, le recompute fait foi). L'attribution vient d'Allocation_ST_2026, 17 mois de prestation.",
+   "local": true
+  },
+  {
+   "b": "d20",
+   "titre": "Un serveur qui sert le cockpit en entier, et le bandeau à trois états",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "http.server tronquait le cockpit à 783 360 octets sur 792 274 : impossible de vérifier avant de pousser. serveur_local.py le sert entier en 0,26 s. Et une page de navigation le dit au lieu de s'annoncer « pas encore branchée ».",
+   "local": true
+  },
+  {
+   "b": "d21",
+   "titre": "Le dépôt du capital entre au RADAR — par un générateur, pas à la main",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "SCRIPTS/radar.py manipule le littéral SECS sans le casser (il est en JS, pas en JSON) et refuse d'écrire si l'équilibre est rompu. L'item porte l'écart 243 € déclarés / 430 € reçus.",
+   "local": true
+  },
+  {
+   "b": "d22",
+   "titre": "PILOTAGE et HUB lisent le grand livre — plus rien « à câbler »",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "« Justificatifs charges fournisseurs » n'avait que janvier ; les 8 mois se recalculent (25 / 118). Au HUB, « Impayés clients » devient « Reste dû clients » — le calcul ne dit pas la même chose que l'ancien nom.",
+   "local": true
+  },
+  {
+   "b": "d23",
+   "titre": "CASCADE lit l'allocation, et 94 914 € de non-viré cessent d'être invisibles",
+   "source": "Zeus",
+   "theme": "Domaines / Facturation",
+   "pourquoipas": "La 5e colonne était codée en dur à « 0,00 ✓ ». Elle montre le vrai : avril 25 726,44 €, mai 69 187,92 €, alloués à GARIS et pas encore virés.",
+   "local": true
+  },
+  {
+   "b": "d24",
+   "titre": "Les heures 2026 entrent au carnet — Répartition lit ses 5 mois",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Elles sont dans Cascade_ST_2026, pas dans Sous_Traitance (qui ne contient que 2025). Recompute validé : janvier 2 964,28 − 213 = 2 751,28, exactement ce que la vue affichait.",
+   "local": true
+  },
+  {
+   "b": "d25",
+   "titre": "DAHLIA et GARIS savent ce qu'il y a dans leur dossier",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Présence des factures client × mois, factorisée pour les trois domaines. GARIS dit aussitôt quelque chose de vrai : juillet est vide, sa facturation n'est pas faite.",
+   "local": true
+  },
+  {
+   "b": "d26",
+   "titre": "TVA mensuelle DAHLIA, charges fournisseurs GARIS",
+   "source": "Zeus",
+   "theme": "Domaines / Facturation",
+   "pourquoipas": "Le bloc fiscal DAHLIA ne retenait que les totaux annuels ; le détail des 13 mois était juste au-dessus. GARIS reçoit ses factures fournisseurs. L'onglet Sous-traitance de GARIS est vide : rien à transporter.",
+   "local": true
+  },
+  {
+   "b": "d27",
+   "titre": "La section Domaines passe en plein écran, comme le Planning",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Un cockpit en iframe dans une colonne centrée perdait la moitié de sa largeur. Même classe que le Planning au-delà de 1100 px, et hauteur portée à presque tout l'écran.",
+   "local": true
+  },
+  {
+   "b": "d28",
+   "titre": "Le veilleur — la chaîne se relance toute seule, et le dépôt redescend avec",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Le carnet ne se recalculait que si quelqu'un lançait la commande. Le veilleur regarde les dossiers (réveil 30 s, métadonnées seules) et rejoue la chaîne du domaine qui a bougé. Il range aussi les dépôts R2 au passage.",
+   "local": true
+  },
+  {
+   "b": "d29",
+   "titre": "DAHLIA et GARIS ont enfin un registre bancaire — 244 mouvements lus dans les PDF",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Ni l'un ni l'autre n'avait d'équivalent de TB_2026_Mvts. Les relevés sont lus ligne à ligne (formats SWAN/INDY et QONTO). Registre BRUT : la matière, pas la comptabilité.",
+   "local": true
+  },
+  {
+   "b": "d30",
+   "titre": "Les relevés FKH étaient là — et le registre de juillet est incomplet de 30 lignes",
+   "source": "Zeus",
+   "theme": "Domaines / Facturation",
+   "pourquoipas": "Zeus avait raison : juin et juillet étaient déposés. En les lisant à côté du registre saisi, cinq mois tombent au carreau près et JUILLET n'a que 11 lignes saisies sur 41.",
+   "local": true
   }
  ],
  "attente": [
+  {
+   "titre": "📍 ✏️ Modifier : changer le CODE POSTAL seul ne déplace pas la demande — le nom garde la main",
+   "source": "Constaté le 12/08 en corrigeant les deux demandes Enelis en base",
+   "note": "Doctrine b416/b431 : LE CODE POSTAL FAIT FOI, le nom départage. `svGeoLocal` l'applique. Mais `editsave` (index.html:2704) fait l'inverse : il essaie d'abord `commSearch(it.ville,1)[0]` — le NOM — et ne consulte `commByCP(it.cp,1)` que si le nom n'a RIEN donné. Or un nom faux donne presque toujours quelque chose. Mesuré sur le cas réel : demande à Sainte-Savine (10300, Aube) écrite « Saint-Savin (33920) » ; en ne corrigeant que le code postal, editsave retient Saint-Savin (38300) en ISÈRE — 45.6282, 5.3216, soit ~300 km à côté, et sans le dire. Le chemin de clic que je donne depuis toujours (« Renseigne le code postal par ✏️ Modifier ») ne tient donc pas. Correction pressentie : dans editsave, interroger le code postal EN PREMIER quand il fait 5 chiffres, le nom ne servant qu'à départager entre les communes de ce code — exactement svGeoLocal. À trancher avec Zeus : faut-il purement appeler svGeoLocal depuis editsave plutôt que d'entretenir deux résolutions divergentes ?"
+  },
   {
    "titre": "📞 Analyser TOUT appel décroché sur la ligne des donneurs d'ordre",
    "source": "Zeus 12/08 — « c'est une ligne dédiée aux donneurs d'ordre »",
