@@ -1,12 +1,34 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR DAHLIA. Éditer CE fichier suffit : l'appli le relit à chaque chargement de page, aucun rebuild (G-71/G-72).",
- "maj": "2026-08-13",
+ "maj": "2026-08-13 · fouille sources",
  "secs": [
   {
    "t": "🔴 À résoudre",
    "c": "#f87171",
    "bg": "rgba(248,113,113,.16)",
    "items": [
+    {
+     "l": "🚨 SARR N'DIOUMA — titre de séjour signalé EXPIRÉ",
+     "w": "relevé lors de la fouille conformité du 04/07, jamais remonté au RADAR · un agent sans titre valide = risque immédiat (CNAPS, pénal employeur) · À REVÉRIFIER avant toute conclusion",
+     "a": [
+      "Vérifier",
+      "POSTE : DAHLIA — vérifier le titre de séjour de SARR N'DIOUMA"
+     ],
+     "det": [
+      [
+       "Source",
+       "ATELIERS_DATA_DAHLIA · A11 Conformité (fouille du 2026-07-04)"
+      ],
+      [
+       "Statut",
+       "non revérifié depuis le 04/07 — peut avoir été régularisé"
+      ],
+      [
+       "Pourquoi c'est ici",
+       "une alerte de cette gravité n'a rien à faire enterrée dans une vue d'atelier"
+      ]
+     ]
+    },
     {
      "l": "Doublon TVA 4 576 € (gate cockpits)",
      "w": "🎛️ EN TRAITEMENT au poste · bloque les cockpits",
@@ -16,19 +38,57 @@
      ]
     },
     {
-     "l": "Appels JEX Reims ×2 — état à vérifier",
-     "w": "échéance ~13/06 passée · ⚠️ non recoupé le 13/08 — à vérifier avant d'agir",
+     "l": "⚖️ JEX Reims ×2 — le délai d'appel est passé depuis 2 mois",
+     "w": "RG 25/00045 (3BM : 1 500 € DI + art.700 + dépens) et RG 25/00044 (saisie SHINE, mainlevée) · appel ~13/06 · 500 € de frais d'avocat versés le 01/06 · UNE question à poser : l'appel a-t-il été formé ?",
+     "due": "13/06",
+     "dd": "2026-06-13",
      "a": [
       "Traiter",
       "POSTE : DAHLIA — appels JEX Reims DAHLIA"
+     ],
+     "det": [
+      [
+       "Décision Zeus du 11/06",
+       "option C — avis d'avocat ; résumé du dossier rédigé, MAJ Notion jamais écrite"
+      ],
+      [
+       "Trace bancaire",
+       "relevé DAHLIA 01/06/2026 : virement « FRAIS D'AVOCAT » 500,00 € — un avocat a donc bien été saisi"
+      ],
+      [
+       "Pièces au dossier",
+       "2 décisions scannées (8 p. chacune, 05/05 et 21/05) + Kit_contestation + Requête délai de grâce (.docx)"
+      ],
+      [
+       "⚠️ Non établi",
+       "aucune pièce ne dit si l'appel a été déposé. Si non, les décisions sont définitives."
+      ],
+      {
+       "a": "Appeler l'avocat pour l'état des 2 appels",
+       "p": "POSTE : DAHLIA — appeler l'avocat état des appels JEX RG 25/00045 et 25/00044"
+      }
      ]
     },
     {
-     "l": "Maître v62_D53 à caler dans _PILOTAGE_DAHLIA",
-     "w": "le classeur maître n'est pas au bon endroit · ⚠️ non recoupé le 13/08 — à vérifier avant d'agir",
+     "l": "Le « maître v62 » n'existe pas — c'est v56 qui est en place",
+     "w": "tranché le 13/08 : zéro fichier v62 dans toute l'arborescence · le maître réellement présent est Rapprochement_v56_par_mois_D53_MAITRE.xlsx, déjà DANS _PILOTAGE_DAHLIA",
      "a": [
       "Traiter",
-      "POSTE : DAHLIA — maître v62 DAHLIA"
+      "POSTE : DAHLIA — corriger les références au maître v62 (le maître est v56_D53)"
+     ],
+     "det": [
+      [
+       "Ce qui existe",
+       "_PILOTAGE_DAHLIA/Rapprochement_v56_par_mois_D53_MAITRE.xlsx"
+      ],
+      [
+       "Ce qui le cite à tort",
+       "ATELIERS_DATA_DAHLIA (« BASE_Paie dans maître v62 », « EMPLACEMENTS.md §DAHLIA · maître v62 »)"
+      ],
+      [
+       "À trancher",
+       "soit v62 a existé et a été perdu, soit c'est une coquille pour v56 — Zeus seul peut le dire"
+      ]
      ]
     }
    ]
@@ -55,11 +115,29 @@
      ]
     },
     {
-     "l": "Vérifier que la MED de mars (303 €) est soldée",
-     "w": "⚠️ non recoupé le 13/08 — à vérifier avant d'agir",
+     "l": "MED URSSAF de mars — 303 € : NON soldée selon les relevés",
+     "w": "tranché le 13/08 : aucun débit URSSAF sur les relevés Indy de juin ni de juillet · la piste était déjà ouverte au poste du 04/07 · MED du 29/04 au dossier",
      "a": [
-      "Vérifier",
+      "Traiter",
       "CHARGE : URSSAF DAHLIA"
+     ],
+     "det": [
+      [
+       "Pièce",
+       "COURRIER/2026/04/DAHLIA_2026-04-29_URSSAF_mise-en-demeure_303e.pdf"
+      ],
+      [
+       "Seconde MED",
+       "28/05 · 186 € (cotisations avril rejetées, clôture Qonto au 31/03)"
+      ],
+      [
+       "Relevé juin",
+       "solde de clôture 131,26 € — aucune ligne URSSAF"
+      ],
+      [
+       "Relevé juillet",
+       "solde de clôture 36,19 € — aucun mouvement"
+      ]
      ]
     },
     {
@@ -86,8 +164,8 @@
    "bg": "rgba(124,147,255,.16)",
    "items": [
     {
-     "l": "URSSAF — 337 €",
-     "w": "télépaiement · la date est passée, l'état du paiement n'est pas recoupé",
+     "l": "URSSAF — 337 € à télépayer",
+     "w": "tranché le 13/08 : 337 € = avril 178 € + mai 159 € · NON payé, et le compte ne le permet pas (36,19 € au 31/07) — c'est la relance clients qui débloque",
      "due": "03/07",
      "dd": "2026-07-03",
      "a": [
@@ -96,13 +174,27 @@
      ]
     },
     {
-     "l": "Retour URSSAF sur les remises",
-     "w": "réponse attendue · ⚠️ non recoupé le 13/08 — à vérifier avant d'agir",
+     "l": "Remises gracieuses URSSAF — aucune trace d'envoi",
+     "w": "2 courriers RÉDIGÉS (majoration avril 8 € · mai 7 €) et conservés au poste du 04/07, mais rien ne prouve qu'ils soient partis — donc pas de retour à attendre",
      "due": "11/07",
      "dd": "2026-07-11",
      "a": [
       "Traiter",
       "CHARGE : URSSAF DAHLIA"
+     ],
+     "det": [
+      [
+       "Motif invoqué",
+       "rejet de prélèvement dû à la clôture du compte Qonto le 31/03/2026, nouveau mandat SEPA posé le 25/06"
+      ],
+      [
+       "Dossier URSSAF",
+       "n° 0104948102 · SIREN 951 932 730"
+      ],
+      [
+       "À faire",
+       "confirmer l'envoi, sinon envoyer"
+      ]
      ]
     },
     {
@@ -112,6 +204,16 @@
      "a": [
       "Traiter",
       "POSTE : DAHLIA — acompte TVA juillet DAHLIA"
+     ]
+    },
+    {
+     "l": "TVA — solde CA12 2025 : 4 780 €",
+     "w": "échéance du 01/07 DÉPASSÉE · base HT 465 229 € · net TVA 15 132 € · à ne pas confondre avec l'acompte de juillet (8 322 €) ni avec le doublon de 4 576 €",
+     "due": "01/07",
+     "dd": "2026-07-01",
+     "a": [
+      "Traiter",
+      "POSTE : DAHLIA — solde CA12 2025 DAHLIA"
      ]
     }
    ]

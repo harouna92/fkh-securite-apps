@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR FKH. Éditer CE fichier suffit : l'appli le relit à chaque ouverture, aucun rebuild nécessaire (G-71/G-72). La copie inline dans la vue n'est qu'un repli hors-ligne.",
- "maj": "2026-08-13",
+ "maj": "2026-08-13 · boutons dossier",
  "secs": [
   {
    "t": "🗓️ Contrôle du mois",
@@ -256,6 +256,10 @@
        "l": "Formalité 1 · Dépôt des comptes 2025",
        "v": "31/08 · 4 pièces ✅ · 2 signatures ⏳",
        "sub": [
+        {
+         "a": "📂 Ouvrir le dossier (Explorateur)",
+         "p": "OUVRIR DOSSIER : C:\\Users\\Utilisateur\\Downloads\\FKH SECURITE CLAUDE\\FKH\\1_ETABLISSEMENT\\approbation des comptes 2025"
+        },
         [
          "PV d'affectation du 30/06",
          "🖊️ à signer — p. 3 du pack"
@@ -286,6 +290,10 @@
        "l": "Formalité 2 · Capital 1 000 → 15 000 €",
        "v": "sans date limite · 6 pièces ✅ · 1 signature ⏳ · attestation ❌",
        "sub": [
+        {
+         "a": "📂 Ouvrir le dossier (Explorateur)",
+         "p": "OUVRIR DOSSIER : C:\\Users\\Utilisateur\\Downloads\\FKH SECURITE CLAUDE\\FKH\\1_ETABLISSEMENT\\augmentation du capital social"
+        },
         [
          "Constat de réalisation définitive du 13/08",
          "🖊️ à signer — p. 5 du pack"
@@ -320,6 +328,10 @@
        "l": "Blocage transverse · 3 signatures DIANE Moussa",
        "v": "un seul aller-retour",
        "sub": [
+        {
+         "a": "📂 Ouvrir le dossier du pack à signer",
+         "p": "OUVRIR DOSSIER : C:\\Users\\Utilisateur\\Downloads\\FKH SECURITE CLAUDE\\FKH\\1_ETABLISSEMENT"
+        },
         [
          "Fichier",
          "FKH/1_ETABLISSEMENT/PACK_A_SIGNER_DIANE-Moussa_2026-08-13.pdf — 7 pages"
