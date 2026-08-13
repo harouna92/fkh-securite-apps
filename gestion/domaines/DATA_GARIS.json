@@ -1,4 +1,13 @@
 {
+ "conformite_2026": {
+  "source": "fichiers reellement presents dans le dossier courriers du domaine",
+  "lu_le": "2026-08-13 14:58",
+  "courriers": {
+   "2026-05": [
+    "GARIS_2026-05-18_LAPOSTE_avis-reception_ar87500148214085r.pdf"
+   ]
+  }
+ },
  "registre_bancaire_2026": {
   "source": "relevés PDF des dossiers du domaine, lus ligne à ligne",
   "avertissement": "registre BRUT : aucune catégorisation, aucun rapprochement. Il donne la matière, pas la comptabilité.",
@@ -2027,7 +2036,7 @@
  ],
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-13 12:30",
+  "lu_le": "2026-08-13 14:58",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",

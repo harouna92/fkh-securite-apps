@@ -1,4 +1,33 @@
 {
+ "conformite_2026": {
+  "source": "fichiers reellement presents dans le dossier courriers du domaine",
+  "lu_le": "2026-08-13 14:58",
+  "courriers": {
+   "2026-01": [
+    "DAHLIA_2026-01-05_JUSTICE_demande-releve-forclusion_RG2025JC05482.pdf"
+   ],
+   "2026-02": [
+    "DAHLIA_2026-02-06_JUSTICE_notification-ordonnance-forclusion_RG2025JC05482.pdf",
+    "DAHLIA_2026-02-16_IMPOTS_avis-mise-en-recouvrement_amr20260200169.pdf",
+    "DAHLIA_2026-02-27_IMPOTS_mise-en-demeure-payer_amr20260200169.pdf"
+   ],
+   "2026-03": [
+    "DAHLIA_2026-03-18_IMPOTS_saisie-tiers-detenteur.pdf"
+   ],
+   "2026-04": [
+    "DAHLIA_2026-04-29_URSSAF_mise-en-demeure_303e.pdf"
+   ],
+   "2026-05": [
+    "DAHLIA_2026-05-15_IMPOTS_avis-mise-en-recouvrement_amr20260500065.pdf",
+    "DAHLIA_2026-05-21_JUSTICE_decision-jex_595a9c.pdf",
+    "DAHLIA_2026-05-28_URSSAF_mise-en-demeure_186e.pdf"
+   ],
+   "2026-06": [
+    "DAHLIA_2026-06-01_CNAPS_compte-rendu-visite-controle.pdf",
+    "DAHLIA_2026-06-10_IMPOTS_mise-en-demeure-payer_MDP20260505068.pdf"
+   ]
+  }
+ },
  "registre_bancaire_2026": {
   "source": "relevés PDF des dossiers du domaine, lus ligne à ligne",
   "avertissement": "registre BRUT : aucune catégorisation, aucun rapprochement. Il donne la matière, pas la comptabilité.",
@@ -1519,7 +1548,7 @@
  ],
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-13 12:30",
+  "lu_le": "2026-08-13 14:58",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
