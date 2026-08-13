@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR DAHLIA. Éditer CE fichier suffit : l'appli le relit à chaque chargement de page, aucun rebuild (G-71/G-72).",
- "maj": "2026-08-13 · recoupé Notion",
+ "maj": "2026-08-13 · virement 1 860 €",
  "secs": [
   {
    "t": "🔴 À résoudre",
@@ -214,27 +214,51 @@
      ]
     },
     {
-     "l": "TVA — solde CA12 2025 : 4 780 € (SEULE dette TVA réelle)",
-     "w": "échéance réelle 05/05 (Notion, sourcé impots.gouv) · base HT 465 229 € · net TVA 15 132 € · demander un ÉCHÉANCIER, la trésorerie ne suit pas",
+     "l": "TVA — solde CA12 2025 : reste 2 920 € (1 860 € versés le 13/08)",
+     "w": "virement de 1 860 € émis par DAHLIA le 13/08 · libellé « declaration 3517SCA12 » + n° fiscal 951932730 · échéance initiale 05/05, les pénalités courent sur le reste",
      "due": "05/05",
      "dd": "2026-05-05",
      "a": [
       "Traiter",
-      "POSTE : DAHLIA — solde CA12 2025 DAHLIA"
+      "POSTE : DAHLIA — solde CA12 2025 : reste 2 920 € après le virement du 13/08"
      ],
      "det": [
       [
+       "Dette initiale",
+       "4 780 € — solde de la déclaration annuelle CA12 2025 (régularisation)"
+      ],
+      [
+       "Versé le 13/08/2026",
+       "1 860 € par VIREMENT (pas télépaiement)"
+      ],
+      [
+       "Reste dû",
+       "2 920 € + pénalités (5 % + 0,20 %/mois depuis le 05/05)"
+      ],
+      [
+       "Libellé du virement",
+       "declaration 3517SCA12 · n° fiscal 951932730"
+      ],
+      [
+       "⚠️ À contrôler",
+       "le libellé ne porte PAS la référence de créance : vérifier sur impots.gouv que les 1 860 € sont bien imputés sur le solde CA12 et non sur une autre dette"
+      ],
+      [
+       "Base",
+       "TVA nette due 2025 = 15 132 € · base HT 465 229 € · CA12 déposée en mai 2026"
+      ],
+      [
        "SIE",
-       "Paris 8e Madeleine · 01 56 35 92 20 · sie.paris-8e-madeleine@dgfip.finances.gouv.fr"
+       "Paris 8e Madeleine · 01 56 35 92 20"
       ],
-      [
-       "⚠️ Contradiction",
-       "Notion donne l'acompte de juillet à 6 293 € soldé ET demande au SIE de confirmer ~8 322 € — non tranché"
-      ],
-      [
-       "Trop-perçu à imputer",
-       "17 € · AMR 20260407514 / créance 202602460"
-      ]
+      {
+       "a": "Contrôler l'imputation des 1 860 €",
+       "p": "POSTE : DAHLIA — contrôle de l'imputation du virement de 1 860 € sur le solde CA12"
+      },
+      {
+       "a": "Demander un échéancier pour le reste",
+       "p": "POSTE : DAHLIA — demander au SIE un échéancier pour les 2 920 € restants du solde CA12"
+      }
      ]
     }
    ]
