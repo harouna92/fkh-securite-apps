@@ -13,12 +13,12 @@
  .hint{font-size:11px;color:#6b7480}
  .carnet{font-size:11px;font-family:ui-monospace,Menlo,monospace;padding:3px 9px;border-radius:999px;border:1px solid #2a313c;color:#6b7480;white-space:nowrap} .carnet.on{color:#34d399;border-color:#1e5540} .carnet.ko{color:#fbbf24;border-color:#5a4a1e}
 </style></head><body>
-<div class="top"><span class="brand">🌸 Appli DAHLIA</span><div class="tabs"><button class="tab on" data-v="hub" onclick="showV('hub')">Hub</button><button class="tab" data-v="carnet" onclick="showV('carnet')">📓 Carnet vivant</button><button class="tab" data-v="ccasc" onclick="showV('ccasc')">🔗 Cascade & virements</button><button class="tab" data-v="cfisc" onclick="showV('cfisc')">🧾 Fiscal & clôture</button><button class="tab" data-v="cdo" onclick="showV('cdo')">🏢 Encaissements DO</button><button class="tab" data-v="factu" onclick="showV('factu')">🧾 Facturation</button><button class="tab" data-v="admin" onclick="showV('admin')">🗂️ Administratif</button><button class="tab" data-v="ca3" onclick="showV('ca3')">🧾 CA12 / TVA</button><button class="tab" data-v="mouvements" onclick="showV('mouvements')">💳 Mouvements</button><button class="tab" data-v="etat" onclick="showV('etat')">ÉTAT</button><button class="tab" data-v="radar" onclick="showV('radar')">RADAR</button><button class="tab" data-v="pilotage" onclick="showV('pilotage')">PILOTAGE</button><button class="tab" data-v="cockdoss" onclick="showV('cockdoss')">Cockpit dossiers</button><button class="tab" data-v="briefing" onclick="showV('briefing')">Briefing auto</button><button class="tab" data-v="ech" onclick="showV('ech')">⏳ Échéances</button><button class="tab" data-v="proch" onclick="showV('proch')">▶ Prochaines actions</button><button class="tab" data-v="cockfin" onclick="showV('cockfin')">💰 Cockpit financier 🟡</button><button class="tab" data-v="atdata" onclick="showV('atdata')">📦 Données ateliers</button></div><span class="hint" style="margin-left:auto">clic = navigue · action = commande à copier</span><span class="carnet" id="rolebadge" style="display:none;color:#fbbf24;border-color:#5a4a1e" title="Rôle admin : seule la vue Administratif est accessible">rôle admin — vue unique</span><span class="carnet" id="tampon" title="Moment où ce cockpit a été assemblé — s'il diffère de ce que Claude annonce, la version en ligne n'est pas la sienne">assemblé 13/08 18:15</span><span class="carnet" id="carnet" title="Carnet lu sur le Drive et diffusé à toutes les vues">carnet…</span></div>
+<div class="top"><span class="brand">🌸 Appli DAHLIA</span><div class="tabs"><button class="tab on" data-v="hub" onclick="showV('hub')">Hub</button><button class="tab" data-v="carnet" onclick="showV('carnet')">📓 Carnet vivant</button><button class="tab" data-v="ccasc" onclick="showV('ccasc')">🔗 Cascade & virements</button><button class="tab" data-v="cfisc" onclick="showV('cfisc')">🧾 Fiscal & clôture</button><button class="tab" data-v="cdo" onclick="showV('cdo')">🏢 Encaissements DO</button><button class="tab" data-v="factu" onclick="showV('factu')">🧾 Facturation</button><button class="tab" data-v="admin" onclick="showV('admin')">🗂️ Administratif</button><button class="tab" data-v="ca3" onclick="showV('ca3')">🧾 CA12 / TVA</button><button class="tab" data-v="mouvements" onclick="showV('mouvements')">💳 Mouvements</button><button class="tab" data-v="etat" onclick="showV('etat')">ÉTAT</button><button class="tab" data-v="radar" onclick="showV('radar')">RADAR</button><button class="tab" data-v="pilotage" onclick="showV('pilotage')">PILOTAGE</button><button class="tab" data-v="cockdoss" onclick="showV('cockdoss')">Cockpit dossiers</button><button class="tab" data-v="briefing" onclick="showV('briefing')">Briefing auto</button><button class="tab" data-v="ech" onclick="showV('ech')">⏳ Échéances</button><button class="tab" data-v="proch" onclick="showV('proch')">▶ Prochaines actions</button><button class="tab" data-v="cockfin" onclick="showV('cockfin')">💰 Cockpit financier 🟡</button><button class="tab" data-v="atdata" onclick="showV('atdata')">📦 Données ateliers</button></div><span class="hint" style="margin-left:auto">clic = navigue · action = commande à copier</span><span class="carnet" id="rolebadge" style="display:none;color:#fbbf24;border-color:#5a4a1e" title="Rôle admin : seule la vue Administratif est accessible">rôle admin — vue unique</span><span class="carnet" id="tampon" title="Moment où ce cockpit a été assemblé — s'il diffère de ce que Claude annonce, la version en ligne n'est pas la sienne">assemblé 13/08 19:14</span><span class="carnet" id="carnet" title="Carnet lu sur le Drive et diffusé à toutes les vues">carnet…</span></div>
 <div><iframe id="if-hub" class="vframe" srcdoc="<!DOCTYPE html><html lang=&quot;fr&quot;><head><style>[class*=&quot;ti-&quot;]::before{content:&quot;&quot;!important}.ico{font-style:normal;display:inline-block}</style><script>function sendPrompt(t){try{parent.postMessage({__cmd:String(t)},&quot;*&quot;)}catch(e){}}</script><script>window.CARNET=(function(){var cbs=[],last=null,seq=0,pend={};function fire(){cbs.forEach(function(f){try{f(last)}catch(e){}})}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined){last={data:d.__data||null,err:d.__err||null,at:d.__at||null,src:d.__src||null};fire();}if(d.__mcpres&amp;&amp;pend[d.__mcpres.id]){pend[d.__mcpres.id].ok(d.__mcpres.payload);delete pend[d.__mcpres.id];}if(d.__mcperr&amp;&amp;pend[d.__mcperr.id]){pend[d.__mcperr.id].ko({code:d.__mcperr.code});delete pend[d.__mcperr.id];}});var solo=(window.parent===window);function ask(){if(solo){setTimeout(function(){last={data:null,err:&quot;__hors_appli&quot;,at:null};fire();},0);return;}try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(e){}}return{onData:function(f){cbs.push(f);if(last){try{f(last)}catch(e){}}else ask();},ask:ask,nb:function(){return cbs.length},mcp:function(tool,input){var id=++seq;return new Promise(function(ok,ko){pend[id]={ok:ok,ko:ko};try{parent.postMessage({__mcp:{id:id,tool:tool,input:input}},&quot;*&quot;)}catch(e){ko({code:&quot;bad_request&quot;})}setTimeout(function(){if(pend[id]){pend[id].ko({code:&quot;upstream_error&quot;});delete pend[id];}},45000);})},explain:function(c){switch(c){case &quot;__absent&quot;:return &quot;DATA_DAHLIA.json pas encore visible sur le Drive \u2014 la synchronisation peut prendre quelques minutes.&quot;;case &quot;__illisible&quot;:return &quot;DATA_DAHLIA.json trouv\u00e9 mais illisible : le connecteur en a alt\u00e9r\u00e9 le format.&quot;;case &quot;__vide&quot;:return &quot;Carnet lu, mais ce bloc y est vide \u2014 relancer build_data_dahlia.py.&quot;;case &quot;server_not_connected&quot;:return &quot;Aucun connecteur Google Drive \u2014 \u00e0 ajouter dans R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;needs_reauth&quot;:return &quot;Connecteur Google Drive \u00e0 reconnecter : R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;selection_required&quot;:return &quot;Plusieurs comptes Drive : en choisir un dans l\u2019invite d\u2019ouverture.&quot;;case &quot;server_unavailable&quot;:return &quot;Drive momentan\u00e9ment injoignable \u2014 derniers chiffres conserv\u00e9s.&quot;;case &quot;capability_disabled&quot;:case &quot;not_granted&quot;:case &quot;capability_removed&quot;:return &quot;Cette page n\u2019a pas re\u00e7u le pont connecteur dans cette session.&quot;;case &quot;__hors_appli&quot;:return &quot;Vue ouverte hors de l\u2019appli \u2014 chiffres fig\u00e9s.&quot;;case &quot;__lecture&quot;:return &quot;Lecture de DATA_DAHLIA.json en cours\u2026&quot;;default:return &quot;Lecture impossible (&quot;+c+&quot;).&quot;;}}};})();window.DAHLIA=window.CARNET;</script><style>#fkhfrais{position:sticky;bottom:0;z-index:99;font:11.5px/1.5 ui-monospace,Menlo,monospace;padding:5px 12px;border-top:1px solid #2a313c;background:#0e1116;color:#6b7480;display:flex;gap:8px;flex-wrap:wrap}#fkhfrais b{font-weight:600}.fkhv{color:#34d399}.fkhf{color:#fbbf24}</style><script>(function(){function pose(){var e=document.getElementById(&quot;fkhfrais&quot;);if(!e){e=document.createElement(&quot;div&quot;);e.id=&quot;fkhfrais&quot;;document.body.appendChild(e);}return e;}function dit(s){var e=pose(),vit=s&amp;&amp;s.data&amp;&amp;(s.src===&quot;fichier&quot;||s.src===&quot;drive&quot;),sert=(window.__UTILISE_CARNET__===true)||(function(){try{return window.CARNET.nb()>0}catch(_){return false}})();var h=s&amp;&amp;s.at?new Date(s.at).toLocaleTimeString(&quot;fr-FR&quot;):&quot;&quot;;e.innerHTML=(vit?'<span class=&quot;fkhv&quot;>\u25cf carnet DAHLIA lu '+h+&quot;</span>&quot;:'<span class=&quot;fkhf&quot;>\u25cb carnet DAHLIA NON lu \u2014 chiffres fig\u00e9s dans la page</span>')+(sert?&quot;<span>\u00b7 cette vue s'en sert</span>&quot;:(window.__PAGE_NAV__===true?&quot;<span>\u00b7 page de navigation \u2014 aucune donn\u00e9e \u00e0 rafra\u00eechir</span>&quot;:'<span class=&quot;fkhf&quot;>\u00b7 cette vue ne s\u2019en sert PAS ENCORE \u2014 son contenu date de sa g\u00e9n\u00e9ration</span>'));}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined)dit({data:d.__data||null,at:d.__at||null,src:d.__src||null});});function go(){dit(null);try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(_){}}if(document.readyState===&quot;loading&quot;)document.addEventListener(&quot;DOMContentLoaded&quot;,go);else go();})();</script><script>(function(){window.__ROLE__=window.__ROLE__||null;window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__role!==undefined){var av=window.__ROLE__;window.__ROLE__=d.__role||null;if(av!==window.__ROLE__&amp;&amp;typeof window.__onRole===&quot;function&quot;){try{window.__onRole(window.__ROLE__)}catch(_){}}}});function ask(){try{parent.postMessage({__wantrole:1},&quot;*&quot;)}catch(_){}}if(document.readyState===&quot;loading&quot;)document.addEventListener(&quot;DOMContentLoaded&quot;,ask);else ask();window.addEventListener(&quot;load&quot;,ask);})();</script><script>(function(){window.__pubEtat={envoye:null,err:null};window.__pubSync=function(liste,cb){ var up=null,pret=null; try{up=window.top.fkhUpload;pret=window.top.fkhPret;}catch(e){} if(typeof up!==&quot;function&quot;||typeof pret!==&quot;function&quot;||!pret()){  window.__pubEtat={envoye:null,err:&quot;hors_appli&quot;}; if(cb)cb({ok:false,err:&quot;hors_appli&quot;}); return; } var b; try{ b=new Blob([JSON.stringify(liste||[])],{type:&quot;application/json&quot;}); } catch(e){ if(cb)cb({ok:false,err:&quot;blob&quot;}); return; } up(&quot;admin/publications/DAHLIA.json&quot;, b, function(j){  var ok=!!(j&amp;&amp;j.ok); window.__pubEtat={envoye:ok?new Date().toISOString():null,err:ok?null:&quot;envoi&quot;};  try{ var m={__pubsync:{dom:&quot;DAHLIA&quot;,ok:ok}}; parent.postMessage(m,&quot;*&quot;);       var fr=parent.frames; for(var i=0;i<fr.length;i++){ if(fr[i]!==window) fr[i].postMessage(m,&quot;*&quot;); } }catch(_){}  if(cb)cb({ok:ok}); });};})();</script><script>
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -47,7 +47,11 @@
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -179,12 +183,56 @@
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -207,7 +255,7 @@
 <div class=&quot;sec&quot;>🚨 POINTS CHAUDS</div><div class=&quot;grid&quot;>
 <div class=&quot;tile&quot; onclick=&quot;sendPrompt('POSTE : PAS DAHLIA')&quot;><div class=&quot;tt2&quot; style=&quot;color:var(--warn)&quot;>🧾 Impôts DAHLIA — TVA 4 780 € + PAS 23 €</div><div class=&quot;td&quot;>TVA due = solde CA12 4 780 €. Acomptes déc 4576 + juil 6293 SOLDÉS. PAS : mars payé, fév 12 + avr 11 (appel SIE). RIB à refaire.</div></div>
 <div class=&quot;tile&quot; onclick=&quot;sendPrompt('VUE : Poste')&quot;><div class=&quot;tt2&quot; style=&quot;color:var(--warn)&quot;>🏛️ URSSAF — 337 € + remises</div><div class=&quot;td&quot;>Échéance 03/07 dépassée · 2 remises envoyées 04/07 · retour attendu 11/07.</div></div>
-<div class=&quot;tile&quot; onclick=&quot;sendPrompt('TRAITER : appels JEX Reims DAHLIA')&quot;><div class=&quot;tt2&quot;>⚖️ JEX Reims ×2 (3BM)</div><div class=&quot;td&quot;>RG 25/00045 + 25/00044 · appels ~13/06 — état à vérifier.</div></div>
+<div class=&quot;tile&quot; onclick=&quot;sendPrompt('TRAITER : appels JEX Reims DAHLIA')&quot;><div class=&quot;tt2&quot;>⚖️ JEX Reims ×2 (3BM)</div><div class=&quot;td&quot;>RG …45 + 25/00044 · appels ~13/06 — état à vérifier.</div></div>
 <div class=&quot;tile&quot; onclick=&quot;sendPrompt('TRAITER : accès PayFit DAHLIA')&quot;><div class=&quot;tt2&quot;>👥 PayFit</div><div class=&quot;td&quot;>Payé le 10/06 — accès à débloquer.</div></div>
 </div>
 <div class=&quot;sec&quot;>🗓️ ÉCHÉANCES RÉGLEMENTAIRES</div><div class=&quot;grid&quot;><div class=&quot;tile&quot; onclick=&quot;sendPrompt('RADAR')&quot;><div class=&quot;tt2&quot;>🧾 Comptes 2025</div><div class=&quot;td&quot;>déposés ✅ 10/06/2026 (clôture 31/12)</div></div><div class=&quot;tile&quot; onclick=&quot;sendPrompt('RADAR')&quot;><div class=&quot;tt2&quot;>⚖️ Prochains comptes 2026</div><div class=&quot;td&quot;>approbation 30/06/2027 · dépôt greffe ~31/07/2027</div></div><div class=&quot;tile&quot; onclick=&quot;sendPrompt('RADAR')&quot;><div class=&quot;tt2&quot;>🧾 Factu. élec. — réception</div><div class=&quot;td&quot;>01/09/2026 · choisir une PDP</div></div><div class=&quot;tile&quot; onclick=&quot;sendPrompt('RADAR')&quot;><div class=&quot;tt2&quot;>📤 Factu. élec. — émission</div><div class=&quot;td&quot;>01/09/2027 + e-reporting</div></div></div>
@@ -232,7 +280,7 @@
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -261,7 +309,11 @@
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -393,12 +445,56 @@
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -488,7 +584,7 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -517,7 +613,11 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -649,12 +749,56 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -744,7 +888,7 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -773,7 +917,11 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -905,12 +1053,56 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -1000,7 +1192,7 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -1029,7 +1221,11 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -1161,12 +1357,56 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -1256,7 +1496,7 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -1285,7 +1525,11 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -1417,12 +1661,56 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -1477,7 +1765,7 @@ function render(){document.getElementById('app').innerHTML=(!DATA)?'<div class=&
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -1506,7 +1794,11 @@ function render(){document.getElementById('app').innerHTML=(!DATA)?'<div class=&
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -1638,12 +1930,56 @@ function render(){document.getElementById('app').innerHTML=(!DATA)?'<div class=&
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -1983,7 +2319,7 @@ function decor(){
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -2012,7 +2348,11 @@ function decor(){
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -2144,12 +2484,56 @@ function decor(){
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -2193,7 +2577,7 @@ function render(){ if(!DATA){document.getElementById('app').innerHTML='<div clas
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -2222,7 +2606,11 @@ function render(){ if(!DATA){document.getElementById('app').innerHTML='<div clas
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -2354,12 +2742,56 @@ function render(){ if(!DATA){document.getElementById('app').innerHTML='<div clas
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -2443,7 +2875,7 @@ document.getElementById('q').addEventListener('input',rendre);
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -2472,7 +2904,11 @@ document.getElementById('q').addEventListener('input',rendre);
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -2604,12 +3040,56 @@ document.getElementById('q').addEventListener('input',rendre);
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -2785,7 +3265,7 @@ document.addEventListener('click',function(ev){
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -2814,7 +3294,11 @@ document.addEventListener('click',function(ev){
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -2946,12 +3430,56 @@ document.addEventListener('click',function(ev){
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -3031,7 +3559,7 @@ function detHTML(det,pid){return det.map(function(d,j){
 const VIEWS=[['Hub','ti-compass',0],['RADAR','ti-radar',1],['PILOTAGE','ti-chart-dots',0],['Promenade','ti-compass',0],['Toile FKH','ti-affiliate',0],['Cockpit dossiers','ti-folders',0],['Cockpit financier FKH','ti-cash',0],['Briefing auto','ti-activity',0]];
 const PAIE=[1,1,1,1,1,1,2,0,0,0,0,0];
 const PC={1:'var(--ok)',2:'var(--warn)',0:'var(--line)'};
-const SECS=[{&quot;t&quot;: &quot;🔴 À résoudre&quot;, &quot;c&quot;: &quot;#f87171&quot;, &quot;bg&quot;: &quot;rgba(248,113,113,.16)&quot;, &quot;items&quot;: [{&quot;l&quot;: &quot;Doublon TVA 4 576 € (gate cockpits)&quot;, &quot;w&quot;: &quot;🎛️ EN TRAITEMENT au poste · bloque les cockpits&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;POSTE : DAHLIA — doublon TVA 4576 DAHLIA&quot;]}, {&quot;l&quot;: &quot;Appels JEX Reims ×2 — état à vérifier&quot;, &quot;w&quot;: &quot;échéance ~13/06 passée · ⚠️ non recoupé le 13/08 — à vérifier avant d'agir&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;POSTE : DAHLIA — appels JEX Reims DAHLIA&quot;]}, {&quot;l&quot;: &quot;Maître v62_D53 à caler dans _PILOTAGE_DAHLIA&quot;, &quot;w&quot;: &quot;le classeur maître n'est pas au bon endroit · ⚠️ non recoupé le 13/08 — à vérifier avant d'agir&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;POSTE : DAHLIA — maître v62 DAHLIA&quot;]}]}, {&quot;t&quot;: &quot;🟠 À faire&quot;, &quot;c&quot;: &quot;#fb923c&quot;, &quot;bg&quot;: &quot;rgba(251,146,60,.16)&quot;, &quot;items&quot;: [{&quot;l&quot;: &quot;Acompte TVA juillet — solde CA12 + avis + télépaiement 8 322 €&quot;, &quot;w&quot;: &quot;🎛️ en traitement&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;CHARGE : acompte TVA juillet DAHLIA&quot;]}, {&quot;l&quot;: &quot;Relancer les clients (trésorerie) → télépayer 337 €&quot;, &quot;w&quot;: &quot;la relance conditionne le paiement URSSAF&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;CHARGE : URSSAF DAHLIA&quot;]}, {&quot;l&quot;: &quot;Vérifier que la MED de mars (303 €) est soldée&quot;, &quot;w&quot;: &quot;⚠️ non recoupé le 13/08 — à vérifier avant d'agir&quot;, &quot;a&quot;: [&quot;Vérifier&quot;, &quot;CHARGE : URSSAF DAHLIA&quot;]}, {&quot;l&quot;: &quot;Débloquer l'accès PayFit&quot;, &quot;w&quot;: &quot;à dater&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;POSTE : DAHLIA — accès PayFit DAHLIA&quot;]}, {&quot;l&quot;: &quot;Lister les donneurs d'ordre DAHLIA&quot;, &quot;w&quot;: &quot;à dater · alimente le carnet et la facturation&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;POSTE : DAHLIA — DO DAHLIA&quot;]}]}, {&quot;t&quot;: &quot;⏳ Échéances&quot;, &quot;c&quot;: &quot;#7c93ff&quot;, &quot;bg&quot;: &quot;rgba(124,147,255,.16)&quot;, &quot;items&quot;: [{&quot;l&quot;: &quot;URSSAF — 337 €&quot;, &quot;w&quot;: &quot;télépaiement · la date est passée, l'état du paiement n'est pas recoupé&quot;, &quot;due&quot;: &quot;03/07&quot;, &quot;dd&quot;: &quot;2026-07-03&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;CHARGE : URSSAF DAHLIA&quot;]}, {&quot;l&quot;: &quot;Retour URSSAF sur les remises&quot;, &quot;w&quot;: &quot;réponse attendue · ⚠️ non recoupé le 13/08 — à vérifier avant d'agir&quot;, &quot;due&quot;: &quot;11/07&quot;, &quot;dd&quot;: &quot;2026-07-11&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;CHARGE : URSSAF DAHLIA&quot;]}, {&quot;l&quot;: &quot;Acompte TVA juillet — 8 322 €&quot;, &quot;w&quot;: &quot;à télépayer&quot;, &quot;due&quot;: &quot;juillet&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;POSTE : DAHLIA — acompte TVA juillet DAHLIA&quot;]}]}, {&quot;t&quot;: &quot;🧾 Facturation&quot;, &quot;c&quot;: &quot;#34d399&quot;, &quot;bg&quot;: &quot;rgba(52,211,153,.16)&quot;, &quot;items&quot;: [{&quot;l&quot;: &quot;Nouveau RIB Shine — toute facture à partir de juin 2026&quot;, &quot;w&quot;: &quot;IBAN [RETIRE] · BIC SNNNFR22XXX — le SWAN DAHLIA est FERMÉ, ne plus jamais l'utiliser&quot;, &quot;det&quot;: [[&quot;Ancien compte (SWAN)&quot;, &quot;…0013 5141 2706 678 — FERMÉ&quot;], [&quot;À contrôler&quot;, &quot;toute facture DAHLIA émise depuis juin 2026 porte-t-elle le bon IBAN ?&quot;]]}]}];
+const SECS=[{&quot;t&quot;: &quot;🔴 À résoudre&quot;, &quot;c&quot;: &quot;#f87171&quot;, &quot;bg&quot;: &quot;rgba(248,113,113,.16)&quot;, &quot;items&quot;: [{&quot;l&quot;: &quot;Doublon TVA 4 576 € (gate cockpits)&quot;, &quot;w&quot;: &quot;🎛️ EN TRAITEMENT au poste · bloque les cockpits&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;POSTE : DAHLIA — doublon TVA 4576 DAHLIA&quot;]}, {&quot;l&quot;: &quot;Appels JEX Reims ×2 — état à vérifier&quot;, &quot;w&quot;: &quot;échéance ~13/06 passée · ⚠️ non recoupé le 13/08 — à vérifier avant d'agir&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;POSTE : DAHLIA — appels JEX Reims DAHLIA&quot;]}, {&quot;l&quot;: &quot;Maître v62_D53 à caler dans _PILOTAGE_DAHLIA&quot;, &quot;w&quot;: &quot;le classeur maître n'est pas au bon endroit · ⚠️ non recoupé le 13/08 — à vérifier avant d'agir&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;POSTE : DAHLIA — maître v62 DAHLIA&quot;]}]}, {&quot;t&quot;: &quot;🟠 À faire&quot;, &quot;c&quot;: &quot;#fb923c&quot;, &quot;bg&quot;: &quot;rgba(251,146,60,.16)&quot;, &quot;items&quot;: [{&quot;l&quot;: &quot;Acompte TVA juillet — solde CA12 + avis + télépaiement 8 322 €&quot;, &quot;w&quot;: &quot;🎛️ en traitement&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;CHARGE : acompte TVA juillet DAHLIA&quot;]}, {&quot;l&quot;: &quot;Relancer les clients (trésorerie) → télépayer 337 €&quot;, &quot;w&quot;: &quot;la relance conditionne le paiement URSSAF&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;CHARGE : URSSAF DAHLIA&quot;]}, {&quot;l&quot;: &quot;Vérifier que la MED de mars (303 €) est soldée&quot;, &quot;w&quot;: &quot;⚠️ non recoupé le 13/08 — à vérifier avant d'agir&quot;, &quot;a&quot;: [&quot;Vérifier&quot;, &quot;CHARGE : URSSAF DAHLIA&quot;]}, {&quot;l&quot;: &quot;Débloquer l'accès PayFit&quot;, &quot;w&quot;: &quot;à dater&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;POSTE : DAHLIA — accès PayFit DAHLIA&quot;]}, {&quot;l&quot;: &quot;Lister les donneurs d'ordre DAHLIA&quot;, &quot;w&quot;: &quot;à dater · alimente le carnet et la facturation&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;POSTE : DAHLIA — DO DAHLIA&quot;]}]}, {&quot;t&quot;: &quot;⏳ Échéances&quot;, &quot;c&quot;: &quot;#7c93ff&quot;, &quot;bg&quot;: &quot;rgba(124,147,255,.16)&quot;, &quot;items&quot;: [{&quot;l&quot;: &quot;URSSAF — 337 €&quot;, &quot;w&quot;: &quot;télépaiement · la date est passée, l'état du paiement n'est pas recoupé&quot;, &quot;due&quot;: &quot;03/07&quot;, &quot;dd&quot;: &quot;2026-07-03&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;CHARGE : URSSAF DAHLIA&quot;]}, {&quot;l&quot;: &quot;Retour URSSAF sur les remises&quot;, &quot;w&quot;: &quot;réponse attendue · ⚠️ non recoupé le 13/08 — à vérifier avant d'agir&quot;, &quot;due&quot;: &quot;11/07&quot;, &quot;dd&quot;: &quot;2026-07-11&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;CHARGE : URSSAF DAHLIA&quot;]}, {&quot;l&quot;: &quot;Acompte TVA juillet — 8 322 €&quot;, &quot;w&quot;: &quot;à télépayer&quot;, &quot;due&quot;: &quot;juillet&quot;, &quot;a&quot;: [&quot;Traiter&quot;, &quot;POSTE : DAHLIA — acompte TVA juillet DAHLIA&quot;]}]}, {&quot;t&quot;: &quot;🧾 Facturation&quot;, &quot;c&quot;: &quot;#34d399&quot;, &quot;bg&quot;: &quot;rgba(52,211,153,.16)&quot;, &quot;items&quot;: [{&quot;l&quot;: &quot;Nouveau RIB Shine — toute facture à partir de juin 2026&quot;, &quot;w&quot;: &quot;IBAN IBAN au dossier interne · BIC SNNNFR22XXX — le SWAN DAHLIA est FERMÉ, ne plus jamais l'utiliser&quot;, &quot;det&quot;: [[&quot;Ancien compte (SWAN)&quot;, &quot;…0013 5141 2706 678 — FERMÉ&quot;], [&quot;À contrôler&quot;, &quot;toute facture DAHLIA émise depuis juin 2026 porte-t-elle le bon IBAN ?&quot;]]}]}];
 function jrs(iso,dm){var t=new Date();t.setHours(0,0,0,0);var d;
  if(dm){d=new Date(t.getFullYear(),t.getMonth(),dm);if(d<t)d=new Date(t.getFullYear(),t.getMonth()+1,dm);}
  else{var p=iso.split('-');d=new Date(+p[0],+p[1]-1,+p[2]);}
@@ -3135,7 +3663,7 @@ document.getElementById('addBesoin').onclick=()=>{const v=document.getElementByI
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -3164,7 +3692,11 @@ document.getElementById('addBesoin').onclick=()=>{const v=document.getElementByI
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -3296,12 +3828,56 @@ document.getElementById('addBesoin').onclick=()=>{const v=document.getElementByI
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -3359,7 +3935,7 @@ function fill(d){
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -3388,7 +3964,11 @@ function fill(d){
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -3520,12 +4100,56 @@ function fill(d){
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -3549,7 +4173,7 @@ td{padding:5px;text-align:center;border-top:1px solid var(--line)}td:first-child
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -3578,7 +4202,11 @@ td{padding:5px;text-align:center;border-top:1px solid var(--line)}td:first-child
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -3710,12 +4338,56 @@ td{padding:5px;text-align:center;border-top:1px solid var(--line)}td:first-child
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -3739,7 +4411,7 @@ td{padding:5px;text-align:center;border-top:1px solid var(--line)}td:first-child
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -3768,7 +4440,11 @@ td{padding:5px;text-align:center;border-top:1px solid var(--line)}td:first-child
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -3900,12 +4576,56 @@ td{padding:5px;text-align:center;border-top:1px solid var(--line)}td:first-child
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -3961,7 +4681,7 @@ function fill(d){
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -3990,7 +4710,11 @@ function fill(d){
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -4122,12 +4846,56 @@ function fill(d){
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -4297,7 +5065,7 @@ render();
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -4326,7 +5094,11 @@ render();
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -4458,12 +5230,56 @@ render();
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -4502,7 +5318,7 @@ document.getElementById('L').innerHTML=L.map(function(x){return '<div class=&quo
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -4531,7 +5347,11 @@ document.getElementById('L').innerHTML=L.map(function(x){return '<div class=&quo
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -4663,12 +5483,56 @@ document.getElementById('L').innerHTML=L.map(function(x){return '<div class=&quo
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -4700,7 +5564,7 @@ document.getElementById('L').innerHTML=A.map(function(x){var c=x.w==='à faire'?
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -4729,7 +5593,11 @@ document.getElementById('L').innerHTML=A.map(function(x){var c=x.w==='à faire'?
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -4861,12 +5729,56 @@ document.getElementById('L').innerHTML=A.map(function(x){var c=x.w==='à faire'?
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -4946,7 +5858,7 @@ function fill(d){
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -4975,7 +5887,11 @@ function fill(d){
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -5107,12 +6023,56 @@ function fill(d){
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -5128,12 +6088,12 @@ function fill(d){
 .ah{cursor:pointer;padding:9px 12px;display:flex;gap:8px;align-items:center;font-size:12.5px;font-weight:600}
 .ah:hover{background:var(--card2)}.ab{padding:0 12px 10px;font-size:11.5px;color:var(--ts);line-height:1.65;display:none}
 .ab b{color:var(--tp)}.src{font-size:9.5px;color:var(--tt)}
-.b{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600;margin-left:auto}</style></head><body><div style=&quot;font-size:15px;font-weight:600;&quot;>📦 Ateliers — données DAHLIA</div><div class=&quot;h&quot;>les instances réelles des 8 ateliers (les moules restent dans les onglets Atelier n)</div><div id=&quot;A&quot;><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b0');b.style.display=b.style.display==='block'?'none':'block'&quot;>📬 A1 · Courriers<span class=&quot;b&quot; style=&quot;background:var(--ok)20;color:var(--ok)&quot;>22 pièces</span></div><div class=&quot;ab&quot; id=&quot;b0&quot;><b>22 courriers téléchargés</b> (2025-2026) + 3 résumés · livreur Kandbaz 7h45/19h45 ✅.<br>Clés reçus : mises en recouvrement TVA (14/11, 15/12), forclusion RG2025JC05482 (05/01→06/02), MED TVA (16+27/02), <b>décision JEX Reims saisie SHINE (05/05)</b>.<br><span class=src>DAHLIA/COURRIER/*</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b1');b.style.display=b.style.display==='block'?'none':'block'&quot;>📝 A2 · Tâches<span class=&quot;b&quot; style=&quot;background:var(--warn)20;color:var(--warn)&quot;>4 chantiers</span></div><div class=&quot;ab&quot; id=&quot;b1&quot;>JEX ×2 (RG 25/00045+44, appels ~13/06) · dette TVA déc. · URSSAF ×2 · PayFit à débloquer.<br><span class=src>(db) mes taches filtre DAHLIA · MAINTENANCE_DAHLIA</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b2');b.style.display=b.style.display==='block'?'none':'block'&quot;>🧾 A7 · TVA<span class=&quot;b&quot; style=&quot;background:var(--dang)20;color:var(--dang)&quot;>4 780 € dû</span></div><div class=&quot;ab&quot; id=&quot;b2&quot;><b>CA12 2025 déposée</b> — base HT 465 229 € · net TVA 15 132 € · <b>solde 4 780 €</b> (éch. 01/07 DÉPASSÉE — vérifier paiement !) · acomptes 2026 : juil <b>8 322 €</b> + déc <b>6 053 €</b> · transition RSI→CA3 à confirmer.<br><span class=src>MAINTENANCE_DAHLIA · CA12</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b3');b.style.display=b.style.display==='block'?'none':'block'&quot;>💶 A8 · Facturation DO<span class=&quot;b&quot; style=&quot;background:var(--ok)20;color:var(--ok)&quot;>236 factures · 16 clients</span></div><div class=&quot;ab&quot; id=&quot;b3&quot;><b>236 factures</b> F-000001→F-000628 (2023 : 5 · 2024 : 124 · 2025 : 86 · 2026 : 21 jan→mai).<br><b>16 donneurs d'ordre</b> : OGERIS (~30) · IGS-21 (~25) · NATIONAL FRANCE (~20) · AGIR (~16) · PHARMACIE (15) · ADN (~10) · SPIG (~10) · PACK (~8) · LA HAUTE POMPIGNANE (forfait 98 h/mois) · FKH · FRANCE GARDIENNAGE · SINCOB · EURO PROTECTION · PROVENCIA · COPS…<br><span class=src>DAHLIA/FACTURATION DONNEUR D'ORDRE/2023-2026</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b4');b.style.display=b.style.display==='block'?'none':'block'&quot;>🧬 A9 · Cascade ST<span class=&quot;b&quot; style=&quot;background:var(--info)20;color:var(--info)&quot;>6 ST · GARIS actif</span></div><div class=&quot;ab&quot; id=&quot;b4&quot;>CG 18,15 (oct 23→17/06/24) <b style='color:var(--dang)'>déficit 55 034,21</b> · JADIS (→28/02/25) soldé 35 575,76 · HIS (28/02→25/06/25) soldé 7 742,15 · GALOIS (11/07/24→15/09/25) soldé 178 404,70 · DIANTRA (27/09/25→31/01/26) soldé 36 474,60 <b style='color:var(--warn)'>⚠️ jan+fév alloués non virés</b> · <b>GARIS 18,50</b> (13/11/25→actif).<br>26 factures ST classées (CG-004…094 · HIS-2025-031/33 · GAL · D2025/26 · GS).<br>⚠️ Anomalies D53 : sur-allocation DIANTRA (26 974,52 + 21 638,42) · divergences GARIS (96 819,39 vs 86 282,43).<br><span class=src>DAHLIA.md master · CONTRATS SOUS TRAITANCE</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b5');b.style.display=b.style.display==='block'?'none':'block'&quot;>🔁 A10 · Rapprochement<span class=&quot;b&quot; style=&quot;background:var(--warn)20;color:var(--warn)&quot;>doublon relevés</span></div><div class=&quot;ab&quot; id=&quot;b5&quot;>Qonto (clôturé 31/03/26) → SWAN + Indy · casier canonique : <b>relevé de compte dahlia/AAAA/</b> ✅ · 🔴 doublon <b>RELEVE DE COMPTE BANCAIRE/ (32 fichiers)</b> à nettoyer après vérif · GATE : doublon TVA 4 576 € (SATD vs majoration SIE).<br><span class=src>EMPLACEMENTS.md §DAHLIA · maître v62</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b6');b.style.display=b.style.display==='block'?'none':'block'&quot;>📋 A11 · Conformité<span class=&quot;b&quot; style=&quot;background:var(--dang)20;color:var(--dang)&quot;>alerte agent</span></div><div class=&quot;ab&quot; id=&quot;b6&quot;>AUT-075-2122-09-19-20230875706 ✓ · <b style='color:var(--dang)'>ALERTE : SARR N'DIOUMA — titre de séjour EXPIRÉ</b> · dossiers CNAPS DIANTRA + GARIS à compléter · 6 dossiers ST complets (agréments + AUT + contrats v5-v8).<br><span class=src>DAHLIA.md · SOUS TRAITANT DAHLIA/</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b7');b.style.display=b.style.display==='block'?'none':'block'&quot;>👥 A12 · Paie<span class=&quot;b&quot; style=&quot;background:var(--warn)20;color:var(--warn)&quot;>4 agents</span></div><div class=&quot;ab&quot; id=&quot;b7&quot;><b>4 agents actifs</b> · PayFit payé 10/06, <b>accès à débloquer</b> · dossiers agents structurés (cartes pro, contrats, DPAE) · BASE_Paie dans maître v62.<br><span class=src>PERSONNEL DAHLIA/ · MAINTENANCE_DAHLIA</span></div></div></div><div class=&quot;h&quot; style=&quot;margin-top:8px&quot;>clic sur un atelier = déplier · données réelles sourcées (fouille 2026-07-04) · rien d inventé</div><script>(function(){var id=&quot;atdata&quot;;function r(){try{parent.postMessage({__id:id,__h:document.documentElement.scrollHeight||document.body.scrollHeight},&quot;*&quot;)}catch(e){}}window.addEventListener(&quot;load&quot;,function(){r();setTimeout(r,300);try{new MutationObserver(r).observe(document.body,{subtree:true,childList:true,attributes:true})}catch(e){}});document.addEventListener(&quot;click&quot;,function(){setTimeout(r,60);setTimeout(r,250)});window.addEventListener(&quot;message&quot;,function(e){if(e&amp;&amp;e.data&amp;&amp;e.data.__ask){r();setTimeout(r,150);setTimeout(r,400)}});setTimeout(r,900);setTimeout(r,1800);})();</script></body></html>" style="display:none"></iframe>
+.b{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600;margin-left:auto}</style></head><body><div style=&quot;font-size:15px;font-weight:600;&quot;>📦 Ateliers — données DAHLIA</div><div class=&quot;h&quot;>les instances réelles des 8 ateliers (les moules restent dans les onglets Atelier n)</div><div id=&quot;A&quot;><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b0');b.style.display=b.style.display==='block'?'none':'block'&quot;>📬 A1 · Courriers<span class=&quot;b&quot; style=&quot;background:var(--ok)20;color:var(--ok)&quot;>22 pièces</span></div><div class=&quot;ab&quot; id=&quot;b0&quot;><b>22 courriers téléchargés</b> (2025-2026) + 3 résumés · livreur Kandbaz 7h45/19h45 ✅.<br>Clés reçus : mises en recouvrement TVA (14/11, 15/12), forclusion RG2025JC05482 (05/01→06/02), MED TVA (16+27/02), <b>décision JEX Reims saisie SHINE (05/05)</b>.<br><span class=src>DAHLIA/COURRIER/*</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b1');b.style.display=b.style.display==='block'?'none':'block'&quot;>📝 A2 · Tâches<span class=&quot;b&quot; style=&quot;background:var(--warn)20;color:var(--warn)&quot;>4 chantiers</span></div><div class=&quot;ab&quot; id=&quot;b1&quot;>JEX ×2 (RG …45+44, appels ~13/06) · dette TVA déc. · URSSAF ×2 · PayFit à débloquer.<br><span class=src>(db) mes taches filtre DAHLIA · MAINTENANCE_DAHLIA</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b2');b.style.display=b.style.display==='block'?'none':'block'&quot;>🧾 A7 · TVA<span class=&quot;b&quot; style=&quot;background:var(--dang)20;color:var(--dang)&quot;>4 780 € dû</span></div><div class=&quot;ab&quot; id=&quot;b2&quot;><b>CA12 2025 déposée</b> — base HT 465 229 € · net TVA 15 132 € · <b>solde 4 780 €</b> (éch. 01/07 DÉPASSÉE — vérifier paiement !) · acomptes 2026 : juil <b>8 322 €</b> + déc <b>6 053 €</b> · transition RSI→CA3 à confirmer.<br><span class=src>MAINTENANCE_DAHLIA · CA12</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b3');b.style.display=b.style.display==='block'?'none':'block'&quot;>💶 A8 · Facturation DO<span class=&quot;b&quot; style=&quot;background:var(--ok)20;color:var(--ok)&quot;>236 factures · 16 clients</span></div><div class=&quot;ab&quot; id=&quot;b3&quot;><b>236 factures</b> F-000001→F-000628 (2023 : 5 · 2024 : 124 · 2025 : 86 · 2026 : 21 jan→mai).<br><b>16 donneurs d'ordre</b> : OGERIS (~30) · IGS-21 (~25) · NATIONAL FRANCE (~20) · AGIR (~16) · PHARMACIE (15) · ADN (~10) · SPIG (~10) · PACK (~8) · LA HAUTE POMPIGNANE (forfait 98 h/mois) · FKH · FRANCE GARDIENNAGE · SINCOB · EURO PROTECTION · PROVENCIA · COPS…<br><span class=src>DAHLIA/FACTURATION DONNEUR D'ORDRE/2023-2026</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b4');b.style.display=b.style.display==='block'?'none':'block'&quot;>🧬 A9 · Cascade ST<span class=&quot;b&quot; style=&quot;background:var(--info)20;color:var(--info)&quot;>6 ST · GARIS actif</span></div><div class=&quot;ab&quot; id=&quot;b4&quot;>CG 18,15 (oct 23→17/06/24) <b style='color:var(--dang)'>déficit 55 034,21</b> · JADIS (→28/02/25) soldé 35 575,76 · HIS (28/02→25/06/25) soldé 7 742,15 · GALOIS (11/07/24→15/09/25) soldé 178 404,70 · DIANTRA (27/09/25→31/01/26) soldé 36 474,60 <b style='color:var(--warn)'>⚠️ jan+fév alloués non virés</b> · <b>GARIS 18,50</b> (13/11/25→actif).<br>26 factures ST classées (CG-004…094 · HIS-2025-031/33 · GAL · D2025/26 · GS).<br>⚠️ Anomalies D53 : sur-allocation DIANTRA (26 974,52 + 21 638,42) · divergences GARIS (96 819,39 vs 86 282,43).<br><span class=src>DAHLIA.md master · CONTRATS SOUS TRAITANCE</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b5');b.style.display=b.style.display==='block'?'none':'block'&quot;>🔁 A10 · Rapprochement<span class=&quot;b&quot; style=&quot;background:var(--warn)20;color:var(--warn)&quot;>doublon relevés</span></div><div class=&quot;ab&quot; id=&quot;b5&quot;>Qonto (clôturé 31/03/26) → SWAN + Indy · casier canonique : <b>relevé de compte dahlia/AAAA/</b> ✅ · 🔴 doublon <b>RELEVE DE COMPTE BANCAIRE/ (32 fichiers)</b> à nettoyer après vérif · GATE : doublon TVA 4 576 € (SATD vs majoration SIE).<br><span class=src>EMPLACEMENTS.md §DAHLIA · maître v62</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b6');b.style.display=b.style.display==='block'?'none':'block'&quot;>📋 A11 · Conformité<span class=&quot;b&quot; style=&quot;background:var(--dang)20;color:var(--dang)&quot;>alerte agent</span></div><div class=&quot;ab&quot; id=&quot;b6&quot;>AUT-075-2122-09-19-20230875706 ✓ · <b style='color:var(--dang)'>ALERTE : un agent (identité au dossier interne) — titre de séjour EXPIRÉ</b> · dossiers CNAPS DIANTRA + GARIS à compléter · 6 dossiers ST complets (agréments + AUT + contrats v5-v8).<br><span class=src>DAHLIA.md · SOUS TRAITANT DAHLIA/</span></div></div><div class=&quot;at&quot;><div class=&quot;ah&quot; onclick=&quot;var b=document.getElementById('b7');b.style.display=b.style.display==='block'?'none':'block'&quot;>👥 A12 · Paie<span class=&quot;b&quot; style=&quot;background:var(--warn)20;color:var(--warn)&quot;>4 agents</span></div><div class=&quot;ab&quot; id=&quot;b7&quot;><b>4 agents actifs</b> · PayFit payé 10/06, <b>accès à débloquer</b> · dossiers agents structurés (cartes pro, contrats, DPAE) · BASE_Paie dans maître v62.<br><span class=src>PERSONNEL DAHLIA/ · MAINTENANCE_DAHLIA</span></div></div></div><div class=&quot;h&quot; style=&quot;margin-top:8px&quot;>clic sur un atelier = déplier · données réelles sourcées (fouille 2026-07-04) · rien d inventé</div><script>(function(){var id=&quot;atdata&quot;;function r(){try{parent.postMessage({__id:id,__h:document.documentElement.scrollHeight||document.body.scrollHeight},&quot;*&quot;)}catch(e){}}window.addEventListener(&quot;load&quot;,function(){r();setTimeout(r,300);try{new MutationObserver(r).observe(document.body,{subtree:true,childList:true,attributes:true})}catch(e){}});document.addEventListener(&quot;click&quot;,function(){setTimeout(r,60);setTimeout(r,250)});window.addEventListener(&quot;message&quot;,function(e){if(e&amp;&amp;e.data&amp;&amp;e.data.__ask){r();setTimeout(r,150);setTimeout(r,400)}});setTimeout(r,900);setTimeout(r,1800);})();</script></body></html>" style="display:none"></iframe>
 <iframe id="if-at7" class="vframe" srcdoc="<!DOCTYPE html><html lang=&quot;fr&quot;><head><style>[class*=&quot;ti-&quot;]::before{content:&quot;&quot;!important}.ico{font-style:normal;display:inline-block}</style><script>function sendPrompt(t){try{parent.postMessage({__cmd:String(t)},&quot;*&quot;)}catch(e){}}</script><script>window.CARNET=(function(){var cbs=[],last=null,seq=0,pend={};function fire(){cbs.forEach(function(f){try{f(last)}catch(e){}})}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined){last={data:d.__data||null,err:d.__err||null,at:d.__at||null,src:d.__src||null};fire();}if(d.__mcpres&amp;&amp;pend[d.__mcpres.id]){pend[d.__mcpres.id].ok(d.__mcpres.payload);delete pend[d.__mcpres.id];}if(d.__mcperr&amp;&amp;pend[d.__mcperr.id]){pend[d.__mcperr.id].ko({code:d.__mcperr.code});delete pend[d.__mcperr.id];}});var solo=(window.parent===window);function ask(){if(solo){setTimeout(function(){last={data:null,err:&quot;__hors_appli&quot;,at:null};fire();},0);return;}try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(e){}}return{onData:function(f){cbs.push(f);if(last){try{f(last)}catch(e){}}else ask();},ask:ask,nb:function(){return cbs.length},mcp:function(tool,input){var id=++seq;return new Promise(function(ok,ko){pend[id]={ok:ok,ko:ko};try{parent.postMessage({__mcp:{id:id,tool:tool,input:input}},&quot;*&quot;)}catch(e){ko({code:&quot;bad_request&quot;})}setTimeout(function(){if(pend[id]){pend[id].ko({code:&quot;upstream_error&quot;});delete pend[id];}},45000);})},explain:function(c){switch(c){case &quot;__absent&quot;:return &quot;DATA_DAHLIA.json pas encore visible sur le Drive \u2014 la synchronisation peut prendre quelques minutes.&quot;;case &quot;__illisible&quot;:return &quot;DATA_DAHLIA.json trouv\u00e9 mais illisible : le connecteur en a alt\u00e9r\u00e9 le format.&quot;;case &quot;__vide&quot;:return &quot;Carnet lu, mais ce bloc y est vide \u2014 relancer build_data_dahlia.py.&quot;;case &quot;server_not_connected&quot;:return &quot;Aucun connecteur Google Drive \u2014 \u00e0 ajouter dans R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;needs_reauth&quot;:return &quot;Connecteur Google Drive \u00e0 reconnecter : R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;selection_required&quot;:return &quot;Plusieurs comptes Drive : en choisir un dans l\u2019invite d\u2019ouverture.&quot;;case &quot;server_unavailable&quot;:return &quot;Drive momentan\u00e9ment injoignable \u2014 derniers chiffres conserv\u00e9s.&quot;;case &quot;capability_disabled&quot;:case &quot;not_granted&quot;:case &quot;capability_removed&quot;:return &quot;Cette page n\u2019a pas re\u00e7u le pont connecteur dans cette session.&quot;;case &quot;__hors_appli&quot;:return &quot;Vue ouverte hors de l\u2019appli \u2014 chiffres fig\u00e9s.&quot;;case &quot;__lecture&quot;:return &quot;Lecture de DATA_DAHLIA.json en cours\u2026&quot;;default:return &quot;Lecture impossible (&quot;+c+&quot;).&quot;;}}};})();window.DAHLIA=window.CARNET;</script><style>#fkhfrais{position:sticky;bottom:0;z-index:99;font:11.5px/1.5 ui-monospace,Menlo,monospace;padding:5px 12px;border-top:1px solid #2a313c;background:#0e1116;color:#6b7480;display:flex;gap:8px;flex-wrap:wrap}#fkhfrais b{font-weight:600}.fkhv{color:#34d399}.fkhf{color:#fbbf24}</style><script>(function(){function pose(){var e=document.getElementById(&quot;fkhfrais&quot;);if(!e){e=document.createElement(&quot;div&quot;);e.id=&quot;fkhfrais&quot;;document.body.appendChild(e);}return e;}function dit(s){var e=pose(),vit=s&amp;&amp;s.data&amp;&amp;(s.src===&quot;fichier&quot;||s.src===&quot;drive&quot;),sert=(window.__UTILISE_CARNET__===true)||(function(){try{return window.CARNET.nb()>0}catch(_){return false}})();var h=s&amp;&amp;s.at?new Date(s.at).toLocaleTimeString(&quot;fr-FR&quot;):&quot;&quot;;e.innerHTML=(vit?'<span class=&quot;fkhv&quot;>\u25cf carnet DAHLIA lu '+h+&quot;</span>&quot;:'<span class=&quot;fkhf&quot;>\u25cb carnet DAHLIA NON lu \u2014 chiffres fig\u00e9s dans la page</span>')+(sert?&quot;<span>\u00b7 cette vue s'en sert</span>&quot;:(window.__PAGE_NAV__===true?&quot;<span>\u00b7 page de navigation \u2014 aucune donn\u00e9e \u00e0 rafra\u00eechir</span>&quot;:'<span class=&quot;fkhf&quot;>\u00b7 cette vue ne s\u2019en sert PAS ENCORE \u2014 son contenu date de sa g\u00e9n\u00e9ration</span>'));}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined)dit({data:d.__data||null,at:d.__at||null,src:d.__src||null});});function go(){dit(null);try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(_){}}if(document.readyState===&quot;loading&quot;)document.addEventListener(&quot;DOMContentLoaded&quot;,go);else go();})();</script><script>(function(){window.__ROLE__=window.__ROLE__||null;window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__role!==undefined){var av=window.__ROLE__;window.__ROLE__=d.__role||null;if(av!==window.__ROLE__&amp;&amp;typeof window.__onRole===&quot;function&quot;){try{window.__onRole(window.__ROLE__)}catch(_){}}}});function ask(){try{parent.postMessage({__wantrole:1},&quot;*&quot;)}catch(_){}}if(document.readyState===&quot;loading&quot;)document.addEventListener(&quot;DOMContentLoaded&quot;,ask);else ask();window.addEventListener(&quot;load&quot;,ask);})();</script><script>(function(){window.__pubEtat={envoye:null,err:null};window.__pubSync=function(liste,cb){ var up=null,pret=null; try{up=window.top.fkhUpload;pret=window.top.fkhPret;}catch(e){} if(typeof up!==&quot;function&quot;||typeof pret!==&quot;function&quot;||!pret()){  window.__pubEtat={envoye:null,err:&quot;hors_appli&quot;}; if(cb)cb({ok:false,err:&quot;hors_appli&quot;}); return; } var b; try{ b=new Blob([JSON.stringify(liste||[])],{type:&quot;application/json&quot;}); } catch(e){ if(cb)cb({ok:false,err:&quot;blob&quot;}); return; } up(&quot;admin/publications/DAHLIA.json&quot;, b, function(j){  var ok=!!(j&amp;&amp;j.ok); window.__pubEtat={envoye:ok?new Date().toISOString():null,err:ok?null:&quot;envoi&quot;};  try{ var m={__pubsync:{dom:&quot;DAHLIA&quot;,ok:ok}}; parent.postMessage(m,&quot;*&quot;);       var fr=parent.frames; for(var i=0;i<fr.length;i++){ if(fr[i]!==window) fr[i].postMessage(m,&quot;*&quot;); } }catch(_){}  if(cb)cb({ok:ok}); });};})();</script><script>
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -5162,7 +6122,11 @@ function fill(d){
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -5294,12 +6258,56 @@ function fill(d){
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -5388,7 +6396,7 @@ render();
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -5417,7 +6425,11 @@ render();
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -5549,12 +6561,56 @@ render();
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -5638,7 +6694,7 @@ render();
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -5667,7 +6723,11 @@ render();
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -5799,12 +6859,56 @@ render();
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -5896,7 +7000,7 @@ render();
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -5925,7 +7029,11 @@ render();
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -6057,12 +7165,56 @@ render();
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -6149,7 +7301,7 @@ render();
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -6178,7 +7330,11 @@ render();
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -6310,12 +7466,56 @@ render();
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -6402,7 +7602,7 @@ render();
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -6431,7 +7631,11 @@ render();
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -6563,12 +7767,56 @@ render();
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
@@ -6655,7 +7903,7 @@ render();
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
  var PUBCLE=&quot;fkh_admin_pub_DAHLIA&quot;, DOMN=&quot;DAHLIA&quot;;
- var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null;
+ var VUEID=null, VUELABEL=null, PUBCARNET=[], travaille=false, minuteur=null, MIROIR=null;
  var MOIS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
  /* Les vues ne partagent pas un vocabulaire de classes : cette liste a été relevée dans
     les vues réelles (PILOTAGE construit .grp/.cs à l'exécution, Mouvements .cat/.lg…).
@@ -6684,7 +7932,11 @@ render();
   var t='';
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length>=2) t=el.cells[0].textContent;
   else { var h=el.querySelector('b,strong,h1,h2,h3,h4,.tit,.mno,.kl,.k'); t=h?h.textContent:el.textContent; }
-  t=String(t||'').replace(/[\u{1F441}⊕⏱▸▾]/gu,'').replace(/\s+/g,' ').trim();
+  /* On retire les ornements que les vues ajoutent autour du libellé (pastille d'état,
+     loupe, horloge, chevrons, l'œil lui-même). Ils ne font pas partie du nom du bloc :
+     si on les gardait, la clé calculée ici ne correspondrait plus à celle qu'une vue
+     autonome (ÉTAT) a publiée — et le miroir masquerait justement ce qu'il doit montrer. */
+  t=String(t||'').replace(/[\u{1F441}●○⊕⏱▸▾✎]/gu,'').replace(/\s+/g,' ').trim();
   return t.slice(0,90);
  }
  var PLAFOND=250, tronque=0;
@@ -6816,12 +8068,56 @@ render();
   try{ new MutationObserver(replanifie).observe(document.body,{subtree:true,childList:true}); }catch(e){}
  }
 
- /* La vue ne connaît pas son identifiant : elle le demande à la coque. Tant qu'elle ne
-    l'a pas, elle ne peut désigner aucun bloc — on n'installe donc rien avant. */
+ /* ---- LE MIROIR (Zeus 13/08) ------------------------------------------------------
+    « Au lieu de copier là où je mets l'œil, mets-le en miroir. » Cette vue sait donc
+    envoyer SA PAGE ENTIÈRE, qu'Administratif ré-instancie telle quelle. L'exemplaire
+    ainsi ouvert reçoit la liste des blocs à garder et masque tout le reste : identique
+    par construction, et vivant — ses propres scripts tournent, ses clics marchent.
+    On ne recopie donc plus ni HTML ni style, et il n'y a plus rien à « reproduire ». */
+ function copieDeLaVue(){
+  var d=document.documentElement.cloneNode(true);
+  var j=d.querySelectorAll('.oeilg,.oeilp,.oeilpub,#oeilg-tronque');
+  for(var i=0;i<j.length;i++){ if(j[i].parentNode) j[i].parentNode.removeChild(j[i]); }
+  return '<!DOCTYPE html>'+d.outerHTML;
+ }
+ function appliqueMiroir(){
+  if(!MIROIR) return;
+  var garde={}, i;
+  for(i=0;i<MIROIR.length;i++) garde[MIROIR[i]]=1;
+  var c=candidats();
+  for(i=0;i<c.length;i++) c[i].el.style.display = garde[c[i].cle] ? '' : 'none';
+  var o=document.querySelectorAll('.oeilg,.oeilp,.oeilpub');     /* un miroir ne publie pas */
+  for(i=0;i<o.length;i++){ if(o[i].parentNode) o[i].parentNode.removeChild(o[i]); }
+  hauteur();
+ }
+ function hauteur(){
+  try{ parent.postMessage({__miroirH:document.documentElement.scrollHeight||document.body.scrollHeight},'*'); }catch(_){}
+ }
+ /* Un miroir doit vivre : le carnet le fait grandir, le drill le fait s'ouvrir. On
+    remesure à chaque changement plutôt que de figer une hauteur à l'ouverture. */
+ function surveilleMiroir(){
+  try{ new MutationObserver(function(){ if(MIROIR){ appliqueMiroir(); } }).observe(document.body,{subtree:true,childList:true,attributes:true}); }catch(e){}
+  document.addEventListener('click',function(){ setTimeout(hauteur,60); setTimeout(hauteur,300); });
+  window.addEventListener('load',function(){ hauteur(); setTimeout(hauteur,300); setTimeout(hauteur,900); });
+  setTimeout(hauteur,400); setTimeout(hauteur,1200);
+ }
+
+ /* La vue ne connaît pas son identifiant : elle le demande à sa fenêtre parente. Tant
+    qu'elle ne l'a pas, elle ne peut désigner aucun bloc — on n'installe rien avant. */
  window.addEventListener('message',function(e){
   var d=e.data||{};
+  /* servir sa page à qui veut l'afficher en miroir — y compris pour ÉTAT, qui gère
+     ses blocs lui-même mais n'a pas de raison de refuser son propre reflet. */
+  if(d.__vueask&amp;&amp;e.source){
+   try{ e.source.postMessage({__vueres:{id:d.__vueask.id, vue:VUEID, html:copieDeLaVue()}},'*'); }catch(_){}
+   return;
+  }
+  if(d.__miroir){ MIROIR=d.__miroir.cles||[]; appliqueMiroir(); return; }
   if(d.__vueid===undefined || VUEID) return;
   VUEID=d.__vueid; VUELABEL=d.__vuelabel||d.__vueid;
+  if(d.__miroircles){                          /* on est un reflet, pas la vue de travail */
+   MIROIR=d.__miroircles; appliqueMiroir(); surveilleMiroir(); return;
+  }
   if(VUEID==='admin') return;                  /* la vue qui affiche ne se publie pas elle-même */
   if(typeof window.__blocPret==='function') return;   /* vue déjà autonome (ÉTAT) : on s'efface */
   demarre();
