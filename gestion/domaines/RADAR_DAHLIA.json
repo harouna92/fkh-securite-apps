@@ -1,12 +1,20 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR DAHLIA. Éditer CE fichier suffit : l'appli le relit à chaque chargement de page, aucun rebuild (G-71/G-72).",
- "maj": "2026-08-13 · fouille sources",
+ "maj": "2026-08-13 · recoupé Notion",
  "secs": [
   {
    "t": "🔴 À résoudre",
    "c": "#f87171",
    "bg": "rgba(248,113,113,.16)",
    "items": [
+    {
+     "l": "🏦 Mandat SEPA DAHLIA invalide — CAUSE RACINE de tous les rejets",
+     "w": "la clôture de Qonto au 31/03 a invalidé le mandat : PAS février, mars et avril rejetés, URSSAF avril et mai rejetées · tant qu'il n'est pas refait, tout nouveau prélèvement rebondit et crée des majorations",
+     "a": [
+      "Traiter",
+      "POSTE : DAHLIA — refaire le mandat SEPA auprès de la DGFiP et de l'URSSAF"
+     ]
+    },
     {
      "l": "🚨 Un agent — pièce de conformité individuelle expirée",
      "w": "relevé lors de la fouille du 04/07, jamais remonté · risque immédiat (CNAPS, responsabilité employeur) · identité et pièces au dossier interne, hors ligne · À REVÉRIFIER",
@@ -27,14 +35,6 @@
        "Pourquoi c'est ici",
        "une alerte de cette gravité n'a rien à faire enterrée dans une vue d'atelier"
       ]
-     ]
-    },
-    {
-     "l": "Doublon TVA 4 576 € (gate cockpits)",
-     "w": "🎛️ EN TRAITEMENT au poste · bloque les cockpits",
-     "a": [
-      "Traiter",
-      "POSTE : DAHLIA — doublon TVA 4576 DAHLIA"
      ]
     },
     {
@@ -99,11 +99,11 @@
    "bg": "rgba(251,146,60,.16)",
    "items": [
     {
-     "l": "Acompte TVA juillet — solde CA12 + avis + télépaiement 8 322 €",
-     "w": "🎛️ en traitement",
+     "l": "📞 Appeler le SIE Paris 8e Madeleine — mémo prêt depuis le 07/07",
+     "w": "7 questions rédigées et jamais posées : régulariser le PAS avant AMR, référence de virement spontané, mainlevée SATD, trop-perçu 17 €, échéancier CA12, montants des acomptes, refaire le mandat SEPA · 01 56 35 92 20",
      "a": [
       "Traiter",
-      "CHARGE : acompte TVA juillet DAHLIA"
+      "POSTE : DAHLIA — appeler le SIE Paris 8e Madeleine (mémo du 07/07)"
      ]
     },
     {
@@ -155,6 +155,22 @@
       "Traiter",
       "POSTE : DAHLIA — DO DAHLIA"
      ]
+    },
+    {
+     "l": "PAS sur salaires — 23 € (février 12 + avril 11)",
+     "w": "rejetés, pas encore passés en AMR · mars 33 € payé le 07/07 · à régulariser par téléphone avant bascule en recouvrement",
+     "a": [
+      "Traiter",
+      "CHARGE : PAS DAHLIA"
+     ]
+    },
+    {
+     "l": "Trop-perçu de 17 € à récupérer",
+     "w": "AMR 20260407514 / créance 202602460 · message envoyé le 14/07 via la messagerie pro impots.gouv, EN ATTENTE de réponse du SIE · à imputer sur le solde CA12",
+     "a": [
+      "Relancer",
+      "POSTE : DAHLIA — relancer le SIE sur le trop-perçu de 17 €"
+     ]
     }
    ]
   },
@@ -198,22 +214,27 @@
      ]
     },
     {
-     "l": "Acompte TVA juillet — 8 322 €",
-     "w": "à télépayer",
-     "due": "juillet",
-     "a": [
-      "Traiter",
-      "POSTE : DAHLIA — acompte TVA juillet DAHLIA"
-     ]
-    },
-    {
-     "l": "TVA — solde CA12 2025 : 4 780 €",
-     "w": "échéance du 01/07 DÉPASSÉE · base HT 465 229 € · net TVA 15 132 € · à ne pas confondre avec l'acompte de juillet (8 322 €) ni avec le doublon de 4 576 €",
-     "due": "01/07",
-     "dd": "2026-07-01",
+     "l": "TVA — solde CA12 2025 : 4 780 € (SEULE dette TVA réelle)",
+     "w": "échéance réelle 05/05 (Notion, sourcé impots.gouv) · base HT 465 229 € · net TVA 15 132 € · demander un ÉCHÉANCIER, la trésorerie ne suit pas",
+     "due": "05/05",
+     "dd": "2026-05-05",
      "a": [
       "Traiter",
       "POSTE : DAHLIA — solde CA12 2025 DAHLIA"
+     ],
+     "det": [
+      [
+       "SIE",
+       "Paris 8e Madeleine · 01 56 35 92 20 · sie.paris-8e-madeleine@dgfip.finances.gouv.fr"
+      ],
+      [
+       "⚠️ Contradiction",
+       "Notion donne l'acompte de juillet à 6 293 € soldé ET demande au SIE de confirmer ~8 322 € — non tranché"
+      ],
+      [
+       "Trop-perçu à imputer",
+       "17 € · AMR 20260407514 / créance 202602460"
+      ]
      ]
     }
    ]
