@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR DAHLIA. Éditer CE fichier suffit : l'appli le relit à chaque chargement de page, aucun rebuild (G-71/G-72).",
- "maj": "2026-08-13 · fouille sources",
+ "maj": "2026-08-13 · assaini",
  "secs": [
   {
    "t": "🔴 À résoudre",
@@ -8,24 +8,20 @@
    "bg": "rgba(248,113,113,.16)",
    "items": [
     {
-     "l": "🚨 SARR N'DIOUMA — titre de séjour signalé EXPIRÉ",
-     "w": "relevé lors de la fouille conformité du 04/07, jamais remonté au RADAR · un agent sans titre valide = risque immédiat (CNAPS, pénal employeur) · À REVÉRIFIER avant toute conclusion",
+     "l": "🚨 Un agent — titre de séjour signalé expiré",
+     "w": "relevé lors de la fouille conformité du 04/07, jamais remonté · risque immédiat (CNAPS, pénal employeur) · identité et pièces dans le dossier interne, hors ligne · À REVÉRIFIER",
      "a": [
       "Vérifier",
-      "POSTE : DAHLIA — vérifier le titre de séjour de SARR N'DIOUMA"
+      "POSTE : DAHLIA — vérifier le titre de séjour de l'agent signalé"
      ],
      "det": [
       [
-       "Source",
-       "ATELIERS_DATA_DAHLIA · A11 Conformité (fouille du 2026-07-04)"
+       "Où",
+       "_PILOTAGE_DAHLIA — hors ligne"
       ],
       [
        "Statut",
-       "non revérifié depuis le 04/07 — peut avoir été régularisé"
-      ],
-      [
-       "Pourquoi c'est ici",
-       "une alerte de cette gravité n'a rien à faire enterrée dans une vue d'atelier"
+       "non revérifié depuis le 04/07"
       ]
      ]
     },
@@ -39,7 +35,7 @@
     },
     {
      "l": "⚖️ JEX Reims ×2 — le délai d'appel est passé depuis 2 mois",
-     "w": "RG 25/00045 (3BM : 1 500 € DI + art.700 + dépens) et RG 25/00044 (saisie SHINE, mainlevée) · appel ~13/06 · 500 € de frais d'avocat versés le 01/06 · UNE question à poser : l'appel a-t-il été formé ?",
+     "w": "RG …45 (3BM : 1 500 € DI + art.700 + dépens) et RG …44 (saisie SHINE, mainlevée) · appel ~13/06 · 500 € de frais d'avocat versés le 01/06 · UNE question à poser : l'appel a-t-il été formé ?",
      "due": "13/06",
      "dd": "2026-06-13",
      "a": [
@@ -65,7 +61,7 @@
       ],
       {
        "a": "Appeler l'avocat pour l'état des 2 appels",
-       "p": "POSTE : DAHLIA — appeler l'avocat état des appels JEX RG 25/00045 et 25/00044"
+       "p": "POSTE : DAHLIA — appeler l'avocat état des appels JEX RG …45 et 25/00044"
       }
      ]
     },
@@ -189,7 +185,7 @@
       ],
       [
        "Dossier URSSAF",
-       "n° 0104948102 · SIREN 951 932 730"
+       "n° au dossier interne · SIREN au dossier interne"
       ],
       [
        "À faire",
@@ -225,7 +221,7 @@
    "items": [
     {
      "l": "Nouveau RIB Shine — toute facture à partir de juin 2026",
-     "w": "IBAN [RETIRE] · BIC SNNNFR22XXX — le SWAN DAHLIA est FERMÉ, ne plus jamais l'utiliser",
+     "w": "IBAN IBAN au dossier interne · BIC SNNNFR22XXX — le SWAN DAHLIA est FERMÉ, ne plus jamais l'utiliser",
      "det": [
       [
        "Ancien compte (SWAN)",

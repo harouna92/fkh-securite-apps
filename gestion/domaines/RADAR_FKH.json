@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR FKH. Éditer CE fichier suffit : l'appli le relit à chaque ouverture, aucun rebuild nécessaire (G-71/G-72). La copie inline dans la vue n'est qu'un repli hors-ligne.",
- "maj": "2026-08-13 · boutons dossier",
+ "maj": "2026-08-13 · assaini",
  "secs": [
   {
    "t": "🗓️ Contrôle du mois",
@@ -368,7 +368,7 @@
         ],
         [
          "Origine",
-         "virement de M. DIANE Moussa crédité le 12/08 sur [RETIRE]"
+         "virement de M. DIANE Moussa crédité le 12/08 sur IBAN au dossier interne"
         ]
        ]
       },
