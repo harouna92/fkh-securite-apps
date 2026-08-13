@@ -280,7 +280,9 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
 <script>
 function go(p){try{sendPrompt(p)}catch(e){}}
 const VIEWS=[['Hub','ti-compass',0],['ÉTAT','ti-calendar-stats',1],['RADAR','ti-radar',0],['PILOTAGE','ti-chart-dots',0],['Promenade','ti-compass',0],['Cockpit dossiers','ti-folders',0]];
-const NOW=5;
+/* 13/08 : NOW était figé à 5 (juin) — le « mois courant » surligné datait de la
+   construction de la page. Il se calcule, il ne se grave pas (G-65). */
+const NOW=new Date().getMonth();
 const MO=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
 const MOF=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const TXT={1:'var(--ok)',2:'var(--dang)',4:'var(--warn)',3:'var(--mut)',0:'var(--tt)'};
@@ -490,6 +492,62 @@ crumb();lvl1();stRender();
       if(STDET[m]&amp;&amp;typeof l.ca_st_net_ttc==='number'){STDET[m].ca=l.ca_st_net_ttc;n++;}
     });
     if(n) touche.push('cascade ST ('+n+' mois · virements restés figés)');
+  }
+  /* ---- 13/08 : la grille « Conformité &amp; pièces » restait un instantané de mai ----
+     Constat de Zeus : les relevés de juin et juillet sont DANS le dossier, la grille
+     les affichait absents. Le branchement d'étape A ne réalimentait que CA / paie /
+     clients / cascade — pas les lignes de conformité. On les branche sur les blocs
+     que le carnet porte réellement ; ce que le carnet ne porte pas (DSN, vigilance,
+     régularité) reste figé et le dit (G-34 : on n'invente pas). */
+  var rk={}; ROWS.forEach(function(r){if(r.k)rk[r.k]=r;});
+  /* Relevés bancaires ← releve_bancaire_2026.releves_lus (fichiers réellement lus
+     dans BANQUE/relevé de compte). Recalcul des 12 mois : présent = ✓, mois passé
+     sans relevé = ✗, mois courant et à venir = rien. */
+  if(d.releve_bancaire_2026&amp;&amp;Array.isArray(d.releve_bancaire_2026.releves_lus)&amp;&amp;rk['Relevés bancaires']){
+    var rr=rk['Relevés bancaires'],lus={};
+    d.releve_bancaire_2026.releves_lus.forEach(function(f){
+      var m=/2026-(\d{2})/.exec(f.fichier||'');
+      if(m){var i=+m[1]-1;(lus[i]=lus[i]||[]).push(String(f.fichier||'').replace(/\.pdf$/i,'')+' ('+f.lignes+' lignes)');}
+    });
+    for(var i=0;i<12;i++){
+      if(lus[i]){rr.v[i]=1;rr.d[i]='✓';DET.releves[MOF[i]]=lus[i];}
+      else if(i<NOW){rr.v[i]=2;rr.d[i]='✗';delete DET.releves[MOF[i]];}
+      else{rr.v[i]=3;rr.d[i]='';}
+    }
+    touche.push('relevés bancaires ('+Object.keys(lus).length+' mois au dossier)');
+  }
+  /* Bulletins de paie ← paie_2026.nb_agents (mois où la paie existe). */
+  if(Array.isArray(d.paie_2026)&amp;&amp;rk['Bulletins de paie']){
+    var rb2=rk['Bulletins de paie'];
+    d.paie_2026.forEach(function(l,i){
+      if(typeof l.nb_agents==='number'&amp;&amp;l.nb_agents>0){rb2.v[i]=1;rb2.d[i]=String(l.nb_agents);}
+    });
+  }
+  /* Factures clients : on ne remplit QUE les mois vides (juin+) — janvier→mai
+     gardent leur décompte validé, adossé au détail FCLI qui n'existe que pour eux. */
+  if(Array.isArray(d.ca_client_2026)&amp;&amp;rk['Factures clients émises']){
+    var rf=rk['Factures clients émises'];
+    d.ca_client_2026.forEach(function(l,i){
+      if(rf.v[i]===3&amp;&amp;typeof l.nb_factures==='number'&amp;&amp;l.nb_factures>0){
+        rf.v[i]=(l.a_saisir_au_maitre?4:1);rf.d[i]=String(l.nb_factures);}
+    });
+  }
+  /* TVA CA3 : déclaré = lu (jamais recalculé) ; mois passés non déclarés = recompute
+     affiché en « à déclarer » (orange). Le mois courant attend son échéance. */
+  if(Array.isArray(d.tva_2026)&amp;&amp;rk['TVA CA3']){
+    var rt=rk['TVA CA3'];
+    d.tva_2026.forEach(function(l,i){
+      if(typeof l.declare==='number'){rt.v[i]=1;rt.d[i]=k0(Math.round(l.declare));}
+      else if(i<NOW&amp;&amp;rt.v[i]===3&amp;&amp;(l.a_payer||l.credit)){rt.v[i]=4;rt.d[i]=k0(Math.round(l.a_payer-l.credit));}
+    });
+  }
+  /* CA encaissé (TTC) ← encaissements_client_2026 (TB_2026_Mvts, cat. Encaissement). */
+  if(Array.isArray(d.encaissements_client_2026)&amp;&amp;rk['CA encaissé (TTC)']){
+    var re2=rk['CA encaissé (TTC)'];
+    d.encaissements_client_2026.forEach(function(l,i){
+      if(typeof l.encaisse_ttc==='number'&amp;&amp;l.encaisse_ttc>0){re2.v[i]=1;re2.d[i]=k0(Math.round(l.encaisse_ttc));}
+    });
+    touche.push('conformité (grille)');
   }
   lvl1();stRender();
   ligneSrc('DATA_FKH.json lu sur le Drive'+(s.at?' à '+new Date(s.at).toLocaleTimeString('fr-FR'):'')
