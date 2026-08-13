@@ -15,7 +15,7 @@
  .carnet.on{color:#34d399;border-color:#1e5540}
  .carnet.ko{color:#fbbf24;border-color:#5a4a1e}
 </style></head><body>
-<div class="top"><span class="brand">🧭 Appli FKH</span><div class="tabs"><button class="tab on" data-v="hub" onclick="showV('hub')">Hub</button><button class="tab" data-v="carnet" onclick="showV('carnet')">📓 Carnet vivant</button><button class="tab" data-v="etat" onclick="showV('etat')">ÉTAT</button><button class="tab" data-v="radar" onclick="showV('radar')">RADAR</button><button class="tab" data-v="pilotage" onclick="showV('pilotage')">PILOTAGE</button><button class="tab" data-v="cockdoss" onclick="showV('cockdoss')">Cockpit dossiers</button><button class="tab" data-v="cockfin" onclick="showV('cockfin')">Cockpit financier</button><button class="tab" data-v="ca3" onclick="showV('ca3')">🧾 CA3</button><button class="tab" data-v="mouvements" onclick="showV('mouvements')">💳 Mouvements</button><button class="tab" data-v="facturation" onclick="showV('facturation')">🧾 Facturation</button><button class="tab" data-v="briefing" onclick="showV('briefing')">Briefing auto</button><button class="tab" data-v="tenues" onclick="showV('tenues')">Tenues</button></div><span class="hint" style="margin-left:auto">le Hub ouvre toutes les vues · clic = navigue/déplie · action = commande à copier</span><span class="carnet" id="tampon" title="Moment où ce cockpit a été assemblé — s'il diffère de ce que Claude annonce, la version en ligne n'est pas la sienne">assemblé 13/08 12:47</span><span class="carnet" id="carnet" title="Carnet DATA_FKH.json lu sur le Drive et diffusé à toutes les vues">carnet…</span></div>
+<div class="top"><span class="brand">🧭 Appli FKH</span><div class="tabs"><button class="tab on" data-v="hub" onclick="showV('hub')">Hub</button><button class="tab" data-v="carnet" onclick="showV('carnet')">📓 Carnet vivant</button><button class="tab" data-v="etat" onclick="showV('etat')">ÉTAT</button><button class="tab" data-v="radar" onclick="showV('radar')">RADAR</button><button class="tab" data-v="pilotage" onclick="showV('pilotage')">PILOTAGE</button><button class="tab" data-v="cockdoss" onclick="showV('cockdoss')">Cockpit dossiers</button><button class="tab" data-v="cockfin" onclick="showV('cockfin')">Cockpit financier</button><button class="tab" data-v="ca3" onclick="showV('ca3')">🧾 CA3</button><button class="tab" data-v="mouvements" onclick="showV('mouvements')">💳 Mouvements</button><button class="tab" data-v="facturation" onclick="showV('facturation')">🧾 Facturation</button><button class="tab" data-v="briefing" onclick="showV('briefing')">Briefing auto</button><button class="tab" data-v="tenues" onclick="showV('tenues')">Tenues</button></div><span class="hint" style="margin-left:auto">le Hub ouvre toutes les vues · clic = navigue/déplie · action = commande à copier</span><span class="carnet" id="tampon" title="Moment où ce cockpit a été assemblé — s'il diffère de ce que Claude annonce, la version en ligne n'est pas la sienne">assemblé 13/08 13:11</span><span class="carnet" id="carnet" title="Carnet DATA_FKH.json lu sur le Drive et diffusé à toutes les vues">carnet…</span></div>
 <div><iframe id="if-hub" class="vframe" srcdoc="<!DOCTYPE html>
 <html lang=&quot;fr&quot;>
 <head><style>[class*=&quot;ti-&quot;]::before{content:&quot;&quot;!important}.ico{font-style:normal;display:inline-block}</style><script>function sendPrompt(t){try{parent.postMessage({__cmd:String(t)},&quot;*&quot;)}catch(e){}}</script><script>window.CARNET=(function(){var cbs=[],last=null,seq=0,pend={};function fire(){cbs.forEach(function(f){try{f(last)}catch(e){}})}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined){last={data:d.__data||null,err:d.__err||null,at:d.__at||null,src:d.__src||null};fire();}if(d.__mcpres&amp;&amp;pend[d.__mcpres.id]){pend[d.__mcpres.id].ok(d.__mcpres.payload);delete pend[d.__mcpres.id];}if(d.__mcperr&amp;&amp;pend[d.__mcperr.id]){pend[d.__mcperr.id].ko({code:d.__mcperr.code});delete pend[d.__mcperr.id];}});var solo=(window.parent===window);function ask(){if(solo){setTimeout(function(){last={data:null,err:&quot;__hors_appli&quot;,at:null};fire();},0);return;}try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(e){}}return{onData:function(f){cbs.push(f);if(last){try{f(last)}catch(e){}}else ask();},ask:ask,nb:function(){return cbs.length},mcp:function(tool,input){var id=++seq;return new Promise(function(ok,ko){pend[id]={ok:ok,ko:ko};try{parent.postMessage({__mcp:{id:id,tool:tool,input:input}},&quot;*&quot;)}catch(e){ko({code:&quot;bad_request&quot;})}setTimeout(function(){if(pend[id]){pend[id].ko({code:&quot;upstream_error&quot;});delete pend[id];}},45000);})},explain:function(c){switch(c){case &quot;__absent&quot;:return &quot;DATA_FKH.json pas encore visible sur le Drive \u2014 la synchronisation peut prendre quelques minutes.&quot;;case &quot;__illisible&quot;:return &quot;DATA_FKH.json trouv\u00e9 mais illisible : le connecteur en a alt\u00e9r\u00e9 le format.&quot;;case &quot;__vide&quot;:return &quot;Carnet lu, mais ce bloc y est vide \u2014 relancer build_data_fkh.py.&quot;;case &quot;server_not_connected&quot;:return &quot;Aucun connecteur Google Drive \u2014 \u00e0 ajouter dans R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;needs_reauth&quot;:return &quot;Connecteur Google Drive \u00e0 reconnecter : R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;selection_required&quot;:return &quot;Plusieurs comptes Drive : en choisir un dans l\u2019invite d\u2019ouverture.&quot;;case &quot;server_unavailable&quot;:return &quot;Drive momentan\u00e9ment injoignable \u2014 derniers chiffres conserv\u00e9s.&quot;;case &quot;capability_disabled&quot;:case &quot;not_granted&quot;:case &quot;capability_removed&quot;:return &quot;Cette page n\u2019a pas re\u00e7u le pont connecteur dans cette session.&quot;;case &quot;__hors_appli&quot;:return &quot;Vue ouverte hors de l\u2019appli \u2014 chiffres fig\u00e9s.&quot;;case &quot;__lecture&quot;:return &quot;Lecture de DATA_FKH.json en cours\u2026&quot;;default:return &quot;Lecture impossible (&quot;+c+&quot;).&quot;;}}};})();window.FKH=window.CARNET;</script><style>#fkhfrais{position:sticky;bottom:0;z-index:99;font:11.5px/1.5 ui-monospace,Menlo,monospace;padding:5px 12px;border-top:1px solid #2a313c;background:#0e1116;color:#6b7480;display:flex;gap:8px;flex-wrap:wrap}#fkhfrais b{font-weight:600}.fkhv{color:#34d399}.fkhf{color:#fbbf24}</style><script>(function(){function pose(){var e=document.getElementById(&quot;fkhfrais&quot;);if(!e){e=document.createElement(&quot;div&quot;);e.id=&quot;fkhfrais&quot;;document.body.appendChild(e);}return e;}function dit(s){var e=pose(),vit=s&amp;&amp;s.data&amp;&amp;(s.src===&quot;fichier&quot;||s.src===&quot;drive&quot;),sert=(window.__UTILISE_CARNET__===true)||(function(){try{return window.CARNET.nb()>0}catch(_){return false}})();var h=s&amp;&amp;s.at?new Date(s.at).toLocaleTimeString(&quot;fr-FR&quot;):&quot;&quot;;e.innerHTML=(vit?'<span class=&quot;fkhv&quot;>\u25cf carnet FKH lu '+h+&quot;</span>&quot;:'<span class=&quot;fkhf&quot;>\u25cb carnet FKH NON lu \u2014 chiffres fig\u00e9s dans la page</span>')+(sert?&quot;<span>\u00b7 cette vue s'en sert</span>&quot;:(window.__PAGE_NAV__===true?&quot;<span>\u00b7 page de navigation \u2014 aucune donn\u00e9e \u00e0 rafra\u00eechir</span>&quot;:'<span class=&quot;fkhf&quot;>\u00b7 cette vue ne s\u2019en sert PAS ENCORE \u2014 son contenu date de sa g\u00e9n\u00e9ration</span>'));}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined)dit({data:d.__data||null,at:d.__at||null,src:d.__src||null});});function go(){dit(null);try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(_){}}if(document.readyState===&quot;loading&quot;)document.addEventListener(&quot;DOMContentLoaded&quot;,go);else go();})();</script>
@@ -2142,147 +2142,95 @@ Ronde 01→02/07 (DUC Chailley) scoree <b>65/100</b> · Inbox videe · recap soi
 
 <div class=&quot;foot&quot;>Mot d'appel <code>BRIEFING</code> (ou <code>POINT AUTO</code>) → rouvre ce visuel avec le Journal rafraichi. Vue navigable depuis la barre du RADAR. Donnees lues dans la base Journal des passages.</div>
 </div><script>window.__PAGE_NAV__=true;</script><script>(function(){var id=&quot;briefing&quot;;function r(){try{parent.postMessage({__id:id,__h:document.documentElement.scrollHeight||document.body.scrollHeight},&quot;*&quot;)}catch(e){}}window.addEventListener(&quot;load&quot;,function(){r();setTimeout(r,300);try{new MutationObserver(r).observe(document.body,{subtree:true,childList:true,attributes:true})}catch(e){}});document.addEventListener(&quot;click&quot;,function(){setTimeout(r,60);setTimeout(r,250)});window.addEventListener(&quot;message&quot;,function(e){if(e&amp;&amp;e.data&amp;&amp;e.data.__ask){r();setTimeout(r,150);setTimeout(r,400)}});setTimeout(r,900);setTimeout(r,1800);})();</script></body></html>" style="display:none"></iframe>
-<iframe id="if-tenues" class="vframe" srcdoc="<!DOCTYPE html>
-<html lang=&quot;fr&quot;>
-<head><style>[class*=&quot;ti-&quot;]::before{content:&quot;&quot;!important}.ico{font-style:normal;display:inline-block}</style><script>function sendPrompt(t){try{parent.postMessage({__cmd:String(t)},&quot;*&quot;)}catch(e){}}</script><script>window.CARNET=(function(){var cbs=[],last=null,seq=0,pend={};function fire(){cbs.forEach(function(f){try{f(last)}catch(e){}})}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined){last={data:d.__data||null,err:d.__err||null,at:d.__at||null,src:d.__src||null};fire();}if(d.__mcpres&amp;&amp;pend[d.__mcpres.id]){pend[d.__mcpres.id].ok(d.__mcpres.payload);delete pend[d.__mcpres.id];}if(d.__mcperr&amp;&amp;pend[d.__mcperr.id]){pend[d.__mcperr.id].ko({code:d.__mcperr.code});delete pend[d.__mcperr.id];}});var solo=(window.parent===window);function ask(){if(solo){setTimeout(function(){last={data:null,err:&quot;__hors_appli&quot;,at:null};fire();},0);return;}try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(e){}}return{onData:function(f){cbs.push(f);if(last){try{f(last)}catch(e){}}else ask();},ask:ask,nb:function(){return cbs.length},mcp:function(tool,input){var id=++seq;return new Promise(function(ok,ko){pend[id]={ok:ok,ko:ko};try{parent.postMessage({__mcp:{id:id,tool:tool,input:input}},&quot;*&quot;)}catch(e){ko({code:&quot;bad_request&quot;})}setTimeout(function(){if(pend[id]){pend[id].ko({code:&quot;upstream_error&quot;});delete pend[id];}},45000);})},explain:function(c){switch(c){case &quot;__absent&quot;:return &quot;DATA_FKH.json pas encore visible sur le Drive \u2014 la synchronisation peut prendre quelques minutes.&quot;;case &quot;__illisible&quot;:return &quot;DATA_FKH.json trouv\u00e9 mais illisible : le connecteur en a alt\u00e9r\u00e9 le format.&quot;;case &quot;__vide&quot;:return &quot;Carnet lu, mais ce bloc y est vide \u2014 relancer build_data_fkh.py.&quot;;case &quot;server_not_connected&quot;:return &quot;Aucun connecteur Google Drive \u2014 \u00e0 ajouter dans R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;needs_reauth&quot;:return &quot;Connecteur Google Drive \u00e0 reconnecter : R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;selection_required&quot;:return &quot;Plusieurs comptes Drive : en choisir un dans l\u2019invite d\u2019ouverture.&quot;;case &quot;server_unavailable&quot;:return &quot;Drive momentan\u00e9ment injoignable \u2014 derniers chiffres conserv\u00e9s.&quot;;case &quot;capability_disabled&quot;:case &quot;not_granted&quot;:case &quot;capability_removed&quot;:return &quot;Cette page n\u2019a pas re\u00e7u le pont connecteur dans cette session.&quot;;case &quot;__hors_appli&quot;:return &quot;Vue ouverte hors de l\u2019appli \u2014 chiffres fig\u00e9s.&quot;;case &quot;__lecture&quot;:return &quot;Lecture de DATA_FKH.json en cours\u2026&quot;;default:return &quot;Lecture impossible (&quot;+c+&quot;).&quot;;}}};})();window.FKH=window.CARNET;</script><style>#fkhfrais{position:sticky;bottom:0;z-index:99;font:11.5px/1.5 ui-monospace,Menlo,monospace;padding:5px 12px;border-top:1px solid #2a313c;background:#0e1116;color:#6b7480;display:flex;gap:8px;flex-wrap:wrap}#fkhfrais b{font-weight:600}.fkhv{color:#34d399}.fkhf{color:#fbbf24}</style><script>(function(){function pose(){var e=document.getElementById(&quot;fkhfrais&quot;);if(!e){e=document.createElement(&quot;div&quot;);e.id=&quot;fkhfrais&quot;;document.body.appendChild(e);}return e;}function dit(s){var e=pose(),vit=s&amp;&amp;s.data&amp;&amp;(s.src===&quot;fichier&quot;||s.src===&quot;drive&quot;),sert=(window.__UTILISE_CARNET__===true)||(function(){try{return window.CARNET.nb()>0}catch(_){return false}})();var h=s&amp;&amp;s.at?new Date(s.at).toLocaleTimeString(&quot;fr-FR&quot;):&quot;&quot;;e.innerHTML=(vit?'<span class=&quot;fkhv&quot;>\u25cf carnet FKH lu '+h+&quot;</span>&quot;:'<span class=&quot;fkhf&quot;>\u25cb carnet FKH NON lu \u2014 chiffres fig\u00e9s dans la page</span>')+(sert?&quot;<span>\u00b7 cette vue s'en sert</span>&quot;:(window.__PAGE_NAV__===true?&quot;<span>\u00b7 page de navigation \u2014 aucune donn\u00e9e \u00e0 rafra\u00eechir</span>&quot;:'<span class=&quot;fkhf&quot;>\u00b7 cette vue ne s\u2019en sert PAS ENCORE \u2014 son contenu date de sa g\u00e9n\u00e9ration</span>'));}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined)dit({data:d.__data||null,at:d.__at||null,src:d.__src||null});});function go(){dit(null);try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(_){}}if(document.readyState===&quot;loading&quot;)document.addEventListener(&quot;DOMContentLoaded&quot;,go);else go();})();</script>
-<meta charset=&quot;utf-8&quot;>
-<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;>
-<title>TENUES — Inventaire tenues agents (FKH / DAHLIA / GARIS)</title>
-<style>
-:root{--bg:#f7f7f5;--card:#fff;--line:#e4e4dd;--ink:#1a1a17;--mut:#6b6b64;--acc:#1F4E79;--accbg:#e6f1fb;
---green:#0F6E56;--greenbg:#E1F5EE;--red:#A32D2D;--redbg:#FCEBEB;--amber:#854F0B;--amberbg:#FAEEDA;--coral:#D85A30;}
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
-.wrap{max-width:1060px;margin:0 auto;padding:20px}
-h1{font-size:20px;font-weight:600;margin:0 0 2px}
-.sub{color:var(--mut);font-size:12.5px;margin-bottom:12px}
-.sub a{color:var(--acc)}
-.note{background:#fff8e6;border:1px solid #f0e0a8;border-radius:8px;padding:9px 12px;font-size:12px;color:#6b5a1e;margin-bottom:16px}
-.tnav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-.tnav button{font-size:13px;padding:7px 14px;border:1px solid var(--line);background:var(--card);border-radius:8px;cursor:pointer;color:var(--ink)}
-.tnav button.on{background:var(--accbg);color:var(--acc);border-color:#B5D4F4}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
-.kc{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
-.kc .l{font-size:12.5px;color:var(--mut)}
-.kc .v{font-size:24px;font-weight:600;margin-top:2px}
-.kc .s{font-size:12px;color:var(--mut)}
-.panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}
-.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
-.box h3{font-size:14px;font-weight:600;margin:0 0 10px}
-.wrapt{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
-table{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
-th{color:var(--mut);font-weight:600;text-align:left;padding:8px 11px;border-bottom:1px solid var(--line)}
-td{padding:8px 11px;border-bottom:1px solid var(--line)}
-.pill{font-size:11px;padding:2px 7px;border-radius:20px;display:inline-block;margin:1px 0}
-button.mini{font-size:11px;padding:3px 8px;border:1px solid var(--line);background:var(--card);border-radius:6px;cursor:pointer;margin-left:3px}
-button.mini:hover{background:#f0f0ec}
-.foot{margin-top:14px;font-size:11.5px;color:var(--mut)}
-.brow{display:flex;align-items:center;gap:8px;margin:6px 0}
-.brow .bl{width:82px;color:var(--mut);font-size:12px}
-.brow .bt{flex:1;height:8px;background:#efefe9;border-radius:4px;overflow:hidden}
-.brow .bt span{display:block;height:100%}
-.brow .bv{width:18px;text-align:right;font-size:12px}
-</style>
-</head>
-<body>
-<div class=&quot;wrap&quot;>
-<h1>TENUES — Inventaire tenues agents</h1>
-<div class=&quot;sub&quot;>Périmètre FKH · DAHLIA · GARIS — stock réel (06/07/2026) · agents à saisir. Source : <a href=&quot;#&quot;>FKH/9_EQUIPEMENT/INVENTAIRE_TENUES_partage.xlsx</a> (5 onglets). Mot d'appel : <b>TENUES</b>.</div>
-<div class=&quot;note&quot;><b>Standard tenue.</b> Base obligatoire pour tous : Chaussures + Pantalon + Tshirt + Gilet. Supplément par agent : une pièce en <b>N/A</b> n'est pas exigée ; passée à OK/Manquant, elle devient exigée pour cet agent (ex. Ceinturon pour KAMISSOKO, Parka pour SARR). <b>Complet</b> = aucune pièce « Manquant ».</div>
-<div class=&quot;tnav&quot; id=&quot;tnav&quot;>
-  <button data-t=&quot;kpi&quot; class=&quot;on&quot;>Tableau de bord</button>
-  <button data-t=&quot;ctrl&quot;>Contrôles agents</button>
-  <button data-t=&quot;stock&quot;>Stock</button>
-  <button data-t=&quot;ach&quot;>Achats &amp;amp; Commandes</button>
-</div>
-<div id=&quot;pane-kpi&quot;></div>
-<div id=&quot;pane-ctrl&quot; style=&quot;display:none&quot;></div>
-<div id=&quot;pane-stock&quot; style=&quot;display:none&quot;></div>
-<div id=&quot;pane-ach&quot; style=&quot;display:none&quot;></div>
-<div class=&quot;foot&quot;>Démo interactive — clique les actions (couvrir depuis stock, envoyer aux achats, marquer reçu) : les onglets et les KPIs se recalculent en direct. La saisie réelle se fait dans le classeur Excel partagé ; cette vue est régénérée depuis le classeur au mot d'appel TENUES.</div>
-</div>
+<iframe id="if-tenues" class="vframe" srcdoc="<!DOCTYPE html><html lang=&quot;fr&quot;><head><style>[class*=&quot;ti-&quot;]::before{content:&quot;&quot;!important}.ico{font-style:normal;display:inline-block}</style><script>function sendPrompt(t){try{parent.postMessage({__cmd:String(t)},&quot;*&quot;)}catch(e){}}</script><script>window.CARNET=(function(){var cbs=[],last=null,seq=0,pend={};function fire(){cbs.forEach(function(f){try{f(last)}catch(e){}})}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined){last={data:d.__data||null,err:d.__err||null,at:d.__at||null,src:d.__src||null};fire();}if(d.__mcpres&amp;&amp;pend[d.__mcpres.id]){pend[d.__mcpres.id].ok(d.__mcpres.payload);delete pend[d.__mcpres.id];}if(d.__mcperr&amp;&amp;pend[d.__mcperr.id]){pend[d.__mcperr.id].ko({code:d.__mcperr.code});delete pend[d.__mcperr.id];}});var solo=(window.parent===window);function ask(){if(solo){setTimeout(function(){last={data:null,err:&quot;__hors_appli&quot;,at:null};fire();},0);return;}try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(e){}}return{onData:function(f){cbs.push(f);if(last){try{f(last)}catch(e){}}else ask();},ask:ask,nb:function(){return cbs.length},mcp:function(tool,input){var id=++seq;return new Promise(function(ok,ko){pend[id]={ok:ok,ko:ko};try{parent.postMessage({__mcp:{id:id,tool:tool,input:input}},&quot;*&quot;)}catch(e){ko({code:&quot;bad_request&quot;})}setTimeout(function(){if(pend[id]){pend[id].ko({code:&quot;upstream_error&quot;});delete pend[id];}},45000);})},explain:function(c){switch(c){case &quot;__absent&quot;:return &quot;DATA_FKH.json pas encore visible sur le Drive \u2014 la synchronisation peut prendre quelques minutes.&quot;;case &quot;__illisible&quot;:return &quot;DATA_FKH.json trouv\u00e9 mais illisible : le connecteur en a alt\u00e9r\u00e9 le format.&quot;;case &quot;__vide&quot;:return &quot;Carnet lu, mais ce bloc y est vide \u2014 relancer build_data_fkh.py.&quot;;case &quot;server_not_connected&quot;:return &quot;Aucun connecteur Google Drive \u2014 \u00e0 ajouter dans R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;needs_reauth&quot;:return &quot;Connecteur Google Drive \u00e0 reconnecter : R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;selection_required&quot;:return &quot;Plusieurs comptes Drive : en choisir un dans l\u2019invite d\u2019ouverture.&quot;;case &quot;server_unavailable&quot;:return &quot;Drive momentan\u00e9ment injoignable \u2014 derniers chiffres conserv\u00e9s.&quot;;case &quot;capability_disabled&quot;:case &quot;not_granted&quot;:case &quot;capability_removed&quot;:return &quot;Cette page n\u2019a pas re\u00e7u le pont connecteur dans cette session.&quot;;case &quot;__hors_appli&quot;:return &quot;Vue ouverte hors de l\u2019appli \u2014 chiffres fig\u00e9s.&quot;;case &quot;__lecture&quot;:return &quot;Lecture de DATA_FKH.json en cours\u2026&quot;;default:return &quot;Lecture impossible (&quot;+c+&quot;).&quot;;}}};})();window.FKH=window.CARNET;</script><style>#fkhfrais{position:sticky;bottom:0;z-index:99;font:11.5px/1.5 ui-monospace,Menlo,monospace;padding:5px 12px;border-top:1px solid #2a313c;background:#0e1116;color:#6b7480;display:flex;gap:8px;flex-wrap:wrap}#fkhfrais b{font-weight:600}.fkhv{color:#34d399}.fkhf{color:#fbbf24}</style><script>(function(){function pose(){var e=document.getElementById(&quot;fkhfrais&quot;);if(!e){e=document.createElement(&quot;div&quot;);e.id=&quot;fkhfrais&quot;;document.body.appendChild(e);}return e;}function dit(s){var e=pose(),vit=s&amp;&amp;s.data&amp;&amp;(s.src===&quot;fichier&quot;||s.src===&quot;drive&quot;),sert=(window.__UTILISE_CARNET__===true)||(function(){try{return window.CARNET.nb()>0}catch(_){return false}})();var h=s&amp;&amp;s.at?new Date(s.at).toLocaleTimeString(&quot;fr-FR&quot;):&quot;&quot;;e.innerHTML=(vit?'<span class=&quot;fkhv&quot;>\u25cf carnet FKH lu '+h+&quot;</span>&quot;:'<span class=&quot;fkhf&quot;>\u25cb carnet FKH NON lu \u2014 chiffres fig\u00e9s dans la page</span>')+(sert?&quot;<span>\u00b7 cette vue s'en sert</span>&quot;:(window.__PAGE_NAV__===true?&quot;<span>\u00b7 page de navigation \u2014 aucune donn\u00e9e \u00e0 rafra\u00eechir</span>&quot;:'<span class=&quot;fkhf&quot;>\u00b7 cette vue ne s\u2019en sert PAS ENCORE \u2014 son contenu date de sa g\u00e9n\u00e9ration</span>'));}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined)dit({data:d.__data||null,at:d.__at||null,src:d.__src||null});});function go(){dit(null);try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(_){}}if(document.readyState===&quot;loading&quot;)document.addEventListener(&quot;DOMContentLoaded&quot;,go);else go();})();</script><meta charset=&quot;utf-8&quot;><meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;><title>TENUES — stock &amp; distributions (vivant)</title><style>
+:root{--bg:#0e1116;--card:#161b22;--card2:#1c232d;--line:#2a313c;--info:#7c93ff;--tp:#e6edf3;--ts:#9aa7b4;--tt:#6b7480;--dang:#f87171;--warn:#fbbf24;--ok:#34d399;}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tp);padding:14px;}
+.h{font-size:11px;color:var(--tt);margin:2px 0 10px;line-height:1.5}
+.src{font-size:10.5px;font-family:ui-monospace,Menlo,monospace;padding:2px 9px;border-radius:999px;border:1px solid var(--line);display:inline-block;margin-left:6px}
+.warnb{font-size:11.5px;color:var(--warn);border:1px solid #5a4a1e;border-radius:9px;background:rgba(251,191,36,.06);padding:7px 11px;margin-bottom:10px}
+h2{font-size:13px;margin:14px 0 6px;color:var(--ts)}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{color:var(--ts);font-weight:500;padding:5px 6px;text-align:left;border-bottom:1px solid var(--line)}
+td{padding:6px;border-top:1px solid var(--line)}
+tr:hover td{background:rgba(124,147,255,.10)}
+tr{cursor:pointer}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.dang{color:var(--dang)}.tt{color:var(--tt)}
+.det{margin:8px 0;padding:9px 12px;border-left:2px solid var(--info);font-size:11.5px;color:var(--ts);line-height:1.8;background:var(--card)}
+.act{display:inline-block;margin:4px 6px 0 0;padding:4px 10px;border:1px solid var(--info);border-radius:7px;color:var(--info);cursor:pointer;font-size:11.5px}
+.vide{color:var(--tt);font-size:12px;padding:12px}
+</style></head><body>
+<div style=&quot;font-size:15px;font-weight:600;&quot;>👕 Tenues — stock &amp;amp; distributions <span class=&quot;src&quot; id=&quot;src&quot;>source…</span></div>
+<div class=&quot;h&quot;>pont GESTION (13/08) : dans l'appli, cette vue lit le <b>localStorage partagé</b> (les clés fkh_tenues_* de GESTION, à la seconde) ; hors appli elle se replie sur le <b>carnet</b> (bloc tenues_2026, rapatrié par le veilleur). Clique une ligne → action.</div>
+<div class=&quot;warnb&quot;>⚠️ Stock en attente du NOUVEL INVENTAIRE (règle gravée) — ce qui s'affiche est le contenu actuel de l'appli, seule l'appli fait foi pour la saisie.</div>
+<h2>📦 Stock par pièce</h2><div id=&quot;stock&quot; class=&quot;vide&quot;>lecture…</div>
+<h2>🚚 Distributions aux agents</h2><div id=&quot;dist&quot; class=&quot;vide&quot;>lecture…</div>
+<div id=&quot;det&quot;></div>
 <script>
-(function(){
-var TODAY=new Date(2026,6,6);
-var PIECES=['Chaussures','Pantalon','Tshirt','Polo','Parka','Gilet','Ceinturon'];
-var DELAI={Chaussures:10,Pantalon:7,Tshirt:5,Polo:5,Parka:12,Gilet:6,Ceinturon:8};
-function sizeOf(a,p){if(p==='Chaussures')return a.size.ch;if(p==='Pantalon')return a.size.pa;if(p==='Ceinturon')return 'Unique';return a.size.ht}
-var agents=[];
-var stock=[
- {piece:'Chaussures',couleur:'Noir',groupe:'Lent',size:'40',qty:2,seuil:1,etat:'Neuf'},
- {piece:'Chaussures',couleur:'Noir',groupe:'Lent',size:'41',qty:1,seuil:1,etat:'Neuf'},
- {piece:'Chaussures',couleur:'Noir',groupe:'Lent',size:'42',qty:1,seuil:1,etat:'Neuf'},
- {piece:'Chaussures',couleur:'Noir',groupe:'Lent',size:'46',qty:1,seuil:1,etat:'Neuf'},
- {piece:'Pantalon',couleur:'Noir',groupe:'Lent',size:'38',qty:1,seuil:1,etat:'Neuf'},
- {piece:'Pantalon',couleur:'Noir',groupe:'Lent',size:'46',qty:2,seuil:1,etat:'Neuf'},
- {piece:'Polo',couleur:'Noir',groupe:'Lent',size:'M',qty:1,seuil:1,etat:'Neuf'},
- {piece:'Tshirt',couleur:'Noir',groupe:'Lent',size:'XL',qty:1,seuil:1,etat:'Neuf'},
- {piece:'Gilet',couleur:'Noir',groupe:'Lent',size:'Unique',qty:4,seuil:1,etat:'Neuf'},
- {piece:'Ceinturon',couleur:'Noir',groupe:'Lent',size:'L',qty:5,seuil:1,etat:'Neuf'},
- {piece:'Parka',couleur:'Noir',groupe:'Lent',size:'L',qty:1,seuil:1,etat:'Neuf'},
- {piece:'Softshell',couleur:'Noir',groupe:'Lent',size:'M',qty:1,seuil:1,etat:'Neuf'},
- {piece:'Softshell',couleur:'Noir',groupe:'Lent',size:'L',qty:1,seuil:1,etat:'Neuf'},
- {piece:&quot;Pochette d'envoi&quot;,couleur:'',groupe:'Rapide',size:'Unique',qty:14,seuil:10,etat:'Neuf'},
- {piece:'Logo FKH',couleur:'',groupe:'Rapide',size:'Unique',qty:28,seuil:10,etat:'Neuf'},
- {piece:'Logo DAHLIA',couleur:'',groupe:'Rapide',size:'Unique',qty:4,seuil:10,etat:'Neuf'},
- {piece:'Pochette immat',couleur:'',groupe:'Rapide',size:'Unique',qty:2,seuil:10,etat:'Neuf'},
- {piece:'Pochette logo',couleur:'',groupe:'Rapide',size:'Unique',qty:17,seuil:10,etat:'Neuf'}
-];
-var achats=[];
-function stkStat(r){if(r.qty<r.seuil)return{t:'Sous seuil',bg:'#F8C9C9',fg:'#7a1f1f'};if(r.qty<=r.seuil+2)return{t:'Proche',bg:'#FCE3B4',fg:'#7a5410'};return{t:'Bon',bg:'#CDE9D6',fg:'#1f5c3d'}}
-function findStock(p,s){return stock.find(function(r){return r.piece===p&amp;&amp;String(r.size)===String(s)})}
-function parse(d){if(!d)return null;var x=d.split('/');return new Date(+x[2],+x[1]-1,+x[0])}
-function fmt(dt){return ('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2)+'/'+dt.getFullYear()}
-function orderInfo(besoin,piece){var b=parse(besoin);if(!b)return{avant:'—',col:'var(--mut)'};var d=DELAI[piece]||7;var av=new Date(b.getTime()-d*86400000);var days=Math.round((av-TODAY)/86400000);var col='var(--green)';if(days<0)col='var(--red)';else if(days<=5)col='var(--amber)';return{avant:fmt(av),col:col}}
-function coverStock(i,p){var a=agents[i];var r=findStock(p,sizeOf(a,p));if(r&amp;&amp;r.qty>0){r.qty--;a.p[p]='ok';}render()}
-function toAchat(i,p){var a=agents[i];a.p[p]='cmd';achats.push({agent:a.n,soc:a.soc,piece:p,size:sizeOf(a,p),urg:a.urg||'Normal',besoin:a.besoin,statut:'À commander',ai:i,pc:p});render()}
-function recu(k){var o=achats[k];o.statut='Reçu';agents[o.ai].p[o.pc]='ok';render()}
-function kpis(){var comp=0,manq=0,byp={},stk=0,buy=0;PIECES.forEach(function(p){byp[p]=0});
- agents.forEach(function(a){var m=PIECES.some(function(p){return a.p[p]==='manque'||a.p[p]==='cmd'});if(!m)comp++;else manq++;
-  PIECES.forEach(function(p){if(a.p[p]==='manque'){byp[p]++;var r=findStock(p,sizeOf(a,p));if(r&amp;&amp;r.qty>0)stk++;else buy++;}});});
- return{comp:comp,tot:agents.length,manq:manq,byp:byp,stk:stk,buy:buy,pct:Math.round(comp/agents.length*100)}}
-function kc(l,v,s,c){return '<div class=&quot;kc&quot;><div class=&quot;l&quot;>'+l+'</div><div class=&quot;v&quot;'+(c?' style=&quot;color:'+c+'&quot;':'')+'>'+v+'</div><div class=&quot;s&quot;>'+s+'</div></div>'}
-function bar(l,val,max,c){var w=max?Math.round(val/max*100):0;return '<div class=&quot;brow&quot;><span class=&quot;bl&quot;>'+l+'</span><span class=&quot;bt&quot;><span style=&quot;width:'+w+'%;background:'+c+'&quot;></span></span><span class=&quot;bv&quot;>'+val+'</span></div>'}
-function render(){
- var k=kpis();
- var maxp=Math.max(1,Math.max.apply(null,PIECES.map(function(p){return k.byp[p]})));
- document.getElementById('pane-kpi').innerHTML=
-  '<div style=&quot;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:14px&quot;>'+'<div style=&quot;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px&quot;><span style=&quot;font-size:14px;font-weight:600&quot;>Avancement de la saisie des agents</span>'+'<span style=&quot;font-size:13px;color:var(--mut)&quot;>'+agents.length+' / 25 · '+Math.round(agents.length/25*100)+'%</span></div>'+'<div style=&quot;height:10px;background:#efefe9;border-radius:5px;overflow:hidden&quot;><span style=&quot;display:block;height:100%;width:'+Math.min(100,Math.round(agents.length/25*100))+'%;background:#1F4E79&quot;></span></div></div>'+
-  '<div class=&quot;cards&quot;>'+kc('Conformité tenue',k.pct+'%',k.comp+' / '+k.tot+' complets','')+
-  kc('Agents avec manquant',k.manq,'à équiper','var(--red)')+
-  kc('À sortir du stock',k.stk,'gratuit, immédiat','var(--green)')+
-  kc('À acheter',k.buy,'→ chasse prix','var(--amber)')+'</div>'+
-  '<div class=&quot;panel&quot;><div class=&quot;box&quot;><h3>Manquants par pièce</h3>'+
-   PIECES.map(function(p){return bar(p,k.byp[p],maxp,'var(--coral)')}).join('')+'</div>'+
-  '<div class=&quot;box&quot;><h3>Stock — seuils</h3>'+
-   (stock.map(function(r){var s=stkStat(r);if(s.t==='Bon')return '';return '<div style=&quot;display:flex;justify-content:space-between;margin:5px 0&quot;><span>'+r.piece+' '+r.size+'</span><span style=&quot;color:'+s.fg+'&quot;>'+r.qty+' / seuil '+r.seuil+' · '+s.t+'</span></div>'}).join('')||'<div style=&quot;color:var(--mut)&quot;>Tout est bon</div>')+'</div></div>';
- var rows=agents.map(function(a,i){
-  var cells=PIECES.map(function(p){var st=a.p[p];
-   if(st==='na')return '<span class=&quot;pill&quot; style=&quot;background:#efefe9;color:#8a8a82&quot;>'+p+' N/A</span>';
-   if(st==='ok')return '<span class=&quot;pill&quot; style=&quot;background:var(--greenbg);color:var(--green)&quot;>'+p+' ✓</span>';
-   if(st==='cmd')return '<span class=&quot;pill&quot; style=&quot;background:var(--amberbg);color:var(--amber)&quot;>'+p+' cmd</span>';
-   var r=findStock(p,sizeOf(a,p));var av=r&amp;&amp;r.qty>0;
-   var btn=av?'<button class=&quot;mini&quot; data-cov=&quot;'+i+'&quot; data-p=&quot;'+p+'&quot;>Stock ('+sizeOf(a,p)+')</button>':'<button class=&quot;mini&quot; data-ach=&quot;'+i+'&quot; data-p=&quot;'+p+'&quot;>→ Achats</button>';
-   return '<span class=&quot;pill&quot; style=&quot;background:var(--redbg);color:var(--red)&quot;>'+p+' ✗</span>'+btn}).join(' ');
-  return '<tr><td>'+a.n+'</td><td>'+a.soc+'</td><td>'+a.site+'</td><td>'+a.size.ch+'·'+a.size.pa+'·'+a.size.ht+'</td><td>'+(a.urg||'—')+'</td><td>'+(a.besoin||'—')+'</td><td style=&quot;white-space:normal;min-width:420px&quot;>'+cells+'</td></tr>'});
- document.getElementById('pane-ctrl').innerHTML='<div class=&quot;wrapt&quot;><table style=&quot;min-width:960px&quot;><thead><tr><th>Agent</th><th>Société</th><th>Site</th><th>Point·Pant·Haut</th><th>Urgence</th><th>Besoin</th><th>Pièces (✓ / ✗ + action · N/A = non requis)</th></tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
- var srows=stock.map(function(r){var s=stkStat(r);return '<tr><td>'+r.piece+'</td><td>'+(r.couleur||'—')+'</td><td>'+(r.groupe||'—')+'</td><td>'+r.size+'</td><td style=&quot;font-weight:600&quot;>'+r.qty+'</td><td>'+r.etat+'</td><td>'+r.seuil+'</td><td><span style=&quot;background:'+s.bg+';color:'+s.fg+';padding:2px 8px;border-radius:20px;font-size:11px&quot;>'+s.t+'</span></td></tr>'});
- document.getElementById('pane-stock').innerHTML='<div class=&quot;wrapt&quot;><table style=&quot;min-width:720px&quot;><thead><tr><th>Pièce</th><th>Couleur</th><th>Groupe</th><th>Taille</th><th>Qté</th><th>État</th><th>Seuil</th><th>Statut</th></tr></thead><tbody>'+srows.join('')+'</tbody></table></div><div class=&quot;foot&quot;>Onglet Référentiel du classeur = liste des pièces ; ajoute une ligne pour créer un nouveau type (menus Stock &amp;amp; Achats mis à jour). Saisie libre aussi possible.</div>';
- var arows=achats.length?achats.map(function(o,k){var oi=orderInfo(o.besoin,o.piece);var act=o.statut==='Reçu'?'<span style=&quot;color:var(--green)&quot;>Reçu ✓ → agent équipé</span>':'<button class=&quot;mini&quot; data-recu=&quot;'+k+'&quot;>Marquer reçu</button>';
-  return '<tr><td>'+o.piece+' '+o.size+'</td><td>'+o.agent+' ('+o.soc+')</td><td>'+o.urg+'</td><td>'+(o.besoin||'—')+'</td><td>'+(DELAI[o.piece]||7)+' j</td><td style=&quot;color:'+oi.col+'&quot;>'+oi.avant+'</td><td>'+o.statut+'</td><td>'+act+'</td></tr>'}).join(''):'<tr><td colspan=&quot;8&quot; style=&quot;color:var(--mut);text-align:center;padding:18px&quot;>Aucune commande — envoie un manquant non couvert par le stock depuis l\'onglet Contrôles.</td></tr>';
- document.getElementById('pane-ach').innerHTML='<div class=&quot;wrapt&quot;><table style=&quot;min-width:900px&quot;><thead><tr><th>Article</th><th>Pour</th><th>Urgence</th><th>Besoin</th><th>Délai</th><th>Commander avant</th><th>Statut</th><th>Action</th></tr></thead><tbody>'+arows+'</tbody></table></div>';
- document.querySelectorAll('[data-cov]').forEach(function(b){b.onclick=function(){coverStock(+b.dataset.cov,b.dataset.p)}});
- document.querySelectorAll('[data-ach]').forEach(function(b){b.onclick=function(){toAchat(+b.dataset.ach,b.dataset.p)}});
- document.querySelectorAll('[data-recu]').forEach(function(b){b.onclick=function(){recu(+b.dataset.recu)}});
+function lsJson(k){try{var v=window.localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}}
+var DIST_LBL={'':'— non gérée',preaffecte:'🟡 pré-affecté',encours:'📦 en cours',envoye:'🚚 envoyé',recu:'✅ reçu'};
+function rendre(stock,dist,srcLabel){
+  document.getElementById('src').textContent=srcLabel;
+  var zs=document.getElementById('stock');
+  if(!stock||!stock.length){zs.className='vide';zs.textContent='aucune ligne de stock ('+srcLabel+')';}
+  else{
+    zs.className='';
+    var h='<table><tr><th>Pièce</th><th>Taille</th><th>Couleur</th><th style=&quot;text-align:right&quot;>Qté</th><th style=&quot;text-align:right&quot;>Seuil</th><th>Statut</th></tr>';
+    stock.forEach(function(s,i){
+      var q=parseInt(s['Qté en stock'],10);q=isNaN(q)?null:q;
+      var seuil=parseInt(s['Seuil (groupe)'],10);seuil=isNaN(seuil)?null:seuil;
+      var st=(q==null)?'<span class=&quot;tt&quot;>qté ?</span>':(seuil!=null&amp;&amp;q<=seuil)?'<span class=&quot;dang&quot;>⚠️ sous le seuil</span>':'<span class=&quot;ok&quot;>✓</span>';
+      h+='<tr data-i=&quot;'+i+'&quot;><td>'+(s['Pièce']||'?')+'</td><td>'+(s['Taille']||'—')+'</td><td>'+(s['Couleur']||'—')+'</td><td style=&quot;text-align:right&quot;>'+(q==null?'?':q)+'</td><td style=&quot;text-align:right&quot;>'+(seuil==null?'—':seuil)+'</td><td>'+st+'</td></tr>';
+    });
+    zs.innerHTML=h+'</table>';
+    zs.querySelectorAll('tr[data-i]').forEach(function(tr){tr.onclick=function(){
+      var s=stock[+tr.dataset.i];var dv=document.getElementById('det');dv.innerHTML='';
+      var b=document.createElement('div');b.className='det';
+      b.innerHTML='<b>'+(s['Pièce']||'?')+' '+(s['Taille']||'')+' '+(s['Couleur']||'')+'</b> — qté '+(s['Qté en stock']||'?')+(s['Seuil (groupe)']?' · seuil '+s['Seuil (groupe)']:'');
+      var a=document.createElement('span');a.className='act';a.textContent='⚡ commander cette pièce';
+      a.onclick=function(){sendPrompt('Commande à préparer : '+(s['Pièce']||'?')+' taille '+(s['Taille']||'?')+' '+(s['Couleur']||'')+' — stock actuel '+(s['Qté en stock']||'?')+', seuil '+(s['Seuil (groupe)']||'—')+' (vetsecurite.com, voir facture VET SECURITE de juillet pour les références)');};
+      b.appendChild(document.createElement('br'));b.appendChild(a);dv.appendChild(b);
+    };});
+  }
+  var zd=document.getElementById('dist');
+  var noms=dist?Object.keys(dist):[];
+  if(!noms.length){zd.className='vide';zd.textContent='aucune distribution suivie ('+srcLabel+')';}
+  else{
+    zd.className='';
+    var h2='<table><tr><th>Agent</th><th>Statut</th><th>Pièces</th><th>Envoi</th><th>Reçu</th></tr>';
+    noms.sort().forEach(function(n,i){var r=dist[n]||{};
+      h2+='<tr data-n=&quot;'+i+'&quot;><td>'+n+'</td><td>'+(DIST_LBL[r.statut]||r.statut||'—')+'</td><td>'+(r.pieces||'—')+'</td><td>'+(r.dateEnvoi||'—')+'</td><td>'+(r.dateRecu||'—')+'</td></tr>';});
+    zd.innerHTML=h2+'</table>';
+    zd.querySelectorAll('tr[data-n]').forEach(function(tr){tr.onclick=function(){
+      var n=noms.sort()[+tr.dataset.n],r=dist[n]||{};var dv=document.getElementById('det');dv.innerHTML='';
+      var b=document.createElement('div');b.className='det';
+      b.innerHTML='<b>'+n+'</b> — '+(DIST_LBL[r.statut]||'—')+(r.pieces?' · '+r.pieces:'');
+      var a=document.createElement('span');a.className='act';
+      a.textContent=(r.statut==='recu')?'⚡ vérifier la tenue au prochain contrôle':'⚡ relancer l\'envoi de la tenue';
+      a.onclick=function(){sendPrompt((r.statut==='recu'?'Programme un contrôle tenue pour ':'Relance l\'envoi de la tenue de ')+n+' (statut actuel : '+(DIST_LBL[r.statut]||'non géré')+')');};
+      b.appendChild(document.createElement('br'));b.appendChild(a);dv.appendChild(b);
+    };});
+  }
 }
-document.querySelectorAll('#tnav button').forEach(function(b){b.onclick=function(){
- document.querySelectorAll('#tnav button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');
- ['kpi','ctrl','stock','ach'].forEach(function(t){document.getElementById('pane-'+t).style.display=(t===b.dataset.t)?'block':'none'})}});
-render();
+function tick(){
+  var stock=lsJson('fkh_tenues_stock'),dist=lsJson('fkh_tenues_dist');
+  if((stock&amp;&amp;stock.length)||(dist&amp;&amp;Object.keys(dist).length)){rendre(stock||[],dist||{},'● appli (localStorage, direct)');return true;}
+  return false;
+}
+(function(){
+  if(tick()){setInterval(tick,15000);return;}
+  /* hors appli : repli carnet */
+  if(window.FKH&amp;&amp;window.FKH.onData){
+    FKH.onData(function(s){
+      var t=s&amp;&amp;s.data&amp;&amp;s.data.tenues_2026;
+      if(t&amp;&amp;t.statut==='ok'){rendre(t.stock||[],t.distributions||{},'◐ carnet ('+(t.lu_le||'')+')');}
+      else if(!tick()){document.getElementById('src').textContent='○ ni appli ni carnet';
+        document.getElementById('stock').textContent=(t&amp;&amp;t.statut)||'aucune source';
+        document.getElementById('dist').textContent='en attente de la même source';}
+    });
+  }
+  setInterval(tick,15000);
 })();
-</script>
-<script>(function(){var id=&quot;tenues&quot;;function r(){try{parent.postMessage({__id:id,__h:document.documentElement.scrollHeight||document.body.scrollHeight},&quot;*&quot;)}catch(e){}}window.addEventListener(&quot;load&quot;,function(){r();setTimeout(r,300);try{new MutationObserver(r).observe(document.body,{subtree:true,childList:true,attributes:true})}catch(e){}});document.addEventListener(&quot;click&quot;,function(){setTimeout(r,60);setTimeout(r,250)});window.addEventListener(&quot;message&quot;,function(e){if(e&amp;&amp;e.data&amp;&amp;e.data.__ask){r();setTimeout(r,150);setTimeout(r,400)}});setTimeout(r,900);setTimeout(r,1800);})();</script></body>
-</html>
+</script><script>window.__UTILISE_CARNET__=true;</script><script>(function(){var id=&quot;tenues&quot;;function r(){try{parent.postMessage({__id:id,__h:document.documentElement.scrollHeight||document.body.scrollHeight},&quot;*&quot;)}catch(e){}}window.addEventListener(&quot;load&quot;,function(){r();setTimeout(r,300);try{new MutationObserver(r).observe(document.body,{subtree:true,childList:true,attributes:true})}catch(e){}});document.addEventListener(&quot;click&quot;,function(){setTimeout(r,60);setTimeout(r,250)});window.addEventListener(&quot;message&quot;,function(e){if(e&amp;&amp;e.data&amp;&amp;e.data.__ask){r();setTimeout(r,150);setTimeout(r,400)}});setTimeout(r,900);setTimeout(r,1800);})();</script></body></html>
 " style="display:none"></iframe>
 <iframe id="if-stact" class="vframe" srcdoc="<!DOCTYPE html><html lang=&quot;fr&quot;><head><style>[class*=&quot;ti-&quot;]::before{content:&quot;&quot;!important}.ico{font-style:normal;display:inline-block}</style><script>function sendPrompt(t){try{parent.postMessage({__cmd:String(t)},&quot;*&quot;)}catch(e){}}</script><script>window.CARNET=(function(){var cbs=[],last=null,seq=0,pend={};function fire(){cbs.forEach(function(f){try{f(last)}catch(e){}})}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined){last={data:d.__data||null,err:d.__err||null,at:d.__at||null,src:d.__src||null};fire();}if(d.__mcpres&amp;&amp;pend[d.__mcpres.id]){pend[d.__mcpres.id].ok(d.__mcpres.payload);delete pend[d.__mcpres.id];}if(d.__mcperr&amp;&amp;pend[d.__mcperr.id]){pend[d.__mcperr.id].ko({code:d.__mcperr.code});delete pend[d.__mcperr.id];}});var solo=(window.parent===window);function ask(){if(solo){setTimeout(function(){last={data:null,err:&quot;__hors_appli&quot;,at:null};fire();},0);return;}try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(e){}}return{onData:function(f){cbs.push(f);if(last){try{f(last)}catch(e){}}else ask();},ask:ask,nb:function(){return cbs.length},mcp:function(tool,input){var id=++seq;return new Promise(function(ok,ko){pend[id]={ok:ok,ko:ko};try{parent.postMessage({__mcp:{id:id,tool:tool,input:input}},&quot;*&quot;)}catch(e){ko({code:&quot;bad_request&quot;})}setTimeout(function(){if(pend[id]){pend[id].ko({code:&quot;upstream_error&quot;});delete pend[id];}},45000);})},explain:function(c){switch(c){case &quot;__absent&quot;:return &quot;DATA_FKH.json pas encore visible sur le Drive \u2014 la synchronisation peut prendre quelques minutes.&quot;;case &quot;__illisible&quot;:return &quot;DATA_FKH.json trouv\u00e9 mais illisible : le connecteur en a alt\u00e9r\u00e9 le format.&quot;;case &quot;__vide&quot;:return &quot;Carnet lu, mais ce bloc y est vide \u2014 relancer build_data_fkh.py.&quot;;case &quot;server_not_connected&quot;:return &quot;Aucun connecteur Google Drive \u2014 \u00e0 ajouter dans R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;needs_reauth&quot;:return &quot;Connecteur Google Drive \u00e0 reconnecter : R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;selection_required&quot;:return &quot;Plusieurs comptes Drive : en choisir un dans l\u2019invite d\u2019ouverture.&quot;;case &quot;server_unavailable&quot;:return &quot;Drive momentan\u00e9ment injoignable \u2014 derniers chiffres conserv\u00e9s.&quot;;case &quot;capability_disabled&quot;:case &quot;not_granted&quot;:case &quot;capability_removed&quot;:return &quot;Cette page n\u2019a pas re\u00e7u le pont connecteur dans cette session.&quot;;case &quot;__hors_appli&quot;:return &quot;Vue ouverte hors de l\u2019appli \u2014 chiffres fig\u00e9s.&quot;;case &quot;__lecture&quot;:return &quot;Lecture de DATA_FKH.json en cours\u2026&quot;;default:return &quot;Lecture impossible (&quot;+c+&quot;).&quot;;}}};})();window.FKH=window.CARNET;</script><style>#fkhfrais{position:sticky;bottom:0;z-index:99;font:11.5px/1.5 ui-monospace,Menlo,monospace;padding:5px 12px;border-top:1px solid #2a313c;background:#0e1116;color:#6b7480;display:flex;gap:8px;flex-wrap:wrap}#fkhfrais b{font-weight:600}.fkhv{color:#34d399}.fkhf{color:#fbbf24}</style><script>(function(){function pose(){var e=document.getElementById(&quot;fkhfrais&quot;);if(!e){e=document.createElement(&quot;div&quot;);e.id=&quot;fkhfrais&quot;;document.body.appendChild(e);}return e;}function dit(s){var e=pose(),vit=s&amp;&amp;s.data&amp;&amp;(s.src===&quot;fichier&quot;||s.src===&quot;drive&quot;),sert=(window.__UTILISE_CARNET__===true)||(function(){try{return window.CARNET.nb()>0}catch(_){return false}})();var h=s&amp;&amp;s.at?new Date(s.at).toLocaleTimeString(&quot;fr-FR&quot;):&quot;&quot;;e.innerHTML=(vit?'<span class=&quot;fkhv&quot;>\u25cf carnet FKH lu '+h+&quot;</span>&quot;:'<span class=&quot;fkhf&quot;>\u25cb carnet FKH NON lu \u2014 chiffres fig\u00e9s dans la page</span>')+(sert?&quot;<span>\u00b7 cette vue s'en sert</span>&quot;:(window.__PAGE_NAV__===true?&quot;<span>\u00b7 page de navigation \u2014 aucune donn\u00e9e \u00e0 rafra\u00eechir</span>&quot;:'<span class=&quot;fkhf&quot;>\u00b7 cette vue ne s\u2019en sert PAS ENCORE \u2014 son contenu date de sa g\u00e9n\u00e9ration</span>'));}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined)dit({data:d.__data||null,at:d.__at||null,src:d.__src||null});});function go(){dit(null);try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(_){}}if(document.readyState===&quot;loading&quot;)document.addEventListener(&quot;DOMContentLoaded&quot;,go);else go();})();</script><meta charset=&quot;utf-8&quot;><meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;><title>🗓️ Activité des sous-traitants — FKH 2026</title><style>
 :root{--bg:#0e1116;--card:#161b22;--card2:#1c232d;--line:#2a313c;--info:#7c93ff;--tp:#e6edf3;--ts:#9aa7b4;--tt:#6b7480;--dang:#f87171;--warn:#fbbf24;--ok:#34d399;}
