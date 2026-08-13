@@ -1,4 +1,1807 @@
 {
+ "releve_bancaire_2026": {
+  "source": "relevés PDF des dossiers du domaine, lus ligne à ligne",
+  "avertissement": "registre BRUT : aucune catégorisation, aucun rapprochement. Il donne la matière, pas la comptabilité.",
+  "releves_lus": [
+   {
+    "fichier": "2026-01_releve_Qonto.pdf",
+    "format": "qonto",
+    "lignes": 28
+   },
+   {
+    "fichier": "2026-02_releve_Qonto.pdf",
+    "format": "qonto",
+    "lignes": 42
+   },
+   {
+    "fichier": "2026-03_releve_Qonto.pdf",
+    "format": "qonto",
+    "lignes": 35
+   },
+   {
+    "fichier": "2026-04_releve_Qonto.pdf",
+    "format": "qonto",
+    "lignes": 44
+   },
+   {
+    "fichier": "2026-05_releve_Qonto.pdf",
+    "format": "qonto",
+    "lignes": 45
+   },
+   {
+    "fichier": "2026-06_releve_Indy.pdf",
+    "format": "swan",
+    "lignes": 16
+   },
+   {
+    "fichier": "2026-07_releve_Indy.pdf",
+    "format": "swan",
+    "lignes": 41
+   }
+  ],
+  "releves_illisibles": [],
+  "entrees": 445137.96,
+  "sorties": 459280.03,
+  "mouvements": [
+   {
+    "date": "2026-01-01",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 70.8,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-05",
+    "libelle": "GOCARDLESS 41468",
+    "sens": "SORTIE",
+    "montant": 131.97,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-05",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202543375846",
+    "sens": "SORTIE",
+    "montant": 1.2,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-05",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202543393459",
+    "sens": "SORTIE",
+    "montant": 1.2,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-05",
+    "libelle": "SOTEL TELESURVEILLANCE Fact FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 496.5,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-06",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202543416834",
+    "sens": "SORTIE",
+    "montant": 0.84,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-07",
+    "libelle": "FREE MOBILE Carte **7070",
+    "sens": "SORTIE",
+    "montant": 19.99,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-07",
+    "libelle": "SECURITAS FRANCE SARL F-000947 F-000948 F-000949",
+    "sens": "ENTREE",
+    "montant": 2838.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-08",
+    "libelle": "HISCOX SA HISCOX SA Police d'assurance numero : HARCP0342762",
+    "sens": "SORTIE",
+    "montant": 90.57,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-12",
+    "libelle": "P2S A.N. au 010126 301125 FKH SECURITE INTERVENTION 11/25",
+    "sens": "ENTREE",
+    "montant": 356.52,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-13",
+    "libelle": "SAS GAMBRI FKH SECURITE F950 GAMBRI",
+    "sens": "ENTREE",
+    "montant": 2229.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-14",
+    "libelle": "FS *sejda Carte **7070",
+    "sens": "SORTIE",
+    "montant": 7.08,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-15",
+    "libelle": "AQUILA SA FA 000952 FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 6570.13,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-16",
+    "libelle": "BULLION VIR BULLION F951",
+    "sens": "ENTREE",
+    "montant": 2229.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-16",
+    "libelle": "FKH SECURITE SATD FR - 100130035899 888853819 - FKH SECURITE",
+    "sens": "SORTIE",
+    "montant": 291.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-16",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 29.1,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-16",
+    "libelle": "URSSAF D'ILE DE FRANCE UR 117000001579664416 DEC 25788617793000160126",
+    "sens": "SORTIE",
+    "montant": 357.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-16",
+    "libelle": "VIGICORE SECURITY sous traitant",
+    "sens": "SORTIE",
+    "montant": 2000.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-19",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 7992.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-19",
+    "libelle": "PAYFIT FR-INV00955445",
+    "sens": "SORTIE",
+    "montant": 277.2,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-20",
+    "libelle": "COMMANDE Carte **7070",
+    "sens": "SORTIE",
+    "montant": 3.2,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-23",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 5083.8,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-23",
+    "libelle": "RANC DEVELOPPEMENT FKH F-000943",
+    "sens": "ENTREE",
+    "montant": 2465.38,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-26",
+    "libelle": "DOMICILIATION Carte **7070",
+    "sens": "SORTIE",
+    "montant": 24.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-26",
+    "libelle": "MALAKOFF HUMANIS RETRAITE - MALAKOFF HUMANIS - 202512M - SIRET 88885381900041 -AG0...",
+    "sens": "SORTIE",
+    "montant": 70.04,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-27",
+    "libelle": "URSSAF D'ILE DE FRANCE UR 117000001579664416 788617793000270126",
+    "sens": "SORTIE",
+    "montant": 507.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-28",
+    "libelle": "INDY COMPTABILITE Carte **7070",
+    "sens": "SORTIE",
+    "montant": 70.8,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-28",
+    "libelle": "INDY COMPTABILITE Carte **7070",
+    "sens": "SORTIE",
+    "montant": 70.8,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-01",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 70.8,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-03",
+    "libelle": "GOCARDLESS 42356",
+    "sens": "SORTIE",
+    "montant": 131.97,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-03",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202543785824",
+    "sens": "SORTIE",
+    "montant": 21.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-03",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202543804570",
+    "sens": "SORTIE",
+    "montant": 37.2,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-03",
+    "libelle": "SOTEL TELESURVEILLANCE Fact FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 1552.08,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-04",
+    "libelle": "FREE MOBILE Carte **7070",
+    "sens": "SORTIE",
+    "montant": 19.99,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-04",
+    "libelle": "INST NAT PROPRIETE IND Carte **7070",
+    "sens": "SORTIE",
+    "montant": 44.77,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-04",
+    "libelle": "INST NAT PROPRIETE IND Carte **7070",
+    "sens": "SORTIE",
+    "montant": 72.81,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-05",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202543831390",
+    "sens": "SORTIE",
+    "montant": 8.4,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-05",
+    "libelle": "LE LEGALISTE Carte **7070",
+    "sens": "SORTIE",
+    "montant": 99.6,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-06",
+    "libelle": "HISCOX SA HISCOX SA Police d'assurance numero : HARCP0342762",
+    "sens": "SORTIE",
+    "montant": 90.57,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-07",
+    "libelle": "INDY COMPTABILITE Carte **7070",
+    "sens": "ENTREE",
+    "montant": 70.8,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-07",
+    "libelle": "INDY COMPTABILITE Carte **7070",
+    "sens": "ENTREE",
+    "montant": 70.8,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-11",
+    "libelle": "RANC DEVELOPPEMENT 311225 FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 6738.89,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-12",
+    "libelle": "NDIOUMA SARR salaire",
+    "sens": "SORTIE",
+    "montant": 504.06,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-13",
+    "libelle": "AQUILA SA FA 000965 FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 6833.39,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-14",
+    "libelle": "FS *sejda Carte **7070",
+    "sens": "SORTIE",
+    "montant": 7.08,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-14",
+    "libelle": "INST NAT PROPRIETE IND Carte **7070",
+    "sens": "SORTIE",
+    "montant": 1.3,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-16",
+    "libelle": "BULLION VIR BULLION F973",
+    "sens": "ENTREE",
+    "montant": 2760.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-16",
+    "libelle": "SAS GAMBRI FKH SECURITE F972 GAMBRI",
+    "sens": "ENTREE",
+    "montant": 2760.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-16",
+    "libelle": "SECURITAS FRANCE SARL F-000953 F-000958 F-000959 F-000961 F-000962 F-000954 F-000955 F-...",
+    "sens": "ENTREE",
+    "montant": 32565.78,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-17",
+    "libelle": "URSSAF D'ILE DE FRANCE UR 117000001579664416 JANV26788617793000170226",
+    "sens": "SORTIE",
+    "montant": 728.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-17",
+    "libelle": "VIGICORE SECURITY sous traitant",
+    "sens": "SORTIE",
+    "montant": 2000.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-18",
+    "libelle": "GAITEMIROV YOUSSOUP Salaires",
+    "sens": "SORTIE",
+    "montant": 488.47,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-18",
+    "libelle": "GAITEMIROV YOUSSOUP Salaires",
+    "sens": "SORTIE",
+    "montant": 1057.08,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-18",
+    "libelle": "GAITEMIROV YOUSSOUP Salaires",
+    "sens": "SORTIE",
+    "montant": 1090.84,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-18",
+    "libelle": "PAYFIT FR-INV00990625",
+    "sens": "SORTIE",
+    "montant": 324.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-18",
+    "libelle": "RIZVAN TSAKACHEV salaire",
+    "sens": "SORTIE",
+    "montant": 304.15,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-18",
+    "libelle": "ROUSTAM KIMIEV salaire",
+    "sens": "SORTIE",
+    "montant": 245.05,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-19",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 12099.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-19",
+    "libelle": "LBA CENTRE D’AFFAIRE F2025-196",
+    "sens": "SORTIE",
+    "montant": 67.2,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-20",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 11988.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-20",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 12987.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-23",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 9079.8,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-25",
+    "libelle": "COMMANDE Carte **7070",
+    "sens": "SORTIE",
+    "montant": 3.2,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-25",
+    "libelle": "MALAKOFF HUMANIS RETRAITE - MALAKOFF HUMANIS - 202601M - SIRET 88885381900041 - G0...",
+    "sens": "SORTIE",
+    "montant": 136.06,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-25",
+    "libelle": "SECURITAS FRANCE SARL F-000974 F-000964",
+    "sens": "ENTREE",
+    "montant": 35545.47,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-26",
+    "libelle": "DGFIP TVA-022026-3310CA3",
+    "sens": "SORTIE",
+    "montant": 1149.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-26",
+    "libelle": "DOMICILIATION Carte **7070",
+    "sens": "SORTIE",
+    "montant": 24.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-26",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 15984.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-27",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 17582.4,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-28",
+    "libelle": "M MOHAMED ABAYOMI salaire",
+    "sens": "SORTIE",
+    "montant": 500.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-01",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 70.8,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-03",
+    "libelle": "GOCARDLESS 43253",
+    "sens": "SORTIE",
+    "montant": 131.97,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-04",
+    "libelle": "FREE MOBILE Carte **7070",
+    "sens": "SORTIE",
+    "montant": 19.99,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-04",
+    "libelle": "SECURITAS FRANCE SARL F-000960",
+    "sens": "ENTREE",
+    "montant": 30990.95,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-05",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202544210941",
+    "sens": "SORTIE",
+    "montant": 3.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-06",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202544229298/ Fact. 202544251793",
+    "sens": "SORTIE",
+    "montant": 27.6,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-09",
+    "libelle": "HISCOX SA HISCOX SA Police d'assurance numero : HARCP0342762",
+    "sens": "SORTIE",
+    "montant": 90.57,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-10",
+    "libelle": "NEW ANGEL'S RGLT FKH F-000979",
+    "sens": "ENTREE",
+    "montant": 242.4,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-12",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 14985.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-13",
+    "libelle": "AQUILA SA FA 000982 FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 5798.7,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-13",
+    "libelle": "SAS GAMBRI FKH F980 GAMBRI",
+    "sens": "ENTREE",
+    "montant": 2169.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-14",
+    "libelle": "FS *sejda Carte **7070",
+    "sens": "SORTIE",
+    "montant": 7.08,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-16",
+    "libelle": "DIABY KARAMOKO salaire",
+    "sens": "SORTIE",
+    "montant": 3121.8,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-17",
+    "libelle": "BULLION BIR BULLION F981 AV244",
+    "sens": "ENTREE",
+    "montant": 1509.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-17",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 9990.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-17",
+    "libelle": "NDIOUMA SARR salaire",
+    "sens": "SORTIE",
+    "montant": 960.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-17",
+    "libelle": "PAYFIT FR-INV00992506",
+    "sens": "SORTIE",
+    "montant": 415.2,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-17",
+    "libelle": "URSSAF D'ILE DE FRANCE UR 117000001579664416 FEV 26788617793000170326",
+    "sens": "SORTIE",
+    "montant": 7910.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-18",
+    "libelle": "SECURITAS FRANCE SARL F-000968 F-000969 F-000970 F-000971",
+    "sens": "ENTREE",
+    "montant": 39301.88,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-19",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 14990.4,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-21",
+    "libelle": "GAITEMIROV YOUSSOUP Salaires",
+    "sens": "SORTIE",
+    "montant": 1853.92,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-23",
+    "libelle": "KADIA DIANE Sa",
+    "sens": "SORTIE",
+    "montant": 668.72,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-24",
+    "libelle": "DIRECTION GENERALE DES FINANCES PUBLIQUES TLR SEPA DGFIP IMPOT-PAS-DSN-16032026-022026- 88885381900041",
+    "sens": "SORTIE",
+    "montant": 699.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-24",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 14985.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-24",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 4995.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-24",
+    "libelle": "ILAN NASSI salaire",
+    "sens": "SORTIE",
+    "montant": 1179.25,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-24",
+    "libelle": "JAMAL DRISSI salaire",
+    "sens": "SORTIE",
+    "montant": 538.23,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-24",
+    "libelle": "VIGICORE SECURITY sous traitant",
+    "sens": "SORTIE",
+    "montant": 2100.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-25",
+    "libelle": "FKH SECURITE SATD FR - 100132432551 888853819 - FKH SECURITE",
+    "sens": "SORTIE",
+    "montant": 250.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-25",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 25.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-26",
+    "libelle": "DOMICILIATION Carte **7070",
+    "sens": "SORTIE",
+    "montant": 24.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-30",
+    "libelle": "SECURITAS FRANCE SARL F-000985",
+    "sens": "ENTREE",
+    "montant": 6708.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-31",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 14985.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-31",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 5194.8,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-31",
+    "libelle": "SECURITAS FRANCE SARL A-000242 A-000243 F-000967",
+    "sens": "ENTREE",
+    "montant": 13375.58,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-01",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 70.8,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-02",
+    "libelle": "GOCARDLESS 44103",
+    "sens": "SORTIE",
+    "montant": 131.97,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-02",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202544637478",
+    "sens": "SORTIE",
+    "montant": 3.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-04",
+    "libelle": "FREE MOBILE Carte **7070",
+    "sens": "SORTIE",
+    "montant": 19.99,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-07",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202544655350",
+    "sens": "SORTIE",
+    "montant": 19.2,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-08",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202544681105",
+    "sens": "SORTIE",
+    "montant": 8.4,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-13",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 7992.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-13",
+    "libelle": "RANC DEVELOPPEMENT FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 3751.8,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-13",
+    "libelle": "SECURITAS FRANCE SARL F-000986",
+    "sens": "ENTREE",
+    "montant": 4953.6,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-14",
+    "libelle": "AQUILA SA FA 000989 FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 5532.76,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-14",
+    "libelle": "BAH ALPHA OUMAR Sa",
+    "sens": "SORTIE",
+    "montant": 708.7,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-14",
+    "libelle": "CAMARA IBRAHIMA sa",
+    "sens": "SORTIE",
+    "montant": 1986.67,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-14",
+    "libelle": "FS *sejda Carte **7070",
+    "sens": "SORTIE",
+    "montant": 7.08,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-14",
+    "libelle": "M MOHAMED ABAYOMI sa",
+    "sens": "SORTIE",
+    "montant": 1448.18,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-14",
+    "libelle": "MAHFOUF MOULOUD sa",
+    "sens": "SORTIE",
+    "montant": 103.28,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-14",
+    "libelle": "NDIOUMA SARR salaire",
+    "sens": "SORTIE",
+    "montant": 1020.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-14",
+    "libelle": "ROUSTAM KIMIEV sa",
+    "sens": "SORTIE",
+    "montant": 256.68,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-15",
+    "libelle": "SECURITAS FRANCE SARL F-000976 F-000977",
+    "sens": "ENTREE",
+    "montant": 38703.42,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-15",
+    "libelle": "VIGICORE SECURITY sous traitant",
+    "sens": "SORTIE",
+    "montant": 2000.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-16",
+    "libelle": "GAITEMIROV YOUSSOUP Salaires",
+    "sens": "SORTIE",
+    "montant": 1085.01,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-16",
+    "libelle": "ILAN NASSI salaire",
+    "sens": "SORTIE",
+    "montant": 235.73,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-16",
+    "libelle": "ROUSTAM KIMIEV salaire",
+    "sens": "SORTIE",
+    "montant": 405.73,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-16",
+    "libelle": "SAS GAMBRI FKH SECURITE F987 GAMBRI",
+    "sens": "ENTREE",
+    "montant": 2169.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-16",
+    "libelle": "URSSAF D'ILE DE FRANCE UR 117000001579664416 MARS26788617793000160426",
+    "sens": "SORTIE",
+    "montant": 974.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-17",
+    "libelle": "BULLION VIR BULLION F988",
+    "sens": "ENTREE",
+    "montant": 2169.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-17",
+    "libelle": "PAYFIT FR-INV01028032",
+    "sens": "SORTIE",
+    "montant": 436.8,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-19",
+    "libelle": "ELECTRO DEPOT FRANCE Carte **7070",
+    "sens": "SORTIE",
+    "montant": 17.99,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-21",
+    "libelle": "BEXLEY Carte **1983",
+    "sens": "SORTIE",
+    "montant": 308.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-21",
+    "libelle": "Marsadis Carte **1983",
+    "sens": "SORTIE",
+    "montant": 13.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-21",
+    "libelle": "PRIMARK DIJON Carte **1983",
+    "sens": "SORTIE",
+    "montant": 10.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-21",
+    "libelle": "ZARA Carte **1983",
+    "sens": "SORTIE",
+    "montant": 199.25,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-22",
+    "libelle": "DIRECTION GENERALE DES FINANCES PUBLIQUES TLR SEPA DGFIP IMPOT-PAS-DSN-15042026-032026- 88885381900041",
+    "sens": "SORTIE",
+    "montant": 16.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-22",
+    "libelle": "INST NAT PROPRIETE IND Carte **7070",
+    "sens": "ENTREE",
+    "montant": 3.04,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-23",
+    "libelle": "APRR NFC Carte **1983",
+    "sens": "SORTIE",
+    "montant": 10.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-23",
+    "libelle": "APRR NFC Carte **1983",
+    "sens": "SORTIE",
+    "montant": 14.7,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-23",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 19980.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-27",
+    "libelle": "FAL FEATURES LABELS 1.16686114352392 USD = 1.00 EUR Carte **2955",
+    "sens": "SORTIE",
+    "montant": 8.57,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-27",
+    "libelle": "MALAKOFF HUMANIS RETRAITE - MALAKOFF HUMANIS - 202603M - SIRET 88885381900041 - G0...",
+    "sens": "SORTIE",
+    "montant": 190.06,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-27",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 0.17,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-28",
+    "libelle": "AMAZON PAYMENTS Carte **2955",
+    "sens": "SORTIE",
+    "montant": 29.74,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-28",
+    "libelle": "BOUT SECURITE C+ Carte **2955",
+    "sens": "SORTIE",
+    "montant": 59.4,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-28",
+    "libelle": "DGFIP TVA-042026-3310CA3",
+    "sens": "SORTIE",
+    "montant": 2061.0,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-28",
+    "libelle": "GOCARDLESS 44933",
+    "sens": "SORTIE",
+    "montant": 383.99,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-30",
+    "libelle": "COMMANDE Carte **1983",
+    "sens": "SORTIE",
+    "montant": 3.06,
+    "releve": "2026-04_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-01",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 70.8,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-02",
+    "libelle": "RINGOVER Carte **1983",
+    "sens": "SORTIE",
+    "montant": 547.2,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-04",
+    "libelle": "BKG*HOTEL AT BOOKING.C Carte **1983",
+    "sens": "SORTIE",
+    "montant": 7.41,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-04",
+    "libelle": "BKG*HOTEL AT BOOKING.C Carte **1983",
+    "sens": "ENTREE",
+    "montant": 7.41,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-04",
+    "libelle": "P2S FKH SECURITE - Facture N F-000916 -",
+    "sens": "ENTREE",
+    "montant": 1654.56,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-04",
+    "libelle": "P2S FKH SECURITE - Facture N F-000922 -",
+    "sens": "ENTREE",
+    "montant": 540.0,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 17992.8,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "GOCARDLESS 45160",
+    "sens": "SORTIE",
+    "montant": 131.97,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202545063122",
+    "sens": "SORTIE",
+    "montant": 3.0,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202545084321",
+    "sens": "SORTIE",
+    "montant": 19.2,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "NDIOUMA SARR salaire",
+    "sens": "SORTIE",
+    "montant": 200.0,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "SOTEL TELESURVEILLANCE Fact FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 2839.08,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-06",
+    "libelle": "CLAUDE.AI SUBSCRIPTION Carte **1983",
+    "sens": "SORTIE",
+    "montant": 117.3,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-06",
+    "libelle": "IONOS SARL Num-CL. K309770420/ Fact. 202545112251",
+    "sens": "SORTIE",
+    "montant": 8.4,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-06",
+    "libelle": "SIE PARIS 15E REMB. DGFiP - TROP VERSE SATD DETTE SOLDEE",
+    "sens": "ENTREE",
+    "montant": 250.0,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-07",
+    "libelle": "GOCARDLESS 45308",
+    "sens": "SORTIE",
+    "montant": 10.44,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-07",
+    "libelle": "MCDONALDS 102 Carte **1983",
+    "sens": "SORTIE",
+    "montant": 14.9,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-08",
+    "libelle": "FREE MOBILE Carte **1983",
+    "sens": "SORTIE",
+    "montant": 19.99,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-10",
+    "libelle": "Hotel at Booking.com Carte **1983",
+    "sens": "SORTIE",
+    "montant": 132.6,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-10",
+    "libelle": "TELEDEC Carte **1983",
+    "sens": "SORTIE",
+    "montant": 118.8,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-12",
+    "libelle": "ROUSTAM KIMIEV Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 256.68,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-12",
+    "libelle": "SEDOMICILIER Carte **1983",
+    "sens": "SORTIE",
+    "montant": 27.6,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-13",
+    "libelle": "HISCOX SA HISCOX SA Police d'assurance numero : HARCP0342762",
+    "sens": "SORTIE",
+    "montant": 90.57,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-13",
+    "libelle": "RANC DEVELOPPEMENT FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 5657.12,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-14",
+    "libelle": "CGF17516MCDO1 Carte **1983",
+    "sens": "SORTIE",
+    "montant": 32.3,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-14",
+    "libelle": "DIRECT ASSURANC Carte **1983",
+    "sens": "SORTIE",
+    "montant": 82.91,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-14",
+    "libelle": "SECURITAS FRANCE SARL F-000994 F-000992",
+    "sens": "ENTREE",
+    "montant": 20153.59,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-14",
+    "libelle": "SNCF VOYAGEURS Carte **1983",
+    "sens": "SORTIE",
+    "montant": 120.0,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-14",
+    "libelle": "SNCF-VOYAGEURS Carte **1983",
+    "sens": "SORTIE",
+    "montant": 80.0,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-15",
+    "libelle": "AQUILA SA FA 001000 FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 5415.29,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-16",
+    "libelle": "GARIS SÉCURITÉ ss traitant",
+    "sens": "SORTIE",
+    "montant": 19980.0,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-16",
+    "libelle": "SCI LES 6 T logement",
+    "sens": "SORTIE",
+    "montant": 880.0,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-18",
+    "libelle": "COMMANDE Carte **1983",
+    "sens": "SORTIE",
+    "montant": 3.06,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-18",
+    "libelle": "HISCOX SA HISCOX SA Police d'assurance numero : HARCP0342762",
+    "sens": "SORTIE",
+    "montant": 90.57,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-18",
+    "libelle": "URSSAF D ILE DE FRANCE UR 117000001579664416 AVR 26788617793000180526",
+    "sens": "SORTIE",
+    "montant": 921.0,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "libelle": "GAITEMIROV YOUSSOUP Salaires",
+    "sens": "SORTIE",
+    "montant": 1085.01,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "libelle": "PAYFIT FR-INV01031147",
+    "sens": "SORTIE",
+    "montant": 254.4,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "libelle": "SARL AGENCE IMMOBILIÈRE DE TOURNUS logement",
+    "sens": "SORTIE",
+    "montant": 648.85,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "libelle": "SECURITAS FRANCE SARL F-000993",
+    "sens": "ENTREE",
+    "montant": 19168.88,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-20",
+    "libelle": "SHABAZOV MAGOMED salaire",
+    "sens": "SORTIE",
+    "montant": 1111.8,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-21",
+    "libelle": "GARIS SÉCURITÉ Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 17760.0,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-21",
+    "libelle": "RANC DEVELOPPEMENT FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 5023.14,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-22",
+    "libelle": "GARIS SÉCURITÉ Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 13411.5,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-22",
+    "libelle": "LAPOSTE L219370 Carte **1983",
+    "sens": "SORTIE",
+    "montant": 9.33,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-05-22",
+    "libelle": "LAPOSTE L219370 Carte **1983",
+    "sens": "SORTIE",
+    "montant": 9.33,
+    "releve": "2026-05_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-06-02",
+    "libelle": "Virement Fact FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 162.0,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-04",
+    "libelle": "Carte SeDomicilier - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 27.6,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-11",
+    "libelle": "Virement FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 12906.0,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-15",
+    "libelle": "Virement FA 001013 FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 13493.55,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-15",
+    "libelle": "Virement SALAIRES",
+    "sens": "SORTIE",
+    "montant": 1001.75,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-15",
+    "libelle": "Virement logement",
+    "sens": "SORTIE",
+    "montant": 604.0,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-16",
+    "libelle": "Carte Free Mobile - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 29.99,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-16",
+    "libelle": "Virement A-000257 F-000995 F-001001",
+    "sens": "ENTREE",
+    "montant": 18251.45,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-19",
+    "libelle": "Virement Salaire",
+    "sens": "SORTIE",
+    "montant": 1611.25,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-19",
+    "libelle": "Virement Salaire",
+    "sens": "SORTIE",
+    "montant": 1850.43,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-22",
+    "libelle": "Virement LOYER",
+    "sens": "SORTIE",
+    "montant": 400.0,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-22",
+    "libelle": "Virement Virement vers VIGICORE SECURITY",
+    "sens": "SORTIE",
+    "montant": 2400.0,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-25",
+    "libelle": "Carte Notion - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 23.5,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-25",
+    "libelle": "Virement SOUS TRAITANT",
+    "sens": "SORTIE",
+    "montant": 18492.6,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-26",
+    "libelle": "Carte SeDomicilier - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 27.6,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-27",
+    "libelle": "Virement Virement vers GARIS SECURITE",
+    "sens": "SORTIE",
+    "montant": 13986.0,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-01",
+    "libelle": "Carte Sekur - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 143.96,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-01",
+    "libelle": "Virement Fact FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 4448.28,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-02",
+    "libelle": "Carte Sekur - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 143.96,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-03",
+    "libelle": "Carte Ionos - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 30.6,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-04",
+    "libelle": "Carte Free Mobile - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 29.99,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-06",
+    "libelle": "Carte Airbnb - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 214.84,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-06",
+    "libelle": "Carte Anthropic - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 180.0,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-07",
+    "libelle": "Carte Airbnb - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 186.32,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-07",
+    "libelle": "Virement Virement vers SCI LES 6 T",
+    "sens": "SORTIE",
+    "montant": 480.0,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-10",
+    "libelle": "Carte Ionos - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 30.6,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-10",
+    "libelle": "Virement F-001011 F-001012",
+    "sens": "ENTREE",
+    "montant": 12848.4,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-10",
+    "libelle": "Virement FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 10945.03,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-12",
+    "libelle": "Carte Lidl - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 41.3,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-12",
+    "libelle": "Virement Sous traitant",
+    "sens": "SORTIE",
+    "montant": 25726.44,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-13",
+    "libelle": "Carte Amazon Pay - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 65.99,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-13",
+    "libelle": "Carte La Poste - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 14.59,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-13",
+    "libelle": "Carte La Poste - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 14.59,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-14",
+    "libelle": "Carte Amazon Pay - Moussa Diane **6279",
+    "sens": "ENTREE",
+    "montant": 65.99,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-15",
+    "libelle": "Carte Amazon Pay - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 39.99,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-16",
+    "libelle": "Virement FA 001014 FKH SECURITE",
+    "sens": "ENTREE",
+    "montant": 10518.53,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-17",
+    "libelle": "Carte Google One - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 0.49,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-17",
+    "libelle": "Carte Le Légaliste - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 163.2,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-17",
+    "libelle": "Prélèvement automatique FR-INV01065925",
+    "sens": "SORTIE",
+    "montant": 277.2,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-17",
+    "libelle": "Prélèvement automatique FR-INV01066846",
+    "sens": "SORTIE",
+    "montant": 300.0,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-18",
+    "libelle": "Carte Ringover - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 212.04,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-19",
+    "libelle": "Carte PPG - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 2082.82,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-21",
+    "libelle": "Virement Virement vers VIGICORE SECURITY",
+    "sens": "SORTIE",
+    "montant": 2400.0,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-22",
+    "libelle": "Carte Lyca Mobile - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 19.99,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-25",
+    "libelle": "Carte Notion - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 23.5,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-25",
+    "libelle": "Virement SOUS TRAITANT",
+    "sens": "SORTIE",
+    "montant": 16000.0,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-26",
+    "libelle": "Carte SeDomicilier - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 27.6,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-28",
+    "libelle": "Carte Anthropic - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 21.11,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-28",
+    "libelle": "Carte Cloudflare - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 4.26,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-28",
+    "libelle": "Carte OpenAI - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 10.56,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-28",
+    "libelle": "Frais Card transaction in foreign currency",
+    "sens": "SORTIE",
+    "montant": 0.11,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-28",
+    "libelle": "Frais Card transaction in foreign currency",
+    "sens": "SORTIE",
+    "montant": 0.5,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-28",
+    "libelle": "Frais Card transaction in foreign currency",
+    "sens": "SORTIE",
+    "montant": 0.25,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-29",
+    "libelle": "Virement F-001010",
+    "sens": "ENTREE",
+    "montant": 37329.79,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-30",
+    "libelle": "Carte Ringover - Moussa Diane **6279",
+    "sens": "SORTIE",
+    "montant": 202.92,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-30",
+    "libelle": "Virement sous traitant",
+    "sens": "SORTIE",
+    "montant": 20000.0,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-31",
+    "libelle": "Virement Virement vers GARIS SECURITE",
+    "sens": "SORTIE",
+    "montant": 25000.0,
+    "releve": "2026-07_releve_Indy.pdf"
+   }
+  ]
+ },
  "domaine": "FKH",
  "genere_par": "SCRIPTS/build_data_fkh.py",
  "source": "maître TB2026_v23 · onglets BASE_Factures (1925 lignes) + Cascade_ST_2026 + BASE_Paie",
@@ -21470,7 +23273,7 @@
  },
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-12 22:37",
+  "lu_le": "2026-08-13 08:03",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
