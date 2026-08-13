@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b440</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b441</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -6112,7 +6112,12 @@ button.big:active{transform:translateY(1px)}
   function _plAgentMonthHours(aid,refISO){ if(!aid||!refISO)return 0; var mo=refISO.slice(0,7),tot=0; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(x){ if(x.agentId!==aid||x.statut!=='validee'||!x.mdate||x.mdate.slice(0,7)!==mo)return; var r=(typeof missRange==='function')?missRange(x):null; if(r)tot+=(r[1]-r[0]); }); return Math.round(tot/60*10)/10; }
   function _plAgentResults(m){ var q=(_plAffQ||'').toLowerCase().trim(); if(typeof FA==='undefined'||!FA||!FA.length)return '<div class="hint" style="padding:4px 2px">Aucun agent en base.</div>'; if(q.length<2)return '<div class="hint" style="padding:4px 2px">✍️ Tape au moins 2 lettres (nom · n° · ville) — les propositions se filtrent au fur et à mesure.</div>'; /* b199 : plus de liste complete, autocompletion seulement */ var arr=FA.filter(function(a){ return !q||(((a.nom||'')+' '+((a.tels||[]).join(' '))+' '+(a.ville||'')).toLowerCase().indexOf(q)>=0); }).slice(0,8); if(!arr.length)return '<div class="hint" style="padding:4px 2px">Aucun agent trouvé.</div>'; return arr.map(function(a){ var cur=(a.id===m.agentId); var ind=(typeof agentIndispoOn==='function')?agentIndispoOn(a.id,m.mdate):null; if(ind){ return '<div class="fa" style="opacity:.6;background:repeating-linear-gradient(45deg,rgba(110,168,254,.10) 0 6px,transparent 6px 12px)"><div><div class="fa-n">'+esc(a.nom||'—')+' <span style="color:#6ea8fe">🏖 indisponible</span></div><div class="fa-d">'+(ind.motif?esc(ind.motif)+' · ':'')+'jusqu\'au '+esc((ind.fin||'').split('-').reverse().join('/'))+'</div></div></div>'; } var cf=(typeof agentTimeConflicts==='function')?agentTimeConflicts(a.id,m):[]; var dispo=cf.length?'<span style="color:#c02626">🔴 déjà en mission</span>':'<span style="color:#1a9e5c">🟢 dispo</span>'; var hm=_plAgentMonthHours(a.id,m.mdate||impTodayISO()); var note=(a.fiab?(' · ⭐ '+esc(a.fiab)):''); return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+(cur?' <span style="color:var(--ok)">✓</span>':'')+note+'</div><div class="fa-d">'+esc((a.tels||[]).join(' / ')||'—')+(a.ville?' · '+esc(a.ville):'')+' · '+dispo+' · <b>['+hm+'h]</b> ce mois</div></div><div class="fa-a"><button class="ok pl-affpick" data-aid="'+esc(a.id)+'">Choisir</button></div></div>'; }).join(''); }
   /* b438 : la fiche recoit les memes ecouteurs que la liste du Suivi. */
-  function _plWireNear(card){ if(typeof svBindActs==='function')svBindActs(card); }
+  /* b441 : plie par defaut (Zeus, 13/08), mais il retient son etat le temps de la fiche —
+     sans ca, chaque changement de rayon le refermerait sous les doigts. */
+  var _plNearOpen=false;
+  function _plWireNear(card){ if(typeof svBindActs==='function')svBindActs(card);
+    var d=card.querySelector('#pl-near-det');
+    if(d&&!d._wired){ d._wired=1; d.addEventListener('toggle',function(){ _plNearOpen=d.open; }); } }
   function _plWirePicks(card,m){ _plWireNear(card); card.querySelectorAll('.pl-affpick').forEach(function(b){ b.onclick=function(){ var aid=b.getAttribute('data-aid'); if(typeof affpickWithCheck==='function'&&!affpickWithCheck(m,aid))return; m.agentId=aid; m.valide=Date.now(); /* b304 */ if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; }); }
   function _plRenderModal(){ var m=_plMissById(_plAffId); if(!m){planningAffectClose();return;} var card=byId('pl-modal-card'); if(!card)return; var M=_plStatusMap(); /* b430 : le titre porte la ville — c'est ce que Zeus cherchait sur BASIC FIT du 13/08. */ var site=(typeof svLabel==='function')?svLabel(m.siteAgent||m.titre||'—',m.ville||''):(m.siteAgent||m.titre||'—'); var cur=m.agentId?(typeof faById==='function'?faById(m.agentId):null):null; var when=(m.mdate?m.mdate.split('-').reverse().join('/'):'')+(m.mheure?' · '+m.mheure:'')+((typeof missEndTxt==='function'&&missEndTxt(m))?'→'+missEndTxt(m):''); var st=_plVacState(m);
     var opts='<option value="">Auto ('+esc(st.l)+')</option>'+Object.keys(M).map(function(code){ return '<option value="'+code+'"'+(String(m.vacStatus||'')===code?' selected':'')+'>'+esc(M[code].l)+'</option>'; }).join('');
@@ -6166,7 +6171,7 @@ button.big:active{transform:translateY(1px)}
       /* b438 : les agents proches AVANT la recherche par nom — quand personne n'est affecte,
          la question n'est pas « qui s'appelle comment » mais « qui est a cote ». */
       +((!m.agentId&&typeof renderNear==='function')
-         ? ('<details class="meta" style="margin:8px 0 6px" open><summary style="cursor:pointer;font-weight:700">\ud83d\udc65 Agents proches</summary><div style="margin-top:6px">'
+         ? ('<details class="meta" style="margin:8px 0 6px" id="pl-near-det"'+(_plNearOpen?' open':'')+'><summary style="cursor:pointer;font-weight:700">\ud83d\udc65 Agents proches</summary><div style="margin-top:6px">'
             +renderNear(m,true)+'</div></details>')
          : '')
       +'<div class="lab" style="margin:2px 0 3px">Affecter un agent (nom · n° · ville)</div><input class="pl-afsearch" placeholder="Tape un nom, un numéro, une ville…" autocomplete="off" value="'+esc(_plAffQ)+'" style="width:100%"><div class="pl-afres" style="margin-top:6px">'+_plAgentResults(m)+'</div>'
@@ -6233,7 +6238,15 @@ button.big:active{transform:translateY(1px)}
     }catch(e){} return x; }
     card.querySelectorAll('.pl-tk-h').forEach(function(b9){ b9.onchange=function(){ var k9=b9.getAttribute('data-key'), v9=(b9.value||'').trim(); if(!v9)return;
       m=_plLive(m);   /* b360 : on écrit dans la vacation vivante, pas dans une copie orpheline */
-      if(k9==='prise'){ m.mheure=v9; }
+      /* ===== b441 : L'HEURE DU TICKET N'EST PAS L'HEURE DE LA MISSION =====
+         POURQUOI (Zeus, 13/08) : « une mission qui commence a 8h, je veux pouvoir creer une
+         heure — 7h30 — pour associer le ticket de prise de service, mais 8h reste la vraie
+         heure de prise de service ». Jusqu'ici ce champ ecrivait `m.mheure` : poser 7h30
+         deplacait la MISSION — planning, duree, facturation, tout glissait d'une demi-heure.
+         `route` et `j15` avaient deja leur champ propre (routeH, j15H) ; la prise etait la
+         seule a confondre l'appel et le fait. Elle a desormais le sien : `priseH`.
+         L'heure vraie se modifie au-dessus, dans « Heure DEBUT ». */
+      if(k9==='prise'){ m.priseH=v9; }
       else if(k9==='fin'){ m.mfin=v9; }
       else if(k9==='route'){ m.routeH=v9; }
       else if(k9==='j15'){ m.j15H=v9; }
@@ -7554,7 +7567,7 @@ button.big:active{transform:translateY(1px)}
     var P=ssParams(), steps=[], prise=m.mheure||'';
     if(prise)steps.push({key:'route',label:'☎ Route (renseignements)',heure:(m.routeH||shiftTime(prise,-P.route)),type:'route'}); /* b206 : H24 = pas d'appel route */
     if(prise)steps.push({key:'j15',label:'☎ Pré-prise (J‑'+P.before+')',heure:(m.j15H||shiftTime(prise,-P.before)),type:'j15'}); /* b206 */
-    steps.push({key:'prise',label:'🟢 Prise de service',heure:prise,type:'prise'});
+    steps.push({key:'prise',label:'🟢 Prise de service',heure:(m.priseH||prise),type:'prise'});   /* b441 */
     if(m.agentId&&prise){ var _an=faById(m.agentId); if(_an&&typeof agentCtrl==='function'){ var _c=agentCtrl(_an.nom||''),_dd=(_c&&typeof ctrlDays==='function')?ctrlDays(_c['Date contrôle']):null, _need=!_c||(_dd!=null&&_dd>14); if(_need)steps.push({key:'tenue',label:'🦺 Contrôle tenue + PHOTO',heure:prise,type:'tenue'}); } }
     var _vus={}; apControls(m).forEach(function(c,i){ var ck=ctrlKey(c); if(!ck)return; if(_vus[ck])return; _vus[ck]=1; steps.push({key:ck,label:'🌙 Contrôle '+(steps.filter(function(s){return s.type==='call';}).length+1),heure:c,type:'call'}); });   /* b341 : cle = heure du controle */
     steps.push({key:'fin',label:'🔚 Fin de service',heure:(typeof apFinHeure==='function')?apFinHeure(m):'',type:'fin'});
