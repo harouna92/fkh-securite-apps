@@ -1804,7 +1804,7 @@
  },
  "conformite_2026": {
   "source": "👁️ fichiers RÉELLEMENT présents dans les dossiers de conformité du domaine",
-  "lu_le": "2026-08-13 11:16",
+  "lu_le": "2026-08-13 11:29",
   "dsn": {
    "2026-04": [
     "DSN11_Feedback_OK_6a06451ad9716355a8a094b1_04_2026.json"
@@ -1868,6 +1868,51 @@
    ],
    "2026-03": [
     "FACTURE_MARS_GARIS_FKH_GS-2026-099.pdf"
+   ]
+  },
+  "courriers": {
+   "2026-06": [
+    "FKH_2026-06-04_LAPOSTE_avis-reception_ar88500067877645h.pdf",
+    "FKH_2026-06-10_JUSTICE_notification-decision-prudhommes_2025-00016470.pdf",
+    "FKH_2026-06-12_FINANCES-PUBLIQUES_COURRIER-DGFIP_4014193.pdf",
+    "FKH_2026-06-15_SECURITAS_mise-en-demeure_10228-9107582.pdf"
+   ],
+   "2026-07": [
+    "FKH_2026-07-21_IMPOTS_avis-mise-en-recouvrement_amr20260605267.pdf"
+   ]
+  },
+  "plannings": {
+   "2026-01": [
+    "2026-01_planning_GAITEMIROV-Youssoup.pdf",
+    "2026-01_planning_KIMIEV-Roustam.pdf",
+    "2026-01_planning_SARR-Ndiouma.pdf",
+    "2026-01_planning_TSAKACHEV-Rizvan.pdf",
+    "2026-01_planning_sites_FKH.pdf"
+   ],
+   "2026-02": [
+    "2026-02_planning_ABAYOMI-Mohamed.pdf",
+    "2026-02_planning_DRISSI-EL-BOUZAIDI-Jamal.pdf",
+    "2026-02_planning_GAITEMIROV-Youssoup.pdf",
+    "2026-02_planning_KARAMOKO-Diaby.pdf",
+    "2026-02_planning_KIMIEV-Roustam.pdf",
+    "2026-02_planning_NASSI-Ilan.pdf",
+    "2026-02_planning_SARR-Ndiouma.pdf",
+    "2026-02_planning_TSAKACHEV-Rizvan.pdf"
+   ],
+   "2026-03": [
+    "2026-03_planning_GAITEMIROV-Youssoup.pdf",
+    "2026-03_planning_GAITEMIROV-Youssoup_CORRECTION.md",
+    "2026-03_planning_KIMIEV-Roustam.pdf",
+    "2026-03_planning_NASSI-Ilan.pdf"
+   ],
+   "2026-04": [
+    "2026-04_planning_GAITEMIROV-Youssoup.pdf",
+    "2026-04_planning_KIMIEV-Roustam.pdf",
+    "2026-04_planning_SARR-Ndiouma.pdf",
+    "2026-04_planning_SHABAZOV-Magomed.pdf"
+   ],
+   "2026-05": [
+    "2026-05_planning_GAITEMIROV-Youssoup.pdf"
    ]
   }
  },
@@ -23819,7 +23864,7 @@
  },
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-13 11:16",
+  "lu_le": "2026-08-13 11:29",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
