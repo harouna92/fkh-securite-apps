@@ -1804,7 +1804,7 @@
  },
  "conformite_2026": {
   "source": "👁️ fichiers RÉELLEMENT présents dans les dossiers de conformité du domaine",
-  "lu_le": "2026-08-13 10:43",
+  "lu_le": "2026-08-13 11:00",
   "dsn": {
    "2026-04": [
     "DSN11_Feedback_OK_6a06451ad9716355a8a094b1_04_2026.json"
@@ -23819,7 +23819,7 @@
  },
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-13 10:43",
+  "lu_le": "2026-08-13 11:00",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
