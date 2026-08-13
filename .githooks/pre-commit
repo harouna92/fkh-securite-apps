@@ -1,0 +1,30 @@
+#!/bin/sh
+# G-73 — dépôt PUBLIC : aucune donnée personnelle, bancaire ou de dossier.
+# Prévention MÉCANIQUE (G-66) : un motif trouvé bloque le commit.
+vis=$(gh repo view --json visibility -q .visibility 2>/dev/null)
+[ "$vis" = "PUBLIC" ] || exit 0
+
+trouve=0
+for f in $(git diff --cached --name-only --diff-filter=ACM); do
+  [ -f "$f" ] || continue
+  # le hook contient lui-même les motifs qu il cherche : il ne s audite pas (cf. boucle {{J}} du 13/08)
+  case "$f" in .githooks/*|*.png|*.jpg|*.jpeg|*.pdf|*.zip|*.ico) continue;; esac
+  hits=$(grep -nEo "FR[0-9]{2} ?[0-9]{4} ?[0-9]{4} ?[0-9]{4} ?[0-9]{4} ?[0-9]{4} ?[0-9A-Z]{3}|titre de séjour|RG ?[0-9]{2}/[0-9]{5}|N° ?SS|[0-9]{13}" "$f" 2>/dev/null | head -3)
+  if [ -n "$hits" ]; then
+    echo "🔴 G-73 — motif sensible dans $f :"
+    echo "$hits" | sed 's/^/     /'
+    trouve=1
+  fi
+done
+
+if [ "$trouve" = "1" ]; then
+  cat <<'MSG'
+
+Dépôt PUBLIC. Retire la donnée ou renvoie au dossier interne.
+Interdits : nom de personne physique · IBAN/BIC · n° de dossier (URSSAF,
+fiscal, RG, CNAPS) · SIREN de tiers · donnée de santé ou de séjour.
+Contournement conscient et assumé : git commit --no-verify
+MSG
+  exit 1
+fi
+exit 0
