@@ -1804,7 +1804,7 @@
  },
  "conformite_2026": {
   "source": "👁️ fichiers RÉELLEMENT présents dans les dossiers de conformité du domaine",
-  "lu_le": "2026-08-13 12:27",
+  "lu_le": "2026-08-13 12:36",
   "dsn": {
    "2026-04": [
     "DSN11_Feedback_OK_6a06451ad9716355a8a094b1_04_2026.json"
@@ -1915,6 +1915,9130 @@
     "2026-05_planning_GAITEMIROV-Youssoup.pdf"
    ]
   }
+ },
+ "heures_par_site_2026": {
+  "source": "factures PDF du dossier, lues site par site (gabarit FKH) — G-34, rien d'écrit au maître",
+  "factures": [
+   {
+    "doc": "F-000997",
+    "cote": "DO",
+    "fichier": "2026-04_Facture-N-F-000997-P2S-PROTECTION-SECURITE-SERVICE.pdf",
+    "ht_calcule": 1187.85,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "LIDL - CHALON SUR SAONE",
+      "du": "12/04/2026",
+      "au": "13/04/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 20.9,
+        "ht": 125.4
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 5.5,
+        "pu": 20.9,
+        "ht": 114.95
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 3.0,
+        "pu": 22.8,
+        "ht": 68.4
+       }
+      ]
+     },
+     {
+      "site": "GRAND FRAIS - SAINT-ANDRE-LES-",
+      "du": "14/04/2026",
+      "au": "15/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.5,
+        "pu": 19.0,
+        "ht": 28.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 20.9,
+        "ht": 188.1
+       }
+      ]
+     },
+     {
+      "site": "GRAND FRAIS - TROYES",
+      "du": "15/04/2026",
+      "au": "16/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.0,
+        "pu": 19.0,
+        "ht": 38.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 20.9,
+        "ht": 188.1
+       }
+      ]
+     },
+     {
+      "site": "GRAND FRAIS CHALONS EN",
+      "du": "15/04/2026",
+      "au": "21/04/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.0,
+        "pu": 19.0,
+        "ht": 57.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 16.0,
+        "pu": 20.9,
+        "ht": 334.4
+       }
+      ]
+     },
+     {
+      "site": "LIDL - CHALON SUR",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 710008",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000998",
+    "cote": "DO",
+    "fichier": "2026-04_Facture-N-F-000998-SOTEL.pdf",
+    "ht_calcule": 3706.9,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "SMYTHSTOYS DIJON (FR37) CENTRE",
+      "du": "07/04/2026",
+      "au": "28/04/2026",
+      "services": 13,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 30.25,
+        "pu": 22.0,
+        "ht": 665.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 99.0,
+        "pu": 24.2,
+        "ht": 2395.8
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 24.2,
+        "ht": 363.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 26.4,
+        "ht": 237.6
+       },
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 511103",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "CLOAREC TOM: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-000999",
+    "cote": "DO",
+    "fichier": "2026-04_Facture-N-F-000999-RANC-DEVELOPPEMENT.pdf",
+    "ht_calcule": 11034.4,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "BNP DIJON 412",
+      "du": "05/04/2026",
+      "au": "01/05/2026",
+      "services": 23,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 24.83,
+        "pu": 19.0,
+        "ht": 471.77
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 102.75,
+        "pu": 20.9,
+        "ht": 2147.48
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 14.0,
+        "pu": 39.9,
+        "ht": 558.6
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 22.0,
+        "pu": 22.8,
+        "ht": 501.6
+       }
+      ]
+     },
+     {
+      "site": "BNP CHENOVE 924",
+      "du": "13/04/2026",
+      "au": "24/04/2026",
+      "services": 23,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 155.25,
+        "pu": 19.0,
+        "ht": 2949.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 90.0,
+        "pu": 20.9,
+        "ht": 1881.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 20.9,
+        "ht": 313.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 22.8,
+        "ht": 205.2
+       }
+      ]
+     },
+     {
+      "site": "SG DAB HS BROGNON 63562",
+      "du": "14/04/2026",
+      "au": "14/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 7.0,
+        "pu": 19.0,
+        "ht": 133.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON CLEMENCEAU 756",
+      "du": "14/04/2026",
+      "au": "17/04/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 19.0,
+        "ht": 190.0
+       }
+      ]
+     },
+     {
+      "site": "SG DAB HS SEMUR EN AUXOIS 62740",
+      "du": "15/04/2026",
+      "au": "15/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 19.0,
+        "ht": 76.0
+       }
+      ]
+     },
+     {
+      "site": "SG CHATENOY LE ROYAL 0542",
+      "du": "20/04/2026",
+      "au": "20/04/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 19.0,
+        "ht": 76.0
+       }
+      ]
+     },
+     {
+      "site": "SG BEAUNE 00752",
+      "du": "21/04/2026",
+      "au": "27/04/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 27.0,
+        "pu": 19.0,
+        "ht": 513.0
+       }
+      ]
+     },
+     {
+      "site": "SG CHEVIGNY ST SAUVEUR 04182",
+      "du": "23/04/2026",
+      "au": "23/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 19.0,
+        "ht": 114.0
+       }
+      ]
+     },
+     {
+      "site": "SG TOTAL TAILLY BEAUNE MERCEUIL",
+      "du": "23/04/2026",
+      "au": "23/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 5.0,
+        "pu": 19.0,
+        "ht": 95.0
+       }
+      ]
+     },
+     {
+      "site": "SG GHS LONS LE SAUNIER CASINO",
+      "du": "24/04/2026",
+      "au": "24/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 8.5,
+        "pu": 19.0,
+        "ht": 161.5
+       }
+      ]
+     },
+     {
+      "site": "BNP CHÂTILLON-SUR-SEINE 00878",
+      "du": "30/04/2026",
+      "au": "30/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 8.0,
+        "pu": 19.0,
+        "ht": 152.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON FACULTES",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420091, 420093",
+        "h": 2.0,
+        "pu": 45.0,
+        "ht": 90.0
+       },
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420092",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP BEAUNE 4130: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420094, 420099",
+        "h": 3.0,
+        "pu": 45.0,
+        "ht": 135.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON 412: 3",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420096",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP CHENOVE 924: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     },
+     {
+      "site": "BNP DIJON FACULTES",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420097",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       },
+       {
+        "cat": "autre",
+        "lib": "2286: 1",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON TOISON D'OR",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     },
+     {
+      "site": "BNP QUETIGNY GRAND",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420098",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON REPUBLIQUE",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420100",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001000",
+    "cote": "DO",
+    "fichier": "2026-04_Facture-N-F-001000-AQUILA.pdf",
+    "ht_calcule": 4628.45,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "CARREFOUR MARKET TOURNUS",
+      "du": "01/04/2026",
+      "au": "30/04/2026",
+      "services": 30,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 181.25,
+        "pu": 19.0,
+        "ht": 3443.75
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 7.25,
+        "pu": 38.0,
+        "ht": 275.5
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 18.0,
+        "pu": 20.9,
+        "ht": 376.2
+       },
+       {
+        "cat": "autre",
+        "lib": "CHALON SUR SAONE: 13",
+        "h": 13.0,
+        "pu": 41.0,
+        "ht": 533.0
+       }
+      ]
+     },
+     {
+      "site": "NC MALAKOFF HUMANIS",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-001001",
+    "cote": "DO",
+    "fichier": "2026-04_Facture-N-F-001001-SECURITAS-FRANCE-SARL-AGENCE-10228-TSA-51234.pdf",
+    "ht_calcule": 16831.92,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "ABT20260184/OVH SAS",
+      "du": "01/04/2026",
+      "au": "01/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 2.0,
+        "pu": 21.5,
+        "ht": 43.0
+       }
+      ]
+     },
+     {
+      "site": "APN20260036/DUC",
+      "du": "01/04/2026",
+      "au": "21/04/2026",
+      "services": 15,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 41.0,
+        "pu": 21.5,
+        "ht": 881.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 129.0,
+        "pu": 21.5,
+        "ht": 2773.5
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 2.0,
+        "pu": 43.0,
+        "ht": 86.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 3.0,
+        "pu": 43.0,
+        "ht": 129.0
+       }
+      ]
+     },
+     {
+      "site": "DNT20260455/PLANCHERS ACOR",
+      "du": "03/04/2026",
+      "au": "06/04/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 25.0,
+        "pu": 21.5,
+        "ht": 537.5
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 12.5,
+        "pu": 43.0,
+        "ht": 537.5
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 12.5,
+        "pu": 21.5,
+        "ht": 268.75
+       }
+      ]
+     },
+     {
+      "site": "DUC CHAILLEY",
+      "du": "04/04/2026",
+      "au": "26/04/2026",
+      "services": 11,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 5.0,
+        "pu": 21.5,
+        "ht": 107.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 15.0,
+        "pu": 43.0,
+        "ht": 645.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 9.0,
+        "pu": 43.0,
+        "ht": 387.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 56.0,
+        "pu": 21.5,
+        "ht": 1204.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 26.0,
+        "pu": 21.5,
+        "ht": 559.0
+       }
+      ]
+     },
+     {
+      "site": "DNT20260469/UPS METZ",
+      "du": "07/04/2026",
+      "au": "08/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20261557/CEBPL SABLE SUR",
+      "du": "10/04/2026",
+      "au": "10/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 120.0,
+        "ht": 120.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20261557/CEBPL SABLE SUR",
+      "du": "10/04/2026",
+      "au": "18/04/2026",
+      "services": 16,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 51.5,
+        "pu": 21.5,
+        "ht": 1107.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20260963/BPLC JARNY",
+      "du": "13/04/2026",
+      "au": "27/04/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 25.25,
+        "pu": 21.5,
+        "ht": 542.88
+       }
+      ]
+     },
+     {
+      "site": "CRI20261343/BPLC NANCY",
+      "du": "13/04/2026",
+      "au": "13/04/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20261608/BPLC ESSEY LES",
+      "du": "15/04/2026",
+      "au": "18/04/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 32.5,
+        "pu": 21.5,
+        "ht": 698.75
+       }
+      ]
+     },
+     {
+      "site": "CCA20260247/UNIVERSITE MARIE ET",
+      "du": "16/04/2026",
+      "au": "16/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 80.0,
+        "ht": 80.0
+       }
+      ]
+     },
+     {
+      "site": "CCA20260247/UNIVERSITE MARIE",
+      "du": "16/04/2026",
+      "au": "16/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.5,
+        "pu": 21.5,
+        "ht": 96.75
+       }
+      ]
+     },
+     {
+      "site": "CCA20260241/CELIO BOURGES LA",
+      "du": "17/04/2026",
+      "au": "18/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CBR20260087/GARE DES",
+      "du": "18/04/2026",
+      "au": "20/04/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.25,
+        "pu": 21.5,
+        "ht": 91.38
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20255029/ CIC EST BRIEY",
+      "du": "20/04/2026",
+      "au": "20/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 15.0,
+        "ht": 15.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20261342/BPLC NANCY",
+      "du": "20/04/2026",
+      "au": "20/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20255029/ CIC EST BRIEY",
+      "du": "20/04/2026",
+      "au": "20/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.5,
+        "pu": 21.5,
+        "ht": 139.75
+       }
+      ]
+     },
+     {
+      "site": "GCN20260382/DUC",
+      "du": "21/04/2026",
+      "au": "30/04/2026",
+      "services": 8,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 22.0,
+        "pu": 21.5,
+        "ht": 473.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 65.98,
+        "pu": 21.5,
+        "ht": 1418.57
+       }
+      ]
+     },
+     {
+      "site": "CCA20260258/CELIO",
+      "du": "22/04/2026",
+      "au": "23/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.5,
+        "pu": 21.5,
+        "ht": 75.25
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "DBL20260208/BASIC FIT 4353",
+      "du": "25/04/2026",
+      "au": "25/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       }
+      ]
+     },
+     {
+      "site": "JLX20260172/GARE DES",
+      "du": "26/04/2026",
+      "au": "27/04/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 9.42,
+        "pu": 21.5,
+        "ht": 202.53
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       }
+      ]
+     },
+     {
+      "site": "DBL20260210/BASIC FIT 4353",
+      "du": "26/04/2026",
+      "au": "26/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 5.5,
+        "pu": 21.5,
+        "ht": 118.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20261601/BPLC NANCY",
+      "du": "27/04/2026",
+      "au": "27/04/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "NDG20260618/DUC",
+      "du": "27/04/2026",
+      "au": "30/04/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 11.0,
+        "pu": 21.5,
+        "ht": 236.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 29.98,
+        "pu": 21.5,
+        "ht": 644.57
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001002",
+    "cote": "DO",
+    "fichier": "2026-04_Facture-N-F-001002-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 1698.5,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "EBN20250459/SNCF RESEAU",
+      "du": "01/04/2026",
+      "au": "04/04/2026",
+      "services": 7,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 46.0,
+        "pu": 21.5,
+        "ht": 989.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 33.0,
+        "pu": 21.5,
+        "ht": 709.5
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001003",
+    "cote": "DO",
+    "fichier": "2026-04_Facture-N-F-001003-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 3870.0,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "EBN20260135/SNCF RESEAU",
+      "du": "04/04/2026",
+      "au": "10/04/2026",
+      "services": 13,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 72.0,
+        "pu": 21.5,
+        "ht": 1548.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 36.0,
+        "pu": 21.5,
+        "ht": 774.0
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 15.0,
+        "pu": 43.0,
+        "ht": 645.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 9.0,
+        "pu": 43.0,
+        "ht": 387.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001004",
+    "cote": "DO",
+    "fichier": "2026-04_Facture-N-F-001004-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 10964.57,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "EBN20260158/SNCF RESEAU",
+      "du": "09/04/2026",
+      "au": "30/04/2026",
+      "services": 43,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 273.0,
+        "pu": 21.5,
+        "ht": 5869.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 164.98,
+        "pu": 21.5,
+        "ht": 3547.07
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 45.0,
+        "pu": 21.5,
+        "ht": 967.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 27.0,
+        "pu": 21.5,
+        "ht": 580.5
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001005",
+    "cote": "DO",
+    "fichier": "2026-04_Facture-N-F-001005-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 10964.57,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "EBN20260158/SNCF RESEAU",
+      "du": "09/04/2026",
+      "au": "30/04/2026",
+      "services": 43,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 273.0,
+        "pu": 21.5,
+        "ht": 5869.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 164.98,
+        "pu": 21.5,
+        "ht": 3547.07
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 45.0,
+        "pu": 21.5,
+        "ht": 967.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 27.0,
+        "pu": 21.5,
+        "ht": 580.5
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001006",
+    "cote": "DO",
+    "fichier": "2026-04_Facture-N-F-001006-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 413.88,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "PTN20260392/DB CARGO FRANCE",
+      "du": "03/04/2026",
+      "au": "04/04/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.25,
+        "pu": 21.5,
+        "ht": 220.38
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000975",
+    "cote": "DO",
+    "fichier": "2026-02_Facture-N-F-000975-RANC-DEVELOPPEMENT.pdf",
+    "ht_calcule": 3126.5,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "BNP DIJON 412",
+      "du": "01/02/2026",
+      "au": "11/02/2026",
+      "services": 10,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 70.0,
+        "pu": 20.9,
+        "ht": 1463.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 10.0,
+        "pu": 22.8,
+        "ht": 228.0
+       }
+      ]
+     },
+     {
+      "site": "BNP LE CREUSOT",
+      "du": "11/02/2026",
+      "au": "14/02/2026",
+      "services": 8,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 22.0,
+        "pu": 19.0,
+        "ht": 418.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON LIBERTE 750",
+      "du": "23/02/2026",
+      "au": "24/02/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 13.5,
+        "pu": 19.0,
+        "ht": 256.5
+       }
+      ]
+     },
+     {
+      "site": "SG CHATENOY LE ROYAL 0542",
+      "du": "25/02/2026",
+      "au": "25/02/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 19.0,
+        "ht": 76.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON VICTOR HUGO 00757",
+      "du": "25/02/2026",
+      "au": "25/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 19.0,
+        "ht": 190.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON TOISON D'OR",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 386253, 386255",
+        "h": 2.0,
+        "pu": 45.0,
+        "ht": 90.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON CLEMENCEAU",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 386254",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "SG CHATENOY LE ROYAL",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 386256",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP QUETIGNY GRAND",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 386256, 420076",
+        "h": 2.0,
+        "pu": 45.0,
+        "ht": 90.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON FACULTES",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 386257",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP CHÂTILLON-SUR-",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 386258",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       },
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420076",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP BEAUNE 4130: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420077",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON 412: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     },
+     {
+      "site": "SG BARALP DIJON TOISON",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420078",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000976",
+    "cote": "DO",
+    "fichier": "2026-02_Facture-N-F-000976-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 14447.57,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "EBN20250457/SNCF RESEAU",
+      "du": "01/02/2026",
+      "au": "28/02/2026",
+      "services": 57,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 360.0,
+        "pu": 21.5,
+        "ht": 7740.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 215.98,
+        "pu": 21.5,
+        "ht": 4643.57
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 60.0,
+        "pu": 21.5,
+        "ht": 1290.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 36.0,
+        "pu": 21.5,
+        "ht": 774.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000977",
+    "cote": "DO",
+    "fichier": "2026-02_Facture-N-F-000977-SECURITAS-FRANCE-SARL-AGENCE-10228-TSA-51234.pdf",
+    "ht_calcule": 17805.25,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "GCN20260090/GARE DES",
+      "du": "01/02/2026",
+      "au": "01/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 1.0,
+        "pu": 21.5,
+        "ht": 21.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       }
+      ]
+     },
+     {
+      "site": "NDG20251753/DUC",
+      "du": "01/02/2026",
+      "au": "02/02/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.0,
+        "pu": 21.5,
+        "ht": 43.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20260456/BPLC NANCY",
+      "du": "02/02/2026",
+      "au": "02/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20260407/BPGO SAINT RENAN",
+      "du": "02/02/2026",
+      "au": "09/02/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 20.5,
+        "pu": 21.5,
+        "ht": 440.75
+       }
+      ]
+     },
+     {
+      "site": "PS-26.01.2026-FKH02/Normal",
+      "du": "02/02/2026",
+      "au": "28/02/2026",
+      "services": 24,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 192.0,
+        "pu": 21.5,
+        "ht": 4128.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20260502/CMCEE METZ",
+      "du": "03/02/2026",
+      "au": "04/02/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 14.25,
+        "pu": 21.5,
+        "ht": 306.38
+       }
+      ]
+     },
+     {
+      "site": "CCA20260045/CALO VANDOEUVRE",
+      "du": "03/02/2026",
+      "au": "07/02/2026",
+      "services": 9,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 34.5,
+        "pu": 21.5,
+        "ht": 741.75
+       }
+      ]
+     },
+     {
+      "site": "CRI20260486/CMCEE MULHOUSE",
+      "du": "03/02/2026",
+      "au": "14/02/2026",
+      "services": 22,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 67.0,
+        "pu": 21.5,
+        "ht": 1440.5
+       }
+      ]
+     },
+     {
+      "site": "CCA20260056/MAGASIN CELIO -",
+      "du": "04/02/2026",
+      "au": "05/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 21.5,
+        "ht": 21.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       }
+      ]
+     },
+     {
+      "site": "NDG20260129/DUC",
+      "du": "07/02/2026",
+      "au": "01/03/2026",
+      "services": 7,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 30.0,
+        "pu": 21.5,
+        "ht": 645.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 11.0,
+        "pu": 21.5,
+        "ht": 236.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 33.0,
+        "pu": 21.5,
+        "ht": 709.5
+       }
+      ]
+     },
+     {
+      "site": "DNT20260246/MAGNY METZ ESSO",
+      "du": "09/02/2026",
+      "au": "09/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.5,
+        "pu": 21.5,
+        "ht": 53.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 1.5,
+        "pu": 21.5,
+        "ht": 32.25
+       }
+      ]
+     },
+     {
+      "site": "DNT20260267/GARE DES",
+      "du": "12/02/2026",
+      "au": "13/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 21.5,
+        "ht": 21.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 8.0,
+        "pu": 21.5,
+        "ht": 172.0
+       }
+      ]
+     },
+     {
+      "site": "BDT20260239/METALEC LOGISTIQUE",
+      "du": "14/02/2026",
+      "au": "14/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 60.0,
+        "ht": 60.0
+       }
+      ]
+     },
+     {
+      "site": "BDT20260239/METALEC",
+      "du": "14/02/2026",
+      "au": "16/02/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.25,
+        "pu": 21.5,
+        "ht": 220.38
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20260720/BPGO SAINT RENAN",
+      "du": "16/02/2026",
+      "au": "16/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20260563/BPLC JARNY",
+      "du": "16/02/2026",
+      "au": "16/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.67,
+        "pu": 21.5,
+        "ht": 100.41
+       }
+      ]
+     },
+     {
+      "site": "ABT20260090/CALO LUNEVILLE",
+      "du": "17/02/2026",
+      "au": "21/02/2026",
+      "services": 10,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 35.5,
+        "pu": 21.5,
+        "ht": 763.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20260739/CMCEE MULHOUSE",
+      "du": "17/02/2026",
+      "au": "21/02/2026",
+      "services": 11,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 33.5,
+        "pu": 21.5,
+        "ht": 720.25
+       }
+      ]
+     },
+     {
+      "site": "LBD20260208 / BASIC FIT 4960 -",
+      "du": "19/02/2026",
+      "au": "19/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       }
+      ]
+     },
+     {
+      "site": "CCA20260096/LOOMIS BREST",
+      "du": "19/02/2026",
+      "au": "20/02/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 5.5,
+        "pu": 21.5,
+        "ht": 118.25
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CCA20260098/LOOMIS BREST",
+      "du": "20/02/2026",
+      "au": "23/02/2026",
+      "services": 6,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 21.25,
+        "pu": 21.5,
+        "ht": 456.88
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 14.0,
+        "pu": 21.5,
+        "ht": 301.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 8.0,
+        "pu": 21.5,
+        "ht": 172.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20260837/BPBFC DOLE GREVY",
+      "du": "21/02/2026",
+      "au": "21/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       }
+      ]
+     },
+     {
+      "site": "TME20260047/GARE DES",
+      "du": "21/02/2026",
+      "au": "23/02/2026",
+      "services": 8,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.5,
+        "pu": 21.5,
+        "ht": 204.25
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 16.0,
+        "pu": 21.5,
+        "ht": 344.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 30.0,
+        "pu": 21.5,
+        "ht": 645.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       }
+      ]
+     },
+     {
+      "site": "LSZ20260124/ACTION STORE 4056",
+      "du": "22/02/2026",
+      "au": "22/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 1.0,
+        "pu": 60.0,
+        "ht": 60.0
+       }
+      ]
+     },
+     {
+      "site": "LSZ20260124/ACTION STORE 4056",
+      "du": "22/02/2026",
+      "au": "23/02/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 21.5,
+        "ht": 21.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 11.0,
+        "pu": 21.5,
+        "ht": 236.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20260804/BPLC SAINT PARRES",
+      "du": "23/02/2026",
+      "au": "23/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 11.0,
+        "pu": 21.5,
+        "ht": 236.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20260843/CMCEE MULHOUSE",
+      "du": "24/02/2026",
+      "au": "24/02/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       }
+      ]
+     },
+     {
+      "site": "LSZ20260148/UPS METZ",
+      "du": "27/02/2026",
+      "au": "28/02/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 10.15,
+        "pu": 21.5,
+        "ht": 218.23
+       }
+      ]
+     },
+     {
+      "site": "CRI20260935/CALO BRIEY HAUT",
+      "du": "28/02/2026",
+      "au": "28/02/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000978",
+    "cote": "DO",
+    "fichier": "2026-02_Facture-N-F-000978-SOTEL.pdf",
+    "ht_calcule": 2365.9,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "SMYTHSTOYS DIJON (FR37) CENTRE",
+      "du": "02/02/2026",
+      "au": "09/02/2026",
+      "services": 9,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 16.75,
+        "pu": 22.0,
+        "ht": 368.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 54.0,
+        "pu": 24.2,
+        "ht": 1306.8
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 24.2,
+        "ht": 363.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 26.4,
+        "ht": 237.6
+       },
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 510010",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "SMYTHSTOYS REIMS: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 289021",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "KILOUTOU SENS: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-000979",
+    "cote": "DO",
+    "fichier": "2026-02_Facture-N-F-000979-NEW-ANGEL-S.pdf",
+    "ht_calcule": 202.0,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "ETS GUISIANO 3D IMPRIM",
+      "du": "02/02/2026",
+      "au": "02/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 20.0,
+        "ht": 180.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 1.0,
+        "pu": 22.0,
+        "ht": 22.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000980",
+    "cote": "DO",
+    "fichier": "2026-02_Facture-N-F-000980-GAMBRINUS.pdf",
+    "ht_calcule": 1807.5,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "GAMBRINUS",
+      "du": "05/02/2026",
+      "au": "01/03/2026",
+      "services": 13,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 57.0,
+        "pu": 27.5,
+        "ht": 1567.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 8.0,
+        "pu": 30.0,
+        "ht": 240.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000981",
+    "cote": "DO",
+    "fichier": "2026-02_Facture-N-F-000981-SAS-BULLION-KRAFT-POINT.pdf",
+    "ht_calcule": 1807.5,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "KRAFT POINT MULHOUSE",
+      "du": "05/02/2026",
+      "au": "01/03/2026",
+      "services": 13,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 57.0,
+        "pu": 27.5,
+        "ht": 1567.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 8.0,
+        "pu": 30.0,
+        "ht": 240.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000982",
+    "cote": "DO",
+    "fichier": "2026-02_Facture-N-F-000982-AQUILA.pdf",
+    "ht_calcule": 4956.15,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "CARREFOUR MARKET TOURNUS",
+      "du": "01/02/2026",
+      "au": "28/02/2026",
+      "services": 28,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 174.0,
+        "pu": 19.0,
+        "ht": 3306.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 16.0,
+        "pu": 20.9,
+        "ht": 334.4
+       }
+      ]
+     },
+     {
+      "site": "BONNIN ANNIE",
+      "du": "08/02/2026",
+      "au": "09/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.5,
+        "pu": 19.0,
+        "ht": 85.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 20.9,
+        "ht": 125.4
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 2.5,
+        "pu": 22.8,
+        "ht": 57.0
+       }
+      ]
+     },
+     {
+      "site": "KIKO FRANCE BESANCON 341",
+      "du": "25/02/2026",
+      "au": "26/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.25,
+        "pu": 19.0,
+        "ht": 80.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 20.9,
+        "ht": 188.1
+       },
+       {
+        "cat": "autre",
+        "lib": "CHALON SUR SAONE: 19",
+        "h": 19.0,
+        "pu": 41.0,
+        "ht": 779.0
+       }
+      ]
+     },
+     {
+      "site": "NC MALAKOFF HUMANIS",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-000983",
+    "cote": "DO",
+    "fichier": "2026-02_Facture-N-F-000983-AQUILA.pdf",
+    "ht_calcule": 123.9,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "(hors site identifié)",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "ESCOMPTE",
+        "h": 1.0,
+        "pu": 123.9,
+        "ht": 123.9
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000986",
+    "cote": "DO",
+    "fichier": "2026-02_Facture-N-F-000986-Securitas-France-SARL-Retail-Grand-Est-10385.pdf",
+    "ht_calcule": 4128.0,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "PS-26.01.2026-FKH02/Normal",
+      "du": "02/02/2026",
+      "au": "28/02/2026",
+      "services": 24,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 192.0,
+        "pu": 21.5,
+        "ht": 4128.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001007",
+    "cote": "DO",
+    "fichier": "2026-02_Facture-N-F-001007-RANC-DEVELOPPEMENT.pdf",
+    "ht_calcule": 136.8,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "BNP DIJON 412",
+      "du": "01/02/2026",
+      "au": "01/02/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 22.8,
+        "ht": 136.8
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000965",
+    "cote": "DO",
+    "fichier": "2026-01_Facture-N-F-000965-AQUILA.pdf",
+    "ht_calcule": 5882.3,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "CARREFOUR MARKET TOURNUS",
+      "du": "02/01/2026",
+      "au": "31/01/2026",
+      "services": 34,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 188.5,
+        "pu": 19.0,
+        "ht": 3581.5
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 16.0,
+        "pu": 20.9,
+        "ht": 334.4
+       }
+      ]
+     },
+     {
+      "site": "BUT LANGRES E114 REGION",
+      "du": "03/01/2026",
+      "au": "05/01/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 18.0,
+        "pu": 19.0,
+        "ht": 342.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 13.67,
+        "pu": 20.9,
+        "ht": 285.7
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 20.9,
+        "ht": 313.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 22.8,
+        "ht": 205.2
+       },
+       {
+        "cat": "autre",
+        "lib": "CHALON SUR SAONE: 20",
+        "h": 20.0,
+        "pu": 41.0,
+        "ht": 820.0
+       }
+      ]
+     },
+     {
+      "site": "NC MALAKOFF HUMANIS",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-000966",
+    "cote": "DO",
+    "fichier": "2026-01_Facture-N-F-000966-RANC-DEVELOPPEMENT.pdf",
+    "ht_calcule": 4185.95,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "SG DAB HS MERCEUIL TOTAL",
+      "du": "09/01/2026",
+      "au": "09/01/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 19.0,
+        "ht": 76.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON VICTOR HUGO 00757",
+      "du": "22/01/2026",
+      "au": "22/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.75,
+        "pu": 19.0,
+        "ht": 71.25
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 1.0,
+        "pu": 20.9,
+        "ht": 20.9
+       }
+      ]
+     },
+     {
+      "site": "SG LONS LE SAUNIER 1150",
+      "du": "22/01/2026",
+      "au": "22/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.25,
+        "pu": 19.0,
+        "ht": 61.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 1.0,
+        "pu": 20.9,
+        "ht": 20.9
+       }
+      ]
+     },
+     {
+      "site": "SG LOUHANS 551",
+      "du": "23/01/2026",
+      "au": "23/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.75,
+        "pu": 19.0,
+        "ht": 90.25
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 1.0,
+        "pu": 20.9,
+        "ht": 20.9
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON 412",
+      "du": "27/01/2026",
+      "au": "01/02/2026",
+      "services": 6,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 39.5,
+        "pu": 20.9,
+        "ht": 825.55
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 22.8,
+        "ht": 136.8
+       }
+      ]
+     },
+     {
+      "site": "SOCIETE GENERALE MONTCEAU LES MINES",
+      "du": "27/01/2026",
+      "au": "31/01/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 5.0,
+        "pu": 30.0,
+        "ht": 150.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON TOISON D'OR 2286",
+      "du": "27/01/2026",
+      "au": "30/01/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 38.5,
+        "pu": 19.0,
+        "ht": 731.5
+       }
+      ]
+     },
+     {
+      "site": "SOCIETE GENERALE MONTCEAU LES",
+      "du": "27/01/2026",
+      "au": "31/01/2026",
+      "services": 13,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 33.5,
+        "pu": 19.0,
+        "ht": 636.5
+       }
+      ]
+     },
+     {
+      "site": "SG GHS LONS LE SAUNIER CASINO",
+      "du": "29/01/2026",
+      "au": "29/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 19.0,
+        "ht": 76.0
+       }
+      ]
+     },
+     {
+      "site": "SG AUXONNE 00751",
+      "du": "29/01/2026",
+      "au": "29/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.25,
+        "pu": 19.0,
+        "ht": 61.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 1.0,
+        "pu": 20.9,
+        "ht": 20.9
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON REPUBLIQUE",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 386238, 386239, 386242",
+        "h": 3.0,
+        "pu": 45.0,
+        "ht": 135.0
+       },
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 386240",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP BEAUNE 4130: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 386241, 386247",
+        "h": 2.0,
+        "pu": 45.0,
+        "ht": 90.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON 412: 2",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     },
+     {
+      "site": "BNP DIJON FACULTES",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "386252",
+        "h": 6.0,
+        "pu": 45.0,
+        "ht": 270.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON TOISON D'OR",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 386241",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "SG LONS LE SAUNIER",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 386243, 386249",
+        "h": 6.0,
+        "pu": 45.0,
+        "ht": 270.0
+       },
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 386246, 386251",
+        "h": 2.0,
+        "pu": 45.0,
+        "ht": 90.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON LIBERTE 750: 2",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "1150: 8",
+        "h": 8.0,
+        "pu": 30.0,
+        "ht": 240.0
+       }
+      ]
+     },
+     {
+      "site": "SG LONS LE SAUNIER",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-000967",
+    "cote": "DO",
+    "fichier": "2026-01_Facture-N-F-000967-SECURITAS-FRANCE-SARL-AGENCE-10228-TSA-51234.pdf",
+    "ht_calcule": 20683.04,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "NDG20251753/DUC",
+      "du": "01/01/2026",
+      "au": "31/01/2026",
+      "services": 10,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 44.98,
+        "pu": 21.5,
+        "ht": 967.07
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 1.0,
+        "pu": 43.0,
+        "ht": 43.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 3.0,
+        "pu": 43.0,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 12.0,
+        "pu": 21.5,
+        "ht": 258.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 36.0,
+        "pu": 21.5,
+        "ht": 774.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20255058/CMCEE MULHOUSE",
+      "du": "02/01/2026",
+      "au": "10/01/2026",
+      "services": 19,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 53.0,
+        "pu": 21.5,
+        "ht": 1139.5
+       }
+      ]
+     },
+     {
+      "site": "VH-30.12.2025-FKH01/MAGASIN",
+      "du": "02/01/2026",
+      "au": "31/01/2026",
+      "services": 26,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 260.0,
+        "pu": 21.5,
+        "ht": 5590.0
+       }
+      ]
+     },
+     {
+      "site": "LSZ20260022/ACTION STORE 4071",
+      "du": "11/01/2026",
+      "au": "12/01/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 11.25,
+        "pu": 21.5,
+        "ht": 241.88
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20260075/BPLC NANCY",
+      "du": "12/01/2026",
+      "au": "19/01/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 17.5,
+        "pu": 21.5,
+        "ht": 376.25
+       }
+      ]
+     },
+     {
+      "site": "NDG20260064/UPS METZ",
+      "du": "13/01/2026",
+      "au": "14/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 8.0,
+        "pu": 21.5,
+        "ht": 172.0
+       }
+      ]
+     },
+     {
+      "site": "CBR20260026/UPS METZ",
+      "du": "14/01/2026",
+      "au": "15/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.17,
+        "pu": 21.5,
+        "ht": 154.16
+       }
+      ]
+     },
+     {
+      "site": "CRI20260190/CMCEE MULHOUSE",
+      "du": "15/01/2026",
+      "au": "17/01/2026",
+      "services": 8,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 22.0,
+        "pu": 21.5,
+        "ht": 473.0
+       }
+      ]
+     },
+     {
+      "site": "CCA20260024/SAS MANUFACTURE",
+      "du": "15/01/2026",
+      "au": "16/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "DNT20260118/UPS METZ",
+      "du": "15/01/2026",
+      "au": "16/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20260191/CMCEE MULHOUSE",
+      "du": "20/01/2026",
+      "au": "24/01/2026",
+      "services": 14,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 40.0,
+        "pu": 21.5,
+        "ht": 860.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20260308/BPLC NANCY",
+      "du": "21/01/2026",
+      "au": "21/01/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       }
+      ]
+     },
+     {
+      "site": "NDG20260122/CCF BOURGES",
+      "du": "22/01/2026",
+      "au": "23/01/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 8.0,
+        "pu": 21.5,
+        "ht": 172.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20260371/CACE ST VALLIER GAMBETTA",
+      "du": "23/01/2026",
+      "au": "23/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 150.0,
+        "ht": 150.0
+       }
+      ]
+     },
+     {
+      "site": "BDT20260111/CELIO HEILLECOURT",
+      "du": "23/01/2026",
+      "au": "24/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.83,
+        "pu": 21.5,
+        "ht": 82.35
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "NDG20260133/AFPA CENTRE D",
+      "du": "23/01/2026",
+      "au": "30/01/2026",
+      "services": 14,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 88.5,
+        "pu": 21.5,
+        "ht": 1902.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 54.0,
+        "pu": 21.5,
+        "ht": 1161.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20260371/CACE ST VALLIER",
+      "du": "23/01/2026",
+      "au": "26/01/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 20.0,
+        "pu": 21.5,
+        "ht": 430.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 17.67,
+        "pu": 21.5,
+        "ht": 379.91
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "LBD20260119/AXEREAL ST PIERRE",
+      "du": "25/01/2026",
+      "au": "26/01/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.0,
+        "pu": 21.5,
+        "ht": 43.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       }
+      ]
+     },
+     {
+      "site": "LBD20260119/AXEREAL ST PIERRE LES",
+      "du": "26/01/2026",
+      "au": "26/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 30.0,
+        "ht": 30.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20260320/BPLC NANCY",
+      "du": "26/01/2026",
+      "au": "26/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20260357/BPGO SAINT RENAN",
+      "du": "26/01/2026",
+      "au": "26/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       }
+      ]
+     },
+     {
+      "site": "NDG20260015/U EXPRESS",
+      "du": "26/01/2026",
+      "au": "28/01/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20260192/CMCEE MULHOUSE",
+      "du": "27/01/2026",
+      "au": "31/01/2026",
+      "services": 14,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 40.0,
+        "pu": 21.5,
+        "ht": 860.0
+       }
+      ]
+     },
+     {
+      "site": "CCA20260045/CALO VANDOEUVRE",
+      "du": "30/01/2026",
+      "au": "31/01/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 12.75,
+        "pu": 21.5,
+        "ht": 274.13
+       }
+      ]
+     },
+     {
+      "site": "GCN20260090/GARE DES",
+      "du": "31/01/2026",
+      "au": "31/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 2.98,
+        "pu": 21.5,
+        "ht": 64.07
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000968",
+    "cote": "DO",
+    "fichier": "2026-01_Facture-N-F-000968-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 16511.57,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "EBN20250456/SNCF RESEAU",
+      "du": "01/01/2026",
+      "au": "31/01/2026",
+      "services": 63,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 390.0,
+        "pu": 21.5,
+        "ht": 8385.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 233.98,
+        "pu": 21.5,
+        "ht": 5030.57
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 15.0,
+        "pu": 43.0,
+        "ht": 645.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 9.0,
+        "pu": 43.0,
+        "ht": 387.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 60.0,
+        "pu": 21.5,
+        "ht": 1290.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 36.0,
+        "pu": 21.5,
+        "ht": 774.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000969",
+    "cote": "DO",
+    "fichier": "2026-01_Facture-N-F-000969-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 9976.0,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "EBN20250465/SNCF RESEAU",
+      "du": "01/01/2026",
+      "au": "19/01/2026",
+      "services": 37,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 212.0,
+        "pu": 21.5,
+        "ht": 4558.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 132.0,
+        "pu": 21.5,
+        "ht": 2838.0
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 15.0,
+        "pu": 43.0,
+        "ht": 645.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 9.0,
+        "pu": 43.0,
+        "ht": 387.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 45.0,
+        "pu": 21.5,
+        "ht": 967.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 27.0,
+        "pu": 21.5,
+        "ht": 580.5
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000970",
+    "cote": "DO",
+    "fichier": "2026-01_Facture-N-F-000970-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 3132.0,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "PTN20251575/SNCF RESEAU",
+      "du": "01/01/2026",
+      "au": "05/01/2026",
+      "services": 9,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 32.0,
+        "pu": 21.5,
+        "ht": 688.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 24.0,
+        "pu": 21.5,
+        "ht": 516.0
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 15.0,
+        "pu": 43.0,
+        "ht": 645.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 9.0,
+        "pu": 43.0,
+        "ht": 387.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "PTN20251575/SNCF RESEAU",
+      "du": "01/01/2026",
+      "au": "01/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 1.0,
+        "pu": 380.0,
+        "ht": 380.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000971",
+    "cote": "DO",
+    "fichier": "2026-01_Facture-N-F-000971-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 3132.0,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "PTN20251576/SNCF RESEAU",
+      "du": "01/01/2026",
+      "au": "05/01/2026",
+      "services": 9,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 32.0,
+        "pu": 21.5,
+        "ht": 688.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 24.0,
+        "pu": 21.5,
+        "ht": 516.0
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 15.0,
+        "pu": 43.0,
+        "ht": 645.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 9.0,
+        "pu": 43.0,
+        "ht": 387.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "PTN20251576/SNCF RESEAU",
+      "du": "01/01/2026",
+      "au": "01/01/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 1.0,
+        "pu": 380.0,
+        "ht": 380.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000972",
+    "cote": "DO",
+    "fichier": "2026-01_Facture-N-F-000972-GAMBRINUS.pdf",
+    "ht_calcule": 2300.0,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "GAMBRINUS",
+      "du": "01/01/2026",
+      "au": "01/02/2026",
+      "services": 16,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 67.0,
+        "pu": 27.5,
+        "ht": 1842.5
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 3.0,
+        "pu": 52.5,
+        "ht": 157.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 10.0,
+        "pu": 30.0,
+        "ht": 300.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000973",
+    "cote": "DO",
+    "fichier": "2026-01_Facture-N-F-000973-SAS-BULLION-KRAFT-POINT.pdf",
+    "ht_calcule": 2300.0,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "KRAFT POINT MULHOUSE",
+      "du": "01/01/2026",
+      "au": "01/02/2026",
+      "services": 16,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 67.0,
+        "pu": 27.5,
+        "ht": 1842.5
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 3.0,
+        "pu": 52.5,
+        "ht": 157.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 10.0,
+        "pu": 30.0,
+        "ht": 300.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000984",
+    "cote": "DO",
+    "fichier": "2026-01_Facture-N-F-000984-Securitas-France-SARL-Retail-Grand-Est-10385.pdf",
+    "ht_calcule": 5590.0,
+    "controle_maitre": "hors maître",
+    "sites": [
+     {
+      "site": "VH-30.12.2025-FKH01/MAGASIN",
+      "du": "02/01/2026",
+      "au": "31/01/2026",
+      "services": 26,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 260.0,
+        "pu": 21.5,
+        "ht": 5590.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001020",
+    "cote": "DO",
+    "fichier": "2026-07_Facture-N-F-001020-AQUILA.pdf",
+    "ht_calcule": 12840.6,
+    "controle_maitre": "hors maître",
+    "sites": [
+     {
+      "site": "CARREFOUR MARKET TOURNUS",
+      "du": "01/07/2026",
+      "au": "31/07/2026",
+      "services": 31,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 188.5,
+        "pu": 19.0,
+        "ht": 3581.5
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 6.0,
+        "pu": 38.0,
+        "ht": 228.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 24.0,
+        "pu": 20.9,
+        "ht": 501.6
+       }
+      ]
+     },
+     {
+      "site": "EDF COLMAR - EUM BAS RHIN",
+      "du": "22/07/2026",
+      "au": "23/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.0,
+        "pu": 19.0,
+        "ht": 57.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 20.9,
+        "ht": 188.1
+       }
+      ]
+     },
+     {
+      "site": "DECATHLON/SARREBOURG",
+      "du": "23/07/2026",
+      "au": "24/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.0,
+        "pu": 19.0,
+        "ht": 38.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.0,
+        "pu": 20.9,
+        "ht": 146.3
+       }
+      ]
+     },
+     {
+      "site": "NOCIBE",
+      "du": "23/07/2026",
+      "au": "24/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.67,
+        "pu": 19.0,
+        "ht": 88.73
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 20.9,
+        "ht": 188.1
+       }
+      ]
+     },
+     {
+      "site": "CARREFOUR MARKET PERRIGNY",
+      "du": "23/07/2026",
+      "au": "31/07/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 7.5,
+        "pu": 19.0,
+        "ht": 142.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 41.33,
+        "pu": 20.9,
+        "ht": 863.8
+       }
+      ]
+     },
+     {
+      "site": "RELAIS DE LA RIPAILLE - ARGEDIS",
+      "du": "23/07/2026",
+      "au": "24/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 0.08,
+        "pu": 19.0,
+        "ht": 1.52
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 20.9,
+        "ht": 188.1
+       }
+      ]
+     },
+     {
+      "site": "ENEDIS EPAGNY DR LES ALPES",
+      "du": "23/07/2026",
+      "au": "24/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.5,
+        "pu": 19.0,
+        "ht": 28.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 8.5,
+        "pu": 20.9,
+        "ht": 177.65
+       }
+      ]
+     },
+     {
+      "site": "GRAND FRAIS GIE LA ROCHE / YON",
+      "du": "24/07/2026",
+      "au": "01/08/2026",
+      "services": 6,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 5.25,
+        "pu": 19.0,
+        "ht": 99.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 49.42,
+        "pu": 20.9,
+        "ht": 1032.88
+       }
+      ]
+     },
+     {
+      "site": "BASIC FIT/CONFLANS EN JARNISY",
+      "du": "25/07/2026",
+      "au": "25/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 19.0,
+        "ht": 114.0
+       }
+      ]
+     },
+     {
+      "site": "BASIC FIT/CHAUVIGNY",
+      "du": "25/07/2026",
+      "au": "25/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 19.0,
+        "ht": 114.0
+       }
+      ]
+     },
+     {
+      "site": "BASIC FIT",
+      "du": "25/07/2026",
+      "au": "26/07/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 19.0,
+        "ht": 114.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 6.0,
+        "pu": 20.9,
+        "ht": 125.4
+       }
+      ]
+     },
+     {
+      "site": "BASIC FIT/Varennes-Vauzelles",
+      "du": "26/07/2026",
+      "au": "31/07/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 21.5,
+        "pu": 19.0,
+        "ht": 408.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 20.9,
+        "ht": 125.4
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 10.5,
+        "pu": 20.9,
+        "ht": 219.45
+       }
+      ]
+     },
+     {
+      "site": "CARREFOUR NEVERS MARZY",
+      "du": "26/07/2026",
+      "au": "29/07/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 20.9,
+        "ht": 376.2
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 8.0,
+        "pu": 20.9,
+        "ht": 167.2
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 3.0,
+        "pu": 22.8,
+        "ht": 68.4
+       }
+      ]
+     },
+     {
+      "site": "BASIC FIT",
+      "du": "26/07/2026",
+      "au": "26/07/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 6.0,
+        "pu": 20.9,
+        "ht": 125.4
+       }
+      ]
+     },
+     {
+      "site": "STELLANTIS",
+      "du": "27/07/2026",
+      "au": "30/07/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 30.0,
+        "pu": 19.0,
+        "ht": 570.0
+       }
+      ]
+     },
+     {
+      "site": "CARREFOUR ST ANDRE LES VERGERS",
+      "du": "27/07/2026",
+      "au": "31/07/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 50.0,
+        "pu": 19.0,
+        "ht": 950.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 1.0,
+        "pu": 20.9,
+        "ht": 20.9
+       }
+      ]
+     },
+     {
+      "site": "CEDEO SEYNOD",
+      "du": "27/07/2026",
+      "au": "28/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.33,
+        "pu": 19.0,
+        "ht": 44.27
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 20.9,
+        "ht": 188.1
+       }
+      ]
+     },
+     {
+      "site": "DHL STE SAVINE",
+      "du": "27/07/2026",
+      "au": "28/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.0,
+        "pu": 19.0,
+        "ht": 38.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 8.5,
+        "pu": 20.9,
+        "ht": 177.65
+       }
+      ]
+     },
+     {
+      "site": "DECATHLON/HOUDEMONT",
+      "du": "28/07/2026",
+      "au": "31/07/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 28.0,
+        "pu": 19.0,
+        "ht": 532.0
+       }
+      ]
+     },
+     {
+      "site": "KUEHNE NAGEL CERNAY",
+      "du": "28/07/2026",
+      "au": "29/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 20.9,
+        "ht": 125.4
+       }
+      ]
+     },
+     {
+      "site": "DECATHLON MONTPELLIER CITY",
+      "du": "29/07/2026",
+      "au": "29/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.5,
+        "pu": 19.0,
+        "ht": 66.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 3.5,
+        "pu": 20.9,
+        "ht": 73.15
+       }
+      ]
+     },
+     {
+      "site": "BASIC FIT",
+      "du": "29/07/2026",
+      "au": "29/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.83,
+        "pu": 19.0,
+        "ht": 72.77
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 2.17,
+        "pu": 20.9,
+        "ht": 45.35
+       }
+      ]
+     },
+     {
+      "site": "BASIC FIT/ST MAIXENT L'ECOLE",
+      "du": "30/07/2026",
+      "au": "30/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 19.0,
+        "ht": 76.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 2.0,
+        "pu": 20.9,
+        "ht": 41.8
+       }
+      ]
+     },
+     {
+      "site": "BASIC FIT",
+      "du": "31/07/2026",
+      "au": "31/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 5.0,
+        "pu": 19.0,
+        "ht": 95.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 1.5,
+        "pu": 20.9,
+        "ht": 31.35
+       }
+      ]
+     },
+     {
+      "site": "ENEDIS SAINTE SAVINE DR",
+      "du": "31/07/2026",
+      "au": "31/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 1.98,
+        "pu": 20.9,
+        "ht": 41.38
+       },
+       {
+        "cat": "autre",
+        "lib": "CHALON SUR SAONE: 3",
+        "h": 3.0,
+        "pu": 41.0,
+        "ht": 123.0
+       }
+      ]
+     },
+     {
+      "site": "NC MALAKOFF HUMANIS",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "SAVINE: 1",
+        "h": 1.0,
+        "pu": 18.0,
+        "ht": 18.0
+       }
+      ]
+     },
+     {
+      "site": "ENEDIS SAINTE",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-001021",
+    "cote": "DO",
+    "fichier": "2026-07_Facture-N-F-001021-SOTEL.pdf",
+    "ht_calcule": 3457.66,
+    "controle_maitre": "hors maître",
+    "sites": [
+     {
+      "site": "SMYTHSTOYS DIJON (FR37) CENTRE",
+      "du": "06/07/2026",
+      "au": "09/07/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 11.75,
+        "pu": 22.0,
+        "ht": 258.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 27.0,
+        "pu": 24.2,
+        "ht": 653.4
+       }
+      ]
+     },
+     {
+      "site": "SOCIETE GENERALE NEVERS",
+      "du": "08/07/2026",
+      "au": "18/07/2026",
+      "services": 16,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 56.58,
+        "pu": 22.0,
+        "ht": 1244.76
+       }
+      ]
+     },
+     {
+      "site": "SOCIETE GENERALE/ BREST",
+      "du": "24/07/2026",
+      "au": "31/07/2026",
+      "services": 7,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 53.0,
+        "pu": 22.0,
+        "ht": 1166.0
+       }
+      ]
+     },
+     {
+      "site": "MAISON ALBERT BICHOT",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 212001",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       },
+       {
+        "cat": "autre",
+        "lib": "Nombre d'interventions sur le site COLLEGE SAINT COEUR: 1",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "COLLEGE SAINT COEUR: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "EMBAG ET EBDH: 1",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "EMBAG ET EBDH: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-001022",
+    "cote": "DO",
+    "fichier": "2026-07_Facture-N-F-001022-RANC-DEVELOPPEMENT.pdf",
+    "ht_calcule": 5515.88,
+    "controle_maitre": "hors maître",
+    "sites": [
+     {
+      "site": "BNP QUETIGNY GRAND MARCHE",
+      "du": "01/07/2026",
+      "au": "03/07/2026",
+      "services": 6,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 39.33,
+        "pu": 19.0,
+        "ht": 747.27
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 24.0,
+        "pu": 20.9,
+        "ht": 501.6
+       }
+      ]
+     },
+     {
+      "site": "SG GHS LONS LE SAUNIER CASINO",
+      "du": "02/07/2026",
+      "au": "02/07/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 19.0,
+        "ht": 114.0
+       }
+      ]
+     },
+     {
+      "site": "BNP CHENOVE 924",
+      "du": "03/07/2026",
+      "au": "03/07/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 19.0,
+        "ht": 114.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON 412",
+      "du": "11/07/2026",
+      "au": "31/07/2026",
+      "services": 10,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 47.32,
+        "pu": 20.9,
+        "ht": 988.99
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 8.0,
+        "pu": 39.9,
+        "ht": 319.2
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 16.0,
+        "pu": 22.8,
+        "ht": 364.8
+       }
+      ]
+     },
+     {
+      "site": "BNP BEAUNE 4130",
+      "du": "13/07/2026",
+      "au": "13/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 7.5,
+        "pu": 19.0,
+        "ht": 142.5
+       }
+      ]
+     },
+     {
+      "site": "SG CHEVIGNY ST SAUVEUR 04182",
+      "du": "17/07/2026",
+      "au": "17/07/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 19.0,
+        "ht": 114.0
+       }
+      ]
+     },
+     {
+      "site": "SG BEAUNE 00752",
+      "du": "20/07/2026",
+      "au": "20/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 19.0,
+        "ht": 114.0
+       }
+      ]
+     },
+     {
+      "site": "SG DAB HS MERCEUIL TOTAL",
+      "du": "21/07/2026",
+      "au": "29/07/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 18.0,
+        "pu": 19.0,
+        "ht": 342.0
+       }
+      ]
+     },
+     {
+      "site": "SG LONS LE SAUNIER 1150",
+      "du": "22/07/2026",
+      "au": "31/07/2026",
+      "services": 7,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 37.33,
+        "pu": 19.0,
+        "ht": 709.27
+       }
+      ]
+     },
+     {
+      "site": "BNP LONS LE SAUNIER 455",
+      "du": "24/07/2026",
+      "au": "29/07/2026",
+      "services": 6,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 30.75,
+        "pu": 19.0,
+        "ht": 584.25
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON FACULTES",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420079",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       },
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420080",
+        "h": 2.0,
+        "pu": 45.0,
+        "ht": 90.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON 412: 2",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     },
+     {
+      "site": "SG DAB HS MERCEUIL",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420081",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP CHÂTILLON-SUR-",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420082",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "SG CHEVIGNY ST",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420083",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP QUETIGNY GRAND",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420084",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       },
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420085",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP CHENOVE 924: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-001023",
+    "cote": "DO",
+    "fichier": "2026-07_Facture-N-F-001023-SECURITAS-FRANCE-SARL-AGENCE-10228-TSA-51234.pdf",
+    "ht_calcule": 36541.01,
+    "controle_maitre": "hors maître",
+    "sites": [
+     {
+      "site": "CRI20262852/BPLC JARVILLE",
+      "du": "01/07/2026",
+      "au": "04/07/2026",
+      "services": 11,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 33.5,
+        "pu": 21.5,
+        "ht": 720.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20262001/CIC GUINGAMP",
+      "du": "01/07/2026",
+      "au": "01/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "GCN20260551/DUC",
+      "du": "01/07/2026",
+      "au": "01/08/2026",
+      "services": 60,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 136.0,
+        "pu": 21.5,
+        "ht": 2924.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 408.0,
+        "pu": 21.5,
+        "ht": 8772.0
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 18.0,
+        "pu": 43.0,
+        "ht": 774.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 19.0,
+        "pu": 43.0,
+        "ht": 817.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 56.0,
+        "pu": 21.5,
+        "ht": 1204.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 24.0,
+        "pu": 21.5,
+        "ht": 516.0
+       }
+      ]
+     },
+     {
+      "site": "DUC CHAILLEY",
+      "du": "04/07/2026",
+      "au": "26/07/2026",
+      "services": 11,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 16.0,
+        "pu": 21.5,
+        "ht": 344.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 12.0,
+        "pu": 21.5,
+        "ht": 258.0
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 12.0,
+        "pu": 43.0,
+        "ht": 516.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 56.0,
+        "pu": 21.5,
+        "ht": 1204.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 24.0,
+        "pu": 21.5,
+        "ht": 516.0
+       }
+      ]
+     },
+     {
+      "site": "CBR20260177/GARE DES",
+      "du": "05/07/2026",
+      "au": "06/07/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 21.5,
+        "ht": 21.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 8.25,
+        "pu": 21.5,
+        "ht": 177.38
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       }
+      ]
+     },
+     {
+      "site": "DBL20260316/BASIC FIT 4665",
+      "du": "05/07/2026",
+      "au": "05/07/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       }
+      ]
+     },
+     {
+      "site": "DNT20260848/CIC EST JARNY",
+      "du": "06/07/2026",
+      "au": "06/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.25,
+        "pu": 21.5,
+        "ht": 198.88
+       }
+      ]
+     },
+     {
+      "site": "CRI20262842/CMSE DIGOIN",
+      "du": "06/07/2026",
+      "au": "27/07/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 39.25,
+        "pu": 21.5,
+        "ht": 843.88
+       }
+      ]
+     },
+     {
+      "site": "DNT20260840/BPLC NANCY",
+      "du": "06/07/2026",
+      "au": "06/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.5,
+        "pu": 21.5,
+        "ht": 204.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20262969/BPLC LAXOU",
+      "du": "07/07/2026",
+      "au": "08/07/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 19.0,
+        "pu": 21.5,
+        "ht": 408.5
+       }
+      ]
+     },
+     {
+      "site": "DNT20260867/UPS FLEVILLE",
+      "du": "07/07/2026",
+      "au": "08/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.5,
+        "pu": 21.5,
+        "ht": 32.25
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263048/CCMBO MONTCEAU",
+      "du": "09/07/2026",
+      "au": "10/07/2026",
+      "services": 6,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 18.5,
+        "pu": 21.5,
+        "ht": 397.75
+       }
+      ]
+     },
+     {
+      "site": "CRI20263091/CEAL MULHOUSE",
+      "du": "11/07/2026",
+      "au": "11/07/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263051/CCMBO MONTCEAU",
+      "du": "11/07/2026",
+      "au": "11/07/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262891/BPLC JARVILLE",
+      "du": "11/07/2026",
+      "au": "11/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       }
+      ]
+     },
+     {
+      "site": "DBL20260334/CAPTRAIN",
+      "du": "11/07/2026",
+      "au": "13/07/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 5.67,
+        "pu": 21.5,
+        "ht": 121.91
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "DBL20260323/BPLC JARVILLE",
+      "du": "12/07/2026",
+      "au": "12/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 1.0,
+        "pu": 30.0,
+        "ht": 30.0
+       }
+      ]
+     },
+     {
+      "site": "DBL20260323/BPLC JARVILLE",
+      "du": "12/07/2026",
+      "au": "12/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263059/BPLC NANCY",
+      "du": "13/07/2026",
+      "au": "13/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20262996/BPLC JARVILLE",
+      "du": "14/07/2026",
+      "au": "14/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 10.0,
+        "pu": 43.0,
+        "ht": 430.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262524/CICLB TOURNUS NLE",
+      "du": "15/07/2026",
+      "au": "15/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 15.0,
+        "ht": 15.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263097/CCMBO MONTCEAU LES",
+      "du": "15/07/2026",
+      "au": "15/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 80.0,
+        "ht": 80.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262524/CICLB TOURNUS",
+      "du": "15/07/2026",
+      "au": "15/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.33,
+        "pu": 21.5,
+        "ht": 136.1
+       }
+      ]
+     },
+     {
+      "site": "CRI20263097/CCMBO MONTCEAU",
+      "du": "15/07/2026",
+      "au": "18/07/2026",
+      "services": 11,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 32.75,
+        "pu": 21.5,
+        "ht": 704.13
+       }
+      ]
+     },
+     {
+      "site": "DNT20260903/UPS METZ",
+      "du": "15/07/2026",
+      "au": "16/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.5,
+        "pu": 21.5,
+        "ht": 53.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       }
+      ]
+     },
+     {
+      "site": "DNT20260909/LOOMIS BREST",
+      "du": "15/07/2026",
+      "au": "16/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "PTN20260868/DB CARGO",
+      "du": "16/07/2026",
+      "au": "17/07/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 20.33,
+        "pu": 21.5,
+        "ht": 437.1
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CCA20260561/Controle Technique",
+      "du": "16/07/2026",
+      "au": "17/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.75,
+        "pu": 21.5,
+        "ht": 59.13
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CCA20260574/AGENCE",
+      "du": "18/07/2026",
+      "au": "25/07/2026",
+      "services": 7,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 49.83,
+        "pu": 21.5,
+        "ht": 1071.35
+       }
+      ]
+     },
+     {
+      "site": "DNT20260871/CMCEE L'HOPITAL",
+      "du": "20/07/2026",
+      "au": "22/07/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 36.0,
+        "pu": 21.5,
+        "ht": 774.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263053/CIC EST RAON L'ETAPE",
+      "du": "20/07/2026",
+      "au": "20/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 15.0,
+        "ht": 15.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263002/CIC EST PONTARLIER P",
+      "du": "20/07/2026",
+      "au": "20/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 20.0,
+        "ht": 20.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263002/CIC EST",
+      "du": "20/07/2026",
+      "au": "20/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20263181/BPLC NANCY",
+      "du": "20/07/2026",
+      "au": "20/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 7.83,
+        "pu": 21.5,
+        "ht": 168.35
+       }
+      ]
+     },
+     {
+      "site": "CRI20263053/CIC EST RAON",
+      "du": "20/07/2026",
+      "au": "20/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.88,
+        "pu": 21.5,
+        "ht": 212.42
+       }
+      ]
+     },
+     {
+      "site": "CCA20260532/CELIO",
+      "du": "20/07/2026",
+      "au": "21/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.5,
+        "pu": 21.5,
+        "ht": 75.25
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20263234/BPLC CREUTZWALD",
+      "du": "21/07/2026",
+      "au": "21/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263255/CMCEE",
+      "du": "21/07/2026",
+      "au": "25/07/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 42.75,
+        "pu": 21.5,
+        "ht": 919.13
+       }
+      ]
+     },
+     {
+      "site": "DNT20260962/ABEILLE NANCY",
+      "du": "22/07/2026",
+      "au": "24/07/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 35.0,
+        "pu": 21.5,
+        "ht": 752.5
+       }
+      ]
+     },
+     {
+      "site": "BDT20261046/GARE DES",
+      "du": "23/07/2026",
+      "au": "23/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.5,
+        "pu": 21.5,
+        "ht": 225.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 1.5,
+        "pu": 21.5,
+        "ht": 32.25
+       }
+      ]
+     },
+     {
+      "site": "DNT20260973/UPERIO FRANCE",
+      "du": "23/07/2026",
+      "au": "25/07/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 16.17,
+        "pu": 21.5,
+        "ht": 347.66
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 22.5,
+        "pu": 21.5,
+        "ht": 483.75
+       }
+      ]
+     },
+     {
+      "site": "CRI20263339/CIC SAINT LOUBES",
+      "du": "25/07/2026",
+      "au": "25/07/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.5,
+        "pu": 21.5,
+        "ht": 75.25
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 2.5,
+        "pu": 21.5,
+        "ht": 53.75
+       }
+      ]
+     },
+     {
+      "site": "JLX20260257 / VIDELOT SAS",
+      "du": "25/07/2026",
+      "au": "25/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       }
+      ]
+     },
+     {
+      "site": "JLX20260260 / ESSO EXPRESS",
+      "du": "25/07/2026",
+      "au": "27/07/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 12.0,
+        "pu": 21.5,
+        "ht": 258.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "LBD20260888/GARE DES",
+      "du": "25/07/2026",
+      "au": "26/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 0.5,
+        "pu": 21.5,
+        "ht": 10.75
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263260/BPLC GERARDMER",
+      "du": "27/07/2026",
+      "au": "27/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 20.0,
+        "ht": 20.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263236/BPLC JARVILLE",
+      "du": "27/07/2026",
+      "au": "27/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263260/BPLC GERARDMER",
+      "du": "27/07/2026",
+      "au": "27/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263258/CMCEE",
+      "du": "28/07/2026",
+      "au": "31/07/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 38.5,
+        "pu": 21.5,
+        "ht": 827.75
+       }
+      ]
+     },
+     {
+      "site": "CRI20263331/BPAURA DOMERAT",
+      "du": "28/07/2026",
+      "au": "31/07/2026",
+      "services": 6,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 38.0,
+        "pu": 21.5,
+        "ht": 817.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20263334 / BPMC MONTLUCON",
+      "du": "28/07/2026",
+      "au": "31/07/2026",
+      "services": 6,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 38.0,
+        "pu": 21.5,
+        "ht": 817.0
+       }
+      ]
+     },
+     {
+      "site": "JLX20260265/BPMC MONTLUCON",
+      "du": "28/07/2026",
+      "au": "28/07/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "GCN20260935 / GARE DES",
+      "du": "30/07/2026",
+      "au": "31/07/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.17,
+        "pu": 21.5,
+        "ht": 197.16
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001024",
+    "cote": "DO",
+    "fichier": "2026-07_Facture-N-F-001024-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 451.5,
+    "controle_maitre": "hors maître",
+    "sites": [
+     {
+      "site": "PTN20260830/DB CARGO",
+      "du": "06/07/2026",
+      "au": "07/07/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 12.0,
+        "pu": 21.5,
+        "ht": 258.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001015",
+    "cote": "DO",
+    "fichier": "2026-06_Facture-N-F-001015-P2S-PROTECTION-SECURITE-SERVICE.pdf",
+    "ht_calcule": 746.45,
+    "controle_maitre": "hors maître",
+    "sites": [
+     {
+      "site": "GRAND FRAIS - SAINT-ANDRE-LES-",
+      "du": "26/06/2026",
+      "au": "30/06/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.5,
+        "pu": 19.0,
+        "ht": 47.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 16.42,
+        "pu": 20.9,
+        "ht": 343.18
+       }
+      ]
+     },
+     {
+      "site": "GRAND FRAIS CHALONS EN",
+      "du": "28/06/2026",
+      "au": "29/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 5.0,
+        "pu": 20.9,
+        "ht": 104.5
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 8.75,
+        "pu": 20.9,
+        "ht": 182.88
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 3.0,
+        "pu": 22.8,
+        "ht": 68.4
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001016",
+    "cote": "DO",
+    "fichier": "2026-06_Facture-N-F-001016-RANC-DEVELOPPEMENT.pdf",
+    "ht_calcule": 9058.88,
+    "controle_maitre": "hors maître",
+    "sites": [
+     {
+      "site": "BNP DIJON 412",
+      "du": "01/06/2026",
+      "au": "26/06/2026",
+      "services": 21,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 140.17,
+        "pu": 20.9,
+        "ht": 2929.55
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 24.0,
+        "pu": 22.8,
+        "ht": 547.2
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON LIBERTE 750",
+      "du": "01/06/2026",
+      "au": "01/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 19.0,
+        "ht": 190.0
+       }
+      ]
+     },
+     {
+      "site": "SG BARALP DIJON TOISON D'OR 667",
+      "du": "08/06/2026",
+      "au": "08/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 19.0,
+        "ht": 190.0
+       }
+      ]
+     },
+     {
+      "site": "SG BEAUNE 00752",
+      "du": "11/06/2026",
+      "au": "22/06/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 14.0,
+        "pu": 19.0,
+        "ht": 266.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON VICTOR HUGO 00757",
+      "du": "15/06/2026",
+      "au": "15/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 19.0,
+        "ht": 76.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON CHENOVE 00753",
+      "du": "15/06/2026",
+      "au": "15/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.33,
+        "pu": 19.0,
+        "ht": 120.27
+       }
+      ]
+     },
+     {
+      "site": "SG DAB HS MERCEUIL TOTAL",
+      "du": "15/06/2026",
+      "au": "15/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 19.0,
+        "ht": 76.0
+       }
+      ]
+     },
+     {
+      "site": "SG DAB HS SEMUR EN AUXOIS 62740",
+      "du": "16/06/2026",
+      "au": "16/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 8.0,
+        "pu": 19.0,
+        "ht": 152.0
+       }
+      ]
+     },
+     {
+      "site": "SG TOTAL TAILLY BEAUNE MERCEUIL",
+      "du": "18/06/2026",
+      "au": "18/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 19.0,
+        "ht": 76.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON FACULTES 00772",
+      "du": "22/06/2026",
+      "au": "22/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 7.58,
+        "pu": 19.0,
+        "ht": 144.02
+       }
+      ]
+     },
+     {
+      "site": "BNP QUETIGNY GRAND MARCHE 2637",
+      "du": "23/06/2026",
+      "au": "30/06/2026",
+      "services": 16,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 98.75,
+        "pu": 19.0,
+        "ht": 1876.25
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 56.98,
+        "pu": 20.9,
+        "ht": 1190.88
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 20.9,
+        "ht": 313.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 22.8,
+        "ht": 205.2
+       }
+      ]
+     },
+     {
+      "site": "SG AUXONNE 00751",
+      "du": "29/06/2026",
+      "au": "29/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 19.0,
+        "ht": 76.0
+       }
+      ]
+     },
+     {
+      "site": "SG BARALP DIJON TOISON",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420065",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON FACULTES",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420066",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP LONS LE SAUNIER",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420067, 420069, 420075",
+        "h": 3.0,
+        "pu": 60.0,
+        "ht": 180.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON VICTOR HUGO",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420068",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "SG CHEVIGNY ST",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420070",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       },
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420071",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON 412: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     },
+     {
+      "site": "SG LONS LE SAUNIER",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420072, 420074",
+        "h": 2.0,
+        "pu": 45.0,
+        "ht": 90.0
+       },
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420073",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "SG AUXONNE 00751: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     },
+     {
+      "site": "BNP CHÂTILLON-SUR-",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420076",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       },
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420077",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "SG BEAUNE 00752: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-001017",
+    "cote": "DO",
+    "fichier": "2026-06_Facture-N-F-001017-SECURITAS-FRANCE-SARL-AGENCE-10228-TSA-51234.pdf",
+    "ht_calcule": 21329.53,
+    "controle_maitre": "hors maître",
+    "sites": [
+     {
+      "site": "CRI20262269/BPLC DOMBASLE",
+      "du": "01/06/2026",
+      "au": "01/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.25,
+        "pu": 21.5,
+        "ht": 134.38
+       }
+      ]
+     },
+     {
+      "site": "CRI20262272/BPLC NANCY",
+      "du": "01/06/2026",
+      "au": "01/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.75,
+        "pu": 21.5,
+        "ht": 231.13
+       }
+      ]
+     },
+     {
+      "site": "GCN20260551/DUC",
+      "du": "01/06/2026",
+      "au": "01/07/2026",
+      "services": 52,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 136.0,
+        "pu": 21.5,
+        "ht": 2924.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 408.0,
+        "pu": 21.5,
+        "ht": 8772.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 56.0,
+        "pu": 21.5,
+        "ht": 1204.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 24.0,
+        "pu": 21.5,
+        "ht": 516.0
+       }
+      ]
+     },
+     {
+      "site": "CFS20260160/CCF ST AMAND",
+      "du": "06/06/2026",
+      "au": "06/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.0,
+        "pu": 21.5,
+        "ht": 43.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 2.0,
+        "pu": 21.5,
+        "ht": 43.0
+       }
+      ]
+     },
+     {
+      "site": "DUC CHAILLEY",
+      "du": "06/06/2026",
+      "au": "28/06/2026",
+      "services": 8,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 12.0,
+        "pu": 21.5,
+        "ht": 258.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 56.0,
+        "pu": 21.5,
+        "ht": 1204.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 24.0,
+        "pu": 21.5,
+        "ht": 516.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262368/BPLC NANCY",
+      "du": "08/06/2026",
+      "au": "08/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262432/BPLC NANCY",
+      "du": "08/06/2026",
+      "au": "08/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CCA20260389/CELIO METZ - CC",
+      "du": "10/06/2026",
+      "au": "12/06/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 12.0,
+        "pu": 21.5,
+        "ht": 258.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262516/CIC BOURGES",
+      "du": "15/06/2026",
+      "au": "15/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.5,
+        "pu": 21.5,
+        "ht": 139.75
+       }
+      ]
+     },
+     {
+      "site": "ABT20260433/CELIO METZ - CC",
+      "du": "16/06/2026",
+      "au": "18/06/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 12.0,
+        "pu": 21.5,
+        "ht": 258.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262705/BPLC CHATEAU",
+      "du": "18/06/2026",
+      "au": "25/06/2026",
+      "services": 15,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 47.0,
+        "pu": 21.5,
+        "ht": 1010.5
+       }
+      ]
+     },
+     {
+      "site": "BDT20260845/BASIC FIT 7136",
+      "du": "21/06/2026",
+      "au": "21/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 5.5,
+        "pu": 21.5,
+        "ht": 118.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20262669/BPLC NANCY",
+      "du": "22/06/2026",
+      "au": "22/06/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       }
+      ]
+     },
+     {
+      "site": "ABT20260459/MAGASIN CELIO",
+      "du": "23/06/2026",
+      "au": "24/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.5,
+        "pu": 21.5,
+        "ht": 96.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CCA20260452/CELIO METZ - CC",
+      "du": "24/06/2026",
+      "au": "26/06/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 12.0,
+        "pu": 21.5,
+        "ht": 258.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262713/BPLC CHATEAU",
+      "du": "26/06/2026",
+      "au": "26/06/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.67,
+        "pu": 21.5,
+        "ht": 207.91
+       }
+      ]
+     },
+     {
+      "site": "CRI20262852/BPLC JARVILLE",
+      "du": "27/06/2026",
+      "au": "30/06/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 13.5,
+        "pu": 21.5,
+        "ht": 290.25
+       }
+      ]
+     },
+     {
+      "site": "CFS20260192/BASIC FIT 4439",
+      "du": "28/06/2026",
+      "au": "28/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 5.5,
+        "pu": 21.5,
+        "ht": 118.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20262879 / BPLC TOUL",
+      "du": "29/06/2026",
+      "au": "29/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 12.25,
+        "pu": 21.5,
+        "ht": 263.38
+       }
+      ]
+     },
+     {
+      "site": "CRI20262842/CMSE DIGOIN",
+      "du": "29/06/2026",
+      "au": "29/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 100.0,
+        "ht": 100.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262842/CMSE DIGOIN",
+      "du": "29/06/2026",
+      "au": "29/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262829/BPLC METZ NORD",
+      "du": "29/06/2026",
+      "au": "29/06/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001018",
+    "cote": "DO",
+    "fichier": "2026-06_Facture-N-F-001018-SOTEL.pdf",
+    "ht_calcule": 727.44,
+    "controle_maitre": "hors maître",
+    "sites": [
+     {
+      "site": "SMYTHSTOYS DIJON (FR37) CENTRE",
+      "du": "03/06/2026",
+      "au": "30/06/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 7.92,
+        "pu": 22.0,
+        "ht": 174.24
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 21.0,
+        "pu": 24.2,
+        "ht": 508.2
+       },
+       {
+        "cat": "autre",
+        "lib": "QUETIGNY : 1",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "CARTER CASH-M44",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-001008",
+    "cote": "DO",
+    "fichier": "2026-05_Facture-N-F-001008-SOTEL.pdf",
+    "ht_calcule": 1644.06,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "SMYTHSTOYS DIJON (FR37) CENTRE",
+      "du": "20/05/2026",
+      "au": "30/05/2026",
+      "services": 6,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 15.33,
+        "pu": 22.0,
+        "ht": 337.26
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 54.0,
+        "pu": 24.2,
+        "ht": 1306.8
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001009",
+    "cote": "DO",
+    "fichier": "2026-05_Facture-N-F-001009-RANC-DEVELOPPEMENT.pdf",
+    "ht_calcule": 9120.86,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "BNP DIJON 412",
+      "du": "01/05/2026",
+      "au": "31/05/2026",
+      "services": 26,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 130.67,
+        "pu": 20.9,
+        "ht": 2731.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 26.25,
+        "pu": 39.9,
+        "ht": 1047.38
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 39.98,
+        "pu": 22.8,
+        "ht": 911.54
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON LIBERTE 750",
+      "du": "05/05/2026",
+      "au": "20/05/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 14.58,
+        "pu": 19.0,
+        "ht": 277.02
+       }
+      ]
+     },
+     {
+      "site": "SG CHEVIGNY ST SAUVEUR 04182",
+      "du": "06/05/2026",
+      "au": "07/05/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.58,
+        "pu": 19.0,
+        "ht": 201.02
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 20.9,
+        "ht": 188.1
+       }
+      ]
+     },
+     {
+      "site": "BNP CHÂTILLON-SUR-SEINE 00878",
+      "du": "07/05/2026",
+      "au": "07/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 8.25,
+        "pu": 19.0,
+        "ht": 156.75
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON REPUBLIQUE 408",
+      "du": "08/05/2026",
+      "au": "18/05/2026",
+      "services": 11,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 54.0,
+        "pu": 20.9,
+        "ht": 1128.6
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 16.0,
+        "pu": 39.9,
+        "ht": 638.4
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 16.0,
+        "pu": 22.8,
+        "ht": 364.8
+       }
+      ]
+     },
+     {
+      "site": "SG BEAUNE 00752",
+      "du": "11/05/2026",
+      "au": "11/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 19.0,
+        "ht": 114.0
+       }
+      ]
+     },
+     {
+      "site": "BNP BEAUNE 4130",
+      "du": "11/05/2026",
+      "au": "18/05/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 16.0,
+        "pu": 19.0,
+        "ht": 304.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON FACULTES 00772",
+      "du": "11/05/2026",
+      "au": "11/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 7.5,
+        "pu": 19.0,
+        "ht": 142.5
+       }
+      ]
+     },
+     {
+      "site": "SG NUITS ST GEORGES 00754",
+      "du": "11/05/2026",
+      "au": "11/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.5,
+        "pu": 19.0,
+        "ht": 85.5
+       }
+      ]
+     },
+     {
+      "site": "BNP CHENOVE 924",
+      "du": "26/05/2026",
+      "au": "26/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.75,
+        "pu": 19.0,
+        "ht": 185.25
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON FACULTES",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "420061, 420062",
+        "h": 6.0,
+        "pu": 45.0,
+        "ht": 270.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON REPUBLIQUE",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420053, 420055",
+        "h": 2.0,
+        "pu": 45.0,
+        "ht": 90.0
+       },
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420057, 420063",
+        "h": 2.0,
+        "pu": 45.0,
+        "ht": 90.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON 412: 2",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     },
+     {
+      "site": "BNP CHÂTILLON-SUR-",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420058",
+        "h": 2.0,
+        "pu": 45.0,
+        "ht": 90.0
+       }
+      ]
+     },
+     {
+      "site": "SG LONS LE SAUNIER",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420060",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP LONS LE SAUNIER",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420064",
+        "h": 1.0,
+        "pu": 60.0,
+        "ht": 60.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001010",
+    "cote": "DO",
+    "fichier": "2026-05_Facture-N-F-001010-SECURITAS-FRANCE-SARL-AGENCE-10228-TSA-51234.pdf",
+    "ht_calcule": 35813.66,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "NDG20260618/DUC",
+      "du": "01/05/2026",
+      "au": "31/05/2026",
+      "services": 36,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 58.0,
+        "pu": 21.5,
+        "ht": 1247.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 180.0,
+        "pu": 21.5,
+        "ht": 3870.0
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 59.0,
+        "pu": 43.0,
+        "ht": 2537.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 30.0,
+        "pu": 43.0,
+        "ht": 1290.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 70.0,
+        "pu": 21.5,
+        "ht": 1505.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 30.0,
+        "pu": 21.5,
+        "ht": 645.0
+       }
+      ]
+     },
+     {
+      "site": "GCN20260382/DUC",
+      "du": "01/05/2026",
+      "au": "30/05/2026",
+      "services": 22,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 53.0,
+        "pu": 21.5,
+        "ht": 1139.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 165.0,
+        "pu": 21.5,
+        "ht": 3547.5
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 11.0,
+        "pu": 43.0,
+        "ht": 473.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 30.0,
+        "pu": 43.0,
+        "ht": 1290.0
+       }
+      ]
+     },
+     {
+      "site": "DUC CHAILLEY",
+      "du": "01/05/2026",
+      "au": "31/05/2026",
+      "services": 14,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 5.0,
+        "pu": 21.5,
+        "ht": 107.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 48.0,
+        "pu": 43.0,
+        "ht": 2064.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 70.0,
+        "pu": 21.5,
+        "ht": 1505.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 30.0,
+        "pu": 21.5,
+        "ht": 645.0
+       }
+      ]
+     },
+     {
+      "site": "DBL20260233/BASIC FIT 4193",
+      "du": "02/05/2026",
+      "au": "02/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 5.5,
+        "pu": 21.5,
+        "ht": 118.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20261770/POSTE MACON",
+      "du": "04/05/2026",
+      "au": "04/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 80.0,
+        "ht": 80.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20261341/CIC LB CHATILLON",
+      "du": "04/05/2026",
+      "au": "04/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20261653/BPLC JARNY",
+      "du": "04/05/2026",
+      "au": "18/05/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 31.67,
+        "pu": 21.5,
+        "ht": 680.91
+       }
+      ]
+     },
+     {
+      "site": "CRI20261770/POSTE MACON",
+      "du": "04/05/2026",
+      "au": "07/05/2026",
+      "services": 12,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 37.33,
+        "pu": 21.5,
+        "ht": 802.6
+       }
+      ]
+     },
+     {
+      "site": "BPLC NANCY HAUSSONVI",
+      "du": "04/05/2026",
+      "au": "04/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.5,
+        "pu": 21.5,
+        "ht": 139.75
+       }
+      ]
+     },
+     {
+      "site": "CRI20261909/CALO METZ CAISSE",
+      "du": "05/05/2026",
+      "au": "05/05/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 2.0,
+        "pu": 21.5,
+        "ht": 43.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20261942/BPALC THIONVILLE",
+      "du": "07/05/2026",
+      "au": "09/05/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 12.5,
+        "pu": 21.5,
+        "ht": 268.75
+       }
+      ]
+     },
+     {
+      "site": "SGX20260026/GARE TRIAGE",
+      "du": "08/05/2026",
+      "au": "11/05/2026",
+      "services": 7,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 30.0,
+        "pu": 21.5,
+        "ht": 645.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 7.75,
+        "pu": 43.0,
+        "ht": 333.25
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 3.0,
+        "pu": 43.0,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20261853/BPLC NANCY",
+      "du": "11/05/2026",
+      "au": "11/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "NDG20260658/UPS METZ",
+      "du": "11/05/2026",
+      "au": "12/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20262025/BPALC THIONVILLE",
+      "du": "12/05/2026",
+      "au": "15/05/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 25.83,
+        "pu": 21.5,
+        "ht": 555.35
+       }
+      ]
+     },
+     {
+      "site": "CRI20262048/CICLB MACON",
+      "du": "13/05/2026",
+      "au": "13/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 30.0,
+        "ht": 30.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262039/CICLB MACON",
+      "du": "13/05/2026",
+      "au": "13/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 30.0,
+        "ht": 30.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262048/CICLB MACON",
+      "du": "13/05/2026",
+      "au": "13/05/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20262039/CICLB MACON",
+      "du": "13/05/2026",
+      "au": "13/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.5,
+        "pu": 21.5,
+        "ht": 96.75
+       }
+      ]
+     },
+     {
+      "site": "CCA20260301/GEN-HY CUBE",
+      "du": "15/05/2026",
+      "au": "18/05/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 20.5,
+        "pu": 21.5,
+        "ht": 440.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "LBD20260615/JEAN JAURES ESSO",
+      "du": "15/05/2026",
+      "au": "27/05/2026",
+      "services": 13,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 124.33,
+        "pu": 21.5,
+        "ht": 2673.1
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "JLX20260189/CCF BOURGES",
+      "du": "16/05/2026",
+      "au": "19/05/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 22.5,
+        "pu": 21.5,
+        "ht": 483.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CBR20260112/COLLEGE LA",
+      "du": "17/05/2026",
+      "au": "18/05/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.0,
+        "pu": 21.5,
+        "ht": 43.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 6.5,
+        "pu": 21.5,
+        "ht": 139.75
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       }
+      ]
+     },
+     {
+      "site": "CBR20260114/MAISON -LE BEGUEC",
+      "du": "17/05/2026",
+      "au": "18/05/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 5.83,
+        "pu": 21.5,
+        "ht": 125.35
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 5.0,
+        "pu": 21.5,
+        "ht": 107.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       }
+      ]
+     },
+     {
+      "site": "CCA20260303/COLLEGE LA",
+      "du": "18/05/2026",
+      "au": "20/05/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 13.75,
+        "pu": 21.5,
+        "ht": 295.63
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       }
+      ]
+     },
+     {
+      "site": "BDT20260670/CCF BOURGES",
+      "du": "26/05/2026",
+      "au": "26/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       }
+      ]
+     },
+     {
+      "site": "DNT20260642/CCF BOURGES",
+      "du": "28/05/2026",
+      "au": "28/05/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 12.0,
+        "pu": 21.5,
+        "ht": 258.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001011",
+    "cote": "DO",
+    "fichier": "2026-05_Facture-N-F-001011-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 3999.0,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "EBN20260159/SNCF RESEAU",
+      "du": "01/05/2026",
+      "au": "07/05/2026",
+      "services": 14,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 72.0,
+        "pu": 21.5,
+        "ht": 1548.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 42.0,
+        "pu": 21.5,
+        "ht": 903.0
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 15.0,
+        "pu": 43.0,
+        "ht": 645.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 9.0,
+        "pu": 43.0,
+        "ht": 387.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001012",
+    "cote": "DO",
+    "fichier": "2026-05_Facture-N-F-001012-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 6708.0,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "PTN20260517/SNCF RESEAU",
+      "du": "07/05/2026",
+      "au": "18/05/2026",
+      "services": 22,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 105.0,
+        "pu": 21.5,
+        "ht": 2257.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 63.0,
+        "pu": 21.5,
+        "ht": 1354.5
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 30.0,
+        "pu": 43.0,
+        "ht": 1290.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 18.0,
+        "pu": 43.0,
+        "ht": 774.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 30.0,
+        "pu": 21.5,
+        "ht": 645.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-001013",
+    "cote": "DO",
+    "fichier": "2026-05_Facture-N-F-001013-AQUILA.pdf",
+    "ht_calcule": 11544.94,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "CARREFOUR MARKET TOURNUS",
+      "du": "02/05/2026",
+      "au": "31/05/2026",
+      "services": 51,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 264.0,
+        "pu": 19.0,
+        "ht": 5016.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 120.0,
+        "pu": 20.9,
+        "ht": 2508.0
+       },
+       {
+        "cat": "Hjf",
+        "lib": null,
+        "h": 37.0,
+        "pu": 38.0,
+        "ht": 1406.0
+       },
+       {
+        "cat": "Hnf",
+        "lib": null,
+        "h": 18.0,
+        "pu": 39.9,
+        "ht": 718.2
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 54.0,
+        "pu": 20.9,
+        "ht": 1128.6
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 26.98,
+        "pu": 22.8,
+        "ht": 615.14
+       },
+       {
+        "cat": "autre",
+        "lib": "CHALON SUR SAONE: 3",
+        "h": 3.0,
+        "pu": 41.0,
+        "ht": 123.0
+       }
+      ]
+     },
+     {
+      "site": "NC MALAKOFF HUMANIS",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Nombre de rondes mobiles sur le site LCL DIJON WILSON: 1",
+        "h": 1.0,
+        "pu": 30.0,
+        "ht": 30.0
+       }
+      ]
+     },
+     {
+      "site": "LCL DIJON WILSON: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-000987",
+    "cote": "DO",
+    "fichier": "2026-03_Facture-N-F-000987-GAMBRINUS.pdf",
+    "ht_calcule": 1807.5,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "(hors site identifié)",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 57.0,
+        "pu": 27.5,
+        "ht": 1567.5
+       }
+      ]
+     },
+     {
+      "site": "GAMBRINUS",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 8.0,
+        "pu": 30.0,
+        "ht": 240.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000988",
+    "cote": "DO",
+    "fichier": "2026-03_Facture-N-F-000988-SAS-BULLION-KRAFT-POINT.pdf",
+    "ht_calcule": 1807.5,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "(hors site identifié)",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 57.0,
+        "pu": 27.5,
+        "ht": 1567.5
+       }
+      ]
+     },
+     {
+      "site": "KRAFT POINT MULHOUSE",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 8.0,
+        "pu": 30.0,
+        "ht": 240.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000989",
+    "cote": "DO",
+    "fichier": "2026-03_Facture-N-F-000989-AQUILA.pdf",
+    "ht_calcule": 5012.9,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "CARREFOUR MARKET TOURNUS",
+      "du": "01/03/2026",
+      "au": "31/03/2026",
+      "services": 31,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 188.5,
+        "pu": 19.0,
+        "ht": 3581.5
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 25.0,
+        "pu": 20.9,
+        "ht": 522.5
+       },
+       {
+        "cat": "autre",
+        "lib": "CHALON SUR SAONE: 22",
+        "h": 22.0,
+        "pu": 41.0,
+        "ht": 902.0
+       }
+      ]
+     },
+     {
+      "site": "NC MALAKOFF HUMANIS",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Dépassement interventions - Heures de nuit",
+        "h": 0.33,
+        "pu": 20.9,
+        "ht": 6.9
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000990",
+    "cote": "DO",
+    "fichier": "2026-03_Facture-N-F-000990-SOTEL.pdf",
+    "ht_calcule": 135.0,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "(hors site identifié)",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 510011, 510012, 510013",
+        "h": 3.0,
+        "pu": 45.0,
+        "ht": 135.0
+       }
+      ]
+     },
+     {
+      "site": "SMYTHSTOYS REIMS: 3",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-000991",
+    "cote": "DO",
+    "fichier": "2026-03_Facture-N-F-000991-RANC-DEVELOPPEMENT.pdf",
+    "ht_calcule": 4714.27,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "SG GHS LONS LE SAUNIER CASINO",
+      "du": "02/03/2026",
+      "au": "19/03/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 8.0,
+        "pu": 19.0,
+        "ht": 152.0
+       }
+      ]
+     },
+     {
+      "site": "BNP CHENOVE 924",
+      "du": "03/03/2026",
+      "au": "26/03/2026",
+      "services": 8,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 65.75,
+        "pu": 19.0,
+        "ht": 1249.25
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON 412",
+      "du": "08/03/2026",
+      "au": "31/03/2026",
+      "services": 14,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.0,
+        "pu": 19.0,
+        "ht": 57.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 78.73,
+        "pu": 20.9,
+        "ht": 1645.46
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 17.13,
+        "pu": 22.8,
+        "ht": 390.56
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON LIBERTE 750",
+      "du": "17/03/2026",
+      "au": "25/03/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.5,
+        "pu": 19.0,
+        "ht": 180.5
+       }
+      ]
+     },
+     {
+      "site": "SG TOTAL TAILLY BEAUNE MERCEUIL",
+      "du": "25/03/2026",
+      "au": "25/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 19.0,
+        "ht": 76.0
+       }
+      ]
+     },
+     {
+      "site": "SG LONS LE SAUNIER 1150",
+      "du": "28/03/2026",
+      "au": "28/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.5,
+        "pu": 19.0,
+        "ht": 47.5
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON 00770",
+      "du": "30/03/2026",
+      "au": "30/03/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 19.0,
+        "ht": 76.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON TOISON D'OR",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420079, 420080, 420086",
+        "h": 3.0,
+        "pu": 45.0,
+        "ht": 135.0
+       }
+      ]
+     },
+     {
+      "site": "BNP DIJON 412: 7",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "089",
+        "h": 7.0,
+        "pu": 45.0,
+        "ht": 315.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON CHENOVE",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420084",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP QUETIGNY GRAND",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420 087",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "SG GHS LONS LE SAUNIER",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420088",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       },
+       {
+        "cat": "autre",
+        "lib": "1150: 2",
+        "h": 2.0,
+        "pu": 45.0,
+        "ht": 90.0
+       }
+      ]
+     },
+     {
+      "site": "SG LONS LE SAUNIER",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "Bon(s) de commande : 420090",
+        "h": 1.0,
+        "pu": 45.0,
+        "ht": 45.0
+       }
+      ]
+     },
+     {
+      "site": "BNP CHENOVE 924: 1",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "750: 2",
+        "h": 2.0,
+        "pu": 30.0,
+        "ht": 60.0
+       }
+      ]
+     },
+     {
+      "site": "SG DIJON LIBERTE",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": [
+       {
+        "cat": "autre",
+        "lib": "1150: 2",
+        "h": 2.0,
+        "pu": 30.0,
+        "ht": 60.0
+       }
+      ]
+     },
+     {
+      "site": "SG LONS LE SAUNIER",
+      "du": "",
+      "au": "",
+      "services": null,
+      "lignes": []
+     }
+    ]
+   },
+   {
+    "doc": "F-000992",
+    "cote": "DO",
+    "fichier": "2026-03_Facture-N-F-000992-SECURITAS-FRANCE-SARL-AGENCE-10228-TSA-51234.pdf",
+    "ht_calcule": 16558.14,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "LSZ20260149/UPS METZ",
+      "du": "01/03/2026",
+      "au": "02/03/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "LSZ20260148/UPS METZ",
+      "du": "01/03/2026",
+      "au": "01/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       }
+      ]
+     },
+     {
+      "site": "NDG20260129/DUC",
+      "du": "01/03/2026",
+      "au": "02/03/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.0,
+        "pu": 21.5,
+        "ht": 43.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20260978/POSTE VILLENEUVE SUR",
+      "du": "03/03/2026",
+      "au": "03/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 40.0,
+        "ht": 40.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20260935/CALO BRIEY HAUT",
+      "du": "03/03/2026",
+      "au": "03/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "NDG20260348/UPS METZ",
+      "du": "03/03/2026",
+      "au": "04/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.0,
+        "pu": 21.5,
+        "ht": 150.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20260978/POSTE VILLENEUVE",
+      "du": "03/03/2026",
+      "au": "04/03/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20260993/CALO BRIEY HAUT",
+      "du": "04/03/2026",
+      "au": "07/03/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 27.5,
+        "pu": 21.5,
+        "ht": 591.25
+       }
+      ]
+     },
+     {
+      "site": "NDG20260357/UPS METZ",
+      "du": "04/03/2026",
+      "au": "05/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20260928/BPGO BREST CENTRE",
+      "du": "05/03/2026",
+      "au": "05/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.0,
+        "pu": 21.5,
+        "ht": 86.0
+       }
+      ]
+     },
+     {
+      "site": "NDG20260362/UPS METZ",
+      "du": "05/03/2026",
+      "au": "06/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       }
+      ]
+     },
+     {
+      "site": "NDG20260376/UPS METZ",
+      "du": "06/03/2026",
+      "au": "09/03/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 16.5,
+        "pu": 21.5,
+        "ht": 354.75
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "NDG20260372/DUC",
+      "du": "07/03/2026",
+      "au": "30/03/2026",
+      "services": 8,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 12.0,
+        "pu": 21.5,
+        "ht": 258.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 36.0,
+        "pu": 21.5,
+        "ht": 774.0
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 12.0,
+        "pu": 21.5,
+        "ht": 258.0
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 35.0,
+        "pu": 21.5,
+        "ht": 752.5
+       }
+      ]
+     },
+     {
+      "site": "GCN20260245 / GARE DES CONFLANS",
+      "du": "09/03/2026",
+      "au": "09/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 6.0,
+        "pu": 21.5,
+        "ht": 129.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 5.83,
+        "pu": 21.5,
+        "ht": 125.35
+       }
+      ]
+     },
+     {
+      "site": "CRI20260963/BPLC JARNY",
+      "du": "09/03/2026",
+      "au": "30/03/2026",
+      "services": 4,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 36.5,
+        "pu": 21.5,
+        "ht": 784.75
+       }
+      ]
+     },
+     {
+      "site": "CRI20260962/BPLC ARS SUR",
+      "du": "09/03/2026",
+      "au": "09/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "DNT20260343/UPS METZ",
+      "du": "09/03/2026",
+      "au": "10/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       }
+      ]
+     },
+     {
+      "site": "CRI20261060/BPLC NANCY",
+      "du": "10/03/2026",
+      "au": "14/03/2026",
+      "services": 6,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 42.0,
+        "pu": 21.5,
+        "ht": 903.0
+       }
+      ]
+     },
+     {
+      "site": "DNT20260349/UPS METZ",
+      "du": "10/03/2026",
+      "au": "11/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       }
+      ]
+     },
+     {
+      "site": "DNT20260358/UPS METZ",
+      "du": "11/03/2026",
+      "au": "12/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       }
+      ]
+     },
+     {
+      "site": "DNT20260366/UPS METZ",
+      "du": "12/03/2026",
+      "au": "13/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 7.5,
+        "pu": 21.5,
+        "ht": 161.25
+       }
+      ]
+     },
+     {
+      "site": "DNT20260374/UPS METZ",
+      "du": "13/03/2026",
+      "au": "16/03/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 16.5,
+        "pu": 21.5,
+        "ht": 354.75
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20261122/BPLC ARS SUR",
+      "du": "16/03/2026",
+      "au": "16/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 8.5,
+        "pu": 21.5,
+        "ht": 182.75
+       }
+      ]
+     },
+     {
+      "site": "CRI20261154/BPLC NANCY",
+      "du": "17/03/2026",
+      "au": "21/03/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 42.0,
+        "pu": 21.5,
+        "ht": 903.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20261189/CALO METZ",
+      "du": "17/03/2026",
+      "au": "17/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.25,
+        "pu": 21.5,
+        "ht": 91.38
+       }
+      ]
+     },
+     {
+      "site": "CCA20260168/CELIO METZ - CC MUSE",
+      "du": "18/03/2026",
+      "au": "20/03/2026",
+      "services": 2,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.5,
+        "pu": 21.5,
+        "ht": 225.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 18.0,
+        "pu": 21.5,
+        "ht": 387.0
+       }
+      ]
+     },
+     {
+      "site": "NDG20260439/DUC",
+      "du": "20/03/2026",
+      "au": "31/03/2026",
+      "services": 8,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 23.0,
+        "pu": 21.5,
+        "ht": 494.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 65.98,
+        "pu": 21.5,
+        "ht": 1418.57
+       }
+      ]
+     },
+     {
+      "site": "BDT20260421/DB CARGO FRANCE",
+      "du": "21/03/2026",
+      "au": "23/03/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20261191/BPGO SAINT RENAN",
+      "du": "23/03/2026",
+      "au": "23/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 10.0,
+        "pu": 21.5,
+        "ht": 215.0
+       }
+      ]
+     },
+     {
+      "site": "DNT20260438/C S G BOURGES N",
+      "du": "26/03/2026",
+      "au": "27/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 4.5,
+        "pu": 21.5,
+        "ht": 96.75
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20260547/CMCEE FAMECK",
+      "du": "27/03/2026",
+      "au": "27/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 1.0,
+        "pu": 50.0,
+        "ht": 50.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20260547/CMCEE FAMECK",
+      "du": "27/03/2026",
+      "au": "28/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 3.5,
+        "pu": 21.5,
+        "ht": 75.25
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 3.0,
+        "pu": 21.5,
+        "ht": 64.5
+       }
+      ]
+     },
+     {
+      "site": "CRI20261366/CMCEE YUTZ",
+      "du": "28/03/2026",
+      "au": "30/03/2026",
+      "services": 5,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 11.67,
+        "pu": 21.5,
+        "ht": 250.91
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 15.0,
+        "pu": 21.5,
+        "ht": 322.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 8.0,
+        "pu": 21.5,
+        "ht": 172.0
+       }
+      ]
+     },
+     {
+      "site": "CRI20261344/BPLC NANCY",
+      "du": "30/03/2026",
+      "au": "30/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 8.5,
+        "pu": 21.5,
+        "ht": 182.75
+       }
+      ]
+     },
+     {
+      "site": "CRI20261367/BPLC ARS SUR",
+      "du": "31/03/2026",
+      "au": "31/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.75,
+        "pu": 21.5,
+        "ht": 209.63
+       }
+      ]
+     },
+     {
+      "site": "ABT20260184/OVH SAS",
+      "du": "31/03/2026",
+      "au": "31/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 2.0,
+        "pu": 21.5,
+        "ht": 43.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 2.98,
+        "pu": 21.5,
+        "ht": 64.07
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000993",
+    "cote": "DO",
+    "fichier": "2026-03_Facture-N-F-000993-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 15974.07,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "EBN20250458/SNCF RESEAU",
+      "du": "01/03/2026",
+      "au": "31/03/2026",
+      "services": 63,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 390.0,
+        "pu": 21.5,
+        "ht": 8385.0
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 233.98,
+        "pu": 21.5,
+        "ht": 5030.57
+       },
+       {
+        "cat": "Hd",
+        "lib": null,
+        "h": 75.0,
+        "pu": 21.5,
+        "ht": 1612.5
+       },
+       {
+        "cat": "Hdn",
+        "lib": null,
+        "h": 44.0,
+        "pu": 21.5,
+        "ht": 946.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000994",
+    "cote": "DO",
+    "fichier": "2026-03_Facture-N-F-000994-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 236.5,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "PTN20260280/DB CARGO FRANCE",
+      "du": "09/03/2026",
+      "au": "09/03/2026",
+      "services": 1,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 2.0,
+        "pu": 21.5,
+        "ht": 43.0
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "doc": "F-000995",
+    "cote": "DO",
+    "fichier": "2026-03_Facture-N-F-000995-SECURITAS-FRANCE-SARL-AGENCE-10017.pdf",
+    "ht_calcule": 492.78,
+    "controle_maitre": "ok",
+    "sites": [
+     {
+      "site": "PTN20260348/DB CARGO FRANCE",
+      "du": "20/03/2026",
+      "au": "21/03/2026",
+      "services": 3,
+      "lignes": [
+       {
+        "cat": "Hj",
+        "lib": null,
+        "h": 13.92,
+        "pu": 21.5,
+        "ht": 299.28
+       },
+       {
+        "cat": "Hn",
+        "lib": null,
+        "h": 9.0,
+        "pu": 21.5,
+        "ht": 193.5
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "ecarts": [],
+  "illisibles": [
+   {
+    "fichier": "2026-07_Facture-N-F-001025-AGIR-SECURITE.pdf",
+    "raison": "aucun bloc site/heures reconnu"
+   },
+   {
+    "fichier": "FACTURE_AVRIL_GARIS_FKH_GS-2026-108.pdf",
+    "raison": "aucun bloc site/heures reconnu"
+   },
+   {
+    "fichier": "FACTURE_FEVRIER_GARIS_FKH_GS-2026-095.pdf",
+    "raison": "aucun bloc site/heures reconnu"
+   },
+   {
+    "fichier": "FACTURE_JANVIER_GARIS_FKH_GS-2026-091.pdf",
+    "raison": "aucun bloc site/heures reconnu"
+   },
+   {
+    "fichier": "FACTURE_MARS_GARIS_FKH_GS-2026-099.pdf",
+    "raison": "aucun bloc site/heures reconnu"
+   }
+  ]
  },
  "rapprochement_factures_2026": {
   "source": "TB_2026_Mvts col « Rapproché à » × BASE_Factures — recompute au build (G-34)",
@@ -24763,7 +33887,7 @@
  },
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-13 12:27",
+  "lu_le": "2026-08-13 12:36",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
