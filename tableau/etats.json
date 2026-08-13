@@ -1642,6 +1642,30 @@
    "source": "Constate en rejouant la demo",
    "theme": "Tickets",
    "pourquoipas": "Monter deux fois la demo empilait ses vacations — 32 devenaient 64 — et le classement par sollicitation mentait. Le decor se retire avant de se reposer."
+  },
+  {
+   "b": "b438",
+   "titre": "Les agents proches depuis la fiche d'une vacation du Planning",
+   "source": "Zeus 13/08 : « depuis cette vue, donne la possibilite d'avoir l'onglet agents proches avec toutes ses fonctionnalites, comme dans Suivi des demandes »",
+   "theme": "Planning",
+   "local": true,
+   "pourquoipas": "Rien de reecrit : les deux vues travaillent DEJA le meme objet (un element de SUIVI), donc renderNear(m) s'applique tel quel. Ce qui manquait etait le CABLAGE — les quatre ecouteurs du Suivi etaient cloues sur #suiviList. Ils sont enregistres une fois (svAddAct) et rebranchables sur n'importe quel conteneur (svBindActs). Factorise, pas recopie. Aussi : svGeoCompleter ne completait que les demandes en RECHERCHE, alors que les agents proches se cherchent surtout sur une vacation VALIDEE que personne n'a prise (154 dans la base au 13/08, dont 10 sans coordonnees)."
+  },
+  {
+   "b": "b439",
+   "titre": "Le rafraichissement ne doit rien suspendre aux entrailles d'une autre fonction",
+   "source": "Trouve en testant b438 : les filtres du panneau semblaient morts",
+   "theme": "Planning",
+   "local": true,
+   "pourquoipas": "J'avais suspendu le rafraichissement de la fiche a renderSuivi, que tous ces gestes appellent. Mais renderSuivi SORT PAR ANTICIPATION quand sa liste est vide (« Aucun resultat », ligne 2470) : le rafraichissement n'avait jamais lieu. Le rayon changeait bien en memoire, l'ecran ne bougeait pas — le pire des cas, un geste qui a l'air ignore alors qu'il a ete pris. Le rafraichissement vit desormais dans le cablage lui-meme. Verifie : 100 km -> 5 agents, 20 km -> 3, 200 km -> 6, +vehicule -> 4, +ADS -> 3, fiche jamais fermee. Demo : ?sandbox=1&demo=proches."
+  },
+  {
+   "b": "b440",
+   "titre": "« Affecter » directement depuis la ligne d'un agent proche",
+   "source": "Zeus 13/08 : oui au bouton propose",
+   "theme": "Planning",
+   "local": true,
+   "pourquoipas": "Dans le Planning, quand personne n'est affecte, le geste naturel n'est pas « associer » mais « c'est lui ». Le bouton passe par affpickWithCheck — la MEME verification que le bouton « Choisir » de la fiche (conflits d'horaires, indisponibilites) : on ne cree pas un second chemin d'affectation qui contournerait les controles du premier. Le mode est un 2e argument de renderNear, pas un champ pose sur la donnee. Deux appels dans tout le fichier : Suivi des demandes renderNear(x) bouton masque, fiche Planning renderNear(m,true) bouton visible."
   }
  ],
  "attente": [
