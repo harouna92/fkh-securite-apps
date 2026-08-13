@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v12-08·b431</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b432</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2881,7 +2881,7 @@ button.big:active{transform:translateY(1px)}
       var vbadge=a.verifie?'<span style="color:var(--ok);font-size:12px;font-weight:600"> 🟢 vérifiée</span>':'<span style="color:var(--warn);font-size:12px;font-weight:600"> 🟠 à vérifier</span>';
       var plurl='https://photo-de-service.pages.dev/?aid='+encodeURIComponent(a.id)+'&name='+encodeURIComponent(a.nom||'');
       var flpanel='<div class="falink" id="falink-'+a.id+'" style="display:none;margin-top:6px;padding:7px 9px;border:1px dashed var(--brand,#3b6ef5);border-radius:9px;background:var(--panel2)"><div class="lab" style="font-size:11px;margin:0 0 4px">🔗 Lien photo permanent — le même à vie pour cet agent</div><div class="sub" style="word-break:break-all;font-size:11.5px;margin:0 0 6px">'+esc(plurl)+'</div><div class="acts" style="gap:6px;flex-wrap:wrap"><button class="ok falink-copy" data-u="'+esc(plurl)+'" style="font-size:12px;padding:4px 10px">📋 Copier</button><button class="falink-wa" data-u="'+esc(plurl)+'" data-n="'+esc(a.nom||'')+'" style="font-size:12px;padding:4px 10px">🟢 WhatsApp</button><button class="falink-sms" data-u="'+esc(plurl)+'" data-n="'+esc(a.nom||'')+'" style="font-size:12px;padding:4px 10px">💬 SMS</button></div></div>';
-      return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+vbadge+'</div><div class="fa-d">'+(d||'—')+'</div>'+agentStatLine(a.nom)+acLine(a.nom)+distBlock(a.nom)+faPhotoBlock(a.nom)+faProBlock(a)+flpanel+'</div><div class="fa-a">'+call+'<button class="falink-btn" data-falink="'+a.id+'" title="Lien photo de l\'agent">🔗</button><button data-fav="'+a.id+'" title="'+(a.verifie?'Repasser à « à vérifier »':'Marquer vérifiée')+'">'+(a.verifie?'↩':'✅')+'</button><button data-fae="'+a.id+'" title="Modifier">✏️</button><button class="no" data-fad="'+a.id+'" title="Supprimer">🗑️</button></div></div>';
+      return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+vbadge+'</div><div class="fa-d">'+(d||'—')+'</div>'+agentStatLine(a.nom)+acLine(a.nom)+((typeof faManqueBtns==='function')?faManqueBtns(a):'')+distBlock(a.nom)+faPhotoBlock(a.nom)+faProBlock(a)+flpanel+'</div><div class="fa-a">'+call+'<button class="falink-btn" data-falink="'+a.id+'" title="Lien photo de l\'agent">🔗</button><button data-fav="'+a.id+'" title="'+(a.verifie?'Repasser à « à vérifier »':'Marquer vérifiée')+'">'+(a.verifie?'↩':'✅')+'</button><button data-fae="'+a.id+'" title="Modifier">✏️</button><button class="no" data-fad="'+a.id+'" title="Supprimer">🗑️</button></div></div>';
     }).join('');
     byId('fa-list').querySelectorAll('[data-fav]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fav'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id)a=FA[i];if(a){a.verifie=!a.verifie;saveFA();renderFA();}};});
     byId('fa-list').querySelectorAll('[data-fad]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fad');FA=FA.filter(function(x){return x.id!==id;});saveFA();renderFA();};});
@@ -2892,6 +2892,10 @@ button.big:active{transform:translateY(1px)}
     if(typeof wireDistHandlers==='function')wireDistHandlers(byId('fa-list')); if(typeof wireFaPro==='function')wireFaPro(byId('fa-list'));
     byId('fa-list').querySelectorAll('.faphoto-det').forEach(function(det){ var nom=det.getAttribute('data-nom'); det.addEventListener('toggle',function(){ if(det.open)faPhotoLoad(det,nom); }); var up=det.querySelector('.faphoto-up'); if(up)up.onchange=function(){ var f=up.files&&up.files[0]; if(!f)return; if(typeof photoReady!=='function'||!photoReady()){ alert('Connexion en ligne requise pour envoyer la photo.'); up.value=''; return; } var ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg',key=photoAgentPrefix(nom)+Date.now()+'.'+ext,lbl=up.parentNode; lbl.childNodes[0].nodeValue='⏳ envoi…'; photoUpload(key,f,function(res){ if(res&&res.ok){ lbl.childNodes[0].nodeValue='✅ ajoutée'; agentAttachPhoto(nom,key); det.open=true; faPhotoLoad(det,nom); } else { lbl.childNodes[0].nodeValue='📤 Ajouter une photo'; alert('Échec de l\'envoi.'); } }); }; });
     byId('fa-list').querySelectorAll('[data-goanom]').forEach(function(b){b.onclick=function(ev){ev.preventDefault(); var tb=document.querySelector('#tabs button[data-s="supervision"]'); if(tb)tb.click(); supTab='anom'; if(typeof renderSupervision==='function')renderSupervision(); if(byId('sup-body')&&byId('sup-body').scrollIntoView)byId('sup-body').scrollIntoView({behavior:'smooth',block:'start'});};});
+    /* b432 : demander l'info manquante sans quitter la fiche. */
+    byId('fa-list').querySelectorAll('.fa-tkm').forEach(function(b){ b.onclick=function(){
+      var a=faById(b.getAttribute('data-id')), k=b.getAttribute('data-k'); if(!a)return;
+      tkxDemanderManque(k,[{id:a.id,nom:a.nom||''}],TK_TYPES[k].lbl+' \u2014 '+(a.nom||'')); }; });
     byId('fa-list').querySelectorAll('[data-fae]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-fae'),a=null,i;for(i=0;i<FA.length;i++)if(FA[i].id===id){a=FA[i];break;}if(a){byId('fa-nom').value=a.nom||'';faTelsRender(a.tels||(a.tel?[a.tel]:[]));byId('fa-ville').value=a.ville||'';byId('fa-fiab').value=a.fiab||'';byId('fa-voiture').checked=!!a.voiture;byId('fa-ads').checked=!!a.ads;byId('fa-verif').checked=!!a.verifie;byId('fa-interv').value=(a.interv||[]).join('\n');if(byId('fa-adresse'))byId('fa-adresse').value=a.adresse||'';if(byId('fa-respsecteur')){byId('fa-respsecteur').checked=!!a.respSecteur;byId('fa-secteur-partout').checked=!!a.secteurPartout;byId('fa-secteur-deps').value=(a.secteurDeps||[]).join(', ');faSecteurToggle();}var _c=(typeof agentCtrl==='function')?agentCtrl(a.nom):null,_set=(typeof selSet==='function')?selSet:function(id,v){if(byId(id))byId(id).value=v||'';}; _set('fa-pointure',_c&&_c.Pointure); _set('fa-pantalon',_c&&_c['T. pantalon']); _set('fa-haut',_c&&_c['T. haut']);faSel={nom:a.ville,cp:a.cp,la:a.la,lo:a.lo,dep:a.dep,depnom:a.depnom};faEdit=a.id;byId('fa-add').textContent='✔️ Enregistrer';window.scrollTo(0,0);}};});
   }
   renderFA();
@@ -3538,6 +3542,56 @@ button.big:active{transform:translateY(1px)}
   document.addEventListener('click',function(ev){ var b=ev.target&&ev.target.closest?ev.target.closest('.aide-b'):null; if(b){ ev.preventDefault(); ev.stopPropagation(); aideOuvrir(b.getAttribute('data-a')); } });
   function aideWire(root){ (root||document).querySelectorAll('.aide-b').forEach(function(b){ b.onclick=function(){ aideOuvrir(b.getAttribute('data-a')); }; }); }
   var DEMOS={
+    'ticket-mens':{ titre:'\ud83c\udfab Un ticket qui se ferme sur la donn\u00e9e, pas sur une d\u00e9claration',
+      quoi:'8 des agents qui ont travaill\u00e9 cette semaine \u2014 les vrais noms, l\u2019\u00e9tat r\u00e9el de leurs mensurations au 12/08. Un ticket est d\u00e9j\u00e0 parti au superviseur.',
+      aFaire:'Ouvre \u00ab \ud83c\udfab Tickets \u00bb. Le ticket affiche 1/8 renseign\u00e9. Essaie \u00ab \u2705 Fait \u00bb : l\u2019appli REFUSE et te dit combien manquent. Tape une pointure, un pantalon et un haut sur Joycelin GOTOAS : sa ligne passe \u2705, le compteur monte, et tu lis qui l\u2019a saisi. Remplis les 6 restants et le ticket se ferme tout seul.',
+      monter:function(){
+        /* Le decor : des agents, leurs controles tenue, et des vacations de CETTE semaine
+           (sinon « les agents de la semaine » ne les verrait pas). Tout est prefixe demo_. */
+        var GENS=[
+          ['TELLA Ykbal',        '44','42','XL'],   /* deja complet — renseigne HORS ticket */
+          ['Issa ADS Dole',      '46','L', ''  ],   /* 2/3 : le haut manque */
+          ['Joycelin GOTOAS',    '',  '',  ''  ],
+          ['Ilyass Russe',       '',  '',  ''  ],
+          ['DRISSI EL BOUZAIDI Jamal','','',''  ],
+          ['VALENTIN CHANUDET',  '',  '',  ''  ],
+          ['OWONO Joseph',       '',  '',  ''  ],
+          ['KARAMOKO DIABY',     '',  '',  ''  ]
+        ];
+        var FA2=(typeof FA!=='undefined'&&FA)?FA.slice():[];
+        var TC2=(typeof load==='function'&&Array.isArray(load('fkh_tenues_ctrl')))?load('fkh_tenues_ctrl').slice():[];
+        var SU2=(typeof SUIVI!=='undefined'&&SUIVI)?SUIVI:[];
+        var lundi=new Date(); lundi.setHours(0,0,0,0); lundi.setDate(lundi.getDate()-((lundi.getDay()+6)%7));
+        var iso=function(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); };
+        var vises=[];
+        GENS.forEach(function(g,i){
+          var id='demo_ag'+i;
+          FA2=FA2.filter(function(a){ return a.id!==id; });
+          FA2.push({id:id,nom:g[0],tels:['06000000'+('0'+i).slice(-2)],ville:'Dijon',verifie:true,src:'demo'});
+          TC2=TC2.filter(function(c){ return String(c.Agent||'')!==g[0]; });
+          if(g[1]||g[2]||g[3])TC2.push({'Date contr\u00f4le':iso(lundi),'Agent':g[0],'Pointure':g[1],'T. pantalon':g[2],'T. haut':g[3],'Statut tenue':'','Manquants':''});
+          /* une vacation de cette semaine, sinon l'agent n'est pas « de la semaine » */
+          var d=new Date(lundi.getTime()); d.setDate(d.getDate()+(i%3));
+          SU2.push({id:'demo_v'+i,statut:'validee',agentId:id,mdate:iso(d),mheure:'20:00',
+                    titre:'Gardiennage '+g[0],client:'\ud83c\udfe2 D\u00e9mo',ville:'Dijon',vacations:[]});
+          vises.push({id:id,nom:g[0]});
+        });
+        if(typeof save==='function'){ save('fkh_fa',FA2); save('fkh_tenues_ctrl',TC2); }
+        try{ FA=FA2; }catch(e){}
+        try{ TCTRL=TC2; }catch(e){}
+        /* le ticket, deja parti au superviseur — etat « a faire », rien de declare */
+        try{
+          var A=tkxLoad().filter(function(t){ return String(t.id).indexOf('demo_tk')!==0; });
+          A.push({id:'demo_tk_mens',kind:'echange',
+            objet:'\ud83d\udccf Mensurations manquantes \u2014 agents ayant travaill\u00e9 cette semaine',
+            message:'Merci de r\u00e9cup\u00e9rer ces informations et de les saisir directement dans le ticket.',
+            contexte:vises.map(function(g){return g.nom;}), source:'',
+            deUser:'superadmin-1', deNom:'Zeus', pourRole:'superviseur', pourUser:'',
+            manque:{champ:'mensurations',agents:vises}, saisies:{},
+            etat:'a_faire', cree:Date.now()-3600*1000, fil:[]});
+          tkxSave(A);
+        }catch(e){}
+      } },
     photos:{ titre:'📸 La galerie des photos ne s’arrête plus au 25e',
       quoi:'171 photos reçues par le lien terrain, réparties sur 9 jours (35 aujourd’hui, 27 le 05/08, 41 le 02/08…) — le volume exact mesuré dans la vraie base le 06/08.',
       aFaire:'Ouvre « 📞 Suivi des appels », déplie « 📸 Photos terrain à rattacher » et clique « 🔄 Charger les photos reçues ». En bas de la liste tu dois lire combien il en reste, avec « ⬇️ Voir 40 de plus » et « 📜 Tout afficher » — avant, la liste s’arrêtait à 25 sans le dire. Puis clique « 🙈 Écarter » sur une photo : elle quitte la file et se retrouve sous « 🙈 Écartées », où « ↩️ Remettre dans la file » la ramène. Rien n’est supprimé.',
@@ -4054,6 +4108,12 @@ button.big:active{transform:translateY(1px)}
     demoMonter(k);
   }
   function demoNettoyer(){
+    /* b432 : la demo des mensurations pose des agents et des controles — ils partent aussi. */
+    try{ if(typeof load==='function'&&typeof save==='function'){
+      save('fkh_fa',(load('fkh_fa')||[]).filter(function(a){ return String(a&&a.id||'').indexOf('demo_ag')!==0; }));
+      var _dn=['TELLA Ykbal','Issa ADS Dole','Joycelin GOTOAS','Ilyass Russe','DRISSI EL BOUZAIDI Jamal','VALENTIN CHANUDET','OWONO Joseph','KARAMOKO DIABY'];
+      save('fkh_tenues_ctrl',(load('fkh_tenues_ctrl')||[]).filter(function(c){ return _dn.indexOf(String(c&&c.Agent||''))<0; }));
+    } }catch(e){}
     try{ aiDetected=(aiDetected||[]).filter(function(x){ return String(x.cdr_id||'').indexOf('demo_v')!==0; }); }catch(e){}   /* b385 */
     /* b380 : les tickets de demo partent avec le reste — une demo ne laisse pas de trace. */
     try{ if(typeof tkxLoad==='function')tkxSave(tkxLoad().filter(function(t){ return !t||String(t.id).indexOf('demo_tk')!==0; })); }catch(e){}
@@ -5439,8 +5499,26 @@ button.big:active{transform:translateY(1px)}
   var TK_OPEN={};
   var TK_TYPES={
     adresse:  { lbl:'Adresses manquantes', fieldLbl:'Adresse', ph:'Ex. 12 rue des Lilas, 21000 Dijon', get:function(a){return a.adresse||'';}, set:function(a,v){ a.adresse=String(v||'').trim(); save('fkh_fa',FA); }, missing:function(a){ return !(a.adresse&&String(a.adresse).trim()); } },
-    matricule:{ lbl:'Matricules manquants', fieldLbl:'N° matricule', ph:'Ex. 12345', get:function(a){ var m=(typeof matState==='function')?matState(a.nom):null; return (m&&m.num)||''; }, set:function(a,v){ if(typeof setAgentMatricule==='function')setAgentMatricule(a.nom,String(v||'').trim()); }, missing:function(a){ var m=(typeof matState==='function')?matState(a.nom):null; return !(m&&m.num); } }
+    matricule:{ lbl:'Matricules manquants', fieldLbl:'N° matricule', ph:'Ex. 12345', get:function(a){ var m=(typeof matState==='function')?matState(a.nom):null; return (m&&m.num)||''; }, set:function(a,v){ if(typeof setAgentMatricule==='function')setAgentMatricule(a.nom,String(v||'').trim()); }, missing:function(a){ var m=(typeof matState==='function')?matState(a.nom):null; return !(m&&m.num); } },
+    /* ===== b432 : LES MENSURATIONS DEVIENNENT UN TROU QUE L'APPLI SAIT REGARDER =====
+       Elles existaient partout comme un CONSTAT (« 📏 mensurations manquantes ») et nulle part
+       comme une DEMANDE verifiable. `missing` exige les TROIS : un haut absent empeche d'habiller
+       un agent autant qu'une pointure absente — l'ancienne regle (« au moins une des trois »)
+       declarait Issa ADS Dole renseigne avec 46 et L, sans taille de haut.
+       `set` passe par faSaveMens : la source unique que la fiche, l'onglet Tenues et les anomalies
+       lisent deja. Saisir ici ou saisir dans la fiche revient donc EXACTEMENT au meme. */
+    mensurations:{ lbl:'Mensurations manquantes', fieldLbl:'Pointure · T. pantalon · T. haut',
+      multi:[['Pointure','👟 Pointure','44'],['T. pantalon','👖 T. pantalon','L'],['T. haut','👕 T. haut','XL']],
+      ph:'',
+      vals:function(a){ var c=(typeof agentCtrl==='function')?agentCtrl(a.nom):null; c=c||{}; return [String(c.Pointure||'').trim(),String(c['T. pantalon']||'').trim(),String(c['T. haut']||'').trim()]; },
+      get:function(a){ return this.vals(a).filter(Boolean).join(' · '); },
+      set:function(a,v){ var w=Array.isArray(v)?v:this.vals(a); if(typeof faSaveMens==='function')faSaveMens(a.nom,String(w[0]||'').trim(),String(w[1]||'').trim(),String(w[2]||'').trim()); },
+      missing:function(a){ return this.vals(a).some(function(x){ return !x; }); },
+      /* combien des trois sont la — pour afficher « 2/3 » au lieu de cacher l'agent */
+      part:function(a){ var w=this.vals(a); return {fait:w.filter(Boolean).length,total:3}; } }
   };
+  /* b432 : le champ demande, ecrit en clair sur le ticket et dans les notifications. */
+  function tkTypeLbl(k){ return (TK_TYPES[k]&&TK_TYPES[k].lbl)||k||'Information manquante'; }
   function tkLoad(){ var a=load('fkh_tickets'); return Array.isArray(a)?a:[]; }
   function tkSave(a){ save('fkh_tickets',a); }
   function tkProgress(t){ var ty=TK_TYPES[t.type]; if(!ty)return {done:0,total:0}; var ids=t.targetIds||[],done=0; ids.forEach(function(id){ var a=faById(id); if(a&&!ty.missing(a))done++; }); return {done:done,total:ids.length}; }
@@ -6517,9 +6595,16 @@ button.big:active{transform:translateY(1px)}
            var fait=r.total-r.reste, pct=r.total?Math.round(100*fait/r.total):0;
            var col=(r.reste===0)?'#1a9e5c':(fait?'#e0a13b':'var(--muted)');
            return '<div style="margin-top:6px"><div style="font-size:12px;font-weight:700;color:'+col+'">'
-             +(r.reste===0?'\u2705 Plus rien dans la file — le travail est fait':(fait+' sur '+r.total+' r\u00e9gl\u00e9e(s) \u00b7 '+r.reste+' restante(s)'))
+             /* b432 : un ticket qui demande une INFORMATION se compte en renseignes, et il dit
+                ou l'appli est allee regarder. « regle » ne veut rien dire pour une taille de pantalon. */
+             +(r.manque
+                ? (r.reste===0
+                    ? '\u2705 '+r.total+'/'+r.total+' renseign\u00e9'+(r.total>1?'s':'')+' — v\u00e9rifi\u00e9 dans les fiches'
+                    : fait+'/'+r.total+' renseign\u00e9'+(fait>1?'s':'')+' \u00b7 '+r.reste+' encore manquant'+(r.reste>1?'s':''))
+                : (r.reste===0?'\u2705 Plus rien dans la file — le travail est fait':(fait+' sur '+r.total+' r\u00e9gl\u00e9e(s) \u00b7 '+r.reste+' restante(s)')))
              +'</div><div style="height:6px;border-radius:4px;background:var(--panel2);overflow:hidden;margin-top:3px"><div style="height:100%;width:'+pct+'%;background:'+col+'"></div></div></div>'; })()
-        +(t.autoFait?('<div class="sub" style="margin:4px 0 0;color:#1a9e5c;font-size:11.5px">\ud83e\udd16 Ferm\u00e9 automatiquement — les '+(t.autoDe||0)+' ligne(s) vis\u00e9e(s) ont quitt\u00e9 la file</div>'):'');
+        +(t.autoFait?('<div class="sub" style="margin:4px 0 0;color:#1a9e5c;font-size:11.5px">\ud83e\udd16 Ferm\u00e9 automatiquement — '+(t.manque?('les '+(t.autoDe||0)+' information(s) sont dans les fiches'):('les '+(t.autoDe||0)+' ligne(s) vis\u00e9e(s) ont quitt\u00e9 la file'))+'</div>'):'')
+        +((typeof tkxManqueBloc==='function')?tkxManqueBloc(t):'');   /* b432 : la saisie ET le controle, dans la carte */
       if(t.contexte&&t.contexte.length){
         h+='<details style="margin-top:6px"><summary class="sub" style="cursor:pointer">'+t.contexte.length+' élément(s) concerné(s)</summary>'
           +'<div class="sub" style="margin:4px 0 0">'+t.contexte.map(function(l){return '• '+esc(l);}).join('<br>')+'</div></details>';
@@ -6594,6 +6679,24 @@ button.big:active{transform:translateY(1px)}
     return ch;
   }
   function tkxWire(wrap){
+    /* b432 : une saisie ecrit dans la SOURCE UNIQUE, et trace qui l'a faite depuis le ticket. */
+    wrap.querySelectorAll('.tkm-f').forEach(function(inp){ inp.addEventListener('change',function(){
+      var tid=inp.getAttribute('data-tk'), aid=inp.getAttribute('data-ag');
+      var arr=tkxLoad(), t=null,i; for(i=0;i<arr.length;i++)if(arr[i].id===tid){t=arr[i];break;}
+      if(!t||!t.manque)return; var ty=TK_TYPES[t.manque.champ], a=faById(aid); if(!ty||!a)return;
+      var vals=(ty.multi||[['']]).map(function(c,k){
+        var el=wrap.querySelector('.tkm-f[data-tk="'+tid+'"][data-ag="'+aid+'"][data-i="'+k+'"]');
+        return el?(el.value||'').trim():''; });
+      ty.set(a, vals);
+      if(!ty.missing(a)){ t.saisies=t.saisies||{}; if(!t.saisies[aid])t.saisies[aid]={by:tkxMonNom(),at:Date.now()}; }
+      tkxSave(arr);
+      if(typeof cloudPush==='function'){ try{ cloudPush('fkh_tenues_ctrl'); cloudPush('fkh_tickets'); }catch(e){} }
+      if(typeof renderTickets==='function')renderTickets();
+      if(typeof renderSupTerrain==='function'&&byId('sec-supterrain')&&!byId('sec-supterrain').classList.contains('hidden'))try{renderSupTerrain();}catch(e){}
+    }); });
+    wrap.querySelectorAll('.tkm-fiche').forEach(function(b){ b.onclick=function(){
+      var nom=b.getAttribute('data-nom'), tb=document.querySelector('#tabs button[data-s="fiche"]'); if(tb)tb.click();
+      var fs=byId('fa-search'); if(fs){ fs.value=nom; fs.dispatchEvent(new Event('input',{bubbles:true})); } }; });
     wrap.querySelectorAll('.tkx-e').forEach(function(b){ b.onclick=function(){ tkxRepondre(b.getAttribute('data-id'),b.getAttribute('data-e'),''); }; });
     wrap.querySelectorAll('.tkx-r').forEach(function(b){ b.onclick=function(){ var m=prompt('Ta réponse :'); if(m)tkxRepondre(b.getAttribute('data-id'),'',m); }; });
     /* b366 : RENVOYER — le ticket repart chez la meme personne, avec un point en plus et tout
@@ -6617,7 +6720,11 @@ button.big:active{transform:translateY(1px)}
     }; });
   }
   function renderTickets(){
-    var wrap=byId('tk-body'); if(!wrap)return; var T=tkLoad();
+    /* b432 : `fkh_tickets` porte DEUX familles — les echanges (tkx, adresses a un role) et les
+       tickets « info manquante » (TK_TYPES). La liste ci-dessous ne concerne que les seconds ;
+       sans ce filtre, un echange s'affichait ici en carte vide « Ticket · 0/0 renseignes ».
+       Bug preexistant, rendu visible en jouant la demo. */
+    var wrap=byId('tk-body'); if(!wrap)return; var T=tkLoad().filter(function(t){ return t&&t.kind!=='echange'; });
     var typeOpts=Object.keys(TK_TYPES).map(function(k){ var n=(typeof FA!=='undefined'?FA:[]).filter(function(a){return TK_TYPES[k].missing(a);}).length; return '<option value="'+k+'">'+TK_TYPES[k].lbl+' ('+n+' agents concernés)</option>'; }).join('');
     var create='<div class="card"><div class="lab" style="margin:0 0 6px">➕ Nouveau ticket <span class="sub" style="font-weight:400">— la cible est détectée automatiquement</span></div>'
       +'<div class="grid2"><label class="f"><div class="lab">Tâche</div><select id="tk-type">'+typeOpts+'</select></label><label class="f"><div class="lab">Destinataire</div><input id="tk-assignee" placeholder="Ex. Traoré, ou « opérateurs »" autocomplete="off"></label></div>'
@@ -6638,7 +6745,28 @@ button.big:active{transform:translateY(1px)}
       }
       return h+'</div>';
     }).join(''):'<div class="card"><div class="sub" style="margin:0">Aucun ticket pour l\'instant. Crée-en un ci-dessus.</div></div>';
-    wrap.innerHTML=tkxBloc()+create+list;
+    /* ===== b432 : DEMANDER POUR LES AGENTS QUI TRAVAILLENT VRAIMENT =====
+       Zeus : « tous les agents avec qui on a travaille cette semaine et qui n'ont pas de
+       mensuration ». La base compte 281 agents ; la semaine en compte 25. On demande sur les 25. */
+    var _fen=(window._tkmFen||'semaine'), _ch=(window._tkmChamp||'mensurations');
+    var _cib=(typeof faManqueDans==='function')?faManqueDans(_ch,_fen):[];
+    var _fenL=[['semaine','cette semaine'],['7','7 derniers jours'],['30','30 derniers jours'],['','tous les agents']];
+    var _demande='<div class="card" style="border:1.5px solid #6ea8fe"><div class="lab" style="margin:0 0 6px">\ud83c\udfab Demander une information manquante <span class="sub" style="font-weight:400">\u2014 le ticket se ferme tout seul quand l\u2019info arrive</span></div>'
+      +'<div class="acts" style="gap:6px;flex-wrap:wrap;align-items:center">'
+      +'<select id="tkm-champ" style="width:auto">'+Object.keys(TK_TYPES).map(function(k){return '<option value="'+k+'"'+(k===_ch?' selected':'')+'>'+TK_TYPES[k].lbl+'</option>';}).join('')+'</select>'
+      +'<span class="sub" style="margin:0">chez les agents ayant travaill\u00e9</span>'
+      +'<select id="tkm-fen" style="width:auto">'+_fenL.map(function(f){return '<option value="'+f[0]+'"'+(f[0]===_fen?' selected':'')+'>'+f[1]+'</option>';}).join('')+'</select>'
+      +'<button type="button" class="ok" id="tkm-open"'+(_cib.length?'':' disabled')+'>\ud83c\udfab '+_cib.length+' agent'+(_cib.length>1?'s':'')+' \u2014 envoyer au superviseur</button>'
+      +'</div>'
+      +(_cib.length?('<div class="sub" style="margin:6px 0 0;font-size:11.5px">'+_cib.slice(0,8).map(function(g){return esc(g.nom);}).join(' \u00b7 ')+(_cib.length>8?(' \u2026 +'+(_cib.length-8)):'')+'</div>')
+                  :'<div class="sub" style="margin:6px 0 0;color:#1a9e5c">\u2705 Personne \u2014 tout est renseign\u00e9 sur cette p\u00e9riode.</div>')
+      +'</div>';
+    wrap.innerHTML=tkxBloc()+_demande+create+list;
+    if(byId('tkm-champ'))byId('tkm-champ').onchange=function(){ window._tkmChamp=this.value; renderTickets(); };
+    if(byId('tkm-fen'))byId('tkm-fen').onchange=function(){ window._tkmFen=this.value; renderTickets(); };
+    if(byId('tkm-open'))byId('tkm-open').onclick=function(){
+      var lbl=TK_TYPES[_ch].lbl+' \u2014 agents ayant travaill\u00e9 '+((_fenL.filter(function(f){return f[0]===_fen;})[0]||['','' ])[1]);
+      tkxDemanderManque(_ch,_cib,lbl); };
     tkxWire(wrap);
     try{ if(tkxMarquerVus())setTimeout(renderTickets,50); }catch(e){}   /* b275 */
     if(byId('tk-create'))byId('tk-create').onclick=function(){ var type=byId('tk-type').value, ty=TK_TYPES[type]; if(!ty)return; var ids=(typeof FA!=='undefined'?FA:[]).filter(function(a){return ty.missing(a);}).map(function(a){return a.id;}); if(!ids.length){ alert('Aucun agent concerné — rien à faire pour cette tâche.'); return; }
@@ -9605,8 +9733,30 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       });
     }catch(e){ return null; }
   }
+  /* ===== b432 : UN TICKET QUI DEMANDE UNE INFORMATION SE JUGE SUR L'INFORMATION =====
+     POURQUOI (Zeus, 12/08) : « quand je donne un ticket au superviseur, je dois pouvoir voir si
+     c'est reellement renseigne ou pas ». Un ticket qui porte une PHRASE (« demande la mensuration
+     de GOTOAS ») est invérifiable pour toujours : « Fait » ne veut dire que « j'ai fait quelque
+     chose ». Un ticket qui porte le TROU (`manque`) se relit dans la donnee.
+     Corollaire demande par Zeus : peu importe OU le superviseur remplit — dans le ticket ou
+     directement dans la fiche — on lit la meme source, donc les deux se voient pareil. */
+  function tkxManqueEtat(t){
+    if(!t||!t.manque||!t.manque.champ)return null;
+    var ty=(typeof TK_TYPES!=='undefined')&&TK_TYPES[t.manque.champ]; if(!ty)return null;
+    var lignes=(t.manque.agents||[]).map(function(g){
+      var a=(typeof faById==='function')?faById(g.id):null;
+      if(!a)return {id:g.id,nom:g.nom||'—',absent:true,fait:false};
+      var p=ty.part?ty.part(a):{fait:ty.missing(a)?0:1,total:1};
+      var s=(t.saisies&&t.saisies[g.id])||null;
+      return {id:g.id,nom:a.nom||g.nom||'—',fait:!ty.missing(a),val:ty.get(a),part:p,par:s&&s.by,at:s&&s.at};
+    });
+    return {champ:t.manque.champ,lbl:ty.lbl,ty:ty,lignes:lignes,
+            fait:lignes.filter(function(l){return l.fait;}).length,total:lignes.length};
+  }
   /* Ce qu'il reste a faire sur ce ticket : {reste, total, connu}. connu=false -> on ne sait pas juger. */
   function tkxReste(t){
+    var m=tkxManqueEtat(t);
+    if(m)return {connu:true, reste:m.total-m.fait, total:m.total, manque:m};
     if(!t||!t.contexte||!t.contexte.length)return {connu:false};
     var vivantes=tkxLignesVivantes(t.source);
     if(vivantes===null)return {connu:false};
@@ -9622,17 +9772,129 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       var r=tkxReste(t);
       if(!r.connu||r.reste>0)return;
       t.etat='fait'; t.autoFait=Date.now(); t.autoDe=r.total;
-      (t.fil=t.fil||[]).push({de:'', deNom:'Détection automatique', txt:'Les '+r.total+' ligne(s) visée(s) ont quitté la file : le travail est fait.', at:Date.now(), auto:1});
+      /* b432 : un ticket d'information ne ferme pas sur « la file est vide » mais sur
+         « l'information est dans les fiches » — c'est ce qu'on est alle verifier. */
+      (t.fil=t.fil||[]).push({de:'', deNom:'Détection automatique',
+        txt:r.manque
+          ? ('Les '+r.total+' information(s) demandée(s) sont dans les fiches : rien à déclarer, c’est vérifié.')
+          : ('Les '+r.total+' ligne(s) visée(s) ont quitté la file : le travail est fait.'),
+        at:Date.now(), auto:1});
       chg++;
     });
     if(chg)tkxSave(arr);
     return chg;
+  }
+  /* ===== b432 : LA CARTE PORTE LA SAISIE, ET LE CONTROLE =====
+     Regle Zeus « drill jusqu'a l'action » : le superviseur renseigne les tailles ICI, il ne
+     repart pas chercher chaque fiche. Ce qu'il tape passe par TK_TYPES.set -> faSaveMens, donc
+     par la source unique. Et le controle (qui a rempli, quand, ou) est reserve au super-admin
+     et a l'administrateur — demande explicite de Zeus le 12/08. */
+  function tkxPeutControler(){ try{ var r=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role)||'full';
+    return r==='admin'||r==='superadmin'||r==='full'; }catch(e){ return false; } }
+  function _tkxQuand(ms){ try{ var d=new Date(ms); return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' a '+('0'+d.getHours()).slice(-2)+'h'+('0'+d.getMinutes()).slice(-2); }catch(e){ return ''; } }
+  function tkxManqueBloc(t){
+    var m=(typeof tkxManqueEtat==='function')?tkxManqueEtat(t):null; if(!m)return '';
+    var ctrl=tkxPeutControler(), cols=m.ty.multi||[['','valeur','']];
+    var lignes=m.lignes.map(function(l){
+      var a=(typeof faById==='function')?faById(l.id):null;
+      var vals=(a&&m.ty.vals)?m.ty.vals(a):[];
+      var champs=cols.map(function(c,i){
+        /* la valeur affichee vient de la FICHE, pas du ticket : remplir ailleurs se voit ici. */
+        var vv=vals[i]||'';
+        return '<input class="tkm-f" data-tk="'+esc(t.id)+'" data-ag="'+esc(l.id)+'" data-i="'+i+'" value="'+esc(vv)+'" placeholder="'+esc(c[1])+'" title="'+esc(c[1])+'" style="width:88px;padding:4px 6px;font-size:12px;border:1px solid '+(vv?'#1a9e5c':'var(--line)')+';border-radius:7px;background:var(--panel2);color:var(--ink)">';
+      }).join(' ');
+      var etat=l.fait?'\u2705':((l.part&&l.part.fait)?('\ud83d\udfe1 '+l.part.fait+'/'+l.part.total):'\u2b1c');
+      /* Qui a rempli — et surtout PAR OU. Une valeur trouvee sans saisie dans le ticket a ete
+         posee dans la fiche : c'est bien, et il faut le dire, sinon on croit le ticket ignore. */
+      var trace='';
+      if(ctrl&&l.fait){ trace=l.par
+        ? '<div class="sub" style="margin:2px 0 0;font-size:11px;color:#1a9e5c">\u2713 saisi dans le ticket par <b>'+esc(l.par)+'</b>'+(l.at?(' le '+_tkxQuand(l.at)):'')+'</div>'
+        : '<div class="sub" style="margin:2px 0 0;font-size:11px;color:#6ea8fe">\u2713 renseign\u00e9 directement dans la fiche (hors ticket)</div>'; }
+      return '<div style="padding:6px 0;border-top:1px solid var(--line)"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'
+        +'<span style="min-width:150px;flex:1;font-weight:600;font-size:12.5px">'+etat+' '+esc(l.nom)+'</span>'
+        +champs
+        +'<button type="button" class="tkm-fiche" data-nom="'+esc(l.nom)+'" style="font-size:11px">\ud83d\udc64 fiche</button>'
+        +'</div>'+trace+'</div>';
+    }).join('');
+    var reste=m.total-m.fait;
+    return '<div style="margin-top:8px;border:1px solid '+(reste?'#e0a13b':'#1a9e5c')+';border-radius:10px;padding:8px">'
+      +'<div class="lab" style="margin:0 0 2px">\ud83d\udccf '+esc(m.lbl)+' \u2014 \u00e0 renseigner ici</div>'
+      +'<div class="sub" style="margin:0 0 4px;font-size:11.5px">Ce qui est tap\u00e9 ici va dans la fiche de l\u2019agent, tout de suite et partout.'
+      +(ctrl?' Toi seul (super-admin / administrateur) vois qui a rempli quoi.':'')+'</div>'
+      +lignes+'</div>';
+  }
+  /* ===== b432 : « LES AGENTS AVEC QUI ON A TRAVAILLE CETTE SEMAINE » =====
+     Zeus ne veut pas demander les mensurations des 281 agents de la base : il veut celles des
+     agents qui TRAVAILLENT. La fenetre se lit dans les vacations validees et affectees. */
+  function faFenetreDebut(mode){
+    var d=new Date(); d.setHours(0,0,0,0);
+    if(mode==='semaine'){ var j=(d.getDay()+6)%7; d.setDate(d.getDate()-j); return d; }   /* lundi */
+    if(mode==='7')  { d.setDate(d.getDate()-6);  return d; }
+    if(mode==='30') { d.setDate(d.getDate()-29); return d; }
+    return null;   /* tous */
+  }
+  function faAgentsFenetre(mode){
+    var out={}, deb=faFenetreDebut(mode);
+    try{
+      if(typeof SUIVI==='undefined'||!SUIVI)return [];
+      SUIVI.forEach(function(x){
+        if(!x||x.deleted||x.statut!=='validee'||!x.agentId)return;
+        if(deb){ var md=String(x.mdate||'').slice(0,10); if(!md)return;
+          var p=md.split('-'); var dt=new Date(+p[0],+p[1]-1,+p[2]); if(isNaN(dt)||dt<deb)return; }
+        out[x.agentId]=(out[x.agentId]||0)+1;
+      });
+    }catch(e){}
+    return Object.keys(out);
+  }
+  /* Les agents de la fenetre a qui il manque `champ`. */
+  function faManqueDans(champ,mode){
+    var ty=TK_TYPES[champ]; if(!ty)return [];
+    return faAgentsFenetre(mode).map(function(id){ return faById(id); })
+      .filter(function(a){ return a&&ty.missing(a); })
+      .map(function(a){ return {id:a.id,nom:a.nom||''}; });
+  }
+  /* La porte d'entree commune : on montre QUI est vise avant d'envoyer. */
+  function tkxDemanderManque(champ,agents,titre){
+    var ty=TK_TYPES[champ]; if(!ty||!agents||!agents.length){ alert('Personne n\u2019est concern\u00e9 \u2014 rien \u00e0 demander.'); return; }
+    var old=byId('tkm-pop'); if(old)old.parentNode.removeChild(old);
+    var pop=document.createElement('div'); pop.id='tkm-pop';
+    pop.style.cssText='position:fixed;inset:6% 5%;z-index:220;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+    var ops=[['superviseur','\ud83d\udc64 Les superviseurs'],['admin','\ud83d\udc64 Les administrateurs'],['operateur','\ud83d\udc64 Les op\u00e9rateurs'],['superadmin','\ud83d\udc64 Le super-admin']];
+    pop.innerHTML='<div style="display:flex;align-items:center;gap:8px"><b style="flex:1">\ud83c\udfab '+esc(titre||ty.lbl)+'</b><button type="button" id="tkm-x">\u2715</button></div>'
+      +'<div class="sub" style="margin:6px 0 0"><b>'+agents.length+' agent'+(agents.length>1?'s':'')+'</b> concern\u00e9'+(agents.length>1?'s':'')+'. Le ticket se fermera <b>tout seul</b> quand '+(agents.length>1?'leurs fiches seront renseign\u00e9es':'sa fiche sera renseign\u00e9e')+' \u2014 personne n\u2019aura \u00e0 le d\u00e9clarer.</div>'
+      +'<label class="f" style="margin-top:8px"><div class="lab">\u00c0 qui ?</div><select id="tkm-pour">'+ops.map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></label>'
+      +'<label class="f" style="margin-top:6px"><div class="lab">Ton message</div><input id="tkm-msg" value="Merci de r\u00e9cup\u00e9rer ces informations et de les saisir directement dans le ticket."></label>'
+      +'<div class="lab" style="margin:10px 0 4px">Qui est vis\u00e9 ('+agents.length+')</div>'
+      +'<div class="sub" style="margin:0;max-height:34vh;overflow:auto">'+agents.map(function(g){return '\u2022 '+esc(g.nom);}).join('<br>')+'</div>'
+      +'<div class="acts" style="margin-top:12px"><button type="button" id="tkm-go" class="ok">\ud83d\udce4 Envoyer le ticket</button><button type="button" id="tkm-no">Annuler</button></div>';
+    document.body.appendChild(pop);
+    byId('tkm-x').onclick=byId('tkm-no').onclick=function(){ var q=byId('tkm-pop'); if(q)q.parentNode.removeChild(q); };
+    byId('tkm-pour').value='superviseur';
+    byId('tkm-go').onclick=function(){
+      tkxCreer({objet:'\ud83d\udccf '+(titre||ty.lbl), message:(byId('tkm-msg').value||''),
+        contexte:agents.map(function(g){return g.nom;}), source:'',
+        pourRole:byId('tkm-pour').value, manque:{champ:champ,agents:agents}});
+      var q=byId('tkm-pop'); if(q)q.parentNode.removeChild(q);
+      if(typeof cloudPush==='function'){ try{cloudPush('fkh_tickets');}catch(e){} }
+      alert('\ud83c\udfab Ticket envoy\u00e9.\n\n\ud83e\udded Il arrive dans \u00ab Terrain \u00bb chez le destinataire, avec les champs \u00e0 remplir dedans.\n\ud83c\udfab Tu suis le remplissage r\u00e9el dans Tickets \u2014 agent par agent.');
+      if(typeof renderTickets==='function')renderTickets();
+      if(typeof renderFA==='function')renderFA();
+    };
+  }
+  /* Sur la fiche d'un agent : un bouton par trou reel. On ne propose pas ce qui est deja rempli. */
+  function faManqueBtns(a){
+    if(!a)return '';
+    var out=Object.keys(TK_TYPES).filter(function(k){ try{ return TK_TYPES[k].missing(a); }catch(e){ return false; } })
+      .map(function(k){ return '<button type="button" class="fa-tkm" data-k="'+k+'" data-id="'+esc(a.id)+'" style="font-size:11px;border-color:#6ea8fe;color:#8fb6ff">\ud83c\udfab Demander \u2014 '+esc(TK_TYPES[k].lbl.replace(/ manquante?s?$/i,'').toLowerCase())+'</button>'; });
+    if(!out.length)return '';
+    return '<div class="acts" style="gap:5px;flex-wrap:wrap;margin:4px 0 0">'+out.join('')+'</div>';
   }
   function tkxCreer(o){
     var arr=tkxLoad();
     arr.push({id:'tx'+Date.now()+'_'+Math.round(Math.random()*9999),kind:'echange',
       objet:o.objet||'Point à faire', message:o.message||'', contexte:o.contexte||[], source:o.source||'',
       deUser:tkxMoi(), deNom:tkxMonNom(), pourRole:o.pourRole||'', pourUser:o.pourUser||'',
+      manque:o.manque||null, saisies:{},   /* b432 : le trou que ce ticket vient boucher */
       etat:'a_faire', cree:Date.now(), fil:[]});
     tkxSave(arr);
     try{ if(typeof notifScan==='function')notifScan(); }catch(e){}
@@ -9641,6 +9903,14 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
   }
   function tkxRepondre(id,etat,mot){
     var arr=tkxLoad();
+    /* ===== b432 : ON NE DECLARE PAS FAIT CE QUI N'EST PAS FAIT =====
+       Le coeur de la demande de Zeus. Sur un ticket qui demande une information, « Fait » n'est
+       pas une opinion : tant qu'un champ est vide dans la fiche, le bouton refuse. */
+    if(etat==='fait'){ var _t=null,_k; for(_k=0;_k<arr.length;_k++)if(arr[_k].id===id){_t=arr[_k];break;}
+      var _m=(_t&&typeof tkxManqueEtat==='function')?tkxManqueEtat(_t):null;
+      if(_m&&_m.fait<_m.total){
+        alert('\u26d4 Pas encore.\n\n'+(_m.total-_m.fait)+' agent(s) sur '+_m.total+' n\u2019ont toujours pas leurs mesures dans leur fiche.\n\nRenseigne-les ici (ou dans la fiche) : le ticket se fermera tout seul.');
+        return; } }
     for(var i=0;i<arr.length;i++){ if(arr[i].id!==id)continue;
       /* b381 : la PREMIERE action du tour en cours — on ne l'ecrase pas aux suivantes. */
       if(!arr[i].agiAt)arr[i].agiAt=Date.now();
