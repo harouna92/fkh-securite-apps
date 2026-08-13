@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b435</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b437</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3561,7 +3561,11 @@ button.big:active{transform:translateY(1px)}
         ];
         var FA2=(typeof FA!=='undefined'&&FA)?FA.slice():[];
         var TC2=(typeof load==='function'&&Array.isArray(load('fkh_tenues_ctrl')))?load('fkh_tenues_ctrl').slice():[];
+        /* b437 : monter deux fois ne doit pas doubler les vacations — sinon « 32 » devient « 64 »
+           et le classement par sollicitation ment. */
         var SU2=(typeof SUIVI!=='undefined'&&SUIVI)?SUIVI:[];
+        if(SU2.length){ var _g=SU2.filter(function(x){ return String(x&&x.id||'').indexOf('demo_v')===0; });
+          if(_g.length){ _g.forEach(function(x){ var k=SU2.indexOf(x); if(k>=0)SU2.splice(k,1); }); } }
         var lundi=new Date(); lundi.setHours(0,0,0,0); lundi.setDate(lundi.getDate()-((lundi.getDay()+6)%7));
         var iso=function(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); };
         var vises=[];
@@ -9894,30 +9898,58 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     var ty=TK_TYPES[champs[0]]; if(!ty||!agents||!agents.length){ alert('Personne n\u2019est concern\u00e9 \u2014 rien \u00e0 demander.'); return; }
     var old=byId('tkm-pop'); if(old)old.parentNode.removeChild(old);
     var pop=document.createElement('div'); pop.id='tkm-pop';
-    pop.style.cssText='position:fixed;inset:6% 5%;z-index:220;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
+    pop.style.cssText='position:fixed;inset:5% 4%;z-index:220;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
     var ops=[['superviseur','\ud83d\udc64 Les superviseurs'],['admin','\ud83d\udc64 Les administrateurs'],['operateur','\ud83d\udc64 Les op\u00e9rateurs'],['superadmin','\ud83d\udc64 Le super-admin']];
+    /* ===== b436 : ON DECOCHE AVANT D'ENVOYER =====
+       POURQUOI (Zeus, 13/08) : « AGENT Poulet DUC » est l'agent le plus sollicite de la base
+       avec 32 vacations — et ce n'est pas une personne, c'est une ligne generique venue d'un
+       import. Envoyer le superviseur chercher sa pointure n'a aucun sens. Sans decochage, elle
+       reviendrait a chaque envoi. On montre donc CE QU'ON DEMANDE a chacun, et on peut retirer. */
+    function quoi(g){
+      var a=faById(g.id); if(!a)return '';
+      return champs.filter(function(k){ try{ return TK_TYPES[k].missing(a); }catch(e){ return false; } })
+        .map(function(k){ return TK_TYPES[k].lbl.replace(/ (manquante?s?|inconnu)$/i,'').toLowerCase(); }).join(' + ');
+    }
     pop.innerHTML='<div style="display:flex;align-items:center;gap:8px"><b style="flex:1">\ud83c\udfab '+esc(titre||ty.lbl)+'</b><button type="button" id="tkm-x">\u2715</button></div>'
-      +'<div class="sub" style="margin:6px 0 0"><b>'+agents.length+' agent'+(agents.length>1?'s':'')+'</b> concern\u00e9'+(agents.length>1?'s':'')+'. Le ticket se fermera <b>tout seul</b> quand '+(agents.length>1?'leurs fiches seront renseign\u00e9es':'sa fiche sera renseign\u00e9e')+' \u2014 personne n\u2019aura \u00e0 le d\u00e9clarer.</div>'
+      +'<div class="sub" style="margin:6px 0 0">Le ticket se fermera <b>tout seul</b> quand ces informations seront dans les fiches \u2014 personne n\u2019aura \u00e0 le d\u00e9clarer.</div>'
       +'<label class="f" style="margin-top:8px"><div class="lab">\u00c0 qui ?</div><select id="tkm-pour">'+ops.map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></label>'
       +'<label class="f" style="margin-top:6px"><div class="lab">Ton message</div><input id="tkm-msg" value="Merci de r\u00e9cup\u00e9rer ces informations et de les saisir directement dans le ticket."></label>'
-      +'<div class="lab" style="margin:10px 0 4px">Qui est vis\u00e9 ('+agents.length+')</div>'
-      +'<div class="sub" style="margin:0;max-height:34vh;overflow:auto">'+agents.map(function(g){return '\u2022 '+esc(g.nom);}).join('<br>')+'</div>'
+      +'<div class="acts" style="margin:10px 0 4px;gap:6px;align-items:center;flex-wrap:wrap">'
+        +'<div class="lab" style="margin:0;flex:1">Qui est vis\u00e9 <span id="tkm-n" class="sub" style="font-weight:400"></span></div>'
+        +'<button type="button" id="tkm-all" style="font-size:11px">Tout cocher</button>'
+        +'<button type="button" id="tkm-none" style="font-size:11px">Tout d\u00e9cocher</button></div>'
+      +'<div id="tkm-liste" style="max-height:40vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:4px 6px">'
+      +agents.map(function(g,i){
+          return '<label style="display:flex;gap:7px;align-items:center;padding:3px 0;font-size:12.5px;text-transform:none">'
+            +'<input type="checkbox" class="tkm-c" data-i="'+i+'" checked>'
+            +'<span style="flex:1">'+esc(g.nom)+(g.vac!=null?(' <span class="sub" style="font-weight:400">\u00b7 '+g.vac+' vacation'+(g.vac>1?'s':'')+'</span>'):'')+'</span>'
+            +'<span class="sub" style="margin:0 0 0 8px;font-size:11px;white-space:nowrap">'+esc(quoi(g))+'</span></label>';
+        }).join('')
+      +'</div>'
       +'<div class="acts" style="margin-top:12px"><button type="button" id="tkm-go" class="ok">\ud83d\udce4 Envoyer le ticket</button><button type="button" id="tkm-no">Annuler</button></div>';
     document.body.appendChild(pop);
+    function coches(){ return [].slice.call(pop.querySelectorAll('.tkm-c')).filter(function(c){return c.checked;}).map(function(c){ return agents[+c.getAttribute('data-i')]; }); }
+    function maj(){ var n=coches().length; byId('tkm-n').textContent='\u2014 '+n+' agent'+(n>1?'s':'')+' sur '+agents.length;
+      byId('tkm-go').disabled=!n; }
+    pop.querySelectorAll('.tkm-c').forEach(function(c){ c.onchange=maj; });
+    byId('tkm-all').onclick=function(){ pop.querySelectorAll('.tkm-c').forEach(function(c){c.checked=true;}); maj(); };
+    byId('tkm-none').onclick=function(){ pop.querySelectorAll('.tkm-c').forEach(function(c){c.checked=false;}); maj(); };
+    maj();
     byId('tkm-x').onclick=byId('tkm-no').onclick=function(){ var q=byId('tkm-pop'); if(q)q.parentNode.removeChild(q); };
     byId('tkm-pour').value='superviseur';
     byId('tkm-go').onclick=function(){
-      tkxCreer({objet:'\ud83d\udccf '+(titre||ty.lbl), message:(byId('tkm-msg').value||''),
-        contexte:agents.map(function(g){return g.nom;}), source:'',
-        pourRole:byId('tkm-pour').value, manque:{champs:champs,agents:agents}});
+      var sel=coches(); if(!sel.length){ alert('Coche au moins un agent.'); return; }
+      tkxCreer({objet:'\ud83d\udccb '+(titre||ty.lbl), message:(byId('tkm-msg').value||''),
+        contexte:sel.map(function(g){ return g.nom+(g.vac!=null?(' ('+g.vac+' vacations)'):''); }), source:'',
+        pourRole:byId('tkm-pour').value, manque:{champs:champs,agents:sel}});
       var q=byId('tkm-pop'); if(q)q.parentNode.removeChild(q);
       if(typeof cloudPush==='function'){ try{cloudPush('fkh_tickets');}catch(e){} }
-      alert('\ud83c\udfab Ticket envoy\u00e9.\n\n\ud83e\udded Il arrive dans \u00ab Terrain \u00bb chez le destinataire, avec les champs \u00e0 remplir dedans.\n\ud83c\udfab Tu suis le remplissage r\u00e9el dans Tickets \u2014 agent par agent.');
+      alert('\ud83c\udfab Ticket envoy\u00e9 \u2014 '+sel.length+' agent(s).\n\n\ud83e\udded Il arrive dans \u00ab Terrain \u00bb chez le destinataire, avec les champs \u00e0 remplir dedans.\n\ud83c\udfab Tu suis le remplissage r\u00e9el agent par agent, et champ par champ.');
       if(typeof renderTickets==='function')renderTickets();
+      if(typeof renderSupTerrain==='function')try{renderSupTerrain();}catch(e){}
       if(typeof renderFA==='function')renderFA();
     };
-  }
-  /* Sur la fiche d'un agent : un bouton par trou reel. On ne propose pas ce qui est deja rempli. */
+  }  /* Sur la fiche d'un agent : un bouton par trou reel. On ne propose pas ce qui est deja rempli. */
   function faManqueBtns(a){
     /* ===== b434 : CORRECTIF BLOQUANT =====
        `renderFA()` s'execute ligne ~2902, au fil du script ; `var TK_TYPES` n'est affecte que
