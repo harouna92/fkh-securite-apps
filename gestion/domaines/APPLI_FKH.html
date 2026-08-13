@@ -541,6 +541,22 @@ crumb();lvl1();stRender();
       else if(i<NOW&amp;&amp;rt.v[i]===3&amp;&amp;(l.a_payer||l.credit)){rt.v[i]=4;rt.d[i]=k0(Math.round(l.a_payer-l.credit));}
     });
   }
+  /* Cascade GARIS viré / à virer ← allocation_st (Allocation_ST_2026, rattachement
+     chronologique des virements — R-RATTACHEMENT-CHRONO-VIREMENTS). Réalimente aussi
+     STDET pour que le drill raconte la même chose que la grille. */
+  if(Array.isArray(d.allocation_st)&amp;&amp;rk['dont GARIS — viré']){
+    var MA={'janv':0,'févr':1,'mars':2,'avr':3,'mai':4,'juin':5,'juil':6,'août':7,'sept':8,'oct':9,'nov':10,'déc':11};
+    var rv=rk['dont GARIS — viré'],rn=rk['dont GARIS — à virer (non viré)'];
+    d.allocation_st.forEach(function(l){
+      var m=/^(\S+?)-26$/.exec(String(l.mois_prestation||''));
+      if(!m||MA[m[1]]===undefined) return;
+      var i=MA[m[1]];
+      if(typeof l.garis_vire==='number'){rv.v[i]=l.garis_vire>0?1:3;rv.d[i]=l.garis_vire>0?k0(Math.round(l.garis_vire)):'—';}
+      if(rn&amp;&amp;typeof l.garis_non_vire==='number'){rn.v[i]=l.garis_non_vire>0?1:3;rn.d[i]=l.garis_non_vire>0?k0(Math.round(l.garis_non_vire)):'—';}
+      if(STDET[MOF[i]]){STDET[MOF[i]].vire=l.garis_vire;STDET[MOF[i]].avirer=l.garis_non_vire;}
+    });
+    touche.push('cascade GARIS viré/à virer');
+  }
   /* CA encaissé (TTC) ← encaissements_client_2026 (TB_2026_Mvts, cat. Encaissement). */
   if(Array.isArray(d.encaissements_client_2026)&amp;&amp;rk['CA encaissé (TTC)']){
     var re2=rk['CA encaissé (TTC)'];
