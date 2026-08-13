@@ -1802,6 +1802,75 @@
    }
   ]
  },
+ "conformite_2026": {
+  "source": "👁️ fichiers RÉELLEMENT présents dans les dossiers de conformité du domaine",
+  "lu_le": "2026-08-13 09:27",
+  "dsn": {
+   "2026-04": [
+    "DSN11_Feedback_OK_6a06451ad9716355a8a094b1_04_2026.json"
+   ],
+   "2026-02": [
+    "DSN11_Feedback_OK_69b72a12149ae5b776f727db_02_2026.json"
+   ],
+   "2026-01": [
+    "DSN11_Feedback_OK_6992581f5bce62c845550517_01_2026.json"
+   ],
+   "2026-05": [
+    "DSN11_Feedback_OK_6a2f23f5ffc3f1c84251ce98_05_2026.json"
+   ],
+   "2026-03": [
+    "DSN11_Feedback_OK_69dea5aa178a661a89e1bb80_03_2026.json"
+   ]
+  },
+  "vigilance": {
+   "2026-04": [
+    "ATTESTATION DE VIGILANCE FKH AVRIL 2026.pdf"
+   ],
+   "2026-02": [
+    "Attestation de vigilance FKH FEVRIER 2026.pdf"
+   ],
+   "2026-05": [
+    "ATTESTATION DE VIGILANCE MAI 2026 FKH SECURITE.pdf"
+   ],
+   "2026-03": [
+    "ATTESTATION VIGILANCE FKH MARS 2026.pdf"
+   ],
+   "2026-01": [
+    "Attestation vigilance janvier 2026 FKH.pdf"
+   ]
+  },
+  "regularite": {
+   "2026-02": [
+    "ATTESTATION DE REGULARITE FEVRIER 2026 FKH.pdf"
+   ],
+   "2026-05": [
+    "ATTESTATION DE REGULARITE FISCALE FKH MAI 2026.pdf"
+   ],
+   "2026-01": [
+    "ATTESTATION DE REGULARITE JANVIER 2026.pdf"
+   ],
+   "2026-04": [
+    "ATTESTATION REGULARITE FKH AVRIL 2026.pdf"
+   ],
+   "2026-03": [
+    "ATTESTATION REGULARITE FKH MARS POUR AVRIL.pdf"
+   ]
+  },
+  "factures_st": {
+   "2026-04": [
+    "FACTURE_AVRIL_GARIS_FKH_GS-2026-108.pdf"
+   ],
+   "2026-02": [
+    "FACTURE_FEVRIER_GARIS_FKH_GS-2026-095.pdf"
+   ],
+   "2026-01": [
+    "FACTURE_JANVIER_GARIS_FKH_GS-2026-091.pdf"
+   ],
+   "2026-03": [
+    "FACTURE_MARS_GARIS_FKH_GS-2026-099.pdf"
+   ]
+  }
+ },
  "domaine": "FKH",
  "genere_par": "SCRIPTS/build_data_fkh.py",
  "source": "maître TB2026_v23 · onglets BASE_Factures (1925 lignes) + Cascade_ST_2026 + BASE_Paie",
@@ -23750,7 +23819,7 @@
  },
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-13 09:18",
+  "lu_le": "2026-08-13 09:27",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
