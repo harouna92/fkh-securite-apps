@@ -13,7 +13,7 @@
  .hint{font-size:11px;color:#6b7480}
  .carnet{font-size:11px;font-family:ui-monospace,Menlo,monospace;padding:3px 9px;border-radius:999px;border:1px solid #2a313c;color:#6b7480;white-space:nowrap} .carnet.on{color:#34d399;border-color:#1e5540} .carnet.ko{color:#fbbf24;border-color:#5a4a1e}
 </style></head><body>
-<div class="top"><span class="brand">🌸 Appli DAHLIA</span><div class="tabs"><button class="tab on" data-v="hub" onclick="showV('hub')">Hub</button><button class="tab" data-v="carnet" onclick="showV('carnet')">📓 Carnet vivant</button><button class="tab" data-v="ccasc" onclick="showV('ccasc')">🔗 Cascade & virements</button><button class="tab" data-v="cfisc" onclick="showV('cfisc')">🧾 Fiscal & clôture</button><button class="tab" data-v="cdo" onclick="showV('cdo')">🏢 Encaissements DO</button><button class="tab" data-v="factu" onclick="showV('factu')">🧾 Facturation</button><button class="tab" data-v="admin" onclick="showV('admin')">🗂️ Administratif</button><button class="tab" data-v="ca3" onclick="showV('ca3')">🧾 CA12 / TVA</button><button class="tab" data-v="mouvements" onclick="showV('mouvements')">💳 Mouvements</button><button class="tab" data-v="etat" onclick="showV('etat')">ÉTAT</button><button class="tab" data-v="radar" onclick="showV('radar')">RADAR</button><button class="tab" data-v="pilotage" onclick="showV('pilotage')">PILOTAGE</button><button class="tab" data-v="cockdoss" onclick="showV('cockdoss')">Cockpit dossiers</button><button class="tab" data-v="briefing" onclick="showV('briefing')">Briefing auto</button><button class="tab" data-v="ech" onclick="showV('ech')">⏳ Échéances</button><button class="tab" data-v="proch" onclick="showV('proch')">▶ Prochaines actions</button><button class="tab" data-v="cockfin" onclick="showV('cockfin')">💰 Cockpit financier 🟡</button><button class="tab" data-v="atdata" onclick="showV('atdata')">📦 Données ateliers</button></div><span class="hint" style="margin-left:auto">clic = navigue · action = commande à copier</span><span class="carnet" id="rolebadge" style="display:none;color:#fbbf24;border-color:#5a4a1e" title="Rôle admin : seule la vue Administratif est accessible">rôle admin — vue unique</span><span class="carnet" id="tampon" title="Moment où ce cockpit a été assemblé — s'il diffère de ce que Claude annonce, la version en ligne n'est pas la sienne">assemblé 13/08 16:05</span><span class="carnet" id="carnet" title="Carnet lu sur le Drive et diffusé à toutes les vues">carnet…</span></div>
+<div class="top"><span class="brand">🌸 Appli DAHLIA</span><div class="tabs"><button class="tab on" data-v="hub" onclick="showV('hub')">Hub</button><button class="tab" data-v="carnet" onclick="showV('carnet')">📓 Carnet vivant</button><button class="tab" data-v="ccasc" onclick="showV('ccasc')">🔗 Cascade & virements</button><button class="tab" data-v="cfisc" onclick="showV('cfisc')">🧾 Fiscal & clôture</button><button class="tab" data-v="cdo" onclick="showV('cdo')">🏢 Encaissements DO</button><button class="tab" data-v="factu" onclick="showV('factu')">🧾 Facturation</button><button class="tab" data-v="admin" onclick="showV('admin')">🗂️ Administratif</button><button class="tab" data-v="ca3" onclick="showV('ca3')">🧾 CA12 / TVA</button><button class="tab" data-v="mouvements" onclick="showV('mouvements')">💳 Mouvements</button><button class="tab" data-v="etat" onclick="showV('etat')">ÉTAT</button><button class="tab" data-v="radar" onclick="showV('radar')">RADAR</button><button class="tab" data-v="pilotage" onclick="showV('pilotage')">PILOTAGE</button><button class="tab" data-v="cockdoss" onclick="showV('cockdoss')">Cockpit dossiers</button><button class="tab" data-v="briefing" onclick="showV('briefing')">Briefing auto</button><button class="tab" data-v="ech" onclick="showV('ech')">⏳ Échéances</button><button class="tab" data-v="proch" onclick="showV('proch')">▶ Prochaines actions</button><button class="tab" data-v="cockfin" onclick="showV('cockfin')">💰 Cockpit financier 🟡</button><button class="tab" data-v="atdata" onclick="showV('atdata')">📦 Données ateliers</button></div><span class="hint" style="margin-left:auto">clic = navigue · action = commande à copier</span><span class="carnet" id="rolebadge" style="display:none;color:#fbbf24;border-color:#5a4a1e" title="Rôle admin : seule la vue Administratif est accessible">rôle admin — vue unique</span><span class="carnet" id="tampon" title="Moment où ce cockpit a été assemblé — s'il diffère de ce que Claude annonce, la version en ligne n'est pas la sienne">assemblé 13/08 18:15</span><span class="carnet" id="carnet" title="Carnet lu sur le Drive et diffusé à toutes les vues">carnet…</span></div>
 <div><iframe id="if-hub" class="vframe" srcdoc="<!DOCTYPE html><html lang=&quot;fr&quot;><head><style>[class*=&quot;ti-&quot;]::before{content:&quot;&quot;!important}.ico{font-style:normal;display:inline-block}</style><script>function sendPrompt(t){try{parent.postMessage({__cmd:String(t)},&quot;*&quot;)}catch(e){}}</script><script>window.CARNET=(function(){var cbs=[],last=null,seq=0,pend={};function fire(){cbs.forEach(function(f){try{f(last)}catch(e){}})}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined){last={data:d.__data||null,err:d.__err||null,at:d.__at||null,src:d.__src||null};fire();}if(d.__mcpres&amp;&amp;pend[d.__mcpres.id]){pend[d.__mcpres.id].ok(d.__mcpres.payload);delete pend[d.__mcpres.id];}if(d.__mcperr&amp;&amp;pend[d.__mcperr.id]){pend[d.__mcperr.id].ko({code:d.__mcperr.code});delete pend[d.__mcperr.id];}});var solo=(window.parent===window);function ask(){if(solo){setTimeout(function(){last={data:null,err:&quot;__hors_appli&quot;,at:null};fire();},0);return;}try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(e){}}return{onData:function(f){cbs.push(f);if(last){try{f(last)}catch(e){}}else ask();},ask:ask,nb:function(){return cbs.length},mcp:function(tool,input){var id=++seq;return new Promise(function(ok,ko){pend[id]={ok:ok,ko:ko};try{parent.postMessage({__mcp:{id:id,tool:tool,input:input}},&quot;*&quot;)}catch(e){ko({code:&quot;bad_request&quot;})}setTimeout(function(){if(pend[id]){pend[id].ko({code:&quot;upstream_error&quot;});delete pend[id];}},45000);})},explain:function(c){switch(c){case &quot;__absent&quot;:return &quot;DATA_DAHLIA.json pas encore visible sur le Drive \u2014 la synchronisation peut prendre quelques minutes.&quot;;case &quot;__illisible&quot;:return &quot;DATA_DAHLIA.json trouv\u00e9 mais illisible : le connecteur en a alt\u00e9r\u00e9 le format.&quot;;case &quot;__vide&quot;:return &quot;Carnet lu, mais ce bloc y est vide \u2014 relancer build_data_dahlia.py.&quot;;case &quot;server_not_connected&quot;:return &quot;Aucun connecteur Google Drive \u2014 \u00e0 ajouter dans R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;needs_reauth&quot;:return &quot;Connecteur Google Drive \u00e0 reconnecter : R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;selection_required&quot;:return &quot;Plusieurs comptes Drive : en choisir un dans l\u2019invite d\u2019ouverture.&quot;;case &quot;server_unavailable&quot;:return &quot;Drive momentan\u00e9ment injoignable \u2014 derniers chiffres conserv\u00e9s.&quot;;case &quot;capability_disabled&quot;:case &quot;not_granted&quot;:case &quot;capability_removed&quot;:return &quot;Cette page n\u2019a pas re\u00e7u le pont connecteur dans cette session.&quot;;case &quot;__hors_appli&quot;:return &quot;Vue ouverte hors de l\u2019appli \u2014 chiffres fig\u00e9s.&quot;;case &quot;__lecture&quot;:return &quot;Lecture de DATA_DAHLIA.json en cours\u2026&quot;;default:return &quot;Lecture impossible (&quot;+c+&quot;).&quot;;}}};})();window.DAHLIA=window.CARNET;</script><style>#fkhfrais{position:sticky;bottom:0;z-index:99;font:11.5px/1.5 ui-monospace,Menlo,monospace;padding:5px 12px;border-top:1px solid #2a313c;background:#0e1116;color:#6b7480;display:flex;gap:8px;flex-wrap:wrap}#fkhfrais b{font-weight:600}.fkhv{color:#34d399}.fkhf{color:#fbbf24}</style><script>(function(){function pose(){var e=document.getElementById(&quot;fkhfrais&quot;);if(!e){e=document.createElement(&quot;div&quot;);e.id=&quot;fkhfrais&quot;;document.body.appendChild(e);}return e;}function dit(s){var e=pose(),vit=s&amp;&amp;s.data&amp;&amp;(s.src===&quot;fichier&quot;||s.src===&quot;drive&quot;),sert=(window.__UTILISE_CARNET__===true)||(function(){try{return window.CARNET.nb()>0}catch(_){return false}})();var h=s&amp;&amp;s.at?new Date(s.at).toLocaleTimeString(&quot;fr-FR&quot;):&quot;&quot;;e.innerHTML=(vit?'<span class=&quot;fkhv&quot;>\u25cf carnet DAHLIA lu '+h+&quot;</span>&quot;:'<span class=&quot;fkhf&quot;>\u25cb carnet DAHLIA NON lu \u2014 chiffres fig\u00e9s dans la page</span>')+(sert?&quot;<span>\u00b7 cette vue s'en sert</span>&quot;:(window.__PAGE_NAV__===true?&quot;<span>\u00b7 page de navigation \u2014 aucune donn\u00e9e \u00e0 rafra\u00eechir</span>&quot;:'<span class=&quot;fkhf&quot;>\u00b7 cette vue ne s\u2019en sert PAS ENCORE \u2014 son contenu date de sa g\u00e9n\u00e9ration</span>'));}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined)dit({data:d.__data||null,at:d.__at||null,src:d.__src||null});});function go(){dit(null);try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(_){}}if(document.readyState===&quot;loading&quot;)document.addEventListener(&quot;DOMContentLoaded&quot;,go);else go();})();</script><script>(function(){window.__ROLE__=window.__ROLE__||null;window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__role!==undefined){var av=window.__ROLE__;window.__ROLE__=d.__role||null;if(av!==window.__ROLE__&amp;&amp;typeof window.__onRole===&quot;function&quot;){try{window.__onRole(window.__ROLE__)}catch(_){}}}});function ask(){try{parent.postMessage({__wantrole:1},&quot;*&quot;)}catch(_){}}if(document.readyState===&quot;loading&quot;)document.addEventListener(&quot;DOMContentLoaded&quot;,ask);else ask();window.addEventListener(&quot;load&quot;,ask);})();</script><script>(function(){window.__pubEtat={envoye:null,err:null};window.__pubSync=function(liste,cb){ var up=null,pret=null; try{up=window.top.fkhUpload;pret=window.top.fkhPret;}catch(e){} if(typeof up!==&quot;function&quot;||typeof pret!==&quot;function&quot;||!pret()){  window.__pubEtat={envoye:null,err:&quot;hors_appli&quot;}; if(cb)cb({ok:false,err:&quot;hors_appli&quot;}); return; } var b; try{ b=new Blob([JSON.stringify(liste||[])],{type:&quot;application/json&quot;}); } catch(e){ if(cb)cb({ok:false,err:&quot;blob&quot;}); return; } up(&quot;admin/publications/DAHLIA.json&quot;, b, function(j){  var ok=!!(j&amp;&amp;j.ok); window.__pubEtat={envoye:ok?new Date().toISOString():null,err:ok?null:&quot;envoi&quot;};  try{ var m={__pubsync:{dom:&quot;DAHLIA&quot;,ok:ok}}; parent.postMessage(m,&quot;*&quot;);       var fr=parent.frames; for(var i=0;i<fr.length;i++){ if(fr[i]!==window) fr[i].postMessage(m,&quot;*&quot;); } }catch(_){}  if(cb)cb({ok:ok}); });};})();</script><script>
 (function(){
  if(window.__BLOC_GEN__) return; window.__BLOC_GEN__=1;
@@ -88,17 +88,26 @@
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -154,7 +163,7 @@
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -293,17 +302,26 @@
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -359,7 +377,7 @@
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -540,17 +558,26 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -606,7 +633,7 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -787,17 +814,26 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -853,7 +889,7 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -1034,17 +1070,26 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -1100,7 +1145,7 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -1281,17 +1326,26 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -1347,7 +1401,7 @@ function setSt(on,txt){var e=document.getElementById('st');e.className='st '+(on
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -1493,17 +1547,26 @@ function render(){document.getElementById('app').innerHTML=(!DATA)?'<div class=&
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -1559,7 +1622,7 @@ function render(){document.getElementById('app').innerHTML=(!DATA)?'<div class=&
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -1613,10 +1676,9 @@ function render(){document.getElementById('app').innerHTML=(!DATA)?'<div class=&
 .det{margin:0 10px 10px;padding:8px 12px;border-left:2px solid var(--info);font-size:11.5px;color:var(--ts);line-height:1.8;background:var(--card2);border-radius:0 8px 8px 0}
 .det b{color:var(--tp)}
 .act{display:inline-block;margin-top:7px;margin-right:6px;padding:4px 10px;border:1px solid var(--info);border-radius:7px;color:var(--info);cursor:pointer;font-size:11.5px}
-.blochtml{margin:0 10px 8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card2);overflow-x:auto}
-.blochtml table{width:100%;border-collapse:collapse}
-.blochtml td,.blochtml th{padding:4px 5px;text-align:center;border-top:1px solid var(--line)}
-.blochtml td:first-child{text-align:left}
+.cadrebloc{margin:0 10px 8px;border:1px solid var(--line);border-radius:8px;
+ background:var(--bg);overflow-x:auto;padding:4px 6px}
+.cadrebloc table{width:100%}
 .att{padding:6px 12px 10px;font-size:11.5px;color:var(--tt)}
 .att.err{color:var(--warn)}
 .vide{border:1px dashed var(--line);border-radius:10px;padding:24px 18px;color:var(--ts);font-size:12.5px;line-height:1.9;text-align:center}
@@ -1632,7 +1694,6 @@ une ligne publiée reste <b>vivante</b> : c'est la vue d'origine qui la redessin
 <script>
 var DOM=&quot;DAHLIA&quot;, CLE=&quot;fkh_admin_pub_&quot;+DOM;
 var PARTAGEES=[], LOCALES=[], ouverts={}, moisSel={}, RENDU={}, carnetLu=false, seq=0, attente={};
-
 /* ---- demander sa ligne VIVANTE à la vue d'origine (elle seule sait la calculer) ---- */
 function fenetreDe(vue){
   try{ if(window.parent===window) return null;
@@ -1720,6 +1781,39 @@ function toutes(){
   return PARTAGEES.concat(LOCALES.filter(function(p){return !vus[p.id];}).map(function(p){p.__att=true;return p;}));
 }
 
+/* ---- LE STYLE DE LA VUE D'ORIGINE, CLOISONNE (Zeus 13/08) ------------------------
+   « Je veux que les informations s'affichent de la meme maniere dans Administratif que
+   dans les vues d'origine. » Le bloc arrive donc avec le style de sa vue. Mais 34
+   habillages differents dans une seule page se marcheraient dessus : chaque regle est
+   prefixee par la vue a laquelle elle appartient. :root, html et body deviennent le
+   cadre lui-meme, puisque c'est lui qui porte les variables de couleur. */
+var CSSPOSE={};
+function cloisonne(css,pref){
+  css=String(css||'').replace(/\/\*[\s\S]*?\*\//g,'');
+  var out='', blocs=css.split('}');
+  for(var i=0;i<blocs.length;i++){
+    var b=blocs[i], j=b.indexOf('{');
+    if(j<0) continue;
+    var sel=b.slice(0,j).trim(), corps=b.slice(j+1);
+    if(!sel || sel.charAt(0)==='@') continue;   /* @media / @keyframes : laisses de cote */
+    var parts=sel.split(',');
+    for(var k=0;k<parts.length;k++){
+      var x=parts[k].trim();
+      if(/^(:root|html|body)$/.test(x)) parts[k]=pref;
+      else if(/^(:root|html|body)\b/.test(x)) parts[k]=pref+' '+x.replace(/^(:root|html|body)\s*/,'');
+      else parts[k]=pref+' '+x;
+    }
+    out+=parts.join(',')+'{'+corps+'}'+String.fromCharCode(10);
+  }
+  return out;
+}
+function poseCss(vue,css){
+  if(!css||CSSPOSE[vue]) return;
+  CSSPOSE[vue]=1;
+  var st=document.createElement('style'); st.id='css-vue-'+vue;
+  st.textContent=cloisonne(css,'.vue-'+vue);
+  document.head.appendChild(st);
+}
 function dessine(){
   var q=(document.getElementById('q').value||'').toLowerCase().trim();
   var tout=toutes();
@@ -1754,14 +1848,28 @@ function dessine(){
       if(ouverts[p.id]){
         if(!r){ var a=document.createElement('div'); a.className='att'; a.textContent='lecture de la ligne auprès de « '+(p.vue_label||p.vue)+' »…'; c.appendChild(a); }
         else if(!r.ok){ var e2=document.createElement('div'); e2.className='att err'; e2.textContent='⚠ '+(r.motif||'ligne indisponible'); c.appendChild(e2); }
-        else if(r.type==='html'){
+        /* AFFICHAGE À L'IDENTIQUE (Zeus 13/08) — la vue d'origine nous a envoyé son
+           dessin ET son style. On les rend dans un cadre isolé : même allure que chez
+           elle, et aucun mélange entre les habillages de 34 vues différentes. */
+        if(r.html){
+          poseCss(p.vue, r.css);
+          var cad=document.createElement('div');
+          cad.className='cadrebloc vue-'+p.vue;
+          cad.innerHTML=r.html;
+          /* cliquer une case du tableau choisit le mois, exactement comme dans la vue
+             d'origine : le bloc n'est pas une image, il reste manoeuvrable. */
+          (function(pp,rr){ cad.addEventListener('click',function(ev){
+            var td=ev.target.closest&amp;&amp;ev.target.closest('td'); if(!td||!td.parentElement.cells) return;
+            var i=[].indexOf.call(td.parentElement.cells,td)-1;      /* colonne 0 = le libelle */
+            if(rr.mois&amp;&amp;i>=0&amp;&amp;i<12){ moisSel[pp.id]=(moisSel[pp.id]===i?-1:i); dessine(); }
+          }); })(p,r);
+          c.appendChild(cad);
+        }
+        if(r.type==='html'){
           /* bloc générique (n'importe quelle vue) : la vue d'origine nous a envoyé son
              dessin, débarrassé de ses scripts et de ses clics — ils appelleraient un code
              qui n'existe pas ici. C'est donc une reproduction fidèle mais inerte ; l'action
              reste offerte en dessous, elle, et elle marche. */
-          var hb=document.createElement('div'); hb.className='blochtml';
-          hb.innerHTML=r.html||'<span style=&quot;color:var(--tt)&quot;>bloc vide</span>';
-          c.appendChild(hb);
           var db=document.createElement('div'); db.className='det';
           db.innerHTML='<span style=&quot;color:var(--tt);font-size:11px&quot;>servi à l\'instant par la vue <b>'
             +(p.vue_label||p.vue)+'</b> — rien n\'est recopié dans cette page.</span>';
@@ -1771,7 +1879,12 @@ function dessine(){
           db.appendChild(ab); c.appendChild(db);
         }
         else {
+          /* Si le bloc est déjà dessiné à l'identique au-dessus, cette bande ferait
+             doublon : on choisit le mois en cliquant la case du tableau, comme dans la
+             vue d'origine. Elle ne sert que de repli quand la vue n'a pas envoyé son
+             dessin (vue plus ancienne, ou bloc non reconstituable). */
           var mz=document.createElement('div'); mz.className='mois';
+          if(r.html) mz.style.display='none';
           r.mois.forEach(function(mn,i){
             var d=r.d[i], v=r.v[i];
             var b=document.createElement('div');
@@ -1940,17 +2053,26 @@ function decor(){
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -2006,7 +2128,7 @@ function decor(){
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -2141,17 +2263,26 @@ function render(){ if(!DATA){document.getElementById('app').innerHTML='<div clas
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -2207,7 +2338,7 @@ function render(){ if(!DATA){document.getElementById('app').innerHTML='<div clas
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -2382,17 +2513,26 @@ document.getElementById('q').addEventListener('input',rendre);
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -2448,7 +2588,7 @@ document.getElementById('q').addEventListener('input',rendre);
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -2715,17 +2855,26 @@ document.addEventListener('click',function(ev){
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -2781,7 +2930,7 @@ document.addEventListener('click',function(ev){
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -3056,17 +3205,26 @@ document.getElementById('addBesoin').onclick=()=>{const v=document.getElementByI
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -3122,7 +3280,7 @@ document.getElementById('addBesoin').onclick=()=>{const v=document.getElementByI
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -3271,17 +3429,26 @@ function fill(d){
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -3337,7 +3504,7 @@ function fill(d){
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -3452,17 +3619,26 @@ td{padding:5px;text-align:center;border-top:1px solid var(--line)}td:first-child
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -3518,7 +3694,7 @@ td{padding:5px;text-align:center;border-top:1px solid var(--line)}td:first-child
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -3633,17 +3809,26 @@ td{padding:5px;text-align:center;border-top:1px solid var(--line)}td:first-child
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -3699,7 +3884,7 @@ td{padding:5px;text-align:center;border-top:1px solid var(--line)}td:first-child
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -3846,17 +4031,26 @@ function fill(d){
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -3912,7 +4106,7 @@ function fill(d){
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -4173,17 +4367,26 @@ render();
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -4239,7 +4442,7 @@ render();
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -4369,17 +4572,26 @@ document.getElementById('L').innerHTML=L.map(function(x){return '<div class=&quo
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -4435,7 +4647,7 @@ document.getElementById('L').innerHTML=L.map(function(x){return '<div class=&quo
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -4558,17 +4770,26 @@ document.getElementById('L').innerHTML=A.map(function(x){var c=x.w==='à faire'?
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -4624,7 +4845,7 @@ document.getElementById('L').innerHTML=A.map(function(x){var c=x.w==='à faire'?
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -4795,17 +5016,26 @@ function fill(d){
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -4861,7 +5091,7 @@ function fill(d){
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -4973,17 +5203,26 @@ function fill(d){
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -5039,7 +5278,7 @@ function fill(d){
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -5219,17 +5458,26 @@ render();
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -5285,7 +5533,7 @@ render();
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -5460,17 +5708,26 @@ render();
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -5526,7 +5783,7 @@ render();
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -5709,17 +5966,26 @@ render();
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -5775,7 +6041,7 @@ render();
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -5953,17 +6219,26 @@ render();
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -6019,7 +6294,7 @@ render();
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -6197,17 +6472,26 @@ render();
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -6263,7 +6547,7 @@ render();
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,
@@ -6441,17 +6725,26 @@ render();
   if(el.tagName==='TR') h='<table style=&quot;width:100%;border-collapse:collapse;font-size:11.5px&quot;>'+h+'</table>';
   return h.slice(0,20000);
  }
+ /* Le STYLE de la vue voyage avec le bloc (demande de Zeus 13/08 : « je veux que les
+    informations s'affichent de la même manière dans Administratif que dans les vues
+    d'origine »). Sans lui, le même HTML rendu ailleurs change d'allure — et un tableau
+    qu'on ne reconnaît pas oblige à relire au lieu de regarder. */
+ function styles(){
+  var out='', ss=document.querySelectorAll('style');
+  for(var i=0;i<ss.length;i++){ if(ss[i].id==='oeilg-css') continue; out+=ss[i].textContent+'\n'; }
+  return out.slice(0,60000);
+ }
  function servir(cle){
   var c=candidats(), t=null;
   for(var i=0;i<c.length;i++){ if(c[i].cle===cle) t=c[i]; }
   if(!t) return null;
-  var el=t.el;
+  var el=t.el, h=nettoie(el), css=styles();
   if(el.tagName==='TR' &amp;&amp; el.cells &amp;&amp; el.cells.length===13){
    var d=[],v=[];
    for(var j=1;j<=12;j++){ var x=(el.cells[j].textContent||'').trim(); v.push(etatCase(x)); d.push(x==='·'?'':x); }
-   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v};
+   return {type:'grid', cle:cle, mois:MOIS, d:d, v:v, html:h, css:css};
   }
-  return {type:'html', cle:cle, html:nettoie(el)};
+  return {type:'html', cle:cle, html:h, css:css};
  }
  function pret(){ var m={__blocpret:{vue:VUEID}};
   try{ parent.postMessage(m,'*'); }catch(_){}
@@ -6507,7 +6800,7 @@ render();
   window.addEventListener('message',function(e){
    var d=e.data||{};
    if(d.__blocask){ var q=d.__blocask, s=servir(q.cle);
-    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html}
+    var rep=s?{id:q.id, ok:true, vue:VUEID, cle:s.cle, type:s.type, mois:s.mois, d:s.d, v:s.v, html:s.html, css:s.css}
              :{id:q.id, ok:false, vue:VUEID, cle:q.cle, motif:'bloc introuvable dans la vue '+(VUELABEL||VUEID)};
     try{ e.source.postMessage({__blocres:rep},'*'); }catch(_){} }
    if(d.__bloclist){ try{ e.source.postMessage({__bloclistres:{id:d.__bloclist.id, vue:VUEID,

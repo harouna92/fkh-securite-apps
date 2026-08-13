@@ -2,7 +2,7 @@
  "administratif_publications": [],
  "conformite_2026": {
   "source": "fichiers reellement presents dans le dossier courriers du domaine",
-  "lu_le": "2026-08-13 16:05",
+  "lu_le": "2026-08-13 18:15",
   "courriers": {
    "2026-01": [
     "DAHLIA_2026-01-05_JUSTICE_demande-releve-forclusion_RG2025JC05482.pdf"
@@ -1549,7 +1549,7 @@
  ],
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-13 16:05",
+  "lu_le": "2026-08-13 18:15",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
