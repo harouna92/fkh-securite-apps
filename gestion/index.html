@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b437</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b439</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1631,7 +1631,11 @@ button.big:active{transform:translateY(1px)}
   function svGeoCompleter(){ try{
     if(typeof COMMUNES==='undefined'||!COMMUNES)return 0;
     if(typeof SUIVI==='undefined'||!SUIVI)return 0;
-    var ch=0; SUIVI.forEach(function(m){ if(!m||m.deleted)return; if(m.statut!=='recherche')return;
+    /* b438 : b431 ne completait que les demandes en RECHERCHE. Or les agents proches se
+       cherchent surtout sur une vacation VALIDEE que personne n'a prise : 154 dans la base au
+       13/08, dont 10 sans coordonnees — le panneau serait reste bloque sur « Localisation… ». */
+    var ch=0; SUIVI.forEach(function(m){ if(!m||m.deleted)return;
+      if(m.statut!=='recherche'&&!(m.statut==='validee'&&!m.agentId))return;
       if(svGeoLocal(m))ch++; });
     if(ch&&typeof saveSuivi==='function')saveSuivi();
     return ch;
@@ -2607,8 +2611,28 @@ button.big:active{transform:translateY(1px)}
   setInterval(function(){ var sec=byId('sec-suivi'); if(!sec||sec.classList.contains('hidden')||suiviBucket!=='recherche')return; svTick(); },1000);
   // Aperçu live du texte à copier (Infos agent / Mission validée) : recalculé à chaque case cochée/décochée
   function plPreview(card){ if(!card)return; var out=card.querySelector('.pl-out'); if(!out)return; var id=out.getAttribute('data-id'),it=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;} if(!it)return; var lines=it.texte.split('\n'),arr=[]; card.querySelectorAll('input.pl').forEach(function(c){if(c.checked)arr.push(lines[+c.getAttribute('data-li')]);}); out.textContent=arr.join('\n')||'(rien de sélectionné)'; }
-  byId('suiviList').addEventListener('change',function(e){ var s=e.target; if(s&&s.classList&&s.classList.contains('sv-srchsel')){ var sid=s.getAttribute('data-id'),it2=null,j; for(j=0;j<SUIVI.length;j++)if(SUIVI[j].id===sid){it2=SUIVI[j];break;} if(!it2)return; it2.noSearch=(s.value==='nosearch'); delete it2._near; delete it2._pick; delete it2._pick2; if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); } });
-  byId('suiviList').addEventListener('click',function(e){
+  /* ===== b438 : LES MEMES GESTES, DANS UNE AUTRE VUE =====
+     POURQUOI (Zeus, 13/08) : « depuis cette vue, donne la possibilite d'avoir l'onglet agents
+     proches avec toutes ses fonctionnalites, comme dans Suivi des demandes ». Les deux vues
+     travaillent deja le MEME objet (un element de SUIVI) — `renderNear` s'y applique tel quel.
+     Ce qui manquait, c'est le CABLAGE : les quatre ecouteurs etaient cloues sur `#suiviList`.
+     On les enregistre donc une fois, et on peut les rebrancher sur n'importe quel conteneur.
+     (Regle du 01/08 : une mecanique eprouvee se factorise, elle ne se recopie pas.) */
+  var _SV_ACTS=[], _svInModal=0;
+  function svAddAct(type,fn){ _SV_ACTS.push([type,fn]); var el=byId('suiviList'); if(el)el.addEventListener(type,fn); }
+  function svBindActs(el){ if(!el||el._svBound)return; el._svBound=1;
+    /* b439 : le geste fait, on redessine la vue QUI L'A RECU. Premiere version : je m'appuyais
+       sur `renderSuivi`, que ces gestes appellent tous. Erreur — renderSuivi SORT PAR
+       ANTICIPATION quand sa liste est vide (« Aucun résultat »), et le rafraichissement n'avait
+       jamais lieu : les filtres du panneau semblaient morts. On ne suspend donc rien aux
+       entrailles d'une autre fonction. */
+    _SV_ACTS.forEach(function(p){ el.addEventListener(p[0],function(e){
+      p[1](e);
+      try{ if(!_svInModal&&byId('pl-modal-card')&&typeof _plRenderModal==='function'){
+        _svInModal=1; try{ _plRenderModal(); } finally { _svInModal=0; } } }catch(_e){ _svInModal=0; }
+    }); }); }
+  svAddAct('change',function(e){ var s=e.target; if(s&&s.classList&&s.classList.contains('sv-srchsel')){ var sid=s.getAttribute('data-id'),it2=null,j; for(j=0;j<SUIVI.length;j++)if(SUIVI[j].id===sid){it2=SUIVI[j];break;} if(!it2)return; it2.noSearch=(s.value==='nosearch'); delete it2._near; delete it2._pick; delete it2._pick2; if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); } });
+  svAddAct('click',function(e){
     var ecl=e.target.closest('.ed-cl'); if(ecl){ var _cd0=ecl.closest('.sv'); var _in0=_cd0&&_cd0.querySelector('.ed-client'); if(_in0)_in0.value=ecl.getAttribute('data-n')||''; var _bx0=_cd0&&_cd0.querySelector('.ed-clsugg'); if(_bx0)_bx0.innerHTML='<span class="sub" style="font-size:11px;margin:0">✅ '+(ecl.getAttribute('data-n')||'')+'</span>'; return; }
     var eci=e.target.closest('.ed-client'); if(eci){ _edClientChips(eci.closest('.sv'),''); }
     var vs=e.target.closest('.ed-vs'); if(vs){ var _cd=vs.closest('.sv'); if(_cd){ var _vi=_cd.querySelector('.ed-ville'); if(_vi)_vi.value=vs.getAttribute('data-n')||''; var _ci=_cd.querySelector('.ed-cp'); if(_ci&&vs.getAttribute('data-cp'))_ci.value=vs.getAttribute('data-cp'); var _sg=_cd.querySelector('.ed-vsugg'); if(_sg)_sg.innerHTML='<span class="sub" style="margin:0;font-size:11px">✅ '+ (vs.getAttribute('data-n')||'') +'</span>'; } return; }
@@ -2730,7 +2754,7 @@ button.big:active{transform:translateY(1px)}
     else if(act==='pickcopy'){var card=b.closest('.sv'),lines=it.texte.split('\n'),outL=[];card.querySelectorAll('input.pl').forEach(function(c){if(c.checked)outL.push(lines[+c.getAttribute('data-li')]);});if(navigator.clipboard)navigator.clipboard.writeText(outL.join('\n'));flash(b,'Copié ✓');return;}
     saveSuivi(); renderSuivi();
   });
-  byId('suiviList').addEventListener('change',function(e){
+  svAddAct('change',function(e){
     if(e.target.classList&&e.target.classList.contains('pl')){ plPreview(e.target.closest('.sv')); return; }
     if(e.target.classList&&(e.target.classList.contains('af-date')||e.target.classList.contains('af-h')||e.target.classList.contains('af-m'))){ var aid=e.target.getAttribute('data-id'),ai=null,k; for(k=0;k<SUIVI.length;k++)if(SUIVI[k].id===aid){ai=SUIVI[k];break;} if(ai){ var acard=e.target.closest('.sv'),dt=acard.querySelector('.af-date'),hh=acard.querySelector('.af-h'),mm=acard.querySelector('.af-m'); ai.mdate=dt?dt.value:ai.mdate; var H=hh?hh.value:'',M=mm?mm.value:''; ai.mheure=H?(H+':'+(M||'00')):''; saveSuivi(); renderSuivi(); } return; }
     var t2=e.target;
@@ -2746,7 +2770,7 @@ button.big:active{transform:translateY(1px)}
     else if(t2.hasAttribute('data-nvoit'))it._nvoit=t2.checked;
     renderSuivi();
   });
-  byId('suiviList').addEventListener('input',function(e){
+  svAddAct('input',function(e){
     var t=e.target; if(!t.classList)return;
     if(t.classList&&t.classList.contains('ed-client')){ _edClientChips(t.closest('.sv'),t.value.trim()); return; }
     if(t.classList&&t.classList.contains('ed-ville')){ var _cd3=t.closest('.sv'), _bx=_cd3&&_cd3.querySelector('.ed-vsugg'); if(_bx){ var _q=t.value.trim(); var _rs=(_q.length>=2&&typeof commSearch==='function')?(commSearch(_q,5)||[]):[]; _bx.innerHTML=_rs.map(function(c){ var _cp0=(c.codesPostaux&&c.codesPostaux[0])||''; return '<button type="button" class="ed-vs" data-n="'+esc(c.nom)+'" data-cp="'+esc(_cp0)+'" style="font-size:11.5px">'+esc(c.nom)+(_cp0?' ('+esc(_cp0)+')':'')+'</button>'; }).join(''); } return; }
@@ -3543,6 +3567,39 @@ button.big:active{transform:translateY(1px)}
   document.addEventListener('click',function(ev){ var b=ev.target&&ev.target.closest?ev.target.closest('.aide-b'):null; if(b){ ev.preventDefault(); ev.stopPropagation(); aideOuvrir(b.getAttribute('data-a')); } });
   function aideWire(root){ (root||document).querySelectorAll('.aide-b').forEach(function(b){ b.onclick=function(){ aideOuvrir(b.getAttribute('data-a')); }; }); }
   var DEMOS={
+    proches:{ titre:'\ud83d\udc65 Les agents proches, depuis la fiche d\u2019une vacation du Planning',
+      quoi:'Une vacation BASIC FIT (Chartres) du 14/08 \u00e0 13:00, sans agent \u2014 et six agents r\u00e9partis de 4 \u00e0 190 km autour, avec voiture / ADS / fiabilit\u00e9 renseign\u00e9s.',
+      aFaire:'Ouvre \ud83d\udcc5 Planning, va au 14/08 et clique la vacation \u00ab BASIC FIT (Chartres) \u00bb. Dans la fiche, sous les horaires, le bloc \ud83d\udc65 Agents proches est d\u00e9j\u00e0 ouvert : change le rayon (20 \u2192 200 km), coche \ud83d\udee1\ufe0fADS puis \ud83d\ude97 V\u00e9hicule, la liste se refiltre SANS fermer la fiche. Chaque agent affiche sa distance, sa dispo pour ce cr\u00e9neau, et son num\u00e9ro cliquable.',
+      monter:function(){
+        var SU2=(typeof SUIVI!=='undefined'&&SUIVI)?SUIVI:[];
+        if(SU2.length){ var _v=SU2.filter(function(x){ return String(x&&x.id||'').indexOf('demo_')===0; });
+          _v.forEach(function(x){ var k=SU2.indexOf(x); if(k>=0)SU2.splice(k,1); }); }
+        var FA2=((typeof FA!=='undefined'&&FA)?FA:[]).filter(function(a){ return String(a&&a.id||'').indexOf('demo_ag')!==0; });
+        /* Six agents autour de Chartres (48.4469, 1.4890) — distances vraies. */
+        var GENS=[
+          ['Bras droit Chartres',   48.4469, 1.4890,'0600000001',true, true, '\u2705 Fiable'],
+          ['Mainvilliers Ibrahim',  48.4525, 1.4610,'0600000002',false,true, '\ud83d\udfe1 Moyennement fiable'],
+          ['Lucien Lucé',           48.4337, 1.4570,'0600000003',true, false,''],
+          ['Dreux Amadou',          48.7369, 1.3660,'0600000004',true, true, '\u2705 Fiable'],
+          ['Le Mans Souleymane',    48.0061, 0.1996,'0600000005',true, true, ''],
+          ['Paris Karim',           48.8566, 2.3522,'0600000006',false,true, '\ud83d\udd34 Non fiable']
+        ];
+        GENS.forEach(function(g,i){
+          FA2.push({id:'demo_ag'+i,nom:g[0],tels:[g[3]],ville:g[0].split(' ')[0],
+                    la:g[1],lo:g[2],voiture:g[4],ads:g[5],fiab:g[6],verifie:true,src:'demo'});
+        });
+        if(typeof save==='function')save('fkh_fa',FA2);
+        try{ FA=FA2; }catch(e){}
+        /* La vacation : validee, AUCUN agent, coordonnees de Chartres deja connues. */
+        var d=new Date(); d.setDate(d.getDate()+1);
+        var iso=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+        SU2.push({id:'demo_vac_bf',statut:'validee',agentId:null,
+          titre:'BASIC FIT',siteAgent:'BASIC FIT',client:'\ud83c\udfe2 AQUILA',
+          ville:'Chartres',cp:'28000',la:48.4469,lo:1.4890,
+          mdate:iso,mheure:'13:00',mdateFin:iso,mfin:'',
+          texte:'Prestation : Gardiennage\nClient : AQUILA\nSite : BASIC FIT\nVille : Chartres (28000)',
+          vacations:[],assoc:[],creeAt:Date.now()});
+      } },
     'ticket-mens':{ titre:'\ud83c\udfab Un ticket qui se ferme sur la donn\u00e9e, pas sur une d\u00e9claration',
       quoi:'8 de tes agents r\u00e9els, avec leur nombre de vacations et l\u2019\u00e9tat exact de leur dossier au 12/08 : adresse, mensurations, \u00e9tat de la tenue. Un ticket est d\u00e9j\u00e0 parti au superviseur.',
       aFaire:'Ouvre \u00ab \ud83e\udded Terrain \u00bb. En haut, le ticket re\u00e7u : 8 agents, 24 informations attendues, les plus sollicit\u00e9s d\u2019abord. Essaie \u00ab \u2705 Fait \u00bb : l\u2019appli REFUSE. Remplis une ligne d\u2019AGENT Poulet DUC : elle passe \u2705 et tu lis qui l\u2019a saisie. Juste en dessous, la carte \u00ab Demander une information manquante \u00bb : c\u2019est de l\u00e0 que tu envoies, plus depuis Tickets.',
@@ -6043,7 +6100,9 @@ button.big:active{transform:translateY(1px)}
   // Heures planifiées de l'agent sur le mois de la vacation (calque du panneau « Affecter vos agents » Sekur : [54.28h])
   function _plAgentMonthHours(aid,refISO){ if(!aid||!refISO)return 0; var mo=refISO.slice(0,7),tot=0; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(x){ if(x.agentId!==aid||x.statut!=='validee'||!x.mdate||x.mdate.slice(0,7)!==mo)return; var r=(typeof missRange==='function')?missRange(x):null; if(r)tot+=(r[1]-r[0]); }); return Math.round(tot/60*10)/10; }
   function _plAgentResults(m){ var q=(_plAffQ||'').toLowerCase().trim(); if(typeof FA==='undefined'||!FA||!FA.length)return '<div class="hint" style="padding:4px 2px">Aucun agent en base.</div>'; if(q.length<2)return '<div class="hint" style="padding:4px 2px">✍️ Tape au moins 2 lettres (nom · n° · ville) — les propositions se filtrent au fur et à mesure.</div>'; /* b199 : plus de liste complete, autocompletion seulement */ var arr=FA.filter(function(a){ return !q||(((a.nom||'')+' '+((a.tels||[]).join(' '))+' '+(a.ville||'')).toLowerCase().indexOf(q)>=0); }).slice(0,8); if(!arr.length)return '<div class="hint" style="padding:4px 2px">Aucun agent trouvé.</div>'; return arr.map(function(a){ var cur=(a.id===m.agentId); var ind=(typeof agentIndispoOn==='function')?agentIndispoOn(a.id,m.mdate):null; if(ind){ return '<div class="fa" style="opacity:.6;background:repeating-linear-gradient(45deg,rgba(110,168,254,.10) 0 6px,transparent 6px 12px)"><div><div class="fa-n">'+esc(a.nom||'—')+' <span style="color:#6ea8fe">🏖 indisponible</span></div><div class="fa-d">'+(ind.motif?esc(ind.motif)+' · ':'')+'jusqu\'au '+esc((ind.fin||'').split('-').reverse().join('/'))+'</div></div></div>'; } var cf=(typeof agentTimeConflicts==='function')?agentTimeConflicts(a.id,m):[]; var dispo=cf.length?'<span style="color:#c02626">🔴 déjà en mission</span>':'<span style="color:#1a9e5c">🟢 dispo</span>'; var hm=_plAgentMonthHours(a.id,m.mdate||impTodayISO()); var note=(a.fiab?(' · ⭐ '+esc(a.fiab)):''); return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+(cur?' <span style="color:var(--ok)">✓</span>':'')+note+'</div><div class="fa-d">'+esc((a.tels||[]).join(' / ')||'—')+(a.ville?' · '+esc(a.ville):'')+' · '+dispo+' · <b>['+hm+'h]</b> ce mois</div></div><div class="fa-a"><button class="ok pl-affpick" data-aid="'+esc(a.id)+'">Choisir</button></div></div>'; }).join(''); }
-  function _plWirePicks(card,m){ card.querySelectorAll('.pl-affpick').forEach(function(b){ b.onclick=function(){ var aid=b.getAttribute('data-aid'); if(typeof affpickWithCheck==='function'&&!affpickWithCheck(m,aid))return; m.agentId=aid; m.valide=Date.now(); /* b304 */ if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; }); }
+  /* b438 : la fiche recoit les memes ecouteurs que la liste du Suivi. */
+  function _plWireNear(card){ if(typeof svBindActs==='function')svBindActs(card); }
+  function _plWirePicks(card,m){ _plWireNear(card); card.querySelectorAll('.pl-affpick').forEach(function(b){ b.onclick=function(){ var aid=b.getAttribute('data-aid'); if(typeof affpickWithCheck==='function'&&!affpickWithCheck(m,aid))return; m.agentId=aid; m.valide=Date.now(); /* b304 */ if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; }); }
   function _plRenderModal(){ var m=_plMissById(_plAffId); if(!m){planningAffectClose();return;} var card=byId('pl-modal-card'); if(!card)return; var M=_plStatusMap(); /* b430 : le titre porte la ville — c'est ce que Zeus cherchait sur BASIC FIT du 13/08. */ var site=(typeof svLabel==='function')?svLabel(m.siteAgent||m.titre||'—',m.ville||''):(m.siteAgent||m.titre||'—'); var cur=m.agentId?(typeof faById==='function'?faById(m.agentId):null):null; var when=(m.mdate?m.mdate.split('-').reverse().join('/'):'')+(m.mheure?' · '+m.mheure:'')+((typeof missEndTxt==='function'&&missEndTxt(m))?'→'+missEndTxt(m):''); var st=_plVacState(m);
     var opts='<option value="">Auto ('+esc(st.l)+')</option>'+Object.keys(M).map(function(code){ return '<option value="'+code+'"'+(String(m.vacStatus||'')===code?' selected':'')+'>'+esc(M[code].l)+'</option>'; }).join('');
     card.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><b style="font-size:15px;flex:1">📅 '+esc(site)+'</b><button class="pl-close" style="font-size:18px;background:none;border:none;color:var(--muted);cursor:pointer">✕</button></div>'
@@ -6093,6 +6152,12 @@ button.big:active{transform:translateY(1px)}
         return '<div class="lab" style="margin:10px 0 3px">⏸ Pauses / interruptions'+(tot?' <span class="sub" style="font-weight:400">— total '+Math.floor(tot/60)+'h'+(tot%60?('0'+tot%60).slice(-2):'')+'</span>':'')+'</div>'+rows
         +'<div style="display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:6px;margin-top:4px"><input class="pl-brk-h1" placeholder="Début 02:00"><input class="pl-brk-h2" placeholder="Fin 02:30"><input class="pl-brk-type" placeholder="Type (repas, repos…)"></div>'
         +'<div class="acts" style="gap:10px;margin-top:4px;align-items:center;flex-wrap:wrap;font-size:12px"><label style="display:flex;gap:4px;align-items:center;text-transform:none"><input type="checkbox" class="pl-brk-nw" style="height:auto;min-height:0;width:auto">non travaillée</label><label style="display:flex;gap:4px;align-items:center;text-transform:none"><input type="checkbox" class="pl-brk-nc" style="height:auto;min-height:0;width:auto">non facturée</label><button class="ok pl-brk-add" style="margin-left:auto">➕ Pause</button></div>'; })()
+      /* b438 : les agents proches AVANT la recherche par nom — quand personne n'est affecte,
+         la question n'est pas « qui s'appelle comment » mais « qui est a cote ». */
+      +((!m.agentId&&typeof renderNear==='function')
+         ? ('<details class="meta" style="margin:8px 0 6px" open><summary style="cursor:pointer;font-weight:700">\ud83d\udc65 Agents proches</summary><div style="margin-top:6px">'
+            +renderNear(m)+'</div></details>')
+         : '')
       +'<div class="lab" style="margin:2px 0 3px">Affecter un agent (nom · n° · ville)</div><input class="pl-afsearch" placeholder="Tape un nom, un numéro, une ville…" autocomplete="off" value="'+esc(_plAffQ)+'" style="width:100%"><div class="pl-afres" style="margin-top:6px">'+_plAgentResults(m)+'</div>'
       +'<div style="margin-top:6px"><button type="button" id="pl-newag-btn" style="font-size:12px;border-color:#1a9e5c;color:#1a9e5c">➕ Créer un agent</button></div>'
       +'<div id="pl-newag-zone" style="display:none;margin-top:8px;border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--panel2)"><div class="lab" style="margin:0 0 6px;font-size:12px">Nouvel agent — sera affecté à cette vacation</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><input id="pl-newag-nom" placeholder="Nom prénom *" autocomplete="off" style="width:100%"><input id="pl-newag-tel" placeholder="Téléphone" type="tel" style="width:100%"></div><input id="pl-newag-ville" placeholder="Ville" autocomplete="off" style="width:100%;margin-top:6px"><div class="acts" style="margin-top:8px"><button type="button" class="ok pl-newag-go" style="font-size:12px">✅ Créer et affecter</button><button type="button" class="pl-newag-cancel" style="font-size:12px">✕ Annuler</button></div></div>' // b296
