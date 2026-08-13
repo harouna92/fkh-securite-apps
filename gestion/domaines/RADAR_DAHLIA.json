@@ -1,0 +1,141 @@
+{
+ "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR DAHLIA. Éditer CE fichier suffit : l'appli le relit à chaque chargement de page, aucun rebuild (G-71/G-72).",
+ "maj": "2026-08-13",
+ "secs": [
+  {
+   "t": "🔴 À résoudre",
+   "c": "#f87171",
+   "bg": "rgba(248,113,113,.16)",
+   "items": [
+    {
+     "l": "Doublon TVA 4 576 € (gate cockpits)",
+     "w": "🎛️ EN TRAITEMENT au poste · bloque les cockpits",
+     "a": [
+      "Traiter",
+      "POSTE : DAHLIA — doublon TVA 4576 DAHLIA"
+     ]
+    },
+    {
+     "l": "Appels JEX Reims ×2 — état à vérifier",
+     "w": "échéance ~13/06 passée · ⚠️ non recoupé le 13/08 — à vérifier avant d'agir",
+     "a": [
+      "Traiter",
+      "POSTE : DAHLIA — appels JEX Reims DAHLIA"
+     ]
+    },
+    {
+     "l": "Maître v62_D53 à caler dans _PILOTAGE_DAHLIA",
+     "w": "le classeur maître n'est pas au bon endroit · ⚠️ non recoupé le 13/08 — à vérifier avant d'agir",
+     "a": [
+      "Traiter",
+      "POSTE : DAHLIA — maître v62 DAHLIA"
+     ]
+    }
+   ]
+  },
+  {
+   "t": "🟠 À faire",
+   "c": "#fb923c",
+   "bg": "rgba(251,146,60,.16)",
+   "items": [
+    {
+     "l": "Acompte TVA juillet — solde CA12 + avis + télépaiement 8 322 €",
+     "w": "🎛️ en traitement",
+     "a": [
+      "Traiter",
+      "CHARGE : acompte TVA juillet DAHLIA"
+     ]
+    },
+    {
+     "l": "Relancer les clients (trésorerie) → télépayer 337 €",
+     "w": "la relance conditionne le paiement URSSAF",
+     "a": [
+      "Traiter",
+      "CHARGE : URSSAF DAHLIA"
+     ]
+    },
+    {
+     "l": "Vérifier que la MED de mars (303 €) est soldée",
+     "w": "⚠️ non recoupé le 13/08 — à vérifier avant d'agir",
+     "a": [
+      "Vérifier",
+      "CHARGE : URSSAF DAHLIA"
+     ]
+    },
+    {
+     "l": "Débloquer l'accès PayFit",
+     "w": "à dater",
+     "a": [
+      "Traiter",
+      "POSTE : DAHLIA — accès PayFit DAHLIA"
+     ]
+    },
+    {
+     "l": "Lister les donneurs d'ordre DAHLIA",
+     "w": "à dater · alimente le carnet et la facturation",
+     "a": [
+      "Traiter",
+      "POSTE : DAHLIA — DO DAHLIA"
+     ]
+    }
+   ]
+  },
+  {
+   "t": "⏳ Échéances",
+   "c": "#7c93ff",
+   "bg": "rgba(124,147,255,.16)",
+   "items": [
+    {
+     "l": "URSSAF — 337 €",
+     "w": "télépaiement · la date est passée, l'état du paiement n'est pas recoupé",
+     "due": "03/07",
+     "dd": "2026-07-03",
+     "a": [
+      "Traiter",
+      "CHARGE : URSSAF DAHLIA"
+     ]
+    },
+    {
+     "l": "Retour URSSAF sur les remises",
+     "w": "réponse attendue · ⚠️ non recoupé le 13/08 — à vérifier avant d'agir",
+     "due": "11/07",
+     "dd": "2026-07-11",
+     "a": [
+      "Traiter",
+      "CHARGE : URSSAF DAHLIA"
+     ]
+    },
+    {
+     "l": "Acompte TVA juillet — 8 322 €",
+     "w": "à télépayer",
+     "due": "juillet",
+     "a": [
+      "Traiter",
+      "POSTE : DAHLIA — acompte TVA juillet DAHLIA"
+     ]
+    }
+   ]
+  },
+  {
+   "t": "🧾 Facturation",
+   "c": "#34d399",
+   "bg": "rgba(52,211,153,.16)",
+   "items": [
+    {
+     "l": "Nouveau RIB Shine — toute facture à partir de juin 2026",
+     "w": "IBAN [RETIRE] · BIC SNNNFR22XXX — le SWAN DAHLIA est FERMÉ, ne plus jamais l'utiliser",
+     "det": [
+      [
+       "Ancien compte (SWAN)",
+       "…0013 5141 2706 678 — FERMÉ"
+      ],
+      [
+       "À contrôler",
+       "toute facture DAHLIA émise depuis juin 2026 porte-t-elle le bon IBAN ?"
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

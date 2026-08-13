@@ -1,0 +1,125 @@
+{
+ "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR GARIS. Éditer CE fichier suffit : l'appli le relit à chaque chargement de page, aucun rebuild (G-71/G-72).",
+ "maj": "2026-08-13",
+ "secs": [
+  {
+   "t": "🔴 À résoudre",
+   "c": "#f87171",
+   "bg": "rgba(248,113,113,.16)",
+   "items": [
+    {
+     "l": "GARIS a-t-il ses propres sous-traitants ?",
+     "w": "décision à trancher par Zeus · conditionne la cascade et la conformité",
+     "a": [
+      "Trancher",
+      "POSTE : GARIS — ST propres GARIS"
+     ]
+    },
+    {
+     "l": "Outil de paie + agents à établir",
+     "w": "décision à trancher · rien n'est en place",
+     "a": [
+      "Trancher",
+      "POSTE : GARIS — paie GARIS"
+     ]
+    },
+    {
+     "l": "Courrier SeDomicilier — rangement manuel",
+     "w": "récurrent · aucun automatisme",
+     "a": [
+      "Traiter",
+      "POSTE : GARIS — rangement courrier GARIS"
+     ]
+    }
+   ]
+  },
+  {
+   "t": "🟠 À faire",
+   "c": "#fb923c",
+   "bg": "rgba(251,146,60,.16)",
+   "items": [
+    {
+     "l": "Classer + inscrire GS-2026-108 (avril → FKH)",
+     "w": "facture ST GARIS→FKH · R-ALLOC-FACTURE-ST-01",
+     "a": [
+      "Traiter",
+      "POSTE : GARIS — GS-2026-108 classement"
+     ]
+    },
+    {
+     "l": "Compléter les pièces de conformité — 3/9",
+     "w": "présents : Kbis, Vigilance, RC Pro · vu depuis FKH (Atelier 11)",
+     "det": [
+      [
+       "Présents",
+       "Kbis · Attestation de vigilance · RC Pro"
+      ],
+      [
+       "Manquants",
+       "6 pièces sur 9 — liste à recouper avec ATTESTATIONS"
+      ],
+      {
+       "a": "Réclamer les pièces manquantes",
+       "p": "POSTE : GARIS — pièces conformité GARIS"
+      }
+     ],
+     "a": [
+      "Traiter",
+      "POSTE : GARIS — pièces conformité GARIS"
+     ]
+    },
+    {
+     "l": "Récolte GARIS → skill (factures, DO, cascade)",
+     "w": "à dater",
+     "a": [
+      "Traiter",
+      "POSTE : GARIS — récolte GARIS skill"
+     ]
+    },
+    {
+     "l": "Plannings agents MAI 2026 à déposer",
+     "w": "bloque la facture GARIS de mai — le CA ST de mai reste provisoire (niveau B) · R-FACTURE-ST-DEFINITIF-01",
+     "a": [
+      "Traiter",
+      "POSTE : GARIS — plannings mai GARIS"
+     ]
+    },
+    {
+     "l": "Factures ST manquantes — avril + mai",
+     "w": "vu depuis FKH · R-ALLOC-FACTURE-ST-01",
+     "a": [
+      "Traiter",
+      "POSTE : GARIS — factures ST manquantes GARIS"
+     ]
+    }
+   ]
+  },
+  {
+   "t": "⏳ Échéances",
+   "c": "#7c93ff",
+   "bg": "rgba(124,147,255,.16)",
+   "items": [
+    {
+     "l": "Kbis GARIS à renouveler",
+     "w": "pièce de conformité · expire",
+     "due": "17/08",
+     "dd": "2026-08-17",
+     "a": [
+      "Traiter",
+      "POSTE : GARIS — Kbis GARIS"
+     ]
+    },
+    {
+     "l": "RC Pro à renouveler",
+     "w": "pièce de conformité",
+     "due": "12/11",
+     "dd": "2026-11-12",
+     "a": [
+      "Traiter",
+      "POSTE : GARIS — RC Pro GARIS"
+     ]
+    }
+   ]
+  }
+ ]
+}
