@@ -1,4 +1,2017 @@
 {
+ "registre_bancaire_2026": {
+  "source": "relevés PDF des dossiers du domaine, lus ligne à ligne",
+  "avertissement": "registre BRUT : aucune catégorisation, aucun rapprochement. Il donne la matière, pas la comptabilité.",
+  "releves_lus": [
+   {
+    "fichier": "2025-09-garis-securite-8455-compte-principal-1-statement.pdf",
+    "format": "qonto",
+    "lignes": 2
+   },
+   {
+    "fichier": "2025-12-garis-securite-8455-compte-principal-1-statement.pdf",
+    "format": "qonto",
+    "lignes": 1
+   },
+   {
+    "fichier": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf",
+    "format": "qonto",
+    "lignes": 18
+   },
+   {
+    "fichier": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf",
+    "format": "qonto",
+    "lignes": 32
+   },
+   {
+    "fichier": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf",
+    "format": "qonto",
+    "lignes": 25
+   },
+   {
+    "fichier": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf",
+    "format": "qonto",
+    "lignes": 25
+   },
+   {
+    "fichier": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf",
+    "format": "qonto",
+    "lignes": 30
+   },
+   {
+    "fichier": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf",
+    "format": "swan",
+    "lignes": 7
+   },
+   {
+    "fichier": "ReleveCompte_Indy_23980538490_202605_fr_202606010302.pdf",
+    "format": "swan",
+    "lignes": 2
+   }
+  ],
+  "releves_illisibles": [
+   {
+    "fichier": "2025-10-garis-securite-8455-compte-principal-1-statement.pdf",
+    "raison": "aucune ligne reconnue (format non géré)"
+   },
+   {
+    "fichier": "2025-11-garis-securite-8455-compte-principal-1-statement.pdf",
+    "raison": "aucune ligne reconnue (format non géré)"
+   }
+  ],
+  "entrees": 538523.17,
+  "sorties": 473105.04,
+  "mouvements": [
+   {
+    "date": "2026-01-07",
+    "libelle": "DAHLIA SECURITE sous-traitance",
+    "sens": "ENTREE",
+    "montant": 16494.6,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-08",
+    "libelle": "TRANSACT CONSEIL fournisseur",
+    "sens": "SORTIE",
+    "montant": 7180.0,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-08",
+    "libelle": "TRANSACT CONSEIL fournisseur",
+    "sens": "SORTIE",
+    "montant": 7820.0,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-10",
+    "libelle": "PENNYLANE Carte **2473",
+    "sens": "SORTIE",
+    "montant": 34.8,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-16",
+    "libelle": "DAHLIA SECURITE sous-traitance",
+    "sens": "ENTREE",
+    "montant": 8258.4,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-16",
+    "libelle": "FLASH BAT Fournisseur",
+    "sens": "SORTIE",
+    "montant": 225.0,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-17",
+    "libelle": "ARSENE GBEGNERY d",
+    "sens": "SORTIE",
+    "montant": 450.01,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-19",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 7992.0,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-19",
+    "libelle": "FLASH BAT Fournisseur",
+    "sens": "SORTIE",
+    "montant": 3796.2,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-19",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 5000.01,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-19",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 5000.01,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-19",
+    "libelle": "PAYFIT FR-INV00919672",
+    "sens": "SORTIE",
+    "montant": 140.4,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-19",
+    "libelle": "PAYFIT FR-INV00957769",
+    "sens": "SORTIE",
+    "montant": 81.6,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-21",
+    "libelle": "DAHLIA SECURITE sous-traitance",
+    "sens": "ENTREE",
+    "montant": 3396.6,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-21",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 3390.01,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-23",
+    "libelle": "EUROPE TRUCKS fournisseur",
+    "sens": "SORTIE",
+    "montant": 4000.01,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-23",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 5083.8,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-01-29",
+    "libelle": "PENNYLANE Carte **2473",
+    "sens": "SORTIE",
+    "montant": 34.8,
+    "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-06",
+    "libelle": "DAHLIA SECURITE sous-traitance",
+    "sens": "ENTREE",
+    "montant": 9990.0,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-06",
+    "libelle": "EDB fournisseur",
+    "sens": "SORTIE",
+    "montant": 3999.5,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-06",
+    "libelle": "EDB fournisseur",
+    "sens": "SORTIE",
+    "montant": 4000.5,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-06",
+    "libelle": "ISHARA fournisseur",
+    "sens": "SORTIE",
+    "montant": 2000.01,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-08",
+    "libelle": "DAHLIA SECURITE sous-traitance",
+    "sens": "ENTREE",
+    "montant": 4995.0,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-08",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 5000.01,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-14",
+    "libelle": "ARSENE GBEGNERY d",
+    "sens": "SORTIE",
+    "montant": 553.82,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-16",
+    "libelle": "DAHLIA SECURITE sous-traitance",
+    "sens": "ENTREE",
+    "montant": 19980.0,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-16",
+    "libelle": "DAHLIA SECURITE sous-traitance",
+    "sens": "ENTREE",
+    "montant": 9980.0,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-16",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 11440.01,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-16",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 10000.0,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-17",
+    "libelle": "ASPEA SÉCURITÉ d",
+    "sens": "SORTIE",
+    "montant": 9990.0,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-17",
+    "libelle": "DAHLIA SECURITE sous-traitance",
+    "sens": "ENTREE",
+    "montant": 8080.8,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-17",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 9000.01,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-17",
+    "libelle": "URSSAF D'ILE DE FRANCE UR 117000001582153043 JANV26788617793000170226",
+    "sens": "SORTIE",
+    "montant": 277.0,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-18",
+    "libelle": "ARSENE GBEGNERY d",
+    "sens": "SORTIE",
+    "montant": 500.01,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-18",
+    "libelle": "PAYFIT FR-INV00975427",
+    "sens": "SORTIE",
+    "montant": 58.8,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-19",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 12099.0,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-19",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 9000.01,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-19",
+    "libelle": "SARL CHÂTEAU ROUGE fournisseur",
+    "sens": "SORTIE",
+    "montant": 2600.01,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-20",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 11988.0,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-20",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 12987.0,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-20",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 11900.01,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-20",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 2000.01,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-23",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 9079.8,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-23",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 15000.01,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-25",
+    "libelle": "GIE AG2R REUNICA RETRAITE - GIE AG2R REUNICA - 202601M - SIRET 99145134500011 - A7...",
+    "sens": "SORTIE",
+    "montant": 54.45,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-26",
+    "libelle": "ARSENE GBEGNERY d",
+    "sens": "SORTIE",
+    "montant": 200.01,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-26",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 15984.0,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-26",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 5500.01,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-26",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 10000.02,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-02-27",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 17582.4,
+    "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-03",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 8441.07,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-04",
+    "libelle": "ADN SECURITE VIR SEPA ADN SECURITE",
+    "sens": "ENTREE",
+    "montant": 9240.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-09",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 3000.07,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-10",
+    "libelle": "DIANTRA SÉCURITÉ d",
+    "sens": "SORTIE",
+    "montant": 6000.08,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-12",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 14985.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-12",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 15000.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-12",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 1000.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-16",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 6000.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-16",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 8550.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-17",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 9990.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-17",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 9900.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-17",
+    "libelle": "URSSAF D'ILE DE FRANCE UR 117000001582153043 FEV 26788617793000170326",
+    "sens": "SORTIE",
+    "montant": 78.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-19",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 14990.4,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-19",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 9900.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-20",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 5000.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-24",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 14985.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-24",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 4995.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-24",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 15000.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-25",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 4900.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-25",
+    "libelle": "GIE AG2R REUNICA RETRAITE - GIE AG2R REUNICA - 202602M - SIRET 99145134500011 - A7...",
+    "sens": "SORTIE",
+    "montant": 18.01,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-26",
+    "libelle": "PAYFIT FR-INV00992389",
+    "sens": "SORTIE",
+    "montant": 104.4,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-31",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 14985.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-31",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 5194.8,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-31",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 15000.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-03-31",
+    "libelle": "FLASH BAT fournisseur",
+    "sens": "SORTIE",
+    "montant": 5000.0,
+    "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-03",
+    "libelle": "LOVABLE Carte **2473",
+    "sens": "SORTIE",
+    "montant": 25.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-03",
+    "libelle": "Virement VIR SEPA ADN SECURITE",
+    "sens": "ENTREE",
+    "montant": 13200.0,
+    "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+   },
+   {
+    "date": "2026-04-07",
+    "libelle": "IONOS SARL Carte **2473",
+    "sens": "SORTIE",
+    "montant": 1.2,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-07",
+    "libelle": "Virement Virement vers FLASH BAT",
+    "sens": "SORTIE",
+    "montant": 5000.0,
+    "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+   },
+   {
+    "date": "2026-04-10",
+    "libelle": "Virement GS 2026 078",
+    "sens": "ENTREE",
+    "montant": 5635.98,
+    "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+   },
+   {
+    "date": "2026-04-13",
+    "libelle": "ASPEA SÉCURITÉ d",
+    "sens": "SORTIE",
+    "montant": 8000.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-13",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 7992.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-13",
+    "libelle": "Virement Virement vers A.S.P.E.A. AGENCE DE SECURITE PRIVEE EURO AFRICAINE",
+    "sens": "SORTIE",
+    "montant": 6000.0,
+    "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+   },
+   {
+    "date": "2026-04-14",
+    "libelle": "Virement Virement vers GARIS SECURITE",
+    "sens": "ENTREE",
+    "montant": 4484.4,
+    "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+   },
+   {
+    "date": "2026-04-15",
+    "libelle": "I.G.S-21 FACTURE SOUS TRAITANT GARIS SECURITE",
+    "sens": "ENTREE",
+    "montant": 38348.8,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-15",
+    "libelle": "I.G.S-21 FACTURE SOUS TRAITANT GARIS SECURITE",
+    "sens": "ENTREE",
+    "montant": 20000.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-16",
+    "libelle": "PRO RENOVATION paiement facture",
+    "sens": "SORTIE",
+    "montant": 14500.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-16",
+    "libelle": "URSSAF D'ILE DE FRANCE UR 117000001582153043 MARS26788617793000160426",
+    "sens": "SORTIE",
+    "montant": 89.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-16",
+    "libelle": "Virement Virement vers PRO RENOVATION",
+    "sens": "SORTIE",
+    "montant": 6000.0,
+    "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+   },
+   {
+    "date": "2026-04-17",
+    "libelle": "APPLE.COM/BILL Carte **2473",
+    "sens": "SORTIE",
+    "montant": 7.19,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-17",
+    "libelle": "APPLE.COM/BILL Carte **2473",
+    "sens": "SORTIE",
+    "montant": 39.99,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-17",
+    "libelle": "PAYFIT FR-INV01012442",
+    "sens": "SORTIE",
+    "montant": 127.2,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-18",
+    "libelle": "APPLE.COM/BILL Carte **2473",
+    "sens": "SORTIE",
+    "montant": 7.19,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-18",
+    "libelle": "PRO RENOVATION paiement facture",
+    "sens": "SORTIE",
+    "montant": 3799.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-19",
+    "libelle": "APPLE.COM/BILL Carte **2473",
+    "sens": "SORTIE",
+    "montant": 4.99,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-21",
+    "libelle": "KIMPE TRADING fournisseur",
+    "sens": "SORTIE",
+    "montant": 16400.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-21",
+    "libelle": "PRO RENOVATION paiement facture",
+    "sens": "SORTIE",
+    "montant": 15000.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-21",
+    "libelle": "PRO RENOVATION paiement facture",
+    "sens": "SORTIE",
+    "montant": 6000.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-23",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 19980.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-24",
+    "libelle": "PRO RENOVATION paiement facture",
+    "sens": "SORTIE",
+    "montant": 15000.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-24",
+    "libelle": "PRO RENOVATION paiement facture",
+    "sens": "SORTIE",
+    "montant": 1556.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-24",
+    "libelle": "Virement Virement vers PRO RENOVATION",
+    "sens": "SORTIE",
+    "montant": 6320.0,
+    "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+   },
+   {
+    "date": "2026-04-27",
+    "libelle": "APPLE.COM/BILL Carte **2473",
+    "sens": "SORTIE",
+    "montant": 0.99,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-27",
+    "libelle": "GIE AG2R REUNICA RETRAITE - GIE AG2R REUNICA - 202603M - SIRET 99145134500011 - A7...",
+    "sens": "SORTIE",
+    "montant": 16.95,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-29",
+    "libelle": "SETCARGO INTERNATIONAL Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 2660.2,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-29",
+    "libelle": "VPMI DISTRIBUTION Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 1860.0,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-04-30",
+    "libelle": "APPLE.COM/BILL Carte **2473",
+    "sens": "SORTIE",
+    "montant": 17.99,
+    "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-03",
+    "libelle": "LOVABLE Carte **2473",
+    "sens": "SORTIE",
+    "montant": 25.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "CARZFLEET ANNULATION COMMANDE",
+    "sens": "ENTREE",
+    "montant": 6000.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "CARZFLEET ANNULATION COMMANDE 2",
+    "sens": "ENTREE",
+    "montant": 9000.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "Carzfleet Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 9000.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "Carzfleet Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 6000.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 17992.8,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "Virement VIREMENT INSTANTANE",
+    "sens": "ENTREE",
+    "montant": 17160.0,
+    "releve": "ReleveCompte_Indy_23980538490_202605_fr_202606010302.pdf"
+   },
+   {
+    "date": "2026-05-06",
+    "libelle": "IONOS SARL Carte **2473",
+    "sens": "SORTIE",
+    "montant": 1.2,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-10",
+    "libelle": "I.G.S-21 FACTURE SOUS TRAITANT",
+    "sens": "ENTREE",
+    "montant": 21300.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-12",
+    "libelle": "SAMBROU INTERNATIONAL Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 12615.2,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-13",
+    "libelle": "SAMBROU INTERNATIONAL Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 10500.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-14",
+    "libelle": "SAMBROU INTERNATIONAL Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 7755.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-15",
+    "libelle": "I.G.S-21 FACTURE SOUS TRAITANT GARIS SECURITE",
+    "sens": "ENTREE",
+    "montant": 22941.09,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-16",
+    "libelle": "CEMP Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 14500.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-16",
+    "libelle": "FKH SECURITE ss traitant",
+    "sens": "ENTREE",
+    "montant": 19980.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-16",
+    "libelle": "PRO RENOVATION paiement facture",
+    "sens": "SORTIE",
+    "montant": 10000.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-16",
+    "libelle": "PRO RENOVATION paiement facture",
+    "sens": "SORTIE",
+    "montant": 8744.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-18",
+    "libelle": "ELITE PROTECTION Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 500.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-18",
+    "libelle": "I.G.S-21 FACTURE SOUS TRAITANT GARIS SECURITE",
+    "sens": "ENTREE",
+    "montant": 20000.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-18",
+    "libelle": "URSSAF D ILE DE FRANCE UR 117000001582153043 AVR 26788617793000180526",
+    "sens": "SORTIE",
+    "montant": 16.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "libelle": "APPLE.COM/BILL Carte **2473",
+    "sens": "SORTIE",
+    "montant": 4.99,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "libelle": "Carte SeDomicilier - Arsene Gnegnery **1995",
+    "sens": "SORTIE",
+    "montant": 28.8,
+    "releve": "ReleveCompte_Indy_23980538490_202605_fr_202606010302.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "libelle": "PAYFIT FR-INV01033898",
+    "sens": "SORTIE",
+    "montant": 58.8,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-20",
+    "libelle": "SERVICE DES IMPOTS DES ENTREPRISES DE PARIS 1E-2E PAS DSN15 03/2026 SIRET 991 451 345 00011 GARIS SECURITE",
+    "sens": "SORTIE",
+    "montant": 15.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-21",
+    "libelle": "APPEST LIMITED 1.15909822866345 USD = 1.00 EUR Carte **2473",
+    "sens": "SORTIE",
+    "montant": 31.05,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-21",
+    "libelle": "FKH SECURITE Envoye depuis Qonto",
+    "sens": "ENTREE",
+    "montant": 17760.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-21",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 0.62,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-21",
+    "libelle": "SAMBROU INTERNATIONAL Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 11253.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-22",
+    "libelle": "FKH SECURITE Envoye depuis Qonto",
+    "sens": "ENTREE",
+    "montant": 13411.5,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-27",
+    "libelle": "APPLE.COM/BILL Carte **2473",
+    "sens": "SORTIE",
+    "montant": 0.99,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-28",
+    "libelle": "GIE AG2R REUNICA RETRAITE - GIE AG2R REUNICA - 202604M - SIRET 99145134500011 - A7...",
+    "sens": "SORTIE",
+    "montant": 3.81,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   },
+   {
+    "date": "2026-05-30",
+    "libelle": "SAMBROU INTERNATIONAL Envoye depuis Qonto",
+    "sens": "SORTIE",
+    "montant": 10500.0,
+    "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+   }
+  ]
+ },
+ "mouvements_2026": [
+  {
+   "date": "2026-01-07",
+   "libelle": "DAHLIA SECURITE sous-traitance",
+   "sens": "ENTREE",
+   "montant": 16494.6,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-08",
+   "libelle": "TRANSACT CONSEIL fournisseur",
+   "sens": "SORTIE",
+   "montant": 7180.0,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-08",
+   "libelle": "TRANSACT CONSEIL fournisseur",
+   "sens": "SORTIE",
+   "montant": 7820.0,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-10",
+   "libelle": "PENNYLANE Carte **2473",
+   "sens": "SORTIE",
+   "montant": 34.8,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-16",
+   "libelle": "DAHLIA SECURITE sous-traitance",
+   "sens": "ENTREE",
+   "montant": 8258.4,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-16",
+   "libelle": "FLASH BAT Fournisseur",
+   "sens": "SORTIE",
+   "montant": 225.0,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-17",
+   "libelle": "ARSENE GBEGNERY d",
+   "sens": "SORTIE",
+   "montant": 450.01,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-19",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 7992.0,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-19",
+   "libelle": "FLASH BAT Fournisseur",
+   "sens": "SORTIE",
+   "montant": 3796.2,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-19",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 5000.01,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-19",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 5000.01,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-19",
+   "libelle": "PAYFIT FR-INV00919672",
+   "sens": "SORTIE",
+   "montant": 140.4,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-19",
+   "libelle": "PAYFIT FR-INV00957769",
+   "sens": "SORTIE",
+   "montant": 81.6,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-21",
+   "libelle": "DAHLIA SECURITE sous-traitance",
+   "sens": "ENTREE",
+   "montant": 3396.6,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-21",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 3390.01,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-23",
+   "libelle": "EUROPE TRUCKS fournisseur",
+   "sens": "SORTIE",
+   "montant": 4000.01,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-23",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 5083.8,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-01-29",
+   "libelle": "PENNYLANE Carte **2473",
+   "sens": "SORTIE",
+   "montant": 34.8,
+   "releve": "2026-01-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-06",
+   "libelle": "DAHLIA SECURITE sous-traitance",
+   "sens": "ENTREE",
+   "montant": 9990.0,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-06",
+   "libelle": "EDB fournisseur",
+   "sens": "SORTIE",
+   "montant": 3999.5,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-06",
+   "libelle": "EDB fournisseur",
+   "sens": "SORTIE",
+   "montant": 4000.5,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-06",
+   "libelle": "ISHARA fournisseur",
+   "sens": "SORTIE",
+   "montant": 2000.01,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-08",
+   "libelle": "DAHLIA SECURITE sous-traitance",
+   "sens": "ENTREE",
+   "montant": 4995.0,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-08",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 5000.01,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-14",
+   "libelle": "ARSENE GBEGNERY d",
+   "sens": "SORTIE",
+   "montant": 553.82,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-16",
+   "libelle": "DAHLIA SECURITE sous-traitance",
+   "sens": "ENTREE",
+   "montant": 19980.0,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-16",
+   "libelle": "DAHLIA SECURITE sous-traitance",
+   "sens": "ENTREE",
+   "montant": 9980.0,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-16",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 11440.01,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-16",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 10000.0,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-17",
+   "libelle": "ASPEA SÉCURITÉ d",
+   "sens": "SORTIE",
+   "montant": 9990.0,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-17",
+   "libelle": "DAHLIA SECURITE sous-traitance",
+   "sens": "ENTREE",
+   "montant": 8080.8,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-17",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 9000.01,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-17",
+   "libelle": "URSSAF D'ILE DE FRANCE UR 117000001582153043 JANV26788617793000170226",
+   "sens": "SORTIE",
+   "montant": 277.0,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-18",
+   "libelle": "ARSENE GBEGNERY d",
+   "sens": "SORTIE",
+   "montant": 500.01,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-18",
+   "libelle": "PAYFIT FR-INV00975427",
+   "sens": "SORTIE",
+   "montant": 58.8,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-19",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 12099.0,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-19",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 9000.01,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-19",
+   "libelle": "SARL CHÂTEAU ROUGE fournisseur",
+   "sens": "SORTIE",
+   "montant": 2600.01,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-20",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 11988.0,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-20",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 12987.0,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-20",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 11900.01,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-20",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 2000.01,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-23",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 9079.8,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-23",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 15000.01,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-25",
+   "libelle": "GIE AG2R REUNICA RETRAITE - GIE AG2R REUNICA - 202601M - SIRET 99145134500011 - A7...",
+   "sens": "SORTIE",
+   "montant": 54.45,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-26",
+   "libelle": "ARSENE GBEGNERY d",
+   "sens": "SORTIE",
+   "montant": 200.01,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-26",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 15984.0,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-26",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 5500.01,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-26",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 10000.02,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-02-27",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 17582.4,
+   "releve": "2026-02-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-03",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 8441.07,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-04",
+   "libelle": "ADN SECURITE VIR SEPA ADN SECURITE",
+   "sens": "ENTREE",
+   "montant": 9240.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-09",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 3000.07,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-10",
+   "libelle": "DIANTRA SÉCURITÉ d",
+   "sens": "SORTIE",
+   "montant": 6000.08,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-12",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 14985.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-12",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 15000.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-12",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 1000.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-16",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 6000.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-16",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 8550.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-17",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 9990.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-17",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 9900.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-17",
+   "libelle": "URSSAF D'ILE DE FRANCE UR 117000001582153043 FEV 26788617793000170326",
+   "sens": "SORTIE",
+   "montant": 78.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-19",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 14990.4,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-19",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 9900.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-20",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 5000.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-24",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 14985.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-24",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 4995.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-24",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 15000.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-25",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 4900.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-25",
+   "libelle": "GIE AG2R REUNICA RETRAITE - GIE AG2R REUNICA - 202602M - SIRET 99145134500011 - A7...",
+   "sens": "SORTIE",
+   "montant": 18.01,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-26",
+   "libelle": "PAYFIT FR-INV00992389",
+   "sens": "SORTIE",
+   "montant": 104.4,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-31",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 14985.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-31",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 5194.8,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-31",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 15000.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-03-31",
+   "libelle": "FLASH BAT fournisseur",
+   "sens": "SORTIE",
+   "montant": 5000.0,
+   "releve": "2026-03-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-03",
+   "libelle": "LOVABLE Carte **2473",
+   "sens": "SORTIE",
+   "montant": 25.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-03",
+   "libelle": "Virement VIR SEPA ADN SECURITE",
+   "sens": "ENTREE",
+   "montant": 13200.0,
+   "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+  },
+  {
+   "date": "2026-04-07",
+   "libelle": "IONOS SARL Carte **2473",
+   "sens": "SORTIE",
+   "montant": 1.2,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-07",
+   "libelle": "Virement Virement vers FLASH BAT",
+   "sens": "SORTIE",
+   "montant": 5000.0,
+   "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+  },
+  {
+   "date": "2026-04-10",
+   "libelle": "Virement GS 2026 078",
+   "sens": "ENTREE",
+   "montant": 5635.98,
+   "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+  },
+  {
+   "date": "2026-04-13",
+   "libelle": "ASPEA SÉCURITÉ d",
+   "sens": "SORTIE",
+   "montant": 8000.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-13",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 7992.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-13",
+   "libelle": "Virement Virement vers A.S.P.E.A. AGENCE DE SECURITE PRIVEE EURO AFRICAINE",
+   "sens": "SORTIE",
+   "montant": 6000.0,
+   "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+  },
+  {
+   "date": "2026-04-14",
+   "libelle": "Virement Virement vers GARIS SECURITE",
+   "sens": "ENTREE",
+   "montant": 4484.4,
+   "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+  },
+  {
+   "date": "2026-04-15",
+   "libelle": "I.G.S-21 FACTURE SOUS TRAITANT GARIS SECURITE",
+   "sens": "ENTREE",
+   "montant": 38348.8,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-15",
+   "libelle": "I.G.S-21 FACTURE SOUS TRAITANT GARIS SECURITE",
+   "sens": "ENTREE",
+   "montant": 20000.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-16",
+   "libelle": "PRO RENOVATION paiement facture",
+   "sens": "SORTIE",
+   "montant": 14500.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-16",
+   "libelle": "URSSAF D'ILE DE FRANCE UR 117000001582153043 MARS26788617793000160426",
+   "sens": "SORTIE",
+   "montant": 89.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-16",
+   "libelle": "Virement Virement vers PRO RENOVATION",
+   "sens": "SORTIE",
+   "montant": 6000.0,
+   "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+  },
+  {
+   "date": "2026-04-17",
+   "libelle": "APPLE.COM/BILL Carte **2473",
+   "sens": "SORTIE",
+   "montant": 7.19,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-17",
+   "libelle": "APPLE.COM/BILL Carte **2473",
+   "sens": "SORTIE",
+   "montant": 39.99,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-17",
+   "libelle": "PAYFIT FR-INV01012442",
+   "sens": "SORTIE",
+   "montant": 127.2,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-18",
+   "libelle": "APPLE.COM/BILL Carte **2473",
+   "sens": "SORTIE",
+   "montant": 7.19,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-18",
+   "libelle": "PRO RENOVATION paiement facture",
+   "sens": "SORTIE",
+   "montant": 3799.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-19",
+   "libelle": "APPLE.COM/BILL Carte **2473",
+   "sens": "SORTIE",
+   "montant": 4.99,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-21",
+   "libelle": "KIMPE TRADING fournisseur",
+   "sens": "SORTIE",
+   "montant": 16400.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-21",
+   "libelle": "PRO RENOVATION paiement facture",
+   "sens": "SORTIE",
+   "montant": 15000.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-21",
+   "libelle": "PRO RENOVATION paiement facture",
+   "sens": "SORTIE",
+   "montant": 6000.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-23",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 19980.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-24",
+   "libelle": "PRO RENOVATION paiement facture",
+   "sens": "SORTIE",
+   "montant": 15000.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-24",
+   "libelle": "PRO RENOVATION paiement facture",
+   "sens": "SORTIE",
+   "montant": 1556.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-24",
+   "libelle": "Virement Virement vers PRO RENOVATION",
+   "sens": "SORTIE",
+   "montant": 6320.0,
+   "releve": "ReleveCompte_Indy_23980538490_202604_fr_202605010251.pdf"
+  },
+  {
+   "date": "2026-04-27",
+   "libelle": "APPLE.COM/BILL Carte **2473",
+   "sens": "SORTIE",
+   "montant": 0.99,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-27",
+   "libelle": "GIE AG2R REUNICA RETRAITE - GIE AG2R REUNICA - 202603M - SIRET 99145134500011 - A7...",
+   "sens": "SORTIE",
+   "montant": 16.95,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-29",
+   "libelle": "SETCARGO INTERNATIONAL Envoye depuis Qonto",
+   "sens": "SORTIE",
+   "montant": 2660.2,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-29",
+   "libelle": "VPMI DISTRIBUTION Envoye depuis Qonto",
+   "sens": "SORTIE",
+   "montant": 1860.0,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-04-30",
+   "libelle": "APPLE.COM/BILL Carte **2473",
+   "sens": "SORTIE",
+   "montant": 17.99,
+   "releve": "2026-04-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-03",
+   "libelle": "LOVABLE Carte **2473",
+   "sens": "SORTIE",
+   "montant": 25.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-05",
+   "libelle": "CARZFLEET ANNULATION COMMANDE",
+   "sens": "ENTREE",
+   "montant": 6000.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-05",
+   "libelle": "CARZFLEET ANNULATION COMMANDE 2",
+   "sens": "ENTREE",
+   "montant": 9000.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-05",
+   "libelle": "Carzfleet Envoye depuis Qonto",
+   "sens": "SORTIE",
+   "montant": 9000.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-05",
+   "libelle": "Carzfleet Envoye depuis Qonto",
+   "sens": "SORTIE",
+   "montant": 6000.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-05",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 17992.8,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-05",
+   "libelle": "Virement VIREMENT INSTANTANE",
+   "sens": "ENTREE",
+   "montant": 17160.0,
+   "releve": "ReleveCompte_Indy_23980538490_202605_fr_202606010302.pdf"
+  },
+  {
+   "date": "2026-05-06",
+   "libelle": "IONOS SARL Carte **2473",
+   "sens": "SORTIE",
+   "montant": 1.2,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-10",
+   "libelle": "I.G.S-21 FACTURE SOUS TRAITANT",
+   "sens": "ENTREE",
+   "montant": 21300.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-12",
+   "libelle": "SAMBROU INTERNATIONAL Envoye depuis Qonto",
+   "sens": "SORTIE",
+   "montant": 12615.2,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-13",
+   "libelle": "SAMBROU INTERNATIONAL Envoye depuis Qonto",
+   "sens": "SORTIE",
+   "montant": 10500.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-14",
+   "libelle": "SAMBROU INTERNATIONAL Envoye depuis Qonto",
+   "sens": "SORTIE",
+   "montant": 7755.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-15",
+   "libelle": "I.G.S-21 FACTURE SOUS TRAITANT GARIS SECURITE",
+   "sens": "ENTREE",
+   "montant": 22941.09,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-16",
+   "libelle": "CEMP Envoye depuis Qonto",
+   "sens": "SORTIE",
+   "montant": 14500.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-16",
+   "libelle": "FKH SECURITE ss traitant",
+   "sens": "ENTREE",
+   "montant": 19980.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-16",
+   "libelle": "PRO RENOVATION paiement facture",
+   "sens": "SORTIE",
+   "montant": 10000.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-16",
+   "libelle": "PRO RENOVATION paiement facture",
+   "sens": "SORTIE",
+   "montant": 8744.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-18",
+   "libelle": "ELITE PROTECTION Envoye depuis Qonto",
+   "sens": "SORTIE",
+   "montant": 500.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-18",
+   "libelle": "I.G.S-21 FACTURE SOUS TRAITANT GARIS SECURITE",
+   "sens": "ENTREE",
+   "montant": 20000.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-18",
+   "libelle": "URSSAF D ILE DE FRANCE UR 117000001582153043 AVR 26788617793000180526",
+   "sens": "SORTIE",
+   "montant": 16.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-19",
+   "libelle": "APPLE.COM/BILL Carte **2473",
+   "sens": "SORTIE",
+   "montant": 4.99,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-19",
+   "libelle": "Carte SeDomicilier - Arsene Gnegnery **1995",
+   "sens": "SORTIE",
+   "montant": 28.8,
+   "releve": "ReleveCompte_Indy_23980538490_202605_fr_202606010302.pdf"
+  },
+  {
+   "date": "2026-05-19",
+   "libelle": "PAYFIT FR-INV01033898",
+   "sens": "SORTIE",
+   "montant": 58.8,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-20",
+   "libelle": "SERVICE DES IMPOTS DES ENTREPRISES DE PARIS 1E-2E PAS DSN15 03/2026 SIRET 991 451 345 00011 GARIS SECURITE",
+   "sens": "SORTIE",
+   "montant": 15.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-21",
+   "libelle": "APPEST LIMITED 1.15909822866345 USD = 1.00 EUR Carte **2473",
+   "sens": "SORTIE",
+   "montant": 31.05,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-21",
+   "libelle": "FKH SECURITE Envoye depuis Qonto",
+   "sens": "ENTREE",
+   "montant": 17760.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-21",
+   "libelle": "Qonto Abonnement / Frais additionnels",
+   "sens": "SORTIE",
+   "montant": 0.62,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-21",
+   "libelle": "SAMBROU INTERNATIONAL Envoye depuis Qonto",
+   "sens": "SORTIE",
+   "montant": 11253.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-22",
+   "libelle": "FKH SECURITE Envoye depuis Qonto",
+   "sens": "ENTREE",
+   "montant": 13411.5,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-27",
+   "libelle": "APPLE.COM/BILL Carte **2473",
+   "sens": "SORTIE",
+   "montant": 0.99,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-28",
+   "libelle": "GIE AG2R REUNICA RETRAITE - GIE AG2R REUNICA - 202604M - SIRET 99145134500011 - A7...",
+   "sens": "SORTIE",
+   "montant": 3.81,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  },
+  {
+   "date": "2026-05-30",
+   "libelle": "SAMBROU INTERNATIONAL Envoye depuis Qonto",
+   "sens": "SORTIE",
+   "montant": 10500.0,
+   "releve": "2026-05-garis-securite-8455-compte-principal-1-statement.pdf"
+  }
+ ],
  "charges_fournisseurs": [
   {
    "facture": "PRO-2603-031",
@@ -14,7 +2027,7 @@
  ],
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-13 07:48",
+  "lu_le": "2026-08-13 07:59",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",

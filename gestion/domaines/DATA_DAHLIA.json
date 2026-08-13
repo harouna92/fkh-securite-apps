@@ -1,7 +1,1525 @@
 {
+ "registre_bancaire_2026": {
+  "source": "relevés PDF des dossiers du domaine, lus ligne à ligne",
+  "avertissement": "registre BRUT : aucune catégorisation, aucun rapprochement. Il donne la matière, pas la comptabilité.",
+  "releves_lus": [
+   {
+    "fichier": "2026-01_releve_Qonto.pdf",
+    "format": "qonto",
+    "lignes": 22
+   },
+   {
+    "fichier": "2026-02_releve_Qonto.pdf",
+    "format": "qonto",
+    "lignes": 15
+   },
+   {
+    "fichier": "2026-03_releve_Qonto.pdf",
+    "format": "qonto",
+    "lignes": 6
+   },
+   {
+    "fichier": "2026-04_releve_Indy.pdf",
+    "format": "swan",
+    "lignes": 11
+   },
+   {
+    "fichier": "2026-05_releve_Indy.pdf",
+    "format": "swan",
+    "lignes": 26
+   },
+   {
+    "fichier": "2026-06_releve_Indy.pdf",
+    "format": "swan",
+    "lignes": 20
+   },
+   {
+    "fichier": "2026-07_releve_Indy.pdf",
+    "format": "swan",
+    "lignes": 5
+   }
+  ],
+  "releves_illisibles": [],
+  "entrees": 184899.12,
+  "sorties": 184397.56,
+  "mouvements": [
+   {
+    "date": "2026-01-01",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 2.4,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-02",
+    "libelle": "ADN SECURITE PRESTATIONS DECEMBRE 2025",
+    "sens": "ENTREE",
+    "montant": 19800.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-02",
+    "libelle": "MONYIKI RAMAZANE salaire",
+    "sens": "SORTIE",
+    "montant": 473.87,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-02",
+    "libelle": "SELARL GTC REIMS DAHLIA SECURITE / 3BM SECURITE",
+    "sens": "SORTIE",
+    "montant": 120.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-04",
+    "libelle": "INDY COMPTABILITE Carte **0657",
+    "sens": "SORTIE",
+    "montant": 70.8,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-07",
+    "libelle": "GARIS SÉCURITÉ sous-traitance",
+    "sens": "SORTIE",
+    "montant": 16494.6,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-08",
+    "libelle": "DIRECTION GENERALE DES FINANCES PUBLIQUES AMR20251200162 500001405734",
+    "sens": "SORTIE",
+    "montant": 90.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-12",
+    "libelle": "NDIOUMA SARR Salaire",
+    "sens": "SORTIE",
+    "montant": 193.46,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-13",
+    "libelle": "I.G.S-21 FACTURE SOUS TRAITANT",
+    "sens": "ENTREE",
+    "montant": 40587.84,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-13",
+    "libelle": "SELAS LA HAUTE POMPIGNANE FACTURE F 00165 FEVRIER 2026",
+    "sens": "ENTREE",
+    "montant": 2000.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-14",
+    "libelle": "DIANTRA SECURITY sous traitance",
+    "sens": "SORTIE",
+    "montant": 5994.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-14",
+    "libelle": "DIANTRA SECURITY sous traitance",
+    "sens": "SORTIE",
+    "montant": 15184.8,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-15",
+    "libelle": "DIANTRA SECURITY sous traitance",
+    "sens": "SORTIE",
+    "montant": 15295.8,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-15",
+    "libelle": "S.A.S. CENTRE ORLEANAIS PROTEC T F 000142",
+    "sens": "ENTREE",
+    "montant": 364.72,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-16",
+    "libelle": "GARIS SÉCURITÉ sous-traitance",
+    "sens": "SORTIE",
+    "montant": 8258.4,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-16",
+    "libelle": "URSSAF D'ILE DE FRANCE UR 117000001575677453 DEC 25788617793000160126",
+    "sens": "SORTIE",
+    "montant": 222.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-19",
+    "libelle": "AGIR SECURITE DAHLIA-GARDIENNAGE CRF BEAUNE - 11/2025",
+    "sens": "ENTREE",
+    "montant": 3484.52,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-19",
+    "libelle": "PAYFIT FR-INV00955488",
+    "sens": "SORTIE",
+    "montant": 254.4,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-21",
+    "libelle": "DGFIP PASDSN15012026-122025-95193273000017",
+    "sens": "SORTIE",
+    "montant": 30.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-21",
+    "libelle": "GARIS SÉCURITÉ sous-traitance",
+    "sens": "SORTIE",
+    "montant": 3396.6,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-26",
+    "libelle": "KANDBAZ Carte **0657",
+    "sens": "SORTIE",
+    "montant": 108.0,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-01-26",
+    "libelle": "MALAKOFF HUMANIS RETRAITE - MALAKOFF HUMANIS - 202512M - SIRET 95193273000017 -AG0...",
+    "sens": "SORTIE",
+    "montant": 45.27,
+    "releve": "2026-01_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-01",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 2.4,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-02",
+    "libelle": "AGIR SECURITE 311225 7517 F-000148 DAHLIA-GARDIENNAGE CRF BAUNE-12/25",
+    "sens": "ENTREE",
+    "montant": 4153.48,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-03",
+    "libelle": "ADN SECURITE PRESTATIONS JANVIER 2026",
+    "sens": "ENTREE",
+    "montant": 11880.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-04",
+    "libelle": "INDY COMPTABILITE Carte **0657",
+    "sens": "SORTIE",
+    "montant": 70.8,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-06",
+    "libelle": "GARIS SÉCURITÉ sous-traitance",
+    "sens": "SORTIE",
+    "montant": 9990.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-08",
+    "libelle": "GARIS SÉCURITÉ sous-traitance",
+    "sens": "SORTIE",
+    "montant": 4995.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-16",
+    "libelle": "GARIS SÉCURITÉ sous-traitance",
+    "sens": "SORTIE",
+    "montant": 19980.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-16",
+    "libelle": "GARIS SÉCURITÉ sous-traitance",
+    "sens": "SORTIE",
+    "montant": 9980.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-16",
+    "libelle": "I.G.S-21 FACTURE SOUS TRAITANT",
+    "sens": "ENTREE",
+    "montant": 35640.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-17",
+    "libelle": "GARIS SÉCURITÉ sous-traitance",
+    "sens": "SORTIE",
+    "montant": 8080.8,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-17",
+    "libelle": "SELAS LA HAUTE POMPIGNANE FACTURE F 000170 MARS 2026",
+    "sens": "ENTREE",
+    "montant": 2000.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-17",
+    "libelle": "URSSAF D'ILE DE FRANCE UR 117000001575677453 JANV26788617793000170226",
+    "sens": "SORTIE",
+    "montant": 256.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-18",
+    "libelle": "KANDBAZ Carte **0657",
+    "sens": "SORTIE",
+    "montant": 55.2,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-24",
+    "libelle": "DIRECTION GENERALE DES FINANCES PUBLIQUES TLR SEPA DGFIP IMPOT-PAS-DSN-16022026-012026- 95193273000017",
+    "sens": "SORTIE",
+    "montant": 61.0,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-02-25",
+    "libelle": "MALAKOFF HUMANIS RETRAITE - MALAKOFF HUMANIS - 202601M - SIRET 95193273000017 - G0...",
+    "sens": "SORTIE",
+    "montant": 69.01,
+    "releve": "2026-02_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-02",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 2.4,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-04",
+    "libelle": "INDY COMPTABILITE Carte **0657",
+    "sens": "SORTIE",
+    "montant": 70.8,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-10",
+    "libelle": "Qonto Abonnement / Frais additionnels",
+    "sens": "SORTIE",
+    "montant": 8.52,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-15",
+    "libelle": "I.G.S-21 FACTURE SOUS TRAITANT DAHLIA SECURITE",
+    "sens": "ENTREE",
+    "montant": 32451.36,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-20",
+    "libelle": "Saisie Administrative À Tiers Détenteur SATD FR - 100132492444 951932730 - DAHLIA SECURITE",
+    "sens": "SORTIE",
+    "montant": 4576.0,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-03-31",
+    "libelle": "DAHLIA SECURITE CL - FRA - CLOSING ACCOUNT",
+    "sens": "SORTIE",
+    "montant": 27963.86,
+    "releve": "2026-03_releve_Qonto.pdf"
+   },
+   {
+    "date": "2026-04-07",
+    "libelle": "Virement DAHLIA SECURITE",
+    "sens": "ENTREE",
+    "montant": 25000.0,
+    "releve": "2026-04_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-04-08",
+    "libelle": "Virement Mars",
+    "sens": "ENTREE",
+    "montant": 2000.0,
+    "releve": "2026-04_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-04-13",
+    "libelle": "Virement avril",
+    "sens": "ENTREE",
+    "montant": 2000.0,
+    "releve": "2026-04_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-04-14",
+    "libelle": "Virement Virement vers GARIS SECURITE",
+    "sens": "SORTIE",
+    "montant": 4484.4,
+    "releve": "2026-04_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-04-16",
+    "libelle": "Virement Virement vers MONYIKI RAMAZANE",
+    "sens": "SORTIE",
+    "montant": 191.81,
+    "releve": "2026-04_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-04-16",
+    "libelle": "Virement Virement vers MOULOUD MAHFOUF",
+    "sens": "SORTIE",
+    "montant": 103.49,
+    "releve": "2026-04_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-04-16",
+    "libelle": "Virement salaire",
+    "sens": "SORTIE",
+    "montant": 180.98,
+    "releve": "2026-04_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-04-27",
+    "libelle": "Carte Bolt.new - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 21.43,
+    "releve": "2026-04_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-04-27",
+    "libelle": "Carte Claude.ai - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 108.0,
+    "releve": "2026-04_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-04-27",
+    "libelle": "Frais Card transaction in foreign currency",
+    "sens": "SORTIE",
+    "montant": 0.52,
+    "releve": "2026-04_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-04-30",
+    "libelle": "Virement DAHLIA-GARDIENNAGE CRF BEAUNE-03/26",
+    "sens": "ENTREE",
+    "montant": 474.92,
+    "releve": "2026-04_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-04",
+    "libelle": "Carte Booking.com - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 7.41,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-04",
+    "libelle": "Carte Booking.com - Arsene Gnegnery **0179",
+    "sens": "ENTREE",
+    "montant": 7.41,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-04",
+    "libelle": "Virement Transfer from DAHLIA SECURITE",
+    "sens": "ENTREE",
+    "montant": 836.0,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "libelle": "Carte Airbnb - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 35.38,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-06",
+    "libelle": "Carte Claude.ai - Arsene Gnegnery **0179",
+    "sens": "ENTREE",
+    "montant": 18.0,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-07",
+    "libelle": "Carte Airbnb - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 45.29,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-07",
+    "libelle": "Carte Airbnb - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 388.02,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-08",
+    "libelle": "Carte Airbnb - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 47.88,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-11",
+    "libelle": "Virement Virement vers SAMBROU INTERNATIONAL",
+    "sens": "SORTIE",
+    "montant": 9956.62,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-18",
+    "libelle": "Virement Virement vers MONYIKI RAMAZANE",
+    "sens": "SORTIE",
+    "montant": 177.11,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "libelle": "Carte Airbnb - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 40.16,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "libelle": "Carte Teledec - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 118.8,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "libelle": "Virement salaire",
+    "sens": "SORTIE",
+    "montant": 204.32,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-20",
+    "libelle": "Carte Indy.fr - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 70.8,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-21",
+    "libelle": "Carte Kandbaz - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 55.2,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-21",
+    "libelle": "Carte Tick Tick - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 31.05,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-21",
+    "libelle": "Frais Card transaction in foreign currency",
+    "sens": "SORTIE",
+    "montant": 0.74,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-23",
+    "libelle": "Carte Allianz - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 62.16,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-24",
+    "libelle": "Carte Lyca Mobile - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 9.99,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-26",
+    "libelle": "Carte Infogreffe - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 3.06,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-27",
+    "libelle": "Carte Bolt.new - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 21.5,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-27",
+    "libelle": "Carte Onoff - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 7.19,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-27",
+    "libelle": "Carte Onoff - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 7.19,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-27",
+    "libelle": "Carte Vetsécurité - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 263.94,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-27",
+    "libelle": "Frais Card transaction in foreign currency",
+    "sens": "SORTIE",
+    "montant": 0.52,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-05-31",
+    "libelle": "Carte Navigo - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 2.55,
+    "releve": "2026-05_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-01",
+    "libelle": "Carte SNCF - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 10.3,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-01",
+    "libelle": "Virement FRAIS D'AVOCAT",
+    "sens": "SORTIE",
+    "montant": 500.0,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-02",
+    "libelle": "Carte SNCF - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 20.6,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-04",
+    "libelle": "Carte Indy.fr - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 70.8,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-06",
+    "libelle": "Carte Claude (Anthropic) - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 180.0,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-06",
+    "libelle": "Carte Lyca Mobile - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 10.0,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-06",
+    "libelle": "Carte Lyca Mobile - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 5.0,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-09",
+    "libelle": "Carte Le Légaliste - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 163.2,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-09",
+    "libelle": "Virement FACTURE MAI F00189",
+    "sens": "ENTREE",
+    "montant": 2000.0,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-10",
+    "libelle": "Carte La Poste - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 13.04,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-10",
+    "libelle": "Carte La Poste - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 7.86,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-10",
+    "libelle": "Virement 100028637",
+    "sens": "SORTIE",
+    "montant": 949.2,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-13",
+    "libelle": "Virement Salaire",
+    "sens": "SORTIE",
+    "montant": 308.87,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-15",
+    "libelle": "Virement Virement vers GARIS SECURITE",
+    "sens": "SORTIE",
+    "montant": 12674.08,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-15",
+    "libelle": "Virement Virement vers NDIOUMA SARR",
+    "sens": "SORTIE",
+    "montant": 308.87,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-23",
+    "libelle": "Virement Transfer from M NDIOUMA SARR",
+    "sens": "ENTREE",
+    "montant": 200.87,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-26",
+    "libelle": "Carte Onoff - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 7.19,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-26",
+    "libelle": "Carte Onoff - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 7.19,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-27",
+    "libelle": "Carte Bolt.new - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 22.06,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-06-27",
+    "libelle": "Frais Card transaction in foreign currency",
+    "sens": "SORTIE",
+    "montant": 0.53,
+    "releve": "2026-06_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-01",
+    "libelle": "Carte BookBeat - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 14.99,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-01",
+    "libelle": "Carte La Poste - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 15.04,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-01",
+    "libelle": "Carte La Poste - Arsene Gnegnery **0179",
+    "sens": "SORTIE",
+    "montant": 15.04,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-10",
+    "libelle": "Prélèvement automatique AMR20260407514 500001562710",
+    "sens": "SORTIE",
+    "montant": 17.0,
+    "releve": "2026-07_releve_Indy.pdf"
+   },
+   {
+    "date": "2026-07-10",
+    "libelle": "Prélèvement automatique AMR20260500065 500001562708",
+    "sens": "SORTIE",
+    "montant": 33.0,
+    "releve": "2026-07_releve_Indy.pdf"
+   }
+  ]
+ },
+ "mouvements_2026": [
+  {
+   "date": "2026-01-01",
+   "libelle": "Qonto Abonnement / Frais additionnels",
+   "sens": "SORTIE",
+   "montant": 2.4,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-02",
+   "libelle": "ADN SECURITE PRESTATIONS DECEMBRE 2025",
+   "sens": "ENTREE",
+   "montant": 19800.0,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-02",
+   "libelle": "MONYIKI RAMAZANE salaire",
+   "sens": "SORTIE",
+   "montant": 473.87,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-02",
+   "libelle": "SELARL GTC REIMS DAHLIA SECURITE / 3BM SECURITE",
+   "sens": "SORTIE",
+   "montant": 120.0,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-04",
+   "libelle": "INDY COMPTABILITE Carte **0657",
+   "sens": "SORTIE",
+   "montant": 70.8,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-07",
+   "libelle": "GARIS SÉCURITÉ sous-traitance",
+   "sens": "SORTIE",
+   "montant": 16494.6,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-08",
+   "libelle": "DIRECTION GENERALE DES FINANCES PUBLIQUES AMR20251200162 500001405734",
+   "sens": "SORTIE",
+   "montant": 90.0,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-12",
+   "libelle": "NDIOUMA SARR Salaire",
+   "sens": "SORTIE",
+   "montant": 193.46,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-13",
+   "libelle": "I.G.S-21 FACTURE SOUS TRAITANT",
+   "sens": "ENTREE",
+   "montant": 40587.84,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-13",
+   "libelle": "SELAS LA HAUTE POMPIGNANE FACTURE F 00165 FEVRIER 2026",
+   "sens": "ENTREE",
+   "montant": 2000.0,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-14",
+   "libelle": "DIANTRA SECURITY sous traitance",
+   "sens": "SORTIE",
+   "montant": 5994.0,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-14",
+   "libelle": "DIANTRA SECURITY sous traitance",
+   "sens": "SORTIE",
+   "montant": 15184.8,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-15",
+   "libelle": "DIANTRA SECURITY sous traitance",
+   "sens": "SORTIE",
+   "montant": 15295.8,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-15",
+   "libelle": "S.A.S. CENTRE ORLEANAIS PROTEC T F 000142",
+   "sens": "ENTREE",
+   "montant": 364.72,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-16",
+   "libelle": "GARIS SÉCURITÉ sous-traitance",
+   "sens": "SORTIE",
+   "montant": 8258.4,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-16",
+   "libelle": "URSSAF D'ILE DE FRANCE UR 117000001575677453 DEC 25788617793000160126",
+   "sens": "SORTIE",
+   "montant": 222.0,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-19",
+   "libelle": "AGIR SECURITE DAHLIA-GARDIENNAGE CRF BEAUNE - 11/2025",
+   "sens": "ENTREE",
+   "montant": 3484.52,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-19",
+   "libelle": "PAYFIT FR-INV00955488",
+   "sens": "SORTIE",
+   "montant": 254.4,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-21",
+   "libelle": "DGFIP PASDSN15012026-122025-95193273000017",
+   "sens": "SORTIE",
+   "montant": 30.0,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-21",
+   "libelle": "GARIS SÉCURITÉ sous-traitance",
+   "sens": "SORTIE",
+   "montant": 3396.6,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-26",
+   "libelle": "KANDBAZ Carte **0657",
+   "sens": "SORTIE",
+   "montant": 108.0,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-01-26",
+   "libelle": "MALAKOFF HUMANIS RETRAITE - MALAKOFF HUMANIS - 202512M - SIRET 95193273000017 -AG0...",
+   "sens": "SORTIE",
+   "montant": 45.27,
+   "releve": "2026-01_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-01",
+   "libelle": "Qonto Abonnement / Frais additionnels",
+   "sens": "SORTIE",
+   "montant": 2.4,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-02",
+   "libelle": "AGIR SECURITE 311225 7517 F-000148 DAHLIA-GARDIENNAGE CRF BAUNE-12/25",
+   "sens": "ENTREE",
+   "montant": 4153.48,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-03",
+   "libelle": "ADN SECURITE PRESTATIONS JANVIER 2026",
+   "sens": "ENTREE",
+   "montant": 11880.0,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-04",
+   "libelle": "INDY COMPTABILITE Carte **0657",
+   "sens": "SORTIE",
+   "montant": 70.8,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-06",
+   "libelle": "GARIS SÉCURITÉ sous-traitance",
+   "sens": "SORTIE",
+   "montant": 9990.0,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-08",
+   "libelle": "GARIS SÉCURITÉ sous-traitance",
+   "sens": "SORTIE",
+   "montant": 4995.0,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-16",
+   "libelle": "GARIS SÉCURITÉ sous-traitance",
+   "sens": "SORTIE",
+   "montant": 19980.0,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-16",
+   "libelle": "GARIS SÉCURITÉ sous-traitance",
+   "sens": "SORTIE",
+   "montant": 9980.0,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-16",
+   "libelle": "I.G.S-21 FACTURE SOUS TRAITANT",
+   "sens": "ENTREE",
+   "montant": 35640.0,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-17",
+   "libelle": "GARIS SÉCURITÉ sous-traitance",
+   "sens": "SORTIE",
+   "montant": 8080.8,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-17",
+   "libelle": "SELAS LA HAUTE POMPIGNANE FACTURE F 000170 MARS 2026",
+   "sens": "ENTREE",
+   "montant": 2000.0,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-17",
+   "libelle": "URSSAF D'ILE DE FRANCE UR 117000001575677453 JANV26788617793000170226",
+   "sens": "SORTIE",
+   "montant": 256.0,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-18",
+   "libelle": "KANDBAZ Carte **0657",
+   "sens": "SORTIE",
+   "montant": 55.2,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-24",
+   "libelle": "DIRECTION GENERALE DES FINANCES PUBLIQUES TLR SEPA DGFIP IMPOT-PAS-DSN-16022026-012026- 95193273000017",
+   "sens": "SORTIE",
+   "montant": 61.0,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-02-25",
+   "libelle": "MALAKOFF HUMANIS RETRAITE - MALAKOFF HUMANIS - 202601M - SIRET 95193273000017 - G0...",
+   "sens": "SORTIE",
+   "montant": 69.01,
+   "releve": "2026-02_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-03-02",
+   "libelle": "Qonto Abonnement / Frais additionnels",
+   "sens": "SORTIE",
+   "montant": 2.4,
+   "releve": "2026-03_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-03-04",
+   "libelle": "INDY COMPTABILITE Carte **0657",
+   "sens": "SORTIE",
+   "montant": 70.8,
+   "releve": "2026-03_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-03-10",
+   "libelle": "Qonto Abonnement / Frais additionnels",
+   "sens": "SORTIE",
+   "montant": 8.52,
+   "releve": "2026-03_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-03-15",
+   "libelle": "I.G.S-21 FACTURE SOUS TRAITANT DAHLIA SECURITE",
+   "sens": "ENTREE",
+   "montant": 32451.36,
+   "releve": "2026-03_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-03-20",
+   "libelle": "Saisie Administrative À Tiers Détenteur SATD FR - 100132492444 951932730 - DAHLIA SECURITE",
+   "sens": "SORTIE",
+   "montant": 4576.0,
+   "releve": "2026-03_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-03-31",
+   "libelle": "DAHLIA SECURITE CL - FRA - CLOSING ACCOUNT",
+   "sens": "SORTIE",
+   "montant": 27963.86,
+   "releve": "2026-03_releve_Qonto.pdf"
+  },
+  {
+   "date": "2026-04-07",
+   "libelle": "Virement DAHLIA SECURITE",
+   "sens": "ENTREE",
+   "montant": 25000.0,
+   "releve": "2026-04_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-04-08",
+   "libelle": "Virement Mars",
+   "sens": "ENTREE",
+   "montant": 2000.0,
+   "releve": "2026-04_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-04-13",
+   "libelle": "Virement avril",
+   "sens": "ENTREE",
+   "montant": 2000.0,
+   "releve": "2026-04_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-04-14",
+   "libelle": "Virement Virement vers GARIS SECURITE",
+   "sens": "SORTIE",
+   "montant": 4484.4,
+   "releve": "2026-04_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-04-16",
+   "libelle": "Virement Virement vers MONYIKI RAMAZANE",
+   "sens": "SORTIE",
+   "montant": 191.81,
+   "releve": "2026-04_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-04-16",
+   "libelle": "Virement Virement vers MOULOUD MAHFOUF",
+   "sens": "SORTIE",
+   "montant": 103.49,
+   "releve": "2026-04_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-04-16",
+   "libelle": "Virement salaire",
+   "sens": "SORTIE",
+   "montant": 180.98,
+   "releve": "2026-04_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-04-27",
+   "libelle": "Carte Bolt.new - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 21.43,
+   "releve": "2026-04_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-04-27",
+   "libelle": "Carte Claude.ai - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 108.0,
+   "releve": "2026-04_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-04-27",
+   "libelle": "Frais Card transaction in foreign currency",
+   "sens": "SORTIE",
+   "montant": 0.52,
+   "releve": "2026-04_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-04-30",
+   "libelle": "Virement DAHLIA-GARDIENNAGE CRF BEAUNE-03/26",
+   "sens": "ENTREE",
+   "montant": 474.92,
+   "releve": "2026-04_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-04",
+   "libelle": "Carte Booking.com - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 7.41,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-04",
+   "libelle": "Carte Booking.com - Arsene Gnegnery **0179",
+   "sens": "ENTREE",
+   "montant": 7.41,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-04",
+   "libelle": "Virement Transfer from DAHLIA SECURITE",
+   "sens": "ENTREE",
+   "montant": 836.0,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-05",
+   "libelle": "Carte Airbnb - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 35.38,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-06",
+   "libelle": "Carte Claude.ai - Arsene Gnegnery **0179",
+   "sens": "ENTREE",
+   "montant": 18.0,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-07",
+   "libelle": "Carte Airbnb - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 45.29,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-07",
+   "libelle": "Carte Airbnb - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 388.02,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-08",
+   "libelle": "Carte Airbnb - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 47.88,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-11",
+   "libelle": "Virement Virement vers SAMBROU INTERNATIONAL",
+   "sens": "SORTIE",
+   "montant": 9956.62,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-18",
+   "libelle": "Virement Virement vers MONYIKI RAMAZANE",
+   "sens": "SORTIE",
+   "montant": 177.11,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-19",
+   "libelle": "Carte Airbnb - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 40.16,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-19",
+   "libelle": "Carte Teledec - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 118.8,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-19",
+   "libelle": "Virement salaire",
+   "sens": "SORTIE",
+   "montant": 204.32,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-20",
+   "libelle": "Carte Indy.fr - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 70.8,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-21",
+   "libelle": "Carte Kandbaz - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 55.2,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-21",
+   "libelle": "Carte Tick Tick - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 31.05,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-21",
+   "libelle": "Frais Card transaction in foreign currency",
+   "sens": "SORTIE",
+   "montant": 0.74,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-23",
+   "libelle": "Carte Allianz - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 62.16,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-24",
+   "libelle": "Carte Lyca Mobile - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 9.99,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-26",
+   "libelle": "Carte Infogreffe - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 3.06,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-27",
+   "libelle": "Carte Bolt.new - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 21.5,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-27",
+   "libelle": "Carte Onoff - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 7.19,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-27",
+   "libelle": "Carte Onoff - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 7.19,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-27",
+   "libelle": "Carte Vetsécurité - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 263.94,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-27",
+   "libelle": "Frais Card transaction in foreign currency",
+   "sens": "SORTIE",
+   "montant": 0.52,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-05-31",
+   "libelle": "Carte Navigo - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 2.55,
+   "releve": "2026-05_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-01",
+   "libelle": "Carte SNCF - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 10.3,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-01",
+   "libelle": "Virement FRAIS D'AVOCAT",
+   "sens": "SORTIE",
+   "montant": 500.0,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-02",
+   "libelle": "Carte SNCF - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 20.6,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-04",
+   "libelle": "Carte Indy.fr - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 70.8,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-06",
+   "libelle": "Carte Claude (Anthropic) - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 180.0,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-06",
+   "libelle": "Carte Lyca Mobile - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 10.0,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-06",
+   "libelle": "Carte Lyca Mobile - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 5.0,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-09",
+   "libelle": "Carte Le Légaliste - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 163.2,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-09",
+   "libelle": "Virement FACTURE MAI F00189",
+   "sens": "ENTREE",
+   "montant": 2000.0,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-10",
+   "libelle": "Carte La Poste - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 13.04,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-10",
+   "libelle": "Carte La Poste - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 7.86,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-10",
+   "libelle": "Virement 100028637",
+   "sens": "SORTIE",
+   "montant": 949.2,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-13",
+   "libelle": "Virement Salaire",
+   "sens": "SORTIE",
+   "montant": 308.87,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-15",
+   "libelle": "Virement Virement vers GARIS SECURITE",
+   "sens": "SORTIE",
+   "montant": 12674.08,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-15",
+   "libelle": "Virement Virement vers NDIOUMA SARR",
+   "sens": "SORTIE",
+   "montant": 308.87,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-23",
+   "libelle": "Virement Transfer from M NDIOUMA SARR",
+   "sens": "ENTREE",
+   "montant": 200.87,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-26",
+   "libelle": "Carte Onoff - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 7.19,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-26",
+   "libelle": "Carte Onoff - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 7.19,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-27",
+   "libelle": "Carte Bolt.new - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 22.06,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-06-27",
+   "libelle": "Frais Card transaction in foreign currency",
+   "sens": "SORTIE",
+   "montant": 0.53,
+   "releve": "2026-06_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-07-01",
+   "libelle": "Carte BookBeat - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 14.99,
+   "releve": "2026-07_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-07-01",
+   "libelle": "Carte La Poste - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 15.04,
+   "releve": "2026-07_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-07-01",
+   "libelle": "Carte La Poste - Arsene Gnegnery **0179",
+   "sens": "SORTIE",
+   "montant": 15.04,
+   "releve": "2026-07_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-07-10",
+   "libelle": "Prélèvement automatique AMR20260407514 500001562710",
+   "sens": "SORTIE",
+   "montant": 17.0,
+   "releve": "2026-07_releve_Indy.pdf"
+  },
+  {
+   "date": "2026-07-10",
+   "libelle": "Prélèvement automatique AMR20260500065 500001562708",
+   "sens": "SORTIE",
+   "montant": 33.0,
+   "releve": "2026-07_releve_Indy.pdf"
+  }
+ ],
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-12 23:39",
+  "lu_le": "2026-08-13 07:59",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
