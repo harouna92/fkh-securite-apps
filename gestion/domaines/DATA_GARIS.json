@@ -2,7 +2,7 @@
  "administratif_publications": [],
  "conformite_2026": {
   "source": "fichiers reellement presents dans le dossier courriers du domaine",
-  "lu_le": "2026-08-13 15:18",
+  "lu_le": "2026-08-13 16:05",
   "courriers": {
    "2026-05": [
     "GARIS_2026-05-18_LAPOSTE_avis-reception_ar87500148214085r.pdf"
@@ -2037,7 +2037,7 @@
  ],
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-13 15:18",
+  "lu_le": "2026-08-13 16:05",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
