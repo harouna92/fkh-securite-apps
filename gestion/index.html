@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b441</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b442</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2627,7 +2627,17 @@ button.big:active{transform:translateY(1px)}
        jamais lieu : les filtres du panneau semblaient morts. On ne suspend donc rien aux
        entrailles d'une autre fonction. */
     _SV_ACTS.forEach(function(p){ el.addEventListener(p[0],function(e){
+      /* ===== b442 : NE REDESSINER QUE POUR LES GESTES QUI LE DEMANDENT =====
+         b439 redessinait la fiche a CHAQUE evenement recu sur la carte — y compris la frappe
+         dans « Affecter un agent ». A chaque lettre, le champ etait detruit et recree : le focus
+         partait, la lettre suivante n'arrivait nulle part, et le champ passait pour mort alors
+         qu'il calculait bien ses propositions. Zeus : « le champ ne marche pas ».
+         Seuls les gestes VENUS DU PANNEAU « Agents proches » ont besoin de ce rafraichissement.
+         On le mesure AVANT d'executer le geste : apres, la cible peut avoir quitte le document. */
+      var _dedans=false;
+      try{ _dedans=!!(e.target&&e.target.closest&&e.target.closest('#pl-near-det')); }catch(_c){}
       p[1](e);
+      if(!_dedans)return;
       try{ if(!_svInModal&&byId('pl-modal-card')&&typeof _plRenderModal==='function'){
         _svInModal=1; try{ _plRenderModal(); } finally { _svInModal=0; } } }catch(_e){ _svInModal=0; }
     }); }); }
