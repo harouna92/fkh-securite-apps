@@ -15,7 +15,7 @@
  .carnet.on{color:#34d399;border-color:#1e5540}
  .carnet.ko{color:#fbbf24;border-color:#5a4a1e}
 </style></head><body>
-<div class="top"><span class="brand">🧭 Appli FKH</span><div class="tabs"><button class="tab on" data-v="hub" onclick="showV('hub')">Hub</button><button class="tab" data-v="carnet" onclick="showV('carnet')">📓 Carnet vivant</button><button class="tab" data-v="etat" onclick="showV('etat')">ÉTAT</button><button class="tab" data-v="radar" onclick="showV('radar')">RADAR</button><button class="tab" data-v="pilotage" onclick="showV('pilotage')">PILOTAGE</button><button class="tab" data-v="cockdoss" onclick="showV('cockdoss')">Cockpit dossiers</button><button class="tab" data-v="cockfin" onclick="showV('cockfin')">Cockpit financier</button><button class="tab" data-v="ca3" onclick="showV('ca3')">🧾 CA3</button><button class="tab" data-v="mouvements" onclick="showV('mouvements')">💳 Mouvements</button><button class="tab" data-v="facturation" onclick="showV('facturation')">🧾 Facturation</button><button class="tab" data-v="briefing" onclick="showV('briefing')">Briefing auto</button><button class="tab" data-v="tenues" onclick="showV('tenues')">Tenues</button></div><span class="hint" style="margin-left:auto">le Hub ouvre toutes les vues · clic = navigue/déplie · action = commande à copier</span><span class="carnet" id="tampon" title="Moment où ce cockpit a été assemblé — s'il diffère de ce que Claude annonce, la version en ligne n'est pas la sienne">assemblé 13/08 11:10</span><span class="carnet" id="carnet" title="Carnet DATA_FKH.json lu sur le Drive et diffusé à toutes les vues">carnet…</span></div>
+<div class="top"><span class="brand">🧭 Appli FKH</span><div class="tabs"><button class="tab on" data-v="hub" onclick="showV('hub')">Hub</button><button class="tab" data-v="carnet" onclick="showV('carnet')">📓 Carnet vivant</button><button class="tab" data-v="etat" onclick="showV('etat')">ÉTAT</button><button class="tab" data-v="radar" onclick="showV('radar')">RADAR</button><button class="tab" data-v="pilotage" onclick="showV('pilotage')">PILOTAGE</button><button class="tab" data-v="cockdoss" onclick="showV('cockdoss')">Cockpit dossiers</button><button class="tab" data-v="cockfin" onclick="showV('cockfin')">Cockpit financier</button><button class="tab" data-v="ca3" onclick="showV('ca3')">🧾 CA3</button><button class="tab" data-v="mouvements" onclick="showV('mouvements')">💳 Mouvements</button><button class="tab" data-v="facturation" onclick="showV('facturation')">🧾 Facturation</button><button class="tab" data-v="briefing" onclick="showV('briefing')">Briefing auto</button><button class="tab" data-v="tenues" onclick="showV('tenues')">Tenues</button></div><span class="hint" style="margin-left:auto">le Hub ouvre toutes les vues · clic = navigue/déplie · action = commande à copier</span><span class="carnet" id="tampon" title="Moment où ce cockpit a été assemblé — s'il diffère de ce que Claude annonce, la version en ligne n'est pas la sienne">assemblé 13/08 11:16</span><span class="carnet" id="carnet" title="Carnet DATA_FKH.json lu sur le Drive et diffusé à toutes les vues">carnet…</span></div>
 <div><iframe id="if-hub" class="vframe" srcdoc="<!DOCTYPE html>
 <html lang=&quot;fr&quot;>
 <head><style>[class*=&quot;ti-&quot;]::before{content:&quot;&quot;!important}.ico{font-style:normal;display:inline-block}</style><script>function sendPrompt(t){try{parent.postMessage({__cmd:String(t)},&quot;*&quot;)}catch(e){}}</script><script>window.CARNET=(function(){var cbs=[],last=null,seq=0,pend={};function fire(){cbs.forEach(function(f){try{f(last)}catch(e){}})}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined){last={data:d.__data||null,err:d.__err||null,at:d.__at||null,src:d.__src||null};fire();}if(d.__mcpres&amp;&amp;pend[d.__mcpres.id]){pend[d.__mcpres.id].ok(d.__mcpres.payload);delete pend[d.__mcpres.id];}if(d.__mcperr&amp;&amp;pend[d.__mcperr.id]){pend[d.__mcperr.id].ko({code:d.__mcperr.code});delete pend[d.__mcperr.id];}});var solo=(window.parent===window);function ask(){if(solo){setTimeout(function(){last={data:null,err:&quot;__hors_appli&quot;,at:null};fire();},0);return;}try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(e){}}return{onData:function(f){cbs.push(f);if(last){try{f(last)}catch(e){}}else ask();},ask:ask,nb:function(){return cbs.length},mcp:function(tool,input){var id=++seq;return new Promise(function(ok,ko){pend[id]={ok:ok,ko:ko};try{parent.postMessage({__mcp:{id:id,tool:tool,input:input}},&quot;*&quot;)}catch(e){ko({code:&quot;bad_request&quot;})}setTimeout(function(){if(pend[id]){pend[id].ko({code:&quot;upstream_error&quot;});delete pend[id];}},45000);})},explain:function(c){switch(c){case &quot;__absent&quot;:return &quot;DATA_FKH.json pas encore visible sur le Drive \u2014 la synchronisation peut prendre quelques minutes.&quot;;case &quot;__illisible&quot;:return &quot;DATA_FKH.json trouv\u00e9 mais illisible : le connecteur en a alt\u00e9r\u00e9 le format.&quot;;case &quot;__vide&quot;:return &quot;Carnet lu, mais ce bloc y est vide \u2014 relancer build_data_fkh.py.&quot;;case &quot;server_not_connected&quot;:return &quot;Aucun connecteur Google Drive \u2014 \u00e0 ajouter dans R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;needs_reauth&quot;:return &quot;Connecteur Google Drive \u00e0 reconnecter : R\u00e9glages \u2192 Connecteurs.&quot;;case &quot;selection_required&quot;:return &quot;Plusieurs comptes Drive : en choisir un dans l\u2019invite d\u2019ouverture.&quot;;case &quot;server_unavailable&quot;:return &quot;Drive momentan\u00e9ment injoignable \u2014 derniers chiffres conserv\u00e9s.&quot;;case &quot;capability_disabled&quot;:case &quot;not_granted&quot;:case &quot;capability_removed&quot;:return &quot;Cette page n\u2019a pas re\u00e7u le pont connecteur dans cette session.&quot;;case &quot;__hors_appli&quot;:return &quot;Vue ouverte hors de l\u2019appli \u2014 chiffres fig\u00e9s.&quot;;case &quot;__lecture&quot;:return &quot;Lecture de DATA_FKH.json en cours\u2026&quot;;default:return &quot;Lecture impossible (&quot;+c+&quot;).&quot;;}}};})();window.FKH=window.CARNET;</script><style>#fkhfrais{position:sticky;bottom:0;z-index:99;font:11.5px/1.5 ui-monospace,Menlo,monospace;padding:5px 12px;border-top:1px solid #2a313c;background:#0e1116;color:#6b7480;display:flex;gap:8px;flex-wrap:wrap}#fkhfrais b{font-weight:600}.fkhv{color:#34d399}.fkhf{color:#fbbf24}</style><script>(function(){function pose(){var e=document.getElementById(&quot;fkhfrais&quot;);if(!e){e=document.createElement(&quot;div&quot;);e.id=&quot;fkhfrais&quot;;document.body.appendChild(e);}return e;}function dit(s){var e=pose(),vit=s&amp;&amp;s.data&amp;&amp;(s.src===&quot;fichier&quot;||s.src===&quot;drive&quot;),sert=(window.__UTILISE_CARNET__===true)||(function(){try{return window.CARNET.nb()>0}catch(_){return false}})();var h=s&amp;&amp;s.at?new Date(s.at).toLocaleTimeString(&quot;fr-FR&quot;):&quot;&quot;;e.innerHTML=(vit?'<span class=&quot;fkhv&quot;>\u25cf carnet FKH lu '+h+&quot;</span>&quot;:'<span class=&quot;fkhf&quot;>\u25cb carnet FKH NON lu \u2014 chiffres fig\u00e9s dans la page</span>')+(sert?&quot;<span>\u00b7 cette vue s'en sert</span>&quot;:(window.__PAGE_NAV__===true?&quot;<span>\u00b7 page de navigation \u2014 aucune donn\u00e9e \u00e0 rafra\u00eechir</span>&quot;:'<span class=&quot;fkhf&quot;>\u00b7 cette vue ne s\u2019en sert PAS ENCORE \u2014 son contenu date de sa g\u00e9n\u00e9ration</span>'));}window.addEventListener(&quot;message&quot;,function(e){var d=e.data||{};if(d.__data!==undefined||d.__err!==undefined)dit({data:d.__data||null,at:d.__at||null,src:d.__src||null});});function go(){dit(null);try{parent.postMessage({__want:&quot;data&quot;},&quot;*&quot;)}catch(_){}}if(document.readyState===&quot;loading&quot;)document.addEventListener(&quot;DOMContentLoaded&quot;,go);else go();})();</script>
@@ -1031,6 +1031,38 @@ function render(){
 render();
 document.getElementById('editBtn').onclick=()=>go('MODIFIER VUE : RADAR');
 document.getElementById('addBesoin').onclick=()=>{const v=document.getElementById('besoin').value.trim();if(v)go('+ BESOIN : '+v);};
+
+/* ---- 2026-08-13 : la partie DONNÉES du Contrôle du mois lit le carnet ------------
+   Le RADAR reste une liste curatée (items posés à la main) — mais le point de fait
+   « qui a sa facture au dossier ? » se périme en heures : la section disait encore
+   « 7 clients sans facture » alors que 5 factures de juillet étaient déposées.
+   On insère donc EN TÊTE de la section un état recalculé à chaque lecture du carnet
+   (presence_factures_client = les fichiers réellement présents). Les items curatés
+   restent, pour le contexte mail et les actions. */
+(function(){
+  function majControle(d){
+    var p=d&amp;&amp;d.presence_factures_client;
+    if(!p||!p.mois||!p.mois.length||!p.clients)return;
+    var mk=p.mois[p.mois.length-1];
+    var moisFr=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'][parseInt(mk.slice(5),10)-1]||mk;
+    var avec=[],sans=[];
+    Object.keys(p.clients).forEach(function(c){(p.clients[c][mk]?avec:sans).push(c);});
+    var el=document.getElementById('ctrl-carnet');
+    if(!el){
+      var titres=Array.prototype.slice.call(document.querySelectorAll('body *')).filter(function(n){
+        return n.children.length===0&amp;&amp;/Contrôle du mois/.test(n.textContent);});
+      var anc=titres.length?titres[0].closest('section,div'):document.body;
+      el=document.createElement('div');el.id='ctrl-carnet';
+      el.style.cssText='margin:6px 0 10px;padding:8px 12px;border:1px solid #2a4a5c;border-radius:9px;background:rgba(125,211,252,.07);font-size:12px;line-height:1.6;color:#9aa7b4';
+      if(anc&amp;&amp;anc.firstChild)anc.insertBefore(el,anc.firstChild.nextSibling);else document.body.insertBefore(el,document.body.firstChild);
+    }
+    el.innerHTML='<b style=&quot;color:#7dd3fc&quot;>👁️ État réel du dossier ('+moisFr+') — recalculé du carnet :</b> '
+      +'<span style=&quot;color:#34d399&quot;>facture présente : '+(avec.join(', ')||'aucune')+'</span>'
+      +' · <span style=&quot;color:#fbbf24&quot;>toujours sans facture : '+(sans.join(', ')||'aucun')+'</span>'
+      +'<span style=&quot;color:#6b7480&quot;> — les items ci-dessous gardent le contexte mail ; ce bandeau, lui, suit le dossier.</span>';
+  }
+  try{window.CARNET.onData(function(s){ if(s&amp;&amp;s.data) majControle(s.data); });}catch(e){}
+})();
 </script><script>(function(){var id=&quot;radar&quot;;function r(){try{parent.postMessage({__id:id,__h:document.documentElement.scrollHeight||document.body.scrollHeight},&quot;*&quot;)}catch(e){}}window.addEventListener(&quot;load&quot;,function(){r();setTimeout(r,300);try{new MutationObserver(r).observe(document.body,{subtree:true,childList:true,attributes:true})}catch(e){}});document.addEventListener(&quot;click&quot;,function(){setTimeout(r,60);setTimeout(r,250)});window.addEventListener(&quot;message&quot;,function(e){if(e&amp;&amp;e.data&amp;&amp;e.data.__ask){r();setTimeout(r,150);setTimeout(r,400)}});setTimeout(r,900);setTimeout(r,1800);})();</script></body></html>
 " style="display:none"></iframe>
 <iframe id="if-pilotage" class="vframe" srcdoc="<!DOCTYPE html>
@@ -1630,6 +1662,7 @@ const COLL=[[&quot;SOTEL&quot;,162,&quot;F-000990 · mars (solde)&quot;],[&quot;
 const DED=[[&quot;GARIS (ST) 27/06&quot;,2331.00,1],[&quot;GARIS (ST) 25/06&quot;,3082.10,1],[&quot;VIGICORE (ST)&quot;,400.00,1],[&quot;FREE Mobile&quot;,5.00,1],[&quot;Domiciliation 25/06&quot;,4.60,0],[&quot;Domiciliation 04/06&quot;,4.60,0],[&quot;NOTION&quot;,3.92,0]];
 const eur=n=>n.toLocaleString(&quot;fr-FR&quot;,{minimumFractionDigits:(n%1?2:0),maximumFractionDigits:2})+&quot; €&quot;;
 let cur=5;   /* recalé sur le dernier mois renseigné dès que le carnet arrive */
+let MVTS=null;   /* mouvements du registre, posés par ca3DuCarnet — nourrit le rapprochement du mois */
 function resBox(){const x=D[cur];const isCr=x.cr>0;
  document.getElementById('res').innerHTML=isCr
   ?`<div class=&quot;res cr&quot;><div class=&quot;big&quot;>${eur(x.cr)}</div><div><div class=&quot;l&quot;><b>Crédit de TVA</b> — ${x.m} · rien à payer.</div><div class=&quot;l&quot;>Se reporte en case 22 du mois suivant.</div></div></div>`
@@ -1658,11 +1691,33 @@ function cases(){const x=D[cur];const isCr=x.cr>0;
   h+=`<tr class=&quot;${cls}&quot;><td class=&quot;cx&quot;>${cc}</td><td class=&quot;lx&quot;>${lab}</td><td class=&quot;vx&quot;>${vv}</td><td class=&quot;gx&quot;>${chip}</td></tr>`;}
  h+='</tbody></table>';document.getElementById('cases').innerHTML=h;}
 function rappro(){
+ /* 2026-08-13 (doctrine « aucun chiffre imprimé ») : dès que le carnet est là, le
+    rapprochement du mois SÉLECTIONNÉ se recalcule depuis mouvements_2026 (lignes
+    Collectée / Déductible du registre, pièce lue de la colonne justificatif).
+    COLL/DED imprimés (juin) ne servent plus que d'écran d'attente sans carnet. */
+ if(MVTS&amp;&amp;MVTS.length){
+   const moisSel=(D[cur]&amp;&amp;D[cur].m)||'';
+   const L=MVTS.filter(x=>String(x.mois).split(' ')[0]===moisSel);
+   const co=L.filter(x=>x.sens==='ENTREE'&amp;&amp;x.type_tva==='Collectée');
+   const de=L.filter(x=>x.sens==='SORTIE'&amp;&amp;(x.type_tva==='Déductible'||x.type_tva==='20%'));
+   const pOk=x=>{const j=String(x.justificatif||'').trim();return (j&amp;&amp;j.indexOf('🔲')!==0)||String(x.statut||'').indexOf('✅')===0;};
+   const sc=co.reduce((s,x)=>s+x.tva,0), sd=de.reduce((s,x)=>s+x.tva,0);
+   const cRows=co.map(x=>`<tr><td>${x.contrepartie||x.libelle}</td><td class=&quot;n&quot;>${eur(x.ttc)}</td><td>${x.facture||x.libelle||'—'}</td><td class=&quot;ok&quot;>✅</td></tr>`).join('')||'<tr><td colspan=&quot;4&quot; style=&quot;color:#6b7480&quot;>aucun encaissement TVA ce mois</td></tr>';
+   const dRows=de.map(x=>`<tr><td>${x.contrepartie||x.libelle} · ${String(x.date).slice(5)}</td><td class=&quot;n&quot;>${eur(x.tva)}</td><td class=&quot;${pOk(x)?'ok':'miss'}&quot;>${pOk(x)?'✅ pièce OK':'🔲 pièce manquante'}</td></tr>`).join('')||'<tr><td colspan=&quot;3&quot; style=&quot;color:#6b7480&quot;>aucune charge déductible ce mois</td></tr>';
+   const missN=de.filter(x=>!pOk(x)), missV=missN.reduce((s,x)=>s+x.tva,0);
+   document.getElementById('rappro').innerHTML=
+    `<div style=&quot;font-size:11px;color:#6b7480;margin-bottom:3px&quot;>Collectée (${eur(Math.round(sc))}) ↔ factures clients — ${moisSel}, lu du carnet</div>
+     <table class=&quot;rap&quot;><thead><tr><th>Client</th><th class=&quot;n&quot;>TTC</th><th>Réf.</th><th></th></tr></thead><tbody>${cRows}</tbody></table>
+     <div style=&quot;font-size:11px;color:#6b7480;margin:12px 0 3px&quot;>Déductible (${eur(Math.round(sd))}) ↔ justificatif</div>
+     <table class=&quot;rap&quot;><thead><tr><th>Fournisseur</th><th class=&quot;n&quot;>TVA</th><th>Pièce</th></tr></thead><tbody>${dRows}</tbody></table>
+     <div class=&quot;rec&quot;>🔎 ${co.length} encaissement(s) · ${de.length} charge(s) déductible(s) · ${missN.length?`<b>manque ${missN.length} pièce(s) = ${eur(missV)} de TVA</b> à pointer`:'toutes les pièces sont pointées ✅'}</div>`;
+   return;
+ }
  const cRows=COLL.map(x=>`<tr><td>${x[0]}</td><td class=&quot;n&quot;>${eur(x[1])}</td><td>${x[2]}</td><td class=&quot;ok&quot;>✅</td></tr>`).join('');
  const dRows=DED.map(x=>`<tr><td>${x[0]}</td><td class=&quot;n&quot;>${eur(x[1])}</td><td class=&quot;${x[2]?'ok':'miss'}&quot;>${x[2]?'✅ pièce OK':'🔲 pièce manquante'}</td></tr>`).join('');
  const miss=DED.filter(x=>!x[2]).reduce((s,x)=>s+x[1],0);
  document.getElementById('rappro').innerHTML=
-  `<div style=&quot;font-size:11px;color:#6b7480;margin-bottom:3px&quot;>Collectée (7 469 €) ↔ factures clients</div>
+  `<div style=&quot;font-size:11px;color:#6b7480;margin-bottom:3px&quot;>Collectée (7 469 €) ↔ factures clients — ⚠️ instantané juin, carnet non lu</div>
    <table class=&quot;rap&quot;><thead><tr><th>Client</th><th class=&quot;n&quot;>TTC</th><th>Facture rapprochée</th><th></th></tr></thead><tbody>${cRows}</tbody></table>
    <div style=&quot;font-size:11px;color:#6b7480;margin:12px 0 3px&quot;>Déductible (5 831 €) ↔ justificatif</div>
    <table class=&quot;rap&quot;><thead><tr><th>Fournisseur</th><th class=&quot;n&quot;>TVA</th><th>Pièce</th></tr></thead><tbody>${dRows}</tbody></table>
@@ -1689,6 +1744,7 @@ function ca3DuCarnet(d){
   }));
   if(!neuf.length)return false;
   D=neuf; cur=Math.min(cur, D.length-1);
+  if(Array.isArray(d.mouvements_2026))MVTS=d.mouvements_2026;   /* rapprochement du mois lu du carnet (13/08) */
   draw();
   return true;
 }
@@ -1848,20 +1904,42 @@ function carnetPresence(d){
   cliState=null; curMF=MOP.length-1;
   return true;
 }
+/* 2026-08-13 (doctrine Zeus « aucun chiffre imprimé ») : les TOTAUX d'argent par mois
+   viennent du carnet — l'axe s'étend au-delà de juin dès que le carnet porte un mois
+   de plus. Le DÉTAIL par facture (CLI/RC/RAP/RELANCE) reste sciemment figé : le
+   rapprochement par facture n'est pas transporté par le carnet (même blocage que les
+   impayés dans PILOTAGE) — on l'affiche comme tel plutôt que d'inventer. */
+function carnetArgent(d){
+  var ca=d&amp;&amp;d.ca_client_2026, enc=d&amp;&amp;d.encaissements_client_2026;
+  if(!Array.isArray(ca)||!ca.length)return false;
+  var mo2=[],ok=false;
+  for(var i=0;i<12;i++){
+    var f=(ca[i]&amp;&amp;+ca[i].ca_net_ttc)||0;
+    var e=(enc&amp;&amp;enc[i]&amp;&amp;+enc[i].encaisse_ttc)||0;
+    if(f||e){ var nom=MOISFR[i]; mo2.push(nom); MT[nom]=[Math.round(f),Math.round(e)]; ok=true; }
+  }
+  if(!ok)return false;
+  MO.length=0; mo2.forEach(function(m){MO.push(m);});
+  tf=MO.reduce((s,m)=>s+MT[m][0],0); te=MO.reduce((s,m)=>s+MT[m][1],0);
+  retard=0;nonechu=0;MO.forEach(m=>{const rc=RC[m]||{};for(const c in rc){if(echu(m,c))retard+=rc[c];else nonechu+=rc[c];}});
+  return true;
+}
 window.addEventListener('message',function(e){
   var d=e.data&amp;&amp;e.data.__data; if(!d)return;
-  if(carnetPresence(d)&amp;&amp;typeof render==='function')render();
+  var maj=carnetPresence(d);
+  try{ maj=carnetArgent(d)||maj; }catch(_x){}
+  if(maj&amp;&amp;typeof render==='function')render();
 });
 try{parent.postMessage({__want:'data'},'*');}catch(_e){}
 const OLD={'Janvier':1,'Février':1,'Mars':1,'Avril':1,'Mai':0,'Juin':0};
 const DELAIS={&quot;SECURITAS&quot;:45,&quot;RANC DÉV.&quot;:45,&quot;AQUILA&quot;:15,&quot;SOTEL&quot;:60,&quot;GAMBRINUS&quot;:15,&quot;SAS BULLION&quot;:15,&quot;P2S&quot;:30,&quot;NEW ANGEL'S&quot;:30};
-const MEND={Janvier:'2026-01-31',Février:'2026-02-28',Mars:'2026-03-31',Avril:'2026-04-30',Mai:'2026-05-31',Juin:'2026-06-30'};
+const MEND={Janvier:'2026-01-31',Février:'2026-02-28',Mars:'2026-03-31',Avril:'2026-04-30',Mai:'2026-05-31',Juin:'2026-06-30',Juillet:'2026-07-31',Août:'2026-08-31',Septembre:'2026-09-30',Octobre:'2026-10-31',Novembre:'2026-11-30',Décembre:'2026-12-31'};
 const TODAY=new Date(); // 2026-07-21 : était figé à new Date('2026-07-20') → les retards ne bougeaient plus. Une date se calcule dans la page, jamais en dur (chantier « dates vivantes »).
 function delai(c){for(const k in DELAIS){if(c.indexOf(k)===0)return DELAIS[k];}return 60;}
 function echu(m,c){const e=new Date(MEND[m]);e.setDate(e.getDate()+delai(c));return TODAY>e;}
 const eur=n=>(n<0?'−':'')+Math.abs(Math.round(n)).toLocaleString(&quot;fr-FR&quot;)+&quot; €&quot;;
 let view='home',curM=null,curC=null,curMF=5,cliState=null;
-const tf=MO.reduce((s,m)=>s+MT[m][0],0),te=MO.reduce((s,m)=>s+MT[m][1],0);
+let tf=MO.reduce((s,m)=>s+MT[m][0],0),te=MO.reduce((s,m)=>s+MT[m][1],0);
 let retard=0,nonechu=0;MO.forEach(m=>{const rc=RC[m]||{};for(const c in rc){if(echu(m,c))retard+=rc[c];else nonechu+=rc[c];}});
 const cad='<div class=&quot;cad&quot;>🗓️ <b>Cadence</b> : au 1er du mois, toutes les factures de M-1 émises · délai clients <b>60 j (à préciser)</b>.</div>';
 function home(){return `<h1>Facturation — vue unifiée</h1><div class=&quot;sub&quot;>Source maître TB_2026_Mvts + BASE_Factures · rapprochement 100% · statut lu de « Rapproché à »</div>
@@ -1894,7 +1972,7 @@ function mois(){
   return `<div class=&quot;crumb&quot;><span onclick=&quot;curM=null;render()&quot;>Factures par mois</span> › <b>${curM}</b></div><span class=&quot;back&quot; onclick=&quot;curM=null;render()&quot;>← retour</span>
    <div class=&quot;buck&quot;><div class=&quot;bk ok&quot;><div class=&quot;v&quot;>${eur(e)}</div><div class=&quot;l&quot;>encaissé</div></div><div class=&quot;bk att&quot;><div class=&quot;v&quot;>${eur(f)}</div><div class=&quot;l&quot;>facturé net</div></div><div class=&quot;bk ret&quot; style=&quot;${f-e>1?'':'opacity:.4'}&quot;><div class=&quot;v&quot;>${eur(Math.max(0,f-e))}</div><div class=&quot;l&quot;>reste dû</div></div></div>
    <table><thead><tr><th>Client</th><th class=&quot;num&quot;>Facturé</th><th class=&quot;num&quot;>Avoir</th><th class=&quot;num&quot;>Net</th><th class=&quot;num&quot;>Reste dû</th><th>Virements</th><th>Statut</th></tr></thead><tbody>${rows}</tbody></table>
-   <div class=&quot;note&quot;>Une ligne par client : Facturé · Avoir · <b>Net à payer</b> · Reste. Clique un client → ses factures + virements.</div>`;}
+   <div class=&quot;note&quot;>${(CLI[curM]&amp;&amp;CLI[curM].length)?'Une ligne par client : Facturé · Avoir · <b>Net à payer</b> · Reste. Clique un client → ses factures + virements.':'⚠️ Totaux du mois lus dans le carnet — le <b>détail par facture</b> de ce mois n\'est pas encore transporté (rapprochement par facture à ajouter au carnet).'}</div>`;}
  let rows=MO.map(m=>{const[f,e]=MT[m],reste=f-e;const rc=RC[m]||{};let ech=0;for(const c in rc){if(echu(m,c))ech+=rc[c];}const st=f===0?['à facturer','b-none']:reste<=1?['✅ payé','b-ok']:ech>0?['🔴 en retard','b-r']:['⏳ non échu','b-att'];const nb=Object.keys(RC[m]||{}).length;
   return `<tr class=&quot;clk&quot; onclick=&quot;curM='${m}';render()&quot;><td>${m} ›</td><td class=&quot;num&quot;>${eur(f)}</td><td class=&quot;num&quot; style=&quot;color:#34d399&quot;>${eur(e)}</td><td class=&quot;num rd&quot;>${eur(Math.max(0,reste))}</td><td>${nb?nb+' client(s)':'—'}</td><td><span class=&quot;badge ${st[1]}&quot;>${st[0]}</span></td></tr>`}).join('');
  return `<h2>🧾 Factures par mois</h2><div class=&quot;buck&quot;><div class=&quot;bk ok&quot;><div class=&quot;v&quot;>${eur(te)}</div><div class=&quot;l&quot;>✅ encaissé</div></div><div class=&quot;bk att&quot;><div class=&quot;v&quot;>${eur(nonechu)}</div><div class=&quot;l&quot;>⏳ non échu</div></div><div class=&quot;bk ret&quot;><div class=&quot;v&quot;>${eur(retard)}</div><div class=&quot;l&quot;>🔴 en retard</div></div></div>
