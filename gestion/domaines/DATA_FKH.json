@@ -1804,7 +1804,7 @@
  },
  "conformite_2026": {
   "source": "👁️ fichiers RÉELLEMENT présents dans les dossiers de conformité du domaine",
-  "lu_le": "2026-08-13 11:29",
+  "lu_le": "2026-08-13 11:51",
   "dsn": {
    "2026-04": [
     "DSN11_Feedback_OK_6a06451ad9716355a8a094b1_04_2026.json"
@@ -1915,6 +1915,636 @@
     "2026-05_planning_GAITEMIROV-Youssoup.pdf"
    ]
   }
+ },
+ "rapprochement_factures_2026": {
+  "source": "TB_2026_Mvts col « Rapproché à » × BASE_Factures — recompute au build (G-34)",
+  "note": "lot exact (±1 €) réparti tel quel ; lot inexact = PARTIEL, réparti séquentiellement, avoirs ajoutés à la couverture. Col N « Rapproché à » d'abord, repli col K quand la référence bancaire est explicite (cas F-001010). Un encaissement sans aucune référence ne compte pas.",
+  "factures": [
+   {
+    "doc": "F-000965",
+    "client": "AQUILA",
+    "mois": "Janvier 2026",
+    "ttc": 7058.76,
+    "encaisse": 7058.76,
+    "virements": [
+     "13/02"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000966",
+    "client": "RANC DEVELOPPEMENT",
+    "mois": "Janvier 2026",
+    "ttc": 5023.14,
+    "encaisse": 5023.14,
+    "virements": [
+     "21/05"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000967",
+    "client": "SECURITAS 10228",
+    "mois": "Janvier 2026",
+    "ttc": 24819.65,
+    "encaisse": 24819.65,
+    "virements": [
+     "31/03"
+    ],
+    "partiel": true,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000968",
+    "client": "SECURITAS 10017",
+    "mois": "Janvier 2026",
+    "ttc": 19813.88,
+    "encaisse": 19813.88,
+    "virements": [
+     "18/03"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000969",
+    "client": "SECURITAS 10017",
+    "mois": "Janvier 2026",
+    "ttc": 11971.2,
+    "encaisse": 11971.2,
+    "virements": [
+     "18/03"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000970",
+    "client": "SECURITAS 10017",
+    "mois": "Janvier 2026",
+    "ttc": 3758.4,
+    "encaisse": 3758.4,
+    "virements": [
+     "18/03"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000971",
+    "client": "SECURITAS 10017",
+    "mois": "Janvier 2026",
+    "ttc": 3758.4,
+    "encaisse": 3758.4,
+    "virements": [
+     "18/03"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000972",
+    "client": "GAMBRINUS",
+    "mois": "Janvier 2026",
+    "ttc": 2760.0,
+    "encaisse": 2760.0,
+    "virements": [
+     "16/02"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000973",
+    "client": "SAS BULLION",
+    "mois": "Janvier 2026",
+    "ttc": 2760.0,
+    "encaisse": 2760.0,
+    "virements": [
+     "16/02"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000975",
+    "client": "RANC DEVELOPPEMENT",
+    "mois": "Février 2026",
+    "ttc": 3751.8,
+    "encaisse": 3751.8,
+    "virements": [
+     "13/04"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000976",
+    "client": "SECURITAS 10017",
+    "mois": "Février 2026",
+    "ttc": 17337.08,
+    "encaisse": 17337.08,
+    "virements": [
+     "15/04"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000977",
+    "client": "SECURITAS 10228",
+    "mois": "Février 2026",
+    "ttc": 21366.31,
+    "encaisse": 21366.31,
+    "virements": [
+     "15/04"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000978",
+    "client": "SOTEL",
+    "mois": "Février 2026",
+    "ttc": 2839.08,
+    "encaisse": 2839.08,
+    "virements": [
+     "05/05"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000979",
+    "client": "NEW ANGEL'S",
+    "mois": "Février 2026",
+    "ttc": 242.4,
+    "encaisse": 242.4,
+    "virements": [
+     "10/03"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000980",
+    "client": "GAMBRINUS",
+    "mois": "Février 2026",
+    "ttc": 2169.0,
+    "encaisse": 2169.0,
+    "virements": [
+     "13/03"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000981",
+    "client": "SAS BULLION",
+    "mois": "Février 2026",
+    "ttc": 2169.0,
+    "encaisse": 2169.0,
+    "virements": [
+     "17/03"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000982",
+    "client": "AQUILA",
+    "mois": "Février 2026",
+    "ttc": 5947.38,
+    "encaisse": 5798.7,
+    "virements": [
+     "13/03"
+    ],
+    "partiel": true,
+    "reste": 0.0,
+    "avoirs_lettres": [
+     "A-000240 −148.68"
+    ],
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000983",
+    "client": "AQUILA",
+    "mois": "Février 2026",
+    "ttc": 148.68,
+    "encaisse": 0.0,
+    "virements": [],
+    "partiel": false,
+    "reste": 0.0,
+    "avoirs_lettres": [
+     "A-000241 −148.68"
+    ],
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000985",
+    "client": "SECURITAS Retail GE 10385",
+    "mois": "Janvier 2026",
+    "ttc": 6708.0,
+    "encaisse": 6708.0,
+    "virements": [
+     "30/03"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000986",
+    "client": "SECURITAS Retail GE 10385",
+    "mois": "Février 2026",
+    "ttc": 4953.6,
+    "encaisse": 4953.6,
+    "virements": [
+     "13/04"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000987",
+    "client": "GAMBRINUS",
+    "mois": "Mars 2026",
+    "ttc": 2169.0,
+    "encaisse": 2169.0,
+    "virements": [
+     "16/04"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000988",
+    "client": "SAS BULLION",
+    "mois": "Mars 2026",
+    "ttc": 2169.0,
+    "encaisse": 2169.0,
+    "virements": [
+     "17/04"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000989",
+    "client": "AQUILA",
+    "mois": "Mars 2026",
+    "ttc": 6015.48,
+    "encaisse": 5532.76,
+    "virements": [
+     "14/04"
+    ],
+    "partiel": true,
+    "reste": 0.0,
+    "avoirs_lettres": [
+     "A-000245 −482.72"
+    ],
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000990",
+    "client": "SOTEL",
+    "mois": "Mars 2026",
+    "ttc": 162.0,
+    "encaisse": 162.0,
+    "virements": [
+     "02/06"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000991",
+    "client": "RANC DEVELOPPEMENT",
+    "mois": "Mars 2026",
+    "ttc": 5657.13,
+    "encaisse": 5657.13,
+    "virements": [
+     "13/05"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000992",
+    "client": "SECURITAS 10228",
+    "mois": "Mars 2026",
+    "ttc": 19869.77,
+    "encaisse": 19869.77,
+    "virements": [
+     "14/05"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000993",
+    "client": "SECURITAS 10017",
+    "mois": "Mars 2026",
+    "ttc": 19168.88,
+    "encaisse": 19168.88,
+    "virements": [
+     "19/05"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000994",
+    "client": "SECURITAS 10017",
+    "mois": "Mars 2026",
+    "ttc": 283.8,
+    "encaisse": 283.8,
+    "virements": [
+     "14/05"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000995",
+    "client": "SECURITAS 10017",
+    "mois": "Mars 2026",
+    "ttc": 591.34,
+    "encaisse": 591.34,
+    "virements": [
+     "16/06"
+    ],
+    "partiel": true,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000997",
+    "client": "P2S",
+    "mois": "Avril 2026",
+    "ttc": 1425.42,
+    "encaisse": 0.0,
+    "virements": [],
+    "partiel": false,
+    "reste": 1425.42,
+    "statut": "impayée"
+   },
+   {
+    "doc": "F-000998",
+    "client": "SOTEL",
+    "mois": "Avril 2026",
+    "ttc": 4448.28,
+    "encaisse": 4448.28,
+    "virements": [
+     "01/07"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-000999",
+    "client": "RANC DEVELOPPEMENT",
+    "mois": "Avril 2026",
+    "ttc": 13241.27,
+    "encaisse": 12906.0,
+    "virements": [
+     "11/06"
+    ],
+    "partiel": true,
+    "reste": 0.0,
+    "avoirs_lettres": [
+     "A-000254 −75.24",
+     "A-000255 −212.16",
+     "A-000256 −47.87"
+    ],
+    "statut": "payée"
+   },
+   {
+    "doc": "F-001000",
+    "client": "AQUILA",
+    "mois": "Avril 2026",
+    "ttc": 5554.14,
+    "encaisse": 5415.29,
+    "virements": [
+     "15/05"
+    ],
+    "partiel": true,
+    "reste": 0.0,
+    "avoirs_lettres": [
+     "A-000252 −138.85"
+    ],
+    "statut": "payée"
+   },
+   {
+    "doc": "F-001001",
+    "client": "SECURITAS 10228",
+    "mois": "Avril 2026",
+    "ttc": 20198.3,
+    "encaisse": 17670.95,
+    "virements": [
+     "16/06"
+    ],
+    "partiel": true,
+    "reste": 2527.35,
+    "statut": "partielle"
+   },
+   {
+    "doc": "F-001002",
+    "client": "SECURITAS 10017",
+    "mois": "Avril 2026",
+    "ttc": 2038.2,
+    "encaisse": 0.0,
+    "virements": [],
+    "partiel": false,
+    "reste": 0.0,
+    "avoirs_lettres": [
+     "A-000253 −2038.20"
+    ],
+    "statut": "payée"
+   },
+   {
+    "doc": "F-001003",
+    "client": "SECURITAS 10017",
+    "mois": "Avril 2026",
+    "ttc": 4644.0,
+    "encaisse": 0.0,
+    "virements": [],
+    "partiel": false,
+    "reste": 0.0,
+    "avoirs_lettres": [
+     "A-000253 −4644.00"
+    ],
+    "statut": "payée"
+   },
+   {
+    "doc": "F-001004",
+    "client": "SECURITAS 10017",
+    "mois": "Avril 2026",
+    "ttc": 13157.48,
+    "encaisse": 0.0,
+    "virements": [],
+    "partiel": false,
+    "reste": 6682.2,
+    "avoirs_lettres": [
+     "A-000253 −6475.28"
+    ],
+    "statut": "impayée"
+   },
+   {
+    "doc": "F-001005",
+    "client": "SECURITAS 10017",
+    "mois": "Avril 2026",
+    "ttc": 13157.48,
+    "encaisse": 0.0,
+    "virements": [],
+    "partiel": false,
+    "reste": 13157.48,
+    "statut": "impayée"
+   },
+   {
+    "doc": "F-001006",
+    "client": "SECURITAS 10017",
+    "mois": "Avril 2026",
+    "ttc": 496.65,
+    "encaisse": 0.0,
+    "virements": [],
+    "partiel": false,
+    "reste": 496.65,
+    "statut": "impayée"
+   },
+   {
+    "doc": "F-001007",
+    "client": "RANC DEVELOPPEMENT",
+    "mois": "Février 2026",
+    "ttc": 164.16,
+    "encaisse": 0.0,
+    "virements": [],
+    "partiel": false,
+    "reste": 0.0,
+    "avoirs_lettres": [
+     "A-000254 −164.16"
+    ],
+    "statut": "payée"
+   },
+   {
+    "doc": "F-001008",
+    "client": "SOTEL",
+    "mois": "Mai 2026",
+    "ttc": 1972.87,
+    "encaisse": 1972.87,
+    "virements": [
+     "2026-08-04"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-001009",
+    "client": "RANC DEVELOPPEMENT",
+    "mois": "Mai 2026",
+    "ttc": 10945.03,
+    "encaisse": 10945.03,
+    "virements": [
+     "2026-07-10"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-001010",
+    "client": "SECURITAS 10228",
+    "mois": "Mai 2026",
+    "ttc": 42976.39,
+    "encaisse": 37329.79,
+    "virements": [
+     "2026-07-29"
+    ],
+    "partiel": true,
+    "reste": 5646.6,
+    "statut": "partielle"
+   },
+   {
+    "doc": "F-001011",
+    "client": "SECURITAS 10017",
+    "mois": "Mai 2026",
+    "ttc": 4798.8,
+    "encaisse": 4798.8,
+    "virements": [
+     "2026-07-10"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-001012",
+    "client": "SECURITAS 10017",
+    "mois": "Mai 2026",
+    "ttc": 8049.6,
+    "encaisse": 8049.6,
+    "virements": [
+     "2026-07-10"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "F-001013",
+    "client": "AQUILA",
+    "mois": "Mai 2026",
+    "ttc": 13853.93,
+    "encaisse": 13853.93,
+    "virements": [
+     "13/06"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   },
+   {
+    "doc": "NF000942",
+    "client": "SOTEL",
+    "mois": "Novembre",
+    "ttc": 1552.08,
+    "encaisse": 1552.08,
+    "virements": [
+     "03/02"
+    ],
+    "partiel": false,
+    "reste": 0.0,
+    "statut": "payée"
+   }
+  ]
  },
  "domaine": "FKH",
  "genere_par": "SCRIPTS/build_data_fkh.py",
@@ -2465,6 +3095,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "Fact. Qonto",
    "justificatif": "BILAN/JANVIER 2026/01-26-invoice-30540795.pdf"
   },
   {
@@ -2480,6 +3111,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. IONOS SARL",
    "justificatif": "2_COMPTA_FISCAL/BILAN/BILAN 2026/JANVIER 2026/"
   },
   {
@@ -2495,6 +3127,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. IONOS SARL",
    "justificatif": "2_COMPTA_FISCAL/BILAN/BILAN 2026/JANVIER 2026/"
   },
   {
@@ -2510,6 +3143,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. GOCARDLESS",
    "justificatif": "2_COMPTA_FISCAL/BILAN/BILAN 2026/JANVIER 2026/"
   },
   {
@@ -2525,6 +3159,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000932 · facture octobre 2025 (solde, payée en 2 fois)",
    "justificatif": "5_DONNEURS_ORDRE/factures clients fkh/"
   },
   {
@@ -2540,6 +3175,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. IONOS SARL",
    "justificatif": "2_COMPTA_FISCAL/BILAN/BILAN 2026/JANVIER 2026/"
   },
   {
@@ -2555,6 +3191,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "Fact. FREE MOBILE",
    "justificatif": "BILAN/JANVIER 2026/facture Janvier 2026.pdf"
   },
   {
@@ -2570,6 +3207,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000947/948/949 · octobre 2025",
    "justificatif": "5_DONNEURS_ORDRE/factures clients fkh/"
   },
   {
@@ -2585,6 +3223,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. HISCOX SA HISCOX SA",
    "justificatif": "2_COMPTA_FISCAL/BILAN/BILAN 2026/JANVIER 2026/"
   },
   {
@@ -2600,6 +3239,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000941 · novembre 2025",
    "justificatif": "5_DONNEURS_ORDRE/factures clients fkh/"
   },
   {
@@ -2615,6 +3255,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000950 · décembre 2025",
    "justificatif": "5_DONNEURS_ORDRE/factures clients fkh/"
   },
   {
@@ -2630,6 +3271,7 @@
    "type_tva": "Autoliq UE",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. FS *sejda",
    "justificatif": "2_COMPTA_FISCAL/BILAN/BILAN 2026/JANVIER 2026/"
   },
   {
@@ -2645,6 +3287,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000952 · décembre 2025",
    "justificatif": "5_DONNEURS_ORDRE/factures clients fkh/"
   },
   {
@@ -2660,6 +3303,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000951 · décembre 2025",
    "justificatif": "5_DONNEURS_ORDRE/factures clients fkh/"
   },
   {
@@ -2675,6 +3319,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "URSSAF D'ILE DE FRANCE · DSN",
    "justificatif": "3_PERSONNEL/.../DSN + écritures Payfit"
   },
   {
@@ -2690,6 +3335,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "ST VIGICORE SECURITY · cascade",
    "justificatif": "4_SOUS_TRAITANCE/facture sous traitant/"
   },
   {
@@ -2705,6 +3351,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "⚠️ à pièce",
+   "rapproche_a": "SATD DGFiP",
    "justificatif": "6_COURRIER (avis SATD)"
   },
   {
@@ -2720,6 +3367,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "Fact. Qonto",
    "justificatif": "BILAN/JANVIER 2026/01-26-invoice-30540795.pdf"
   },
   {
@@ -2735,6 +3383,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "Fact. PAYFIT",
    "justificatif": "BILAN/JANVIER 2026/FR-INV00955445.pdf"
   },
   {
@@ -2750,6 +3399,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "ST GARIS SÉCURITÉ · cascade",
    "justificatif": "4_SOUS_TRAITANCE/facture sous traitant/"
   },
   {
@@ -2765,6 +3415,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. COMMANDE",
    "justificatif": "2_COMPTA_FISCAL/BILAN/BILAN 2026/JANVIER 2026/"
   },
   {
@@ -2780,6 +3431,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000943 · novembre 2025",
    "justificatif": "5_DONNEURS_ORDRE/factures clients fkh/"
   },
   {
@@ -2795,6 +3447,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "ST GARIS SÉCURITÉ · cascade",
    "justificatif": "4_SOUS_TRAITANCE/facture sous traitant/"
   },
   {
@@ -2810,6 +3463,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. DOMICILIATION",
    "justificatif": "2_COMPTA_FISCAL/BILAN/BILAN 2026/JANVIER 2026/"
   },
   {
@@ -2825,6 +3479,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "MALAKOFF HUMANIS · DSN",
    "justificatif": "3_PERSONNEL/.../DSN + écritures Payfit"
   },
   {
@@ -2840,6 +3495,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "URSSAF D'ILE DE FRANCE · DSN",
    "justificatif": "3_PERSONNEL/.../DSN + écritures Payfit"
   },
   {
@@ -2855,6 +3511,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. INDY COMPTABILITE",
    "justificatif": "2_COMPTA_FISCAL/BILAN/BILAN 2026/JANVIER 2026/"
   },
   {
@@ -2870,6 +3527,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. INDY COMPTABILITE",
    "justificatif": "2_COMPTA_FISCAL/BILAN/BILAN 2026/JANVIER 2026/"
   },
   {
@@ -2885,6 +3543,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/FEVRIER 2026/02-26-invoice-31365096.pdf"
   },
   {
@@ -2900,6 +3559,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "NF000942 · novembre 2025",
    "justificatif": ""
   },
   {
@@ -2915,6 +3575,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -2930,6 +3591,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -2945,6 +3607,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -2960,6 +3623,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/FEVRIER 2026/facture Fevrier 2026.pdf"
   },
   {
@@ -2975,6 +3639,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -2990,6 +3655,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3005,6 +3671,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3020,6 +3687,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3035,6 +3703,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3050,6 +3719,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3065,6 +3735,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3080,6 +3751,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000963 − A-000238 · décembre 2025",
    "justificatif": ""
   },
   {
@@ -3095,6 +3767,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3110,6 +3783,7 @@
    "type_tva": "Collectée",
    "facture": "F-000965 A-000239",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000965 − A-000239 · janvier 2026",
    "justificatif": ""
   },
   {
@@ -3125,6 +3799,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3140,6 +3815,7 @@
    "type_tva": "Autoliq UE",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3155,6 +3831,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000953→963 · décembre 2025",
    "justificatif": ""
   },
   {
@@ -3170,6 +3847,7 @@
    "type_tva": "Collectée",
    "facture": "F-000972",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000972 · janvier 2026",
    "justificatif": ""
   },
   {
@@ -3185,6 +3863,7 @@
    "type_tva": "Collectée",
    "facture": "F-000973",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000973 · janvier 2026",
    "justificatif": ""
   },
   {
@@ -3200,6 +3879,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3215,6 +3895,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3230,6 +3911,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/FEVRIER 2026/FR-INV00990625.pdf"
   },
   {
@@ -3245,6 +3927,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3260,6 +3943,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3275,6 +3959,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3290,6 +3975,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3305,6 +3991,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3320,6 +4007,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3335,6 +4023,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3350,6 +4039,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3365,6 +4055,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3380,6 +4071,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3395,6 +4087,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3410,6 +4103,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000974 + F-000964 · novembre 2025",
    "justificatif": ""
   },
   {
@@ -3425,6 +4119,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3440,6 +4135,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3455,6 +4151,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3470,6 +4167,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3485,6 +4183,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3500,6 +4199,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3515,6 +4215,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/MARS 2026/03-26-invoice-32194623.pdf"
   },
   {
@@ -3530,6 +4231,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3545,6 +4247,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/MARS 2026/facture Mars 2026.pdf"
   },
   {
@@ -3560,6 +4263,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000960 · décembre 2025 (net avoir 5 160)",
    "justificatif": ""
   },
   {
@@ -3575,6 +4279,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3590,6 +4295,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3605,6 +4311,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3620,6 +4327,7 @@
    "type_tva": "Collectée",
    "facture": "F-000979",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000979 · février 2026",
    "justificatif": ""
   },
   {
@@ -3635,6 +4343,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3650,6 +4359,7 @@
    "type_tva": "Collectée",
    "facture": "F-000980",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000980 · février 2026",
    "justificatif": ""
   },
   {
@@ -3665,6 +4375,7 @@
    "type_tva": "Collectée",
    "facture": "F-000982 A-000240",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000982 · février 2026",
    "justificatif": ""
   },
   {
@@ -3680,6 +4391,7 @@
    "type_tva": "Autoliq UE",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3695,6 +4407,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3710,6 +4423,7 @@
    "type_tva": "Collectée",
    "facture": "F-000981 A-000244",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000981 − A-000244 · février 2026",
    "justificatif": ""
   },
   {
@@ -3725,6 +4439,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/MARS 2026/FR-INV00992506.pdf"
   },
   {
@@ -3740,6 +4455,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3755,6 +4471,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3770,6 +4487,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3785,6 +4503,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000968/969/970/971 · janvier 2026",
    "justificatif": ""
   },
   {
@@ -3800,6 +4519,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3815,6 +4535,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3830,6 +4551,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3845,6 +4567,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3860,6 +4583,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3875,6 +4599,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3890,6 +4615,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3905,6 +4631,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3920,6 +4647,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3935,6 +4663,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "Verif",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3950,6 +4679,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/MARS 2026/03-26-invoice-32194623.pdf"
   },
   {
@@ -3965,6 +4695,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -3980,6 +4711,7 @@
    "type_tva": "Collectée",
    "facture": "F-000985",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000984/985 · VH-30.12 · janvier 2026 (doublon facturé/payé 1 fois ; banque réf. 985)",
    "justificatif": ""
   },
   {
@@ -3995,6 +4727,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000967 − A-000242 − A-000243 · janvier 2026",
    "justificatif": ""
   },
   {
@@ -4010,6 +4743,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4025,6 +4759,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4040,6 +4775,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/AVRIL 2026/04-26-invoice-33018297.pdf"
   },
   {
@@ -4055,6 +4791,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4070,6 +4807,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4085,6 +4823,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/AVRIL 2026/FREE MOBILE AVRIL 2026 .pdf"
   },
   {
@@ -4100,6 +4839,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4115,6 +4855,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4130,6 +4871,7 @@
    "type_tva": "Collectée",
    "facture": "F-000975",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000975 · février 2026",
    "justificatif": ""
   },
   {
@@ -4145,6 +4887,7 @@
    "type_tva": "Collectée",
    "facture": "F-000986",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000986 · février 2026",
    "justificatif": ""
   },
   {
@@ -4160,6 +4903,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4175,6 +4919,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4190,6 +4935,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4205,6 +4951,7 @@
    "type_tva": "Collectée",
    "facture": "FA 000989",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000989 · mars 2026",
    "justificatif": ""
   },
   {
@@ -4220,6 +4967,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4235,6 +4983,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4250,6 +4999,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4265,6 +5015,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4280,6 +5031,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4295,6 +5047,7 @@
    "type_tva": "Collectée",
    "facture": "F-000976 F-000977",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000976 + F-000977 · février 2026",
    "justificatif": ""
   },
   {
@@ -4310,6 +5063,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4325,6 +5079,7 @@
    "type_tva": "Collectée",
    "facture": "F987",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000987 · mars 2026",
    "justificatif": ""
   },
   {
@@ -4340,6 +5095,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4355,6 +5111,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4370,6 +5127,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4385,6 +5143,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4400,6 +5159,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/AVRIL 2026/FR-INV01028032.pdf"
   },
   {
@@ -4415,6 +5175,7 @@
    "type_tva": "Collectée",
    "facture": "F988",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000988 · mars 2026",
    "justificatif": ""
   },
   {
@@ -4430,6 +5191,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4445,6 +5207,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4460,6 +5223,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4475,6 +5239,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4490,6 +5255,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4505,6 +5271,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4520,6 +5287,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4535,6 +5303,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4550,6 +5319,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4565,6 +5335,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4580,6 +5351,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4595,6 +5367,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4610,6 +5383,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/AVRIL 2026/04-26-invoice-33018297.pdf"
   },
   {
@@ -4625,6 +5399,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4640,6 +5415,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4655,6 +5431,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4670,6 +5447,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4685,6 +5463,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4700,6 +5479,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4715,6 +5495,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/AVRIL 2026/RingOver_Invoice_RO19748198-8011446_.pdf"
   },
   {
@@ -4730,6 +5511,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4745,6 +5527,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4760,6 +5543,7 @@
    "type_tva": "Collectée",
    "facture": "F-000922",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000922 · septembre 2025 (impayé enfin réglé)",
    "justificatif": ""
   },
   {
@@ -4775,6 +5559,7 @@
    "type_tva": "Collectée",
    "facture": "F-000916",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000916 · août 2025 (impayé enfin réglé)",
    "justificatif": ""
   },
   {
@@ -4790,6 +5575,7 @@
    "type_tva": "Collectée",
    "facture": "F-000978",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000978 · février 2026",
    "justificatif": ""
   },
   {
@@ -4805,6 +5591,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4820,6 +5607,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4835,6 +5623,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4850,6 +5639,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4865,6 +5655,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4880,6 +5671,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4895,6 +5687,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4910,6 +5703,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4925,6 +5719,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4940,6 +5735,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4955,6 +5751,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/MAI 2026/FREE MOBILE MAI 2026.pdf"
   },
   {
@@ -4970,6 +5767,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -4985,6 +5783,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/MAI 2026/09-05-2026 facture-TELEDEC-329977.pdf"
   },
   {
@@ -5000,6 +5799,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5015,6 +5815,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5030,6 +5831,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000991 · mars 2026",
    "justificatif": ""
   },
   {
@@ -5045,6 +5847,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5060,6 +5863,7 @@
    "type_tva": "Collectée",
    "facture": "F-000994 F-000992",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000994 + F-000992 · 2026",
    "justificatif": ""
   },
   {
@@ -5075,6 +5879,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5090,6 +5895,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5105,6 +5911,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5120,6 +5927,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5135,6 +5943,7 @@
    "type_tva": "Collectée",
    "facture": "FA 001000",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-001000 · avril 2026",
    "justificatif": ""
   },
   {
@@ -5150,6 +5959,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN/MAI 2026/21-05-26-QuittanceLoyer FKH.pdf"
   },
   {
@@ -5165,6 +5975,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5180,6 +5991,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5195,6 +6007,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5210,6 +6023,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5225,6 +6039,7 @@
    "type_tva": "Collectée",
    "facture": "F-000993",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000993 · 2026",
    "justificatif": ""
   },
   {
@@ -5240,6 +6055,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5255,6 +6071,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5270,6 +6087,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "3 quittances 21/05 (loyer 197,42 + dépôt 285,00 + honoraires 166,43 = 648,85) — BILAN 2026/MAI 2026"
   },
   {
@@ -5285,6 +6103,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5300,6 +6119,7 @@
    "type_tva": "Collectée",
    "facture": "F-000966",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000966 · janvier 2026",
    "justificatif": ""
   },
   {
@@ -5315,6 +6135,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5330,6 +6151,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5345,6 +6167,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5360,6 +6183,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5375,6 +6199,7 @@
    "type_tva": "Collectée",
    "facture": "F-000990",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000990 · mars 2026 (solde)",
    "justificatif": "factures clients fkh/"
   },
   {
@@ -5390,6 +6215,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000999 · avril 2026 (net 12 954, écart 48)",
    "justificatif": "factures clients fkh/"
   },
   {
@@ -5405,6 +6231,7 @@
    "type_tva": "Collectée",
    "facture": "A-000258 F-001013",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-001013 − A-000258 · mai 2026 (net escompte 2,5%)",
    "justificatif": "factures clients fkh/"
   },
   {
@@ -5420,6 +6247,7 @@
    "type_tva": "Collectée",
    "facture": "",
    "statut": "✅ rapproché",
+   "rapproche_a": "A-000257 + F-000995 + F-001001 partiel",
    "justificatif": "factures clients fkh/"
   },
   {
@@ -5435,6 +6263,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "Bulletin TELLA",
    "justificatif": "Bulletin de paie/juin 2026/"
   },
   {
@@ -5450,6 +6279,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "Fact. FREE MOBILE",
    "justificatif": "BILAN/JUIN 2026/2026-06-03_facture_Free-Mobile_2606225794.pdf"
   },
   {
@@ -5465,6 +6295,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "Loyer SCI LES 6 T",
    "justificatif": "BILAN/MAI 2026/21-05-26-QuittanceLoyer FKH.pdf"
   },
   {
@@ -5480,6 +6311,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "URSSAF · DSN",
    "justificatif": "DSN"
   },
   {
@@ -5495,6 +6327,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "Bulletin GAITEMIROV",
    "justificatif": "Bulletin de paie/juin 2026/"
   },
   {
@@ -5510,6 +6343,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "Bulletin SHABAZOV",
    "justificatif": "Bulletin de paie/juin 2026/"
   },
   {
@@ -5525,6 +6359,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲 à réclamer (quittance juin absente)",
+   "rapproche_a": "Loyer Agence Tournus",
    "justificatif": "BILAN/JUIN 2026/"
   },
   {
@@ -5540,6 +6375,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "ST VIGICORE · cascade",
    "justificatif": "facture sous traitant/"
   },
   {
@@ -5555,6 +6391,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. NOTION",
    "justificatif": "BILAN/JUIN 2026/"
   },
   {
@@ -5570,6 +6407,7 @@
    "type_tva": "à définir",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "ST GARIS · cascade",
    "justificatif": "facture sous traitant/"
   },
   {
@@ -5585,6 +6423,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. domiciliation",
    "justificatif": "BILAN/JUIN 2026/"
   },
   {
@@ -5600,6 +6439,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "Fact. domiciliation",
    "justificatif": "BILAN/JUIN 2026/"
   },
   {
@@ -5615,6 +6455,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "MALAKOFF · DSN",
    "justificatif": "DSN"
   },
   {
@@ -5630,6 +6471,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅",
+   "rapproche_a": "ST GARIS · cascade (prest. avr-26)",
    "justificatif": "facture sous traitant/"
   },
   {
@@ -5645,6 +6487,7 @@
    "type_tva": "Collectée",
    "facture": "F-000998",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-000998 · avril 2026 (solde facture)",
    "justificatif": "5_DONNEURS_ORDRE/factures clients fkh/2026/"
   },
   {
@@ -5660,6 +6503,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 à réclamer",
+   "rapproche_a": "Fact. SEKUR (manquante)",
    "justificatif": "2_COMPTA_FISCAL/BILAN/BILAN 2026/JUILLET 2026/"
   },
   {
@@ -5675,6 +6519,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 à réclamer",
+   "rapproche_a": "Fact. SEKUR (manquante)",
    "justificatif": "2_COMPTA_FISCAL/BILAN/BILAN 2026/JUILLET 2026/"
   },
   {
@@ -5690,6 +6535,7 @@
    "type_tva": "20%",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "",
    "justificatif": "BILAN 2026/JUILLET 2026/"
   },
   {
@@ -5705,6 +6551,7 @@
    "type_tva": "20%",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "",
    "justificatif": "BILAN 2026/JUILLET 2026/"
   },
   {
@@ -5720,6 +6567,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN 2026/JUILLET 2026/2026-07-05_FRAIS-DEPL_AIRBNB-Noyers-sur-Cher_214.84.pdf"
   },
   {
@@ -5735,6 +6583,7 @@
    "type_tva": "20%",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "",
    "justificatif": "BILAN 2026/JUILLET 2026/"
   },
   {
@@ -5750,6 +6599,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "⚠️ sans mouvement bancaire",
+   "rapproche_a": "Loyer Agence Tournus",
    "justificatif": "BILAN 2026/JUILLET 2026/"
   },
   {
@@ -5765,6 +6615,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "BILAN 2026/JUILLET 2026/2026-07-06_FRAIS-DEPL_AIRBNB-Tours_186.32.pdf"
   },
   {
@@ -5780,6 +6631,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "🔲 à réclamer (quittance juillet)",
+   "rapproche_a": "Loyer SCI LES 6 T",
    "justificatif": "BILAN 2026/JUILLET 2026/"
   },
   {
@@ -5795,6 +6647,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": ""
   },
   {
@@ -5810,6 +6663,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -5825,6 +6679,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -5840,6 +6695,7 @@
    "type_tva": "à définir",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -5855,6 +6711,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -5869,7 +6726,8 @@
    "tva": 328.81,
    "type_tva": "Collectée",
    "facture": "",
-   "statut": "🔲",
+   "statut": "✅ rapproché",
+   "rapproche_a": "F-001008 · mai 2026",
    "justificatif": "🔲"
   },
   {
@@ -5885,6 +6743,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -5900,6 +6759,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -5915,6 +6775,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -5930,6 +6791,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -5945,6 +6807,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -5960,6 +6823,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -5975,6 +6839,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -5990,6 +6855,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6005,6 +6871,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6020,6 +6887,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6035,6 +6903,7 @@
    "type_tva": "Collectée",
    "facture": "F-001011 + F-001012",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-001011 + F-001012 · mai 2026",
    "justificatif": "🔲"
   },
   {
@@ -6050,6 +6919,7 @@
    "type_tva": "Collectée",
    "facture": "F-001009",
    "statut": "✅ rapproché",
+   "rapproche_a": "F-001009 · mai 2026",
    "justificatif": "🔲"
   },
   {
@@ -6065,6 +6935,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6080,6 +6951,7 @@
    "type_tva": "Déductible",
    "facture": "GS-2026-108",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": "FKH/4_SOUS_TRAITANCE/facture sous traitant/2026/AVRIL/FACTURE_AVRIL_GARIS_FKH_GS-2026-108.pdf"
   },
   {
@@ -6095,6 +6967,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6110,6 +6983,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6125,6 +6999,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6140,6 +7015,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6155,6 +7031,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6170,6 +7047,7 @@
    "type_tva": "Collectée",
    "facture": "F-001014 (réf. du virement)",
    "statut": "⚠️ à rapprocher",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6185,6 +7063,7 @@
    "type_tva": "Déductible",
    "facture": "FR-INV01066846",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6200,6 +7079,7 @@
    "type_tva": "Déductible",
    "facture": "FR-INV01065925",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6215,6 +7095,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6230,6 +7111,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6245,6 +7127,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6260,6 +7143,7 @@
    "type_tva": "Déductible",
    "facture": "VEN/2026/99884",
    "statut": "✅ pièce OK",
+   "rapproche_a": "",
    "justificatif": "FKH/2_COMPTA_FISCAL/BILAN/BILAN 2026/JUILLET 2026/2026-07-18_FOURNISSEUR_facture-6665045.pdf"
   },
   {
@@ -6275,6 +7159,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "Lien",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6290,6 +7175,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6305,6 +7191,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 facture à fournir (R-TVA-01)",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6320,6 +7207,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6335,6 +7223,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6350,6 +7239,7 @@
    "type_tva": "20%",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6365,6 +7255,7 @@
    "type_tva": "0%",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6380,6 +7271,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 pointer pièce",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6395,6 +7287,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6410,6 +7303,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6425,6 +7319,7 @@
    "type_tva": "—",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6440,6 +7335,7 @@
    "type_tva": "Collectée",
    "facture": "F-001010 (réf. du virement)",
    "statut": "⚠️ à rapprocher",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6455,6 +7351,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 facture à fournir (R-TVA-01)",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6470,6 +7367,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲",
+   "rapproche_a": "",
    "justificatif": "🔲"
   },
   {
@@ -6485,6 +7383,7 @@
    "type_tva": "Déductible",
    "facture": "",
    "statut": "🔲 facture à fournir (R-TVA-01)",
+   "rapproche_a": "",
    "justificatif": "🔲"
   }
  ],
@@ -23864,7 +24763,7 @@
  },
  "presence_factures_client": {
   "source": "👁️ surveillant — fichiers RÉELLEMENT présents dans le dossier des factures clients",
-  "lu_le": "2026-08-13 11:29",
+  "lu_le": "2026-08-13 11:51",
   "note": "1 = au moins une facture de ce client pour ce mois dans le dossier. Les avoirs ne comptent pas.",
   "mois": [
    "2026-01",
