@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b432</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b434</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1001,6 +1001,7 @@ button.big:active{transform:translateY(1px)}
     <div id="mq-body"></div>   <!-- b420 : le donneur d'ordre qu'on n'a pas rappelé passe avant le reste -->
     <div id="aq-body"></div>   <!-- b420 : et ce qu'AQUILA annonce ou n'annonce plus juste après -->
     <div id="supterrain-tickets"></div>   <!-- b384 : ce qu'on me demande passe avant le reste -->
+    <div id="supterrain-demande"></div>   <!-- b433 : et ce que JE demande part d'ici, plus de la section Tickets -->
     <div id="supterrain-body"></div>
   </section>
   <section id="sec-planning" class="hidden">
@@ -3544,7 +3545,7 @@ button.big:active{transform:translateY(1px)}
   var DEMOS={
     'ticket-mens':{ titre:'\ud83c\udfab Un ticket qui se ferme sur la donn\u00e9e, pas sur une d\u00e9claration',
       quoi:'8 des agents qui ont travaill\u00e9 cette semaine \u2014 les vrais noms, l\u2019\u00e9tat r\u00e9el de leurs mensurations au 12/08. Un ticket est d\u00e9j\u00e0 parti au superviseur.',
-      aFaire:'Ouvre \u00ab \ud83c\udfab Tickets \u00bb. Le ticket affiche 1/8 renseign\u00e9. Essaie \u00ab \u2705 Fait \u00bb : l\u2019appli REFUSE et te dit combien manquent. Tape une pointure, un pantalon et un haut sur Joycelin GOTOAS : sa ligne passe \u2705, le compteur monte, et tu lis qui l\u2019a saisi. Remplis les 6 restants et le ticket se ferme tout seul.',
+      aFaire:'Ouvre \u00ab \ud83e\udded Terrain \u00bb. Le ticket affiche 1/8 renseign\u00e9. Essaie \u00ab \u2705 Fait \u00bb : l\u2019appli REFUSE et te dit combien manquent. Tape une pointure, un pantalon et un haut sur Joycelin GOTOAS : sa ligne passe \u2705, le compteur monte, et tu lis qui l\u2019a saisi. Remplis les 6 restants et le ticket se ferme tout seul.',
       monter:function(){
         /* Le decor : des agents, leurs controles tenue, et des vacations de CETTE semaine
            (sinon « les agents de la semaine » ne les verrait pas). Tout est prefixe demo_. */
@@ -5717,6 +5718,9 @@ button.big:active{transform:translateY(1px)}
        mails : une notification d'appel manqué peut être arrivée depuis le dernier passage. */
     try{ renderMqManques(); }catch(_e){}
     try{ renderAqRappel(); }catch(_e){}
+    /* b433 : ce que JE demande vit ici aussi — la carte est posee a chaque rendu, comme les
+       tickets recus juste au-dessus. */
+    try{ if(typeof tkmCarteDemande==='function')tkmCarteDemande(byId('supterrain-demande')); }catch(_e){}
     /* b420 : la liste des mails pèse ~250 Ko. Aucun coût d'IA — on relit ce qui est déjà rangé —
        mais 250 Ko à chaque aller-retour, c'est 5 Mo par jour de données mobiles pour rien. Les
        notifications arrivent au rythme des appels, pas des clics : deux minutes suffisent. */
@@ -6745,28 +6749,9 @@ button.big:active{transform:translateY(1px)}
       }
       return h+'</div>';
     }).join(''):'<div class="card"><div class="sub" style="margin:0">Aucun ticket pour l\'instant. Crée-en un ci-dessus.</div></div>';
-    /* ===== b432 : DEMANDER POUR LES AGENTS QUI TRAVAILLENT VRAIMENT =====
-       Zeus : « tous les agents avec qui on a travaille cette semaine et qui n'ont pas de
-       mensuration ». La base compte 281 agents ; la semaine en compte 25. On demande sur les 25. */
-    var _fen=(window._tkmFen||'semaine'), _ch=(window._tkmChamp||'mensurations');
-    var _cib=(typeof faManqueDans==='function')?faManqueDans(_ch,_fen):[];
-    var _fenL=[['semaine','cette semaine'],['7','7 derniers jours'],['30','30 derniers jours'],['','tous les agents']];
-    var _demande='<div class="card" style="border:1.5px solid #6ea8fe"><div class="lab" style="margin:0 0 6px">\ud83c\udfab Demander une information manquante <span class="sub" style="font-weight:400">\u2014 le ticket se ferme tout seul quand l\u2019info arrive</span></div>'
-      +'<div class="acts" style="gap:6px;flex-wrap:wrap;align-items:center">'
-      +'<select id="tkm-champ" style="width:auto">'+Object.keys(TK_TYPES).map(function(k){return '<option value="'+k+'"'+(k===_ch?' selected':'')+'>'+TK_TYPES[k].lbl+'</option>';}).join('')+'</select>'
-      +'<span class="sub" style="margin:0">chez les agents ayant travaill\u00e9</span>'
-      +'<select id="tkm-fen" style="width:auto">'+_fenL.map(function(f){return '<option value="'+f[0]+'"'+(f[0]===_fen?' selected':'')+'>'+f[1]+'</option>';}).join('')+'</select>'
-      +'<button type="button" class="ok" id="tkm-open"'+(_cib.length?'':' disabled')+'>\ud83c\udfab '+_cib.length+' agent'+(_cib.length>1?'s':'')+' \u2014 envoyer au superviseur</button>'
-      +'</div>'
-      +(_cib.length?('<div class="sub" style="margin:6px 0 0;font-size:11.5px">'+_cib.slice(0,8).map(function(g){return esc(g.nom);}).join(' \u00b7 ')+(_cib.length>8?(' \u2026 +'+(_cib.length-8)):'')+'</div>')
-                  :'<div class="sub" style="margin:6px 0 0;color:#1a9e5c">\u2705 Personne \u2014 tout est renseign\u00e9 sur cette p\u00e9riode.</div>')
-      +'</div>';
-    wrap.innerHTML=tkxBloc()+_demande+create+list;
-    if(byId('tkm-champ'))byId('tkm-champ').onchange=function(){ window._tkmChamp=this.value; renderTickets(); };
-    if(byId('tkm-fen'))byId('tkm-fen').onchange=function(){ window._tkmFen=this.value; renderTickets(); };
-    if(byId('tkm-open'))byId('tkm-open').onclick=function(){
-      var lbl=TK_TYPES[_ch].lbl+' \u2014 agents ayant travaill\u00e9 '+((_fenL.filter(function(f){return f[0]===_fen;})[0]||['','' ])[1]);
-      tkxDemanderManque(_ch,_cib,lbl); };
+    /* b433 : la demande a demenage dans Terrain (voir tkmCarteDemande). Ici on ne fait plus
+       que SUIVRE ce qui a ete envoye — c'est la vocation de cette section. */
+    wrap.innerHTML=tkxBloc()+create+list;
     tkxWire(wrap);
     try{ if(tkxMarquerVus())setTimeout(renderTickets,50); }catch(e){}   /* b275 */
     if(byId('tk-create'))byId('tk-create').onclick=function(){ var type=byId('tk-type').value, ty=TK_TYPES[type]; if(!ty)return; var ids=(typeof FA!=='undefined'?FA:[]).filter(function(a){return ty.missing(a);}).map(function(a){return a.id;}); if(!ids.length){ alert('Aucun agent concerné — rien à faire pour cette tâche.'); return; }
@@ -9883,11 +9868,47 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
   }
   /* Sur la fiche d'un agent : un bouton par trou reel. On ne propose pas ce qui est deja rempli. */
   function faManqueBtns(a){
-    if(!a)return '';
+    /* ===== b434 : CORRECTIF BLOQUANT =====
+       `renderFA()` s'execute ligne ~2902, au fil du script ; `var TK_TYPES` n'est affecte que
+       ligne ~5501. Entre les deux, TK_TYPES vaut `undefined` (hoisting) et `Object.keys` levait
+       une TypeError qui TUAIT tout le reste du demarrage : plus de sandbox, plus de sections,
+       plus rien. Invisible sur un stockage vide (aucun agent a dessiner, la fonction n'etait
+       jamais appelee) — systematique des qu'il y a des agents, donc chez Zeus a coup sur.
+       Le bouton reapparait au premier rendu suivant (ouverture de la section Fiche agent). */
+    if(!a||typeof TK_TYPES==='undefined'||!TK_TYPES)return '';
     var out=Object.keys(TK_TYPES).filter(function(k){ try{ return TK_TYPES[k].missing(a); }catch(e){ return false; } })
       .map(function(k){ return '<button type="button" class="fa-tkm" data-k="'+k+'" data-id="'+esc(a.id)+'" style="font-size:11px;border-color:#6ea8fe;color:#8fb6ff">\ud83c\udfab Demander \u2014 '+esc(TK_TYPES[k].lbl.replace(/ manquante?s?$/i,'').toLowerCase())+'</button>'; });
     if(!out.length)return '';
     return '<div class="acts" style="gap:5px;flex-wrap:wrap;margin:4px 0 0">'+out.join('')+'</div>';
+  }
+  /* ===== b433 : ON DEMANDE DEPUIS LA OU L'ON TRAVAILLE =====
+     POURQUOI (Zeus, 13/08) : la carte etait dans « Tickets », une section a part ou il fallait
+     aller expres. Terrain est l'endroit ou il regarde ce qui demande une action MAINTENANT —
+     c'est donc de la que doit partir une demande. La section Tickets reste ce qu'elle etait :
+     le suivi de ce qu'on a envoye.
+     RESERVE super-admin + administrateur : le superviseur RECOIT ces tickets, il ne se les
+     adresse pas a lui-meme. Meme frontiere que le controle « qui a rempli quoi » (b432). */
+  function tkmCarteDemande(box){
+    if(!box||typeof TK_TYPES==='undefined'||!TK_TYPES)return;   /* b434 : meme prudence */
+    if(typeof tkxPeutControler!=='function'||!tkxPeutControler()){ box.innerHTML=''; return; }
+    var fen=(window._tkmFen||'semaine'), ch=(window._tkmChamp||'mensurations');
+    var cib=(typeof faManqueDans==='function')?faManqueDans(ch,fen):[];
+    var fenL=[['semaine','cette semaine'],['7','7 derniers jours'],['30','30 derniers jours'],['','tous les agents']];
+    box.innerHTML='<div class="card" style="border:1.5px solid #6ea8fe"><div class="lab" style="margin:0 0 6px">\ud83c\udfab Demander une information manquante <span class="sub" style="font-weight:400">\u2014 le ticket se ferme tout seul quand l\u2019info arrive</span></div>'
+      +'<div class="acts" style="gap:6px;flex-wrap:wrap;align-items:center">'
+      +'<select id="tkm-champ" style="width:auto">'+Object.keys(TK_TYPES).map(function(k){return '<option value="'+k+'"'+(k===ch?' selected':'')+'>'+TK_TYPES[k].lbl+'</option>';}).join('')+'</select>'
+      +'<span class="sub" style="margin:0">chez les agents ayant travaill\u00e9</span>'
+      +'<select id="tkm-fen" style="width:auto">'+fenL.map(function(f){return '<option value="'+f[0]+'"'+(f[0]===fen?' selected':'')+'>'+f[1]+'</option>';}).join('')+'</select>'
+      +'<button type="button" class="ok" id="tkm-open"'+(cib.length?'':' disabled')+'>\ud83c\udfab '+cib.length+' agent'+(cib.length>1?'s':'')+' \u2014 envoyer au superviseur</button>'
+      +'</div>'
+      +(cib.length?('<div class="sub" style="margin:6px 0 0;font-size:11.5px">'+cib.slice(0,8).map(function(g){return esc(g.nom);}).join(' \u00b7 ')+(cib.length>8?(' \u2026 +'+(cib.length-8)):'')+'</div>')
+                  :'<div class="sub" style="margin:6px 0 0;color:#1a9e5c">\u2705 Personne \u2014 tout est renseign\u00e9 sur cette p\u00e9riode.</div>')
+      +'</div>';
+    byId('tkm-champ').onchange=function(){ window._tkmChamp=this.value; tkmCarteDemande(box); };
+    byId('tkm-fen').onchange=function(){ window._tkmFen=this.value; tkmCarteDemande(box); };
+    byId('tkm-open').onclick=function(){
+      var lbl=TK_TYPES[ch].lbl+' \u2014 agents ayant travaill\u00e9 '+((fenL.filter(function(f){return f[0]===fen;})[0]||['',''])[1]);
+      tkxDemanderManque(ch,cib,lbl); };
   }
   function tkxCreer(o){
     var arr=tkxLoad();
