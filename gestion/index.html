@@ -4353,6 +4353,22 @@ button.big:active{transform:translateY(1px)}
      vit dans gestion/domaines/hub.html, pour que deux sessions ne s'écrivent pas dessus.
      Sans cette ligne, l'iframe ne peut rien téléverser : le fichier est en closure. */
   window.fkhUpload=photoUpload; window.fkhPret=photoReady;
+  /* 13/08 (autorisation explicite de Zeus, exception à G-62 — territoire GESTION) :
+     pendant du dépôt, en LECTURE. Il manquait pour que la section Domaines puisse relire
+     ce qu'elle vient d'écrire : sans lui, une ligne publiée vers « Administratif » devait
+     attendre le veilleur PUIS un push pour être visible par l'admin. Avec lui, quelques
+     secondes. Une seule route, en lecture seule, même mot de passe, aucun droit nouveau —
+     l'iframe pouvait déjà écrire dans R2. Le texte est renvoyé tel quel ; c'est l'appelant
+     qui décide quoi en faire. */
+  function photoTexte(key,cb){
+    if(!photoReady()||!key){ if(cb)cb({error:'offline'}); return; }
+    fetch(CLOUD.base+'/photo/'+photoKeyEnc(key),{headers:{'X-App-Password':CLOUD.pass}})
+      .then(function(r){ if(r.status===404){ if(cb)cb({ok:true,absent:true,texte:''}); return null; }
+                         if(!r.ok) throw 0; return r.text(); })
+      .then(function(t){ if(t!==null&&cb)cb({ok:true,texte:t}); })
+      .catch(function(){ if(cb)cb({error:'net'}); });
+  }
+  window.fkhLire=photoTexte;
   function photoBlobUrl(key,cb){ if(!photoReady()||!key){ if(cb)cb(null); return; } fetch(CLOUD.base+'/photo/'+photoKeyEnc(key),{headers:{'X-App-Password':CLOUD.pass}}).then(function(r){ if(!r.ok)throw 0; return r.blob(); }).then(function(b){ if(cb)cb(URL.createObjectURL(b)); }).catch(function(){ if(cb)cb(null); }); }
   function photoOpen(key){ photoBlobUrl(key,function(u){ if(u)window.open(u,'_blank'); else alert('Photo introuvable (ou hors-ligne).'); }); }
   function photoList(prefix,cb){ if(!photoReady()){ if(cb)cb([]); return; } fetch(CLOUD.base+'/photos?prefix='+encodeURIComponent(prefix||''),{headers:{'X-App-Password':CLOUD.pass}}).then(function(r){return r.json();}).then(function(j){ if(cb)cb((j&&j.keys)||[]); }).catch(function(){ if(cb)cb([]); }); }
