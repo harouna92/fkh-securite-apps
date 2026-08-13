@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b434</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v13-08·b435</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3544,20 +3544,20 @@ button.big:active{transform:translateY(1px)}
   function aideWire(root){ (root||document).querySelectorAll('.aide-b').forEach(function(b){ b.onclick=function(){ aideOuvrir(b.getAttribute('data-a')); }; }); }
   var DEMOS={
     'ticket-mens':{ titre:'\ud83c\udfab Un ticket qui se ferme sur la donn\u00e9e, pas sur une d\u00e9claration',
-      quoi:'8 des agents qui ont travaill\u00e9 cette semaine \u2014 les vrais noms, l\u2019\u00e9tat r\u00e9el de leurs mensurations au 12/08. Un ticket est d\u00e9j\u00e0 parti au superviseur.',
-      aFaire:'Ouvre \u00ab \ud83e\udded Terrain \u00bb. Le ticket affiche 1/8 renseign\u00e9. Essaie \u00ab \u2705 Fait \u00bb : l\u2019appli REFUSE et te dit combien manquent. Tape une pointure, un pantalon et un haut sur Joycelin GOTOAS : sa ligne passe \u2705, le compteur monte, et tu lis qui l\u2019a saisi. Remplis les 6 restants et le ticket se ferme tout seul.',
+      quoi:'8 de tes agents r\u00e9els, avec leur nombre de vacations et l\u2019\u00e9tat exact de leur dossier au 12/08 : adresse, mensurations, \u00e9tat de la tenue. Un ticket est d\u00e9j\u00e0 parti au superviseur.',
+      aFaire:'Ouvre \u00ab \ud83e\udded Terrain \u00bb. En haut, le ticket re\u00e7u : 8 agents, 24 informations attendues, les plus sollicit\u00e9s d\u2019abord. Essaie \u00ab \u2705 Fait \u00bb : l\u2019appli REFUSE. Remplis une ligne d\u2019AGENT Poulet DUC : elle passe \u2705 et tu lis qui l\u2019a saisie. Juste en dessous, la carte \u00ab Demander une information manquante \u00bb : c\u2019est de l\u00e0 que tu envoies, plus depuis Tickets.',
       monter:function(){
-        /* Le decor : des agents, leurs controles tenue, et des vacations de CETTE semaine
-           (sinon « les agents de la semaine » ne les verrait pas). Tout est prefixe demo_. */
+        /* Les 8 agents les plus sollicites de la vraie base, avec leurs vrais trous au 12/08.
+           [nom, vacations, adresse, pointure, pantalon, haut, statut tenue, manquants] */
         var GENS=[
-          ['TELLA Ykbal',        '44','42','XL'],   /* deja complet — renseigne HORS ticket */
-          ['Issa ADS Dole',      '46','L', ''  ],   /* 2/3 : le haut manque */
-          ['Joycelin GOTOAS',    '',  '',  ''  ],
-          ['Ilyass Russe',       '',  '',  ''  ],
-          ['DRISSI EL BOUZAIDI Jamal','','',''  ],
-          ['VALENTIN CHANUDET',  '',  '',  ''  ],
-          ['OWONO Joseph',       '',  '',  ''  ],
-          ['KARAMOKO DIABY',     '',  '',  ''  ]
+          ['AGENT Poulet DUC',        32,'', '', '', '', 'Complet',  ''],
+          ['DRISSI EL BOUZAIDI Jamal',18,'', '', '', '', 'Incomplet','Parka Gilet Ceinturon'],
+          ['MONYIKI RAMAZANE',        17,'', '46','48','XXL','',      ''],
+          ['TELLA Ykbal',             17,'', '44','42','XL', 'Complet',''],
+          ['KARAMOKO DIABY',          16,'12 rue des Lilas, 21000 Dijon','','','','Complet',''],
+          ['Issa ADS Dole',           12,'', '46','L', '',  'Complet',''],
+          ['KOYA TROYES St\u00e9phane',11,'', '', '', '',   'Complet',''],
+          ['VALENTIN CHANUDET',        8,'4 av. de la Gare, 71100 Chalon','','','','Complet','']
         ];
         var FA2=(typeof FA!=='undefined'&&FA)?FA.slice():[];
         var TC2=(typeof load==='function'&&Array.isArray(load('fkh_tenues_ctrl')))?load('fkh_tenues_ctrl').slice():[];
@@ -3568,27 +3568,29 @@ button.big:active{transform:translateY(1px)}
         GENS.forEach(function(g,i){
           var id='demo_ag'+i;
           FA2=FA2.filter(function(a){ return a.id!==id; });
-          FA2.push({id:id,nom:g[0],tels:['06000000'+('0'+i).slice(-2)],ville:'Dijon',verifie:true,src:'demo'});
+          FA2.push({id:id,nom:g[0],tels:['06000000'+('0'+i).slice(-2)],ville:'Dijon',adresse:g[2],verifie:true,src:'demo'});
           TC2=TC2.filter(function(c){ return String(c.Agent||'')!==g[0]; });
-          if(g[1]||g[2]||g[3])TC2.push({'Date contr\u00f4le':iso(lundi),'Agent':g[0],'Pointure':g[1],'T. pantalon':g[2],'T. haut':g[3],'Statut tenue':'','Manquants':''});
-          /* une vacation de cette semaine, sinon l'agent n'est pas « de la semaine » */
-          var d=new Date(lundi.getTime()); d.setDate(d.getDate()+(i%3));
-          SU2.push({id:'demo_v'+i,statut:'validee',agentId:id,mdate:iso(d),mheure:'20:00',
-                    titre:'Gardiennage '+g[0],client:'\ud83c\udfe2 D\u00e9mo',ville:'Dijon',vacations:[]});
-          vises.push({id:id,nom:g[0]});
+          if(g[3]||g[4]||g[5]||g[6])TC2.push({'Date contr\u00f4le':iso(lundi),'Agent':g[0],'Pointure':g[3],'T. pantalon':g[4],'T. haut':g[5],'Statut tenue':g[6],'Manquants':g[7]});
+          /* autant de vacations que dans la vraie base, pour que le classement par sollicitation
+             soit celui que Zeus connait — dont au moins une CETTE SEMAINE. */
+          for(var v=0; v<g[1]; v++){
+            var d=new Date(lundi.getTime()); d.setDate(d.getDate()-(v<2?(-(v%2)):(v*2)));
+            SU2.push({id:'demo_v'+i+'_'+v,statut:'validee',agentId:id,mdate:iso(d),mheure:'20:00',
+                      titre:'Gardiennage '+g[0],client:'\ud83c\udfe2 D\u00e9mo',ville:'Dijon',vacations:[]});
+          }
+          vises.push({id:id,nom:g[0],vac:g[1]});
         });
         if(typeof save==='function'){ save('fkh_fa',FA2); save('fkh_tenues_ctrl',TC2); }
         try{ FA=FA2; }catch(e){}
         try{ TCTRL=TC2; }catch(e){}
-        /* le ticket, deja parti au superviseur — etat « a faire », rien de declare */
         try{
           var A=tkxLoad().filter(function(t){ return String(t.id).indexOf('demo_tk')!==0; });
           A.push({id:'demo_tk_mens',kind:'echange',
-            objet:'\ud83d\udccf Mensurations manquantes \u2014 agents ayant travaill\u00e9 cette semaine',
+            objet:'\ud83d\udccb Adresse, mensurations et \u00e9tat de la tenue \u2014 les agents qu\u2019on sollicite le plus',
             message:'Merci de r\u00e9cup\u00e9rer ces informations et de les saisir directement dans le ticket.',
-            contexte:vises.map(function(g){return g.nom;}), source:'',
+            contexte:vises.map(function(g){return g.nom+' ('+g.vac+' vacations)';}), source:'',
             deUser:'superadmin-1', deNom:'Zeus', pourRole:'superviseur', pourUser:'',
-            manque:{champ:'mensurations',agents:vises}, saisies:{},
+            manque:{champs:['adresse','mensurations','tenue'],agents:vises}, saisies:{},
             etat:'a_faire', cree:Date.now()-3600*1000, fil:[]});
           tkxSave(A);
         }catch(e){}
@@ -5516,8 +5518,34 @@ button.big:active{transform:translateY(1px)}
       set:function(a,v){ var w=Array.isArray(v)?v:this.vals(a); if(typeof faSaveMens==='function')faSaveMens(a.nom,String(w[0]||'').trim(),String(w[1]||'').trim(),String(w[2]||'').trim()); },
       missing:function(a){ return this.vals(a).some(function(x){ return !x; }); },
       /* combien des trois sont la — pour afficher « 2/3 » au lieu de cacher l'agent */
-      part:function(a){ var w=this.vals(a); return {fait:w.filter(Boolean).length,total:3}; } }
+      part:function(a){ var w=this.vals(a); return {fait:w.filter(Boolean).length,total:3}; } },
+    /* ===== b435 : L'ETAT DE LA TENUE EST UNE INFORMATION COMME UNE AUTRE =====
+       Zeus, 13/08 : « et egalement l'etat des tenues, manquant ou present ». Le trou n'est pas
+       « la tenue est incomplete » — c'est qu'on n'en SAIT RIEN : agent jamais controle, ou fiche
+       de controle sans statut. 19 agents portent aujourd'hui « Complet » alors qu'on ignore
+       leurs mensurations : un statut pose sans mesure ne prouve rien, mais il n'est pas vide,
+       donc il n'est pas demande ici. */
+    tenue:{ lbl:'\u00c9tat de la tenue inconnu', fieldLbl:'\u00c9tat de la tenue',
+      multi:[['Statut tenue','Complet / Incomplet','Complet'],['Manquants','Pi\u00e8ces manquantes','Parka, Gilet']],
+      ph:'',
+      vals:function(a){ var c=(typeof agentCtrl==='function')?agentCtrl(a.nom):null; c=c||{};
+        return [String(c['Statut tenue']||'').trim(),String(c.Manquants||'').trim()]; },
+      get:function(a){ var w=this.vals(a); return w[0]?(w[0]+(w[1]?(' \u2014 manque : '+w[1]):'')):''; },
+      set:function(a,v){ var w=Array.isArray(v)?v:this.vals(a);
+        if(typeof faSaveTenueEtat==='function')faSaveTenueEtat(a.nom,String(w[0]||'').trim(),String(w[1]||'').trim()); },
+      /* seul le STATUT est obligatoire : « Complet » sans piece manquante est une reponse. */
+      missing:function(a){ return !this.vals(a)[0]; },
+      part:function(a){ return {fait:this.vals(a)[0]?1:0,total:1}; } }
   };
+  /* Ecrit l'etat de la tenue dans le controle de l'agent — meme source unique que faSaveMens. */
+  function faSaveTenueEtat(nom,statut,manquants){ if(!nom)return;
+    var T=load('fkh_tenues_ctrl'); if(!Array.isArray(T))T=[];
+    var n=tnorm(nom),idx=-1,bd='';
+    T.forEach(function(c,k){ var cn=tnorm(c.Agent); if(cn&&(cn===n||cn.indexOf(n)>=0||n.indexOf(cn)>=0)){ var d=String(c['Date contr\u00f4le']||''); if(idx<0||d>bd){idx=k;bd=d;} } });
+    if(idx>=0){ T[idx]['Statut tenue']=statut; T[idx].Manquants=manquants; }
+    else if(statut||manquants){ T.push({'Date contr\u00f4le':impTodayISO(),'Agent':nom,'Pointure':'','T. pantalon':'','T. haut':'','Statut tenue':statut,'Manquants':manquants}); }
+    else return;
+    save('fkh_tenues_ctrl',T); TCTRL=T; }
   /* b432 : le champ demande, ecrit en clair sur le ticket et dans les notifications. */
   function tkTypeLbl(k){ return (TK_TYPES[k]&&TK_TYPES[k].lbl)||k||'Information manquante'; }
   function tkLoad(){ var a=load('fkh_tickets'); return Array.isArray(a)?a:[]; }
@@ -6687,12 +6715,13 @@ button.big:active{transform:translateY(1px)}
     wrap.querySelectorAll('.tkm-f').forEach(function(inp){ inp.addEventListener('change',function(){
       var tid=inp.getAttribute('data-tk'), aid=inp.getAttribute('data-ag');
       var arr=tkxLoad(), t=null,i; for(i=0;i<arr.length;i++)if(arr[i].id===tid){t=arr[i];break;}
-      if(!t||!t.manque)return; var ty=TK_TYPES[t.manque.champ], a=faById(aid); if(!ty||!a)return;
+      var ch=inp.getAttribute('data-ch')||(t&&t.manque&&t.manque.champ)||'';   /* b435 */
+      if(!t||!t.manque)return; var ty=TK_TYPES[ch], a=faById(aid); if(!ty||!a)return;
       var vals=(ty.multi||[['']]).map(function(c,k){
-        var el=wrap.querySelector('.tkm-f[data-tk="'+tid+'"][data-ag="'+aid+'"][data-i="'+k+'"]');
+        var el=wrap.querySelector('.tkm-f[data-tk="'+tid+'"][data-ag="'+aid+'"][data-ch="'+ch+'"][data-i="'+k+'"]');
         return el?(el.value||'').trim():''; });
       ty.set(a, vals);
-      if(!ty.missing(a)){ t.saisies=t.saisies||{}; if(!t.saisies[aid])t.saisies[aid]={by:tkxMonNom(),at:Date.now()}; }
+      if(!ty.missing(a)){ t.saisies=t.saisies||{}; if(!t.saisies[aid+'|'+ch])t.saisies[aid+'|'+ch]={by:tkxMonNom(),at:Date.now()}; }
       tkxSave(arr);
       if(typeof cloudPush==='function'){ try{ cloudPush('fkh_tenues_ctrl'); cloudPush('fkh_tickets'); }catch(e){} }
       if(typeof renderTickets==='function')renderTickets();
@@ -9726,19 +9755,27 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
      Corollaire demande par Zeus : peu importe OU le superviseur remplit — dans le ticket ou
      directement dans la fiche — on lit la meme source, donc les deux se voient pareil. */
   function tkxManqueEtat(t){
-    if(!t||!t.manque||!t.manque.champ)return null;
-    var ty=(typeof TK_TYPES!=='undefined')&&TK_TYPES[t.manque.champ]; if(!ty)return null;
+    if(!t||!t.manque)return null;
+    /* b435 : `champs` (liste) remplace `champ` (unique). L'ancien format reste lu. */
+    var champs=t.manque.champs||(t.manque.champ?[t.manque.champ]:[]);
+    champs=champs.filter(function(k){ return (typeof TK_TYPES!=='undefined')&&TK_TYPES&&TK_TYPES[k]; });
+    if(!champs.length)return null;
     var lignes=(t.manque.agents||[]).map(function(g){
       var a=(typeof faById==='function')?faById(g.id):null;
-      if(!a)return {id:g.id,nom:g.nom||'—',absent:true,fait:false};
-      var p=ty.part?ty.part(a):{fait:ty.missing(a)?0:1,total:1};
-      var s=(t.saisies&&t.saisies[g.id])||null;
-      return {id:g.id,nom:a.nom||g.nom||'—',fait:!ty.missing(a),val:ty.get(a),part:p,par:s&&s.by,at:s&&s.at};
+      var par=champs.map(function(k){
+        var ty=TK_TYPES[k];
+        var ok=a?!ty.missing(a):false;
+        var s=(t.saisies&&(t.saisies[g.id+'|'+k]||(champs.length===1?t.saisies[g.id]:null)))||null;
+        return {champ:k,lbl:ty.lbl,ty:ty,fait:ok,absent:!a,par:s&&s.by,at:s&&s.at,
+                part:(a&&ty.part)?ty.part(a):{fait:ok?1:0,total:1}};
+      });
+      return {id:g.id,nom:(a&&a.nom)||g.nom||'\u2014',absent:!a,champs:par,
+              fait:par.filter(function(c){return c.fait;}).length,total:par.length};
     });
-    return {champ:t.manque.champ,lbl:ty.lbl,ty:ty,lignes:lignes,
-            fait:lignes.filter(function(l){return l.fait;}).length,total:lignes.length};
-  }
-  /* Ce qu'il reste a faire sur ce ticket : {reste, total, connu}. connu=false -> on ne sait pas juger. */
+    var f=0,tt=0; lignes.forEach(function(l){ f+=l.fait; tt+=l.total; });
+    return {champs:champs, lbl:champs.map(function(k){return TK_TYPES[k].lbl;}).join(' + '),
+            lignes:lignes, fait:f, total:tt, nbAgents:lignes.length};
+  }  /* Ce qu'il reste a faire sur ce ticket : {reste, total, connu}. connu=false -> on ne sait pas juger. */
   function tkxReste(t){
     var m=tkxManqueEtat(t);
     if(m)return {connu:true, reste:m.total-m.fait, total:m.total, manque:m};
@@ -9779,36 +9816,38 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
   function _tkxQuand(ms){ try{ var d=new Date(ms); return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' a '+('0'+d.getHours()).slice(-2)+'h'+('0'+d.getMinutes()).slice(-2); }catch(e){ return ''; } }
   function tkxManqueBloc(t){
     var m=(typeof tkxManqueEtat==='function')?tkxManqueEtat(t):null; if(!m)return '';
-    var ctrl=tkxPeutControler(), cols=m.ty.multi||[['','valeur','']];
+    var ctrl=tkxPeutControler();
     var lignes=m.lignes.map(function(l){
       var a=(typeof faById==='function')?faById(l.id):null;
-      var vals=(a&&m.ty.vals)?m.ty.vals(a):[];
-      var champs=cols.map(function(c,i){
-        /* la valeur affichee vient de la FICHE, pas du ticket : remplir ailleurs se voit ici. */
-        var vv=vals[i]||'';
-        return '<input class="tkm-f" data-tk="'+esc(t.id)+'" data-ag="'+esc(l.id)+'" data-i="'+i+'" value="'+esc(vv)+'" placeholder="'+esc(c[1])+'" title="'+esc(c[1])+'" style="width:88px;padding:4px 6px;font-size:12px;border:1px solid '+(vv?'#1a9e5c':'var(--line)')+';border-radius:7px;background:var(--panel2);color:var(--ink)">';
-      }).join(' ');
-      var etat=l.fait?'\u2705':((l.part&&l.part.fait)?('\ud83d\udfe1 '+l.part.fait+'/'+l.part.total):'\u2b1c');
-      /* Qui a rempli — et surtout PAR OU. Une valeur trouvee sans saisie dans le ticket a ete
-         posee dans la fiche : c'est bien, et il faut le dire, sinon on croit le ticket ignore. */
-      var trace='';
-      if(ctrl&&l.fait){ trace=l.par
-        ? '<div class="sub" style="margin:2px 0 0;font-size:11px;color:#1a9e5c">\u2713 saisi dans le ticket par <b>'+esc(l.par)+'</b>'+(l.at?(' le '+_tkxQuand(l.at)):'')+'</div>'
-        : '<div class="sub" style="margin:2px 0 0;font-size:11px;color:#6ea8fe">\u2713 renseign\u00e9 directement dans la fiche (hors ticket)</div>'; }
-      return '<div style="padding:6px 0;border-top:1px solid var(--line)"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'
-        +'<span style="min-width:150px;flex:1;font-weight:600;font-size:12.5px">'+etat+' '+esc(l.nom)+'</span>'
-        +champs
+      var groupes=l.champs.map(function(c){
+        var cols=c.ty.multi||[['','valeur','']];
+        var vals=(a&&c.ty.vals)?c.ty.vals(a):[];
+        var champs=cols.map(function(col,i){
+          var vv=vals[i]||'';
+          return '<input class="tkm-f" data-tk="'+esc(t.id)+'" data-ag="'+esc(l.id)+'" data-ch="'+esc(c.champ)+'" data-i="'+i+'" value="'+esc(vv)+'" placeholder="'+esc(col[1])+'" title="'+esc(col[1])+'" style="width:'+(cols.length>2?88:130)+'px;padding:4px 6px;font-size:12px;border:1px solid '+(vv?'#1a9e5c':'var(--line)')+';border-radius:7px;background:var(--panel2);color:var(--ink)">';
+        }).join(' ');
+        var pastille=c.fait?'\u2705':((c.part&&c.part.fait)?('\ud83d\udfe1 '+c.part.fait+'/'+c.part.total):'\u2b1c');
+        var trace='';
+        if(ctrl&&c.fait){ trace=c.par
+          ? ' <span style="font-size:11px;color:#1a9e5c">\u2713 saisi ici par <b>'+esc(c.par)+'</b>'+(c.at?(' le '+_tkxQuand(c.at)):'')+'</span>'
+          : ' <span style="font-size:11px;color:#6ea8fe">\u2713 renseign\u00e9 dans la fiche (hors ticket)</span>'; }
+        return '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:3px 0 0 4px">'
+          +'<span style="min-width:132px;font-size:11.5px;color:var(--muted)">'+pastille+' '+esc(c.lbl.replace(/ (manquante?s?|inconnu)$/i,''))+'</span>'
+          +champs+trace+'</div>';
+      }).join('');
+      return '<div style="padding:7px 0;border-top:1px solid var(--line)">'
+        +'<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'
+        +'<span style="flex:1;min-width:150px;font-weight:600;font-size:12.5px">'+(l.fait>=l.total?'\u2705':(l.fait?'\ud83d\udfe1':'\u2b1c'))+' '+esc(l.nom)+' <span class="sub" style="font-weight:400">'+l.fait+'/'+l.total+'</span></span>'
         +'<button type="button" class="tkm-fiche" data-nom="'+esc(l.nom)+'" style="font-size:11px">\ud83d\udc64 fiche</button>'
-        +'</div>'+trace+'</div>';
+        +'</div>'+groupes+'</div>';
     }).join('');
     var reste=m.total-m.fait;
     return '<div style="margin-top:8px;border:1px solid '+(reste?'#e0a13b':'#1a9e5c')+';border-radius:10px;padding:8px">'
-      +'<div class="lab" style="margin:0 0 2px">\ud83d\udccf '+esc(m.lbl)+' \u2014 \u00e0 renseigner ici</div>'
-      +'<div class="sub" style="margin:0 0 4px;font-size:11.5px">Ce qui est tap\u00e9 ici va dans la fiche de l\u2019agent, tout de suite et partout.'
+      +'<div class="lab" style="margin:0 0 2px">\ud83d\udccb '+esc(m.lbl)+' \u2014 \u00e0 renseigner ici</div>'
+      +'<div class="sub" style="margin:0 0 4px;font-size:11.5px">'+m.nbAgents+' agent(s), '+m.total+' information(s) attendue(s). Ce qui est tap\u00e9 ici va dans la fiche de l\u2019agent, tout de suite et partout.'
       +(ctrl?' Toi seul (super-admin / administrateur) vois qui a rempli quoi.':'')+'</div>'
       +lignes+'</div>';
-  }
-  /* ===== b432 : « LES AGENTS AVEC QUI ON A TRAVAILLE CETTE SEMAINE » =====
+  }  /* ===== b432 : « LES AGENTS AVEC QUI ON A TRAVAILLE CETTE SEMAINE » =====
      Zeus ne veut pas demander les mensurations des 281 agents de la base : il veut celles des
      agents qui TRAVAILLENT. La fenetre se lit dans les vacations validees et affectees. */
   function faFenetreDebut(mode){
@@ -9832,15 +9871,27 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     return Object.keys(out);
   }
   /* Les agents de la fenetre a qui il manque `champ`. */
-  function faManqueDans(champ,mode){
-    var ty=TK_TYPES[champ]; if(!ty)return [];
-    return faAgentsFenetre(mode).map(function(id){ return faById(id); })
-      .filter(function(a){ return a&&ty.missing(a); })
-      .map(function(a){ return {id:a.id,nom:a.nom||''}; });
+  function faVacCount(){
+    /* b435 : « ceux qu'on sollicite le plus » = le nombre de vacations validees qui leur sont
+       affectees. C'est la seule mesure de sollicitation que l'appli possede. */
+    var n={}; try{ if(typeof SUIVI!=='undefined'&&SUIVI)SUIVI.forEach(function(x){
+      if(x&&!x.deleted&&x.statut==='validee'&&x.agentId)n[x.agentId]=(n[x.agentId]||0)+1; }); }catch(e){}
+    return n;
   }
-  /* La porte d'entree commune : on montre QUI est vise avant d'envoyer. */
+  /* Les agents de la fenetre a qui il manque au moins un des `champs`, les plus sollicites d'abord. */
+  function faManqueDans(champs,mode){
+    var L=Array.isArray(champs)?champs:[champs];
+    L=L.filter(function(k){ return (typeof TK_TYPES!=='undefined')&&TK_TYPES&&TK_TYPES[k]; });
+    if(!L.length)return [];
+    var n=faVacCount();
+    return faAgentsFenetre(mode).map(function(id){ return faById(id); })
+      .filter(function(a){ return a&&L.some(function(k){ try{ return TK_TYPES[k].missing(a); }catch(e){ return false; } }); })
+      .map(function(a){ return {id:a.id,nom:a.nom||'',vac:(n[a.id]||0)}; })
+      .sort(function(x,y){ return y.vac-x.vac; });
+  }  /* La porte d'entree commune : on montre QUI est vise avant d'envoyer. */
   function tkxDemanderManque(champ,agents,titre){
-    var ty=TK_TYPES[champ]; if(!ty||!agents||!agents.length){ alert('Personne n\u2019est concern\u00e9 \u2014 rien \u00e0 demander.'); return; }
+    var champs=Array.isArray(champ)?champ:[champ];   /* b435 */
+    var ty=TK_TYPES[champs[0]]; if(!ty||!agents||!agents.length){ alert('Personne n\u2019est concern\u00e9 \u2014 rien \u00e0 demander.'); return; }
     var old=byId('tkm-pop'); if(old)old.parentNode.removeChild(old);
     var pop=document.createElement('div'); pop.id='tkm-pop';
     pop.style.cssText='position:fixed;inset:6% 5%;z-index:220;background:var(--panel);border:1.5px solid #6ea8fe;border-radius:14px;padding:14px;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.55)';
@@ -9858,7 +9909,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     byId('tkm-go').onclick=function(){
       tkxCreer({objet:'\ud83d\udccf '+(titre||ty.lbl), message:(byId('tkm-msg').value||''),
         contexte:agents.map(function(g){return g.nom;}), source:'',
-        pourRole:byId('tkm-pour').value, manque:{champ:champ,agents:agents}});
+        pourRole:byId('tkm-pour').value, manque:{champs:champs,agents:agents}});
       var q=byId('tkm-pop'); if(q)q.parentNode.removeChild(q);
       if(typeof cloudPush==='function'){ try{cloudPush('fkh_tickets');}catch(e){} }
       alert('\ud83c\udfab Ticket envoy\u00e9.\n\n\ud83e\udded Il arrive dans \u00ab Terrain \u00bb chez le destinataire, avec les champs \u00e0 remplir dedans.\n\ud83c\udfab Tu suis le remplissage r\u00e9el dans Tickets \u2014 agent par agent.');
@@ -9889,28 +9940,38 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
      RESERVE super-admin + administrateur : le superviseur RECOIT ces tickets, il ne se les
      adresse pas a lui-meme. Meme frontiere que le controle « qui a rempli quoi » (b432). */
   function tkmCarteDemande(box){
-    if(!box||typeof TK_TYPES==='undefined'||!TK_TYPES)return;   /* b434 : meme prudence */
+    if(!box||typeof TK_TYPES==='undefined'||!TK_TYPES)return;   /* b434 */
     if(typeof tkxPeutControler!=='function'||!tkxPeutControler()){ box.innerHTML=''; return; }
-    var fen=(window._tkmFen||'semaine'), ch=(window._tkmChamp||'mensurations');
-    var cib=(typeof faManqueDans==='function')?faManqueDans(ch,fen):[];
-    var fenL=[['semaine','cette semaine'],['7','7 derniers jours'],['30','30 derniers jours'],['','tous les agents']];
+    var fen=(window._tkmFen==null?'':window._tkmFen)||(window._tkmFen===''?'':'semaine');
+    if(window._tkmFen!=null)fen=window._tkmFen;
+    var ch=(window._tkmChamp||'tout');
+    /* b435 : « tout ce qui manque » = les trois informations dont depend l'habillement d'un
+       agent : ou l'envoyer, quelle taille, et ce qu'il a deja. */
+    var TOUT=['adresse','mensurations','tenue'];
+    var champs=(ch==='tout')?TOUT:[ch];
+    var cib=(typeof faManqueDans==='function')?faManqueDans(champs,fen):[];
+    var fenL=[['semaine','cette semaine'],['7','7 derniers jours'],['30','30 derniers jours'],['','tous ceux qu\u2019on a fait travailler']];
+    var chL=[['tout','\ud83d\udccb Tout ce qui manque (adresse + mensurations + tenue)']].concat(
+      Object.keys(TK_TYPES).map(function(k){ return [k,TK_TYPES[k].lbl]; }));
     box.innerHTML='<div class="card" style="border:1.5px solid #6ea8fe"><div class="lab" style="margin:0 0 6px">\ud83c\udfab Demander une information manquante <span class="sub" style="font-weight:400">\u2014 le ticket se ferme tout seul quand l\u2019info arrive</span></div>'
       +'<div class="acts" style="gap:6px;flex-wrap:wrap;align-items:center">'
-      +'<select id="tkm-champ" style="width:auto">'+Object.keys(TK_TYPES).map(function(k){return '<option value="'+k+'"'+(k===ch?' selected':'')+'>'+TK_TYPES[k].lbl+'</option>';}).join('')+'</select>'
+      +'<select id="tkm-champ" style="width:auto">'+chL.map(function(c){return '<option value="'+c[0]+'"'+(c[0]===ch?' selected':'')+'>'+c[1]+'</option>';}).join('')+'</select>'
       +'<span class="sub" style="margin:0">chez les agents ayant travaill\u00e9</span>'
       +'<select id="tkm-fen" style="width:auto">'+fenL.map(function(f){return '<option value="'+f[0]+'"'+(f[0]===fen?' selected':'')+'>'+f[1]+'</option>';}).join('')+'</select>'
       +'<button type="button" class="ok" id="tkm-open"'+(cib.length?'':' disabled')+'>\ud83c\udfab '+cib.length+' agent'+(cib.length>1?'s':'')+' \u2014 envoyer au superviseur</button>'
       +'</div>'
-      +(cib.length?('<div class="sub" style="margin:6px 0 0;font-size:11.5px">'+cib.slice(0,8).map(function(g){return esc(g.nom);}).join(' \u00b7 ')+(cib.length>8?(' \u2026 +'+(cib.length-8)):'')+'</div>')
-                  :'<div class="sub" style="margin:6px 0 0;color:#1a9e5c">\u2705 Personne \u2014 tout est renseign\u00e9 sur cette p\u00e9riode.</div>')
+      +(cib.length?('<div class="sub" style="margin:6px 0 0;font-size:11.5px">Les plus sollicit\u00e9s d\u2019abord : '
+          +cib.slice(0,8).map(function(g){return esc(g.nom)+' <b>('+g.vac+')</b>';}).join(' \u00b7 ')
+          +(cib.length>8?(' \u2026 +'+(cib.length-8)):'')+'</div>')
+        :'<div class="sub" style="margin:6px 0 0;color:#1a9e5c">\u2705 Personne \u2014 tout est renseign\u00e9 sur cette p\u00e9riode.</div>')
       +'</div>';
     byId('tkm-champ').onchange=function(){ window._tkmChamp=this.value; tkmCarteDemande(box); };
     byId('tkm-fen').onchange=function(){ window._tkmFen=this.value; tkmCarteDemande(box); };
     byId('tkm-open').onclick=function(){
-      var lbl=TK_TYPES[ch].lbl+' \u2014 agents ayant travaill\u00e9 '+((fenL.filter(function(f){return f[0]===fen;})[0]||['',''])[1]);
-      tkxDemanderManque(ch,cib,lbl); };
-  }
-  function tkxCreer(o){
+      var lblC=(ch==='tout')?'Adresse, mensurations et \u00e9tat de la tenue':TK_TYPES[ch].lbl;
+      var lbl=lblC+' \u2014 agents ayant travaill\u00e9 '+((fenL.filter(function(f){return f[0]===fen;})[0]||['',''])[1]);
+      tkxDemanderManque(champs,cib,lbl); };
+  }  function tkxCreer(o){
     var arr=tkxLoad();
     arr.push({id:'tx'+Date.now()+'_'+Math.round(Math.random()*9999),kind:'echange',
       objet:o.objet||'Point à faire', message:o.message||'', contexte:o.contexte||[], source:o.source||'',
@@ -9930,7 +9991,10 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     if(etat==='fait'){ var _t=null,_k; for(_k=0;_k<arr.length;_k++)if(arr[_k].id===id){_t=arr[_k];break;}
       var _m=(_t&&typeof tkxManqueEtat==='function')?tkxManqueEtat(_t):null;
       if(_m&&_m.fait<_m.total){
-        alert('\u26d4 Pas encore.\n\n'+(_m.total-_m.fait)+' agent(s) sur '+_m.total+' n\u2019ont toujours pas leurs mesures dans leur fiche.\n\nRenseigne-les ici (ou dans la fiche) : le ticket se fermera tout seul.');
+        /* b435 : on compte des INFORMATIONS, pas des agents \u2014 un agent peut en devoir trois. */
+        alert('\u26d4 Pas encore.\n\n'+(_m.total-_m.fait)+' information(s) sur '+_m.total+' manquent encore dans les fiches ('
+          +_m.lignes.filter(function(l){return l.fait<l.total;}).length+' agent(s) concern\u00e9s).\n\n'
+          +'Renseigne-les ici, ou dans la fiche : le ticket se fermera tout seul.');
         return; } }
     for(var i=0;i<arr.length;i++){ if(arr[i].id!==id)continue;
       /* b381 : la PREMIERE action du tour en cours — on ne l'ecrase pas aux suivantes. */
