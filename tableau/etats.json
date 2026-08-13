@@ -1609,12 +1609,39 @@
    "pourquoipas": "Zeus ne pouvait pas le savoir, et ce n'etait pas un manque d'affichage : ses tickets portaient une PHRASE. Une phrase ne se verifie pas — « Fait » ne dit que « j'ai fait quelque chose ». L'appli avait pourtant deja la bonne mecanique a deux endroits sans les relier : TK_TYPES (missing() qui lit la donnee, mais sans destinataire ni accuse) et tkx (adresse a un role, avec accuse, mais qui ferme sur une declaration). Aucune des deux n'avait les deux. b432 fait porter au ticket le TROU qu'il vient boucher : TK_TYPES.mensurations ecrit via faSaveMens (source unique), donc saisir dans le ticket ou dans la fiche revient au meme et se voit pareil — demande explicite de Zeus. tkxReste/tkxAutoScan (b365, ecrits pour les files de vacations) sont etendus au trou de donnee : rien de neuf invente. « Fait » refuse tant qu'un champ est vide. Le controle (qui a rempli, quand, via le ticket ou hors ticket) est reserve super-admin + administrateur. Deux portes : bouton sur la fiche de l'agent, et « agents ayant travaille cette semaine » (281 agents en base, 25 la semaine du 10/08, dont 18 sans mensurations). missing() exige les TROIS mesures : l'ancienne regle « au moins une » declarait Issa ADS Dole renseigne avec 46 et L sans taille de haut. Bug PREEXISTANT corrige au passage : la liste des tickets n'excluait pas les echanges, qui s'y affichaient en carte vide « Ticket 0/0 ». Verifie de bout en bout sur le banc d'essai isole : refus du « Fait », ecriture reelle dans fkh_tenues_ctrl, tracabilite posee, compteur 1/8 -> 8/8, fermeture automatique et sa mention. Demo jouable : ?sandbox=1&demo=ticket-mens."
   },
   {
-   "b": "b433+b434+b435",
-   "titre": "La demande part de Terrain, porte TROIS informations — et un correctif bloquant attrape avant le push",
-   "source": "Zeus 13/08 : « fais en sorte que ce soit dans Terrain et non dans la section Tickets » puis « tous les agents qu'on sollicite le plus, adresse + mensuration + etat des tenues, prepare un ticket pour le superviseur »",
+   "b": "b433",
+   "titre": "La demande d'information part de Terrain, plus de la section Tickets",
+   "source": "Zeus 13/08 : « fais en sorte que ce soit dans Terrain et non dans la section Tickets »",
    "theme": "Tickets",
-   "local": true,
-   "pourquoipas": "b433 : la carte « Demander » demenage de Tickets vers Terrain — l'endroit ou l'on regarde ce qui demande une action maintenant ; Tickets garde sa vocation de SUIVI. Reservee super-admin + administrateur : le superviseur recoit, il ne se commande pas lui-meme. b434 : CORRECTIF BLOQUANT introduit par b432 et attrape avant tout push. renderFA() s'execute ligne ~2902, var TK_TYPES n'est affecte qu'a ~5501 ; entre les deux TK_TYPES vaut undefined et Object.keys levait une TypeError qui TUAIT tout le demarrage. Invisible sur un stockage vide (aucun agent a dessiner) — systematique des qu'il y a des agents, donc chez Zeus a coup sur (281 agents). Preuve par temoin : b431 servi sur le MEME port, donc le meme localStorage, demarrait ; b433 non ; b434 oui. Lecon : un sandbox vierge ne teste rien — le premier « ca marche » de b432 avait ete obtenu sur un stockage vide. b435 : un ticket porte desormais une LISTE de champs (adresse + mensurations + etat tenue), avec tracabilite par agent ET par champ, et les agents ranges par sollicitation reelle. Nouveau type `tenue` (le trou = on n'en sait rien, pas « elle est incomplete »). Mesure au 13/08 : 62 agents sollicites, 57 incomplets, 35 aux deux trous, 7 jamais controles. Trois anomalies signalees a Zeus avant envoi : « AGENT Poulet DUC » (32 vacations) n'est pas une personne, « TELLA Manfiou » est en double, et 19 tenues sont dites « Complet » sans qu'on connaisse la taille de l'agent."
+   "pourquoipas": "Terrain est l'endroit ou l'on regarde ce qui demande une action MAINTENANT : c'est de la que doit partir une demande. La section Tickets garde sa vocation, SUIVRE ce qu'on a envoye. La carte reste reservee au super-admin et a l'administrateur : le superviseur RECOIT ces tickets, il ne se les adresse pas a lui-meme. Les tickets recus etaient deja traitables dans Terrain depuis b384 — la saisie des tailles y a fonctionne sans rien ajouter."
+  },
+  {
+   "b": "b434",
+   "titre": "CORRECTIF BLOQUANT : le bouton de la fiche agent tuait le demarrage de l'appli",
+   "source": "Constate en jouant la demo de b432, avant tout push",
+   "theme": "Tickets",
+   "pourquoipas": "renderFA() s'execute ligne ~2902, au fil du script ; var TK_TYPES n'est affecte qu'a ~5501. Entre les deux TK_TYPES vaut undefined (hoisting), et le Object.keys de faManqueBtns levait une TypeError qui TUAIT tout le reste du demarrage : ni sandbox, ni sections, ni rendu. INVISIBLE sur un stockage vide — sans agent a dessiner, la fonction n'etait jamais appelee. Systematique des qu'il y a des agents : chez Zeus, 281 agents, l'appli n'aurait pas demarre du tout. Preuve par temoin : b431 servi sur le MEME port, donc le meme localStorage, demarrait ; b433 non ; b434 oui. Lecon : un sandbox vierge ne teste rien."
+  },
+  {
+   "b": "b435",
+   "titre": "Un ticket peut demander PLUSIEURS informations a la fois",
+   "source": "Zeus 13/08 : « adresse ET mensuration et egalement l'etat des tenues »",
+   "theme": "Tickets",
+   "pourquoipas": "manque.champs (liste) remplace manque.champ (unique), l'ancien format restant lu. Tracabilite par agent ET par champ : savoir que l'adresse est arrivee ne dit pas que les mesures le sont. Nouveau type `tenue` — le trou n'est pas « la tenue est incomplete », c'est qu'on n'en SAIT RIEN (jamais controle, ou fiche sans statut). Les agents sortent ranges par sollicitation reelle. Mesure au 13/08 : 62 agents sollicites sur 281 en fiche, 57 incomplets, 35 aux deux trous, 7 jamais controles."
+  },
+  {
+   "b": "b436",
+   "titre": "On decoche avant d'envoyer : une ligne generique n'est pas un agent a rappeler",
+   "source": "Zeus 13/08 : « enleve Poulet Duc »",
+   "theme": "Tickets",
+   "pourquoipas": "« AGENT Poulet DUC » est l'agent le plus sollicite de la base avec 32 vacations — et ce n'est pas une personne, c'est une ligne generique venue d'un import. Sans decochage il serait revenu dans CHAQUE envoi. La fenetre d'envoi liste desormais les agents avec cases a cocher, nombre de vacations et ce qu'on leur demande exactement. La fiche n'est PAS supprimee : elle porte des vacations reelles, son nettoyage est un chantier a part."
+  },
+  {
+   "b": "b437",
+   "titre": "Le decor de demo ne se dedouble plus",
+   "source": "Constate en rejouant la demo",
+   "theme": "Tickets",
+   "pourquoipas": "Monter deux fois la demo empilait ses vacations — 32 devenaient 64 — et le classement par sollicitation mentait. Le decor se retire avant de se reposer."
   }
  ],
  "attente": [
