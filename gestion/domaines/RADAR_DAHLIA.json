@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR DAHLIA. Éditer CE fichier suffit : l'appli le relit à chaque chargement de page, aucun rebuild (G-71/G-72).",
- "maj": "2026-08-13 · assaini",
+ "maj": "2026-08-13 · fouille sources",
  "secs": [
   {
    "t": "🔴 À résoudre",
@@ -8,20 +8,24 @@
    "bg": "rgba(248,113,113,.16)",
    "items": [
     {
-     "l": "🚨 Un agent — titre de séjour signalé expiré",
-     "w": "relevé lors de la fouille conformité du 04/07, jamais remonté · risque immédiat (CNAPS, pénal employeur) · identité et pièces dans le dossier interne, hors ligne · À REVÉRIFIER",
+     "l": "🚨 un agent (identité au dossier interne) — pièce de conformité individuelle signalé EXPIRÉ",
+     "w": "relevé lors de la fouille conformité du 04/07, jamais remonté au RADAR · un agent sans titre valide = risque immédiat (CNAPS, pénal employeur) · À REVÉRIFIER avant toute conclusion",
      "a": [
       "Vérifier",
-      "POSTE : DAHLIA — vérifier le titre de séjour de l'agent signalé"
+      "POSTE : DAHLIA — vérifier le pièce de conformité individuelle de un agent (identité au dossier interne)"
      ],
      "det": [
       [
-       "Où",
-       "_PILOTAGE_DAHLIA — hors ligne"
+       "Source",
+       "ATELIERS_DATA_DAHLIA · A11 Conformité (fouille du 2026-07-04)"
       ],
       [
        "Statut",
-       "non revérifié depuis le 04/07"
+       "non revérifié depuis le 04/07 — peut avoir été régularisé"
+      ],
+      [
+       "Pourquoi c'est ici",
+       "une alerte de cette gravité n'a rien à faire enterrée dans une vue d'atelier"
       ]
      ]
     },
@@ -221,7 +225,7 @@
    "items": [
     {
      "l": "Nouveau RIB Shine — toute facture à partir de juin 2026",
-     "w": "IBAN IBAN au dossier interne · BIC SNNNFR22XXX — le SWAN DAHLIA est FERMÉ, ne plus jamais l'utiliser",
+     "w": "IBAN coordonnées bancaires au dossier interne · BIC SNNNFR22XXX — le SWAN DAHLIA est FERMÉ, ne plus jamais l'utiliser",
      "det": [
       [
        "Ancien compte (SWAN)",

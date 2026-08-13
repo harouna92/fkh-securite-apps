@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR FKH. Éditer CE fichier suffit : l'appli le relit à chaque ouverture, aucun rebuild nécessaire (G-71/G-72). La copie inline dans la vue n'est qu'un repli hors-ligne.",
- "maj": "2026-08-13 · assaini",
+ "maj": "2026-08-13 · régime micro",
  "secs": [
   {
    "t": "🗓️ Contrôle du mois",
@@ -212,15 +212,15 @@
      ]
     },
     {
-     "l": "Planning à reporter dans l'outil — GAITEMIROV mars",
+     "l": "Planning à reporter dans l'outil — un agent mars",
      "w": "correction validée (paie=référence) : montant déjà juste, reste à ré-exporter le PDF",
      "a": [
       "Reporter",
-      "POSTE : FKH — Reporte dans l'outil de planning la vacation GAITEMIROV 19/03/2026 07:00–19:00 (SNCF Réseau) puis ré-exporte le PDF"
+      "POSTE : FKH — Reporte dans l'outil de planning la vacation un agent 19/03/2026 07:00–19:00 (SNCF Réseau) puis ré-exporte le PDF"
      ],
      "det": [
       [
-       "GAITEMIROV — mars",
+       "un agent — mars",
        "+1 vacation 19/03 07:00–19:00 (12h) SNCF Réseau → 108h = paie ✅"
       ],
       [
@@ -242,7 +242,7 @@
    "items": [
     {
      "l": "🔴 Formalités juridiques FKH — 2 formalités, 2 blocages",
-     "w": "3 signatures DIANE Moussa (pack p.3·5·7) + attestation de dépositaire 243 € · les comptes 2025 doivent partir avant le 31/08",
+     "w": "2 signatures restantes (pack 2, p.2 et p.4) · comptes 2025 en régime MICRO : rien ne sera public · capital bloqué par l'attestation de dépositaire",
      "a": [
       "Traiter",
       "POSTE : FKH — Traite les formalités juridiques FKH : dépôt des comptes 2025 et augmentation de capital"
@@ -254,7 +254,7 @@
       ],
       {
        "l": "Formalité 1 · Dépôt des comptes 2025",
-       "v": "31/08 · 4 pièces ✅ · 2 signatures ⏳",
+       "v": "31/08 · régime micro · 1 signature ⏳",
        "sub": [
         {
          "a": "📂 Ouvrir le dossier (Explorateur)",
@@ -262,7 +262,19 @@
         },
         [
          "PV d'affectation du 30/06",
-         "🖊️ à signer — p. 3 du pack"
+         "✅ SIGNÉ le 13/08"
+        ],
+        [
+         "Déclaration confidentialité TOTALE (micro)",
+         "🖊️ à signer — p.4 du pack 2"
+        ],
+        [
+         "Ce qui est déposé",
+         "bilan 2033-A + compte de résultat — NON publics (L.232-25 al.1)"
+        ],
+        [
+         "Dispense d'annexe",
+         "OUI (micro, L.123-16-1) — 2033-C à G non déposés"
         ],
         [
          "Déclaration de confidentialité du compte de résultat",
@@ -275,10 +287,6 @@
         [
          "Compte de résultat (confidentiel)",
          "✅ prêt"
-        ],
-        [
-         "Confidentialité du CR = OUI",
-         "petite entreprise · CA 854 573 € HT · art. L.232-25 al.2"
         ],
         {
          "a": "Déposer les comptes au guichet unique",
@@ -325,8 +333,8 @@
        ]
       },
       {
-       "l": "Blocage transverse · 3 signatures DIANE Moussa",
-       "v": "un seul aller-retour",
+       "l": "Blocage transverse · 2 signatures restantes",
+       "v": "pack 2 — p.2 · p.4",
        "sub": [
         {
          "a": "📂 Ouvrir le dossier du pack à signer",
@@ -334,11 +342,15 @@
         },
         [
          "Fichier",
-         "FKH/1_ETABLISSEMENT/PACK_A_SIGNER_DIANE-Moussa_2026-08-13.pdf — 7 pages"
+         "FKH/1_ETABLISSEMENT/PACK_A_SIGNER-2_DIANE-Moussa_2026-08-13.pdf — 4 pages"
         ],
         [
          "Où signer",
-         "p. 3 · p. 5 · p. 7"
+         "p. 2 (constat) · p. 4 (confidentialité micro)"
+        ],
+        [
+         "Déjà signé le 13/08",
+         "PV du 30/06, dans ses deux exemplaires"
         ],
         [
          "Mention manuscrite",
@@ -368,7 +380,7 @@
         ],
         [
          "Origine",
-         "virement de M. DIANE Moussa crédité le 12/08 sur IBAN au dossier interne"
+         "virement de M. DIANE Moussa crédité le 12/08 sur coordonnées bancaires au dossier interne"
         ]
        ]
       },
@@ -663,8 +675,8 @@
        "v": "3",
        "sub": [
         {
-         "a": "📬 Prud'hommes Limoges — jugement CAMARA c/ FKH (éch. 01/07) 🔥🔥🔥 <a href=\"https://drive.google.com/file/d/1Iv05A9sDSokSu3mKrky7znJS1ykezI8Z/view\" target=\"_blank\" style=\"color:var(--info);text-decoration:none\">↗</a>",
-         "p": "POSTE : FKH — Traiter le courrier FKH : Prud'hommes Limoges — jugement CAMARA c/ FKH (éch. 01/07) (contexte FKH)"
+         "a": "📬 Prud'hommes Limoges — jugement un agent c/ FKH (éch. 01/07) 🔥🔥🔥 <a href=\"https://drive.google.com/file/d/1Iv05A9sDSokSu3mKrky7znJS1ykezI8Z/view\" target=\"_blank\" style=\"color:var(--info);text-decoration:none\">↗</a>",
+         "p": "POSTE : FKH — Traiter le courrier FKH : Prud'hommes Limoges — jugement un agent c/ FKH (éch. 01/07) (contexte FKH)"
         },
         {
          "a": "📬 Securitas — mise en demeure 5 486,64 € 🔥🔥🔥 <a href=\"https://drive.google.com/file/d/1j6M12ajhtl0BvUThPJrdUxxJVgC4ADan/view\" target=\"_blank\" style=\"color:var(--info);text-decoration:none\">↗</a>",
@@ -728,19 +740,19 @@
        "p": "POSTE : FKH — Marque payé le salaire KIMIEV mai 2026 (373,47 €)"
       },
       {
-       "l": "ADJIBODOU — févr · 158,89 €",
+       "l": "un agent — févr · 158,89 €",
        "a": 1,
-       "p": "POSTE : FKH — Marque payé le salaire ADJIBODOU février 2026 (158,89 €)"
+       "p": "POSTE : FKH — Marque payé le salaire un agent février 2026 (158,89 €)"
       },
       {
-       "l": "TSAKACHEV — févr · 56,53 €",
+       "l": "un agent — févr · 56,53 €",
        "a": 1,
-       "p": "POSTE : FKH — Marque payé le salaire TSAKACHEV février 2026 (56,53 €)"
+       "p": "POSTE : FKH — Marque payé le salaire un agent février 2026 (56,53 €)"
       },
       {
-       "l": "SARR — reste févr · 228,13 €",
+       "l": "un agent — reste févr · 228,13 €",
        "a": 1,
-       "p": "POSTE : FKH — Marque payé le reliquat SARR février 2026 (228,13 €)"
+       "p": "POSTE : FKH — Marque payé le reliquat un agent février 2026 (228,13 €)"
       }
      ]
     },
@@ -753,9 +765,9 @@
      ],
      "det": [
       {
-       "l": "GAITEMIROV Youssoup",
+       "l": "un agent Youssoup",
        "a": 1,
-       "p": "POSTE : FKH — Complète le dossier agent GAITEMIROV Youssoup (contrat + signature + dossier)"
+       "p": "POSTE : FKH — Complète le dossier agent un agent Youssoup (contrat + signature + dossier)"
       },
       {
        "l": "KIMIEV Roustam",
@@ -1237,7 +1249,7 @@
       },
       [
        "Deja recu",
-       "coordonnées de télépaiement au dossier interne"
+       "IBAN coordonnées bancaires au dossier interne - BIC BDEIFRPPXXX"
       ]
      ]
     }
@@ -1385,7 +1397,7 @@
    "bg": "rgba(245,158,11,.16)",
    "items": [
     {
-     "l": "Prud'hommes CAMARA — 4 800,28 €",
+     "l": "Prud'hommes un agent — 4 800,28 €",
      "w": "à payer · jugement · astreinte J+21",
      "due": "01/07",
      "det": [
@@ -1396,7 +1408,7 @@
       {
        "l": "Payer / traiter (contexte FKH)",
        "a": 1,
-       "p": "POSTE : FKH — Traiter le courrier FKH : Prud'hommes Limoges — jugement CAMARA (paiement 4 800,28 € + documents fin de contrat) (contexte FKH)"
+       "p": "POSTE : FKH — Traiter le courrier FKH : Prud'hommes Limoges — jugement un agent (paiement 4 800,28 € + documents fin de contrat) (contexte FKH)"
       },
       {
        "l": "Cockpit financier FKH",
