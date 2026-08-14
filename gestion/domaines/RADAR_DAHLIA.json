@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR DAHLIA. Éditer CE fichier suffit : l'appli le relit à chaque chargement de page, aucun rebuild (G-71/G-72).",
- "maj": "2026-08-14 · réponse SIE rédigée",
+ "maj": "2026-08-14 · v62 élucidé",
  "secs": [
   {
    "t": "🔴 À résoudre",
@@ -110,11 +110,11 @@
      ]
     },
     {
-     "l": "Le « maître v62 » n'existe pas — c'est v56 qui est en place",
-     "w": "tranché le 13/08 : zéro fichier v62 dans toute l'arborescence · le maître réellement présent est Rapprochement_v56_par_mois_D53_MAITRE.xlsx, déjà DANS _PILOTAGE_DAHLIA",
+     "l": "Maître v62 — jamais reçu, ce n'était pas un fichier perdu",
+     "w": "tranché le 14/08 par CARTE_SYSTEME.html : la carte inscrit « Rapprochement_v62_par_mois_D53.xlsx (à récupérer) » — v62 était une CIBLE, pas un fichier égaré · le maître réel v56_D53 est en place · Zeus doit trancher : obtenir v62 de sa source, ou acter que v56 fait foi",
      "a": [
-      "Traiter",
-      "POSTE : DAHLIA — corriger les références au maître v62 (le maître est v56_D53)"
+      "Trancher",
+      "POSTE : DAHLIA — trancher le maître : récupérer v62 ou acter v56 comme référence"
      ],
      "det": [
       [
@@ -122,12 +122,16 @@
        "_PILOTAGE_DAHLIA/Rapprochement_v56_par_mois_D53_MAITRE.xlsx"
       ],
       [
-       "Ce qui le cite à tort",
-       "ATELIERS_DATA_DAHLIA (« BASE_Paie dans maître v62 », « EMPLACEMENTS.md §DAHLIA · maître v62 »)"
+       "Ce que disait la carte système",
+       "master : Rapprochement_v62_par_mois_D53.xlsx (à récupérer) — juin 2026"
       ],
       [
-       "À trancher",
-       "soit v62 a existé et a été perdu, soit c'est une coquille pour v56 — Zeus seul peut le dire"
+       "Ce qui le cite comme existant à tort",
+       "ATELIERS_DATA_DAHLIA (« BASE_Paie dans maître v62 »)"
+      ],
+      [
+       "À trancher par Zeus",
+       "récupérer v62 auprès de sa source, ou déclarer v56 comme maître officiel"
       ]
      ]
     }
