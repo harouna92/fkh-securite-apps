@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR DAHLIA. Éditer CE fichier suffit : l'appli le relit à chaque chargement de page, aucun rebuild (G-71/G-72).",
- "maj": "2026-08-13 · virement 1 860 €",
+ "maj": "2026-08-13 · virement Shine",
  "secs": [
   {
    "t": "🔴 À résoudre",
@@ -9,7 +9,7 @@
    "items": [
     {
      "l": "🏦 Mandat SEPA DAHLIA invalide — CAUSE RACINE de tous les rejets",
-     "w": "la clôture de Qonto au 31/03 a invalidé le mandat : PAS février, mars et avril rejetés, URSSAF avril et mai rejetées · tant qu'il n'est pas refait, tout nouveau prélèvement rebondit et crée des majorations",
+     "w": "les VIREMENTS depuis Shine passent (1 860 € le 13/08), mais tout PRÉLÈVEMENT automatique vise encore l'ancien compte : PAS fév/mars/avr et URSSAF avr/mai rejetés · un échéancier prélevé sur le mauvais compte rebondirait pareil",
      "a": [
       "Traiter",
       "POSTE : DAHLIA — refaire le mandat SEPA auprès de la DGFiP et de l'URSSAF"
@@ -171,6 +171,14 @@
       "Relancer",
       "POSTE : DAHLIA — relancer le SIE sur le trop-perçu de 17 €"
      ]
+    },
+    {
+     "l": "Classer les relevés SHINE — aucun n'est au dossier",
+     "w": "les paiements partent de Shine mais seuls les relevés Swan/Indy sont classés · sans eux, aucune analyse de trésorerie DAHLIA n'est fiable (leçon G-78)",
+     "a": [
+      "Traiter",
+      "POSTE : DAHLIA — classer les relevés du compte Shine"
+     ]
     }
    ]
   },
@@ -215,7 +223,7 @@
     },
     {
      "l": "TVA — solde CA12 2025 : reste 2 920 € (1 860 € versés le 13/08)",
-     "w": "virement de 1 860 € émis par DAHLIA le 13/08 · libellé « declaration 3517SCA12 » + n° fiscal 951932730 · échéance initiale 05/05, les pénalités courent sur le reste",
+     "w": "virement de 1 860 € parti du compte SHINE le 13/08 · libellé « declaration 3517SCA12 » + SIREN, SANS le n° action → imputation à contrôler · échéance initiale 05/05, pénalités sur le reste",
      "due": "05/05",
      "dd": "2026-05-05",
      "a": [
@@ -236,8 +244,16 @@
        "2 920 € + pénalités (5 % + 0,20 %/mois depuis le 05/05)"
       ],
       [
-       "Libellé du virement",
-       "declaration 3517SCA12 · n° fiscal 951932730"
+       "Compte débité",
+       "SHINE (pas Swan/Indy)"
+      ],
+      [
+       "📁 Coordonnées SIE + n° action",
+       "dossier interne : 2_COMPTA_FISCAL/SOCIAL_FISCAL/SIE_PARIS-8E-MADELEINE_coordonnees-et-references.md"
+      ],
+      [
+       "Libellé à utiliser désormais",
+       "SIREN + « action <n°> » + objet — le n° action identifie la créance"
       ],
       [
        "⚠️ À contrôler",
@@ -246,10 +262,6 @@
       [
        "Base",
        "TVA nette due 2025 = 15 132 € · base HT 465 229 € · CA12 déposée en mai 2026"
-      ],
-      [
-       "SIE",
-       "Paris 8e Madeleine · 01 56 35 92 20"
       ],
       {
        "a": "Contrôler l'imputation des 1 860 €",
