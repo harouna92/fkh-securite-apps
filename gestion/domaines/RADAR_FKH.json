@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR FKH. Éditer CE fichier suffit : l'appli le relit à chaque ouverture, aucun rebuild nécessaire (G-71/G-72). La copie inline dans la vue n'est qu'un repli hors-ligne.",
- "maj": "2026-08-14 · comptes 2024",
+ "maj": "2026-08-14 · 2024 prêt à signer",
  "secs": [
   {
    "t": "🗓️ Contrôle du mois",
@@ -241,16 +241,20 @@
    "bg": "rgba(251,191,36,.16)",
    "items": [
     {
-     "l": "🔴 Comptes annuels 2024 — JAMAIS déposés, à redéposer",
-     "w": "dépôt du 28/01/2026 REFUSÉ le 09/02 (4 motifs de forme), régularisation non faite, dossier CLASSÉ SANS SUITE le 10/06 · l'annuaire public ne connaît que l'exercice 2023 · dossier complet reconstitué le 14/08, rien à créer",
+     "l": "🖊️ Comptes annuels 2024 — dossier PRÊT, il manque la signature",
+     "w": "7 pièces conformes et datées du 14/08 à la racine de DEPOT COMPTES ANNUELS 2024 · dénomination + siège + RCS + certifié conforme contrôlés sur chacune · reste : signature de DIANE Moussa, puis dépôt (nouveaux frais)",
      "a": [
       "Traiter",
       "POSTE : FKH — redépose les comptes annuels 2024 au guichet unique"
      ],
      "det": [
       [
-       "📁 Dossier prêt",
-       "FKH/1_ETABLISSEMENT/DEPOT COMPTES ANNUELS 2024/ — 6 pièces + historique + checklist"
+       "📁 Racine du dossier",
+       "7 fichiers = 7 pièces à téléverser · l'historique est dans « _HISTORIQUE ET PIECES NON DEPOSEES »"
+      ],
+      [
+       "Ce qui a été corrigé le 14/08",
+       "déclaration refaite (coquille d'adresse + RCS manquant) · tampon dénomination/siège/RCS/certifié conforme sur bilan, CR et 2 annexes · mention datée sur la pièce d'identité"
       ],
       [
        "Pourquoi ça a été refusé",
@@ -271,6 +275,10 @@
       {
        "a": "📂 Ouvrir le dossier 2024",
        "p": "OUVRIR DOSSIER : C:\\\\Users\\Utilisateur\\Downloads\\FKH SECURITE CLAUDE\\FKH\\1_ETABLISSEMENT\\DEPOT COMPTES ANNUELS 2024"
+      },
+      {
+       "a": "Marquer le dépôt effectué",
+       "p": "POSTE : FKH — le dépôt des comptes 2024 est effectué, classer le récépissé et clore la ligne"
       }
      ]
     },
