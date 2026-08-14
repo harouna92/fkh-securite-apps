@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR FKH. Éditer CE fichier suffit : l'appli le relit à chaque ouverture, aucun rebuild nécessaire (G-71/G-72). La copie inline dans la vue n'est qu'un repli hors-ligne.",
- "maj": "2026-08-14 · option B confirmée",
+ "maj": "2026-08-14 · comptes 2024",
  "secs": [
   {
    "t": "🗓️ Contrôle du mois",
@@ -127,8 +127,8 @@
      ]
     },
     {
-     "l": "Relevés de compte — 2 manquants (R-RELEVE-M-1-01)",
-     "w": "le relevé de M−1 est dû le 1er du mois M · sans lui, aucun paiement ne se recoupe",
+     "l": "Relevés de compte — captures d'août classées le 14/08",
+     "w": "3 captures du relevé d'août rangées dans 2_COMPTA_FISCAL/BANQUE/relevé de compte/2026/ · ⚠️ ce sont des CAPTURES, pas le relevé officiel · le relevé de M−1 est dû le 1er du mois M",
      "a": [
       "Déposer",
       "POSTE : FKH — Dépose les relevés de compte FKH manquants"
@@ -241,6 +241,40 @@
    "bg": "rgba(251,191,36,.16)",
    "items": [
     {
+     "l": "🔴 Comptes annuels 2024 — JAMAIS déposés, à redéposer",
+     "w": "dépôt du 28/01/2026 REFUSÉ le 09/02 (4 motifs de forme), régularisation non faite, dossier CLASSÉ SANS SUITE le 10/06 · l'annuaire public ne connaît que l'exercice 2023 · dossier complet reconstitué le 14/08, rien à créer",
+     "a": [
+      "Traiter",
+      "POSTE : FKH — redépose les comptes annuels 2024 au guichet unique"
+     ],
+     "det": [
+      [
+       "📁 Dossier prêt",
+       "FKH/1_ETABLISSEMENT/DEPOT COMPTES ANNUELS 2024/ — 6 pièces + historique + checklist"
+      ],
+      [
+       "Pourquoi ça a été refusé",
+       "option de confidentialité NON cochée (niveau 0 = tout public) + déclaration déposée dans la case du rapport du CAC + bilan et CR dans une case générique"
+      ],
+      [
+       "Régime 2024",
+       "PETITE entreprise (CA 1 870 397 €) → confidentialité du SEUL compte de résultat · ≠ 2025 qui est en micro"
+      ],
+      [
+       "Frais",
+       "36,79 € remboursés après le classement → nouveau règlement à prévoir"
+      ],
+      [
+       "Écran Diffusion — réponses 2024",
+       "micro = Non · petite = OUI · présentation simplifiée = Non · dispense d'annexe = Non"
+      ],
+      {
+       "a": "📂 Ouvrir le dossier 2024",
+       "p": "OUVRIR DOSSIER : C:\\\\Users\\Utilisateur\\Downloads\\FKH SECURITE CLAUDE\\FKH\\1_ETABLISSEMENT\\DEPOT COMPTES ANNUELS 2024"
+      }
+     ]
+    },
+    {
      "l": "🔴 Formalités juridiques FKH — 2 formalités, 2 blocages",
      "w": "option B CONFIRMÉE le 14/08 : régime micro, rien ne sera public · 1 SEULE signature reste pour les comptes → fichier PACK_A_SIGNER-2_DIANE-Moussa_2026-08-13.pdf, page 4 · capital : page 2 du même fichier + attestation de dépositaire",
      "a": [
@@ -295,6 +329,10 @@
         [
          "⚖️ Point tranché le 14/08",
          "2024 dépassait 2 seuils (bilan 602 745 · CA 1 870 397) ; Zeus maintient l'option micro sur la lecture littérale de L.123-16-1 (« à la clôture de l'exercice ») — voir la checklist du dossier"
+        ],
+        [
+         "✅ Précédent qui rassure",
+         "DAHLIA a déposé ses comptes 2025 le 10/06/2026 en « Niveau 1 — entièrement confidentiel » et la formalité a été VALIDÉE : le montage micro passe au guichet"
         ]
        ]
       },
