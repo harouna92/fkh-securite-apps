@@ -5,3 +5,8 @@ node_modules/
 # Bac à sable de test : contient des copies des VRAIES données (vacations, agents) — jamais versionné
 tmp/
 .wrangler/
+
+# 2026-08-14 — les carnets ne reviennent JAMAIS dans le depot public.
+# Ils portent la paie, la banque, l URSSAF. Ils vivent dans le coffre (R2),
+# derriere le mot de passe ; le cockpit les y lit. Voir SCRIPTS/carnet_vers_coffre.py
+gestion/domaines/DATA_*.json
