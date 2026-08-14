@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR DAHLIA. Éditer CE fichier suffit : l'appli le relit à chaque chargement de page, aucun rebuild (G-71/G-72).",
- "maj": "2026-08-14 · réponse SIE du 30/07",
+ "maj": "2026-08-14 · réponse SIE rédigée",
  "secs": [
   {
    "t": "🔴 À résoudre",
@@ -9,7 +9,7 @@
    "items": [
     {
      "l": "📨 SIE — réponse du 30/07 restée sans suite depuis 15 jours",
-     "w": "le SIE confirme que les 17 € ont été affectés à leur créance le 09/07 et demande : « peut-être avez-vous fait 2 télérèglements de 17 € ? si oui, envoyez votre relevé bancaire » · ⚠️ sa demande est CLOSE : pour répondre il faut DÉPOSER UNE NOUVELLE DEMANDE sur la messagerie sécurisée",
+     "w": "RÉPONSE RÉDIGÉE, prête à déposer · le SIE demandait si un 2e télérèglement de 17 € existait : le relevé de juillet n'en montre qu'UN · ⚠️ sa demande est CLOSE, il faut DÉPOSER UNE NOUVELLE DEMANDE",
      "due": "30/07",
      "dd": "2026-07-30",
      "a": [
@@ -17,6 +17,10 @@
       "POSTE : DAHLIA — répondre au SIE sur les 2 télérèglements de 17 € (nouvelle demande + relevé de juillet)"
      ],
      "det": [
+      [
+       "📝 Texte prêt à coller",
+       "2_COMPTA_FISCAL/SOCIAL_FISCAL/2026-08-14_DEMANDE-SIE_reponse-17EUR_texte-a-coller.md · pièce à joindre : relevé Indy de juillet"
+      ],
       [
        "Ce que dit le relevé Indy de juillet",
        "UN SEUL prélèvement de 17 € le 10/07 · aucun en juin · le second prélèvement du même jour est celui du PAS de mars (33 €)"
@@ -201,11 +205,25 @@
      ]
     },
     {
-     "l": "Classer les relevés SHINE — aucun n'est au dossier",
-     "w": "les paiements partent de Shine mais seuls les relevés Swan/Indy sont classés · sans eux, aucune analyse de trésorerie DAHLIA n'est fiable (leçon G-78)",
+     "l": "📎 ZEUS — me mettre à disposition les relevés SHINE (+ celui d'août)",
+     "w": "je n'ai AUCUN relevé Shine ni aucun relevé d'août : tant qu'ils manquent, aucune analyse de trésorerie DAHLIA n'est complète et je dois poser une réserve à chaque fois (leçon G-78) · les paiements partent pourtant de Shine",
      "a": [
-      "Traiter",
-      "POSTE : DAHLIA — classer les relevés du compte Shine"
+      "Déposer",
+      "POSTE : DAHLIA — classer les relevés Shine et le relevé d'août que Zeus met à disposition"
+     ],
+     "det": [
+      [
+       "Ce qui est au dossier",
+       "Qonto janv→mars · Indy avril→juillet"
+      ],
+      [
+       "Ce qui manque",
+       "TOUS les relevés Shine · le relevé d'août (tous comptes)"
+      ],
+      [
+       "Impact concret",
+       "le 13/08 j'ai conclu « rien n'est payable » sur le seul solde Indy (36,19 €) alors que Shine a permis un virement de 1 860 €"
+      ]
      ]
     }
    ]
