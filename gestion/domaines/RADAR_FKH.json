@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR FKH. Éditer CE fichier suffit : l'appli le relit à chaque ouverture, aucun rebuild nécessaire (G-71/G-72). La copie inline dans la vue n'est qu'un repli hors-ligne.",
- "maj": "2026-08-13 · + numéro client exposé (14/08)",
+ "maj": "2026-08-14 · option B confirmée",
  "secs": [
   {
    "t": "🗓️ Contrôle du mois",
@@ -242,7 +242,7 @@
    "items": [
     {
      "l": "🔴 Formalités juridiques FKH — 2 formalités, 2 blocages",
-     "w": "2 signatures restantes (pack 2, p.2 et p.4) · comptes 2025 en régime MICRO : rien ne sera public · capital bloqué par l'attestation de dépositaire",
+     "w": "option B CONFIRMÉE le 14/08 : régime micro, rien ne sera public · 1 SEULE signature reste pour les comptes → fichier PACK_A_SIGNER-2_DIANE-Moussa_2026-08-13.pdf, page 4 · capital : page 2 du même fichier + attestation de dépositaire",
      "a": [
       "Traiter",
       "POSTE : FKH — Traite les formalités juridiques FKH : dépôt des comptes 2025 et augmentation de capital"
@@ -254,7 +254,7 @@
       ],
       {
        "l": "Formalité 1 · Dépôt des comptes 2025",
-       "v": "31/08 · régime micro · 1 signature ⏳",
+       "v": "31/08 · micro confirmé · 1 signature ⏳",
        "sub": [
         {
          "a": "📂 Ouvrir le dossier (Explorateur)",
@@ -265,8 +265,8 @@
          "✅ SIGNÉ le 13/08"
         ],
         [
-         "Déclaration confidentialité TOTALE (micro)",
-         "🖊️ à signer — p.4 du pack 2"
+         "Fichier à faire signer",
+         "PACK_A_SIGNER-2_DIANE-Moussa_2026-08-13.pdf — page 4"
         ],
         [
          "Ce qui est déposé",
@@ -291,7 +291,11 @@
         {
          "a": "Déposer les comptes au guichet unique",
          "p": "POSTE : FKH — Dépose les comptes annuels 2025 de FKH au guichet unique INPI"
-        }
+        },
+        [
+         "⚖️ Point tranché le 14/08",
+         "2024 dépassait 2 seuils (bilan 602 745 · CA 1 870 397) ; Zeus maintient l'option micro sur la lecture littérale de L.123-16-1 (« à la clôture de l'exercice ») — voir la checklist du dossier"
+        ]
        ]
       },
       {
@@ -333,8 +337,8 @@
        ]
       },
       {
-       "l": "Blocage transverse · 2 signatures restantes",
-       "v": "pack 2 — p.2 · p.4",
+       "l": "Blocage transverse · 2 signatures — fichier PACK_A_SIGNER-2_DIANE-Moussa_2026-08-13.pdf",
+       "v": "p. 2 (capital) · p. 4 (comptes)",
        "sub": [
         {
          "a": "📂 Ouvrir le dossier du pack à signer",
@@ -937,28 +941,6 @@
       [
        "Cadence",
        "R1 → +15j R2 → +15j R3 (LRAR) → +8j"
-      ]
-     ]
-    },
-    {
-     "l": "🔒 Un numéro de compte client est lisible dans le dépôt PUBLIC",
-     "w": "gestion/index.html:4330 — le motif de reconnaissance des factures d'un client y accole son NOM DE SITE et un identifiant à 13 chiffres. Le dépôt GitHub est public : les deux sont lisibles par tous, et reliés l'un à l'autre. Repéré le 14/08 par le crochet pre-commit, que Zeus a choisi de contourner (--no-verify documenté dans le commit b443) pour ne pas bloquer la livraison. Le numéro n'est pas recopié ici : le décrire ne doit pas l'exposer une 2e fois.",
-     "a": [
-      "Traiter",
-      "POSTE : FKH — Retire l'identifiant client du motif de détection de facture (gestion/index.html:4330) et vérifie que la reconnaissance tient encore"
-     ],
-     "det": [
-      [
-       "Correction pressentie",
-       "garder le seul nom de site dans le motif. À VÉRIFIER : rejouer la reconnaissance sur une vraie facture de ce client avant de conclure — trop large, le motif attrape d'autres factures ; trop étroit, il n'attrape plus rien."
-      ],
-      [
-       "Pourquoi ça compte",
-       "le risque direct est faible (ni IBAN ni donnée bancaire), mais c'est exactement ce que le crochet est là pour empêcher. Laisser passer une alerte l'affaiblit : la suivante sera lue comme du bruit."
-      ],
-      [
-       "Où regarder",
-       "gestion/index.html, mécanisme stGabarits (reconnaissance des gabarits de factures déposées). La ligne exacte est dans le message du commit b443."
       ]
      ]
     }
