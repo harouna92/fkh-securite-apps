@@ -68,6 +68,16 @@ var DOMS=[
  {k:"PERSO", e:"🧑", c:"#34d399", t:"Dépenses · santé · juridique", f:"APPLI_PERSO.html"}
 ];
 var curDom=null;
+/* ===== b443 : L'ADMINISTRATEUR NE VOIT PAS PERSO — DU TOUT =====
+   Zeus, 13/08 : l'admin n'a acces qu'a l'Administratif des TROIS societes. PERSO n'est pas une
+   societe : ni ses depenses, ni sa sante, ni son juridique ne le regardent. La carte n'est donc
+   pas grisee, elle n'est pas dessinee. Le role vient de l'appli GESTION (meme origine).
+   HONNETE : c'est la SURFACE qu'on retire. Le vrai verrou reste le mot de passe cote GESTION —
+   ouvrir APPLI_PERSO.html a la main resterait possible. Dit a Zeus le 13/08. */
+var ROLE_DOM=null;
+try{ var _m=/[?&]role=([a-z-]+)/.exec(location.search);
+     ROLE_DOM=_m?_m[1]:(localStorage.getItem('fkh_role_domaines')||null); }catch(e){}
+if(ROLE_DOM==='admin'){ DOMS=DOMS.filter(function(d){ return d.k!=='PERSO'; }); }
 var grid=document.getElementById('grid');
 DOMS.forEach(function(d){
  var el=document.createElement('div');
@@ -79,7 +89,9 @@ DOMS.forEach(function(d){
 function openDom(d){
  curDom=d;
  document.getElementById('vttl').innerHTML='<span style="color:'+d.c+'">'+d.e+' '+d.k+'</span>';
- document.getElementById('vframe').src=d.f;
+ /* b443 : le cockpit doit connaitre le role AVANT de dessiner ses onglets — on le lui donne
+    dans son URL en plus du stockage, pour qu'il n'ait rien a reclamer. */
+ document.getElementById('vframe').src=d.f+(ROLE_DOM?('?role='+encodeURIComponent(ROLE_DOM)):'');
  document.getElementById('viewer').style.display='flex';
 }
 function closeDom(){
