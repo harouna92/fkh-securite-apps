@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR FKH. Éditer CE fichier suffit : l'appli le relit à chaque ouverture, aucun rebuild nécessaire (G-71/G-72). La copie inline dans la vue n'est qu'un repli hors-ligne.",
- "maj": "2026-08-13 · régime micro",
+ "maj": "2026-08-13 · + numéro client exposé (14/08)",
  "secs": [
   {
    "t": "🗓️ Contrôle du mois",
@@ -937,6 +937,28 @@
       [
        "Cadence",
        "R1 → +15j R2 → +15j R3 (LRAR) → +8j"
+      ]
+     ]
+    },
+    {
+     "l": "🔒 Un numéro de compte client est lisible dans le dépôt PUBLIC",
+     "w": "gestion/index.html:4330 — le motif de reconnaissance des factures d'un client y accole son NOM DE SITE et un identifiant à 13 chiffres. Le dépôt GitHub est public : les deux sont lisibles par tous, et reliés l'un à l'autre. Repéré le 14/08 par le crochet pre-commit, que Zeus a choisi de contourner (--no-verify documenté dans le commit b443) pour ne pas bloquer la livraison. Le numéro n'est pas recopié ici : le décrire ne doit pas l'exposer une 2e fois.",
+     "a": [
+      "Traiter",
+      "POSTE : FKH — Retire l'identifiant client du motif de détection de facture (gestion/index.html:4330) et vérifie que la reconnaissance tient encore"
+     ],
+     "det": [
+      [
+       "Correction pressentie",
+       "garder le seul nom de site dans le motif. À VÉRIFIER : rejouer la reconnaissance sur une vraie facture de ce client avant de conclure — trop large, le motif attrape d'autres factures ; trop étroit, il n'attrape plus rien."
+      ],
+      [
+       "Pourquoi ça compte",
+       "le risque direct est faible (ni IBAN ni donnée bancaire), mais c'est exactement ce que le crochet est là pour empêcher. Laisser passer une alerte l'affaiblit : la suivante sera lue comme du bruit."
+      ],
+      [
+       "Où regarder",
+       "gestion/index.html, mécanisme stGabarits (reconnaissance des gabarits de factures déposées). La ligne exacte est dans le message du commit b443."
       ]
      ]
     }
