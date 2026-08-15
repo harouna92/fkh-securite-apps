@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v15-08·b449</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v15-08·b450</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2888,7 +2888,21 @@ button.big:active{transform:translateY(1px)}
   function telKey(t){return (t||'').replace(/\D/g,'');}
   function saveFA(){ save('fkh_fa',FA); }
   // Enregistre les mensurations d'un agent dans son contrôle tenue (source unique, utilisée partout)
-  function faSaveMens(nom,po,pa,ha){ if(!nom)return; var T=load('fkh_tenues_ctrl'); if(!Array.isArray(T))T=[]; var n=tnorm(nom),idx=-1,bd=''; T.forEach(function(c,k){var cn=tnorm(c.Agent); if(cn&&(cn===n||cn.indexOf(n)>=0||n.indexOf(cn)>=0)){var d=String(c['Date contrôle']||''); if(idx<0||d>bd){idx=k;bd=d;}}}); if(idx>=0){ T[idx].Pointure=po; T[idx]['T. pantalon']=pa; T[idx]['T. haut']=ha; } else if(po||pa||ha){ T.push({'Date contrôle':impTodayISO(),'Agent':nom,'Pointure':po,'T. pantalon':pa,'T. haut':ha,'Statut tenue':'','Manquants':''}); } else return; save('fkh_tenues_ctrl',T); TCTRL=T; }
+  function faSaveMens(nom,po,pa,ha){ if(!nom)return; var T=load('fkh_tenues_ctrl'); if(!Array.isArray(T))T=[]; var n=tnorm(nom),idx=-1,bd=''; T.forEach(function(c,k){var cn=tnorm(c.Agent); if(cn&&(cn===n||cn.indexOf(n)>=0||n.indexOf(cn)>=0)){var d=String(c['Date contrôle']||''); if(idx<0||d>bd){idx=k;bd=d;}}}); /* ===== b450 · 15/08 — UNE SAISIE DE MENSURATIONS NE DOIT PLUS POUVOIR DISPARAÎTRE =====
+     CE QUI S'EST PASSÉ : le 13/08 à 18h14, le superviseur a saisi les mensurations de DRISSI EL
+     BOUZAIDI Jamal depuis son ticket. Le ticket l'a comptée comme faite — il ne compte que si
+     l'information est bien là, elle y était donc. Aujourd'hui elle n'est NULLE PART : cherchée
+     dans les 42 fichiers de la base.
+     POURQUOI : cette fonction écrivait la ligne de contrôle SANS horodatage (`at`), alors que
+     toutes les autres écritures en posent un. Or la fusion des contrôles départage deux lignes de
+     même agent et même date par cet horodatage : une ligne sans `at` vaut zéro et perd contre
+     n'importe quelle autre — y compris une version plus ancienne renvoyée par un autre poste. La
+     saisie était donc effaçable dès le passage suivant.
+     CONSÉQUENCE HUMAINE : le superviseur saisit, l'information disparaît, il ne recommence pas.
+     Deux saisies en deux jours sur ce ticket, puis plus rien.
+     DÉSORMAIS : toute écriture de mensurations est horodatée, à la création comme à la mise à
+     jour. Elle gagne alors normalement l'arbitrage, comme les contrôles de tenue. */
+    if(idx>=0){ T[idx].Pointure=po; T[idx]['T. pantalon']=pa; T[idx]['T. haut']=ha; T[idx].at=Date.now(); } else if(po||pa||ha){ T.push({'Date contrôle':impTodayISO(),'Agent':nom,'Pointure':po,'T. pantalon':pa,'T. haut':ha,'Statut tenue':'','Manquants':'',at:Date.now()}); } else return; save('fkh_tenues_ctrl',T); TCTRL=T; }
   function cityAuto(q,suggId,onPick){ function render(list){var box=byId(suggId);if(!Array.isArray(list)||!list.length){box.classList.add('hidden');return;}box.innerHTML='';list.forEach(function(c){var d=document.createElement('div');var cp=(c.codesPostaux&&c.codesPostaux[0])||'';d.innerHTML='<span>'+esc(c.nom)+'</span> <span class="cp">'+esc(cp)+'</span>';d.onclick=function(){onPick(c);};box.appendChild(d);});box.classList.remove('hidden');} var loc=commSearch(q,25); if(loc){render(loc);return;} fetch('https://geo.api.gouv.fr/communes?nom='+encodeURIComponent(q)+'&fields=nom,departement,centre,codesPostaux,population&boost=population&limit=25').then(function(r){return r.json();}).then(render).catch(function(){byId(suggId).classList.add('hidden');});}
   byId('fa-ville').addEventListener('input',function(){var q=this.value.trim();faSel=null;clearTimeout(faT);if(q.length<2){byId('sugg-fa-ville').classList.add('hidden');return;}faT=setTimeout(function(){cityAuto(q,'sugg-fa-ville',function(c){var co=c.centre&&c.centre.coordinates;faSel={nom:c.nom,cp:(c.codesPostaux&&c.codesPostaux[0])||'',la:co?co[1]:null,lo:co?co[0]:null,dep:(c.departement&&c.departement.code)||'',depnom:(c.departement&&c.departement.nom)||''};byId('fa-ville').value=c.nom;byId('sugg-fa-ville').classList.add('hidden');});},250);});
   byId('fa-refville').addEventListener('input',function(){var q=this.value.trim();faRef=null;clearTimeout(faRT);if(q.length<2){byId('sugg-fa-refville').classList.add('hidden');renderFA();return;}faRT=setTimeout(function(){cityAuto(q,'sugg-fa-refville',function(c){var co=c.centre&&c.centre.coordinates;faRef={nom:c.nom,la:co?co[1]:null,lo:co?co[0]:null};byId('fa-refville').value=c.nom;byId('sugg-fa-refville').classList.add('hidden');renderFA();});},250);});
@@ -4687,7 +4701,19 @@ button.big:active{transform:translateY(1px)}
       var mrgS=suiviMerge(load('fkh_suivi').filter(function(x){return !x.sim;}),remS), mvS=JSON.stringify(mrgS);
       try{localStorage.setItem('fkh_suivi',mvS);}catch(e){}
       var _sims=SUIVI.filter(function(x){return x.sim;}), _tr={};
-      (SUIVI||[]).forEach(function(x){var f={};for(var _k in x)if(_k.charAt(0)==='_'&&_k!=='_pending'&&_k!=='_pick'&&_k!=='_pick2')f[_k]=x[_k];if(Object.keys(f).length)_tr[String(x.id)]=f;});
+      /* ===== b450 · 15/08 — G-97 (b) : CE QUE J'AI OUVERT RESTE OUVERT =====
+         POURQUOI (Zeus, 15/08) : « tout ce qu'on ouvre, il ne faut pas que ça se referme tout
+         seul ». MESURÉ sur le banc, avec ses données : j'ouvre l'affectation d'une demande, un
+         collègue enregistre une mission — moins de 8 secondes plus tard, mon panneau est fermé.
+         LA CAUSE ÉTAIT ICI. Cette ligne mettait de côté les marques locales pour les rendre après
+         la fusion... en excluant justement les TROIS qui disent « cette carte est ouverte »
+         (`_pick` = choix d'agent, `_pick2` = second choix, `_pending` = envoi en attente). Elles
+         étaient donc effacées deux lignes plus bas et jamais rendues : le panneau se refermait.
+         On les met désormais de côté COMME LES AUTRES. Le `delete` de la ligne suivante reste :
+         il nettoie ce qui viendrait du serveur — l'écran d'un collègue n'a pas à ouvrir le mien
+         (G-95 : un drapeau d'affichage écrit dans la donnée voyage). Seules MES ouvertures
+         reviennent, et elles reviennent après la fusion, donc sur des données à jour. */
+      (SUIVI||[]).forEach(function(x){var f={};for(var _k in x)if(_k.charAt(0)==='_')f[_k]=x[_k];if(Object.keys(f).length)_tr[String(x.id)]=f;});
       SUIVI=load('fkh_suivi'); if(_sims.length)SUIVI=_sims.concat(SUIVI);
       SUIVI.forEach(function(x){delete x._pending;delete x._pick;delete x._pick2;var _f=_tr[String(x.id)];if(_f)for(var _k2 in _f)x[_k2]=_f[_k2];});
       /* b431 : une demande deposee par le serveur arrive sans coordonnees. On la complete des
@@ -4964,7 +4990,38 @@ button.big:active{transform:translateY(1px)}
   function _editingIn(secId){ var sec=byId(secId); if(!sec||sec.classList.contains('hidden'))return false; var ae=document.activeElement; return !!(ae&&sec.contains(ae)&&/^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName)); }
   // Anti-fermeture GÉNÉRAL : un rafraîchissement automatique ne doit JAMAIS refermer ce que l'utilisateur a ouvert.
   // → true si, dans cette section, un panneau <details> est ouvert OU un champ est en cours de saisie. Les rendus AUTO sautent alors (les rendus manuels passent).
-  function _uiOpen(secId){ var sec=byId(secId); if(!sec||sec.classList.contains('hidden'))return false; if(_editingIn(secId))return true; if(sec.querySelector('details[open]'))return true; if(sec.querySelector('.oper-panel:not(.hidden)'))return true; return false; }
+  /* ===== b448 · 15/08 — G-97 (b) : « RIEN NE DOIT SE REFERMER TOUT SEUL » =====
+     POURQUOI (Zeus, 15/08) : « tout ce qu'on ouvre il ne faut pas que ça se referme tout seul,
+     je te l'ai répété au moins 1000 fois ». Le garde-fou existait — mais il ne reconnaissait
+     comme « ouvert » que TROIS choses : une saisie en cours, un <details> déplié, et le panneau
+     des opérateurs. Tous les autres panneaux de l'appli lui étaient INVISIBLES : il répondait
+     « rien n'est ouvert », et la synchro (toutes les 4 s) comme les minuteries redessinaient
+     par-dessus le travail en cours.
+     Ce point est le SEUL qui décide : `_activeBusy` s'en sert pour différer la synchro sur
+     TOUTES les sections, et les rendus automatiques l'interrogent un par un. Le compléter ici
+     répare partout à la fois — inutile d'aller retoucher chaque vue.
+     SANS FAUX POSITIF : ces panneaux-là naissent avec la classe `hidden` dans la page. Qu'ils
+     ne l'aient plus ne peut vouloir dire qu'une chose — quelqu'un vient de les ouvrir.
+     `data-ouvert="1"` est la convention pour tout ce qu'on ouvrira désormais : le poser suffit
+     à être protégé, sans toucher à cette fonction.
+     RIEN N'EST PERDU : le rendu n'est pas annulé, il est DIFFÉRÉ — la minuterie repasse, et la
+     synchro retient sa vue « sale » (`CLOUD._vueSale`) pour la rejouer dès la fermeture. */
+  /* ⚠️ N'INSCRIRE ICI QUE DES PANNEAUX, JAMAIS UN BOUTON. Un sélecteur qui attrape un élément
+     TOUJOURS présent ferait répondre « c'est ouvert » en permanence : plus aucune vue ne se
+     rafraîchirait, et on aurait troqué un défaut contre un pire. Écarté pour cette raison le
+     15/08 : `.phm-open`, qui est le BOUTON « ouvrir », pas le bloc ouvert.
+     Règle pour en ajouter un : le panneau doit naître avec `hidden` (ou `data-ouvert="0"`) et ne
+     le perdre qu'au geste de l'utilisateur. */
+  var _UI_OUVERT='details[open],.oper-panel:not(.hidden),.anom-panel:not(.hidden),.tdrill-panel:not(.hidden),.taf-dpanel:not(.hidden),[data-ouvert="1"]';
+  function _uiOpen(secId){ var sec=byId(secId); if(!sec||sec.classList.contains('hidden'))return false; if(_editingIn(secId))return true;
+    /* b450 — LE CAS LE PLUS FRÉQUENT, ET LE PLUS INVISIBLE : dans « Suivi demandes », une carte
+       dépliée (affectation, choix d'agent, agents proches, envoi en attente) n'est marquée nulle
+       part dans la page — le drapeau vit dans la DONNÉE. Le garde-fou, qui ne regarde que la page,
+       répondait donc « rien n'est ouvert » et la synchronisation (toutes les 4 s) redessinait par
+       dessus : la carte se refermait pendant qu'on affectait un agent. Le rendu automatique de la
+       section, lui, faisait déjà ce test depuis longtemps — c'est la synchro qui l'ignorait. */
+    try{ if(secId==='sec-suivi'&&typeof SUIVI!=='undefined'&&SUIVI.some(function(x){return x._affect||x._pick||x._pick2||x._near||x._pending;}))return true; }catch(e){}
+    try{ if(sec.querySelector(_UI_OUVERT))return true; }catch(e){ if(sec.querySelector('details[open]'))return true; if(sec.querySelector('.oper-panel:not(.hidden)'))return true; } return false; }
   // Anti-fermeture GLOBAL : true si la section actuellement visible a un panneau ouvert / une saisie en cours. Utilisé pour DIFFÉRER la synchro cloud (rien n'est perdu, ré-appliqué au cycle suivant).
   function _activeBusy(){ try{ var secs=document.querySelectorAll('section[id^="sec-"]'); for(var i=0;i<secs.length;i++){ var s=secs[i]; if(!s.classList.contains('hidden')&&_uiOpen(s.id))return true; } }catch(e){} return false; }
   // ===== 🛒 À commander : auto (articles sous le seuil, b87) + ajout manuel + « Commandé » + « Reçu → +stock » =====
@@ -5829,7 +5886,7 @@ button.big:active{transform:translateY(1px)}
   function supTerrainAdd(o){ var a=stLoad2(); o.id='st'+Date.now()+'_'+Math.round(Math.random()*99999); o.at=Date.now(); o.statut=o.statut||'attente'; if(o.type==='injoignable'&&!o.deadline)o.deadline=o.at+10*60000; a.unshift(o); if(a.length>500)a=a.slice(0,500); stSave2(a); supTerrainBadge(); return o.id; }
   function supTerrainBadge(){ var el=byId('supterrain-cnt'); if(!el)return; if(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'){ el.style.display='none'; return; } var a=stLoad2(), p=a.filter(function(x){return x.statut==='attente';}), esc2=a.filter(function(x){return x.statut==='escalade';}); /* b384 : un ticket recu et non clos compte dans ce badge — sinon il arrive ici sans que rien ne le signale, et un ticket qu'on ne voit pas est un ticket qui attend. */ var tk=0; try{ if(typeof tkxLoad==='function')tk=tkxLoad().filter(function(t){ return t&&t.kind==='echange'&&t.etat!=='fait'&&tkxPourMoi(t); }).length; }catch(_e){} var n=p.length+esc2.length+tk; if(!n){ el.style.display='none'; el.textContent=''; return; } el.style.display=''; el.textContent=n; el.style.background=esc2.length?'#c02626':''; el.style.color=esc2.length?'#fff':''; el.title=[(p.length+esc2.length)?((p.length+esc2.length)+' cas terrain'):'', tk?(tk+' ticket(s) reçu(s)'):''].filter(Boolean).join(' · '); }
   // Escalade : deadline dépassée sans réaction superviseur → visible admin/super-admin + notif (routage fin par rôle = remontée #15b, à trancher).
-  function supTerrainTick(){ var a=stLoad2(), chg=false, now=Date.now(); a.forEach(function(x){ if((x.type==='injoignable'||x.type==='anomalie')&&x.statut==='attente'&&x.deadline&&now>x.deadline){ x.statut='escalade'; x.escAt=now; chg=true; if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'stesc'+x.id,title:'🔴 ESCALADE — injoignable sans réaction superviseur (10 min)',body:(x.agent||'')+' · '+(x.site||''),go:'supterrain'}); } }); if(chg){ stSave2(a); supTerrainBadge(); var sec=byId('sec-supterrain'); if(sec&&!sec.classList.contains('hidden'))renderSupTerrain(); } }
+  function supTerrainTick(){ var a=stLoad2(), chg=false, now=Date.now(); a.forEach(function(x){ if((x.type==='injoignable'||x.type==='anomalie')&&x.statut==='attente'&&x.deadline&&now>x.deadline){ x.statut='escalade'; x.escAt=now; chg=true; if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'stesc'+x.id,title:'🔴 ESCALADE — injoignable sans réaction superviseur (10 min)',body:(x.agent||'')+' · '+(x.site||''),go:'supterrain'}); } }); if(chg){ stSave2(a); supTerrainBadge(); var sec=byId('sec-supterrain'); /* b448 : le changement est ENREGISTRE quoi qu'il arrive ; seul le redessin attend qu'on ait refermé. */ if(sec&&!sec.classList.contains('hidden')&&!(typeof _uiOpen==='function'&&_uiOpen('sec-supterrain')))renderSupTerrain(); } }
   setInterval(supTerrainTick,30000); try{supTerrainBadge();}catch(e){}
   /* ===== b349 : LES ACTIONS D'UN TICKET DECOULENT DE CE QU'IL DEMANDE =====
      POURQUOI (Zeus, 06/08, capture a l'appui) : il envoie « cree la fiche agent de Ali Madaev, ville
@@ -6744,7 +6801,13 @@ button.big:active{transform:translateY(1px)}
     var arr=tkxLoad().filter(function(t){return t&&t.kind==='echange';});
     var recus=arr.filter(tkxPourMoi), envoyes=(quoi==='recus')?[]:arr.filter(tkxDeMoi);   /* b378 */
     /* b379 : ce que je vois sans que ce soit a moi — je suis au-dessus du destinataire. */
-    var dessus=arr.filter(function(t){ return !tkxPourMoi(t)&&!tkxDeMoi(t)&&tkxVisible(t); });
+    /* b450 · 15/08 : surveiller le ticket d'un autre est réservé au SUPER-ADMINISTRATEUR.
+       Zeus : « je souhaiterais être la seule personne à le suivre en tant que super-administrateur ».
+       Avant, tout rang supérieur au destinataire voyait le bloc — un administrateur suivait donc
+       les tickets adressés aux superviseurs. Ce que J'AI envoyé et ce qu'on M'A envoyé ne changent
+       pas : chacun garde ses deux listes. (G-104 e) */
+    var _rSurv=(typeof drRole==='function')?drRole():'';
+    var dessus=(_rSurv==='superadmin'||_rSurv==='full')?arr.filter(function(t){ return !tkxPourMoi(t)&&!tkxDeMoi(t)&&tkxVisible(t); }):[];
     if(!recus.length&&!envoyes.length&&!dessus.length)return '';
     function carte(t,mien){
       var e=TK_ETATS[t.etat]||TK_ETATS.a_faire;
@@ -6773,6 +6836,7 @@ button.big:active{transform:translateY(1px)}
                     : fait+'/'+r.total+' renseign\u00e9'+(fait>1?'s':'')+' \u00b7 '+r.reste+' encore manquant'+(r.reste>1?'s':''))
                 : (r.reste===0?'\u2705 Plus rien dans la file — le travail est fait':(fait+' sur '+r.total+' r\u00e9gl\u00e9e(s) \u00b7 '+r.reste+' restante(s)')))
              +'</div><div style="height:6px;border-radius:4px;background:var(--panel2);overflow:hidden;margin-top:3px"><div style="height:100%;width:'+pct+'%;background:'+col+'"></div></div></div>'; })()
+        +((mien&&typeof tkxSuiviBloc==='function')?tkxSuiviBloc(t):'')   /* b450 : le silence + qui relancer, pour celui qui a envoye le ticket */
         +(t.autoFait?('<div class="sub" style="margin:4px 0 0;color:#1a9e5c;font-size:11.5px">\ud83e\udd16 Ferm\u00e9 automatiquement — '+(t.manque?('les '+(t.autoDe||0)+' information(s) sont dans les fiches'):('les '+(t.autoDe||0)+' ligne(s) vis\u00e9e(s) ont quitt\u00e9 la file'))+'</div>'):'')
         +((typeof tkxManqueBloc==='function')?tkxManqueBloc(t):'');   /* b432 : la saisie ET le controle, dans la carte */
       if(t.contexte&&t.contexte.length){
@@ -6938,7 +7002,7 @@ button.big:active{transform:translateY(1px)}
   function tkTick(){ try{ var arr=tkLoad(), chg=false, now=Date.now(); arr.forEach(function(t){
     if(t.notifyAt&&!t.notified&&now>=t.notifyAt){ t.notified=true; chg=true; if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'tknf'+t.id,title:'🎫 Ticket'+(t.assignee?' pour '+t.assignee:''),body:(t.titre||'')+(t.due?' — avant '+new Date(t.due).toLocaleString('fr-FR').slice(0,17):''),go:'tickets'}); }
     if(t.due&&now>t.due&&!t.escalated){ var p=tkProgress(t); if(!(p.total&&p.done>=p.total)){ t.escalated=true; chg=true; if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)notifFire({cat:'nouvelle_demande',key:'tkesc'+t.id,title:'🔴 Ticket EN RETARD — non fait dans le délai',body:(t.titre||'')+(t.assignee?' → '+t.assignee:'')+' ('+p.done+'/'+p.total+')',go:'tickets'}); } } });
-    if(chg){ tkSave(arr); var sec=byId('sec-tickets'); if(sec&&!sec.classList.contains('hidden')&&typeof renderTickets==='function')renderTickets(); } }catch(e){} }
+    if(chg){ tkSave(arr); var sec=byId('sec-tickets'); /* b448 : idem — enregistré tout de suite, redessiné seulement quand plus rien n'est ouvert. */ if(sec&&!sec.classList.contains('hidden')&&!(typeof _uiOpen==='function'&&_uiOpen('sec-tickets'))&&typeof renderTickets==='function')renderTickets(); } }catch(e){} }
   setInterval(tkTick,60000);
   function svcSynthCard(m){
     var S=ssLoad(), st=S[m.id]||{}, steps=ssSteps(m);
@@ -9924,6 +9988,50 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     var reste=t.contexte.filter(function(l){ return dedans[l]; });
     return {connu:true, reste:reste.length, total:t.contexte.length, lignes:reste};
   }
+  /* ===== b450 · 15/08 — UN SUIVI DIT AUSSI LE SILENCE, ET IL NOMME LE RESTE =====
+     POURQUOI (Zeus, 15/08) : « à chaque fois que je lui donne un ticket je veux avoir ce type de
+     suivi sur le ticket pour savoir réellement ce qu'il a fait et ce qui reste à faire ».
+     La carte disait déjà « 60/165 renseignés ». Elle ne disait ni depuis quand plus rien ne
+     bouge, ni QUI relancer — il fallait déplier 55 lignes pour le savoir. Or un ticket ouvert
+     puis abandonné se lit exactement comme un ticket en cours : c'est ce silence-là qu'on doit
+     voir. Cas réel : ouvert en 36 min, deux saisies, puis plus rien pendant 20 h.
+     Réservé à celui qui a envoyé le ticket : c'est SON suivi. (G-104) */
+  function tkxDepuis(ms){ var d=Math.max(0,Date.now()-ms);
+    var mn=Math.round(d/60000); if(mn<60)return mn+' min';
+    var h=Math.round(d/3600000); if(h<48)return h+' h';
+    return Math.round(d/86400000)+' j'; }
+  function tkxSuiviBloc(t){
+    try{
+      var s=(t&&t.saisies)||null, ks=s?Object.keys(s):[];
+      var m=(typeof tkxManqueEtat==='function')?tkxManqueEtat(t):null;
+      if(!ks.length&&!m)return '';
+      var out='';
+      if(ks.length){
+        var dern=null; ks.forEach(function(k){ var v=s[k]; if(v&&v.at&&(!dern||v.at>dern.at))dern={at:v.at,by:v.by}; });
+        if(dern){ var dd=new Date(dern.at);
+          out+='<div class="sub" style="margin:4px 0 0">✍️ '+ks.length+' saisie'+(ks.length>1?'s':'')
+            +' · la dernière il y a <b>'+tkxDepuis(dern.at)+'</b> ('
+            +('0'+dd.getDate()).slice(-2)+'/'+('0'+(dd.getMonth()+1)).slice(-2)+' '
+            +('0'+dd.getHours()).slice(-2)+'h'+('0'+dd.getMinutes()).slice(-2)
+            +(dern.by?(', par '+esc(dern.by)):'')+')</div>';
+        }
+      } else if(m&&m.fait<m.total){
+        out+='<div class="sub" style="margin:4px 0 0;color:var(--bad)">✍️ <b>aucune saisie</b> depuis l’envoi — il y a '+tkxDepuis(t.cree||Date.now())+'</div>';
+      }
+      if(m&&m.lignes){
+        var vac={}; ((t.manque&&t.manque.agents)||[]).forEach(function(g){ vac[g.id]=+g.vac||0; });
+        var reste=m.lignes.filter(function(l){ return l.fait<l.total; })
+          .sort(function(a,b){ return (vac[b.id]||0)-(vac[a.id]||0); }).slice(0,3);
+        if(reste.length){
+          out+='<div class="sub" style="margin:2px 0 0">📞 À relancer en priorité : '
+            +reste.map(function(l){ var n=l.total-l.fait;
+                return '<b>'+esc(l.nom)+'</b> ('+(vac[l.id]||0)+' vacation'+((vac[l.id]||0)>1?'s':'')+', '+n+' info'+(n>1?'s':'')+')'; }).join(' · ')
+            +'</div>';
+        }
+      }
+      return out;
+    }catch(e){ return ''; }
+  }
   /* Balayage : ferme les tickets dont plus rien ne reste. Rend le nombre de tickets fermes. */
   function tkxAutoScan(){
     var arr=tkxLoad(), chg=0;
@@ -11388,7 +11496,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     if(mailsAnnulScan(items))_crea=true;   /* b229 */
     return _crea;
   }
-  function mailsAutoPlanFetch(){ try{ mailsFetch(function(items){ if(mailsAutoPlan(items)){ if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}} } }); }catch(e){} }
+  function mailsAutoPlanFetch(){ try{ mailsFetch(function(items){ if(mailsAutoPlan(items)){ /* b448 : le Planning ne se redessine pas sous les doigts de celui qui y travaille — la mission est créée quand même, seul l'affichage attend. */ if(typeof renderPlanning==='function'&&!(typeof _uiOpen==='function'&&_uiOpen('sec-planning'))){try{renderPlanning();}catch(e){}} if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}} } }); }catch(e){} }
   function mailsFetch(cb){ if(typeof CLOUD==='undefined'||!CLOUD||!CLOUD.on){ if(cb)cb(mailsCache()); return; }
     fetch(CLOUD.base+'/mails/list',{headers:cloudHdr()}).then(function(r){return r.json();}).then(function(j){
       if(j&&j.ok){ try{localStorage.setItem(MAILS_CACHE_KEY,JSON.stringify(j.items||[]));}catch(e){} MAIL_HB=j.hb||null; try{localStorage.setItem('fkh_mail_hb',JSON.stringify({hb:MAIL_HB,lu:Date.now()}));}catch(e){} if(cb)cb(j.items||[]); }
