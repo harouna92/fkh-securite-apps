@@ -10,3 +10,4 @@ tmp/
 # Ils portent la paie, la banque, l URSSAF. Ils vivent dans le coffre (R2),
 # derriere le mot de passe ; le cockpit les y lit. Voir SCRIPTS/carnet_vers_coffre.py
 gestion/domaines/DATA_*.json
+gestion/_banc_coffre.html
