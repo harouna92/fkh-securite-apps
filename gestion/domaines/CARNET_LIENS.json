@@ -1,0 +1,26 @@
+{
+ "_doc": "CARNET D'ADRESSES PARTAGEES — source unique. Une adresse utilisee par plusieurs taches ou plusieurs domaines s'ecrit ICI, sous un nom court. Les taches y renvoient par \"ref\". Le jour ou une adresse change, on la corrige a UN SEUL endroit. Ce qui est propre a une seule tache (un numero de dossier, un brouillon precis) reste dans la tache, en \"u\".",
+ "maj": "2026-08-14",
+ "liens": {
+  "guichet-inpi": {
+   "t": "Guichet unique INPI",
+   "u": "https://guichet-unique.inpi.fr/",
+   "quoi": "formalites des entreprises : depot des comptes annuels, modifications, capital",
+   "vaut_pour": [
+    "FKH",
+    "DAHLIA",
+    "GARIS"
+   ]
+  },
+  "suivi-comptes-inpi": {
+   "t": "Suivre le dépôt",
+   "u": "https://guichet-unique.inpi.fr/annual-accounts",
+   "quoi": "liste des dépôts de comptes annuels et leur état — donné par Zeus le 14/08",
+   "vaut_pour": [
+    "FKH",
+    "DAHLIA",
+    "GARIS"
+   ]
+  }
+ }
+}

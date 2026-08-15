@@ -1,6 +1,6 @@
 {
  "_doc": "SOURCE DE VÉRITÉ des lignes du RADAR FKH. Éditer CE fichier suffit : l'appli le relit à chaque ouverture, aucun rebuild nécessaire (G-71/G-72). La copie inline dans la vue n'est qu'un repli hors-ligne.",
- "maj": "2026-08-14 · 2024 prêt à signer",
+ "maj": "2026-08-14 · comptes 2024 et 2025 PRÊTS à déposer · capital bloqué sur l'attestation des 243 €",
  "secs": [
   {
    "t": "🗓️ Contrôle du mois",
@@ -241,8 +241,8 @@
    "bg": "rgba(251,191,36,.16)",
    "items": [
     {
-     "l": "🖊️ Comptes annuels 2024 — dossier PRÊT, il manque la signature",
-     "w": "7 pièces conformes et datées du 14/08 à la racine de DEPOT COMPTES ANNUELS 2024 · dénomination + siège + RCS + certifié conforme contrôlés sur chacune · reste : signature de DIANE Moussa, puis dépôt (nouveaux frais)",
+     "l": "✅ Comptes annuels 2024 — DOSSIER PRÊT À DÉPOSER",
+     "w": "les 7 pièces sont signées et contrôlées à l'écran (14/08) · exercice jamais déposé, refus de février classé sans suite · ne restent que les gestes du formulaire : cocher la confidentialité du compte de résultat · chaque pièce dans SA case · repayer les frais",
      "a": [
       "Traiter",
       "POSTE : FKH — redépose les comptes annuels 2024 au guichet unique"
@@ -280,11 +280,32 @@
        "a": "Marquer le dépôt effectué",
        "p": "POSTE : FKH — le dépôt des comptes 2024 est effectué, classer le récépissé et clore la ligne"
       }
+     ],
+     "liens": [
+      {
+       "t": "Dossier",
+       "u": "C:\\Users\\Utilisateur\\Downloads\\FKH SECURITE CLAUDE\\FKH\\1_ETABLISSEMENT\\DEPOT COMPTES ANNUELS 2024",
+       "k": "dossier"
+      },
+      {
+       "t": "Déposer",
+       "u": "https://guichet-unique.inpi.fr/annual-account-drafts/5740490/edit",
+       "k": "web"
+      },
+      {
+       "t": "Suivre le dépôt",
+       "k": "web",
+       "ref": "suivi-comptes-inpi"
+      },
+      {
+       "t": "Guichet INPI",
+       "ref": "guichet-inpi"
+      }
      ]
     },
     {
-     "l": "🔴 Formalités juridiques FKH — 2 formalités, 2 blocages",
-     "w": "option B CONFIRMÉE le 14/08 : régime micro, rien ne sera public · 1 SEULE signature reste pour les comptes → fichier PACK_A_SIGNER-2_DIANE-Moussa_2026-08-13.pdf, page 4 · capital : page 2 du même fichier + attestation de dépositaire",
+     "l": "🟠 Formalités juridiques FKH — 1 seul blocage restant",
+     "w": "comptes 2024 ✅ prêts · comptes 2025 ✅ prêts (limite 31/08) · augmentation de capital ⛔ bloquée par l'attestation de dépositaire des 243 €, à demander au chat support Indy",
      "a": [
       "Traiter",
       "POSTE : FKH — Traite les formalités juridiques FKH : dépôt des comptes 2025 et augmentation de capital"
@@ -438,6 +459,23 @@
        "Après le dépôt",
        "constater la reconstitution des capitaux propres au 31/12/2025 pour radier la mention du Kbis (échéance 31/12/2026)"
       ]
+     ],
+     "liens": [
+      {
+       "t": "Dossier",
+       "u": "C:\\Users\\Utilisateur\\Downloads\\FKH SECURITE CLAUDE\\FKH\\1_ETABLISSEMENT\\augmentation du capital social",
+       "k": "dossier"
+      },
+      {
+       "t": "Déposer",
+       "u": "",
+       "k": "web"
+      },
+      {
+       "t": "Suivre",
+       "u": "",
+       "k": "web"
+      }
      ]
     },
     {
@@ -1592,7 +1630,7 @@
     },
     {
      "l": "Dépôt comptes annuels 2025",
-     "w": "greffe · dépôt ÉLECTRONIQUE = 2 mois après l'AG du 30/06 (art. L.232-21) — le 31/07 était le délai papier · détail dans « Formalités juridiques FKH » (À faire)",
+     "w": "greffe · dépôt ÉLECTRONIQUE = 2 mois après l'AG du 30/06 (art. L.232-21) — le 31/07 était le délai papier · détail dans « Formalités juridiques FKH » (À faire) · ✅ les 4 pièces sont signées et datées du 14/08 — dossier PRÊT",
      "due": "31/08",
      "det": [
       [
@@ -1613,7 +1651,24 @@
        "p": "POSTE : FKH — Prépare le dépôt des comptes annuels 2025 (greffe/INPI, limite 31/08/2026)"
       }
      ],
-     "dd": "2026-08-31"
+     "dd": "2026-08-31",
+     "liens": [
+      {
+       "t": "Dossier",
+       "u": "C:\\Users\\Utilisateur\\Downloads\\FKH SECURITE CLAUDE\\FKH\\1_ETABLISSEMENT\\approbation des comptes 2025",
+       "k": "dossier"
+      },
+      {
+       "t": "Déposer",
+       "u": "",
+       "k": "web"
+      },
+      {
+       "t": "Suivre le dépôt",
+       "k": "web",
+       "ref": "suivi-comptes-inpi"
+      }
+     ]
     },
     {
      "l": "Conformité — pièces sociétés à renouveler",
