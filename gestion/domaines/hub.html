@@ -74,44 +74,17 @@ var curDom=null;
    pas grisee, elle n'est pas dessinee. Le role vient de l'appli GESTION (meme origine).
    HONNETE : c'est la SURFACE qu'on retire. Le vrai verrou reste le mot de passe cote GESTION —
    ouvrir APPLI_PERSO.html a la main resterait possible. Dit a Zeus le 13/08. */
-/* ===== b446 : ON NE FAIT PAS CONFIANCE A CE QUI TRAINE SUR LE POSTE =====
-   b443 lisait le role dans le stockage du navigateur. Or la deconnexion ne l'effaçait pas : le
-   poste gardait le role du dernier connecte, et quiconque rouvrait cette adresse en heritait.
-   Mesure du 14/08 : poste quitte par un super-admin, hub ouvert SANS mot de passe -> les quatre
-   domaines, PERSO compris.
-   Desormais le role ne vient QUE de l'application, qui l'annonce (voir domDiffuseRole). Hors de
-   l'application, personne ne repond : on applique alors le regime le plus ferme. Un doute sur
-   l'identite de celui qui regarde se tranche toujours en montrant MOINS.
-   (`?role=` reste accepte : c'est ainsi que le hub passe le role au cockpit, et c'est ce qui
-   permet de rejouer un cas. Ce n'est pas un verrou — le verrou est le mot de passe cote GESTION.) */
 var ROLE_DOM=null;
-try{ var _m=/[?&]role=([a-z-]+)/.exec(location.search); if(_m)ROLE_DOM=_m[1]; }catch(e){}
-/* b445 : on RECLAME le role a l'hote et on ECOUTE ses annonces. Lire le stockage une fois au
-   chargement ne suffit pas : le hub est charge avant la connexion. */
-var DOMS_TOUS=DOMS.slice();
+try{ var _m=/[?&]role=([a-z-]+)/.exec(location.search);
+     ROLE_DOM=_m?_m[1]:(localStorage.getItem('fkh_role_domaines')||null); }catch(e){}
+if(ROLE_DOM==='admin'){ DOMS=DOMS.filter(function(d){ return d.k!=='PERSO'; }); }
 var grid=document.getElementById('grid');
-function dessineCartes(){
- /* b446 : PERSO ne s'affiche que si l'application a EXPLICITEMENT annonce un role au-dessus de
-    l'administrateur. Rien d'annonce = on ne sait pas qui regarde = on ne montre pas PERSO. */
- var _voitPerso=(ROLE_DOM==='superadmin'||ROLE_DOM==='full');
- DOMS=_voitPerso?DOMS_TOUS.slice():DOMS_TOUS.filter(function(d){return d.k!=='PERSO';});
- grid.innerHTML='';
- DOMS.forEach(function(d){
+DOMS.forEach(function(d){
  var el=document.createElement('div');
  el.className='dcard'; el.style.borderLeftColor=d.c;
  el.innerHTML='<div class="e">'+d.e+'</div><div class="n" style="color:'+d.c+'">'+d.k+'</div><div class="t">'+d.t+'</div>';
  el.onclick=function(){openDom(d);};
  grid.appendChild(el);
- });
-}
-dessineCartes();
-try{ if(window.parent!==window)window.parent.postMessage({__wantrole:1},'*'); }catch(e){}
-window.addEventListener('message',function(e){
- var d=e.data||{}; if(d.__role===undefined)return;
- var av=ROLE_DOM; ROLE_DOM=d.__role||null;
- if(av!==ROLE_DOM){ dessineCartes();
-   /* un cockpit deja ouvert doit suivre le changement, pas rester sur l'ancien role */
-   if(curDom)document.getElementById('vframe').src=curDom.f+(ROLE_DOM?('?role='+encodeURIComponent(ROLE_DOM)):''); }
 });
 function openDom(d){
  curDom=d;
