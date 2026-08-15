@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v14-08·b447</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v15-08·b449</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -1720,6 +1720,25 @@ button.big:active{transform:translateY(1px)}
     }).catch(function(){it._nogeo=true;cb&&cb();});
   }
   function nearAgents(it){
+    /* ===== b449 : CORRECTIF BLOQUANT — cause reelle de la panne des 13-15/08 =====
+       SYMPTOME chez Zeus (console du 15/08) :
+         Uncaught TypeError: Cannot read properties of undefined (reading 'forEach')
+           at nearAgents -> renderNear -> svItem -> renderSuivi -> demarrage (ligne 12290)
+       CAUSE : `FA` (les fiches agents) est cree ligne 2873. nearAgents vit ligne 1728 et
+       s'execute DES le premier dessin du Suivi, donc AVANT. En JavaScript la variable existe
+       deja mais vaut `undefined` : `FA.forEach` explose. Et une exception au demarrage
+       INTERROMPT le script — tout ce qui suit n'est jamais pose : la connexion (d'ou aucun
+       bandeau et aucun ecran de mot de passe), SUPERADMIN_SECTIONS (d'ou la 2e erreur, sur
+       chaque clic d'onglet), la collecte des mails. TROIS symptomes, UNE cause.
+       LE DECLENCHEUR EST DANS LA DONNEE : le drapeau `_near` (panneau « Agents proches »
+       deplie sur une demande) est ecrit dans `fkh_suivi`, donc synchronise, donc present sur
+       TOUS les appareils. C'est pourquoi vider le cache ne changeait rien.
+       INVISIBLE CHEZ MOI : sans vacation a dessiner, nearAgents n'est jamais appele.
+       Meme piege que b434 -> G-69, regrave le 13/08 et refait le 14/08 avec cette fonction.
+       -> controle mecanique desormais obligatoire : G-95.
+       CORRECTIF : on ne devine pas, on verifie. Pas encore de liste = aucun agent proche a
+       proposer ; le panneau se redessine de toute facon des que la liste existe. */
+    if(typeof FA==='undefined'||!Array.isArray(FA))return [];
     var rad=it._rad||100,list=[],seen={};
     var demDep=String(it.depCode||it.dep||(it.cp?String(it.cp).replace(/\s/g,'').slice(0,2):'')||'').trim();
     function add(a,d,cov){ if(seen[a.id])return; seen[a.id]=1; list.push({a:a,d:d,cover:cov||''}); }
@@ -1850,7 +1869,7 @@ button.big:active{transform:translateY(1px)}
     var cnt='<div class="hint" style="margin:0 0 6px">'+list.length+' agent'+(list.length>1?'s':'')+' (≤ '+rad+' km + couverture 🌍/🗺️)'+((it._nads||it._nvoit)?' (filtré)':'')+'</div>'+(nearTarget?'<div class="hint" style="margin:0 0 6px;color:#6ea8fe;font-weight:600">📅 Dispo vérifiée pour : '+esc(nearTarget.date.split('-').reverse().join('/'))+' · '+hmMin(nearTarget.start)+'→'+hmMin(nearTarget.end)+'</div>':'');
     var nsel=it._nsel||{};
     var body;
-    if(!list.length) body='<div class="svempty" style="padding:12px">Aucun agent dans ce rayon.'+(FA.length?'':' (Fiche agent vide.)')+'</div>';
+    if(!list.length) body='<div class="svempty" style="padding:12px">Aucun agent dans ce rayon.'+(((typeof FA!=='undefined')&&FA&&FA.length)?'':' (Fiche agent vide.)')+'</div>';   /* b449 : cette ligne n'etait atteinte QUE si la liste est vide — c'est exactement ce que renvoie desormais la garde 1. Sans cette seconde garde, mon correctif deplacait la panne de trois lignes au lieu de la supprimer. Un correctif se relit comme du code neuf (G-95). */
     else body='<div class="list">'+list.map(function(o){
       var a=o.a, assoc=(it.assoc||[]).indexOf(a.id)>=0, tels=a.tels||(a.tel?[a.tel]:[]);
       var tags=(a.voiture?'🚗 ':'')+(a.ads?'🛡️ADS ':'');
@@ -3184,7 +3203,7 @@ button.big:active{transform:translateY(1px)}
   var CLOUD = { on:false, base:(BACKEND_URL||'').replace(/\/+$/,''), pass:'', last:0, pushT:{}, pollT:null, role:'full', sections:null, user:'' };
   // Restreint l'affichage aux sections autorisées (CLOUD.sections=null => accès complet)
   var SUPERADMIN_SECTIONS=['prise','fin','thiam','assistant','dispatch','cockpitfkh','streste','depots','clientsf','corbeille','droits','doublons'];   /* b356 : 'doublons' — nettoyage de base, super-admin par defaut (regle Zeus 03/08 : toute nouveaute nait super-admin seul) */ // clientsf = fiches clients (#20-A) : super-admin par défaut, à ouvrir sur décision Zeus // sections visibles UNIQUEMENT par le super-administrateur (défaut de toute NOUVELLE section)  /* b228 : 'mails' retire — la section Mails missions (et son temoin de vie) est desormais visible par le superviseur et l'administrateur, pas seulement le super-admin */
-  function _secSuperOnly(s){ return SUPERADMIN_SECTIONS.indexOf(s)>=0; }
+  function _secSuperOnly(s){ return (typeof SUPERADMIN_SECTIONS!=='undefined'&&SUPERADMIN_SECTIONS)?SUPERADMIN_SECTIONS.indexOf(s)>=0:false; }   /* b449 : 2e erreur de la console du 15/08 — un clic d'onglet ne doit pas mourir parce qu'une liste plus bas n'est pas encore lue */
   // Landing + ordre des onglets selon le rôle : opérateur → « Suivi des appels » en 1er + ouvert ; superviseur/admin/super-admin → « Suivi demandes » en 1er + ouvert.
   function applyRoleLayout(){ try{ var tabs=byId('tabs'); if(!tabs)return; var isOp=(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur'); var primary=isOp?'suiviappels':'suivi'; var pb=tabs.querySelector('button[data-s="'+primary+'"]'); if(!pb)return; tabs.insertBefore(pb,tabs.firstChild); if(!isOp){ var sa=tabs.querySelector('button[data-s="suiviappels"]'); if(sa)tabs.insertBefore(sa,pb.nextSibling); } if(getComputedStyle(pb).display!=='none')pb.click(); }catch(e){} }
   /* b226 : ordre impose pour les roles qui ne rangent pas leurs onglets eux-memes.
