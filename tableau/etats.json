@@ -1,6 +1,6 @@
 {
  "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
- "maj": "2026-08-13",
+ "maj": "2026-08-14",
  "items": [
   {
    "b": 222,
@@ -1666,6 +1666,34 @@
    "theme": "Planning",
    "local": true,
    "pourquoipas": "Dans le Planning, quand personne n'est affecte, le geste naturel n'est pas « associer » mais « c'est lui ». Le bouton passe par affpickWithCheck — la MEME verification que le bouton « Choisir » de la fiche (conflits d'horaires, indisponibilites) : on ne cree pas un second chemin d'affectation qui contournerait les controles du premier. Le mode est un 2e argument de renderNear, pas un champ pose sur la donnee. Deux appels dans tout le fichier : Suivi des demandes renderNear(x) bouton masque, fiche Planning renderNear(m,true) bouton visible."
+  },
+  {
+   "b": "b443",
+   "titre": "Domaines : administrateur + super-admin seulement, et l'admin n'y voit que l'Administratif des 3 societes",
+   "source": "Zeus 14/08 : « qu'aucun utilisateur ne voie la section Domaines a part l'administrateur et le super-administrateur »",
+   "theme": "Droits d'acces",
+   "pourquoipas": "Ce qui manquait n'etait pas la fonctionnalite mais le CABLAGE : les 4 cockpits portaient deja `appliqueRole` (en admin, un seul onglet), mais index.html ne leur disait JAMAIS le role — grep = 0. Interrupteur pose, pas cable (G-61). `cockpitfkh` quitte SUPERADMIN_SECTIONS pour un cran nomme ADMIN_SECTIONS, applique aux trois endroits qui decident."
+  },
+  {
+   "b": "b444",
+   "titre": "L'administrateur ne lit plus le chiffre d'affaires de la societe",
+   "source": "Zeus 14/08, capture a l'appui : « tu enleves ca de la section Administratif »",
+   "theme": "Droits d'acces",
+   "pourquoipas": "Administratif ne recopie rien : elle montre la vue d'origine et RETIRE ce qui n'est pas publie. Ce retrait ne porte que sur les classes listees dans SEL — et `.cd`, celle des tuiles de CA, n'y etait pas : ni publiables, ni retirables, elles traversaient le filtre. Corrige a LA SOURCE (carnet_bridge.py), pas dans le cockpit qui est un fichier GENERE. VERIFIE PAR ZEUS sur le site le 14/08 : le bandeau a disparu."
+  },
+  {
+   "b": "b445",
+   "titre": "CORRECTIF : la restriction de b443 ne marchait pas par le chemin reel",
+   "source": "Trouve en relisant b443/b444 a la demande de Zeus",
+   "theme": "Droits d'acces",
+   "pourquoipas": "b443 ecrivait le role dans le stockage et comptait sur hub.html pour l'y lire. Mais le hub est charge AVEC la page, donc AVANT la connexion : il lisait un role vide, une seule fois. Mesure par le chemin reel : role null, les QUATRE cartes affichees, PERSO compris. Desormais l'hote DIT le role a l'ouverture et repond a qui le RECLAME. Cause : j'avais teste la PIECE (hub.html?role=admin) au lieu du CHEMIN. -> G-90."
+  },
+  {
+   "b": "b446",
+   "titre": "Quand quelqu'un se deconnecte, ses droits partent avec lui",
+   "source": "Troisieme axe de la relecture",
+   "theme": "Droits d'acces",
+   "pourquoipas": "cloudLogout effaçait le mot de passe mais PAS le role : le poste gardait celui du dernier connecte. Mesure : poste quitte par un super-admin, hub ouvert SANS mot de passe -> les 4 domaines, PERSO compris. Deux verrous : le role part a la deconnexion, ET le hub ne lit plus le stockage — sans annonce de l'application, regime le plus ferme. Un doute sur qui regarde se tranche en montrant MOINS. -> G-91."
   }
  ],
  "attente": [
