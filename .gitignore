@@ -11,3 +11,9 @@ tmp/
 # derriere le mot de passe ; le cockpit les y lit. Voir SCRIPTS/carnet_vers_coffre.py
 gestion/domaines/DATA_*.json
 gestion/_banc_coffre.html
+
+# 2026-08-15 — Les RADAR quittent le depot public a leur tour. Ils portaient
+# l'adresse d'un contact chez un tiers, deux telephones et le portefeuille
+# clients. Ils vivent desormais dans le coffre (R2), derriere le mot de passe :
+# cle radar/<DOM>.json, envoyee par SCRIPTS/carnet_vers_coffre.py --radar.
+gestion/domaines/RADAR_*.json
