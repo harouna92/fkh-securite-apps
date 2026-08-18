@@ -17,3 +17,13 @@ gestion/_banc_coffre.html
 # clients. Ils vivent desormais dans le coffre (R2), derriere le mot de passe :
 # cle radar/<DOM>.json, envoyee par SCRIPTS/carnet_vers_coffre.py --radar.
 gestion/domaines/RADAR_*.json
+
+# 2026-08-18 — APPLI_PERSO.html NE REVIENT JAMAIS DANS CE DEPOT.
+# Mesure faite ce jour sur la page publiee : elle contenait des donnees de
+# SANTE en clair (motifs de consultation, appareillage, poids), sur un depot
+# PUBLIC avec GitHub Pages actif. Le domaine PERSO n'est pas un outil
+# d'entreprise : sa page reste LOCALE. Le detecteur qui sort les donnees vers
+# le coffre (carnet_bridge.INDICES_MATIERE) ne connait que du vocabulaire
+# societe (SECURITAS, FACTURE, URSSAF, salaire...) : il ne pouvait pas voir
+# ces blocs-la. Voir la note de reprise du 18/08.
+gestion/domaines/APPLI_PERSO.html
