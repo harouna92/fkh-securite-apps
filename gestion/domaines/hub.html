@@ -65,7 +65,11 @@ var DOMS=[
  {k:"FKH",   e:"🧭", c:"#7c93ff", t:"Cockpit complet · 31+ vues live", f:"APPLI_FKH.html"},
  {k:"GARIS", e:"🛡️", c:"#f0997b", t:"CA hors FKH · alerte Indy", f:"APPLI_GARIS.html"},
  {k:"DAHLIA",e:"🌸", c:"#f0abfc", t:"RSI · reconstruction CA", f:"APPLI_DAHLIA.html"},
- {k:"PERSO", e:"🧑", c:"#34d399", t:"Dépenses · santé · juridique", f:"APPLI_PERSO.html"}
+ /* 2026-08-18 — PERSO N'EST PLUS PUBLIE. Sa page contenait des donnees de sante
+    en clair dans un depot PUBLIC ; elle est sortie du suivi git et vit en local.
+    Decision de Zeus le 18/08 : « on ne met pas les informations de PERSO pour le
+    moment ». La tuile reste, mais elle le DIT au lieu d'ouvrir un 404 muet. */
+ {k:"PERSO", e:"🧑", c:"#34d399", t:"Local uniquement — non publié", f:"APPLI_PERSO.html", local:true}
 ];
 var curDom=null;
 /* ===== b443 : L'ADMINISTRATEUR NE VOIT PAS PERSO — DU TOUT =====
@@ -91,7 +95,22 @@ function openDom(d){
  document.getElementById('vttl').innerHTML='<span style="color:'+d.c+'">'+d.e+' '+d.k+'</span>';
  /* b443 : le cockpit doit connaitre le role AVANT de dessiner ses onglets — on le lui donne
     dans son URL en plus du stockage, pour qu'il n'ait rien a reclamer. */
- document.getElementById('vframe').src=d.f+(ROLE_DOM?('?role='+encodeURIComponent(ROLE_DOM)):'');
+ if(d.local){
+    /* 2026-08-18 — pas de page en ligne pour ce domaine : on l'annonce, on ne
+       laisse pas le navigateur afficher un 404 que personne ne saurait lire. */
+    document.getElementById('vframe').removeAttribute('src');
+    document.getElementById('vframe').srcdoc='<!doctype html><meta charset=utf-8>'
+      +'<div style="font:15px/1.6 system-ui;padding:40px;max-width:620px;margin:auto;color:#334">'
+      +'<h2 style="margin:0 0 14px">🧑 PERSO — consultable en local seulement</h2>'
+      +'<p>Ce domaine <b>n\'est pas publié en ligne</b>. Sa page contenait des données '
+      +'personnelles (santé, dépenses) et ce dépôt est public : elle a été retirée le 18/08.</p>'
+      +'<p>Elle reste complète sur l\'ordinateur, dans '
+      +'<code>fkh-web\\gestion\\domaines\\APPLI_PERSO.html</code>.</p>'
+      +'<p style="color:#889;font-size:13px">Décision de Zeus, 18/08 — voir G-134.</p></div>';
+  } else {
+    document.getElementById('vframe').removeAttribute('srcdoc');
+    document.getElementById('vframe').src=d.f+(ROLE_DOM?('?role='+encodeURIComponent(ROLE_DOM)):'');
+  }
  document.getElementById('viewer').style.display='flex';
 }
 function closeDom(){
