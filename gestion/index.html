@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v19-08·b456</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v19-08·b457</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -12513,39 +12513,45 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
 <!-- B453-DEBUT : fraicheur, compteur, sections vides (Zeus 19/08) -->
 <script>
 (function(){
-  /* 1. LA DATE DES DONNEES, a cote du numero de version.
-        Sans elle, rien ne distingue une appli qui vient de se synchroniser d'une appli
-        restee ouverte depuis hier. */
-  /* b455 : la donnee n'est pas toujours un tableau — selon l'origine (local ou cloud) elle
-     arrive parfois en objet. Sans cette normalisation, un simple forEach cassait TOUT le
-     bloc, et ni le compteur ni la fraicheur ne s'affichaient (constate sur l'ecran de Zeus). */
-  function lit(cle){
-    try{
-      var v=JSON.parse(localStorage.getItem(cle)||'[]');
-      if(Array.isArray(v)) return v;
-      if(v && typeof v==='object'){
-        var tab=Object.keys(v).map(function(k){return v[k];}).filter(Array.isArray)[0];
-        return tab || Object.keys(v).map(function(k){return v[k];}).filter(function(x){return x&&typeof x==='object';});
+  /* 1. QUAND LES DONNEES ONT ETE CHERCHEES POUR LA DERNIERE FOIS.
+        b457 : la premiere version affichait « 1008 demandes, la plus loin au 27/09 ». Zeus :
+        « ca correspond a quoi ces chiffres ? » — et il avait raison : 1008 comptait aussi les
+        supprimees et les validees, et le 27/09 etait la mission la plus lointaine DANS LE
+        FUTUR. Ni l'un ni l'autre ne disait de quand datait ce qu'on regarde.
+        Ce qui compte vraiment : l'heure du dernier echange avec le cloud. On l'obtient sans
+        toucher au code existant, en observant les appels reseau de l'appli. */
+  var SYNC = null;
+  (function(){
+    var vrai = window.fetch;
+    if (!vrai || vrai.__sync) return;
+    var enveloppe = function(){
+      var u = String((arguments[0] && arguments[0].url) || arguments[0] || '');
+      var pr = vrai.apply(this, arguments);
+      if (u.indexOf('/state') >= 0 || u.indexOf('/suivi') >= 0) {
+        pr.then(function(r){ if (r && r.ok) { SYNC = new Date();
+          try { localStorage.setItem('fkh_sync_at', SYNC.toISOString()); } catch(e){}
+          try { fraicheur(true); } catch(e){} } }).catch(function(){});
       }
-      return [];
-    }catch(e){ return []; }
-  }
-  function fraicheur(){
+      return pr;
+    };
+    enveloppe.__sync = 1;
+    window.fetch = enveloppe;
+  })();
+
+  function fraicheur(refaire){
     var bt=document.getElementById('build-tag'); if(!bt) return;
-    if(document.getElementById('frais')) return;
-    /* la date peut vivre sous plusieurs noms selon l'origine (local ou cloud) : on prend
-       la plus recente trouvee, et a defaut on annonce au moins le nombre. */
-    var S=lit('fkh_suivi');
-    var dates=[];
-    S.forEach(function(x){ if(!x) return; ['mdate','date','cree','maj','d'].forEach(function(c){
-      var v=x[c]; if(typeof v==='string' && /^20\d\d-\d\d-\d\d/.test(v)) dates.push(v.slice(0,10)); }); });
-    var d=dates.sort().slice(-1)[0]||'';
-    var s=document.createElement('span'); s.id='frais';
-    s.style.cssText='font-size:10px;color:var(--muted);font-weight:400;margin-left:6px';
-    s.textContent = S.length
-      ? ('· '+S.length+' demandes'+(d?', la plus loin au '+d.split('-').reverse().join('/'):''))
-      : '· donnees chargees du cloud';
-    bt.parentNode.appendChild(s);
+    var s=document.getElementById('frais');
+    if(s && !refaire) return;
+    if(!s){ s=document.createElement('span'); s.id='frais';
+      s.style.cssText='font-size:10px;color:var(--muted);font-weight:400;margin-left:6px';
+      bt.parentNode.appendChild(s); }
+    var q = SYNC;
+    if(!q){ try{ var m=localStorage.getItem('fkh_sync_at'); if(m) q=new Date(m); }catch(e){} }
+    if(!q){ s.textContent='· pas encore synchronise'; s.title='Aucun echange avec le cloud depuis l ouverture'; return; }
+    var min = Math.round((Date.now()-q.getTime())/60000);
+    var h = ('0'+q.getHours()).slice(-2)+':'+('0'+q.getMinutes()).slice(-2);
+    s.textContent = '· synchro ' + (min<1 ? "a l'instant" : (min<60 ? 'il y a '+min+' min' : 'a '+h));
+    s.title = 'Derniere fois que l appli est allee chercher les donnees : ' + q.toLocaleString('fr-FR');
   }
 
   /* 2. LE COMPTEUR DE CE QUI RESTE A TRAITER.
@@ -12605,7 +12611,7 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', tout); else tout();
   document.addEventListener('click', function(){ setTimeout(tout, 250); });
-  setInterval(compteur, 60000);
+  setInterval(function(){ try{compteur();}catch(e){} try{fraicheur(true);}catch(e){} }, 60000);
 })();
 </script>
 <!-- B453-FIN -->
