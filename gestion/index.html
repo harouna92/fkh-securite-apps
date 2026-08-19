@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v19-08·b451</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v19-08·b452</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -4673,6 +4673,19 @@ button.big:active{transform:translateY(1px)}
       if(byId('sec-suivisite')&&!byId('sec-suivisite').classList.contains('hidden'))_majVue(typeof renderSuiviSite==='function'?renderSuiviSite:null);
       return;
     }
+    /* ===== b452 : LES RETRAITS SE FUSIONNENT, ILS NE S'ECRASENT PLUS =====
+       Sans ce bloc, la version du serveur remplacait purement la locale : le retrait qu'on
+       venait de faire disparaissait des qu'un autre poste poussait la sienne, et la ligne
+       revenait a l'ecran. C'est ce que Zeus constatait le 18/08. */
+    if(k==='fkh_sa_excl'){
+      var remX={}; try{remX=JSON.parse(v)||{};}catch(_x){remX={};} if(!remX||typeof remX!=='object')remX={};
+      var mrgX=saExclMerge(saExclLoad(),remX), mvX=JSON.stringify(mrgX);
+      try{ localStorage.setItem('fkh_sa_excl',mvX); }catch(e){}
+      if(mvX!==v && typeof cloudPush==='function')cloudPush('fkh_sa_excl');   /* le local en savait plus -> on renvoie l'union */
+      if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
+      if(byId('sec-suiviappels')&&!byId('sec-suiviappels').classList.contains('hidden')&&typeof renderSuiviAppels==='function')renderSuiviAppels();
+      return;
+    }
     if(k==='fkh_consignes'){ // #8 : fusion par ticket (mtime) au lieu d'écraser — une coche « fait » ou une suppression faite ailleurs ne REVIENT plus
       var remK=[]; try{remK=JSON.parse(v)||[];}catch(_){remK=[];} if(!Array.isArray(remK))remK=[];
       var mrgK=csgMergeArr(csgLoadRaw(),remK), mvK=JSON.stringify(mrgK);
@@ -7890,6 +7903,25 @@ button.big:active{transform:translateY(1px)}
   }
   var saType='all', saSlice='all', roCalls=null, roPeriod='', aiDetected=[], saShowExcl=false, saSelMode=false, saSelected={};
   function saExclLoad(){ try{ return JSON.parse(localStorage.getItem('fkh_sa_excl')||'{}')||{}; }catch(e){ return {}; } }
+    /* ===== b452 : UN RETRAIT NE DOIT PLUS POUVOIR ETRE EFFACE PAR UN AUTRE POSTE =====
+       Zeus, 18/08 : « quand on enleve ces tickets ca ne s'enleve pas ». Le clic marchait
+       (reproduit sur son ecran exact : 18 creneaux -> 17). C'est la SYNCHRO qui defaisait :
+       `fkh_sa_excl` etait ECRASEE par la version du serveur, alors que les controles de
+       tenue, les consignes et le suivi de site sont FUSIONNES. Un collegue qui n'avait pas
+       encore recu le retrait poussait sa version, et la ligne revenait.
+       Meme mecanisme que la saisie de mensurations perdue le 15/08 (G-105).
+       LA MARQUE : positive = retire a telle heure · negative = RESTAURE a telle heure.
+       On ne supprime plus jamais l'entree : une suppression ne voyage pas, une date si.
+       A egalite d'instant, le retrait l'emporte sur la restauration (regime le plus sur). */
+    function saExclMerge(a,b){ a=(a&&typeof a==='object')?a:{}; b=(b&&typeof b==='object')?b:{};
+      var out={},k;
+      for(k in a)out[k]=a[k];
+      for(k in b){ var v=b[k]; if(!(k in out)){ out[k]=v; continue; }
+        var ta=Math.abs(+out[k]||0), tb=Math.abs(+v||0);
+        if(tb>ta)out[k]=v; else if(tb===ta&&(+v||0)>0)out[k]=v; }
+      return out; }
+    /* la seule question qui compte pour un lecteur : cette echeance est-elle retiree ? */
+    function saExclActif(ex,k){ return (+((ex||{})[k])||0)>0; }
   function saExclSave(x){ try{ localStorage.setItem('fkh_sa_excl',JSON.stringify(x)); }catch(e){} if(typeof cloudPush==='function')cloudPush('fkh_sa_excl'); }
   // #4 (Jules) : ARCHIVE PERMANENTE des photos de contrôle — jamais effacée par une mise à jour du planning. Clé stable = site + date + étape (survit aux changements d'agent/heure).
   function saStableKey(e){ return (typeof tnorm==='function'?tnorm(e.site||''):String(e.site||''))+'|'+(e.mdate||e.edate||'')+'|'+e.key; }
@@ -8181,7 +8213,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       out.push({mid:m.id,mdate:m.mdate||'',edate:edate,site:svLabel(m.siteAgent||m.titre||'—',m.ville||''),siteBrut:(m.siteAgent||m.titre||'—'),siteBDC:m.siteBDC||'',client:m.client||'',ville:m.ville||'',   /* b399 */cp:m.cp||'',mheure:m.mheure||'',agent:_ag?(_ag.nom||''):'',agentTel:_tel,agentTels:_tels,agentId:m.agentId||'',key:s.key,label:s.label,heure:s.heure,abs:abs,type:s.type}); }); });
     out.sort(function(a,b){ var da=a.edate||a.mdate||'',db=b.edate||b.mdate||''; if(da!==db)return da<db?-1:1; return (a.abs%1440)-(b.abs%1440); }); // tri sur l'heure RÉELLE de la journée (00:00 avant 07:30)
     // #3 : les appels RETIRÉS par le superviseur (fkh_sa_excl) disparaissent partout (agenda + anomalies + opérationnel), sauf si on demande explicitement de les inclure.
-    if(!inclExcl){ var _ex=(typeof saExclLoad==='function')?saExclLoad():{}; out=out.filter(function(e){ return !_ex[String(e.mid)+'|'+e.key]; }); }
+    if(!inclExcl){ var _ex=(typeof saExclLoad==='function')?saExclLoad():{}; out=out.filter(function(e){ return !((+_ex[String(e.mid)+'|'+e.key]||0)>0); }); }   /* b452 : negatif = restaure, donc visible */
     return out;
   }
   function renderSuiviAppels(){
@@ -8195,8 +8227,8 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     var entries=saEntries(from,to,true).filter(function(e){return saTypeMatch(e.key)&&saSliceMatch(e)&&(!_saHd||!e.mheure||e.mheure>=_saHd);});
     // #3 (Jules) : le superviseur peut RETIRER des appels prise/fin/contrôle de l'agenda (stockés dans fkh_sa_excl, restaurables).
     var _saEx=saExclLoad(); function saExK(e){ return String(e.mid)+'|'+e.key; }
-    var saExN=entries.filter(function(e){ return !e.consigne&&_saEx[saExK(e)]; }).length;
-    if(!saShowExcl)entries=entries.filter(function(e){ return e.consigne||!_saEx[saExK(e)]; });
+    var saExN=entries.filter(function(e){ return !e.consigne&&saExclActif(_saEx,saExK(e)); }).length;
+    if(!saShowExcl)entries=entries.filter(function(e){ return e.consigne||!saExclActif(_saEx,saExK(e)); });
     if(saType==='all'&&typeof csgLoad==='function'){ csgLoad().forEach(function(c){ if(from&&(!c.mdate||c.mdate<from))return; if(to&&(!c.mdate||c.mdate>to))return; var heure=c.heure||'',site='',agent=''; if(c.mid){ var m=csgMissById(c.mid); if(m){ site=m.siteAgent||m.titre||''; if(!heure)heure=m.mheure||''; if(m.agentId&&faById(m.agentId))agent=faById(m.agentId).nom||''; } } var e={consigne:true,cid:c.id,mid:c.mid||'',mdate:c.mdate||'',edate:c.mdate||'',heure:heure,mheure:heure,abs:(toMin(heure)||0),texte:c.texte,client:c.client||'',site:site,agent:agent,done:!!c.done,note:c.note||'',key:'csg',_valid:c._valid||null}; if(!saSliceMatch(e))return; entries.push(e); }); entries.sort(function(a,b){ var da=a.edate||a.mdate||'',db=b.edate||b.mdate||''; if(da!==db)return da<db?-1:1; return ((a.abs||0)%1440)-((b.abs||0)%1440); }); }
     document.querySelectorAll('.sa-type').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-ty')===saType);});
     document.querySelectorAll('.sa-slice').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-sl')===saSlice);});
@@ -8279,7 +8311,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
       if(roCalls&&done){ var parts=[]; if(e.agentTel)parts.push('👤 agent : '+roBadge(e.agentTel,ct)); if((e.key==='prise'||e.key==='fin')&&r.avise){ var ctm={}; try{ctm=JSON.parse(localStorage.getItem('fkh_client_tel')||'{}')||{};}catch(_){} var ctel=e.client?ctm[e.client]:''; if(ctel)parts.push('🏢 client : '+roBadge(ctel,ct)); } if(parts.length)roLine='<div class="fa-d" style="margin:3px 0 0;line-height:1.6">🔌 '+parts.join(' &nbsp;·&nbsp; ')+'</div>'; }
       var ctx='<div class="fa-d" style="margin:4px 0 2px;line-height:1.7">'+cl.join('<br>')+'</div>'+roLine;
       return '<div class="card sacard" data-ct="'+ct+'" data-sakey="'+esc(saExK(e))+'" data-done="'+(done?1:0)+'" data-hideat="'+(done?(Math.max(+ct||0,(r.doneTs||r.at||0))+120000):0)+'" style="padding:8px'+(done?';opacity:.6':'')+(saSelMode&&saSelected[saExK(e)]?';outline:2px solid #4a9eff;outline-offset:-2px':'')+'">'+(saSelMode?'<label style="display:flex;align-items:center;gap:6px;margin:0 0 6px;cursor:pointer;user-select:none"><input type="checkbox" class="sa-sel-chk" data-sakey="'+esc(saExK(e))+'"'+(saSelected[saExK(e)]?' checked':'')+'><span style="font-size:13px">Sélectionner</span></label>':'')+'<div class="fa-n"><span class="sa-tag"></span>'+dispTimeHtml(e)+' · '+(e.key==='tenue'?'<span style="color:#e0784b;font-weight:800">'+e.label+'</span>':e.label)+' — '+esc(e.site)+(e.agent?' <span style="color:var(--muted);font-weight:400">('+esc(e.agent)+')</span>':'')+(e.mdate?' <span style="color:var(--muted);font-weight:400">'+esc(e.mdate)+'</span>':'')+extra+'</div>'+ctx
-        +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">'+fields+((!e.consigne&&e.mid&&(typeof CLOUD==='undefined'||!CLOUD||!CLOUD.role||CLOUD.role==='admin'||CLOUD.role==='superadmin'||CLOUD.role==='full'))?'<button type="button" class="sa-affect" data-mid="'+esc(e.mid)+'" title="Ouvrir la vacation pour affecter / changer l\'agent (compte administrateur)" style="font-size:11px'+(e.agent?'':';border-color:#e0a13b;color:#e0a13b;font-weight:700')+'">👤 '+(e.agent?'Agent…':'Affecter un agent')+'</button>':'')+((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur')?'':'<button type="button" class="sa-excl" data-exk="'+esc(saExK(e))+'" title="Retirer / restaurer cet appel de l\'agenda (superviseur)" style="font-size:11px;margin-left:auto;'+(_saEx[saExK(e)]?'color:var(--ok);border-color:var(--ok)':'color:var(--muted)')+'">'+(_saEx[saExK(e)]?'↩️ Restaurer':'🗑️ Retirer')+'</button>')+'</div></div>';
+        +'<div class="acts" style="gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">'+fields+((!e.consigne&&e.mid&&(typeof CLOUD==='undefined'||!CLOUD||!CLOUD.role||CLOUD.role==='admin'||CLOUD.role==='superadmin'||CLOUD.role==='full'))?'<button type="button" class="sa-affect" data-mid="'+esc(e.mid)+'" title="Ouvrir la vacation pour affecter / changer l\'agent (compte administrateur)" style="font-size:11px'+(e.agent?'':';border-color:#e0a13b;color:#e0a13b;font-weight:700')+'">👤 '+(e.agent?'Agent…':'Affecter un agent')+'</button>':'')+((typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur')?'':'<button type="button" class="sa-excl" data-exk="'+esc(saExK(e))+'" title="Retirer / restaurer cet appel de l\'agenda (superviseur)" style="font-size:11px;margin-left:auto;'+(saExclActif(_saEx,saExK(e))?'color:var(--ok);border-color:var(--ok)':'color:var(--muted)')+'">'+(saExclActif(_saEx,saExK(e))?'↩️ Restaurer':'🗑️ Retirer')+'</button>')+'</div></div>';
     };
     var isDone=function(e){ if(e.consigne)return !!e.done; return !!(S[e.mid]&&S[e.mid][e.key]&&S[e.mid][e.key].done); };
     // Une carte cochée reste visible jusqu'à 2 min après l'heure prévue (ou 2 min après le cochage si coché en retard)
@@ -8313,7 +8345,7 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
     document.querySelectorAll('#sa-body .sa-phsug').forEach(function(b){ b.onclick=function(){ phSugOpen(b.getAttribute('data-mid'),b.getAttribute('data-key'),b.getAttribute('data-when'),b.getAttribute('data-city'),b.getAttribute('data-lbl'),b.getAttribute('data-cp'),b.getAttribute('data-rue')); }; }); /* b200 */
     document.querySelectorAll('#sa-body .sa-affect').forEach(function(b){ b.onclick=function(){ if(typeof planningAffect==='function')planningAffect(b.getAttribute('data-mid')); }; }); // b157 : affectation directe depuis le ticket (admin+)
     document.querySelectorAll('#sa-body .sa-goto-pl').forEach(function(b){ b.onclick=function(){ var mid=b.getAttribute('data-mid'); var tb=document.querySelector('#tabs button[data-s="planning"]'); if(tb)tb.click(); setTimeout(function(){ if(typeof planningAffect==='function')planningAffect(mid); },100); }; }); /* b288 */
-    document.querySelectorAll('#sa-body .sa-excl').forEach(function(b){ b.onclick=function(){ var k=b.getAttribute('data-exk'),ex=saExclLoad(); if(ex[k]){ delete ex[k]; } else { if(!confirm('Retirer cet appel de l\'agenda (prise / fin / contrôle) ? Il sera masqué, mais restaurable à tout moment.'))return; ex[k]=Date.now(); } saExclSave(ex); renderSuiviAppels(); }; });
+    document.querySelectorAll('#sa-body .sa-excl').forEach(function(b){ b.onclick=function(){ var k=b.getAttribute('data-exk'),ex=saExclLoad(); if((+ex[k]||0)>0){ ex[k]=-Date.now();   /* b452 : on DATE la restauration au lieu de l'effacer — une suppression ne voyage pas d'un poste a l'autre, une date si */ } else { if(!confirm('Retirer cet appel de l\'agenda (prise / fin / contrôle) ? Il sera masqué, mais restaurable à tout moment.'))return; ex[k]=Date.now(); } saExclSave(ex); renderSuiviAppels(); }; });
     document.querySelectorAll('#sa-body .sa-excl-toggle').forEach(function(b){ b.onclick=function(){ saShowExcl=b.checked; renderSuiviAppels(); }; });
     document.querySelectorAll('#sa-body .sa-sel-chk').forEach(function(b){ b.onchange=function(){ var k=b.getAttribute('data-sakey'); if(!k)return; if(b.checked){ saSelected[k]=1; } else { delete saSelected[k]; } var card=b.closest('.sacard'); if(card)card.style.outline=b.checked?'2px solid #4a9eff':''; var n=Object.keys(saSelected).length; var cnt=byId('sa-sel-count'); if(cnt)cnt.textContent=n+' ticket'+(n>1?'s':'')+' sélectionné'+(n>1?'s':''); }; }); // b294
     // ☎ +1 : compte une tentative d'appel (stockée sur le ticket, visible par tous) — remontée #18
