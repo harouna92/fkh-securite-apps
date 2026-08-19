@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v19-08·b454</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v19-08·b455</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -12516,7 +12516,20 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
   /* 1. LA DATE DES DONNEES, a cote du numero de version.
         Sans elle, rien ne distingue une appli qui vient de se synchroniser d'une appli
         restee ouverte depuis hier. */
-  function lit(cle){ try{ return JSON.parse(localStorage.getItem(cle)||'[]'); }catch(e){ return []; } }
+  /* b455 : la donnee n'est pas toujours un tableau — selon l'origine (local ou cloud) elle
+     arrive parfois en objet. Sans cette normalisation, un simple forEach cassait TOUT le
+     bloc, et ni le compteur ni la fraicheur ne s'affichaient (constate sur l'ecran de Zeus). */
+  function lit(cle){
+    try{
+      var v=JSON.parse(localStorage.getItem(cle)||'[]');
+      if(Array.isArray(v)) return v;
+      if(v && typeof v==='object'){
+        var tab=Object.keys(v).map(function(k){return v[k];}).filter(Array.isArray)[0];
+        return tab || Object.keys(v).map(function(k){return v[k];}).filter(function(x){return x&&typeof x==='object';});
+      }
+      return [];
+    }catch(e){ return []; }
+  }
   function fraicheur(){
     var bt=document.getElementById('build-tag'); if(!bt) return;
     if(document.getElementById('frais')) return;
@@ -12575,7 +12588,13 @@ var _an=byId('ano-new'); if(_an)_an.onclick=anoFormulaire;
     });
   }
 
-  function tout(){ try{ fraicheur(); compteur(); sectionsVides(); }catch(e){} }
+  /* b455 : chacune dans son propre filet. Avant, une erreur dans la premiere empechait
+     silencieusement les deux suivantes de s'executer. */
+  function tout(){
+    try{ fraicheur(); }catch(e){}
+    try{ compteur(); }catch(e){}
+    try{ sectionsVides(); }catch(e){}
+  }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', tout); else tout();
   document.addEventListener('click', function(){ setTimeout(tout, 250); });
   setInterval(compteur, 60000);
