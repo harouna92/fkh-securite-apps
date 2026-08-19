@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v15-08·b450</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v19-08·b451</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -5996,7 +5996,7 @@ button.big:active{transform:translateY(1px)}
     box.querySelectorAll('.st2-fiche').forEach(function(b){ b.onclick=function(){ var nm=b.getAttribute('data-ag')||''; var tb=document.querySelector('#tabs button[data-s="fiche"]'); if(tb)tb.click(); var fs=byId('fa-search'); if(fs){ fs.value=nm; fs.dispatchEvent(new Event('input',{bubbles:true})); } }; });
   }
   // ===== 📅 Planning (style Sekur) : MÊMES missions validées (fkh_suivi) présentées en grille sites × jours. Le pont : modifier ici = modifier partout. =====
-  var plWeek=null, PL_F={q:'',statut:'',client:'',agent:'',tranche:'',site:'',aff:''}, _plFocusQ=false, PL_GRAN='Semaine', plHeuresOpen=false, plMultiSel=false, plMultiCells=[]; // granularité : Jour · Semaine · Mois (calque Sekur)
+  var plWeek=null, PL_F={q:'',statut:'',client:'',agent:'',tranche:'',site:'',aff:''}, _plFocusQ=false, PL_GRAN='Semaine', plHeuresOpen=false, plMultiSel=false, plMultiCells=[], plMultiVacs=[];   /* b451 : les VACATIONS retenues, a cote des cases vides */ // granularité : Jour · Semaine · Mois (calque Sekur)
   function _plDays(){ var out=[],i; if(PL_GRAN==='Jour'){ out.push(plWeek); } else if(PL_GRAN==='Mois'){ var first=plWeek.slice(0,7)+'-01'; var y=+plWeek.slice(0,4), mo=+plWeek.slice(5,7); var nb=new Date(y,mo,0).getDate(); for(i=0;i<nb;i++)out.push(svcAddDays(first,i)); } else { for(i=0;i<7;i++)out.push(svcAddDays(plWeek,i)); } return out; }
   function _plShift(dir){ if(PL_GRAN==='Jour')plWeek=svcAddDays(plWeek,dir); else if(PL_GRAN==='Mois'){ var y=+plWeek.slice(0,4), mo=+plWeek.slice(5,7)-1+dir; var d=new Date(y,mo,1); plWeek=d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-01'; } else plWeek=svcAddDays(plWeek,7*dir); }
   function _plMonday(iso){ try{ var d=new Date(iso+'T00:00:00'); var wd=(d.getDay()+6)%7; return svcAddDays(iso,-wd); }catch(e){ return iso; } }
@@ -6623,7 +6623,7 @@ button.big:active{transform:translateY(1px)}
         SUIVI.unshift((typeof signerVac==='function')?signerVac(o):o); faits++;
       });
       if(typeof saveSuivi==='function')saveSuivi();
-      plMultiSel=false; plMultiCells=[];
+      plMultiSel=false; plMultiCells=[]; plMultiVacs=[];   /* b451 */
       fermer(); renderPlanning();
       if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
       if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
@@ -6740,7 +6740,7 @@ button.big:active{transform:translateY(1px)}
       });
     }); }
     box.innerHTML=toolbar+filterBar+hWidget+'<div id="pl-scroll" style="overflow:auto;height:76vh;scrollbar-width:auto"><table style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr>'+th+'</tr></thead><tbody>'+bodyR+'</tbody></table></div><div class="sub" style="margin-top:8px">Statuts : <b style="color:#8a8f98">En attente</b> · <b style="color:#2563eb">En cours</b> · <b style="color:#1a9e5c">Terminé</b> · <b style="color:#e0a13b">à affecter</b> · <b style="color:#c02626">en retard / non couvert</b> — clique une vacation → <b>affecter / changer le statut</b> · clique une case vide → ajouter une vacation.</div>'
-    +'<div id="pl-multi-bar" style="display:'+(plMultiSel?'flex':'none')+';position:sticky;bottom:0;left:0;right:0;z-index:65;background:var(--panel);border-top:2px solid #4a9eff;padding:10px 14px;box-shadow:0 -4px 18px rgba(0,0,0,.35);align-items:center;gap:10px"><span id="pl-multi-count" style="font-weight:700;color:#4a9eff;flex:1">'+plMultiCells.length+' case'+(plMultiCells.length>1?'s':'')+' sélectionnée'+(plMultiCells.length>1?'s':'')+'</span><button type="button" id="pl-multi-go" class="ok" style="font-size:12px">➕ Créer '+(plMultiCells.length||'les')+' vacation'+(plMultiCells.length>1?'s':'')+'</button><button type="button" id="pl-multi-cancel" style="font-size:12px">✕ Annuler</button></div>'; // b297
+    +'<div id="pl-multi-bar" style="display:'+(plMultiSel?'flex':'none')+';position:sticky;bottom:0;left:0;right:0;z-index:65;background:var(--panel);border-top:2px solid #4a9eff;padding:10px 14px;box-shadow:0 -4px 18px rgba(0,0,0,.35);align-items:center;gap:10px"><span id="pl-multi-count" style="font-weight:700;color:#4a9eff;flex:1">'+(plMultiCells.length?(plMultiCells.length+' case'+(plMultiCells.length>1?'s':'')+' vide'+(plMultiCells.length>1?'s':'')):'')+(plMultiCells.length&&plMultiVacs.length?' · ':'')+(plMultiVacs.length?(plMultiVacs.length+' vacation'+(plMultiVacs.length>1?'s':'')+' sélectionnée'+(plMultiVacs.length>1?'s':'')):'')+(!plMultiCells.length&&!plMultiVacs.length?'Clique des cases vides (créer) ou des vacations (modifier)':'')+'</span><button type="button" id="pl-multi-go" class="ok" style="font-size:12px;display:'+(plMultiCells.length?'inline-block':'none')+'">➕ Créer '+(plMultiCells.length||'les')+' vacation'+(plMultiCells.length>1?'s':'')+'</button><button type="button" id="pl-multi-aff" class="ok" style="font-size:12px;display:'+(plMultiVacs.length?'inline-block':'none')+'">👤 Affecter le même agent</button><button type="button" id="pl-multi-ret" style="font-size:12px;color:var(--bad);border-color:var(--bad);display:'+(plMultiVacs.length?'inline-block':'none')+'">🗑 Retirer</button><button type="button" id="pl-multi-cancel" style="font-size:12px">✕ Annuler</button></div>'; // b297
     if(byId('pl-prev'))byId('pl-prev').onclick=function(){ _plShift(-1); renderPlanning(); };
     if(byId('pl-next'))byId('pl-next').onclick=function(){ _plShift(1); renderPlanning(); };
     if(byId('pl-fact'))byId('pl-fact').onclick=function(){ planningFacture(); };
@@ -6766,7 +6766,20 @@ button.big:active{transform:translateY(1px)}
     if(byId('pl-fsite'))byId('pl-fsite').onchange=function(){ PL_F.site=this.value; renderPlanning(); };
     if(byId('pl-freset'))byId('pl-freset').onclick=function(){ PL_F={q:'',statut:'',client:'',agent:'',tranche:'',site:'',aff:''}; renderPlanning(); };
     if(_plFocusQ){ var _qi=byId('pl-q'); if(_qi){ _qi.focus(); var _v=_qi.value; _qi.value=''; _qi.value=_v; } _plFocusQ=false; }
-    box.querySelectorAll('.pl-chip').forEach(function(c){ c.onclick=function(e){ e.stopPropagation(); planningAffect(c.getAttribute('data-mid')); }; });
+    box.querySelectorAll('.pl-chip').forEach(function(c){
+        /* b451 : en mode Multi, un clic RETIENT la vacation au lieu d'ouvrir sa fiche.
+           Hors de ce mode, rien ne change : un clic ouvre, comme toujours. */
+        if(plMultiSel&&plMultiVacs.indexOf(c.getAttribute('data-mid'))>=0){ c.style.outline='2px solid #4a9eff'; c.style.outlineOffset='1px'; }
+        c.onclick=function(e){ e.stopPropagation();
+          var _mid=c.getAttribute('data-mid');
+          if(plMultiSel){
+            var _i=plMultiVacs.indexOf(_mid);
+            if(_i<0){ plMultiVacs.push(_mid); c.style.outline='2px solid #4a9eff'; c.style.outlineOffset='1px'; }
+            else { plMultiVacs.splice(_i,1); c.style.outline=''; }
+            if(typeof plMultiMaj==='function')plMultiMaj();
+            return;
+          }
+          planningAffect(_mid); }; });
     box.querySelectorAll('.pl-cell').forEach(function(t3){ // b297 : mode multi-sélection
       var _ck=t3.getAttribute('data-day')+'|'+t3.getAttribute('data-site')+'|'+(t3.getAttribute('data-h1')||'')+'|'+(t3.getAttribute('data-h2')||'');
       if(plMultiSel&&plMultiCells.indexOf(_ck)>=0){ t3.style.outline='2px solid #4a9eff'; t3.style.background='rgba(74,158,255,.08)'; }
@@ -6788,7 +6801,55 @@ button.big:active{transform:translateY(1px)}
     box.querySelectorAll('.pl-sitecopy').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); planningCopySite(b.getAttribute('data-site'),b.getAttribute('data-ville')||''); }; });
     box.querySelectorAll('.pl-ivchip').forEach(function(c){ c.onclick=function(e){ e.stopPropagation(); var tb=document.querySelector('#tabs button[data-s="interv"]'); if(tb)tb.click(); }; });
     if(byId('pl-multi-toggle'))byId('pl-multi-toggle').onclick=function(){ plMultiSel=!plMultiSel; if(!plMultiSel)plMultiCells=[]; renderPlanning(); };
-    if(byId('pl-multi-cancel'))byId('pl-multi-cancel').onclick=function(){ plMultiSel=false; plMultiCells=[]; renderPlanning(); };
+    if(byId('pl-multi-cancel'))byId('pl-multi-cancel').onclick=function(){ plMultiSel=false; plMultiCells=[]; plMultiVacs=[];   /* b451 */ renderPlanning(); };
+    /* ===== b451 : LES ACTIONS QUI PORTENT SUR PLUSIEURS VACATIONS =====
+       On rafraichit la barre SANS redessiner tout le Planning : redessiner effacerait les
+       contours bleus des vacations deja retenues, et on perdrait sa selection en cours. */
+    window.plMultiMaj=function(){ try{
+      var c=byId('pl-multi-count'); if(!c)return;
+      var t=[]; if(plMultiCells.length)t.push(plMultiCells.length+' case'+(plMultiCells.length>1?'s':'')+' vide'+(plMultiCells.length>1?'s':''));
+      if(plMultiVacs.length)t.push(plMultiVacs.length+' vacation'+(plMultiVacs.length>1?'s':'')+' sélectionnée'+(plMultiVacs.length>1?'s':''));
+      c.textContent=t.length?t.join(' · '):'Clique des cases vides (créer) ou des vacations (modifier)';
+      var g=byId('pl-multi-go'); if(g){ g.style.display=plMultiCells.length?'inline-block':'none'; g.textContent='➕ Créer '+(plMultiCells.length||'les')+' vacation'+(plMultiCells.length>1?'s':''); }
+      var a=byId('pl-multi-aff'); if(a)a.style.display=plMultiVacs.length?'inline-block':'none';
+      var r=byId('pl-multi-ret'); if(r)r.style.display=plMultiVacs.length?'inline-block':'none';
+    }catch(e){} };
+    /* AFFECTER LE MEME AGENT — le cas de Jules : une serie de vacations, un seul agent. */
+    if(byId('pl-multi-aff'))byId('pl-multi-aff').onclick=function(){
+      if(!plMultiVacs.length)return;
+      var q=prompt('Affecter QUEL agent aux '+plMultiVacs.length+' vacation(s) sélectionnée(s) ?\n\nTape les premières lettres de son nom :','');
+      if(q===null)return; q=String(q).trim().toLowerCase(); if(!q)return;
+      var trouves=(typeof FA!=='undefined'&&FA)?FA.filter(function(a){ return String(a.nom||'').toLowerCase().indexOf(q)>=0; }):[];
+      if(!trouves.length){ alert('Aucun agent ne correspond à « '+q+' ».'); return; }
+      var ag=trouves[0];
+      if(trouves.length>1){
+        var liste=trouves.slice(0,12).map(function(a,i){return (i+1)+'. '+a.nom;}).join('\n');
+        var ch=prompt(trouves.length+' agents correspondent :\n\n'+liste+'\n\nLequel ? (numéro)','1');
+        if(ch===null)return; var n=parseInt(ch,10); if(!(n>=1&&n<=trouves.length)){ alert('Numéro invalide.'); return; }
+        ag=trouves[n-1];
+      }
+      var quoi=[]; plMultiVacs.forEach(function(mid){ for(var i=0;i<SUIVI.length;i++){ if(String(SUIVI[i].id)===String(mid)){ quoi.push(SUIVI[i]); break; } } });
+      if(!quoi.length){ alert('Ces vacations sont introuvables — recharge la page.'); return; }
+      var ap=quoi.slice(0,6).map(function(m){ return '  · '+((m.siteAgent||m.titre||'—')+' · '+(m.mdate?String(m.mdate).split('-').reverse().join('/'):'')+' '+(m.mheure||'')); }).join('\n');
+      if(!confirm('Affecter '+ag.nom+' à '+quoi.length+' vacation(s) ?\n\n'+ap+(quoi.length>6?('\n  … et '+(quoi.length-6)+' autre(s)'):'')+'\n\nLes tickets d\'appel se recalculent tout seuls.'))return;
+      quoi.forEach(function(m){ m.agentId=ag.id; });
+      if(typeof saveSuivi==='function')saveSuivi();
+      plMultiVacs=[]; renderPlanning();
+      if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
+      alert('✅ '+ag.nom+' affecté à '+quoi.length+' vacation(s).');
+    };
+    /* RETIRER — soft, comme partout : la vacation quitte les listes, rien n'est detruit. */
+    if(byId('pl-multi-ret'))byId('pl-multi-ret').onclick=function(){
+      if(!plMultiVacs.length)return;
+      var quoi=[]; plMultiVacs.forEach(function(mid){ for(var i=0;i<SUIVI.length;i++){ if(String(SUIVI[i].id)===String(mid)){ quoi.push(SUIVI[i]); break; } } });
+      if(!quoi.length)return;
+      var ap=quoi.slice(0,6).map(function(m){ return '  · '+((m.siteAgent||m.titre||'—')+' · '+(m.mdate?String(m.mdate).split('-').reverse().join('/'):'')); }).join('\n');
+      if(!confirm('Retirer '+quoi.length+' vacation(s) du Planning ?\n\n'+ap+(quoi.length>6?('\n  … et '+(quoi.length-6)+' autre(s)'):'')+'\n\nElles partent dans « Vacations retirées » et se rétablissent d\'un clic. Rien n\'est supprimé.'))return;
+      quoi.forEach(function(m){ m.retiree=true; });
+      if(typeof saveSuivi==='function')saveSuivi();
+      plMultiVacs=[]; renderPlanning();
+      alert('🗑 '+quoi.length+' vacation(s) retirée(s). Bouton « Vacations retirées » pour les rétablir.');
+    };
     if(byId('pl-multi-go'))byId('pl-multi-go').onclick=function(){
       if(!plMultiCells.length){alert('Sélectionne au moins une case vide.');return;}
       plMultiForm();   /* b361 : on saisit UNE fois pour toutes les cases */
