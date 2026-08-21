@@ -19,6 +19,11 @@ function builds_pousses() {
     // « Gestion b311 : … » mais aussi « Builds b237 a b247 … »
     const m = ligne.match(/\bGestion\s+b(\d{2,4})\b/i);
     if (m) vus.add(+m[1]);
+    // « b459 — ... » : depuis aout 2026 les messages de commit commencent directement par
+    // le build, sans le mot « Gestion ». Sans cette ligne le garde-fou repondait « a jour »
+    // en ne voyant que les anciens builds (constate le 21/08 : 106 vus alors qu'on est a b459).
+    const seul = ligne.match(/^b(\d{2,4})/i);
+    if (seul) vus.add(+seul[1]);
     const plage = ligne.match(/\bBuilds?\s+b(\d{2,4})\s+a\s+b(\d{2,4})\b/i);
     if (plage) for (let n = +plage[1]; n <= +plage[2]; n++) vus.add(n);
   });
@@ -27,7 +32,14 @@ function builds_pousses() {
 
 function builds_inscrits() {
   const j = JSON.parse(fs.readFileSync(FICHIER, 'utf8'));
-  return new Set((j.items || []).map((x) => x.b).filter(Boolean));
+  // le champ `b` est tantot un nombre (222), tantot un texte ("b440"), tantot un autre
+  // chantier ("d3"). On normalise, sinon des builds inscrits passaient pour absents.
+  const nums = (j.items || []).map((x) => {
+    if (typeof x.b === 'number') return x.b;
+    const m = String(x.b || '').match(/^b(\d{2,4})$/i);
+    return m ? +m[1] : null;
+  }).filter((n) => n !== null);
+  return new Set(nums);
 }
 
 const pousses = builds_pousses();

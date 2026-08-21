@@ -1,7 +1,372 @@
 {
  "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
- "maj": "2026-08-14",
+ "maj": "2026-08-21",
  "items": [
+  {
+   "b": "d1",
+   "titre": "📡 Les RADAR des 3 domaines dans 🌐 Domaines, et le contrôle du mois",
+   "source": "Zeus 12/08 : « insérer dans Domaines pour qu'on les ouvre depuis l'appli » + « avec quels clients on a travaillé le mois M-1 »",
+   "theme": "Domaines / Facturation",
+   "pourquoipas": "Les RADAR de DAHLIA et GARIS étaient des listes plates écrites à la main, figées en juillet, sans facturation ni drill : 5,8 et 4,7 Ko contre 48 Ko pour celui de FKH. Ils sont maintenant générés en clonant la coquille FKH — même moteur, même drill à deux niveaux, même bouton d'action — avec les données lues à la source (dossiers de factures pour DAHLIA, classeur maître pour GARIS, jamais recopiées à la main). Chaque carte de 🌐 Domaines gagne un bouton 📡 RADAR et le viewer une bascule Cockpit/RADAR ; PERSO n'en a pas, ce n'est pas un domaine société. Défaut réparé au passage : les boutons d'action du RADAR appelaient sendPrompt, qui n'existe pas dans l'appli — hors session Claude ils ne faisaient rien, en silence. Ils passent par le pont b411 : un clic crée un vrai ticket 🎫, avec accusé à l'écran. Ajout de CONTROLE_MOIS.html, le contrôle demandé par Zeus : mois passés lus dans les factures présentes (continuité par client, trous signalés), juillet et après par les clients avec qui on a travaillé, proposés depuis les mails séparés par boîte (fkhsecurite/dahliasecurite/garissecurite) et validés par Zeus ; les confirmés sans facture partent au RADAR de LEUR domaine, un ticket par domaine ET par mois pour que le rattrapage de juin ne se noie pas dans juillet. Plus la section 🏦 qui applique enfin R-RELEVE-M-1-01 (gravée le 12/07, jamais appliquée hors DAHLIA) : 7 relevés manquants côté société, avec le retard en jours. Vérifié dans l'appli en bac à sable : dépliage, compteurs cohérents avec ce qu'ils ouvrent, 3 puis 4 tickets réellement créés et retirés après contrôle. Deux compteurs menteurs corrigés avant livraison — une alerte GARIS qui survivait à sa réparation, et un décompte de relevés à 7 pendant que 14 pastilles rouges s'affichaient.",
+   "local": true,
+   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
+  },
+  {
+   "b": "d2",
+   "titre": "Le RADAR revient DANS le cockpit — fin du doublon",
+   "source": "Zeus 12/08 : « quand je parle de radar je parle de la section radar qui se trouve dans le cockpit » · « je ne vois pas pourquoi tu es sortie de la section domaines »",
+   "theme": "Domaines",
+   "pourquoipas": "En b415 les RADAR régénérés avaient été posés A COTE : trois fichiers RADAR_<DOM>.html et un bouton 📡 sur la carte du hub. Or chaque cockpit a DEJA son onglet RADAR, dont le contenu est un radar embarqué en srcdoc. Il y avait donc deux RADAR par domaine en production — le neuf derrière le bouton du hub, le vieux figé en juillet dans le cockpit — et c'est le vieux qu'on atteignait en ouvrant un cockpit normalement. Rien n'indiquait lequel faisait foi. Corrigé : le contenu régénéré remplace celui de <iframe id=\"if-radar\"> dans APPLI_FKH / APPLI_DAHLIA / APPLI_GARIS, en conservant les deux enveloppes que le cockpit pose autour de chaque vue (sendPrompt + le script qui remonte la hauteur, var id=radar) ; sans elles la vue perdrait le carnet et garderait une hauteur figée. Le bouton du hub et les trois fichiers séparés sont supprimés, hub.html revient à sa version d'origine. APPLI_PERSO n'a pas d'onglet RADAR : ce n'est pas un domaine société, rien à y faire. Vérifié en ouvrant les trois cockpits : DAHLIA 5 sections dont 💶 Facturation 2026, GARIS 6 sections avec 576 827,14 € TTC réels, FKH la ligne Agathe sous 📞 Appels & mails. Deux faux positifs écartés au passage : « showV is not defined » venait d'une lecture faite pendant le chargement, et l'erreur console « Unexpected string » est présente à l'identique sur la sauvegarde d'avant — antérieure, sans effet fonctionnel.",
+   "local": true,
+   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
+  },
+  {
+   "b": "d3",
+   "titre": "Le contrôle du mois dans les 3 cockpits · le carnet dit d’où viennent ses chiffres",
+   "source": "Zeus 12/08 : « découpe le contrôle du mois » · « retire le [pied SUIVI_DEPOT] aussi pour fkh » · « regénère les carnets pour qu’ils soient à jour »",
+   "theme": "Domaines",
+   "pourquoipas": "Trois choses, toutes dans la section Domaines. (1) Le contrôle du mois est découpé par domaine et posé en tête du RADAR de chaque cockpit — FKH 4 lignes dont le rattrapage AQUILA juin, DAHLIA 3 lignes (juillet complet), GARIS 3 lignes avec la mise en garde écrite que ses lignes viennent de la continuité de facturation et non d'une preuve mail, sa boîte étant vide en juillet. PERSO est hors sujet, ce n'est pas un domaine société. (2) Le pied « Mettre en miroir dans SUIVI_DEPOT » est retiré des trois radars, avec ses cases à cocher et ses deux fonctions : le système dit que le présent/manquant est régénéré depuis le maître COCKPIT_FKH.html, donc le bouton était un second chemin manuel vers la même destination — et en clonant la coquille FKH je l'avais recopié chez DAHLIA et GARIS où SUIVI_DEPOT n'existe pas. (3) Le badge du carnet distingue enfin trois états. Il affichait « carnet ✓ » avec l'heure courante alors que CARNET était littéralement window.__CARNET_DEMO__, et le court-circuit « si un instantané est embarqué, prends-le » empêchait toute lecture du Drive : les cockpits n'étaient jamais vivants, nulle part. GARIS était le seul honnête. Désormais : ✓ Drive / ○ instantané embarqué / — figé, l'instantané n'est plus qu'un repli, et GARIS affiche enfin ses chiffres. Les quatre carnets ont été régénérés (build_data_*.py) et le bloc de chiffres remplacé dans les pages sans repasser par build_appli_*.py, qui aurait effacé le RADAR régénéré. Preuve : la vue Facturation DAHLIA passe de « juillet 1 facture, 2 000 € » à « 3 factures, 5 268,48 € », total 13 → 15 factures. Deux lignes perdues en régénérant ont été remises : Appels JEX Reims (DAHLIA) et Classer GS-2026-108 (GARIS).",
+   "local": true,
+   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
+  },
+  {
+   "b": "d4",
+   "titre": "Le badge du carnet dit la vérité jusque DANS les vues",
+   "source": "Zeus 12/08 : « oui corrige le dans les vues aussi »",
+   "theme": "Domaines",
+   "pourquoipas": "La coque affichait « carnet ○ instantané embarqué » depuis b418, mais chaque vue porte son propre badge, resté à « carnet ✓ » : le cadre disait la vérité, le contenu mentait un étage plus bas. La vue ne pouvait pas faire mieux — la coque lui envoyait {__data, __err, __at} sans jamais lui dire d'où venaient les chiffres. La coque joint désormais __src, le pont de la vue le conserve, et les badges s'en servent. Deux variantes de code coexistaient (texte composé par l'appelant, ou par setSt lui-même) : les deux sont traitées, 8 setSt réécrits et 26 points de réception marqués sur les 4 cockpits. Vérifié après vidage du cache : sur GARIS, les vues ST/CA/ÉTAT affichent toutes « carnet ○ instantané embarqué », comme la coque. Au passage, question cascade ST GARIS : il n'y a rien à construire. La vue existe, elle fonctionne, et elle dit l'état réel — aucun sous-traitant propre à GARIS, l'onglet Sous_Traitance du classeur est « À renseigner », et la cascade où GARIS figure vit dans DATA_FKH.json parce que GARIS EST le sous-traitant. R-MAITRE-PAR-SOCIETE-01 interdit de rapatrier le chiffre FKH ici. Reste une décision pour Zeus : GARIS aura-t-il ses propres ST ?",
+   "local": true,
+   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
+  },
+  {
+   "b": "d5",
+   "titre": "Le pont de dépôt — joindre une facture depuis la ligne qui la réclame",
+   "source": "Zeus 12/08 : « je veux que les fichiers déposés dans l’application se retrouvent dans le dossier du domaine » · « tout ce que tu peux mettre en iframe, mets-le, pour qu’on travaille en autonomie »",
+   "theme": "Domaines",
+   "pourquoipas": "Le dépôt part de L'ENDROIT, pas du fichier. Sur les 7 clients FKH travaillés en juillet sans facture, chaque ligne porte « 📎 joindre la facture » : la ligne sait déjà le domaine, le casier, le mois et le client, donc la destination est connue avant que le fichier existe et rien n'est deviné. La clé de dépôt EST la destination : depot/<DOMAINE>/<casier>/<AAAA-MM>/<AAAA-MM_NATURE_TIERS.ext>, au nommage standard d'EMPLACEMENTS.md. Le pont vit dans gestion/domaines/hub.html et non dans index.html : ce dernier est écrit par une autre session et deux sessions sur un même fichier se défont — constaté aujourd'hui, CONTROLE_MOIS.html supprimé puis rétabli par erreur. Le hub étant chargé en iframe dès l'ouverture et de même origine, il pose son écouteur sur la fenêtre parente. Seule concession : une ligne dans index.html (window.fkhUpload / window.fkhPret), parce que toute l'appli est en closure et qu'aucune de ses fonctions n'est atteignable de l'extérieur ; l'alternative aurait été de dupliquer le chemin du mot de passe dans un second morceau de code. Le radar réutilise son go() existant avec un préfixe DEPOT: — un seul chemin, pas un second mécanisme. Un dépôt réussi ouvre un ticket 🎫 : un dépôt sans trace est un dépôt qu'on croit fait. Vérifié dans l'appli : le message atteint le pont, qui refuse proprement et le dit à l'écran quand la connexion manque (cas du bac à sable). L'envoi réel reste à jouer connecté, ainsi que le script local qui redescendra depot/... dans le dossier du domaine.",
+   "local": true,
+   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
+  },
+  {
+   "b": "d6",
+   "titre": "Établir OU déposer — la ligne propose les deux gestes",
+   "source": "Zeus 12/08 : « au lieu de mettre établir il faut donner la possibilité de pouvoir déposer également en plus d’établir »",
+   "theme": "Domaines",
+   "pourquoipas": "Une ligne de facturation manquante appelle deux gestes selon le cas : faire la facture, ou déposer celle qui existe déjà. Le RADAR n'en proposait qu'un. Le rendu accepte désormais une seconde action (a2) et les lignes « Juillet 2026 — 7 clients » et « RATTRAPAGE AQUILA juin » portent Établir + 📎 Déposer. Piège écarté au passage : deux boutons « Déposer » côte à côte faisaient des choses différentes — l'un ouvrait un ticket, l'autre téléverse vraiment. La ligne des relevés dit maintenant « Réclamer » (c'est une demande), et le vrai dépôt descend au niveau du mois manquant, où la destination est exacte : « 📎 déposer le relevé de juin », « … de juillet ». Même mot, même geste, partout. Vérifié dans le cockpit : 2 lignes à deux boutons, 14 actions dans le détail des 7 clients (établir + joindre pour chacun), 2 dépôts de relevé datés.",
+   "local": true,
+   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
+  },
+  {
+   "b": "d7",
+   "titre": "Le surveillant branché au carnet FKH — juin et juillet cessent d’être vides",
+   "source": "Zeus 12/08 : « branche le surveillant au carnet » · « tout ce que ça indique en manquant alors que les fichiers sont présents, corrige »",
+   "theme": "Domaines",
+   "pourquoipas": "Le surveillant lit les dossiers depuis le 31/07 et produit fiches_FKH.json — il voyait les 4 factures de juin depuis des semaines. Personne ne les lisait : seul build_data_perso.py consommait les fiches. Le carnet FKH ne connaissait que le maître TB2026, qui s'arrête à mai, d'où un cockpit affichant un juin vide alors que les PDF étaient rangés. Branché : build_data_fkh.py lit désormais les fiches et ne remplit QUE le silence du maître — là où le maître parle il fait foi (il connaît les avoirs et le net), et la ligne venue du dossier le dit : « pièces rangées, PAS ENCORE saisies au maître ». Carnet : 5 → 7 mois, CA 2026 338 657 → 447 460 €. Les 5 factures de juillet trouvées dans À TRAITER SOCIÉTÉ ont été rangées au standard dans 2026/juillet 2026 et la boîte d'entrée est vide. Enfin la ligne « Factures clients émises » de la matrice ÉTAT, qui était écrite en dur (10·11·9·10·6 puis des points), se met à jour à la réception du carnet — un « · » collé au nombre signale une valeur venue du dossier. Deux erreurs corrigées en route : une première version lisait un carnet pas encore arrivé et ne faisait rien en silence ; la seconde écrasait janvier-mai avec des comptages de LIGNES de facture (108 au lieu de 10). Vérifié à l'écran : 10 11 9 10 6 4· 5·. Audit du reste du mois de juin : relevé bancaire, bulletins, DSN et facture ST sont réellement absents — ces points-là disent vrai.",
+   "local": true
+  },
+  {
+   "b": "d8",
+   "titre": "La chaîne du dépôt déroulée en entier — TRI → surveillant → quarantaine",
+   "source": "Zeus 12/08 : « à chaque dépôt, regarde la succession d’événements inhérente et exécute-la comme indiqué dans le système »",
+   "theme": "Domaines",
+   "pourquoipas": "Le système décrit la chaîne dans CARTE_SURVEILLANT.md : TRI (ranger les boîtes d'entrée) → surveillant (le robot lit les rangés) → QUARANTAINE (Claude finit l'illisible), et la règle dit que TRI finit TOUJOURS par le robot et le traitement de la quarantaine. Déroulée sur un dépôt réel : deux relevés Indy déposés à 16h38 dans À TRAITER SOCIÉTÉ. Identifiés comme FKH (compte Swan, IBAN …9987 450), rangés au standard en 2026-06_releve_Indy.pdf et 2026-07_releve_Indy.pdf. Le robot les a mis en QUARANTAINE : le gabarit releve-bancaire ne connaissait que Qonto. Cas (a) de R-QUARANTAINE-BOUCLE-01 — gabarit Swan/Indy ajouté, aiguillage automatique par le CONTENU du fichier et non par son nom. Résultat immédiat : F3 passe de 25 à 29 pièces, quarantaine 2 → 0, et quatre virements ST entrent (juin GARIS 13 986 + VIGICORE 2 400 ; juillet GARIS 25 000 + VIGICORE 2 400). Puis le bloc virements_st_2026 du carnet a été branché sur le surveillant, même principe que le CA : le dossier ne remplit que le SILENCE du maître, et la ligne le dit. Versé GARIS 2026 : 302 516,10 → 327 516,10 €. Juillet apparaît pour la première fois.",
+   "local": true
+  },
+  {
+   "b": "d9",
+   "titre": "Les vues cessent d’annoncer manquant ce qui est rangé",
+   "source": "Zeus 12/08 : « as-tu mis à jour les vues qui indiquaient des manquants alors que les fichiers étaient présents »",
+   "theme": "Domaines",
+   "pourquoipas": "Après le dépôt des relevés Swan de juin et juillet, deux vues continuaient d'annoncer un manque que le disque démentait. La matrice ÉTAT affichait « Relevés bancaires ✓✓✓✓✓····· » avec la ligne écrite en dur ; elle est maintenant calculée sur le contenu réel du dossier — ✓✓✓✓✓✓✓. Et le RADAR affichait « Relevés de compte — 2 manquants » : l'item passe à « ✅ à jour jusqu'à juillet », détail compris (les deux ❌ deviennent « déposé le 12/08 »), pour que le titre et le drill ne disent pas deux choses différentes. Poursuite de la quarantaine dans le même mouvement : deux repères ajoutés au gabarit facture-fournisseur — « Montant TTC » seul (RingOver, que le gabarit ne connaissait pas), et un triplet auto-vérifié HT+TVA=TTC pour les factures qui séparent les libellés des valeurs (LeLegaliste). Cette dernière règle n'accepte un montant que s'il se vérifie : elle ne peut pas inventer. F4 : 21 → 23 pièces, quarantaine FKH 7 → 5. Restent 5 pièces, dont 3 scans images qui relèvent du cas (b) — lecture à la vue.",
+   "local": true
+  },
+  {
+   "b": "worker",
+   "titre": "La ligne des donneurs d'ordre est analysée en entier — DÉPLOYÉ",
+   "source": "Zeus 12/08",
+   "theme": "Worker / Appels",
+   "pourquoipas": "Premier déploiement du worker depuis son gel. Le filtre ne regardait QUE l'interlocuteur (liste blanche de 7 numéros) ; la ligne appelée n'entrait pas dans la décision, donc un donneur d'ordre qui appelle POUR LA PREMIÈRE FOIS était ignoré — le cas du 07 56 92 88 63 aujourd'hui. La ligne dédiée devient un second laissez-passer, à égalité avec la liste blanche : si l'une des deux extrémités de l'appel est 07 57 95 38 49, on analyse, quel que soit le numéro d'en face. Le diagnostic API de Zeus a confirmé que Ringover fournit from_number et to_number. Conditions dures inchangées : décroché + enregistrement (un appel manqué remonte dans 🧭 Terrain, b419). Réglable sans redéployer : clé `fkh_ligne_do`. PÉRIODES DU BDC : mesuré avant de déployer — sur 169 bons de commande lus, `periodes` n'est apparu ZÉRO fois, le code n'a jamais tourné ; on leur a quand même posé un interrupteur fermé par défaut (`fkh_bdc_periodes`=1 pour ouvrir) pour que le gel de Zeus soit explicite. Banc tmp/banc_w1.js : seuls 2 cas changent, ceux qu'on veut. Version déployée 6be3c03a (précédente d073c091).",
+   "local": true
+  },
+  {
+   "b": "d10",
+   "titre": "Les encaissements clients entrent dans le carnet FKH",
+   "source": "Zeus 12/08 : « branche les vues figées de FKH sur le carnet »",
+   "theme": "Domaines",
+   "pourquoipas": "Le carnet FKH savait ce qu'on facture, pas ce qu'on reçoit : aucun bloc d'encaissement client. C'est pour ça que la vue Facturation portait « Encaissé 227 209 € » et « Reste dû 111 446 € » écrits dans la page, impossibles à rafraîchir. Le maître les avait pourtant — TB_2026_Mvts, catégorie « Encaissement client/DO », 40 lignes avec le n° de facture rapproché. Le bloc encaissements_client_2026 est ajouté au carnet : par mois, par client, avec les factures rapprochées. Le cumul réel devient facturé 447 460,18 − encaissé 373 028,17 = 74 432,01 € de reste dû, contre 111 446 € affichés par la vue figée qui ignore juin et juillet. ÉCHEC ASSUMÉ sur la seconde moitié : j'ai tenté de brancher la vue Facturation elle-même (MT/MO écrits dans la page, totaux tf/te calculés une seule fois au chargement). Le ré-échappement du srcdoc a cassé la vue — son script s'affichait en texte au lieu de s'exécuter. Constaté à l'écran, revenu à la version saine par git checkout, vérifié. La vue reste donc figée : la brancher demande de reprendre sa construction, pas un correctif ponctuel.",
+   "local": true
+  },
+  {
+   "b": "d11",
+   "titre": "Audit complet des 3 cockpits — deux défauts trouvés et réparés",
+   "source": "Zeus 12/08 : « fais l’audit complet, vérifie la tuyauterie de toutes les dimensions qu’on a traitées »",
+   "theme": "Domaines",
+   "pourquoipas": "Passage systématique sur chaque dimension travaillée aujourd'hui, fichier par fichier puis dans l'appli. Deux défauts que seul l'audit pouvait montrer : (1) le contrôle du mois avait DISPARU du RADAR GARIS — il y était en fin d'après-midi, une régénération ultérieure du radar l'a écrasé, parce que le générateur et la pose du contrôle sont deux scripts séparés et que je n'avais rejoué que le premier ; (2) l'instantané embarqué de GARIS était plus ancien que son carnet régénéré à 15h40, donc le cockpit montrait des chiffres périmés sans le dire. Les deux sont réparés et revérifiés. Le reste tient : RADAR régénéré dans les 3 cockpits, miroir SUIVI_DEPOT absent partout, badge à 3 états dans la coque ET les vues, instantanés désormais identiques aux carnets du disque, pont de dépôt actif (hub + crochet fkhUpload), carnet FKH à 7 mois de CA dont 2 venus du dossier, 7 mois de virements ST et le bloc encaissements. Leçon : deux scripts qui construisent la même page doivent être rejoués ensemble — sinon le second efface le premier en silence.",
+   "local": true
+  },
+  {
+   "b": "b430",
+   "titre": "Le Planning distingue enfin BASIC FIT Biscarrosse de BASIC FIT Chartres",
+   "source": "Zeus 12/08, fiche BASIC FIT du 13/08 : « pourquoi on ne voit pas Biscarrosse dans le nom du site »",
+   "theme": "Planning",
+   "pourquoipas": "Le Planning regroupait sur le seul nom du site. Mesure du 10 au 31/08 : la ligne « BASIC FIT » portait SIX villes et onze vacations — Biscarrosse, Chartres, Chauvigny, Cherreau, Lucé, Neuville-de-Poitou. Biscarrosse et Chartres, 600 km. Pire que l'absence : la ligne affichait bien UNE ville entre parenthèses, celle de la première vacation rencontrée — les onze étaient donc annoncées à Chartres. Le correctif b399 « le nom du site porte sa ville » n'avait été posé que sur Suivi des appels et les pastilles. La ville entre maintenant dans la clé de regroupement, et le titre de la fiche la porte. Le banc a montré un effet que ma première mesure ne voyait pas : la clé brute scindait aussi sur le VIDE (Duc coupé en deux, « sans ville » 2 vacations + « CHAILLEY » 35). Règle ajoutée : une vacation sans ville rejoint la ville de son site quand il n'en a qu'une. Preuves : 159 vacations rangées avant comme après, 0 ligne à plusieurs villes, 0 site coupé par un champ vide, 31 lignes sur 32 inchangées. Non-régression : Suivi des appels identique à l'horloge près, Fiche agent identique au caractère près, Planning 79 vacations avant comme après (29 → 32 sites). La clé interne ne sort jamais vers les données : le ＋ reçoit data-site=\"BASIC FIT\" et data-ville=\"BISCARROSSE\" séparément, vérifié en créant une vacation depuis la ligne. EN LIGNE le 12/08 : le commit b430 est parti dans la poussee de la session Domaines a 17h42, sans que je la declenche — le fichier en ligne est identique au local, octet pour octet.",
+   "enligne": true
+  },
+  {
+   "b": "d12",
+   "titre": "Le surveillant surveille GARIS — 20 factures et 44 encaissements lus",
+   "source": "Zeus 12/08 : « branche le surveillant sur GARIS » · « scan »",
+   "theme": "Domaines",
+   "pourquoipas": "GARIS n'était surveillé nulle part : le robot ne connaissait que FKH et PERSO, donc pas de fiches_GARIS.json. Trois dossiers ajoutés à la carte (MODE A respecté : le bloc de carnet et la vue existent depuis début août) — les factures du classement mensuel, celles rangées hors classement, et les relevés. Résultat : 20 factures lues, carnet GARIS de 19 à 63 fiches. Les relevés partaient d'abord en quarantaine (11) et le robot avait raison : le gabarit ne retenait que les débits vers GARIS ou VIGICORE, les sous-traitants de FKH, qui n'existent pas dans le relevé de GARIS. Nouveau gabarit lisant les ENTRÉES — 44 encaissements, quarantaine 11 → 3. Scan du même passage : trois relevés Indy DAHLIA (mai, juin, juillet) identifiés et rangés ; celui de mai était un doublon strict du fichier déjà présent, supprimé après comparaison d'empreinte. ÉCHEC ASSUMÉ : j'ai voulu faire entrer ces 44 encaissements dans le carnet GARIS, une fiche sur 44 portait 20 260 889 641 € — l'analyseur avait collé « 2026 » à un montant sur une ligne coupée. Bloc retiré : le cockpit garde son « 0 encaissement tracé », qui est un manque honnête, plutôt qu'un total faux. Le gabarit reste à corriger avant de rebrancher.",
+   "local": true
+  },
+  {
+   "b": "d13",
+   "titre": "Les encaissements GARIS entrent — et les deux domaines se confirment",
+   "source": "Zeus 12/08 : « corrige le gabarit et rebranche les encaissements GARIS »",
+   "theme": "Domaines",
+   "pourquoipas": "Deux défauts corrigés, tous deux du même genre : un chiffre faux mais crédible. (1) La regex des montants acceptait n'importe quelle suite de chiffres séparés d'espaces : sur « Virement FACTURE GS-2026-078 5 635,98 0,00 » elle démarrait à « 2026 » et lisait 20 260 785 635,98 €. Le vrai groupement français est imposé — 1 à 3 chiffres puis des tranches de 3 — donc « 2026 » ne peut plus amorcer un montant. (2) Le dossier des relevés GARIS contient AUSSI 2025 : filtrer sur le seul mois rangeait des mouvements de septembre 2025 dans « Septembre 2026 ». On filtre désormais sur la date complète, et tout montant hors bornes est écarté plutôt qu'additionné en silence. Résultat : 44 encaissements, 558 473,17 € sur 5 mois, contreparties cohérentes (FKH, DAHLIA, I.G.S-21, ADN). CONTRÔLE CROISÉ qui vaut mieux qu'une relecture : FKH déclare avoir versé 270 037,50 € à GARIS de janvier à mai ; GARIS déclare avoir reçu de FKH 270 037 € sur les mêmes mois. Les deux carnets, construits séparément depuis deux sources différentes, tombent d'accord au centime près.",
+   "local": true
+  },
+  {
+   "b": "d14",
+   "titre": "Le relevé DAHLIA d’avril retrouvé — et une alerte de ma part démentie",
+   "source": "Zeus 12/08 : « récupère le relevé DAHLIA d’avril chez SWAN »",
+   "theme": "Domaines",
+   "pourquoipas": "J'avais présenté ce relevé comme le seul manquant PÉRISSABLE, au motif que SWAN serait fermée et l'accès sur le point de disparaître. C'était faux, deux fois. D'abord « Indy » et « SWAN » sont le même compte — Indy est l'interface, Swan la banque derrière (BIC SWNBFR22) ; le compte est vivant, il produit encore les relevés de juin et juillet. Ensuite le relevé d'avril n'était nulle part à récupérer : il était dans Downloads depuis le 1er mai, jamais rangé. Vérifié avant de bouger quoi que ce soit : IBAN [IBAN retire — voir _SYSTEME], DAHLIA SÉCURITÉ, période 01→30/04/2026. Rangé au standard en 2026-04_releve_Indy.pdf. DAHLIA a désormais ses SEPT relevés de janvier à juillet, plus aucun trou. Le RADAR passe de « avril · juin · juillet ABSENTS » à « ✅ à jour jusqu'à juillet », détail compris. Leçon : avant d'annoncer qu'une pièce est en danger, vérifier qu'elle n'est pas simplement mal rangée — et vérifier que la banque est bien fermée avant de le dire.",
+   "local": true
+  },
+  {
+   "b": "b431",
+   "titre": "L'appli finit ce que le serveur dépose : position, nom redressé, villes et agents proches",
+   "source": "Zeus 12/08, demande Cerisé (61000) tombée à 17h45 : « l'onglet agents proches ne marche pas » et « pourquoi il n'y a pas les deux villes les plus proches »",
+   "theme": "Suivi des demandes",
+   "pourquoipas": "Cause : le worker déployé cet après-midi dépose lui-même les demandes venues d'un appel, mais il ne connaît pas les communes de France — les 34 969 sont chargées dans le navigateur, pas sur le serveur. Il écrit donc la:null, lo:null. Sans coordonnées : aucune ligne « ↦ ville à N km », et le panneau 👥 Agents proches s'arrête dès sa première ligne (renderNear rend « Localisation de… » et n'appelle jamais nearAgents). Le rattrapage existant (ensureGeo) ne suffisait pas : il interroge geo.api.gouv.fr par le NOM SEUL en ignorant le code postal — le défaut que b416 avait corrigé pour la création — il dépend du réseau, et au premier échec il pose _nogeo=true qui survit aux synchronisations et gèle la demande pour de bon. b431 résout la commune SUR PLACE dans la table déjà chargée, règle b416 : le code postal fait foi, le nom départage. Le code postal est lu dans son champ, à défaut dans la ligne « Ville : X (12345) » du texte. Trois moments : à l'arrivée de la table des communes, à chaque demande qui descend du cloud, et à l'ouverture du panneau. PREUVES sur trois témoins : Cerisé (CP en champ) → 48.4451 / 0.1314, ↦ Le Mans 49 km, ↦ Caen 90 km, panneau 17 agents ≤ 100 km avec distances réelles ; « Guissan (11430) » CP présent seulement dans le texte → résolu sur Gruissan, champ cp rempli ; « Wouzak » sans CP et nom introuvable → INTACT, rien d'inventé. Sur les 16 demandes en recherche déjà sans coordonnées, 0 réparée et 0 touchée : leurs noms sont déformés et leurs codes postaux absents ou inexistants (Génétine cp=03444) — b431 refuse de deviner, c'est la leçon Enelis. Le gain porte sur les demandes à venir. Non-régression : Planning identique, Fiche agent identique, Suivi des appels identique à l'horloge près. TRANCHÉ par Zeus le 12/08 (« oui fais pareil ») : quand c'est le CODE POSTAL qui a tranché et que le nom diffère, le nom affiché devient celui du code, et le mot entendu reste écrit à côté — exactement comme b416 à la création. « Ville : Guissan (11430) » devient « Ville : Gruissan (11430) · entendu : « Guissan » ». Deux garde-fous vérifiés au banc sur cinq témoins : (1) une commune trouvée par son NOM SEUL n'est jamais redressée, il n'y a rien à signaler ; (2) le titre de la carte ne suit que s'il ne portait que la ville — un titre « BASIC FIT » reste « BASIC FIT » alors que sa ville passe bien à Gruissan. Idempotent : après remise à zéro de la position, une seule mention « entendu » et deux lignes ↦, pas d'empilement. Témoins : Cerisé (nom juste) intact ; Guissan → Gruissan ; Minot (12100) → Millau, le cas exact de b416 ; Wouzak sans code postal → intact. EN LIGNE le 12/08 · confirmé par Zeus sur sa demande Cerisé : « maintenant ça marche ». Le sablier qu'il a vu quelques secondes avant, c'est la table des communes (1,55 Mo) qui n'était pas encore arrivée — svGeoLocal renvoie false tant que COMMUNES est vide, et le panneau se redessine tout seul dès que la table atterrit.",
+   "enligne": true
+  },
+  {
+   "b": "d15",
+   "titre": "Le cockpit FKH lit le dossier au lieu d'en montrer une photo",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "« Attendues M-1 » affichait juin en l'appelant M-1, et annonçait manquantes 5 factures déposées deux heures plus tôt. La matrice était écrite en dur dans la page. Elle vient maintenant du carnet, qui la calcule depuis le dossier.",
+   "local": true
+  },
+  {
+   "b": "d16",
+   "titre": "DAHLIA, GARIS et PERSO lisent leur carnet pour de vrai",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Leur seul chemin de lecture passait par le Drive via une capacité qui n'existe pas dans l'appli : ils tombaient toujours sur leur instantané. Ils lisent désormais le fichier posé à côté du cockpit.",
+   "local": true
+  },
+  {
+   "b": "d17",
+   "titre": "Chaque vue dit d'où viennent ses chiffres — les 96, sans exception",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Bandeau en bas de chaque vue : « carnet lu HH:MM · cette vue s'en sert » ou « … ne s'en sert PAS ENCORE ». Une vue ne peut plus se faire passer pour fraîche.",
+   "local": true
+  },
+  {
+   "b": "d18",
+   "titre": "Le bandeau se détecte tout seul, et CASCADE VIREMENTS lit le carnet à moitié",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "La marque « se sert du carnet » se pose seule (le pont compte ses écouteurs). CASCADE ne recale que le CA : le carnet groupe les virements par mois de PAIEMENT, la vue par mois de PRESTATION — elle l'écrit à l'écran.",
+   "local": true
+  },
+  {
+   "b": "d19",
+   "titre": "La TVA et l'attribution des virements entrent dans le carnet — CA3 et CASCADE suivent",
+   "source": "Zeus",
+   "theme": "Domaines / Facturation",
+   "pourquoipas": "CA3 se recalcule depuis TB_2026_Mvts (validé au centime sur 6 mois sur 7 ; juin diffère, le recompute fait foi). L'attribution vient d'Allocation_ST_2026, 17 mois de prestation.",
+   "local": true
+  },
+  {
+   "b": "d20",
+   "titre": "Un serveur qui sert le cockpit en entier, et le bandeau à trois états",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "http.server tronquait le cockpit à 783 360 octets sur 792 274 : impossible de vérifier avant de pousser. serveur_local.py le sert entier en 0,26 s. Et une page de navigation le dit au lieu de s'annoncer « pas encore branchée ».",
+   "local": true
+  },
+  {
+   "b": "d21",
+   "titre": "Le dépôt du capital entre au RADAR — par un générateur, pas à la main",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "SCRIPTS/radar.py manipule le littéral SECS sans le casser (il est en JS, pas en JSON) et refuse d'écrire si l'équilibre est rompu. L'item porte l'écart 243 € déclarés / 430 € reçus.",
+   "local": true
+  },
+  {
+   "b": "d22",
+   "titre": "PILOTAGE et HUB lisent le grand livre — plus rien « à câbler »",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "« Justificatifs charges fournisseurs » n'avait que janvier ; les 8 mois se recalculent (25 / 118). Au HUB, « Impayés clients » devient « Reste dû clients » — le calcul ne dit pas la même chose que l'ancien nom.",
+   "local": true
+  },
+  {
+   "b": "d23",
+   "titre": "CASCADE lit l'allocation, et 94 914 € de non-viré cessent d'être invisibles",
+   "source": "Zeus",
+   "theme": "Domaines / Facturation",
+   "pourquoipas": "La 5e colonne était codée en dur à « 0,00 ✓ ». Elle montre le vrai : avril 25 726,44 €, mai 69 187,92 €, alloués à GARIS et pas encore virés.",
+   "local": true
+  },
+  {
+   "b": "d24",
+   "titre": "Les heures 2026 entrent au carnet — Répartition lit ses 5 mois",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Elles sont dans Cascade_ST_2026, pas dans Sous_Traitance (qui ne contient que 2025). Recompute validé : janvier 2 964,28 − 213 = 2 751,28, exactement ce que la vue affichait.",
+   "local": true
+  },
+  {
+   "b": "d25",
+   "titre": "DAHLIA et GARIS savent ce qu'il y a dans leur dossier",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Présence des factures client × mois, factorisée pour les trois domaines. GARIS dit aussitôt quelque chose de vrai : juillet est vide, sa facturation n'est pas faite.",
+   "local": true
+  },
+  {
+   "b": "d26",
+   "titre": "TVA mensuelle DAHLIA, charges fournisseurs GARIS",
+   "source": "Zeus",
+   "theme": "Domaines / Facturation",
+   "pourquoipas": "Le bloc fiscal DAHLIA ne retenait que les totaux annuels ; le détail des 13 mois était juste au-dessus. GARIS reçoit ses factures fournisseurs. L'onglet Sous-traitance de GARIS est vide : rien à transporter.",
+   "local": true
+  },
+  {
+   "b": "d27",
+   "titre": "La section Domaines passe en plein écran, comme le Planning",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Un cockpit en iframe dans une colonne centrée perdait la moitié de sa largeur. Même classe que le Planning au-delà de 1100 px, et hauteur portée à presque tout l'écran.",
+   "local": true
+  },
+  {
+   "b": "d28",
+   "titre": "Le veilleur — la chaîne se relance toute seule, et le dépôt redescend avec",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Le carnet ne se recalculait que si quelqu'un lançait la commande. Le veilleur regarde les dossiers (réveil 30 s, métadonnées seules) et rejoue la chaîne du domaine qui a bougé. Il range aussi les dépôts R2 au passage.",
+   "local": true
+  },
+  {
+   "b": "d29",
+   "titre": "DAHLIA et GARIS ont enfin un registre bancaire — 244 mouvements lus dans les PDF",
+   "source": "Zeus",
+   "theme": "Domaines",
+   "pourquoipas": "Ni l'un ni l'autre n'avait d'équivalent de TB_2026_Mvts. Les relevés sont lus ligne à ligne (formats SWAN/INDY et QONTO). Registre BRUT : la matière, pas la comptabilité.",
+   "local": true
+  },
+  {
+   "b": "d30",
+   "titre": "Les relevés FKH étaient là — et le registre de juillet est incomplet de 30 lignes",
+   "source": "Zeus",
+   "theme": "Domaines / Facturation",
+   "pourquoipas": "Zeus avait raison : juin et juillet étaient déposés. En les lisant à côté du registre saisi, cinq mois tombent au carreau près et JUILLET n'a que 11 lignes saisies sur 41.",
+   "local": true
+  },
+  {
+   "b": "b432",
+   "titre": "Un ticket qui demande une information se juge sur l'information — pas sur un « Fait » declare",
+   "source": "Zeus 12/08 : « quand je donne un ticket au superviseur, il faut que je puisse voir si c'etait reellement renseigne ou pas » + « tous les agents avec qui on a travaille cette semaine et qui n'ont pas de mensuration »",
+   "theme": "Tickets",
+   "local": true,
+   "pourquoipas": "Zeus ne pouvait pas le savoir, et ce n'etait pas un manque d'affichage : ses tickets portaient une PHRASE. Une phrase ne se verifie pas — « Fait » ne dit que « j'ai fait quelque chose ». L'appli avait pourtant deja la bonne mecanique a deux endroits sans les relier : TK_TYPES (missing() qui lit la donnee, mais sans destinataire ni accuse) et tkx (adresse a un role, avec accuse, mais qui ferme sur une declaration). Aucune des deux n'avait les deux. b432 fait porter au ticket le TROU qu'il vient boucher : TK_TYPES.mensurations ecrit via faSaveMens (source unique), donc saisir dans le ticket ou dans la fiche revient au meme et se voit pareil — demande explicite de Zeus. tkxReste/tkxAutoScan (b365, ecrits pour les files de vacations) sont etendus au trou de donnee : rien de neuf invente. « Fait » refuse tant qu'un champ est vide. Le controle (qui a rempli, quand, via le ticket ou hors ticket) est reserve super-admin + administrateur. Deux portes : bouton sur la fiche de l'agent, et « agents ayant travaille cette semaine » (281 agents en base, 25 la semaine du 10/08, dont 18 sans mensurations). missing() exige les TROIS mesures : l'ancienne regle « au moins une » declarait Issa ADS Dole renseigne avec 46 et L sans taille de haut. Bug PREEXISTANT corrige au passage : la liste des tickets n'excluait pas les echanges, qui s'y affichaient en carte vide « Ticket 0/0 ». Verifie de bout en bout sur le banc d'essai isole : refus du « Fait », ecriture reelle dans fkh_tenues_ctrl, tracabilite posee, compteur 1/8 -> 8/8, fermeture automatique et sa mention. Demo jouable : ?sandbox=1&demo=ticket-mens."
+  },
+  {
+   "b": "b433",
+   "titre": "La demande d'information part de Terrain, plus de la section Tickets",
+   "source": "Zeus 13/08 : « fais en sorte que ce soit dans Terrain et non dans la section Tickets »",
+   "theme": "Tickets",
+   "pourquoipas": "Terrain est l'endroit ou l'on regarde ce qui demande une action MAINTENANT : c'est de la que doit partir une demande. La section Tickets garde sa vocation, SUIVRE ce qu'on a envoye. La carte reste reservee au super-admin et a l'administrateur : le superviseur RECOIT ces tickets, il ne se les adresse pas a lui-meme. Les tickets recus etaient deja traitables dans Terrain depuis b384 — la saisie des tailles y a fonctionne sans rien ajouter."
+  },
+  {
+   "b": "b434",
+   "titre": "CORRECTIF BLOQUANT : le bouton de la fiche agent tuait le demarrage de l'appli",
+   "source": "Constate en jouant la demo de b432, avant tout push",
+   "theme": "Tickets",
+   "pourquoipas": "renderFA() s'execute ligne ~2902, au fil du script ; var TK_TYPES n'est affecte qu'a ~5501. Entre les deux TK_TYPES vaut undefined (hoisting), et le Object.keys de faManqueBtns levait une TypeError qui TUAIT tout le reste du demarrage : ni sandbox, ni sections, ni rendu. INVISIBLE sur un stockage vide — sans agent a dessiner, la fonction n'etait jamais appelee. Systematique des qu'il y a des agents : chez Zeus, 281 agents, l'appli n'aurait pas demarre du tout. Preuve par temoin : b431 servi sur le MEME port, donc le meme localStorage, demarrait ; b433 non ; b434 oui. Lecon : un sandbox vierge ne teste rien."
+  },
+  {
+   "b": "b435",
+   "titre": "Un ticket peut demander PLUSIEURS informations a la fois",
+   "source": "Zeus 13/08 : « adresse ET mensuration et egalement l'etat des tenues »",
+   "theme": "Tickets",
+   "pourquoipas": "manque.champs (liste) remplace manque.champ (unique), l'ancien format restant lu. Tracabilite par agent ET par champ : savoir que l'adresse est arrivee ne dit pas que les mesures le sont. Nouveau type `tenue` — le trou n'est pas « la tenue est incomplete », c'est qu'on n'en SAIT RIEN (jamais controle, ou fiche sans statut). Les agents sortent ranges par sollicitation reelle. Mesure au 13/08 : 62 agents sollicites sur 281 en fiche, 57 incomplets, 35 aux deux trous, 7 jamais controles."
+  },
+  {
+   "b": "b436",
+   "titre": "On decoche avant d'envoyer : une ligne generique n'est pas un agent a rappeler",
+   "source": "Zeus 13/08 : « enleve Poulet Duc »",
+   "theme": "Tickets",
+   "pourquoipas": "« AGENT Poulet DUC » est l'agent le plus sollicite de la base avec 32 vacations — et ce n'est pas une personne, c'est une ligne generique venue d'un import. Sans decochage il serait revenu dans CHAQUE envoi. La fenetre d'envoi liste desormais les agents avec cases a cocher, nombre de vacations et ce qu'on leur demande exactement. La fiche n'est PAS supprimee : elle porte des vacations reelles, son nettoyage est un chantier a part."
+  },
+  {
+   "b": "b437",
+   "titre": "Le decor de demo ne se dedouble plus",
+   "source": "Constate en rejouant la demo",
+   "theme": "Tickets",
+   "pourquoipas": "Monter deux fois la demo empilait ses vacations — 32 devenaient 64 — et le classement par sollicitation mentait. Le decor se retire avant de se reposer."
+  },
+  {
+   "b": "b438",
+   "titre": "Les agents proches depuis la fiche d'une vacation du Planning",
+   "source": "Zeus 13/08 : « depuis cette vue, donne la possibilite d'avoir l'onglet agents proches avec toutes ses fonctionnalites, comme dans Suivi des demandes »",
+   "theme": "Planning",
+   "local": true,
+   "pourquoipas": "Rien de reecrit : les deux vues travaillent DEJA le meme objet (un element de SUIVI), donc renderNear(m) s'applique tel quel. Ce qui manquait etait le CABLAGE — les quatre ecouteurs du Suivi etaient cloues sur #suiviList. Ils sont enregistres une fois (svAddAct) et rebranchables sur n'importe quel conteneur (svBindActs). Factorise, pas recopie. Aussi : svGeoCompleter ne completait que les demandes en RECHERCHE, alors que les agents proches se cherchent surtout sur une vacation VALIDEE que personne n'a prise (154 dans la base au 13/08, dont 10 sans coordonnees)."
+  },
+  {
+   "b": "b439",
+   "titre": "Le rafraichissement ne doit rien suspendre aux entrailles d'une autre fonction",
+   "source": "Trouve en testant b438 : les filtres du panneau semblaient morts",
+   "theme": "Planning",
+   "local": true,
+   "pourquoipas": "J'avais suspendu le rafraichissement de la fiche a renderSuivi, que tous ces gestes appellent. Mais renderSuivi SORT PAR ANTICIPATION quand sa liste est vide (« Aucun resultat », ligne 2470) : le rafraichissement n'avait jamais lieu. Le rayon changeait bien en memoire, l'ecran ne bougeait pas — le pire des cas, un geste qui a l'air ignore alors qu'il a ete pris. Le rafraichissement vit desormais dans le cablage lui-meme. Verifie : 100 km -> 5 agents, 20 km -> 3, 200 km -> 6, +vehicule -> 4, +ADS -> 3, fiche jamais fermee. Demo : ?sandbox=1&demo=proches."
+  },
+  {
+   "b": "b440",
+   "titre": "« Affecter » directement depuis la ligne d'un agent proche",
+   "source": "Zeus 13/08 : oui au bouton propose",
+   "theme": "Planning",
+   "local": true,
+   "pourquoipas": "Dans le Planning, quand personne n'est affecte, le geste naturel n'est pas « associer » mais « c'est lui ». Le bouton passe par affpickWithCheck — la MEME verification que le bouton « Choisir » de la fiche (conflits d'horaires, indisponibilites) : on ne cree pas un second chemin d'affectation qui contournerait les controles du premier. Le mode est un 2e argument de renderNear, pas un champ pose sur la donnee. Deux appels dans tout le fichier : Suivi des demandes renderNear(x) bouton masque, fiche Planning renderNear(m,true) bouton visible."
+  },
+  {
+   "b": "b443",
+   "titre": "Domaines : administrateur + super-admin seulement, et l'admin n'y voit que l'Administratif des 3 societes",
+   "source": "Zeus 14/08 : « qu'aucun utilisateur ne voie la section Domaines a part l'administrateur et le super-administrateur »",
+   "theme": "Droits d'acces",
+   "pourquoipas": "Ce qui manquait n'etait pas la fonctionnalite mais le CABLAGE : les 4 cockpits portaient deja `appliqueRole` (en admin, un seul onglet), mais index.html ne leur disait JAMAIS le role — grep = 0. Interrupteur pose, pas cable (G-61). `cockpitfkh` quitte SUPERADMIN_SECTIONS pour un cran nomme ADMIN_SECTIONS, applique aux trois endroits qui decident."
+  },
+  {
+   "b": "b444",
+   "titre": "L'administrateur ne lit plus le chiffre d'affaires de la societe",
+   "source": "Zeus 14/08, capture a l'appui : « tu enleves ca de la section Administratif »",
+   "theme": "Droits d'acces",
+   "pourquoipas": "Administratif ne recopie rien : elle montre la vue d'origine et RETIRE ce qui n'est pas publie. Ce retrait ne porte que sur les classes listees dans SEL — et `.cd`, celle des tuiles de CA, n'y etait pas : ni publiables, ni retirables, elles traversaient le filtre. Corrige a LA SOURCE (carnet_bridge.py), pas dans le cockpit qui est un fichier GENERE. VERIFIE PAR ZEUS sur le site le 14/08 : le bandeau a disparu."
+  },
+  {
+   "b": "b445",
+   "titre": "CORRECTIF : la restriction de b443 ne marchait pas par le chemin reel",
+   "source": "Trouve en relisant b443/b444 a la demande de Zeus",
+   "theme": "Droits d'acces",
+   "pourquoipas": "b443 ecrivait le role dans le stockage et comptait sur hub.html pour l'y lire. Mais le hub est charge AVEC la page, donc AVANT la connexion : il lisait un role vide, une seule fois. Mesure par le chemin reel : role null, les QUATRE cartes affichees, PERSO compris. Desormais l'hote DIT le role a l'ouverture et repond a qui le RECLAME. Cause : j'avais teste la PIECE (hub.html?role=admin) au lieu du CHEMIN. -> G-90."
+  },
+  {
+   "b": "b446",
+   "titre": "Quand quelqu'un se deconnecte, ses droits partent avec lui",
+   "source": "Troisieme axe de la relecture",
+   "theme": "Droits d'acces",
+   "pourquoipas": "cloudLogout effaçait le mot de passe mais PAS le role : le poste gardait celui du dernier connecte. Mesure : poste quitte par un super-admin, hub ouvert SANS mot de passe -> les 4 domaines, PERSO compris. Deux verrous : le role part a la deconnexion, ET le hub ne lit plus le stockage — sans annonce de l'application, regime le plus ferme. Un doute sur qui regarde se tranche en montrant MOINS. -> G-91."
+  },
   {
    "b": 222,
    "titre": "Vacations non affectées : 24 h / 7 j / le reste",
@@ -327,6 +692,13 @@
    "theme": "Outils de pilotage",
    "pourquoipas": "Le glisser des pastilles se constate à l'écran ; la file d'ordres se vérifie en déplaçant une carte.",
    "local": true
+  },
+  {
+   "b": 286,
+   "titre": "Transcriptions longues : un moteur plus solide au-dela de 1500 caracteres",
+   "source": "Worker",
+   "pourquoipas": "Les longs appels sont transcrits en entier, sans coupure.",
+   "theme": "Appels & transcription"
   },
   {
    "b": 288,
@@ -759,7 +1131,7 @@
    "source": "Zeus — 06/08",
    "theme": "Suivi des appels",
    "local": true,
-   "pourquoipas": "Un ticket « crée la fiche agent de X, et la vacation de 12h à 19h » proposait « Joint — il est sur site », « Toujours injoignable », « Clore sans coche » : les actions d'un agent injoignable, dont le ticket héritait. Désormais on lit le texte : → Ouvrir Fiche agent · → Ouvrir le Planning · 📞 Appeler [RETIRE] · ✅ Fait · ❓ Je n'ai pas compris (cette dernière renvoie la question à l'expéditeur). Rejoué sur le ticket exact de Zeus."
+   "pourquoipas": "Un ticket « crée la fiche agent de X, et la vacation de 12h à 19h » proposait « Joint — il est sur site », « Toujours injoignable », « Clore sans coche » : les actions d'un agent injoignable, dont le ticket héritait. Désormais on lit le texte : → Ouvrir Fiche agent · → Ouvrir le Planning · 📞 Appeler [numero retire] · ✅ Fait · ❓ Je n'ai pas compris (cette dernière renvoie la question à l'expéditeur). Rejoué sur le ticket exact de Zeus."
   },
   {
    "b": 350,
@@ -1283,24 +1655,6 @@
    "local": true
   },
   {
-   "b": "d1",
-   "titre": "📡 Les RADAR des 3 domaines dans 🌐 Domaines, et le contrôle du mois",
-   "source": "Zeus 12/08 : « insérer dans Domaines pour qu'on les ouvre depuis l'appli » + « avec quels clients on a travaillé le mois M-1 »",
-   "theme": "Domaines / Facturation",
-   "pourquoipas": "Les RADAR de DAHLIA et GARIS étaient des listes plates écrites à la main, figées en juillet, sans facturation ni drill : 5,8 et 4,7 Ko contre 48 Ko pour celui de FKH. Ils sont maintenant générés en clonant la coquille FKH — même moteur, même drill à deux niveaux, même bouton d'action — avec les données lues à la source (dossiers de factures pour DAHLIA, classeur maître pour GARIS, jamais recopiées à la main). Chaque carte de 🌐 Domaines gagne un bouton 📡 RADAR et le viewer une bascule Cockpit/RADAR ; PERSO n'en a pas, ce n'est pas un domaine société. Défaut réparé au passage : les boutons d'action du RADAR appelaient sendPrompt, qui n'existe pas dans l'appli — hors session Claude ils ne faisaient rien, en silence. Ils passent par le pont b411 : un clic crée un vrai ticket 🎫, avec accusé à l'écran. Ajout de CONTROLE_MOIS.html, le contrôle demandé par Zeus : mois passés lus dans les factures présentes (continuité par client, trous signalés), juillet et après par les clients avec qui on a travaillé, proposés depuis les mails séparés par boîte (fkhsecurite/dahliasecurite/garissecurite) et validés par Zeus ; les confirmés sans facture partent au RADAR de LEUR domaine, un ticket par domaine ET par mois pour que le rattrapage de juin ne se noie pas dans juillet. Plus la section 🏦 qui applique enfin R-RELEVE-M-1-01 (gravée le 12/07, jamais appliquée hors DAHLIA) : 7 relevés manquants côté société, avec le retard en jours. Vérifié dans l'appli en bac à sable : dépliage, compteurs cohérents avec ce qu'ils ouvrent, 3 puis 4 tickets réellement créés et retirés après contrôle. Deux compteurs menteurs corrigés avant livraison — une alerte GARIS qui survivait à sa réparation, et un décompte de relevés à 7 pendant que 14 pastilles rouges s'affichaient.",
-   "local": true,
-   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
-  },
-  {
-   "b": "d2",
-   "titre": "Le RADAR revient DANS le cockpit — fin du doublon",
-   "source": "Zeus 12/08 : « quand je parle de radar je parle de la section radar qui se trouve dans le cockpit » · « je ne vois pas pourquoi tu es sortie de la section domaines »",
-   "theme": "Domaines",
-   "pourquoipas": "En b415 les RADAR régénérés avaient été posés A COTE : trois fichiers RADAR_<DOM>.html et un bouton 📡 sur la carte du hub. Or chaque cockpit a DEJA son onglet RADAR, dont le contenu est un radar embarqué en srcdoc. Il y avait donc deux RADAR par domaine en production — le neuf derrière le bouton du hub, le vieux figé en juillet dans le cockpit — et c'est le vieux qu'on atteignait en ouvrant un cockpit normalement. Rien n'indiquait lequel faisait foi. Corrigé : le contenu régénéré remplace celui de <iframe id=\"if-radar\"> dans APPLI_FKH / APPLI_DAHLIA / APPLI_GARIS, en conservant les deux enveloppes que le cockpit pose autour de chaque vue (sendPrompt + le script qui remonte la hauteur, var id=radar) ; sans elles la vue perdrait le carnet et garderait une hauteur figée. Le bouton du hub et les trois fichiers séparés sont supprimés, hub.html revient à sa version d'origine. APPLI_PERSO n'a pas d'onglet RADAR : ce n'est pas un domaine société, rien à y faire. Vérifié en ouvrant les trois cockpits : DAHLIA 5 sections dont 💶 Facturation 2026, GARIS 6 sections avec 576 827,14 € TTC réels, FKH la ligne Agathe sous 📞 Appels & mails. Deux faux positifs écartés au passage : « showV is not defined » venait d'une lecture faite pendant le chargement, et l'erreur console « Unexpected string » est présente à l'identique sur la sauvegarde d'avant — antérieure, sans effet fonctionnel.",
-   "local": true,
-   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
-  },
-  {
    "b": 415,
    "titre": "La ville de la demande ne figure plus parmi ses propres villes proches",
    "source": "Zeus 12/08",
@@ -1325,30 +1679,12 @@
    "local": true
   },
   {
-   "b": "d3",
-   "titre": "Le contrôle du mois dans les 3 cockpits · le carnet dit d’où viennent ses chiffres",
-   "source": "Zeus 12/08 : « découpe le contrôle du mois » · « retire le [pied SUIVI_DEPOT] aussi pour fkh » · « regénère les carnets pour qu’ils soient à jour »",
-   "theme": "Domaines",
-   "pourquoipas": "Trois choses, toutes dans la section Domaines. (1) Le contrôle du mois est découpé par domaine et posé en tête du RADAR de chaque cockpit — FKH 4 lignes dont le rattrapage AQUILA juin, DAHLIA 3 lignes (juillet complet), GARIS 3 lignes avec la mise en garde écrite que ses lignes viennent de la continuité de facturation et non d'une preuve mail, sa boîte étant vide en juillet. PERSO est hors sujet, ce n'est pas un domaine société. (2) Le pied « Mettre en miroir dans SUIVI_DEPOT » est retiré des trois radars, avec ses cases à cocher et ses deux fonctions : le système dit que le présent/manquant est régénéré depuis le maître COCKPIT_FKH.html, donc le bouton était un second chemin manuel vers la même destination — et en clonant la coquille FKH je l'avais recopié chez DAHLIA et GARIS où SUIVI_DEPOT n'existe pas. (3) Le badge du carnet distingue enfin trois états. Il affichait « carnet ✓ » avec l'heure courante alors que CARNET était littéralement window.__CARNET_DEMO__, et le court-circuit « si un instantané est embarqué, prends-le » empêchait toute lecture du Drive : les cockpits n'étaient jamais vivants, nulle part. GARIS était le seul honnête. Désormais : ✓ Drive / ○ instantané embarqué / — figé, l'instantané n'est plus qu'un repli, et GARIS affiche enfin ses chiffres. Les quatre carnets ont été régénérés (build_data_*.py) et le bloc de chiffres remplacé dans les pages sans repasser par build_appli_*.py, qui aurait effacé le RADAR régénéré. Preuve : la vue Facturation DAHLIA passe de « juillet 1 facture, 2 000 € » à « 3 factures, 5 268,48 € », total 13 → 15 factures. Deux lignes perdues en régénérant ont été remises : Appels JEX Reims (DAHLIA) et Classer GS-2026-108 (GARIS).",
-   "local": true,
-   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
-  },
-  {
    "b": 418,
    "titre": "Les demandes réparent toutes seules leurs villes proches",
    "source": "Zeus 12/08 : « pourquoi il y a toujours Valence deux fois »",
    "theme": "Suivi des demandes",
    "pourquoipas": "b415 a corrigé le CALCUL, pas ce qui était DÉJÀ ÉCRIT. Les lignes « ↦ ville à N km » sont du texte rangé dans la demande, pas un calcul refait à l'affichage. Celle de Valence a été réécrite quand Zeus a corrigé le code postal — mais avant b415, donc avec « ↦ Valence à 2 km » dedans — et depuis plus rien ne la touche : svRecalcProches ne part que si la ville ou le CP CHANGE. Ré-enregistrer sans rien modifier ne suffit pas ; il aurait fallu mettre un faux code postal puis remettre le bon. Au chargement, on repère désormais les demandes dont les « ↦ » citent LEUR PROPRE ville — la signature exacte du défaut — et on les recalcule une fois. Ciblé (une demande saine n'est pas touchée) et ça s'éteint tout seul. Vérifié sur le cas de Zeus, sans un clic : avant « ↦ Valence 2 km · Grenoble 70 km », après « ↦ Grenoble 70 km · Saint-Étienne 71 km ». LEÇON : corriger un calcul ne corrige pas ce qu'il a déjà écrit — il faut prévoir la reprise du stock.",
    "local": true
-  },
-  {
-   "b": "d4",
-   "titre": "Le badge du carnet dit la vérité jusque DANS les vues",
-   "source": "Zeus 12/08 : « oui corrige le dans les vues aussi »",
-   "theme": "Domaines",
-   "pourquoipas": "La coque affichait « carnet ○ instantané embarqué » depuis b418, mais chaque vue porte son propre badge, resté à « carnet ✓ » : le cadre disait la vérité, le contenu mentait un étage plus bas. La vue ne pouvait pas faire mieux — la coque lui envoyait {__data, __err, __at} sans jamais lui dire d'où venaient les chiffres. La coque joint désormais __src, le pont de la vue le conserve, et les badges s'en servent. Deux variantes de code coexistaient (texte composé par l'appelant, ou par setSt lui-même) : les deux sont traitées, 8 setSt réécrits et 26 points de réception marqués sur les 4 cockpits. Vérifié après vidage du cache : sur GARIS, les vues ST/CA/ÉTAT affichent toutes « carnet ○ instantané embarqué », comme la coque. Au passage, question cascade ST GARIS : il n'y a rien à construire. La vue existe, elle fonctionne, et elle dit l'état réel — aucun sous-traitant propre à GARIS, l'onglet Sous_Traitance du classeur est « À renseigner », et la cascade où GARIS figure vit dans DATA_FKH.json parce que GARIS EST le sous-traitant. R-MAITRE-PAR-SOCIETE-01 interdit de rapatrier le chiffre FKH ici. Reste une décision pour Zeus : GARIS aura-t-il ses propres ST ?",
-   "local": true,
-   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
   },
   {
    "b": 419,
@@ -1367,333 +1703,124 @@
    "local": true
   },
   {
-   "b": "d5",
-   "titre": "Le pont de dépôt — joindre une facture depuis la ligne qui la réclame",
-   "source": "Zeus 12/08 : « je veux que les fichiers déposés dans l’application se retrouvent dans le dossier du domaine » · « tout ce que tu peux mettre en iframe, mets-le, pour qu’on travaille en autonomie »",
-   "theme": "Domaines",
-   "pourquoipas": "Le dépôt part de L'ENDROIT, pas du fichier. Sur les 7 clients FKH travaillés en juillet sans facture, chaque ligne porte « 📎 joindre la facture » : la ligne sait déjà le domaine, le casier, le mois et le client, donc la destination est connue avant que le fichier existe et rien n'est deviné. La clé de dépôt EST la destination : depot/<DOMAINE>/<casier>/<AAAA-MM>/<AAAA-MM_NATURE_TIERS.ext>, au nommage standard d'EMPLACEMENTS.md. Le pont vit dans gestion/domaines/hub.html et non dans index.html : ce dernier est écrit par une autre session et deux sessions sur un même fichier se défont — constaté aujourd'hui, CONTROLE_MOIS.html supprimé puis rétabli par erreur. Le hub étant chargé en iframe dès l'ouverture et de même origine, il pose son écouteur sur la fenêtre parente. Seule concession : une ligne dans index.html (window.fkhUpload / window.fkhPret), parce que toute l'appli est en closure et qu'aucune de ses fonctions n'est atteignable de l'extérieur ; l'alternative aurait été de dupliquer le chemin du mot de passe dans un second morceau de code. Le radar réutilise son go() existant avec un préfixe DEPOT: — un seul chemin, pas un second mécanisme. Un dépôt réussi ouvre un ticket 🎫 : un dépôt sans trace est un dépôt qu'on croit fait. Vérifié dans l'appli : le message atteint le pont, qui refuse proprement et le dit à l'écran quand la connexion manque (cas du bac à sable). L'envoi réel reste à jouer connecté, ainsi que le script local qui redescendra depot/... dans le dossier du domaine.",
-   "local": true,
-   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
+   "b": 421,
+   "titre": "Le pont de depot : joindre une facture depuis la ligne qui la reclame",
+   "source": "Zeus",
+   "pourquoipas": "Dans le cockpit, la ligne qui manque une facture propose de la deposer sur place.",
+   "theme": "Domaines & cockpits"
   },
   {
-   "b": "d6",
-   "titre": "Établir OU déposer — la ligne propose les deux gestes",
-   "source": "Zeus 12/08 : « au lieu de mettre établir il faut donner la possibilité de pouvoir déposer également en plus d’établir »",
-   "theme": "Domaines",
-   "pourquoipas": "Une ligne de facturation manquante appelle deux gestes selon le cas : faire la facture, ou déposer celle qui existe déjà. Le RADAR n'en proposait qu'un. Le rendu accepte désormais une seconde action (a2) et les lignes « Juillet 2026 — 7 clients » et « RATTRAPAGE AQUILA juin » portent Établir + 📎 Déposer. Piège écarté au passage : deux boutons « Déposer » côte à côte faisaient des choses différentes — l'un ouvrait un ticket, l'autre téléverse vraiment. La ligne des relevés dit maintenant « Réclamer » (c'est une demande), et le vrai dépôt descend au niveau du mois manquant, où la destination est exacte : « 📎 déposer le relevé de juin », « … de juillet ». Même mot, même geste, partout. Vérifié dans le cockpit : 2 lignes à deux boutons, 14 actions dans le détail des 7 clients (établir + joindre pour chacun), 2 dépôts de relevé datés.",
-   "local": true,
-   "note_numerotation": "renuméroté le 12/08 : les bNNN sont le tampon de l’appli, piloté par GESTION. Les travaux de la section Domaines prennent le préfixe d."
+   "b": 422,
+   "titre": "Etablir OU deposer : la ligne propose les deux gestes",
+   "source": "Zeus",
+   "pourquoipas": "Sur une ligne sans facture, deux boutons : en etablir une, ou deposer celle qui existe.",
+   "theme": "Domaines & cockpits"
   },
   {
-   "b": "d7",
-   "titre": "Le surveillant branché au carnet FKH — juin et juillet cessent d’être vides",
-   "source": "Zeus 12/08 : « branche le surveillant au carnet » · « tout ce que ça indique en manquant alors que les fichiers sont présents, corrige »",
-   "theme": "Domaines",
-   "pourquoipas": "Le surveillant lit les dossiers depuis le 31/07 et produit fiches_FKH.json — il voyait les 4 factures de juin depuis des semaines. Personne ne les lisait : seul build_data_perso.py consommait les fiches. Le carnet FKH ne connaissait que le maître TB2026, qui s'arrête à mai, d'où un cockpit affichant un juin vide alors que les PDF étaient rangés. Branché : build_data_fkh.py lit désormais les fiches et ne remplit QUE le silence du maître — là où le maître parle il fait foi (il connaît les avoirs et le net), et la ligne venue du dossier le dit : « pièces rangées, PAS ENCORE saisies au maître ». Carnet : 5 → 7 mois, CA 2026 338 657 → 447 460 €. Les 5 factures de juillet trouvées dans À TRAITER SOCIÉTÉ ont été rangées au standard dans 2026/juillet 2026 et la boîte d'entrée est vide. Enfin la ligne « Factures clients émises » de la matrice ÉTAT, qui était écrite en dur (10·11·9·10·6 puis des points), se met à jour à la réception du carnet — un « · » collé au nombre signale une valeur venue du dossier. Deux erreurs corrigées en route : une première version lisait un carnet pas encore arrivé et ne faisait rien en silence ; la seconde écrasait janvier-mai avec des comptages de LIGNES de facture (108 au lieu de 10). Vérifié à l'écran : 10 11 9 10 6 4· 5·. Audit du reste du mois de juin : relevé bancaire, bulletins, DSN et facture ST sont réellement absents — ces points-là disent vrai.",
-   "local": true
+   "b": 441,
+   "titre": "L'heure du TICKET de prise n'est plus l'heure de la MISSION",
+   "source": "Zeus",
+   "pourquoipas": "Un ticket cree a 14 h sur une vacation de 6 h affiche 14 h, plus 6 h. Panneau repliable.",
+   "theme": "Suivi des appels"
   },
   {
-   "b": "d8",
-   "titre": "La chaîne du dépôt déroulée en entier — TRI → surveillant → quarantaine",
-   "source": "Zeus 12/08 : « à chaque dépôt, regarde la succession d’événements inhérente et exécute-la comme indiqué dans le système »",
-   "theme": "Domaines",
-   "pourquoipas": "Le système décrit la chaîne dans CARTE_SURVEILLANT.md : TRI (ranger les boîtes d'entrée) → surveillant (le robot lit les rangés) → QUARANTAINE (Claude finit l'illisible), et la règle dit que TRI finit TOUJOURS par le robot et le traitement de la quarantaine. Déroulée sur un dépôt réel : deux relevés Indy déposés à 16h38 dans À TRAITER SOCIÉTÉ. Identifiés comme FKH (compte Swan, IBAN …9987 450), rangés au standard en 2026-06_releve_Indy.pdf et 2026-07_releve_Indy.pdf. Le robot les a mis en QUARANTAINE : le gabarit releve-bancaire ne connaissait que Qonto. Cas (a) de R-QUARANTAINE-BOUCLE-01 — gabarit Swan/Indy ajouté, aiguillage automatique par le CONTENU du fichier et non par son nom. Résultat immédiat : F3 passe de 25 à 29 pièces, quarantaine 2 → 0, et quatre virements ST entrent (juin GARIS 13 986 + VIGICORE 2 400 ; juillet GARIS 25 000 + VIGICORE 2 400). Puis le bloc virements_st_2026 du carnet a été branché sur le surveillant, même principe que le CA : le dossier ne remplit que le SILENCE du maître, et la ligne le dit. Versé GARIS 2026 : 302 516,10 → 327 516,10 €. Juillet apparaît pour la première fois.",
-   "local": true
+   "b": 442,
+   "titre": "CORRECTIF : le champ « Affecter un agent » ne repondait plus",
+   "source": "Zeus",
+   "pourquoipas": "On tape un nom dans Affecter un agent : les propositions reviennent.",
+   "theme": "Planning & vacations"
   },
   {
-   "b": "d9",
-   "titre": "Les vues cessent d’annoncer manquant ce qui est rangé",
-   "source": "Zeus 12/08 : « as-tu mis à jour les vues qui indiquaient des manquants alors que les fichiers étaient présents »",
-   "theme": "Domaines",
-   "pourquoipas": "Après le dépôt des relevés Swan de juin et juillet, deux vues continuaient d'annoncer un manque que le disque démentait. La matrice ÉTAT affichait « Relevés bancaires ✓✓✓✓✓····· » avec la ligne écrite en dur ; elle est maintenant calculée sur le contenu réel du dossier — ✓✓✓✓✓✓✓. Et le RADAR affichait « Relevés de compte — 2 manquants » : l'item passe à « ✅ à jour jusqu'à juillet », détail compris (les deux ❌ deviennent « déposé le 12/08 »), pour que le titre et le drill ne disent pas deux choses différentes. Poursuite de la quarantaine dans le même mouvement : deux repères ajoutés au gabarit facture-fournisseur — « Montant TTC » seul (RingOver, que le gabarit ne connaissait pas), et un triplet auto-vérifié HT+TVA=TTC pour les factures qui séparent les libellés des valeurs (LeLegaliste). Cette dernière règle n'accepte un montant que s'il se vérifie : elle ne peut pas inventer. F4 : 21 → 23 pièces, quarantaine FKH 7 → 5. Restent 5 pièces, dont 3 scans images qui relèvent du cas (b) — lecture à la vue.",
-   "local": true
+   "b": 447,
+   "titre": "RETOUR ARRIERE : l'application d'abord, la restriction ensuite",
+   "source": "Zeus",
+   "pourquoipas": "b443/b445/b446 cassaient l'appli chez Zeus : annules. La restriction Domaines reste a refaire, avec ses vraies donnees.",
+   "theme": "Droits & roles"
   },
   {
-   "b": "worker",
-   "titre": "La ligne des donneurs d'ordre est analysée en entier — DÉPLOYÉ",
-   "source": "Zeus 12/08",
-   "theme": "Worker / Appels",
-   "pourquoipas": "Premier déploiement du worker depuis son gel. Le filtre ne regardait QUE l'interlocuteur (liste blanche de 7 numéros) ; la ligne appelée n'entrait pas dans la décision, donc un donneur d'ordre qui appelle POUR LA PREMIÈRE FOIS était ignoré — le cas du 07 56 92 88 63 aujourd'hui. La ligne dédiée devient un second laissez-passer, à égalité avec la liste blanche : si l'une des deux extrémités de l'appel est 07 57 95 38 49, on analyse, quel que soit le numéro d'en face. Le diagnostic API de Zeus a confirmé que Ringover fournit from_number et to_number. Conditions dures inchangées : décroché + enregistrement (un appel manqué remonte dans 🧭 Terrain, b419). Réglable sans redéployer : clé `fkh_ligne_do`. PÉRIODES DU BDC : mesuré avant de déployer — sur 169 bons de commande lus, `periodes` n'est apparu ZÉRO fois, le code n'a jamais tourné ; on leur a quand même posé un interrupteur fermé par défaut (`fkh_bdc_periodes`=1 pour ouvrir) pour que le gel de Zeus soit explicite. Banc tmp/banc_w1.js : seuls 2 cas changent, ceux qu'on veut. Version déployée 6be3c03a (précédente d073c091).",
-   "local": true
+   "b": 449,
+   "titre": "CORRECTIF BLOQUANT : la cause reelle de la panne des 13-15/08",
+   "source": "Zeus",
+   "pourquoipas": "Une fiche agent lue AVANT sa creation tuait le demarrage : 3 symptomes, 1 cause. L'appli demarre.",
+   "theme": "Socle"
   },
   {
-   "b": "d10",
-   "titre": "Les encaissements clients entrent dans le carnet FKH",
-   "source": "Zeus 12/08 : « branche les vues figées de FKH sur le carnet »",
-   "theme": "Domaines",
-   "pourquoipas": "Le carnet FKH savait ce qu'on facture, pas ce qu'on reçoit : aucun bloc d'encaissement client. C'est pour ça que la vue Facturation portait « Encaissé 227 209 € » et « Reste dû 111 446 € » écrits dans la page, impossibles à rafraîchir. Le maître les avait pourtant — TB_2026_Mvts, catégorie « Encaissement client/DO », 40 lignes avec le n° de facture rapproché. Le bloc encaissements_client_2026 est ajouté au carnet : par mois, par client, avec les factures rapprochées. Le cumul réel devient facturé 447 460,18 − encaissé 373 028,17 = 74 432,01 € de reste dû, contre 111 446 € affichés par la vue figée qui ignore juin et juillet. ÉCHEC ASSUMÉ sur la seconde moitié : j'ai tenté de brancher la vue Facturation elle-même (MT/MO écrits dans la page, totaux tf/te calculés une seule fois au chargement). Le ré-échappement du srcdoc a cassé la vue — son script s'affichait en texte au lieu de s'exécuter. Constaté à l'écran, revenu à la version saine par git checkout, vérifié. La vue reste donc figée : la brancher demande de reprendre sa construction, pas un correctif ponctuel.",
-   "local": true
+   "b": 450,
+   "titre": "Ce qui est ouvert ne se referme plus tout seul, et le ticket dit ce qui a ete fait",
+   "source": "Zeus",
+   "pourquoipas": "Un panneau ouvert reste ouvert pendant les rafraichissements. Sur un ticket confie au superviseur : ce qu'il a renseigne, depuis quand il n'a rien fait.",
+   "theme": "Socle"
   },
   {
-   "b": "d11",
-   "titre": "Audit complet des 3 cockpits — deux défauts trouvés et réparés",
-   "source": "Zeus 12/08 : « fais l’audit complet, vérifie la tuyauterie de toutes les dimensions qu’on a traitées »",
-   "theme": "Domaines",
-   "pourquoipas": "Passage systématique sur chaque dimension travaillée aujourd'hui, fichier par fichier puis dans l'appli. Deux défauts que seul l'audit pouvait montrer : (1) le contrôle du mois avait DISPARU du RADAR GARIS — il y était en fin d'après-midi, une régénération ultérieure du radar l'a écrasé, parce que le générateur et la pose du contrôle sont deux scripts séparés et que je n'avais rejoué que le premier ; (2) l'instantané embarqué de GARIS était plus ancien que son carnet régénéré à 15h40, donc le cockpit montrait des chiffres périmés sans le dire. Les deux sont réparés et revérifiés. Le reste tient : RADAR régénéré dans les 3 cockpits, miroir SUIVI_DEPOT absent partout, badge à 3 états dans la coque ET les vues, instantanés désormais identiques aux carnets du disque, pont de dépôt actif (hub + crochet fkhUpload), carnet FKH à 7 mois de CA dont 2 venus du dossier, 7 mois de virements ST et le bloc encaissements. Leçon : deux scripts qui construisent la même page doivent être rejoués ensemble — sinon le second efface le premier en silence.",
-   "local": true
+   "b": 451,
+   "titre": "SELECTIONNER PLUSIEURS VACATIONS ET LES TRAITER D'UN COUP",
+   "source": "Jules (03/08, URGENT)",
+   "pourquoipas": "Dans le Planning, mode Multi : on clique plusieurs vacations, on affecte le meme agent ou on retire, en une fois.",
+   "theme": "Planning & vacations"
   },
   {
-   "b": "b430",
-   "titre": "Le Planning distingue enfin BASIC FIT Biscarrosse de BASIC FIT Chartres",
-   "source": "Zeus 12/08, fiche BASIC FIT du 13/08 : « pourquoi on ne voit pas Biscarrosse dans le nom du site »",
+   "b": 452,
+   "titre": "« Quand on enleve ces tickets, ca ne s'enleve pas »",
+   "source": "Zeus",
+   "pourquoipas": "On retire un ticket : il reste retire, meme apres synchronisation. La cle etait ecrasee au lieu d'etre fusionnee.",
+   "theme": "Suivi des appels"
+  },
+  {
+   "b": 454,
+   "titre": "GESTION : compteur de taches ouvertes, fraicheur des donnees, sections vides",
+   "source": "autre lignee",
+   "pourquoipas": "Voir le commit b454 (non redige par cette lignee).",
+   "theme": "Socle"
+  },
+  {
+   "b": 455,
+   "titre": "GESTION : le compteur et la fraicheur ne s'affichaient pas chez Zeus",
+   "source": "autre lignee",
+   "pourquoipas": "Voir le commit b455 (non redige par cette lignee).",
+   "theme": "Socle"
+  },
+  {
+   "b": 456,
+   "titre": "GESTION : le compteur mentait de 60, et il etait cache",
+   "source": "autre lignee",
+   "pourquoipas": "Voir le commit b456 (non redige par cette lignee).",
+   "theme": "Socle"
+  },
+  {
+   "b": 457,
+   "titre": "GESTION : la ligne de fraicheur disait deux choses qui ne voulaient rien dire",
+   "source": "autre lignee",
+   "pourquoipas": "Voir le commit b457 (non redige par cette lignee).",
+   "theme": "Socle"
+  },
+  {
+   "b": 458,
+   "titre": "Cockpits : les 46 modifications actees et gardees du registre",
+   "source": "autre lignee",
+   "pourquoipas": "Voir le commit b458 (non redige par cette lignee).",
+   "theme": "Domaines & cockpits"
+  },
+  {
+   "b": 459,
+   "titre": "LE PLUS RECENT EN HAUT, ET LA SECTION « A FAIRE » DANS LE COCKPIT DOMAINES",
+   "source": "Zeus",
+   "pourquoipas": "Les 9 listes de manques affichent le plus recent en premier. La section « A faire » est dans le cockpit Domaines, sous les 4 domaines.",
+   "theme": "Socle"
+  },
+  {
+   "b": 460,
+   "titre": "🚨 Une intervention s'ouvre dans la MÊME fiche qu'une vacation",
+   "source": "Zeus 21/08 : « il faut que ça ait les mêmes fiches que les vacations de gardiennage »",
    "theme": "Planning",
-   "pourquoipas": "Le Planning regroupait sur le seul nom du site. Mesure du 10 au 31/08 : la ligne « BASIC FIT » portait SIX villes et onze vacations — Biscarrosse, Chartres, Chauvigny, Cherreau, Lucé, Neuville-de-Poitou. Biscarrosse et Chartres, 600 km. Pire que l'absence : la ligne affichait bien UNE ville entre parenthèses, celle de la première vacation rencontrée — les onze étaient donc annoncées à Chartres. Le correctif b399 « le nom du site porte sa ville » n'avait été posé que sur Suivi des appels et les pastilles. La ville entre maintenant dans la clé de regroupement, et le titre de la fiche la porte. Le banc a montré un effet que ma première mesure ne voyait pas : la clé brute scindait aussi sur le VIDE (Duc coupé en deux, « sans ville » 2 vacations + « CHAILLEY » 35). Règle ajoutée : une vacation sans ville rejoint la ville de son site quand il n'en a qu'une. Preuves : 159 vacations rangées avant comme après, 0 ligne à plusieurs villes, 0 site coupé par un champ vide, 31 lignes sur 32 inchangées. Non-régression : Suivi des appels identique à l'horloge près, Fiche agent identique au caractère près, Planning 79 vacations avant comme après (29 → 32 sites). La clé interne ne sort jamais vers les données : le ＋ reçoit data-site=\"BASIC FIT\" et data-ville=\"BISCARROSSE\" séparément, vérifié en créant une vacation depuis la ligne. EN LIGNE le 12/08 : le commit b430 est parti dans la poussee de la session Domaines a 17h42, sans que je la declenche — le fichier en ligne est identique au local, octet pour octet.",
-   "enligne": true
+   "pourquoipas": "L'affichage vert du Planning ne change pas : c'est le CLIC qui ouvre la fiche SUR PLACE, au lieu de basculer dans l'onglet Interventions — on perdait la semaine sous les yeux pour un geste (affecter, corriger une heure) qui appartient au Planning. L'intervention n'est pas recopiée : elle reçoit l'identité de mission le temps d'ouvrir la fiche, et toute écriture repart dans fkh_interv_dem, jamais dans fkh_suivi — une donnée, une fiche. La fiche gagne le bloc propre à l'intervention : statut de terrain, résumé de la cascade d'appels avec les délais, compte-rendu. Défaut trouvé et réparé en chemin : le répartiteur de gestes ne cherchait la ligne que dans fkh_suivi, donc tous les boutons du panneau « Agents proches » retombaient en silence sur un if(!it)return — ils avaient l'air vivants et ne faisaient rien. Et la pastille d'en-tête annonçait « En attente » pendant que le bloc du dessous disait « En cours » : un seul état désormais, celui du terrain. PAS branché, et c'est voulu : les tickets du Suivi des appels — une intervention n'a pas de contrôles des 2 h, et cette zone est sensible. PREUVE (Chrome piloté, décor ?sandbox=1&demo=interv) : clic sur la pastille → fiche ouverte, onglet toujours 📅 Planning, 0 erreur JS ; heure de fin 22:30→23:15, agent Dreux Amadou affecté, statut → En cours, compte-rendu écrit → tout relu dans fkh_interv_dem, aucune vacation créée dans fkh_suivi, et la section 🚨 Interventions montre la même donnée. NON-RÉGRESSION vérifiée sur une vraie vacation (demo=proches) : tickets, découpe, statut de vacation, Suivi des appels et suppression toujours là, écriture dans fkh_suivi, affectation par « Agents proches » OK.",
+   "demo": "?sandbox=1&demo=interv"
   },
   {
-   "b": "d12",
-   "titre": "Le surveillant surveille GARIS — 20 factures et 44 encaissements lus",
-   "source": "Zeus 12/08 : « branche le surveillant sur GARIS » · « scan »",
-   "theme": "Domaines",
-   "pourquoipas": "GARIS n'était surveillé nulle part : le robot ne connaissait que FKH et PERSO, donc pas de fiches_GARIS.json. Trois dossiers ajoutés à la carte (MODE A respecté : le bloc de carnet et la vue existent depuis début août) — les factures du classement mensuel, celles rangées hors classement, et les relevés. Résultat : 20 factures lues, carnet GARIS de 19 à 63 fiches. Les relevés partaient d'abord en quarantaine (11) et le robot avait raison : le gabarit ne retenait que les débits vers GARIS ou VIGICORE, les sous-traitants de FKH, qui n'existent pas dans le relevé de GARIS. Nouveau gabarit lisant les ENTRÉES — 44 encaissements, quarantaine 11 → 3. Scan du même passage : trois relevés Indy DAHLIA (mai, juin, juillet) identifiés et rangés ; celui de mai était un doublon strict du fichier déjà présent, supprimé après comparaison d'empreinte. ÉCHEC ASSUMÉ : j'ai voulu faire entrer ces 44 encaissements dans le carnet GARIS, une fiche sur 44 portait 20 260 889 641 € — l'analyseur avait collé « 2026 » à un montant sur une ligne coupée. Bloc retiré : le cockpit garde son « 0 encaissement tracé », qui est un manque honnête, plutôt qu'un total faux. Le gabarit reste à corriger avant de rebrancher.",
-   "local": true
-  },
-  {
-   "b": "d13",
-   "titre": "Les encaissements GARIS entrent — et les deux domaines se confirment",
-   "source": "Zeus 12/08 : « corrige le gabarit et rebranche les encaissements GARIS »",
-   "theme": "Domaines",
-   "pourquoipas": "Deux défauts corrigés, tous deux du même genre : un chiffre faux mais crédible. (1) La regex des montants acceptait n'importe quelle suite de chiffres séparés d'espaces : sur « Virement FACTURE GS-2026-078 5 635,98 0,00 » elle démarrait à « 2026 » et lisait 20 260 785 635,98 €. Le vrai groupement français est imposé — 1 à 3 chiffres puis des tranches de 3 — donc « 2026 » ne peut plus amorcer un montant. (2) Le dossier des relevés GARIS contient AUSSI 2025 : filtrer sur le seul mois rangeait des mouvements de septembre 2025 dans « Septembre 2026 ». On filtre désormais sur la date complète, et tout montant hors bornes est écarté plutôt qu'additionné en silence. Résultat : 44 encaissements, 558 473,17 € sur 5 mois, contreparties cohérentes (FKH, DAHLIA, I.G.S-21, ADN). CONTRÔLE CROISÉ qui vaut mieux qu'une relecture : FKH déclare avoir versé 270 037,50 € à GARIS de janvier à mai ; GARIS déclare avoir reçu de FKH 270 037 € sur les mêmes mois. Les deux carnets, construits séparément depuis deux sources différentes, tombent d'accord au centime près.",
-   "local": true
-  },
-  {
-   "b": "d14",
-   "titre": "Le relevé DAHLIA d’avril retrouvé — et une alerte de ma part démentie",
-   "source": "Zeus 12/08 : « récupère le relevé DAHLIA d’avril chez SWAN »",
-   "theme": "Domaines",
-   "pourquoipas": "J'avais présenté ce relevé comme le seul manquant PÉRISSABLE, au motif que SWAN serait fermée et l'accès sur le point de disparaître. C'était faux, deux fois. D'abord « Indy » et « SWAN » sont le même compte — Indy est l'interface, Swan la banque derrière (BIC SWNBFR22) ; le compte est vivant, il produit encore les relevés de juin et juillet. Ensuite le relevé d'avril n'était nulle part à récupérer : il était dans Downloads depuis le 1er mai, jamais rangé. Vérifié avant de bouger quoi que ce soit : IBAN [RETIRE], DAHLIA SÉCURITÉ, période 01→30/04/2026. Rangé au standard en 2026-04_releve_Indy.pdf. DAHLIA a désormais ses SEPT relevés de janvier à juillet, plus aucun trou. Le RADAR passe de « avril · juin · juillet ABSENTS » à « ✅ à jour jusqu'à juillet », détail compris. Leçon : avant d'annoncer qu'une pièce est en danger, vérifier qu'elle n'est pas simplement mal rangée — et vérifier que la banque est bien fermée avant de le dire.",
-   "local": true
-  },
-  {
-   "b": "b431",
-   "titre": "L'appli finit ce que le serveur dépose : position, nom redressé, villes et agents proches",
-   "source": "Zeus 12/08, demande Cerisé (61000) tombée à 17h45 : « l'onglet agents proches ne marche pas » et « pourquoi il n'y a pas les deux villes les plus proches »",
-   "theme": "Suivi des demandes",
-   "pourquoipas": "Cause : le worker déployé cet après-midi dépose lui-même les demandes venues d'un appel, mais il ne connaît pas les communes de France — les 34 969 sont chargées dans le navigateur, pas sur le serveur. Il écrit donc la:null, lo:null. Sans coordonnées : aucune ligne « ↦ ville à N km », et le panneau 👥 Agents proches s'arrête dès sa première ligne (renderNear rend « Localisation de… » et n'appelle jamais nearAgents). Le rattrapage existant (ensureGeo) ne suffisait pas : il interroge geo.api.gouv.fr par le NOM SEUL en ignorant le code postal — le défaut que b416 avait corrigé pour la création — il dépend du réseau, et au premier échec il pose _nogeo=true qui survit aux synchronisations et gèle la demande pour de bon. b431 résout la commune SUR PLACE dans la table déjà chargée, règle b416 : le code postal fait foi, le nom départage. Le code postal est lu dans son champ, à défaut dans la ligne « Ville : X (12345) » du texte. Trois moments : à l'arrivée de la table des communes, à chaque demande qui descend du cloud, et à l'ouverture du panneau. PREUVES sur trois témoins : Cerisé (CP en champ) → 48.4451 / 0.1314, ↦ Le Mans 49 km, ↦ Caen 90 km, panneau 17 agents ≤ 100 km avec distances réelles ; « Guissan (11430) » CP présent seulement dans le texte → résolu sur Gruissan, champ cp rempli ; « Wouzak » sans CP et nom introuvable → INTACT, rien d'inventé. Sur les 16 demandes en recherche déjà sans coordonnées, 0 réparée et 0 touchée : leurs noms sont déformés et leurs codes postaux absents ou inexistants (Génétine cp=03444) — b431 refuse de deviner, c'est la leçon Enelis. Le gain porte sur les demandes à venir. Non-régression : Planning identique, Fiche agent identique, Suivi des appels identique à l'horloge près. TRANCHÉ par Zeus le 12/08 (« oui fais pareil ») : quand c'est le CODE POSTAL qui a tranché et que le nom diffère, le nom affiché devient celui du code, et le mot entendu reste écrit à côté — exactement comme b416 à la création. « Ville : Guissan (11430) » devient « Ville : Gruissan (11430) · entendu : « Guissan » ». Deux garde-fous vérifiés au banc sur cinq témoins : (1) une commune trouvée par son NOM SEUL n'est jamais redressée, il n'y a rien à signaler ; (2) le titre de la carte ne suit que s'il ne portait que la ville — un titre « BASIC FIT » reste « BASIC FIT » alors que sa ville passe bien à Gruissan. Idempotent : après remise à zéro de la position, une seule mention « entendu » et deux lignes ↦, pas d'empilement. Témoins : Cerisé (nom juste) intact ; Guissan → Gruissan ; Minot (12100) → Millau, le cas exact de b416 ; Wouzak sans code postal → intact. EN LIGNE le 12/08 · confirmé par Zeus sur sa demande Cerisé : « maintenant ça marche ». Le sablier qu'il a vu quelques secondes avant, c'est la table des communes (1,55 Mo) qui n'était pas encore arrivée — svGeoLocal renvoie false tant que COMMUNES est vide, et le panneau se redessine tout seul dès que la table atterrit.",
-   "enligne": true
-  },
-  {
-   "b": "d15",
-   "titre": "Le cockpit FKH lit le dossier au lieu d'en montrer une photo",
-   "source": "Zeus",
-   "theme": "Domaines",
-   "pourquoipas": "« Attendues M-1 » affichait juin en l'appelant M-1, et annonçait manquantes 5 factures déposées deux heures plus tôt. La matrice était écrite en dur dans la page. Elle vient maintenant du carnet, qui la calcule depuis le dossier.",
-   "local": true
-  },
-  {
-   "b": "d16",
-   "titre": "DAHLIA, GARIS et PERSO lisent leur carnet pour de vrai",
-   "source": "Zeus",
-   "theme": "Domaines",
-   "pourquoipas": "Leur seul chemin de lecture passait par le Drive via une capacité qui n'existe pas dans l'appli : ils tombaient toujours sur leur instantané. Ils lisent désormais le fichier posé à côté du cockpit.",
-   "local": true
-  },
-  {
-   "b": "d17",
-   "titre": "Chaque vue dit d'où viennent ses chiffres — les 96, sans exception",
-   "source": "Zeus",
-   "theme": "Domaines",
-   "pourquoipas": "Bandeau en bas de chaque vue : « carnet lu HH:MM · cette vue s'en sert » ou « … ne s'en sert PAS ENCORE ». Une vue ne peut plus se faire passer pour fraîche.",
-   "local": true
-  },
-  {
-   "b": "d18",
-   "titre": "Le bandeau se détecte tout seul, et CASCADE VIREMENTS lit le carnet à moitié",
-   "source": "Zeus",
-   "theme": "Domaines",
-   "pourquoipas": "La marque « se sert du carnet » se pose seule (le pont compte ses écouteurs). CASCADE ne recale que le CA : le carnet groupe les virements par mois de PAIEMENT, la vue par mois de PRESTATION — elle l'écrit à l'écran.",
-   "local": true
-  },
-  {
-   "b": "d19",
-   "titre": "La TVA et l'attribution des virements entrent dans le carnet — CA3 et CASCADE suivent",
-   "source": "Zeus",
-   "theme": "Domaines / Facturation",
-   "pourquoipas": "CA3 se recalcule depuis TB_2026_Mvts (validé au centime sur 6 mois sur 7 ; juin diffère, le recompute fait foi). L'attribution vient d'Allocation_ST_2026, 17 mois de prestation.",
-   "local": true
-  },
-  {
-   "b": "d20",
-   "titre": "Un serveur qui sert le cockpit en entier, et le bandeau à trois états",
-   "source": "Zeus",
-   "theme": "Domaines",
-   "pourquoipas": "http.server tronquait le cockpit à 783 360 octets sur 792 274 : impossible de vérifier avant de pousser. serveur_local.py le sert entier en 0,26 s. Et une page de navigation le dit au lieu de s'annoncer « pas encore branchée ».",
-   "local": true
-  },
-  {
-   "b": "d21",
-   "titre": "Le dépôt du capital entre au RADAR — par un générateur, pas à la main",
-   "source": "Zeus",
-   "theme": "Domaines",
-   "pourquoipas": "SCRIPTS/radar.py manipule le littéral SECS sans le casser (il est en JS, pas en JSON) et refuse d'écrire si l'équilibre est rompu. L'item porte l'écart 243 € déclarés / 430 € reçus.",
-   "local": true
-  },
-  {
-   "b": "d22",
-   "titre": "PILOTAGE et HUB lisent le grand livre — plus rien « à câbler »",
-   "source": "Zeus",
-   "theme": "Domaines",
-   "pourquoipas": "« Justificatifs charges fournisseurs » n'avait que janvier ; les 8 mois se recalculent (25 / 118). Au HUB, « Impayés clients » devient « Reste dû clients » — le calcul ne dit pas la même chose que l'ancien nom.",
-   "local": true
-  },
-  {
-   "b": "d23",
-   "titre": "CASCADE lit l'allocation, et 94 914 € de non-viré cessent d'être invisibles",
-   "source": "Zeus",
-   "theme": "Domaines / Facturation",
-   "pourquoipas": "La 5e colonne était codée en dur à « 0,00 ✓ ». Elle montre le vrai : avril 25 726,44 €, mai 69 187,92 €, alloués à GARIS et pas encore virés.",
-   "local": true
-  },
-  {
-   "b": "d24",
-   "titre": "Les heures 2026 entrent au carnet — Répartition lit ses 5 mois",
-   "source": "Zeus",
-   "theme": "Domaines",
-   "pourquoipas": "Elles sont dans Cascade_ST_2026, pas dans Sous_Traitance (qui ne contient que 2025). Recompute validé : janvier 2 964,28 − 213 = 2 751,28, exactement ce que la vue affichait.",
-   "local": true
-  },
-  {
-   "b": "d25",
-   "titre": "DAHLIA et GARIS savent ce qu'il y a dans leur dossier",
-   "source": "Zeus",
-   "theme": "Domaines",
-   "pourquoipas": "Présence des factures client × mois, factorisée pour les trois domaines. GARIS dit aussitôt quelque chose de vrai : juillet est vide, sa facturation n'est pas faite.",
-   "local": true
-  },
-  {
-   "b": "d26",
-   "titre": "TVA mensuelle DAHLIA, charges fournisseurs GARIS",
-   "source": "Zeus",
-   "theme": "Domaines / Facturation",
-   "pourquoipas": "Le bloc fiscal DAHLIA ne retenait que les totaux annuels ; le détail des 13 mois était juste au-dessus. GARIS reçoit ses factures fournisseurs. L'onglet Sous-traitance de GARIS est vide : rien à transporter.",
-   "local": true
-  },
-  {
-   "b": "d27",
-   "titre": "La section Domaines passe en plein écran, comme le Planning",
-   "source": "Zeus",
-   "theme": "Domaines",
-   "pourquoipas": "Un cockpit en iframe dans une colonne centrée perdait la moitié de sa largeur. Même classe que le Planning au-delà de 1100 px, et hauteur portée à presque tout l'écran.",
-   "local": true
-  },
-  {
-   "b": "d28",
-   "titre": "Le veilleur — la chaîne se relance toute seule, et le dépôt redescend avec",
-   "source": "Zeus",
-   "theme": "Domaines",
-   "pourquoipas": "Le carnet ne se recalculait que si quelqu'un lançait la commande. Le veilleur regarde les dossiers (réveil 30 s, métadonnées seules) et rejoue la chaîne du domaine qui a bougé. Il range aussi les dépôts R2 au passage.",
-   "local": true
-  },
-  {
-   "b": "d29",
-   "titre": "DAHLIA et GARIS ont enfin un registre bancaire — 244 mouvements lus dans les PDF",
-   "source": "Zeus",
-   "theme": "Domaines",
-   "pourquoipas": "Ni l'un ni l'autre n'avait d'équivalent de TB_2026_Mvts. Les relevés sont lus ligne à ligne (formats SWAN/INDY et QONTO). Registre BRUT : la matière, pas la comptabilité.",
-   "local": true
-  },
-  {
-   "b": "d30",
-   "titre": "Les relevés FKH étaient là — et le registre de juillet est incomplet de 30 lignes",
-   "source": "Zeus",
-   "theme": "Domaines / Facturation",
-   "pourquoipas": "Zeus avait raison : juin et juillet étaient déposés. En les lisant à côté du registre saisi, cinq mois tombent au carreau près et JUILLET n'a que 11 lignes saisies sur 41.",
-   "local": true
-  },
-  {
-   "b": "b432",
-   "titre": "Un ticket qui demande une information se juge sur l'information — pas sur un « Fait » declare",
-   "source": "Zeus 12/08 : « quand je donne un ticket au superviseur, il faut que je puisse voir si c'etait reellement renseigne ou pas » + « tous les agents avec qui on a travaille cette semaine et qui n'ont pas de mensuration »",
-   "theme": "Tickets",
-   "local": true,
-   "pourquoipas": "Zeus ne pouvait pas le savoir, et ce n'etait pas un manque d'affichage : ses tickets portaient une PHRASE. Une phrase ne se verifie pas — « Fait » ne dit que « j'ai fait quelque chose ». L'appli avait pourtant deja la bonne mecanique a deux endroits sans les relier : TK_TYPES (missing() qui lit la donnee, mais sans destinataire ni accuse) et tkx (adresse a un role, avec accuse, mais qui ferme sur une declaration). Aucune des deux n'avait les deux. b432 fait porter au ticket le TROU qu'il vient boucher : TK_TYPES.mensurations ecrit via faSaveMens (source unique), donc saisir dans le ticket ou dans la fiche revient au meme et se voit pareil — demande explicite de Zeus. tkxReste/tkxAutoScan (b365, ecrits pour les files de vacations) sont etendus au trou de donnee : rien de neuf invente. « Fait » refuse tant qu'un champ est vide. Le controle (qui a rempli, quand, via le ticket ou hors ticket) est reserve super-admin + administrateur. Deux portes : bouton sur la fiche de l'agent, et « agents ayant travaille cette semaine » (281 agents en base, 25 la semaine du 10/08, dont 18 sans mensurations). missing() exige les TROIS mesures : l'ancienne regle « au moins une » declarait Issa ADS Dole renseigne avec 46 et L sans taille de haut. Bug PREEXISTANT corrige au passage : la liste des tickets n'excluait pas les echanges, qui s'y affichaient en carte vide « Ticket 0/0 ». Verifie de bout en bout sur le banc d'essai isole : refus du « Fait », ecriture reelle dans fkh_tenues_ctrl, tracabilite posee, compteur 1/8 -> 8/8, fermeture automatique et sa mention. Demo jouable : ?sandbox=1&demo=ticket-mens."
-  },
-  {
-   "b": "b433",
-   "titre": "La demande d'information part de Terrain, plus de la section Tickets",
-   "source": "Zeus 13/08 : « fais en sorte que ce soit dans Terrain et non dans la section Tickets »",
-   "theme": "Tickets",
-   "pourquoipas": "Terrain est l'endroit ou l'on regarde ce qui demande une action MAINTENANT : c'est de la que doit partir une demande. La section Tickets garde sa vocation, SUIVRE ce qu'on a envoye. La carte reste reservee au super-admin et a l'administrateur : le superviseur RECOIT ces tickets, il ne se les adresse pas a lui-meme. Les tickets recus etaient deja traitables dans Terrain depuis b384 — la saisie des tailles y a fonctionne sans rien ajouter."
-  },
-  {
-   "b": "b434",
-   "titre": "CORRECTIF BLOQUANT : le bouton de la fiche agent tuait le demarrage de l'appli",
-   "source": "Constate en jouant la demo de b432, avant tout push",
-   "theme": "Tickets",
-   "pourquoipas": "renderFA() s'execute ligne ~2902, au fil du script ; var TK_TYPES n'est affecte qu'a ~5501. Entre les deux TK_TYPES vaut undefined (hoisting), et le Object.keys de faManqueBtns levait une TypeError qui TUAIT tout le reste du demarrage : ni sandbox, ni sections, ni rendu. INVISIBLE sur un stockage vide — sans agent a dessiner, la fonction n'etait jamais appelee. Systematique des qu'il y a des agents : chez Zeus, 281 agents, l'appli n'aurait pas demarre du tout. Preuve par temoin : b431 servi sur le MEME port, donc le meme localStorage, demarrait ; b433 non ; b434 oui. Lecon : un sandbox vierge ne teste rien."
-  },
-  {
-   "b": "b435",
-   "titre": "Un ticket peut demander PLUSIEURS informations a la fois",
-   "source": "Zeus 13/08 : « adresse ET mensuration et egalement l'etat des tenues »",
-   "theme": "Tickets",
-   "pourquoipas": "manque.champs (liste) remplace manque.champ (unique), l'ancien format restant lu. Tracabilite par agent ET par champ : savoir que l'adresse est arrivee ne dit pas que les mesures le sont. Nouveau type `tenue` — le trou n'est pas « la tenue est incomplete », c'est qu'on n'en SAIT RIEN (jamais controle, ou fiche sans statut). Les agents sortent ranges par sollicitation reelle. Mesure au 13/08 : 62 agents sollicites sur 281 en fiche, 57 incomplets, 35 aux deux trous, 7 jamais controles."
-  },
-  {
-   "b": "b436",
-   "titre": "On decoche avant d'envoyer : une ligne generique n'est pas un agent a rappeler",
-   "source": "Zeus 13/08 : « enleve Poulet Duc »",
-   "theme": "Tickets",
-   "pourquoipas": "« AGENT Poulet DUC » est l'agent le plus sollicite de la base avec 32 vacations — et ce n'est pas une personne, c'est une ligne generique venue d'un import. Sans decochage il serait revenu dans CHAQUE envoi. La fenetre d'envoi liste desormais les agents avec cases a cocher, nombre de vacations et ce qu'on leur demande exactement. La fiche n'est PAS supprimee : elle porte des vacations reelles, son nettoyage est un chantier a part."
-  },
-  {
-   "b": "b437",
-   "titre": "Le decor de demo ne se dedouble plus",
-   "source": "Constate en rejouant la demo",
-   "theme": "Tickets",
-   "pourquoipas": "Monter deux fois la demo empilait ses vacations — 32 devenaient 64 — et le classement par sollicitation mentait. Le decor se retire avant de se reposer."
-  },
-  {
-   "b": "b438",
-   "titre": "Les agents proches depuis la fiche d'une vacation du Planning",
-   "source": "Zeus 13/08 : « depuis cette vue, donne la possibilite d'avoir l'onglet agents proches avec toutes ses fonctionnalites, comme dans Suivi des demandes »",
-   "theme": "Planning",
-   "local": true,
-   "pourquoipas": "Rien de reecrit : les deux vues travaillent DEJA le meme objet (un element de SUIVI), donc renderNear(m) s'applique tel quel. Ce qui manquait etait le CABLAGE — les quatre ecouteurs du Suivi etaient cloues sur #suiviList. Ils sont enregistres une fois (svAddAct) et rebranchables sur n'importe quel conteneur (svBindActs). Factorise, pas recopie. Aussi : svGeoCompleter ne completait que les demandes en RECHERCHE, alors que les agents proches se cherchent surtout sur une vacation VALIDEE que personne n'a prise (154 dans la base au 13/08, dont 10 sans coordonnees)."
-  },
-  {
-   "b": "b439",
-   "titre": "Le rafraichissement ne doit rien suspendre aux entrailles d'une autre fonction",
-   "source": "Trouve en testant b438 : les filtres du panneau semblaient morts",
-   "theme": "Planning",
-   "local": true,
-   "pourquoipas": "J'avais suspendu le rafraichissement de la fiche a renderSuivi, que tous ces gestes appellent. Mais renderSuivi SORT PAR ANTICIPATION quand sa liste est vide (« Aucun resultat », ligne 2470) : le rafraichissement n'avait jamais lieu. Le rayon changeait bien en memoire, l'ecran ne bougeait pas — le pire des cas, un geste qui a l'air ignore alors qu'il a ete pris. Le rafraichissement vit desormais dans le cablage lui-meme. Verifie : 100 km -> 5 agents, 20 km -> 3, 200 km -> 6, +vehicule -> 4, +ADS -> 3, fiche jamais fermee. Demo : ?sandbox=1&demo=proches."
-  },
-  {
-   "b": "b440",
-   "titre": "« Affecter » directement depuis la ligne d'un agent proche",
-   "source": "Zeus 13/08 : oui au bouton propose",
-   "theme": "Planning",
-   "local": true,
-   "pourquoipas": "Dans le Planning, quand personne n'est affecte, le geste naturel n'est pas « associer » mais « c'est lui ». Le bouton passe par affpickWithCheck — la MEME verification que le bouton « Choisir » de la fiche (conflits d'horaires, indisponibilites) : on ne cree pas un second chemin d'affectation qui contournerait les controles du premier. Le mode est un 2e argument de renderNear, pas un champ pose sur la donnee. Deux appels dans tout le fichier : Suivi des demandes renderNear(x) bouton masque, fiche Planning renderNear(m,true) bouton visible."
-  },
-  {
-   "b": "b443",
-   "titre": "Domaines : administrateur + super-admin seulement, et l'admin n'y voit que l'Administratif des 3 societes",
-   "source": "Zeus 14/08 : « qu'aucun utilisateur ne voie la section Domaines a part l'administrateur et le super-administrateur »",
-   "theme": "Droits d'acces",
-   "pourquoipas": "Ce qui manquait n'etait pas la fonctionnalite mais le CABLAGE : les 4 cockpits portaient deja `appliqueRole` (en admin, un seul onglet), mais index.html ne leur disait JAMAIS le role — grep = 0. Interrupteur pose, pas cable (G-61). `cockpitfkh` quitte SUPERADMIN_SECTIONS pour un cran nomme ADMIN_SECTIONS, applique aux trois endroits qui decident."
-  },
-  {
-   "b": "b444",
-   "titre": "L'administrateur ne lit plus le chiffre d'affaires de la societe",
-   "source": "Zeus 14/08, capture a l'appui : « tu enleves ca de la section Administratif »",
-   "theme": "Droits d'acces",
-   "pourquoipas": "Administratif ne recopie rien : elle montre la vue d'origine et RETIRE ce qui n'est pas publie. Ce retrait ne porte que sur les classes listees dans SEL — et `.cd`, celle des tuiles de CA, n'y etait pas : ni publiables, ni retirables, elles traversaient le filtre. Corrige a LA SOURCE (carnet_bridge.py), pas dans le cockpit qui est un fichier GENERE. VERIFIE PAR ZEUS sur le site le 14/08 : le bandeau a disparu."
-  },
-  {
-   "b": "b445",
-   "titre": "CORRECTIF : la restriction de b443 ne marchait pas par le chemin reel",
-   "source": "Trouve en relisant b443/b444 a la demande de Zeus",
-   "theme": "Droits d'acces",
-   "pourquoipas": "b443 ecrivait le role dans le stockage et comptait sur hub.html pour l'y lire. Mais le hub est charge AVEC la page, donc AVANT la connexion : il lisait un role vide, une seule fois. Mesure par le chemin reel : role null, les QUATRE cartes affichees, PERSO compris. Desormais l'hote DIT le role a l'ouverture et repond a qui le RECLAME. Cause : j'avais teste la PIECE (hub.html?role=admin) au lieu du CHEMIN. -> G-90."
-  },
-  {
-   "b": "b446",
-   "titre": "Quand quelqu'un se deconnecte, ses droits partent avec lui",
-   "source": "Troisieme axe de la relecture",
-   "theme": "Droits d'acces",
-   "pourquoipas": "cloudLogout effaçait le mot de passe mais PAS le role : le poste gardait celui du dernier connecte. Mesure : poste quitte par un super-admin, hub ouvert SANS mot de passe -> les 4 domaines, PERSO compris. Deux verrous : le role part a la deconnexion, ET le hub ne lit plus le stockage — sans annonce de l'application, regime le plus ferme. Un doute sur qui regarde se tranche en montrant MOINS. -> G-91."
+   "b": 461,
+   "titre": "📷 Rattacher une photo reçue : le geste se faisait effacer par la synchro",
+   "source": "Zeus 21/08 : « quand on clique sur choisir une photo, ça ne le prend pas en compte » (prise Saint-Étienne du 21/08, prévue 07:00, pointée 10h06)",
+   "theme": "Photos / Suivi des appels",
+   "pourquoipas": "Le bouton « C'est cette photo » écrivait `at:<heure de la PHOTO>`. Or `at` n'est pas l'heure de la photo : c'est l'ARBITRE de la fusion entre postes — `ssMerge` garde, pour chaque étape, l'enregistrement au `at` le plus récent. Partout ailleurs `saSet` y met `Date.now()`, l'heure du geste ; ici seulement on y mettait une heure du PASSÉ. Une prise pointée à 10h06 (at=10h06) battait donc systématiquement le rattachement d'une photo de 07h05 (at=07h05) : le clic marchait, la ligne quittait la liste, et la synchro suivante la ramenait « sans photo » — sans un mot. CORRIGÉ aux DEUX endroits qui rattachent à la main (le portail « photo reçue » et « Rapprocher cette photo ») : `at` = l'heure du geste, comme partout. L'heure de la photo n'est pas perdue — elle vit déjà dans le nom du fichier (b350) et on la double désormais dans `photoAt`, que `phQuand` lit avant de retomber sur `at`. PREUVE : le vrai `ssMerge` extrait du fichier, exécuté sur les heures réelles du ticket de Zeus — avant le correctif, photoKey disparait après fusion ; après, il reste, et photoAt rend bien 07:05. La ligne de rattachement est LUE DANS LE FICHIER et exécutée telle quelle, pas recopiée. NON-RÉGRESSION : b460 rejoué en entier sous b461, 0 erreur JS. LA MÊME CAUSE, TROISIÈME FOIS : b360 (objet orphelin), b452 (retraits écrasés), b461 (horodatage qui recule). Une donnée écrite sur un poste, effacée par un autre, en silence. RESTE À SAVOIR : si le problème persiste après mise en ligne, le suspect suivant est le filtre de date du portail, pré-réglé sur le jour du ticket (bouton « 📂 Toutes les dates »)."
   }
  ],
  "attente": [
