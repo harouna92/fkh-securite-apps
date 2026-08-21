@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v21-08·b460</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v21-08·b461</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2141,7 +2141,10 @@ button.big:active{transform:translateY(1px)}
   function phQuand(mid,key){
     var e=phEtape(mid,key); if(!e.key)return 0;
     var t=phTsDeCle(e.key); if(t)return t;
-    try{ var S=(typeof ssLoad==='function')?ssLoad():{}, r=(S[mid]&&S[mid][key])||{}; return r.at||0; }catch(_e){ return 0; }
+    /* b461 : `at` est devenu l'heure du GESTE (arbitre de la fusion). L'heure de la photo, quand
+       le nom du fichier ne la porte pas, se lit dans `photoAt`. `at` ne reste qu'en dernier
+       recours, pour les lignes ecrites avant b461. */
+    try{ var S=(typeof ssLoad==='function')?ssLoad():{}, r=(S[mid]&&S[mid][key])||{}; return r.photoAt||r.at||0; }catch(_e){ return 0; }
   }
   /* ===== b350 : D'OÙ VIENT CETTE PHOTO ? =====
      POURQUOI (Zeus, 06/08 — cas « Att Rac Ghs Luant Station Total ») : quand l'agence rattache une
@@ -8975,7 +8978,23 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
   function phAttach(i,mid,stepKey){ var m=phMatches&&phMatches[i]; if(!m)return; var sk=stepKey||PH_TYPE_STEP[m.ph.type]||'tenue'; var S=ssLoad(); S[mid]=S[mid]||{};
     /* b338 : marqueur « man » (rapproche par l'agence) + on rafraichit les pastilles dans la foulee.
        Sans ce rafraichissement, il fallait attendre le cycle suivant pour voir le ticket regle. */
-    S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:m.ph.key,done:true,at:m.ph.ts||Date.now(),man:1}); ssSave(S);
+    /* ===== b461 : LE RATTACHEMENT D'UNE PHOTO SE FAISAIT EFFACER PAR LA SYNCHRO =====
+       POURQUOI (cas Zeus, 21/08 — « quand on clique sur choisir une photo, ça ne le prend pas
+       en compte ») : la ligne écrite ici portait `at:<heure de la PHOTO>`. Or `at` n'est pas
+       l'heure de la photo : c'est l'ARBITRE de la fusion entre postes (`ssMerge` garde, pour
+       chaque étape, l'enregistrement au `at` le plus récent). Partout ailleurs, `saSet` y met
+       `Date.now()` — l'heure du geste. Ici seulement, on y mettait une heure du PASSÉ.
+       Conséquence : une prise pointée à 10h06 (at=10h06) battait systématiquement le
+       rattachement d'une photo de 07h05 (at=07h05). Le clic marchait, la ligne repartait,
+       et la synchro suivante la ramenait « sans photo » — sans un mot.
+       REJOUÉ AVEC LE VRAI `ssMerge` : photo rattachée -> après fusion, photoKey disparu ;
+       avec `at` à l'heure du geste, il reste.
+       COMMENT : `at` = l'heure du GESTE, comme partout. L'heure de la photo n'est pas perdue —
+       elle vit déjà dans le nom du fichier (b350) et on la double dans `photoAt`.
+       LA MÊME CAUSE, DÉJÀ VUE DEUX FOIS : b360 (la fiche écrivait dans un objet orphelin) et
+       b452 (les retraits écrasés au lieu d'être fusionnés). Une donnée écrite sur un poste,
+       effacée par un autre, en silence. */
+    S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:m.ph.key,done:true,photoAt:(m.ph.ts||0),at:Date.now(),man:1}); ssSave(S);   /* b461 */
     if(typeof notifScan==='function'){try{notifScan();}catch(e){}}
     if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
     if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
@@ -9428,7 +9447,23 @@ var now=Date.now(), it={id:'ai'+now+'_'+Math.round(Math.random()*9999),texte:bd.
         var it=L[+b.getAttribute('data-i')]; if(!it)return;
         var S=ssLoad(); S[mid]=S[mid]||{};
         var sk=stepKey||'tenue';
-        S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:it.key,done:true,at:it.ts||Date.now(),man:1});   /* b317 : rattache par l'agence */
+    /* ===== b461 : LE RATTACHEMENT D'UNE PHOTO SE FAISAIT EFFACER PAR LA SYNCHRO =====
+               POURQUOI (cas Zeus, 21/08 — « quand on clique sur choisir une photo, ça ne le prend pas
+               en compte ») : la ligne écrite ici portait `at:<heure de la PHOTO>`. Or `at` n'est pas
+               l'heure de la photo : c'est l'ARBITRE de la fusion entre postes (`ssMerge` garde, pour
+               chaque étape, l'enregistrement au `at` le plus récent). Partout ailleurs, `saSet` y met
+               `Date.now()` — l'heure du geste. Ici seulement, on y mettait une heure du PASSÉ.
+               Conséquence : une prise pointée à 10h06 (at=10h06) battait systématiquement le
+               rattachement d'une photo de 07h05 (at=07h05). Le clic marchait, la ligne repartait,
+               et la synchro suivante la ramenait « sans photo » — sans un mot.
+               REJOUÉ AVEC LE VRAI `ssMerge` : photo rattachée -> après fusion, photoKey disparu ;
+               avec `at` à l'heure du geste, il reste.
+               COMMENT : `at` = l'heure du GESTE, comme partout. L'heure de la photo n'est pas perdue —
+               elle vit déjà dans le nom du fichier (b350) et on la double dans `photoAt`.
+               LA MÊME CAUSE, DÉJÀ VUE DEUX FOIS : b360 (la fiche écrivait dans un objet orphelin) et
+               b452 (les retraits écrasés au lieu d'être fusionnés). Une donnée écrite sur un poste,
+               effacée par un autre, en silence. */
+        S[mid][sk]=Object.assign({},S[mid][sk]||{},{photoKey:it.key,done:true,photoAt:(it.ts||0),at:Date.now(),man:1});   /* b317 : rattache par l'agence · b461 : `at` = heure du geste */
         ssSave(S);
         if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
         if(typeof notifScan==='function'){try{notifScan();}catch(e){}}
