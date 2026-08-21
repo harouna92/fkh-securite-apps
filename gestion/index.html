@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v20-08·b459</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v21-08·b460</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -2638,6 +2638,9 @@ button.big:active{transform:translateY(1px)}
      On les enregistre donc une fois, et on peut les rebrancher sur n'importe quel conteneur.
      (Regle du 01/08 : une mecanique eprouvee se factorise, elle ne se recopie pas.) */
   var _SV_ACTS=[], _svInModal=0;
+  /* b460 : une ligne du Suivi s'enregistre dans fkh_suivi, une intervention dans
+     fkh_interv_dem. Un seul endroit decide — on ne peut plus se tromper de base. */
+  function _svSaveIt(it){ if(it&&it._iv&&typeof _ivWrite==='function'){ _ivWrite(it); return; } if(typeof saveSuivi==='function')saveSuivi(); }
   function svAddAct(type,fn){ _SV_ACTS.push([type,fn]); var el=byId('suiviList'); if(el)el.addEventListener(type,fn); }
   function svBindActs(el){ if(!el||el._svBound)return; el._svBound=1;
     /* b439 : le geste fait, on redessine la vue QUI L'A RECU. Premiere version : je m'appuyais
@@ -2670,6 +2673,12 @@ button.big:active{transform:translateY(1px)}
     var b=e.target.closest('button'); if(!b)return;
     var id=b.getAttribute('data-id'), act=b.getAttribute('data-act'), it=null,i;
     for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id){it=SUIVI[i];break;}
+    /* ===== b460 : UNE INTERVENTION EST AUSSI UNE CIBLE VALABLE =====
+       Ce repartiteur cherchait la ligne UNIQUEMENT dans fkh_suivi. Depuis la fiche d'une
+       intervention, le panneau « Agents proches » s'affichait donc normalement, mais chaque
+       bouton retombait ici sur `if(!it)return` : rien ne se passait, sans un mot. Un bouton
+       qui ne fait rien en silence est pire qu'un bouton absent. */
+    if(!it&&typeof _ivView==='function')it=_ivView(id);
     if(!it)return;
     if(act==='trouve'){
       // #11 garde-fou : formalisme minimum avant de passer en « validée »
@@ -2764,17 +2773,17 @@ button.big:active{transform:translateY(1px)}
     else if(act==='naff'){ var naid=b.getAttribute('data-aid');
       if(typeof affpickWithCheck==='function'&&!affpickWithCheck(it,naid))return;
       it.agentId=naid; it.valide=Date.now();
-      saveSuivi();
+      _svSaveIt(it);   /* b460 */
       if(typeof renderPlanning==='function')try{renderPlanning();}catch(_e){}
       renderSuivi(); return; }
-    else if(act==='nassoc'){ var aid=b.getAttribute('data-aid'); it.assoc=it.assoc||[]; var ix=it.assoc.indexOf(aid); if(ix>=0)it.assoc.splice(ix,1); else it.assoc.push(aid); saveSuivi(); renderSuivi(); return; }
+    else if(act==='nassoc'){ var aid=b.getAttribute('data-aid'); it.assoc=it.assoc||[]; var ix=it.assoc.indexOf(aid); if(ix>=0)it.assoc.splice(ix,1); else it.assoc.push(aid); _svSaveIt(it); /* b460 */ renderSuivi(); return; }
     else if(act==='ntog'){ var tid=b.getAttribute('data-aid'); it._stOpen=it._stOpen||{}; if(it._stOpen[tid])delete it._stOpen[tid]; else it._stOpen[tid]=true; if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); return; }
     else if(act==='nselall'){ it._nsel=it._nsel||{}; (typeof nearAgents==='function'?nearAgents(it):[]).forEach(function(o){it._nsel[o.a.id]=true;}); }
     else if(act==='nselnone'){ it._nsel={}; }
     else if(act==='nwa'){ var waid=b.getAttribute('data-aid'), wa=(typeof faById==='function')?faById(waid):null, num=wa?waNum((wa.tels&&wa.tels[0])||wa.tel):''; var mt=(it._nmsg!=null?it._nmsg:nearGroupMsg(it)); if(wa&&wa.respSecteur){ mt='🧭 RESPONSABLE SECTEUR — mission à pourvoir dans ton secteur :\n\n'+mt+'\nPeux-tu nous proposer un agent disponible sur ce créneau (ou le couvrir) ? Merci de revenir vers nous rapidement.'; } if(num){ window.open('https://wa.me/'+num+'?text='+encodeURIComponent(mt),'_blank'); ctcMark(it,waid,'msg'); renderSuivi(); } else alert('Pas de numéro pour cet agent.'); return; }
     else if(act==='nsms'){ var _ns=it._nsel||{}, selIds=(typeof nearAgents==='function'?nearAgents(it):[]).filter(function(o){return _ns[o.a.id];}), nums=selIds.map(function(o){return String((o.a.tels&&o.a.tels[0])||o.a.tel||'').replace(/\s/g,'');}).filter(Boolean); if(!nums.length){ alert('Aucun agent sélectionné avec un numéro.'); return; } var mt2=(it._nmsg!=null?it._nmsg:nearGroupMsg(it)); window.open('sms:'+nums.join(',')+'?body='+encodeURIComponent(mt2),'_blank'); selIds.forEach(function(o){ ctcMark(it,o.a.id,'msg'); }); renderSuivi(); return; }
-    else if(act==='nctc'){ ctcMark(it,b.getAttribute('data-aid'),'call'); renderSuivi(); return; }
-    else if(act==='nctcm'){ var maid=b.getAttribute('data-aid'); if(!it.contacts)it.contacts={}; var mcc=it.contacts[maid]||{}; mcc.m=!mcc.m; mcc.by=(typeof opNow==='function'?opNow():'')||mcc.by||''; mcc.at=Date.now(); it.contacts[maid]=mcc; if(typeof saveSuivi==='function')saveSuivi(); renderSuivi(); return; }
+    else if(act==='nctc'){ ctcMark(it,b.getAttribute('data-aid'),'call'); _svSaveIt(it); /* b460 */ renderSuivi(); return; }
+    else if(act==='nctcm'){ var maid=b.getAttribute('data-aid'); if(!it.contacts)it.contacts={}; var mcc=it.contacts[maid]||{}; mcc.m=!mcc.m; mcc.by=(typeof opNow==='function'?opNow():'')||mcc.by||''; mcc.at=Date.now(); it.contacts[maid]=mcc; _svSaveIt(it); /* b460 */ renderSuivi(); return; }
     else if(act==='dupmerge'){ var cands=(typeof demDupeCands==='function')?demDupeCands(it):[]; cands.forEach(function(m){ m.dupOf=it.id; }); saveSuivi(); renderSuivi(); return; }
     else if(act==='dupunlink'){ delete it.dupOf; saveSuivi(); renderSuivi(); return; }
     else if(act==='tpledit'){ it._tpledit=!it._tpledit; saveSuivi(); renderSuivi(); return; }
@@ -3621,6 +3630,30 @@ button.big:active{transform:translateY(1px)}
   document.addEventListener('click',function(ev){ var b=ev.target&&ev.target.closest?ev.target.closest('.aide-b'):null; if(b){ ev.preventDefault(); ev.stopPropagation(); aideOuvrir(b.getAttribute('data-a')); } });
   function aideWire(root){ (root||document).querySelectorAll('.aide-b').forEach(function(b){ b.onclick=function(){ aideOuvrir(b.getAttribute('data-a')); }; }); }
   var DEMOS={
+    interv:{ titre:'\ud83d\udea8 Une intervention s\u2019ouvre dans la M\u00caME fiche qu\u2019une vacation',
+      quoi:'Une intervention sur alarme \u00ab CARREFOUR CONTACT (Chartres) \u00bb pos\u00e9e aujourd\u2019hui \u00e0 21:30 \u2192 22:30, encore en recherche, avec 3 agents dans la cascade d\u2019appels (2 d\u00e9j\u00e0 appel\u00e9s) \u2014 et trois agents autour de Chartres.',
+      aFaire:'Ouvre \ud83d\udcc5 Planning : la ligne \ud83d\udea8 Intervention est en t\u00eate, la pastille est l\u00e0 comme avant. CLIQUE-LA : avant, tu partais dans l\u2019onglet Interventions ; maintenant la fiche s\u2019ouvre SUR PLACE, la m\u00eame que pour une vacation. Change l\u2019heure de fin, affecte un agent par \ud83d\udc65 Agents proches, passe le statut \u00e0 \u00ab En cours \u00bb, \u00e9cris un compte-rendu \u2014 puis va dans \ud83d\udea8 Interventions v\u00e9rifier que TOUT y est : c\u2019est la m\u00eame donn\u00e9e, pas une copie.',
+      monter:function(){
+        var FA2=((typeof FA!=='undefined'&&FA)?FA:[]).filter(function(a){ return String(a&&a.id||'').indexOf('demo_ag')!==0; });
+        var GENS=[
+          ['Chartres Moussa',      48.4469, 1.4890,'0600000011',true, true ],
+          ['Lucé Bakary',          48.4337, 1.4570,'0600000012',true, false],
+          ['Dreux Amadou',         48.7369, 1.3660,'0600000013',false,true ]
+        ];
+        GENS.forEach(function(g,i){ FA2.push({maj:Date.now(),id:'demo_ag_iv'+(i+1),nom:g[0],tels:[g[3]],ville:'',cp:'28000',la:g[1],lo:g[2],dep:'28',depnom:'Eure-et-Loir',fiab:'',voiture:g[4],ads:g[5],interv:true,verifie:true}); });
+        if(typeof FA!=='undefined'){ FA.length=0; FA2.forEach(function(a){FA.push(a);}); if(typeof saveFA==='function')saveFA(); }
+        var jour=(typeof impTodayISO==='function')?impTodayISO():'';
+        var iv=(function(){ var a=load('fkh_interv_dem'); return (Array.isArray(a)?a:[]).filter(function(x){ return String(x&&x.id||'').indexOf('demo_iv')!==0; }); })();
+        iv.unshift({id:'demo_iv1',client:'CARREFOUR CONTACT',site:'CARREFOUR CONTACT Chartres',sitetype:'Commerce',presta:'Intervention sur alarme',
+          ville:'Chartres',cp:'28000',la:48.4469,lo:1.4890,dep:'28',depnom:'Eure-et-Loir',
+          date:jour,hdeb:'21:30',hfin:'22:30',statut:'recherche',
+          calls:[{aid:'demo_ag_iv1',nom:'Chartres Moussa',tel:'0600000011',done:true,at:'21:32',tries:'1',resp:'\ud83d\udcf5 Injoignable'},
+                 {aid:'demo_ag_iv2',nom:'Luc\u00e9 Bakary',tel:'0600000012',done:true,at:'21:35',tries:'2',resp:'\ud83d\udd34 Ne peut pas faire'},
+                 {aid:'demo_ag_iv3',nom:'Dreux Amadou',tel:'0600000013',done:false}],
+          agentId:null,agentNom:'',agentTel:'',recherche_at:Date.now()-9*60000,affecte_at:null,terminee_at:null,cr:'',at:Date.now()-9*60000});
+        save('fkh_interv_dem',iv);
+        if(typeof window._ivRender==='function'){try{window._ivRender();}catch(e){}}
+      } },
     proches:{ titre:'\ud83d\udc65 Les agents proches, depuis la fiche d\u2019une vacation du Planning',
       quoi:'Une vacation BASIC FIT (Chartres) du 14/08 \u00e0 13:00, sans agent \u2014 et six agents r\u00e9partis de 4 \u00e0 190 km autour, avec voiture / ADS / fiabilit\u00e9 renseign\u00e9s.',
       aFaire:'Ouvre \ud83d\udcc5 Planning, va au 14/08 et clique la vacation \u00ab BASIC FIT (Chartres) \u00bb. Dans la fiche, sous les horaires, le bloc \ud83d\udc65 Agents proches est d\u00e9j\u00e0 ouvert : change le rayon (20 \u2192 200 km), coche \ud83d\udee1\ufe0fADS puis \ud83d\ude97 V\u00e9hicule, la liste se refiltre SANS fermer la fiche. Chaque agent affiche sa distance, sa dispo pour ce cr\u00e9neau, et son num\u00e9ro cliquable.',
@@ -4236,6 +4269,8 @@ button.big:active{transform:translateY(1px)}
     /* b380 : les tickets de demo partent avec le reste — une demo ne laisse pas de trace. */
     try{ if(typeof tkxLoad==='function')tkxSave(tkxLoad().filter(function(t){ return !t||String(t.id).indexOf('demo_tk')!==0; })); }catch(e){}
     try{ SUIVI=(SUIVI||[]).filter(function(m){ return String(m.id||'').indexOf('demo_')!==0; }); save('fkh_suivi',SUIVI); }catch(e){}
+    /* b460 : l'intervention de demo part avec le reste. */
+    try{ save('fkh_interv_dem',(load('fkh_interv_dem')||[]).filter(function(x){ return String(x&&x.id||'').indexOf('demo_iv')!==0; })); }catch(e){}
     try{ localStorage.removeItem('fkh_pc_poste'); localStorage.removeItem('fkh_mail_hb'); }catch(e){}
     location.href=location.pathname+'?sandbox=1';
   }
@@ -6221,8 +6256,8 @@ button.big:active{transform:translateY(1px)}
         planningAffect(id); }; }
     step0(); }
   function planningAffectClose(){ var w=byId('pl-modal'); if(w)w.style.display='none'; _plAffId=null; }
-  function planningAffect(mid){ var m=null,i; for(i=0;i<SUIVI.length;i++)if(SUIVI[i].id===mid){m=SUIVI[i];break;} if(!m)return; _plAffId=mid; _plAffQ=''; _plModal().style.display='flex'; _plRenderModal(); }
-  function _plMissById(id){ for(var i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id)return SUIVI[i]; return null; }
+  function planningAffect(mid){ var m=_plMissById(mid); if(!m)return;   /* b460 */ _plAffId=mid; _plAffQ=''; _plModal().style.display='flex'; _plRenderModal(); }
+  function _plMissById(id){ for(var i=0;i<SUIVI.length;i++)if(SUIVI[i].id===id)return SUIVI[i]; return (typeof _ivView==='function')?_ivView(id):null; }   /* b460 : une intervention repond au meme appel qu'une vacation */
   // Heures planifiées de l'agent sur le mois de la vacation (calque du panneau « Affecter vos agents » Sekur : [54.28h])
   function _plAgentMonthHours(aid,refISO){ if(!aid||!refISO)return 0; var mo=refISO.slice(0,7),tot=0; (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(x){ if(x.agentId!==aid||x.statut!=='validee'||!x.mdate||x.mdate.slice(0,7)!==mo)return; var r=(typeof missRange==='function')?missRange(x):null; if(r)tot+=(r[1]-r[0]); }); return Math.round(tot/60*10)/10; }
   function _plAgentResults(m){ var q=(_plAffQ||'').toLowerCase().trim(); if(typeof FA==='undefined'||!FA||!FA.length)return '<div class="hint" style="padding:4px 2px">Aucun agent en base.</div>'; if(q.length<2)return '<div class="hint" style="padding:4px 2px">✍️ Tape au moins 2 lettres (nom · n° · ville) — les propositions se filtrent au fur et à mesure.</div>'; /* b199 : plus de liste complete, autocompletion seulement */ var arr=FA.filter(function(a){ return !q||(((a.nom||'')+' '+((a.tels||[]).join(' '))+' '+(a.ville||'')).toLowerCase().indexOf(q)>=0); }).slice(0,8); if(!arr.length)return '<div class="hint" style="padding:4px 2px">Aucun agent trouvé.</div>'; return arr.map(function(a){ var cur=(a.id===m.agentId); var ind=(typeof agentIndispoOn==='function')?agentIndispoOn(a.id,m.mdate):null; if(ind){ return '<div class="fa" style="opacity:.6;background:repeating-linear-gradient(45deg,rgba(110,168,254,.10) 0 6px,transparent 6px 12px)"><div><div class="fa-n">'+esc(a.nom||'—')+' <span style="color:#6ea8fe">🏖 indisponible</span></div><div class="fa-d">'+(ind.motif?esc(ind.motif)+' · ':'')+'jusqu\'au '+esc((ind.fin||'').split('-').reverse().join('/'))+'</div></div></div>'; } var cf=(typeof agentTimeConflicts==='function')?agentTimeConflicts(a.id,m):[]; var dispo=cf.length?'<span style="color:#c02626">🔴 déjà en mission</span>':'<span style="color:#1a9e5c">🟢 dispo</span>'; var hm=_plAgentMonthHours(a.id,m.mdate||impTodayISO()); var note=(a.fiab?(' · ⭐ '+esc(a.fiab)):''); return '<div class="fa"><div><div class="fa-n">'+esc(a.nom||'—')+(cur?' <span style="color:var(--ok)">✓</span>':'')+note+'</div><div class="fa-d">'+esc((a.tels||[]).join(' / ')||'—')+(a.ville?' · '+esc(a.ville):'')+' · '+dispo+' · <b>['+hm+'h]</b> ce mois</div></div><div class="fa-a"><button class="ok pl-affpick" data-aid="'+esc(a.id)+'">Choisir</button></div></div>'; }).join(''); }
@@ -6233,10 +6268,89 @@ button.big:active{transform:translateY(1px)}
   function _plWireNear(card){ if(typeof svBindActs==='function')svBindActs(card);
     var d=card.querySelector('#pl-near-det');
     if(d&&!d._wired){ d._wired=1; d.addEventListener('toggle',function(){ _plNearOpen=d.open; }); } }
-  function _plWirePicks(card,m){ _plWireNear(card); card.querySelectorAll('.pl-affpick').forEach(function(b){ b.onclick=function(){ var aid=b.getAttribute('data-aid'); if(typeof affpickWithCheck==='function'&&!affpickWithCheck(m,aid))return; m.agentId=aid; m.valide=Date.now(); /* b304 */ if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; }); }
+  function _plWirePicks(card,m){ _plWireNear(card); card.querySelectorAll('.pl-affpick').forEach(function(b){ b.onclick=function(){ var aid=b.getAttribute('data-aid'); m=(typeof _plMissById==='function'&&_plMissById(m.id))||m;   /* b460 */ if(typeof affpickWithCheck==='function'&&!affpickWithCheck(m,aid))return; m.agentId=aid; m.valide=Date.now(); /* b304 */ _plSaveM(m);   /* b460 : l'intervention s'ecrit dans SA base, pas dans fkh_suivi */ if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; }); }
+  /* ===== b460 : UNE INTERVENTION S'OUVRE DANS LA FICHE DES VACATIONS =====
+     POURQUOI (Zeus, 21/08) : « il faut que ca ait les memes fiches que les vacations de
+     gardiennage ». Cliquer une intervention verte du Planning envoyait dans l'onglet
+     Interventions — se balader de section en section pour un geste qui appartient a l'ecran
+     ou on est. L'affichage vert ne change pas : c'est le CLIC qui ouvre la meme fiche.
+     COMMENT : l'intervention n'est pas recopiee. On lui donne une IDENTITE DE MISSION
+     (les memes noms de champs) au moment d'ouvrir, et toute ecriture repart dans
+     `fkh_interv_dem` — jamais dans `fkh_suivi`. Une seule donnee, une seule fiche.
+     CE QUI N'EST PAS BRANCHE, ET C'EST VOULU : les tickets du Suivi des appels. Une
+     intervention n'a pas de controles des 2 h ; et le Suivi des appels est une zone sensible
+     qu'on ne touche pas sans le dire. */
+  var _IVMAP={siteAgent:'site',client:'client',ville:'ville',cp:'cp',mdate:'date',mheure:'hdeb',mfin:'hfin',mdateFin:'dateFin',agentId:'agentId',la:'la',lo:'lo',dep:'dep',qual:'qual',breaks:'breaks',isCircuit:'isCircuit',assoc:'assoc',contacts:'contacts'};
+  var _IVVUE={};   /* b460 : UNE seule vue par intervention — le rayon choisi dans « Agents proches » et les cases cochees vivent dessus ; la recreer a chaque fois les effacerait sous les doigts. */
+  var _IVST={recherche:{l:'🔎 En recherche',c:'#e0a13b'},encours:{l:'🚨 En cours',c:'#2563eb'},terminee:{l:'✅ Terminée',c:'#1a9e5c'},nonvalidee:{l:'❌ Non validée',c:'#8a8f98'}};
+  function _ivAll(){ var a=load('fkh_interv_dem'); return Array.isArray(a)?a:[]; }
+  function _ivRecOf(id){ var a=_ivAll(); for(var i=0;i<a.length;i++)if(String(a[i].id)===String(id))return a[i]; return null; }
+  function _ivPlusUne(hm){ var p=String(hm||'').split(':'); if(p.length<2)return ''; var t=((+p[0]*60+ +p[1]+60)%1440+1440)%1440; return ('0'+Math.floor(t/60)).slice(-2)+':'+('0'+(t%60)).slice(-2); }
+  function _ivView(id){ var r=_ivRecOf(id); if(!r)return null;
+    var v=_IVVUE[id]||(_IVVUE[id]={id:r.id,_iv:1});
+    v._ivRec=r; v.statut='validee'; v.planifie=true; v.titre=r.site||''; v.creeAt=r.at||null;
+    Object.keys(_IVMAP).forEach(function(k){ v[k]=r[_IVMAP[k]]; });
+    if(r.vacStatus)v.vacStatus=r.vacStatus; else delete v.vacStatus;
+    /* l'heure de fin PREVUE existe deja a la creation (debut + 1 h, modifiable) ; si une vieille
+       fiche n'en a pas, on la deduit sans jamais l'ecrire toute seule. */
+    if(!v.mfin&&v.mheure)v.mfin=_ivPlusUne(v.mheure);
+    return v; }
+  function _ivWrite(m){ if(!m||!m.id)return; var a=_ivAll(),r=null,i;
+    for(i=0;i<a.length;i++)if(String(a[i].id)===String(m.id)){r=a[i];break;}
+    if(!r)return;
+    Object.keys(_IVMAP).forEach(function(k){ var val=m[k];
+      if(k==='agentId'){
+        if(!val){ if(r.agentId){ r.agentId=null; r.agentNom=''; r.agentTel=''; if(r.statut==='encours')r.statut='recherche'; r.affecte_at=null; } return; }
+        if(String(r.agentId||'')!==String(val)){
+          r.agentId=val; var ag=(typeof faById==='function')?faById(val):null;
+          r.agentNom=ag?(ag.nom||''):''; r.agentTel=(ag&&ag.tels&&ag.tels.length)?ag.tels[0]:'';
+          r.affecte_at=Date.now(); if(r.statut==='recherche')r.statut='encours';
+        } return; }
+      if(val===undefined)return;
+      r[_IVMAP[k]]=val; });
+    if(m.vacStatus)r.vacStatus=m.vacStatus; else delete r.vacStatus;
+    r.maj=Date.now();
+    save('fkh_interv_dem',a.filter(function(x){return !x.sim;}));
+    if(typeof window._ivRender==='function'){try{window._ivRender();}catch(e){}} }
+  /* Une seule porte d'ecriture pour la fiche : la vacation va dans fkh_suivi, l'intervention
+     dans fkh_interv_dem. Les deux cotes gardent exactement les memes gestes. */
+  function _plSaveM(m){ if(m&&m._iv){ _ivWrite(m); return; } if(typeof saveSuivi==='function')saveSuivi(); }
+  function _ivSetStatut(id,st){ var a=_ivAll(),i; for(i=0;i<a.length;i++)if(String(a[i].id)===String(id)){
+      a[i].statut=st; if(st==='terminee'&&!a[i].terminee_at)a[i].terminee_at=Date.now();
+      if(st==='nonvalidee'&&!a[i].nonvalidee_at)a[i].nonvalidee_at=Date.now();
+      if(st==='recherche'){ a[i].terminee_at=null; }
+      a[i].maj=Date.now(); break; }
+    save('fkh_interv_dem',a.filter(function(x){return !x.sim;}));
+    if(typeof window._ivRender==='function'){try{window._ivRender();}catch(e){}} }
+  function _ivSetCR(id,txt){ var a=_ivAll(),i; for(i=0;i<a.length;i++)if(String(a[i].id)===String(id)){ a[i].cr=txt; a[i].maj=Date.now(); break; }
+    save('fkh_interv_dem',a.filter(function(x){return !x.sim;}));
+    if(typeof window._ivRender==='function'){try{window._ivRender();}catch(e){}} }
+  /* b460 : ce qu'une intervention a EN PLUS d'une vacation — son statut de terrain, sa
+     cascade d'appels et son compte-rendu. Tout est ICI : on ne sort plus de l'ecran. */
+  function _ivBlock(m){ var r=m._ivRec||{}; var calls=r.calls||[],done=0,i;
+    for(i=0;i<calls.length;i++)if(calls[i].done)done++;
+    var st=_IVST[r.statut]||{l:r.statut||'?',c:'#8a8f98'};
+    var opts=Object.keys(_IVST).map(function(k){ return '<option value="'+k+'"'+(r.statut===k?' selected':'')+'>'+_IVST[k].l+'</option>'; }).join('');
+    function dl(ms){ if(ms==null||ms<=0)return ''; var s2=Math.floor(ms/1000),mn=Math.floor(s2/60),h=Math.floor(mn/60); return h>0?(h+' h '+(mn%60)+' min'):(mn>0?(mn+' min'):(s2+' s')); }
+    var dR=(r.affecte_at&&r.recherche_at)?dl(r.affecte_at-r.recherche_at):'';
+    var dI=(r.terminee_at&&r.affecte_at)?dl(r.terminee_at-r.affecte_at):'';
+    return '<div style="border:1.5px solid '+st.c+';border-radius:10px;padding:9px 10px;margin-top:10px;background:var(--panel2)">'
+      +'<div class="lab" style="margin:0 0 5px">\ud83d\udea8 Intervention \u2014 <span style="color:'+st.c+'">'+st.l+'</span>'+(r.presta?' <span class="sub" style="font-weight:400">\u00b7 '+esc(r.presta)+'</span>':'')+'</div>'
+      +'<label class="f" style="margin:0 0 8px"><div class="lab" style="margin:0 0 3px;font-size:10px">Statut de l\'intervention</div><select class="iv-st" style="width:100%">'+opts+'</select></label>'
+      +'<div class="sub" style="margin:0 0 6px">\ud83d\udcde Cascade d\'appels : <b>'+done+'/'+calls.length+'</b> agent(s) appel\u00e9(s)'
+        +(dR?' \u00b7 trouv\u00e9 en '+esc(dR):'')+(dI?' \u00b7 intervention '+esc(dI):'')+'</div>'
+      +(calls.length?'<div class="acts" style="margin:0 0 8px"><button type="button" class="iv-go" style="font-size:12px">\u2197 Ouvrir la cascade d\'appels</button></div>':'')
+      +'<div class="lab" style="margin:6px 0 3px;font-size:10px">\ud83d\udcdd Compte-rendu</div>'
+      +'<textarea class="iv-cr" rows="3" placeholder="Ce que l\'agent a constat\u00e9 sur place\u2026" style="width:100%">'+esc(r.cr||'')+'</textarea>'
+      +'</div>'; }
   function _plRenderModal(){ var m=_plMissById(_plAffId); if(!m){planningAffectClose();return;} var card=byId('pl-modal-card'); if(!card)return; var M=_plStatusMap(); /* b430 : le titre porte la ville — c'est ce que Zeus cherchait sur BASIC FIT du 13/08. */ var site=(typeof svLabel==='function')?svLabel(m.siteAgent||m.titre||'—',m.ville||''):(m.siteAgent||m.titre||'—'); var cur=m.agentId?(typeof faById==='function'?faById(m.agentId):null):null; var when=(m.mdate?m.mdate.split('-').reverse().join('/'):'')+(m.mheure?' · '+m.mheure:'')+((typeof missEndTxt==='function'&&missEndTxt(m))?'→'+missEndTxt(m):''); var st=_plVacState(m);
+    /* ===== b460 : UN SEUL ETAT AFFICHE, PAS DEUX QUI SE CONTREDISENT =====
+       La pastille d'en-tete calculait un etat de VACATION (« En attente ») pendant que le bloc
+       du dessous annoncait « En cours ». Deux signaux contraires sur la meme fiche : on ne sait
+       plus lequel croire. Pour une intervention, c'est SON statut de terrain qui fait foi. */
+    if(m._iv){ var _si=_IVST[(m._ivRec||{}).statut]; if(_si)st={code:0,l:_si.l,c:_si.c}; }
     var opts='<option value="">Auto ('+esc(st.l)+')</option>'+Object.keys(M).map(function(code){ return '<option value="'+code+'"'+(String(m.vacStatus||'')===code?' selected':'')+'>'+esc(M[code].l)+'</option>'; }).join('');
-    card.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><b style="font-size:15px;flex:1">📅 '+esc(site)+'</b><button class="pl-close" style="font-size:18px;background:none;border:none;color:var(--muted);cursor:pointer">✕</button></div>'
+    card.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><b style="font-size:15px;flex:1">'+(m._iv?'🚨 ':'📅 ')+esc(site)+'</b><button class="pl-close" style="font-size:18px;background:none;border:none;color:var(--muted);cursor:pointer">✕</button></div>'
       +'<div class="sub" style="margin:0 0 10px">'+esc((m.client?m.client+' · ':'')+when)+' &nbsp;<span style="background:'+st.c+';color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">'+esc(st.l)+'</span></div>'
       +(cur?('<div class="meta" style="color:var(--ok);font-weight:600;margin-bottom:8px">👤 Agent : '+esc(cur.nom||'—')+(cur.tels&&cur.tels.filter(function(t){return !!t;}).length?' <span style="color:var(--muted);font-weight:400;font-size:12px">'+cur.tels.filter(function(t){return !!t;}).join(' / ')+'</span>':'')+' <button class="no pl-affrm" style="font-size:11px;margin-left:6px">❌ Retirer</button></div>'
         /* b314 : la tenue de l'agent, la ou on l'affecte — sans avoir a ouvrir sa fiche. */
@@ -6250,8 +6364,8 @@ button.big:active{transform:translateY(1px)}
             +'<span style="font-size:12px;color:var(--warn)">🦺 Aucune photo de tenue pour cet agent</span>'
             +'<button type="button" class="pl-tenue-portail" data-nom="'+esc(cur.nom||'')+'" style="font-size:11.5px;border-color:#6ea8fe;color:#6ea8fe">📷 Choisir une photo reçue</button>'
             +'</div>'; })()):(m.agentId?'<div class="meta" style="margin-bottom:8px">👤 Agent affecté (fiche supprimée) <button class="no pl-affrm" style="font-size:11px">❌ Retirer</button></div>':'<div class="sub" style="margin:0 0 8px;color:#e0a13b">🟠 Aucun agent affecté</div>'))
-      +'<label class="f" style="margin-bottom:8px"><div class="lab" style="margin:0 0 3px">Statut de la vacation</div><select class="pl-status" style="width:100%">'+opts+'</select></label>'
-      +'<div class="lab" style="margin:8px 0 3px">✏️ Détails de la vacation</div>'
+      +(m._iv?'':'<label class="f" style="margin-bottom:8px"><div class="lab" style="margin:0 0 3px">Statut de la vacation</div><select class="pl-status" style="width:100%">'+opts+'</select></label>')
+      +'<div class="lab" style="margin:8px 0 3px">✏️ Détails de '+(m._iv?'l\'intervention':'la vacation')+'</div>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><input class="pl-e-site" placeholder="Site" value="'+esc(m.siteAgent||m.titre||'')+'"><input class="pl-e-client" placeholder="Client" value="'+esc(m.client||'')+'"></div>'
       +(function(){ // b178 : 4 champs distincts date/heure debut + date/heure fin, + assainissement des fins polluees (ex. '02/08/2026 1')
         var _f=String(m.mfin||'');
@@ -6260,7 +6374,7 @@ button.big:active{transform:translateY(1px)}
           var _hm=/(\d{1,2})[:hH](\d{2})/.exec(_f.replace(/\d{2}\/\d{2}\/\d{4}/,''));
           if(_dm)m.mdateFin=_dm[3]+'-'+_dm[2]+'-'+_dm[1];
           m.mfin=_hm?(pad2(+_hm[1])+':'+_hm[2]):'';
-          if(typeof saveSuivi==='function')saveSuivi();
+          _plSaveM(m);
         }
         function _nh(v){ var mm2=/^(\d{1,2})[:hH](\d{2})$/.exec(String(v||'').trim()); return mm2?(pad2(+mm2[1])+':'+mm2[2]):''; }
         var _dfin=m.mdateFin||((m.mfin&&m.mheure&&toMin(m.mfin)!=null&&toMin(m.mheure)!=null&&toMin(m.mfin)<=toMin(m.mheure))?svcAddDays(m.mdate||'',1):(m.mdate||''));
@@ -6270,7 +6384,8 @@ button.big:active{transform:translateY(1px)}
           +'<label class="f" style="margin:0"><div class="lab" style="font-size:10px;margin:0 0 2px">📅 Date FIN</div><input type="date" class="pl-e-datefin" value="'+esc(_dfin)+'"></label>'
           +'<label class="f" style="margin:0"><div class="lab" style="font-size:10px;margin:0 0 2px">🕐 Heure FIN</div><input type="time" class="pl-e-h2" value="'+esc(_nh(m.mfin))+'"></label>'
           +'</div>'; })()
-      +(function(){ try{ var ex9=saExclLoad(); var st9s=ssSteps(m);
+      +(m._iv?_ivBlock(m):'')   /* b460 */
+      +(function(){ if(m._iv)return '';   /* b460 : pas de tickets de controle sur une intervention */ try{ var ex9=saExclLoad(); var st9s=ssSteps(m);
         var rows9=st9s.map(function(st9){ var k9=String(m.id)+'|'+st9.key; var off9=!!ex9[k9]; var isC9=String(st9.key).indexOf('ctrl')===0;
           var _hv9=(function(hh){var mm9=/^(\d{1,2})[:hH](\d{2})$/.exec(String(hh||'').trim());return mm9?(('0'+(+mm9[1])).slice(-2)+':'+mm9[2]):'';})(st9.heure); return '<div style="display:flex;gap:8px;align-items:center;padding:3px 0;border-bottom:1px dashed var(--line)"><span style="flex:1;min-width:0;'+(off9?'opacity:.5;text-decoration:line-through':'')+'">'+esc(st9.label)+'</span>'+((st9.key==='tenue')?'<b style="font-size:12px">'+esc(st9.heure||'—')+'</b>':'<input type="time" class="pl-tk-h" data-key="'+esc(st9.key)+'" value="'+esc(_hv9)+'" style="width:auto;padding:2px 4px;font-size:12px">')+'<button type="button" class="pl-tk-x" data-k="'+esc(k9)+'" style="font-size:11px;'+(off9?'color:var(--ok);border-color:var(--ok)':'color:var(--muted)')+'">'+(off9?'↩️ Restaurer':'🗑 Retirer')+'</button>'+((isC9&&Array.isArray(m.ctrls)&&m.ctrls.length)?'<button type="button" class="pl-tk-del" data-h="'+esc(st9.heure||'')+'" title="Supprimer ce contrôle personnalisé" style="font-size:11px;color:var(--bad)">✖</button>':'')+'</div>'; }).join('');
         return '<details class="meta" style="margin-top:6px" open><summary style="cursor:pointer;font-weight:700">🎫 Tickets de cette vacation ('+st9s.length+') — envoyés à Suivi des appels</summary><div style="margin-top:6px">'+rows9
@@ -6305,14 +6420,14 @@ button.big:active{transform:translateY(1px)}
               return '<div style="text-align:center"><span class="pl-vac-ph" data-k="'+esc(p.key)+'" style="cursor:zoom-in;display:inline-block">'+((typeof photoThumbTag==='function')?photoThumbTag(p.key):'🖼️')+'</span><div class="sub" style="margin:2px 0 0;font-size:10.5px;max-width:88px">'+esc(String(p.etape||'').replace(/^[^A-Za-zÀ-ÿ]+/,''))+(p.heure?'<br>'+esc(p.heure):'')+'</div></div>';
             }).join('')+'</div>';
         }catch(e){ return ''; } })()
-      +'<div class="lab" style="margin:10px 0 3px">🔪 Découper en vacations</div><div class="acts" style="gap:6px;flex-wrap:wrap"><button class="pl-split" data-rule="720">12h</button><button class="pl-split" data-rule="480">8h</button><button class="pl-split" data-rule="360">6h</button><button class="pl-split" data-rule="0">Garder tel quel</button></div>'
+      +(m._iv?'':'<div class="lab" style="margin:10px 0 3px">🔪 Découper en vacations</div><div class="acts" style="gap:6px;flex-wrap:wrap"><button class="pl-split" data-rule="720">12h</button><button class="pl-split" data-rule="480">8h</button><button class="pl-split" data-rule="360">6h</button><button class="pl-split" data-rule="0">Garder tel quel</button></div>')
       
-      +'<div class="sub" style="margin:4px 0 0;font-size:11.5px;color:var(--muted)">Origine : <b>'+esc(origineVac(m))+'</b>'+(m.creeAt?(' · le '+(function(){var d=new Date(m.creeAt);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' à '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2);})()):'')+'</div>'
+      +'<div class="sub" style="margin:4px 0 0;font-size:11.5px;color:var(--muted)">Origine : <b>'+esc(m._iv?'🚨 Intervention (section Interventions)':origineVac(m))+'</b>'+(m.creeAt?(' · le '+(function(){var d=new Date(m.creeAt);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' à '+('0'+d.getHours()).slice(-2)+' h '+('0'+d.getMinutes()).slice(-2);})()):'')+'</div>'
 
       +(m.reCree?'<div class="meta" style="background:rgba(224,161,59,.15);border:1.5px solid #e0a13b;border-radius:10px;padding:7px 10px;margin-top:6px"><span style="color:#e0a13b;font-weight:700">⚠️ Tu avais supprimé cette vacation</span><div class="fa-d" style="margin-top:3px">Supprimée le '+esc(m.reCree.supprLe||'—')+', puis recréée depuis un mail. Si ce n’est pas une nouvelle commande, supprime-la.</div></div>':'')   /* b343 */
-      +(m.mailPending?'<div class="meta" style="background:rgba(123,97,255,.15);border:1.5px solid #7b61ff;border-radius:10px;padding:7px 10px;margin-top:6px"><span style="color:#a99bff;font-weight:700">📧 Vacation issue d’un mail — À VALIDER</span><div class="acts" style="margin-top:6px"><button type="button" class="ok pl-mail-ok" style="font-size:12px">✅ Valider cette vacation</button><button type="button" class="no pl-mail-ref" style="font-size:12px">🗑 Refuser (supprimer)</button></div></div>':'')+'<div class="acts" style="margin-top:10px;flex-wrap:wrap"><button class="pl-tenue" title="Créer un ticket contrôle tenue pour cette vacation (remontée #27)">🦺 Contrôle tenue</button><button class="pl-jump">↗ Ouvrir dans Suivi demandes</button><button class="pl-saoff" style="border-color:#e0a13b;color:#e0a13b">'+(m.saOff?'🔔 Réactiver dans Suivi des appels':'🔕 Retirer du Suivi des appels')+'</button><button class="no pl-del" title="Suppression DÉFINITIVE : disparaît du Planning et de Suivi des appels. Pour la remettre : en recréer une.">🗑️ Supprimer la vacation (définitif)</button><button class="pl-close">Fermer</button></div>';
+      +(m.mailPending?'<div class="meta" style="background:rgba(123,97,255,.15);border:1.5px solid #7b61ff;border-radius:10px;padding:7px 10px;margin-top:6px"><span style="color:#a99bff;font-weight:700">📧 Vacation issue d’un mail — À VALIDER</span><div class="acts" style="margin-top:6px"><button type="button" class="ok pl-mail-ok" style="font-size:12px">✅ Valider cette vacation</button><button type="button" class="no pl-mail-ref" style="font-size:12px">🗑 Refuser (supprimer)</button></div></div>':'')+(m._iv?'<div class="acts" style="margin-top:10px;flex-wrap:wrap"><button type="button" class="pl-close">Fermer</button></div>':'')+(m._iv?'':'<div class="acts" style="margin-top:10px;flex-wrap:wrap"><button class="pl-tenue" title="Créer un ticket contrôle tenue pour cette vacation (remontée #27)">🦺 Contrôle tenue</button><button class="pl-jump">↗ Ouvrir dans Suivi demandes</button><button class="pl-saoff" style="border-color:#e0a13b;color:#e0a13b">'+(m.saOff?'🔔 Réactiver dans Suivi des appels':'🔕 Retirer du Suivi des appels')+'</button><button class="no pl-del" title="Suppression DÉFINITIVE : disparaît du Planning et de Suivi des appels. Pour la remettre : en recréer une.">🗑️ Supprimer la vacation (définitif)</button><button class="pl-close">Fermer</button></div>');
     card.querySelectorAll('.pl-close').forEach(function(b){b.onclick=planningAffectClose;});
-    var sel=card.querySelector('.pl-status'); if(sel)sel.onchange=function(){ m=_plLive(m); /* b363 */ if(sel.value)m.vacStatus=parseInt(sel.value,10); else delete m.vacStatus; m.valide=Date.now(); /* b304 */ if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); };
+    var sel=card.querySelector('.pl-status'); if(sel)sel.onchange=function(){ m=_plLive(m); /* b363 */ if(sel.value)m.vacStatus=parseInt(sel.value,10); else delete m.vacStatus; m.valide=Date.now(); /* b304 */ _plSaveM(m); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); };
     var srch=card.querySelector('.pl-afsearch'); if(srch)srch.oninput=function(){ _plAffQ=srch.value; var box2=card.querySelector('.pl-afres'); if(box2){ box2.innerHTML=_plAgentResults(m); _plWirePicks(card,m); } };
     /* b314 */
     if(typeof photoHydrate==='function'){try{photoHydrate(card);}catch(e){}}
@@ -6329,14 +6444,14 @@ button.big:active{transform:translateY(1px)}
     card.querySelectorAll('.pl-tenue-portail').forEach(function(b){ b.onclick=function(){
       if(typeof photoPortail==='function')photoPortail('', '', b.getAttribute('data-nom'), 'Photo de tenue');
     }; });
-    var rm=card.querySelector('.pl-affrm'); if(rm)rm.onclick=function(){ if(!confirm('Retirer l\'agent de cette mission ? Elle repassera « à affecter ».'))return; m=_plLive(m); /* b363 : ecrire dans la vacation vivante */ delete m.agentId; m.valide=Date.now(); /* b304 */ if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); };
+    var rm=card.querySelector('.pl-affrm'); if(rm)rm.onclick=function(){ if(!confirm('Retirer l\'agent de cette mission ? Elle repassera « à affecter ».'))return; m=_plLive(m); /* b363 : ecrire dans la vacation vivante */ delete m.agentId; m.valide=Date.now(); /* b304 */ _plSaveM(m); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); };
     var jp=card.querySelector('.pl-jump'); if(jp)jp.onclick=function(){ var id=_plAffId; planningAffectClose(); planningGo(id); };
-    function _bindE(sel,field,isHM){ var el=card.querySelector(sel); if(!el)return; el.onchange=function(){ m=_plLive(m); /* b360 */ var v=el.value; if(isHM)v=_plNormHM(v); m[field]=v; m.valide=Date.now(); /* b304 */ if(field==='siteAgent'&&!m.titre)m.titre=v; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; }
-    _bindE('.pl-e-site','siteAgent',false); _bindE('.pl-e-client','client',false); _bindE('.pl-e-date','mdate',false); _bindE('.pl-e-h1','mheure',true); _bindE('.pl-e-h2','mfin',true); var _df8=card.querySelector('.pl-e-datefin'); if(_df8)_df8.onchange=function(){ m=_plLive(m); /* b363 */ var v=(_df8.value||'').trim(); if(v)m.mdateFin=v; else delete m.mdateFin; m.valide=Date.now(); /* b304 */ if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); }; _bindE('.pl-e-qual','qual',false);
+    function _bindE(sel,field,isHM){ var el=card.querySelector(sel); if(!el)return; el.onchange=function(){ m=_plLive(m); /* b360 */ var v=el.value; if(isHM)v=_plNormHM(v); m[field]=v; m.valide=Date.now(); /* b304 */ if(field==='siteAgent'&&!m.titre)m.titre=v; _plSaveM(m); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; }
+    _bindE('.pl-e-site','siteAgent',false); _bindE('.pl-e-client','client',false); _bindE('.pl-e-date','mdate',false); _bindE('.pl-e-h1','mheure',true); _bindE('.pl-e-h2','mfin',true); var _df8=card.querySelector('.pl-e-datefin'); if(_df8)_df8.onchange=function(){ m=_plLive(m); /* b363 */ var v=(_df8.value||'').trim(); if(v)m.mdateFin=v; else delete m.mdateFin; m.valide=Date.now(); /* b304 */ _plSaveM(m); if(typeof renderPlanning==='function')renderPlanning(); }; _bindE('.pl-e-qual','qual',false);
     var _nc=card.querySelector('.pl-e-nomcli'); if(_nc)_nc.onchange=function(){ if(typeof siteMetaSet==='function')siteMetaSet(m.siteAgent||m.titre||'',{nomClient:(_nc.value||'').trim()}); if(typeof renderPlanning==='function')renderPlanning(); };
-    var _pl=card.querySelector('.pl-e-plan'); if(_pl)_pl.onchange=function(){ m=_plLive(m); /* b360 */ if(_pl.checked)m.planifie=true; else delete m.planifie; m.valide=Date.now(); /* b304 */ if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); };
-    var del=card.querySelector('.pl-del'); if(del)del.onclick=function(){ m=_plLive(m); /* b363 */ if(!confirm('SUPPRIMER DÉFINITIVEMENT cette vacation ?\n\nElle disparaît du Planning ET de Suivi des appels. IRRÉVERSIBLE (pour la remettre, il faudra la recréer).'))return; m.deleted=true; m.creeAt=Date.now(); /* b303 : soft-delete — survit au merge cloud-pull sans revenir */ if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; /* b195 : suppression DEFINITIVE (JULES) */
-    var sof=card.querySelector('.pl-saoff'); if(sof)sof.onclick=function(){ m=_plLive(m); /* b360 */ if(!m.saOff){ if(!confirm('Retirer cette vacation du SUIVI DES APPELS ?\n\nElle reste visible au Planning (trace 🔕) et pourra être RÉACTIVÉE ici à tout moment. Elle ne reviendra jamais toute seule.'))return; m.saOff=true; } else { delete m.saOff; } if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
+    var _pl=card.querySelector('.pl-e-plan'); if(_pl)_pl.onchange=function(){ m=_plLive(m); /* b360 */ if(_pl.checked)m.planifie=true; else delete m.planifie; m.valide=Date.now(); /* b304 */ _plSaveM(m); if(typeof renderPlanning==='function')renderPlanning(); };
+    var del=card.querySelector('.pl-del'); if(del)del.onclick=function(){ m=_plLive(m); /* b363 */ if(!confirm('SUPPRIMER DÉFINITIVEMENT cette vacation ?\n\nElle disparaît du Planning ET de Suivi des appels. IRRÉVERSIBLE (pour la remettre, il faudra la recréer).'))return; m.deleted=true; m.creeAt=Date.now(); /* b303 : soft-delete — survit au merge cloud-pull sans revenir */ _plSaveM(m); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; /* b195 : suppression DEFINITIVE (JULES) */
+    var sof=card.querySelector('.pl-saoff'); if(sof)sof.onclick=function(){ m=_plLive(m); /* b360 */ if(!m.saOff){ if(!confirm('Retirer cette vacation du SUIVI DES APPELS ?\n\nElle reste visible au Planning (trace 🔕) et pourra être RÉACTIVÉE ici à tout moment. Elle ne reviendra jamais toute seule.'))return; m.saOff=true; } else { delete m.saOff; } _plSaveM(m); _plRenderModal(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
     /* ===== b360 : LA FICHE OUVERTE PERDAIT SON LIEN AVEC LA BASE =====
        POURQUOI (cas Zeus, 06/08 : « je mets la route à 08:15 et quelques secondes après c'est revenu ») :
        quand le classeur commun arrive, `cloudApply` fait `SUIVI = load('fkh_suivi')` — TOUTES les
@@ -6348,7 +6463,7 @@ button.big:active{transform:translateY(1px)}
        moment était concerné.
        COMMENT : avant chaque écriture, on redemande la vacation vivante à SUIVI par son identifiant.
        Deux lignes, et le lien ne peut plus se rompre. */
-    function _plLive(x){ try{ if(!x||!x.id)return x;
+    function _plLive(x){ try{ if(!x||!x.id)return x; if(x._iv){ var _v=_ivView(x.id); return _v||x; }   /* b460 */
       for(var i=0;i<(SUIVI||[]).length;i++)if(String(SUIVI[i].id)===String(x.id))return SUIVI[i];
     }catch(e){} return x; }
     card.querySelectorAll('.pl-tk-h').forEach(function(b9){ b9.onchange=function(){ var k9=b9.getAttribute('data-key'), v9=(b9.value||'').trim(); if(!v9)return;
@@ -6371,17 +6486,17 @@ button.big:active{transform:translateY(1px)}
         if(i9>=0)arr9[i9]=v9; else arr9.push(v9);
         arr9.sort(); m.ctrls=arr9;
         if(typeof ssRenameKey==='function')ssRenameKey(m.id,k9,ctrlKey(v9)); }
-      m.valide=Date.now(); /* b305 */ if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
+      m.valide=Date.now(); /* b305 */ _plSaveM(m); _plRenderModal(); if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
     card.querySelectorAll('.pl-tk-x').forEach(function(b9){ b9.onclick=function(){ var k9=b9.getAttribute('data-k'),ex9=saExclLoad(); if(ex9[k9]){ delete ex9[k9]; } else { ex9[k9]=Date.now(); } saExclSave(ex9); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
-    card.querySelectorAll('.pl-tk-del').forEach(function(b9){ b9.onclick=function(){ m=_plLive(m); /* b360 */ var h9=b9.getAttribute('data-h'); if(!Array.isArray(m.ctrls))return; m.ctrls=m.ctrls.filter(function(x9){return x9!==h9;}); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
-    var tka=card.querySelector('.pl-tk-add'); if(tka)tka.onclick=function(){ m=_plLive(m); /* b360 */ var h9=(card.querySelector('.pl-tk-add-h').value||'').trim(); if(!h9){alert('Choisis une heure de contrôle.');return;} if(!Array.isArray(m.ctrls)||!m.ctrls.length)m.ctrls=(apControls(m)||[]).slice(); if(m.ctrls.indexOf(h9)<0)m.ctrls.push(h9); m.ctrls.sort(); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
-    var tk2=card.querySelector('.pl-tk-add2h'); if(tk2)tk2.onclick=function(){ m=_plLive(m); /* b360 */ var s9=toMin(m.mheure||''); if(s9==null){alert('Heure de début requise.');return;} var e9m=missEndMin(m); if(e9m==null){alert('Heure de fin requise (ou ajoute les contrôles un par un).');return;} if(e9m<=s9)e9m+=1440; var out9=[]; for(var t9=s9+120;t9<e9m;t9+=120){ out9.push(pad2(Math.floor((t9%1440)/60))+':'+pad2(t9%60)); } if(!out9.length){alert('Vacation trop courte pour des contrôles 2 h.');return;} /* b386 : un contrôle déjà pointé ou photographié est une PREUVE — on ne l'efface pas. */ var _act9=(Array.isArray(m.ctrls)&&m.ctrls.length)?m.ctrls.slice():((apControls(m)||[]).slice()); var _S9=(typeof ssLoad==='function')?ssLoad():{}, _r9=(_S9[m.id]||{}); function _prv9(h){ var r=_r9['ctrl@'+String(h).replace(/:/g,'')]; return !!(r&&(r.done||r.photoKey)); } var _gard9=_act9.filter(function(h){ return out9.indexOf(h)<0&&_prv9(h); }); var _ret9=_act9.filter(function(h){ return out9.indexOf(h)<0&&!_prv9(h); }); var _add9=out9.filter(function(h){ return _act9.indexOf(h)<0; }); var _fin9=_act9.filter(function(h){ return toMin(h)===toMin(m.mfin||''); }); var _txt9='\ud83c\udf19 Contr\u00f4les toutes les 2 h \u2014 de '+(m.mheure||'?')+' \u00e0 '+(m.mfin||'?')+'\n\n'+'\u2705 '+out9.length+' cr\u00e9neau(x) : '+out9.join(', ')+'\n'+(_add9.length?('\u2795 '+_add9.length+' ajout\u00e9(s) : '+_add9.join(', ')+'\n'):'')+(_gard9.length?('\ud83d\udd12 '+_gard9.length+' conserv\u00e9(s) hors grille \u2014 D\u00c9J\u00c0 POINT\u00c9(s) ou PHOTOGRAPHI\u00c9(s) : '+_gard9.join(', ')+'\n'):'')+(_ret9.length?('\u2796 '+_ret9.length+' retir\u00e9(s), rien n\u2019y \u00e9tait enregistr\u00e9 : '+_ret9.join(', ')+'\n'):'')+(_fin9.length?('\n\u26a0 '+_fin9.join(', ')+' tombait sur la FIN DE SERVICE : c\u2019est la fin qui compte, pas un contr\u00f4le.\n'):'')+'\nOn applique ?'; if(!confirm(_txt9))return; var _dep9=toMin(m.mheure||'00:00')||0; m.ctrls=out9.concat(_gard9).sort(function(a,b){ var x=toMin(a),y=toMin(b); if(x<_dep9)x+=1440; if(y<_dep9)y+=1440; return x-y; }); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
-    var mok=card.querySelector('.pl-mail-ok'); if(mok)mok.onclick=function(){ m=_plLive(m); /* b360 */ delete m.mailPending; if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; var mrf=card.querySelector('.pl-mail-ref'); if(mrf)mrf.onclick=function(){ m=_plLive(m); /* b402 : le seul bouton de la fiche qui écrivait encore sur l'objet d'origine — orphelin dès que le classeur commun arrive (b360). On refusait dans le vide, et il fallait valider d'abord pour que la suppression prenne. */ if(!confirm('Refuser cette vacation issue d'+String.fromCharCode(8217)+'un mail ? Elle sera supprimée du Planning.'))return; m.deleted=true; m.creeAt=Date.now(); /* b303 : soft-delete */ try{ var rf=JSON.parse(localStorage.getItem('fkh_mail_refuse')||'[]')||[]; if(m.mailSrc&&rf.indexOf(m.mailSrc)<0){rf.push(m.mailSrc);localStorage.setItem('fkh_mail_refuse',JSON.stringify(rf));} }catch(e){} if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); };
+    card.querySelectorAll('.pl-tk-del').forEach(function(b9){ b9.onclick=function(){ m=_plLive(m); /* b360 */ var h9=b9.getAttribute('data-h'); if(!Array.isArray(m.ctrls))return; m.ctrls=m.ctrls.filter(function(x9){return x9!==h9;}); _plSaveM(m); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
+    var tka=card.querySelector('.pl-tk-add'); if(tka)tka.onclick=function(){ m=_plLive(m); /* b360 */ var h9=(card.querySelector('.pl-tk-add-h').value||'').trim(); if(!h9){alert('Choisis une heure de contrôle.');return;} if(!Array.isArray(m.ctrls)||!m.ctrls.length)m.ctrls=(apControls(m)||[]).slice(); if(m.ctrls.indexOf(h9)<0)m.ctrls.push(h9); m.ctrls.sort(); _plSaveM(m); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
+    var tk2=card.querySelector('.pl-tk-add2h'); if(tk2)tk2.onclick=function(){ m=_plLive(m); /* b360 */ var s9=toMin(m.mheure||''); if(s9==null){alert('Heure de début requise.');return;} var e9m=missEndMin(m); if(e9m==null){alert('Heure de fin requise (ou ajoute les contrôles un par un).');return;} if(e9m<=s9)e9m+=1440; var out9=[]; for(var t9=s9+120;t9<e9m;t9+=120){ out9.push(pad2(Math.floor((t9%1440)/60))+':'+pad2(t9%60)); } if(!out9.length){alert('Vacation trop courte pour des contrôles 2 h.');return;} /* b386 : un contrôle déjà pointé ou photographié est une PREUVE — on ne l'efface pas. */ var _act9=(Array.isArray(m.ctrls)&&m.ctrls.length)?m.ctrls.slice():((apControls(m)||[]).slice()); var _S9=(typeof ssLoad==='function')?ssLoad():{}, _r9=(_S9[m.id]||{}); function _prv9(h){ var r=_r9['ctrl@'+String(h).replace(/:/g,'')]; return !!(r&&(r.done||r.photoKey)); } var _gard9=_act9.filter(function(h){ return out9.indexOf(h)<0&&_prv9(h); }); var _ret9=_act9.filter(function(h){ return out9.indexOf(h)<0&&!_prv9(h); }); var _add9=out9.filter(function(h){ return _act9.indexOf(h)<0; }); var _fin9=_act9.filter(function(h){ return toMin(h)===toMin(m.mfin||''); }); var _txt9='\ud83c\udf19 Contr\u00f4les toutes les 2 h \u2014 de '+(m.mheure||'?')+' \u00e0 '+(m.mfin||'?')+'\n\n'+'\u2705 '+out9.length+' cr\u00e9neau(x) : '+out9.join(', ')+'\n'+(_add9.length?('\u2795 '+_add9.length+' ajout\u00e9(s) : '+_add9.join(', ')+'\n'):'')+(_gard9.length?('\ud83d\udd12 '+_gard9.length+' conserv\u00e9(s) hors grille \u2014 D\u00c9J\u00c0 POINT\u00c9(s) ou PHOTOGRAPHI\u00c9(s) : '+_gard9.join(', ')+'\n'):'')+(_ret9.length?('\u2796 '+_ret9.length+' retir\u00e9(s), rien n\u2019y \u00e9tait enregistr\u00e9 : '+_ret9.join(', ')+'\n'):'')+(_fin9.length?('\n\u26a0 '+_fin9.join(', ')+' tombait sur la FIN DE SERVICE : c\u2019est la fin qui compte, pas un contr\u00f4le.\n'):'')+'\nOn applique ?'; if(!confirm(_txt9))return; var _dep9=toMin(m.mheure||'00:00')||0; m.ctrls=out9.concat(_gard9).sort(function(a,b){ var x=toMin(a),y=toMin(b); if(x<_dep9)x+=1440; if(y<_dep9)y+=1440; return x-y; }); _plSaveM(m); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
+    var mok=card.querySelector('.pl-mail-ok'); if(mok)mok.onclick=function(){ m=_plLive(m); /* b360 */ delete m.mailPending; _plSaveM(m); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; var mrf=card.querySelector('.pl-mail-ref'); if(mrf)mrf.onclick=function(){ m=_plLive(m); /* b402 : le seul bouton de la fiche qui écrivait encore sur l'objet d'origine — orphelin dès que le classeur commun arrive (b360). On refusait dans le vide, et il fallait valider d'abord pour que la suppression prenne. */ if(!confirm('Refuser cette vacation issue d'+String.fromCharCode(8217)+'un mail ? Elle sera supprimée du Planning.'))return; m.deleted=true; m.creeAt=Date.now(); /* b303 : soft-delete */ try{ var rf=JSON.parse(localStorage.getItem('fkh_mail_refuse')||'[]')||[]; if(m.mailSrc&&rf.indexOf(m.mailSrc)<0){rf.push(m.mailSrc);localStorage.setItem('fkh_mail_refuse',JSON.stringify(rf));} }catch(e){} _plSaveM(m); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); };
     var tn=card.querySelector('.pl-tenue'); if(tn)tn.onclick=function(){ var agNom=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):''; if(!agNom&&!confirm('Aucun agent affecté sur cette vacation — créer quand même le ticket contrôle tenue ?'))return; var ok=(typeof tenueCtrlDemand==='function')&&tenueCtrlDemand(agNom,m.id,(m.siteAgent||m.titre||''),m.mdate||'',m.mheure||'','demande manuelle (Planning)'); alert(ok?'🦺 Ticket contrôle tenue créé dans Suivi des appels.':'Un contrôle tenue est déjà en attente pour cet agent à cette date.'); };
-    var badd=card.querySelector('.pl-brk-add'); if(badd)badd.onclick=function(){ m=_plLive(m); /* b360 */ var h1=_plNormHM(card.querySelector('.pl-brk-h1').value), h2=_plNormHM(card.querySelector('.pl-brk-h2').value); if(!h1||!h2){ alert('Heures de début et fin de pause obligatoires.'); return; } if(!Array.isArray(m.breaks))m.breaks=[]; m.breaks.push({h1:h1,h2:h2,type:(card.querySelector('.pl-brk-type').value||'').trim(),notWork:card.querySelector('.pl-brk-nw').checked,notCharge:card.querySelector('.pl-brk-nc').checked}); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); };
-    card.querySelectorAll('.pl-brkdel').forEach(function(b){ b.onclick=function(){ m=_plLive(m); /* b360 */ if(!Array.isArray(m.breaks))return; m.breaks.splice(+b.getAttribute('data-i'),1); if(typeof saveSuivi==='function')saveSuivi(); _plRenderModal(); }; });
-    var cir=card.querySelector('.pl-e-circuit'); if(cir)cir.onchange=function(){ m=_plLive(m); /* b360 */ if(cir.checked)m.isCircuit=true; else delete m.isCircuit; m.valide=Date.now(); /* b304 */ if(typeof saveSuivi==='function')saveSuivi(); if(typeof renderPlanning==='function')renderPlanning(); };
-    card.querySelectorAll('.pl-split').forEach(function(b){ b.onclick=function(){ var rm=parseInt(b.getAttribute('data-rule'),10)||0; var n=(typeof svValidateSplit==='function')?svValidateSplit(m,rm):1; if(typeof saveSuivi==='function')saveSuivi(); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); alert(n>=2?('🔪 Découpé en '+n+' vacations.'):'1 seule vacation (rien à découper sur ce créneau).'); }; });
+    var badd=card.querySelector('.pl-brk-add'); if(badd)badd.onclick=function(){ m=_plLive(m); /* b360 */ var h1=_plNormHM(card.querySelector('.pl-brk-h1').value), h2=_plNormHM(card.querySelector('.pl-brk-h2').value); if(!h1||!h2){ alert('Heures de début et fin de pause obligatoires.'); return; } if(!Array.isArray(m.breaks))m.breaks=[]; m.breaks.push({h1:h1,h2:h2,type:(card.querySelector('.pl-brk-type').value||'').trim(),notWork:card.querySelector('.pl-brk-nw').checked,notCharge:card.querySelector('.pl-brk-nc').checked}); _plSaveM(m); _plRenderModal(); };
+    card.querySelectorAll('.pl-brkdel').forEach(function(b){ b.onclick=function(){ m=_plLive(m); /* b360 */ if(!Array.isArray(m.breaks))return; m.breaks.splice(+b.getAttribute('data-i'),1); _plSaveM(m); _plRenderModal(); }; });
+    var cir=card.querySelector('.pl-e-circuit'); if(cir)cir.onchange=function(){ m=_plLive(m); /* b360 */ if(cir.checked)m.isCircuit=true; else delete m.isCircuit; m.valide=Date.now(); /* b304 */ _plSaveM(m); if(typeof renderPlanning==='function')renderPlanning(); };
+    card.querySelectorAll('.pl-split').forEach(function(b){ b.onclick=function(){ var rm=parseInt(b.getAttribute('data-rule'),10)||0; var n=(typeof svValidateSplit==='function')?svValidateSplit(m,rm):1; _plSaveM(m); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); alert(n>=2?('🔪 Découpé en '+n+' vacations.'):'1 seule vacation (rien à découper sur ce créneau).'); }; });
     var _nagBtn=card.querySelector('#pl-newag-btn'), _nagZone=card.querySelector('#pl-newag-zone');
     if(_nagBtn)_nagBtn.onclick=function(){ if(_nagZone)_nagZone.style.display=(_nagZone.style.display==='none'?'block':'none'); };
     var _nagCancel=card.querySelector('.pl-newag-cancel');
@@ -6400,10 +6515,14 @@ button.big:active{transform:translateY(1px)}
       if(typeof FA!=='undefined')FA.push({maj:Date.now(),id:newId,nom:nom,tels:tel?[tel]:[],ville:ville,cp:'',la:null,lo:null,dep:'',depnom:'',fiab:'',voiture:false,ads:false,interv:false,verifie:false});
       if(typeof saveFA==='function')saveFA();
       m.agentId=newId;
-      if(typeof saveSuivi==='function')saveSuivi();
+      _plSaveM(m);
       if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
       _plRenderModal();
     }; // b296
+    /* b460 : les trois gestes propres a l'intervention, dans la fiche */
+    var _ivS=card.querySelector('.iv-st'); if(_ivS)_ivS.onchange=function(){ _ivSetStatut(m.id,_ivS.value); var _v=_ivView(m.id); if(_v)m=_v; if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} _plRenderModal(); };
+    var _ivC=card.querySelector('.iv-cr'); if(_ivC)_ivC.onchange=function(){ _ivSetCR(m.id,_ivC.value); };
+    var _ivG=card.querySelector('.iv-go'); if(_ivG)_ivG.onclick=function(){ planningAffectClose(); var tb=document.querySelector('#tabs button[data-s="interv"]'); if(tb)tb.click(); };
     _plWirePicks(card,m);
   }
   // Look « Sekur » (calque) appliqué au seul onglet Planning — voir releve-sekur/calque-planning.md
@@ -6736,7 +6855,7 @@ button.big:active{transform:translateY(1px)}
     // Groupe « 🚨 Intervention » en tête (calque du vrai Sekur) — interventions/rondes de fkh_interv_dem sur la période
     try{ var _ivL=load('fkh_interv_dem'); if(Array.isArray(_ivL)){ var _ivs=_ivL.filter(function(x){return x.date&&days.indexOf(x.date)>=0;}); if(_ivs.length){
       bodyR+='<tr class="pl-ivhead"><td class="pl-sh-lbl" style="position:sticky;left:0;z-index:2"><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;min-width:0"><b>🚨 Intervention</b><div style="font-size:10.5px;opacity:.85">'+_ivs.length+' sur la période</div></div></div></td>'+days.map(function(){return '<td class="pl-ivfill"></td>';}).join('')+'</tr>';
-      _ivs.forEach(function(it){ var col=(it.statut==='terminee')?'#1a9e5c':(it.statut==='recherche'?'#e0a13b':'#2563eb'); var cells=days.map(function(d){ if(it.date!==d)return '<td style="border:1px solid var(--line)"></td>'; return '<td style="border:1px solid var(--line);vertical-align:top;padding:2px"><div class="pl-ivchip" style="background:'+col+';color:#fff;border-radius:4px;padding:3px 4px;font-size:10.5px;cursor:pointer;line-height:1.2">'+esc(it.hdeb||'')+(it.hfin?('→'+esc(it.hfin)):'')+'<div style="font-size:9px;opacity:.92">'+esc(it.presta||'Intervention')+(it.agentNom?' · '+esc(String(it.agentNom).slice(0,10)):'')+'</div></div></td>'; }).join(''); bodyR+='<tr><td class="pl-hlabel" style="position:sticky;left:0;z-index:1"><b>'+esc(it.site||it.client||it.ville||'—')+'</b><div style="font-size:10px;opacity:.8">'+esc((it.hdeb||'')+(it.hfin?'-'+it.hfin:''))+'</div></td>'+cells+'</tr>'; });
+      _ivs.forEach(function(it){ var col=(it.statut==='terminee')?'#1a9e5c':(it.statut==='recherche'?'#e0a13b':'#2563eb'); var cells=days.map(function(d){ if(it.date!==d)return '<td style="border:1px solid var(--line)"></td>'; return '<td style="border:1px solid var(--line);vertical-align:top;padding:2px"><div class="pl-ivchip" data-ivid="'+esc(it.id)+'" style="background:'+col+';color:#fff;border-radius:4px;padding:3px 4px;font-size:10.5px;cursor:pointer;line-height:1.2">'+esc(it.hdeb||'')+(it.hfin?('→'+esc(it.hfin)):'')+'<div style="font-size:9px;opacity:.92">'+esc(it.presta||'Intervention')+(it.agentNom?' · '+esc(String(it.agentNom).slice(0,10)):'')+'</div></div></td>'; }).join(''); bodyR+='<tr><td class="pl-hlabel" style="position:sticky;left:0;z-index:1"><b>'+esc(it.site||it.client||it.ville||'—')+'</b><div style="font-size:10px;opacity:.8">'+esc((it.hdeb||'')+(it.hfin?'-'+it.hfin:''))+'</div></td>'+cells+'</tr>'; });
     } } }catch(e){}
     if(!order.length){ bodyR+='<tr><td colspan="99" style="padding:20px;text-align:center;border:1px solid var(--line)"><span class="sub">Aucune vacation validée cette semaine. Clique ＋ sur un site (ou une case) pour ajouter une vacation.</span></td></tr>'; }
     else { order.forEach(function(s){ var info=siteInfo[s]||{};
@@ -6812,7 +6931,14 @@ button.big:active{transform:translateY(1px)}
     });
     box.querySelectorAll('.pl-siteadd').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); planningAddVac(plWeek,b.getAttribute('data-site'),b.getAttribute('data-ville')||''); }; });
     box.querySelectorAll('.pl-sitecopy').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); planningCopySite(b.getAttribute('data-site'),b.getAttribute('data-ville')||''); }; });
-    box.querySelectorAll('.pl-ivchip').forEach(function(c){ c.onclick=function(e){ e.stopPropagation(); var tb=document.querySelector('#tabs button[data-s="interv"]'); if(tb)tb.click(); }; });
+    box.querySelectorAll('.pl-ivchip').forEach(function(c){ c.onclick=function(e){ e.stopPropagation();
+      /* ===== b460 : LE CLIC OUVRE LA FICHE, IL NE DEPLACE PLUS =====
+         POURQUOI (Zeus, 21/08) : il faut que ca ait les memes fiches que les vacations de
+         gardiennage. Avant, ce clic basculait dans l'onglet Interventions : on perdait la
+         semaine sous les yeux pour un geste — affecter, corriger une heure — qui appartient
+         au Planning. La cascade d'appels reste accessible depuis la fiche, en un bouton. */
+      var _id=c.getAttribute('data-ivid'); if(_id){ planningAffect(_id); return; }
+      var tb=document.querySelector('#tabs button[data-s="interv"]'); if(tb)tb.click(); }; });
     if(byId('pl-multi-toggle'))byId('pl-multi-toggle').onclick=function(){ plMultiSel=!plMultiSel; if(!plMultiSel)plMultiCells=[]; renderPlanning(); };
     if(byId('pl-multi-cancel'))byId('pl-multi-cancel').onclick=function(){ plMultiSel=false; plMultiCells=[]; plMultiVacs=[];   /* b451 */ renderPlanning(); };
     /* ===== b451 : LES ACTIONS QUI PORTENT SUR PLUSIEURS VACATIONS =====
