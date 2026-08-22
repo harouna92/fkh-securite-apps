@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v21-08·b461</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v22-08·b462</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -3633,6 +3633,22 @@ button.big:active{transform:translateY(1px)}
   document.addEventListener('click',function(ev){ var b=ev.target&&ev.target.closest?ev.target.closest('.aide-b'):null; if(b){ ev.preventDefault(); ev.stopPropagation(); aideOuvrir(b.getAttribute('data-a')); } });
   function aideWire(root){ (root||document).querySelectorAll('.aide-b').forEach(function(b){ b.onclick=function(){ aideOuvrir(b.getAttribute('data-a')); }; }); }
   var DEMOS={
+    consignes:{ titre:'\ud83d\udccb Poser une consigne SUR la vacation, depuis le Planning',
+      quoi:'Une vacation \u00ab CARREFOUR MARKET (Chartres) \u00bb demain \u00e0 19:00, avec d\u00e9j\u00e0 2 consignes rattach\u00e9es \u2014 une faite, une pas faite.',
+      aFaire:'Ouvre \ud83d\udcc5 Planning : la vignette porte une pastille \ud83d\udccb 1/2. CLIQUE-LA. Dans la fiche, bloc \u00ab \ud83d\udccb Consignes de cette vacation \u00bb : coche la consigne restante, \u00e9cris un commentaire, puis AJOUTE-EN une nouvelle (le client, le site, le jour et l\'heure sont d\u00e9j\u00e0 connus \u2014 tu n\'\u00e9cris que le texte). Va ensuite dans \ud83d\udcde Suivi des appels : elle y est, \u00e0 l\'heure dite. C\'est la m\u00eame consigne, pas une copie.',
+      monter:function(){
+        var SU2=(typeof SUIVI!=='undefined'&&SUIVI)?SUIVI:[];
+        for(var k=SU2.length-1;k>=0;k--)if(String(SU2[k].id||'').indexOf('demo_csg')===0)SU2.splice(k,1);
+        var jour=(typeof svcAddDays==='function')?svcAddDays(impTodayISO(),1):impTodayISO();
+        SU2.push({id:'demo_csg_vac',statut:'validee',titre:'CARREFOUR MARKET',siteAgent:'CARREFOUR MARKET',
+          client:'CARREFOUR',ville:'Chartres',cp:'28000',mdate:jour,mheure:'19:00',mfin:'07:00',
+          planifie:true,agentId:null,creeAt:Date.now(),creePar:'D\u00e9mo'});
+        if(typeof saveSuivi==='function')saveSuivi();
+        var c=(function(){ try{ return csgLoad().filter(function(x){ return String(x.id||'').indexOf('demo_c')!==0; }); }catch(e){ return []; } })();
+        c.push({id:'demo_c1',texte:'Rappeler au client que l\'agent prend \u00e0 19h00 et non 18h30.',mid:'demo_csg_vac',mdate:jour,heure:'18:30',client:'CARREFOUR',site:'CARREFOUR MARKET',done:true,note:'Client pr\u00e9venu, OK.',at:Date.now()-3600000});
+        c.push({id:'demo_c2',texte:'V\u00e9rifier que le badge d\'acc\u00e8s parking a bien \u00e9t\u00e9 remis \u00e0 l\'agent.',mid:'demo_csg_vac',mdate:jour,heure:'19:15',client:'CARREFOUR',site:'CARREFOUR MARKET',done:false,note:'',at:Date.now()-1800000});
+        try{ csgSave(c); }catch(e){}
+      } },
     interv:{ titre:'\ud83d\udea8 Une intervention s\u2019ouvre dans la M\u00caME fiche qu\u2019une vacation',
       quoi:'Une intervention sur alarme \u00ab CARREFOUR CONTACT (Chartres) \u00bb pos\u00e9e aujourd\u2019hui \u00e0 21:30 \u2192 22:30, encore en recherche, avec 3 agents dans la cascade d\u2019appels (2 d\u00e9j\u00e0 appel\u00e9s) \u2014 et trois agents autour de Chartres.',
       aFaire:'Ouvre \ud83d\udcc5 Planning : la ligne \ud83d\udea8 Intervention est en t\u00eate, la pastille est l\u00e0 comme avant. CLIQUE-LA : avant, tu partais dans l\u2019onglet Interventions ; maintenant la fiche s\u2019ouvre SUR PLACE, la m\u00eame que pour une vacation. Change l\u2019heure de fin, affecte un agent par \ud83d\udc65 Agents proches, passe le statut \u00e0 \u00ab En cours \u00bb, \u00e9cris un compte-rendu \u2014 puis va dans \ud83d\udea8 Interventions v\u00e9rifier que TOUT y est : c\u2019est la m\u00eame donn\u00e9e, pas une copie.',
@@ -4272,6 +4288,8 @@ button.big:active{transform:translateY(1px)}
     /* b380 : les tickets de demo partent avec le reste — une demo ne laisse pas de trace. */
     try{ if(typeof tkxLoad==='function')tkxSave(tkxLoad().filter(function(t){ return !t||String(t.id).indexOf('demo_tk')!==0; })); }catch(e){}
     try{ SUIVI=(SUIVI||[]).filter(function(m){ return String(m.id||'').indexOf('demo_')!==0; }); save('fkh_suivi',SUIVI); }catch(e){}
+    /* b462 : les consignes de demo partent aussi \u2014 une demo ne laisse pas de trace. */
+    try{ save('fkh_consignes',(load('fkh_consignes')||[]).filter(function(x){ return String(x&&x.id||'').indexOf('demo_c')!==0 && String(x&&x.mid||'').indexOf('demo_')!==0; })); }catch(e){}
     /* b460 : l'intervention de demo part avec le reste. */
     try{ save('fkh_interv_dem',(load('fkh_interv_dem')||[]).filter(function(x){ return String(x&&x.id||'').indexOf('demo_iv')!==0; })); }catch(e){}
     try{ localStorage.removeItem('fkh_pc_poste'); localStorage.removeItem('fkh_mail_hb'); }catch(e){}
@@ -6346,6 +6364,46 @@ button.big:active{transform:translateY(1px)}
       +'<div class="lab" style="margin:6px 0 3px;font-size:10px">\ud83d\udcdd Compte-rendu</div>'
       +'<textarea class="iv-cr" rows="3" placeholder="Ce que l\'agent a constat\u00e9 sur place\u2026" style="width:100%">'+esc(r.cr||'')+'</textarea>'
       +'</div>'; }
+  /* ===== b462 : LES CONSIGNES SE POSENT SUR LA VACATION, DEPUIS LE PLANNING =====
+     POURQUOI (Zeus, 21/08) : « donne-moi la possibilite de mettre les consignes dans les
+     vacations dans la section Planning ». Le systeme de consignes EXISTE deja et sait meme
+     se rattacher a une vacation (champ `mid`) — mais le seul chemin pour en poser une passait
+     par Suivi des appels > + Consigne > retrouver la mission dans une liste deroulante. Encore
+     un aller-retour entre sections pour un geste qui appartient a l'ecran ou on regarde le
+     planning. Rien de neuf n'est stocke : meme cle `fkh_consignes`, meme forme, meme fusion
+     anti-ecrasement (#8). C'est le CHEMIN qu'on ouvre, pas une seconde base.
+     CE QUE CA TOUCHE, ET IL FAUT LE DIRE : une consigne posee ici arrive dans Suivi des appels,
+     comme n'importe quelle consigne — c'est le but (elle doit atteindre l'operateur). Aucun
+     code du Suivi des appels n'est modifie. */
+  function plCsgDe(m){ if(!m||!m.id)return [];
+    try{ return csgLoad().filter(function(c){ return String(c.mid||'')===String(m.id); }); }catch(e){ return []; } }
+  function plCsgTag(m){ var a=plCsgDe(m); if(!a.length)return '';
+    var reste=a.filter(function(c){return !c.done;}).length;
+    var col=reste?'#c9b6ff':'#7fe0aa';
+    return '<div style="font-size:9px;font-weight:800;text-align:right;line-height:1.1;color:'+col+'" title="'
+      +esc(a.length+' consigne(s) sur cette vacation'+(reste?(' \u2014 '+reste+' pas encore faite(s)'):' \u2014 toutes faites'))
+      +'">\ud83d\udccb '+(a.length-reste)+'/'+a.length+'</div>'; }
+  /* Le bloc dans la fiche : ce qui est deja demande, et de quoi en demander une de plus. */
+  function plCsgBloc(m){
+    var a=plCsgDe(m).slice().sort(function(x,y){ return (+y.at||0)-(+x.at||0); });
+    var peutRetirer=!(typeof CLOUD!=='undefined'&&CLOUD&&CLOUD.role==='operateur');
+    var lignes=a.map(function(c){
+      return '<div style="border:1px solid var(--line);border-left:3px solid '+(c.done?'#1a9e5c':'#7b61ff')+';border-radius:8px;padding:6px 8px;margin-bottom:5px;background:var(--panel)'+(c.done?';opacity:.6':'')+'">'
+        +'<div style="white-space:pre-wrap;font-size:13px">'+esc(c.texte||'')+'</div>'
+        +'<div class="acts" style="gap:8px;margin-top:5px;align-items:center;flex-wrap:wrap">'
+        +'<label class="chk" style="margin:0"><input type="checkbox" class="pl-csg-done" data-cid="'+esc(c.id)+'"'+(c.done?' checked':'')+'><span>Fait</span></label>'
+        +(c.heure?'<span class="sub" style="margin:0;font-size:11px">\ud83d\udd50 '+esc(c.heure)+'</span>':'')
+        +'<input class="pl-csg-note" data-cid="'+esc(c.id)+'" placeholder="commentaire / r\u00e9sultat\u2026" value="'+esc(c.note||'')+'" style="flex:1;min-width:120px;font-size:12px;padding:3px 6px">'
+        +(peutRetirer?('<button type="button" class="pl-csg-del" data-cid="'+esc(c.id)+'" title="Retirer cette consigne (elle dispara\u00eet aussi de Suivi des appels)" style="font-size:11px;color:var(--muted)">\ud83d\uddd1️ Retirer</button>'):'')
+        +'</div></div>'; }).join('');
+    return '<div class="lab" style="margin:10px 0 3px">\ud83d\udccb Consignes de cette '+(m._iv?'intervention':'vacation')
+      +(a.length?(' <span class="sub" style="font-weight:400">\u2014 '+a.length+', dont '+a.filter(function(c){return !c.done;}).length+' \u00e0 faire</span>'):'')+'</div>'
+      +(lignes||'<div class="sub" style="margin:0 0 5px">Aucune consigne. Ce qui est \u00e9crit ici part dans <b>Suivi des appels</b> \u2014 l\'op\u00e9rateur la voit \u00e0 l\'heure dite.</div>')
+      +'<textarea class="pl-csg-texte" rows="2" placeholder="Ce qu\'il faut dire ou faire sur cette vacation\u2026" style="width:100%;margin-top:4px"></textarea>'
+      +'<div class="acts" style="gap:6px;margin-top:4px;align-items:center;flex-wrap:wrap">'
+      +'<input type="time" class="pl-csg-heure" style="width:auto" title="Heure d\'apparition dans l\'agenda des appels (par d\u00e9faut : l\'heure de la vacation)">'
+      +'<button type="button" class="ok pl-csg-add" style="font-size:12px">\u2795 Ajouter la consigne</button></div>';
+  }
   function _plRenderModal(){ var m=_plMissById(_plAffId); if(!m){planningAffectClose();return;} var card=byId('pl-modal-card'); if(!card)return; var M=_plStatusMap(); /* b430 : le titre porte la ville — c'est ce que Zeus cherchait sur BASIC FIT du 13/08. */ var site=(typeof svLabel==='function')?svLabel(m.siteAgent||m.titre||'—',m.ville||''):(m.siteAgent||m.titre||'—'); var cur=m.agentId?(typeof faById==='function'?faById(m.agentId):null):null; var when=(m.mdate?m.mdate.split('-').reverse().join('/'):'')+(m.mheure?' · '+m.mheure:'')+((typeof missEndTxt==='function'&&missEndTxt(m))?'→'+missEndTxt(m):''); var st=_plVacState(m);
     /* ===== b460 : UN SEUL ETAT AFFICHE, PAS DEUX QUI SE CONTREDISENT =====
        La pastille d'en-tete calculait un etat de VACATION (« En attente ») pendant que le bloc
@@ -6388,6 +6446,7 @@ button.big:active{transform:translateY(1px)}
           +'<label class="f" style="margin:0"><div class="lab" style="font-size:10px;margin:0 0 2px">🕐 Heure FIN</div><input type="time" class="pl-e-h2" value="'+esc(_nh(m.mfin))+'"></label>'
           +'</div>'; })()
       +(m._iv?_ivBlock(m):'')   /* b460 */
+      +plCsgBloc(m)   /* b462 */
       +(function(){ if(m._iv)return '';   /* b460 : pas de tickets de controle sur une intervention */ try{ var ex9=saExclLoad(); var st9s=ssSteps(m);
         var rows9=st9s.map(function(st9){ var k9=String(m.id)+'|'+st9.key; var off9=!!ex9[k9]; var isC9=String(st9.key).indexOf('ctrl')===0;
           var _hv9=(function(hh){var mm9=/^(\d{1,2})[:hH](\d{2})$/.exec(String(hh||'').trim());return mm9?(('0'+(+mm9[1])).slice(-2)+':'+mm9[2]):'';})(st9.heure); return '<div style="display:flex;gap:8px;align-items:center;padding:3px 0;border-bottom:1px dashed var(--line)"><span style="flex:1;min-width:0;'+(off9?'opacity:.5;text-decoration:line-through':'')+'">'+esc(st9.label)+'</span>'+((st9.key==='tenue')?'<b style="font-size:12px">'+esc(st9.heure||'—')+'</b>':'<input type="time" class="pl-tk-h" data-key="'+esc(st9.key)+'" value="'+esc(_hv9)+'" style="width:auto;padding:2px 4px;font-size:12px">')+'<button type="button" class="pl-tk-x" data-k="'+esc(k9)+'" style="font-size:11px;'+(off9?'color:var(--ok);border-color:var(--ok)':'color:var(--muted)')+'">'+(off9?'↩️ Restaurer':'🗑 Retirer')+'</button>'+((isC9&&Array.isArray(m.ctrls)&&m.ctrls.length)?'<button type="button" class="pl-tk-del" data-h="'+esc(st9.heure||'')+'" title="Supprimer ce contrôle personnalisé" style="font-size:11px;color:var(--bad)">✖</button>':'')+'</div>'; }).join('');
@@ -6522,6 +6581,43 @@ button.big:active{transform:translateY(1px)}
       if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
       _plRenderModal();
     }; // b296
+    /* b462 : les consignes, sur place. Toute ecriture passe par les fonctions EXISTANTES
+       (csgSet / csgSave / csgDel) : meme fusion anti-ecrasement, meme tombstone de suppression. */
+    card.querySelectorAll('.pl-csg-done').forEach(function(b){ b.onchange=function(){
+      csgSet(b.getAttribute('data-cid'),{done:b.checked,doneAt:Date.now()});
+      if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
+      if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
+      _plRenderModal(); }; });
+    card.querySelectorAll('.pl-csg-note').forEach(function(b){ b.onchange=function(){
+      csgSet(b.getAttribute('data-cid'),{note:b.value});
+      if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
+    card.querySelectorAll('.pl-csg-del').forEach(function(b){ b.onclick=function(){
+      if(!confirm('Retirer cette consigne ?\n\nElle dispara\u00eet aussi de Suivi des appels.'))return;
+      csgDel(b.getAttribute('data-cid'));
+      if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
+      if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
+      _plRenderModal(); }; });
+    var _csgB=card.querySelector('.pl-csg-add'); if(_csgB)_csgB.onclick=function(){
+      var _t=card.querySelector('.pl-csg-texte'), _h=card.querySelector('.pl-csg-heure');
+      var texte=((_t&&_t.value)||'').trim();
+      if(!texte){ alert('\u00c9cris la consigne \u00e0 donner.'); if(_t)_t.focus(); return; }
+      /* b462 : la vacation connait deja son client, son site, son jour et son heure — on ne les
+         fait pas ressaisir. Le SITE en particulier n'etait jamais rempli depuis Suivi des appels
+         (le formulaire ne le demande pas) : les consignes y arrivaient sans lieu. */
+      var a=csgLoad();
+      a.push({id:csgNewId(),texte:texte,mid:m.id,
+              mdate:(m.mdate||impTodayISO()),
+              heure:(((_h&&_h.value)||'').trim()||m.mheure||''),
+              client:(m.client||''), site:(m.siteAgent||m.titre||''),
+              done:false,note:'',at:Date.now()});
+      csgSave(a);
+      if(typeof notifFire==='function'&&typeof NOTIF!=='undefined'&&NOTIF&&NOTIF.cfg&&NOTIF.cfg.on)
+        notifFire({cat:'nouvelle_demande',key:'csg'+Date.now(),title:'\ud83d\udccb Nouvelle consigne dans Suivi des appels',
+                   body:((m.client?m.client+' \u2014 ':'')+texte.slice(0,80)),go:'suiviappels'});
+      if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
+      if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
+      _plRenderModal();
+    };
     /* b460 : les trois gestes propres a l'intervention, dans la fiche */
     var _ivS=card.querySelector('.iv-st'); if(_ivS)_ivS.onchange=function(){ _ivSetStatut(m.id,_ivS.value); var _v=_ivView(m.id); if(_v)m=_v; if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}} _plRenderModal(); };
     var _ivC=card.querySelector('.iv-cr'); if(_ivC)_ivC.onchange=function(){ _ivSetCR(m.id,_ivC.value); };
@@ -6870,7 +6966,7 @@ button.big:active{transform:translateY(1px)}
       var byH={},hOrder=[]; siteMap[s].forEach(function(m){ var hk=(m.mheure||'')+'-'+(m.mfin||''); if(!byH[hk]){byH[hk]=[];hOrder.push(hk);} byH[hk].push(m); });
       hOrder.sort();
       hOrder.forEach(function(hk){ var sample=byH[hk][0]; var durt=_plDurTxt(sample.mheure,sample.mfin); var lbl=(sample.mheure||'—')+(sample.mfin?('-'+sample.mfin):'')+(durt?(' ('+durt+')'):''); var qual=sample.qual||sample.specialite||'';
-        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); var hach=(aff&&!m.planifie); var bgS=hach?('background:repeating-linear-gradient(45deg,'+st.c+' 0 6px,rgba(0,0,0,.32) 6px 10px)'):('background:'+st.c); if(m.mailPending){ bgS='background:repeating-linear-gradient(45deg,#7b61ff 0 7px,#3d2f99 7px 12px);outline:2px dashed #fff;outline-offset:-2px'; } return '<div class="pl-chip'+((m.annul&&annulVisible())?' annul':'')+'" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l+(aff?(m.planifie?' · planifié':' · NON planifié (hachuré)'):'')+(m.saOff?' · SANS TICKETS (retiree du Suivi des appels)':''))+'" style="'+bgS+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.annul&&annulVisible()?'🔴 ':'')+(m.saOff?'🔕 ':'')+(m.isCircuit?'🚐 ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+(m.mailPending?'<div style="font-size:9px;font-weight:800">📧 À VALIDER</div>':'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div>')+plPhotosTag(m)/* b359 */+'</div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc((siteInfo[s]||{}).brut||s)+'" data-ville="'+esc((siteInfo[s]||{}).ville||'')+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
+        var cells=days.map(function(d){ var here=byH[hk].filter(function(m){return m.mdate===d;}); var chips=here.map(function(m){ var ag=m.agentId?((typeof faById==='function'&&faById(m.agentId))||{nom:''}).nom:''; var aff=!!ag; var st=_plVacState(m); var hach=(aff&&!m.planifie); var bgS=hach?('background:repeating-linear-gradient(45deg,'+st.c+' 0 6px,rgba(0,0,0,.32) 6px 10px)'):('background:'+st.c); if(m.mailPending){ bgS='background:repeating-linear-gradient(45deg,#7b61ff 0 7px,#3d2f99 7px 12px);outline:2px dashed #fff;outline-offset:-2px'; } return '<div class="pl-chip'+((m.annul&&annulVisible())?' annul':'')+'" data-mid="'+esc(m.id)+'" title="'+esc((m.client?m.client+' · ':'')+(m.mheure||'')+(aff?(' · '+ag):' · à affecter')+' · '+st.l+(aff?(m.planifie?' · planifié':' · NON planifié (hachuré)'):'')+(m.saOff?' · SANS TICKETS (retiree du Suivi des appels)':''))+'" style="'+bgS+';color:#fff;border-radius:4px;padding:3px 4px;margin:1px 0;font-size:10.5px;cursor:pointer;line-height:1.2">'+(m.annul&&annulVisible()?'🔴 ':'')+(m.saOff?'🔕 ':'')+(m.isCircuit?'🚐 ':'')+(aff?esc(String(ag).slice(0,12)):'⚠ à affecter')+(m.mailPending?'<div style="font-size:9px;font-weight:800">📧 À VALIDER</div>':'<div style="font-size:9px;opacity:.92">'+esc(st.l)+'</div>')+plPhotosTag(m)/* b359 */+plCsgTag(m)/* b462 */+'</div>'; }).join(''); return '<td class="pl-cell" data-day="'+d+'" data-site="'+esc((siteInfo[s]||{}).brut||s)+'" data-ville="'+esc((siteInfo[s]||{}).ville||'')+'" data-h1="'+esc(sample.mheure||'')+'" data-h2="'+esc(sample.mfin||'')+'" style="border:1px solid var(--line);vertical-align:top;padding:2px;cursor:pointer">'+chips+'</td>'; }).join('');
         bodyR+='<tr><td class="pl-hlabel" style="position:sticky;left:0;z-index:1"><b>'+esc(lbl)+'</b>'+(qual?'<div style="font-size:10px;opacity:.8">'+esc(qual)+'</div>':'')+'</td>'+cells+'</tr>';
       });
     }); }

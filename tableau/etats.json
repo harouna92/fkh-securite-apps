@@ -1,6 +1,6 @@
 {
  "_lisezmoi": "Source unique du tableau de bord. 5 etats : 'attente' = recu, rien decide ; 'decide' = on sait quoi faire, pas encore code ; 'items' sans `local` = code mais pas deploye sur le poste de test (PAS de demo) ; 'items' avec `local:true` = deploye en local et demo verifiee (demo jouable) ; au-dela du tampon publie = en ligne. L'etat 'en ligne' n'est jamais ecrit ici : il est calcule en lisant le tampon reellement publie.",
- "maj": "2026-08-21",
+ "maj": "2026-08-22",
  "items": [
   {
    "b": "d1",
@@ -1821,6 +1821,15 @@
    "source": "Zeus 21/08 : « quand on clique sur choisir une photo, ça ne le prend pas en compte » (prise Saint-Étienne du 21/08, prévue 07:00, pointée 10h06)",
    "theme": "Photos / Suivi des appels",
    "pourquoipas": "Le bouton « C'est cette photo » écrivait `at:<heure de la PHOTO>`. Or `at` n'est pas l'heure de la photo : c'est l'ARBITRE de la fusion entre postes — `ssMerge` garde, pour chaque étape, l'enregistrement au `at` le plus récent. Partout ailleurs `saSet` y met `Date.now()`, l'heure du geste ; ici seulement on y mettait une heure du PASSÉ. Une prise pointée à 10h06 (at=10h06) battait donc systématiquement le rattachement d'une photo de 07h05 (at=07h05) : le clic marchait, la ligne quittait la liste, et la synchro suivante la ramenait « sans photo » — sans un mot. CORRIGÉ aux DEUX endroits qui rattachent à la main (le portail « photo reçue » et « Rapprocher cette photo ») : `at` = l'heure du geste, comme partout. L'heure de la photo n'est pas perdue — elle vit déjà dans le nom du fichier (b350) et on la double désormais dans `photoAt`, que `phQuand` lit avant de retomber sur `at`. PREUVE : le vrai `ssMerge` extrait du fichier, exécuté sur les heures réelles du ticket de Zeus — avant le correctif, photoKey disparait après fusion ; après, il reste, et photoAt rend bien 07:05. La ligne de rattachement est LUE DANS LE FICHIER et exécutée telle quelle, pas recopiée. NON-RÉGRESSION : b460 rejoué en entier sous b461, 0 erreur JS. LA MÊME CAUSE, TROISIÈME FOIS : b360 (objet orphelin), b452 (retraits écrasés), b461 (horodatage qui recule). Une donnée écrite sur un poste, effacée par un autre, en silence. RESTE À SAVOIR : si le problème persiste après mise en ligne, le suspect suivant est le filtre de date du portail, pré-réglé sur le jour du ticket (bouton « 📂 Toutes les dates »)."
+  },
+  {
+   "b": 462,
+   "titre": "📋 Poser une consigne SUR la vacation, depuis le Planning",
+   "source": "Zeus 21/08 : « tu peux me donner la possibilité de mettre les consignes dans les vacations dans la section Planning »",
+   "theme": "Planning",
+   "pourquoipas": "Le système de consignes EXISTAIT déjà, et savait même se rattacher à une vacation (champ `mid`). Ce qui manquait n'était pas la donnée : c'était le CHEMIN. Le seul moyen d'en poser une passait par Suivi des appels > + Consigne > retrouver la mission dans une liste déroulante — encore un aller-retour entre sections pour un geste qui appartient à l'écran où on regarde le planning. DÉSORMAIS : la fiche de vacation porte un bloc « 📋 Consignes de cette vacation » — celles déjà posées (cocher « Fait », écrire le résultat, retirer) et de quoi en ajouter une. Le client, le site, le jour et l'heure sont pris sur la vacation : on n'écrit que le texte. Et la vignette du Planning porte une pastille 📋 1/2 qui dit combien restent à faire. AUCUNE seconde base : même clé `fkh_consignes`, mêmes fonctions d'écriture (csgSet/csgSave/csgDel), donc même fusion anti-écrasement (#8) et même tombstone de suppression. Aucun code du Suivi des appels n'est modifié — mais il faut le dire : une consigne posée ici y arrive, c'est le but. LACUNE RÉPARÉE AU PASSAGE : le formulaire de Suivi des appels ne demande pas le SITE, donc les consignes y arrivaient sans lieu ; depuis le Planning il est renseigné tout seul. PREUVE (Chrome piloté, décor ?sandbox=1&demo=consignes) : pastille 📋 1/2 sur la vignette → fiche ouverte, 2 consignes dont 1 faite → cochée, commentée, puis une 3e ajoutée → relues en base avec site/client/date remplis → pastille passe à 2/3 → retrouvée dans 📞 Suivi des appels au bon jour. 0 erreur JS. La démo ne laisse aucune trace, y compris les consignes créées pendant qu'on la joue.",
+   "local": true,
+   "demo": "?sandbox=1&demo=consignes"
   }
  ],
  "attente": [
