@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v22-08·b463</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v22-08·b464</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -6477,8 +6477,25 @@ button.big:active{transform:translateY(1px)}
       +(m._iv?_ivBlock(m):'')   /* b460 */
       +plCsgBloc(m)   /* b462 */
       +(function(){ if(m._iv)return '';   /* b460 : pas de tickets de controle sur une intervention */ try{ var ex9=saExclLoad(); var st9s=ssSteps(m);
-        var rows9=st9s.map(function(st9){ var k9=String(m.id)+'|'+st9.key; var off9=!!ex9[k9]; var isC9=String(st9.key).indexOf('ctrl')===0;
-          var _hv9=(function(hh){var mm9=/^(\d{1,2})[:hH](\d{2})$/.exec(String(hh||'').trim());return mm9?(('0'+(+mm9[1])).slice(-2)+':'+mm9[2]):'';})(st9.heure); return '<div style="display:flex;gap:8px;align-items:center;padding:3px 0;border-bottom:1px dashed var(--line)"><span style="flex:1;min-width:0;'+(off9?'opacity:.5;text-decoration:line-through':'')+'">'+esc(st9.label)+'</span>'+((st9.key==='tenue')?'<b style="font-size:12px">'+esc(st9.heure||'—')+'</b>':'<input type="time" class="pl-tk-h" data-key="'+esc(st9.key)+'" value="'+esc(_hv9)+'" style="width:auto;padding:2px 4px;font-size:12px">')+'<button type="button" class="pl-tk-x" data-k="'+esc(k9)+'" style="font-size:11px;'+(off9?'color:var(--ok);border-color:var(--ok)':'color:var(--muted)')+'">'+(off9?'↩️ Restaurer':'🗑 Retirer')+'</button>'+((isC9&&Array.isArray(m.ctrls)&&m.ctrls.length)?'<button type="button" class="pl-tk-del" data-h="'+esc(st9.heure||'')+'" title="Supprimer ce contrôle personnalisé" style="font-size:11px;color:var(--bad)">✖</button>':'')+'</div>'; }).join('');
+        var _uid9=String(m.id).replace(/[^a-zA-Z0-9]/g,'');
+        var rows9=st9s.map(function(st9,i9){ var k9=String(m.id)+'|'+st9.key; var off9=!!ex9[k9]; var isC9=String(st9.key).indexOf('ctrl')===0;
+          /* ===== b464 : LA PHOTO SE POSE SUR LE TICKET, DEPUIS LA FICHE =====
+             POURQUOI (Zeus, 22/08) : « pour tout ticket, pouvoir cliquer et ajouter une photo,
+             et que ca apparaisse la ou il y a les photos ». La fiche listait les tickets — prise,
+             controles, fin — avec leur heure et « Retirer », mais aucun moyen d'y joindre la
+             preuve : il fallait ressortir vers la pastille des photos manquantes, ticket par
+             ticket. Meme cle de rangement et meme ecriture que la pastille (`appel/<mid>/<etape>/
+             <horodatage>`, `saSet`, `photoArchiveAdd`) : la photo posee ici remonte donc toute
+             seule dans « Photos de cette vacation », dans le Suivi des appels et dans l'archive.
+             Rien de neuf n'est stocke — c'est le geste qu'on rapproche de l'endroit ou on regarde. */
+          var _ph9=(typeof phEtape==='function')?phEtape(m.id,st9.key):{key:''};
+          var _hv9=(function(hh){var mm9=/^(\d{1,2})[:hH](\d{2})$/.exec(String(hh||'').trim());return mm9?(('0'+(+mm9[1])).slice(-2)+':'+mm9[2]):'';})(st9.heure); return '<div style="display:flex;gap:8px;align-items:center;padding:3px 0;border-bottom:1px dashed var(--line)"><span style="flex:1;min-width:0;'+(off9?'opacity:.5;text-decoration:line-through':'')+'">'+esc(st9.label)+'</span>'+((st9.key==='tenue')?'<b style="font-size:12px">'+esc(st9.heure||'—')+'</b>':'<input type="time" class="pl-tk-h" data-key="'+esc(st9.key)+'" value="'+esc(_hv9)+'" style="width:auto;padding:2px 4px;font-size:12px">')+'<button type="button" class="pl-tk-x" data-k="'+esc(k9)+'" style="font-size:11px;'+(off9?'color:var(--ok);border-color:var(--ok)':'color:var(--muted)')+'">'+(off9?'↩️ Restaurer':'🗑 Retirer')+'</button>'+((isC9&&Array.isArray(m.ctrls)&&m.ctrls.length)?'<button type="button" class="pl-tk-del" data-h="'+esc(st9.heure||'')+'" title="Supprimer ce contrôle personnalisé" style="font-size:11px;color:var(--bad)">✖</button>':'')
+          /* b464 : la preuve, sur la ligne meme */
+          +(_ph9.key?('<span class="pl-tk-ph" data-k="'+esc(_ph9.key)+'" title="Photo rattachée — cliquer pour agrandir" style="cursor:zoom-in;display:inline-block">'+((typeof photoThumbTag==='function')?photoThumbTag(_ph9.key):'🖼️')+'</span>'):'')
+          +((typeof photoReady==='function'&&photoReady()&&typeof photoBtn==='function')
+             ? ('<span class="pl-tk-phz" data-step="'+esc(st9.key)+'" data-uid="pltk-'+_uid9+'-'+i9+'">'+photoBtn('pltk-'+_uid9+'-'+i9,(_ph9.key?'🔁':'📷'))+'</span>')
+             : '<span class="sub" style="margin:0;font-size:10.5px">📷 en ligne requis</span>')
+          +'</div>'; }).join('');
         return '<details class="meta" style="margin-top:6px" open><summary style="cursor:pointer;font-weight:700">🎫 Tickets de cette vacation ('+st9s.length+') — envoyés à Suivi des appels</summary><div style="margin-top:6px">'+rows9
           +'<div class="acts" style="margin-top:6px;align-items:center;flex-wrap:wrap"><input type="time" class="pl-tk-add-h" style="width:auto"><button type="button" class="pl-tk-add" style="font-size:12px">➕ Ajouter un contrôle</button><button type="button" class="pl-tk-add2h" style="font-size:12px" title="Génère un contrôle toutes les 2 h entre la prise et la fin">🌙 Toutes les 2 h</button></div>'
           +'<p class="sub" style="margin:4px 0 0;font-size:11px">🗑 Retirer = le ticket disparaît de Suivi des appels (restaurable ici). ✖ = supprime un contrôle personnalisé. Les ajouts créent les tickets correspondants.</p></div></details>'; }catch(e9){ return ''; } })()
@@ -6586,6 +6603,29 @@ button.big:active{transform:translateY(1px)}
     card.querySelectorAll('.pl-tk-x').forEach(function(b9){ b9.onclick=function(){ var k9=b9.getAttribute('data-k'),ex9=saExclLoad(); if(ex9[k9]){ delete ex9[k9]; } else { ex9[k9]=Date.now(); } saExclSave(ex9); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
     card.querySelectorAll('.pl-tk-del').forEach(function(b9){ b9.onclick=function(){ m=_plLive(m); /* b360 */ var h9=b9.getAttribute('data-h'); if(!Array.isArray(m.ctrls))return; m.ctrls=m.ctrls.filter(function(x9){return x9!==h9;}); _plSaveM(m); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} }; });
     var tka=card.querySelector('.pl-tk-add'); if(tka)tka.onclick=function(){ m=_plLive(m); /* b360 */ var h9=(card.querySelector('.pl-tk-add-h').value||'').trim(); if(!h9){alert('Choisis une heure de contrôle.');return;} if(!Array.isArray(m.ctrls)||!m.ctrls.length)m.ctrls=(apControls(m)||[]).slice(); if(m.ctrls.indexOf(h9)<0)m.ctrls.push(h9); m.ctrls.sort(); _plSaveM(m); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
+    /* b464 : chaque ligne de ticket est branchee comme l'est la pastille des photos
+       manquantes — meme convention de cle, meme ecriture, meme archive. */
+    card.querySelectorAll('.pl-tk-phz').forEach(function(z9){
+      var uid=z9.getAttribute('data-uid'), stk=z9.getAttribute('data-step');
+      if(typeof photoWire!=='function')return;
+      photoWire(uid,function(f){ var ext=(f.name&&f.name.indexOf('.')>=0)?f.name.split('.').pop():'jpg';
+        return 'appel/'+m.id+'/'+stk+'/'+Date.now()+'.'+ext; },
+        function(key){
+          var _ag=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):'';
+          if(stk==='tenue')saSet(m.id,stk,{done:true,tenuePhoto:true,photoKey:key});
+          else saSet(m.id,stk,{photo:'Photo horodat\u00e9e',photoKey:key});
+          if(typeof photoArchiveAdd==='function')photoArchiveAdd({key:key,mid:m.id,step:stk,
+            site:(m.siteAgent||m.titre||''),agent:_ag,mdate:(m.mdate||''),sk:String(m.id)+'|'+stk+'|'+key});
+          _plFlash='photo du ticket \u00ab '+stk+' \u00bb';   /* b463 : on DIT ce qu'on vient d'enregistrer */
+          if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}}
+          if(typeof ppRefresh==='function'){try{ppRefresh();}catch(e){}}
+          if(typeof renderPlanning==='function'){try{renderPlanning();}catch(e){}}
+          _plRenderModal();
+        }); });
+    card.querySelectorAll('.pl-tk-ph').forEach(function(sp){ sp.onclick=function(){
+      var k=sp.getAttribute('data-k');
+      if(typeof photoOpen==='function'){ photoOpen(k); return; }
+      if(typeof photoBlobUrl==='function')photoBlobUrl(k,function(u){ if(u)window.open(u,'_blank'); }); }; });
     var tk2=card.querySelector('.pl-tk-add2h'); if(tk2)tk2.onclick=function(){ m=_plLive(m); /* b360 */ var s9=toMin(m.mheure||''); if(s9==null){alert('Heure de début requise.');return;} var e9m=missEndMin(m); if(e9m==null){alert('Heure de fin requise (ou ajoute les contrôles un par un).');return;} if(e9m<=s9)e9m+=1440; var out9=[]; for(var t9=s9+120;t9<e9m;t9+=120){ out9.push(pad2(Math.floor((t9%1440)/60))+':'+pad2(t9%60)); } if(!out9.length){alert('Vacation trop courte pour des contrôles 2 h.');return;} /* b386 : un contrôle déjà pointé ou photographié est une PREUVE — on ne l'efface pas. */ var _act9=(Array.isArray(m.ctrls)&&m.ctrls.length)?m.ctrls.slice():((apControls(m)||[]).slice()); var _S9=(typeof ssLoad==='function')?ssLoad():{}, _r9=(_S9[m.id]||{}); function _prv9(h){ var r=_r9['ctrl@'+String(h).replace(/:/g,'')]; return !!(r&&(r.done||r.photoKey)); } var _gard9=_act9.filter(function(h){ return out9.indexOf(h)<0&&_prv9(h); }); var _ret9=_act9.filter(function(h){ return out9.indexOf(h)<0&&!_prv9(h); }); var _add9=out9.filter(function(h){ return _act9.indexOf(h)<0; }); var _fin9=_act9.filter(function(h){ return toMin(h)===toMin(m.mfin||''); }); var _txt9='\ud83c\udf19 Contr\u00f4les toutes les 2 h \u2014 de '+(m.mheure||'?')+' \u00e0 '+(m.mfin||'?')+'\n\n'+'\u2705 '+out9.length+' cr\u00e9neau(x) : '+out9.join(', ')+'\n'+(_add9.length?('\u2795 '+_add9.length+' ajout\u00e9(s) : '+_add9.join(', ')+'\n'):'')+(_gard9.length?('\ud83d\udd12 '+_gard9.length+' conserv\u00e9(s) hors grille \u2014 D\u00c9J\u00c0 POINT\u00c9(s) ou PHOTOGRAPHI\u00c9(s) : '+_gard9.join(', ')+'\n'):'')+(_ret9.length?('\u2796 '+_ret9.length+' retir\u00e9(s), rien n\u2019y \u00e9tait enregistr\u00e9 : '+_ret9.join(', ')+'\n'):'')+(_fin9.length?('\n\u26a0 '+_fin9.join(', ')+' tombait sur la FIN DE SERVICE : c\u2019est la fin qui compte, pas un contr\u00f4le.\n'):'')+'\nOn applique ?'; if(!confirm(_txt9))return; var _dep9=toMin(m.mheure||'00:00')||0; m.ctrls=out9.concat(_gard9).sort(function(a,b){ var x=toMin(a),y=toMin(b); if(x<_dep9)x+=1440; if(y<_dep9)y+=1440; return x-y; }); _plSaveM(m); _plRenderModal(); if(typeof renderSuiviAppels==='function'){try{renderSuiviAppels();}catch(e){}} };
     var mok=card.querySelector('.pl-mail-ok'); if(mok)mok.onclick=function(){ m=_plLive(m); /* b360 */ delete m.mailPending; _plSaveM(m); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; var mrf=card.querySelector('.pl-mail-ref'); if(mrf)mrf.onclick=function(){ m=_plLive(m); /* b402 : le seul bouton de la fiche qui écrivait encore sur l'objet d'origine — orphelin dès que le classeur commun arrive (b360). On refusait dans le vide, et il fallait valider d'abord pour que la suppression prenne. */ if(!confirm('Refuser cette vacation issue d'+String.fromCharCode(8217)+'un mail ? Elle sera supprimée du Planning.'))return; m.deleted=true; m.creeAt=Date.now(); /* b303 : soft-delete */ try{ var rf=JSON.parse(localStorage.getItem('fkh_mail_refuse')||'[]')||[]; if(m.mailSrc&&rf.indexOf(m.mailSrc)<0){rf.push(m.mailSrc);localStorage.setItem('fkh_mail_refuse',JSON.stringify(rf));} }catch(e){} _plSaveM(m); planningAffectClose(); if(typeof renderPlanning==='function')renderPlanning(); };
     var tn=card.querySelector('.pl-tenue'); if(tn)tn.onclick=function(){ var agNom=(m.agentId&&typeof faById==='function'&&faById(m.agentId))?(faById(m.agentId).nom||''):''; if(!agNom&&!confirm('Aucun agent affecté sur cette vacation — créer quand même le ticket contrôle tenue ?'))return; var ok=(typeof tenueCtrlDemand==='function')&&tenueCtrlDemand(agNom,m.id,(m.siteAgent||m.titre||''),m.mdate||'',m.mheure||'','demande manuelle (Planning)'); alert(ok?'🦺 Ticket contrôle tenue créé dans Suivi des appels.':'Un contrôle tenue est déjà en attente pour cet agent à cette date.'); };
@@ -6662,7 +6702,12 @@ button.big:active{transform:translateY(1px)}
   // Look « Sekur » (calque) appliqué au seul onglet Planning — voir releve-sekur/calque-planning.md
   function _plEnsureCss(){ if(byId('pl-sekur-css'))return; var st=document.createElement('style'); st.id='pl-sekur-css'; st.textContent=
     /* Visuel = thème natif GESTION (retour demandé par Zeus). On ne garde que le structurel des nouveaux éléments + le fix des listes rognées. */
-    '#planning-body thead th{position:sticky;top:0;z-index:5;background:var(--panel2)}'
+    /* b464 : la vignette d'un ticket reste une vignette — sans cette borne, une image
+       lourde (ou une image cassee) prenait toute la ligne et poussait le reste dehors. */
+    '#pl-modal-card .pl-tk-ph{flex:0 0 auto;width:34px;height:34px;overflow:hidden;border-radius:5px;border:1px solid var(--line)}'
+    +'#pl-modal-card .pl-tk-ph img{width:34px;height:34px;object-fit:cover;display:block}'
+    +'#pl-modal-card .pl-tk-ph>*{max-width:34px;max-height:34px;font-size:10px;line-height:1.1;overflow:hidden}'
+    +'#planning-body thead th{position:sticky;top:0;z-index:5;background:var(--panel2)}'
     +'#pl-scroll{scrollbar-gutter:stable}'
     +'#pl-scroll::-webkit-scrollbar{width:14px;height:16px}'
     +'#pl-scroll::-webkit-scrollbar-track{background:var(--panel2)}'
