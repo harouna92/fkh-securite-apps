@@ -228,7 +228,7 @@ button.big:active{transform:translateY(1px)}
 </style>
 
 <div class="top">
-  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v22-08·b462</span></div>
+  <div class="brand"><span class="dot"></span>GESTION <span id="build-tag" style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0">v22-08·b463</span></div>
   <script>(function(){try{var bt=document.getElementById('build-tag');if(!bt)return;var ver=bt.textContent.trim();var h=location.hostname,isLocal=(!h||h==='localhost'||h==='127.0.0.1'||location.protocol==='file:');bt.innerHTML=ver+' <span style="padding:0 5px;margin-left:2px;border-radius:5px;font-weight:700;font-size:9.5px;'+(isLocal?'background:#8a6d00;color:#ffe08a':'background:#0b6b2e;color:#b6f5c9')+'">'+(isLocal?'🟡 LOCAL':'🟢 EN LIGNE')+'</span>';}catch(e){}})();</script>
   <div class="tabs" id="tabs">
     <button data-s="noterapide" class="on">📝 Prise de note rapide</button>
@@ -6404,6 +6404,35 @@ button.big:active{transform:translateY(1px)}
       +'<input type="time" class="pl-csg-heure" style="width:auto" title="Heure d\'apparition dans l\'agenda des appels (par d\u00e9faut : l\'heure de la vacation)">'
       +'<button type="button" class="ok pl-csg-add" style="font-size:12px">\u2795 Ajouter la consigne</button></div>';
   }
+  /* ===== b463 : LE CHAMP CLIENT PROPOSE, ET LA FICHE DIT QU'ELLE A ENREGISTRE =====
+     POURQUOI (Zeus, 22/08) : « j'ai mis le nom du client, mais comment je fais pour le
+     conserver ? il n'y a aucun bouton Enregistrer ». Le champ enregistrait deja — en quittant
+     le champ — mais RIEN ne le disait. Une sauvegarde qu'on ne voit pas n'existe pas pour
+     celui qui la fait : on retape, on doute, on rouvre la fiche pour verifier.
+     Deuxieme defaut sur le meme champ : aucune proposition. « ARCELOR MITTAL » et
+     « Arcelormittal » saisis deux jours d'ecart font DEUX clients dans tous les comptages.
+     R-AUTOCOMPLETION-PARTOUT : tout champ completable propose des pastilles. */
+  function _plClientsConnus(){
+    var vus={}, out=[];
+    function add(x){ x=String(x||'').trim(); if(!x)return; var k=x.toUpperCase(); if(vus[k])return; vus[k]=1; out.push(x); }
+    try{ (typeof CLIENTS!=='undefined'?CLIENTS:[]).forEach(add); }catch(e){}
+    try{ (load('fkh_clients')||[]).forEach(function(c){ add(typeof c==='string'?c:(c&&c.nom)); }); }catch(e){}
+    /* ce qui est DEJA utilise sur le terrain compte autant que la liste de reference */
+    try{ (typeof SUIVI!=='undefined'?SUIVI:[]).forEach(function(m){ add(m&&m.client); }); }catch(e){}
+    out.sort(function(a,b){ return a.localeCompare(b,'fr'); });
+    return out; }
+  function _plClientsDatalist(){
+    return '<datalist id="pl-cli-dl">'+_plClientsConnus().map(function(c){ return '<option value="'+esc(c)+'">'; }).join('')+'</datalist>'; }
+  /* Le temoin : ce qui vient d'etre enregistre, et quoi. Il disparait tout seul. */
+  var _plFlash=null;
+  function _plFlashMontre(card){
+    if(!_plFlash||!card)return;
+    var el=document.createElement('div');
+    el.id='pl-flash';
+    el.style.cssText='background:rgba(26,158,92,.16);border:1.5px solid #1a9e5c;border-radius:9px;padding:6px 10px;margin:0 0 8px;font-size:12.5px;color:#7fe0aa;font-weight:700';
+    el.textContent='\u2705 Enregistr\u00e9 \u2014 '+_plFlash;
+    card.insertBefore(el,card.firstChild);
+    setTimeout(function(){ _plFlash=null; var q=byId('pl-flash'); if(q&&q.parentNode)q.parentNode.removeChild(q); },2600); }
   function _plRenderModal(){ var m=_plMissById(_plAffId); if(!m){planningAffectClose();return;} var card=byId('pl-modal-card'); if(!card)return; var M=_plStatusMap(); /* b430 : le titre porte la ville — c'est ce que Zeus cherchait sur BASIC FIT du 13/08. */ var site=(typeof svLabel==='function')?svLabel(m.siteAgent||m.titre||'—',m.ville||''):(m.siteAgent||m.titre||'—'); var cur=m.agentId?(typeof faById==='function'?faById(m.agentId):null):null; var when=(m.mdate?m.mdate.split('-').reverse().join('/'):'')+(m.mheure?' · '+m.mheure:'')+((typeof missEndTxt==='function'&&missEndTxt(m))?'→'+missEndTxt(m):''); var st=_plVacState(m);
     /* ===== b460 : UN SEUL ETAT AFFICHE, PAS DEUX QUI SE CONTREDISENT =====
        La pastille d'en-tete calculait un etat de VACATION (« En attente ») pendant que le bloc
@@ -6427,7 +6456,7 @@ button.big:active{transform:translateY(1px)}
             +'</div>'; })()):(m.agentId?'<div class="meta" style="margin-bottom:8px">👤 Agent affecté (fiche supprimée) <button class="no pl-affrm" style="font-size:11px">❌ Retirer</button></div>':'<div class="sub" style="margin:0 0 8px;color:#e0a13b">🟠 Aucun agent affecté</div>'))
       +(m._iv?'':'<label class="f" style="margin-bottom:8px"><div class="lab" style="margin:0 0 3px">Statut de la vacation</div><select class="pl-status" style="width:100%">'+opts+'</select></label>')
       +'<div class="lab" style="margin:8px 0 3px">✏️ Détails de '+(m._iv?'l\'intervention':'la vacation')+'</div>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><input class="pl-e-site" placeholder="Site" value="'+esc(m.siteAgent||m.titre||'')+'"><input class="pl-e-client" placeholder="Client" value="'+esc(m.client||'')+'"></div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><input class="pl-e-site" placeholder="Site" value="'+esc(m.siteAgent||m.titre||'')+'"><input class="pl-e-client" list="pl-cli-dl" placeholder="Client \u2014 tape 2 lettres" value="'+esc(m.client||'')+'" autocomplete="off">'+_plClientsDatalist()+'</div>'
       +(function(){ // b178 : 4 champs distincts date/heure debut + date/heure fin, + assainissement des fins polluees (ex. '02/08/2026 1')
         var _f=String(m.mfin||'');
         if(_f&&!/^\s*\d{1,2}[:hH]\d{2}\s*$/.test(_f)){
@@ -6508,7 +6537,12 @@ button.big:active{transform:translateY(1px)}
     }; });
     var rm=card.querySelector('.pl-affrm'); if(rm)rm.onclick=function(){ if(!confirm('Retirer l\'agent de cette mission ? Elle repassera « à affecter ».'))return; m=_plLive(m); /* b363 : ecrire dans la vacation vivante */ delete m.agentId; m.valide=Date.now(); /* b304 */ _plSaveM(m); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); };
     var jp=card.querySelector('.pl-jump'); if(jp)jp.onclick=function(){ var id=_plAffId; planningAffectClose(); planningGo(id); };
-    function _bindE(sel,field,isHM){ var el=card.querySelector(sel); if(!el)return; el.onchange=function(){ m=_plLive(m); /* b360 */ var v=el.value; if(isHM)v=_plNormHM(v); m[field]=v; m.valide=Date.now(); /* b304 */ if(field==='siteAgent'&&!m.titre)m.titre=v; _plSaveM(m); if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; }
+    var _PL_LBL={siteAgent:'site',client:'client',mdate:'date de d\u00e9but',mheure:'heure de d\u00e9but',mfin:'heure de fin',mdateFin:'date de fin',qual:'qualification'};
+    function _bindE(sel,field,isHM){ var el=card.querySelector(sel); if(!el)return; el.onchange=function(){ m=_plLive(m); /* b360 */ var v=el.value; if(isHM)v=_plNormHM(v); m[field]=v; m.valide=Date.now(); /* b304 */ if(field==='siteAgent'&&!m.titre)m.titre=v; _plSaveM(m);
+      /* b463 : on DIT qu'on a enregistre. Sans ca, Zeus cherchait un bouton « Enregistrer »
+         qui n'existe pas — et n'avait aucun moyen de savoir que c'etait deja fait. */
+      _plFlash=(_PL_LBL[field]||field)+(v?(' \u2192 '+String(v).slice(0,40)):' vid\u00e9');
+      if(typeof renderPlanning==='function')renderPlanning(); _plRenderModal(); }; }
     _bindE('.pl-e-site','siteAgent',false); _bindE('.pl-e-client','client',false); _bindE('.pl-e-date','mdate',false); _bindE('.pl-e-h1','mheure',true); _bindE('.pl-e-h2','mfin',true); var _df8=card.querySelector('.pl-e-datefin'); if(_df8)_df8.onchange=function(){ m=_plLive(m); /* b363 */ var v=(_df8.value||'').trim(); if(v)m.mdateFin=v; else delete m.mdateFin; m.valide=Date.now(); /* b304 */ _plSaveM(m); if(typeof renderPlanning==='function')renderPlanning(); }; _bindE('.pl-e-qual','qual',false);
     var _nc=card.querySelector('.pl-e-nomcli'); if(_nc)_nc.onchange=function(){ if(typeof siteMetaSet==='function')siteMetaSet(m.siteAgent||m.titre||'',{nomClient:(_nc.value||'').trim()}); if(typeof renderPlanning==='function')renderPlanning(); };
     var _pl=card.querySelector('.pl-e-plan'); if(_pl)_pl.onchange=function(){ m=_plLive(m); /* b360 */ if(_pl.checked)m.planifie=true; else delete m.planifie; m.valide=Date.now(); /* b304 */ _plSaveM(m); if(typeof renderPlanning==='function')renderPlanning(); };
@@ -6623,6 +6657,7 @@ button.big:active{transform:translateY(1px)}
     var _ivC=card.querySelector('.iv-cr'); if(_ivC)_ivC.onchange=function(){ _ivSetCR(m.id,_ivC.value); };
     var _ivG=card.querySelector('.iv-go'); if(_ivG)_ivG.onclick=function(){ planningAffectClose(); var tb=document.querySelector('#tabs button[data-s="interv"]'); if(tb)tb.click(); };
     _plWirePicks(card,m);
+    _plFlashMontre(card);   /* b463 */
   }
   // Look « Sekur » (calque) appliqué au seul onglet Planning — voir releve-sekur/calque-planning.md
   function _plEnsureCss(){ if(byId('pl-sekur-css'))return; var st=document.createElement('style'); st.id='pl-sekur-css'; st.textContent=

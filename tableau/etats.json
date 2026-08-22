@@ -1828,8 +1828,15 @@
    "source": "Zeus 21/08 : « tu peux me donner la possibilité de mettre les consignes dans les vacations dans la section Planning »",
    "theme": "Planning",
    "pourquoipas": "Le système de consignes EXISTAIT déjà, et savait même se rattacher à une vacation (champ `mid`). Ce qui manquait n'était pas la donnée : c'était le CHEMIN. Le seul moyen d'en poser une passait par Suivi des appels > + Consigne > retrouver la mission dans une liste déroulante — encore un aller-retour entre sections pour un geste qui appartient à l'écran où on regarde le planning. DÉSORMAIS : la fiche de vacation porte un bloc « 📋 Consignes de cette vacation » — celles déjà posées (cocher « Fait », écrire le résultat, retirer) et de quoi en ajouter une. Le client, le site, le jour et l'heure sont pris sur la vacation : on n'écrit que le texte. Et la vignette du Planning porte une pastille 📋 1/2 qui dit combien restent à faire. AUCUNE seconde base : même clé `fkh_consignes`, mêmes fonctions d'écriture (csgSet/csgSave/csgDel), donc même fusion anti-écrasement (#8) et même tombstone de suppression. Aucun code du Suivi des appels n'est modifié — mais il faut le dire : une consigne posée ici y arrive, c'est le but. LACUNE RÉPARÉE AU PASSAGE : le formulaire de Suivi des appels ne demande pas le SITE, donc les consignes y arrivaient sans lieu ; depuis le Planning il est renseigné tout seul. PREUVE (Chrome piloté, décor ?sandbox=1&demo=consignes) : pastille 📋 1/2 sur la vignette → fiche ouverte, 2 consignes dont 1 faite → cochée, commentée, puis une 3e ajoutée → relues en base avec site/client/date remplis → pastille passe à 2/3 → retrouvée dans 📞 Suivi des appels au bon jour. 0 erreur JS. La démo ne laisse aucune trace, y compris les consignes créées pendant qu'on la joue.",
-   "local": true,
    "demo": "?sandbox=1&demo=consignes"
+  },
+  {
+   "b": 463,
+   "titre": "Le champ Client propose, et la fiche dit qu'elle a enregistré",
+   "source": "Zeus 22/08 : « j'ai mis le nom du client, mais comment je fais pour le conserver ? il n'y a aucun bouton Enregistrer »",
+   "theme": "Planning",
+   "pourquoipas": "Le champ enregistrait déjà — en quittant le champ — mais RIEN ne le disait. Une sauvegarde qu'on ne voit pas n'existe pas pour celui qui la fait : on retape, on doute, on rouvre la fiche pour vérifier. Désormais un témoin vert « ✅ Enregistré — client → RANC DEVELOPPEMENT » apparaît en tête de la fiche et s'efface seul après 2,6 s ; il vaut pour TOUS les champs de « Détails » (site, client, dates, heures). Second défaut sur le même champ : aucune proposition — « ARCELOR MITTAL » et « Arcelormittal » saisis à deux jours d'écart font DEUX clients dans tous les comptages. Le champ propose maintenant les clients connus, en réunissant trois sources : la liste de référence, `fkh_clients`, et ceux déjà utilisés dans les vacations (dédoublonnés sans tenir compte de la casse, triés). PREUVE (Chrome piloté) : datalist attachée, 12 propositions ; saisie → témoin affiché avec le bon libellé → valeur relue en base → témoin disparu tout seul. 0 erreur JS.",
+   "local": true
   }
  ],
  "attente": [
